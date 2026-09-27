@@ -18,6 +18,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 
 | Type | Detector | Policy class | Governing ADR |
 | --- | --- | --- | --- |
+| `ai21_api_key` | `ai21-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `anthropic_api_key` | `anthropic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md); issue #862 extends the prefix set from `sk-ant-api03-` to also `sk-ant-api01-` (Claude Enterprise organization key for any scope set, not only compliance) and `sk-ant-admin01-` (Console Admin API key), all under this one type and detector, grammar in `detectors::anthropic`'s module doc. The prefixes are T1 (provider documentation); the body is the unchanged `>= 20` byte `[A-Za-z0-9_-]` run with a left boundary, a deliberate superset of the T2 scanner shape of 93 bytes plus `AA` (no length or tail is asserted, and none is evidenced for `api01`). False-negative tradeoff: `admin02`, unversioned `sk-ant-admin-`, `sk-ant-oat01-`/`sk-ant-ort01-` and Base64-encoded copies stay unmatched until evidenced. False-positive tradeoff: a doc placeholder of 20 or more valid body bytes (for example a long `x` run) matches, as it already does for `api03`. Sharing `anthropic_api_key` means policy cannot treat an admin key differently from an API key; a distinct type is a separate decision |
 | `atlassian_api_token` | `atlassian-api-token` | `always-redact` | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `authorization_credential` | `generic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -27,6 +28,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `confluent_cloud_api_secret` | `confluent-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `confluent_cloud_api_secret_legacy` | `confluent-cloud-api-secret-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `connection_string_password` | `connection-string` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
@@ -35,6 +37,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `datadog_api_key` | `datadog-api-key` | `confidence-gated` | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `datadog_application_key` | `datadog-application-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; current `ddapp_`-prefixed shape added by issue #671, applying the existing `confluent_cloud_api_secret` / `heroku_api_key` current/legacy split policy to this family |
 | `datadog_application_key_legacy` | `datadog-application-key-legacy` | `confidence-gated` | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `deepgram_api_key` | `deepgram-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `digitalocean_token` | `digitalocean-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `discord_bot_token` | `discord-bot-token` | `always-redact` | [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `docker_token` | `docker-token` | `always-redact` | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -63,6 +66,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `mailchimp_api_key` | `mailchimp-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailchimp`'s own module doc, per issue #313 |
 | `mailgun_api_key` | `mailgun-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailgun`'s own module doc, per issue #314 |
 | `microsoft_entra_client_secret` | `microsoft-entra-client-secret` | `always-redact` | [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `mistral_api_key` | `mistral-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `neon_api_key` | `neon-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `netlify_personal_access_token` | `netlify-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `new_relic_license_key` | `new-relic-license-key` | `confidence-gated` | [Freeze the New Relic User API Key and License Key grammar as an exact-length prefixed shape and a keyword-gated bare hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -275,6 +279,57 @@ from either provider is missed until new evidence widens the contract.
 Together's betterleaks entropy floor (3.0) is not applied, so a low-entropy
 exact-shape value is still claimed. Cost is one anchored literal per family;
 no incremental or WASM concern beyond the other prefixed detectors.
+
+## Keyword-gated provider keys (#868)
+
+Issue [#868](https://github.com/redact-secret/redact-secret/issues/868) covers
+five unprefixed providers whose research (#781, #782, #784, #787, #789)
+concluded that generic coverage was enough. **No provider has T1 evidence**:
+no provider document, staff statement or SDK states a prefix, length or
+alphabet, and none of the SDKs validates one. Each landed row is therefore a
+*contextual, unqualified, T2-at-best* claim resting on scanner rules and
+maintainer observation, in the Twilio mold: a value is a finding only when
+provider context is adjacent on the same line, never as a bare 32/40-byte run.
+
+| Family | Shape (scanner-inferred, not issuer-backed) | Context that qualifies the value | Status |
+| --- | --- | --- | --- |
+| `mistral:studio-api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `mistral`; `Mistral(...)` call argument; `mistral` then a credential key within 32 bytes | landed, `mistral-api-key` |
+| `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional | landed, `cohere-api-key` |
+| `ai21:api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `ai21`; `AI21Client(...)` argument | landed, `ai21-api-key` |
+| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; `Authorization: Token <v>` on a line naming `deepgram` | landed, `deepgram-api-key` |
+| `exa:api-key` | none: no source states any shape (only the key *id* is documented, as a UUID) | none | **not landed**; stays with `generic-token` (env, JSON, YAML, `x-api-key`, `Bearer`), its SDK-call argument gap belongs to #866 |
+
+Confidence: a named assignment (`MISTRAL_API_KEY=`, `"deepgramApiKey":`) or an
+SDK constructor argument is `high` (redacted by default); a credential key
+within 32 bytes after the keyword (`# Mistral API key: <v>`) or the Deepgram
+`Token` header is `medium` (warned). The types are not in the always-redact
+list, like `twilio_auth_token`.
+
+Excluded on purpose: a key ending in an identifier or location segment
+(`MISTRAL_KEY_ID`, `DEEPGRAM_PROJECT_ID`, `COHERE_ORG_ID`, `AI21_TEAM_ID`), a
+non-credential argument (`Mistral(model="...")`), placeholders and
+repeated-character filler, a value behind a hash label (`md5:`), a run of any
+other length or alphabet (31/33 bytes, `_`/`-` inside, uppercase Deepgram), and
+context on another line (a multi-line constructor keeps `api_key=` on a line
+that names nothing; that stays a false negative, as does any provider key under
+a keyword-free name such as `API_KEY=`). The bare `Bearer` header is
+`bearer-token`'s and is not repeated here.
+
+Trade-offs. False negatives: keys that differ from the inferred shape, and the
+same-line rule above; under a provider-named assignment `generic-token` still
+redacts a wrong-length value, so the landed rows add the typed, exact-length,
+constructor-aware claim and no new silent gap. False positives: a 32/40-byte
+hash or id assigned to a keyword-named credential key. Overlap: the rows are
+`Provider` specificity, so overlap resolution reports one finding per span, not
+one from the provider and one from `generic-token`; `generic-token` keeps its
+name-driven verdicts and the provider names are deliberately *not* added to its
+dedicated-provider deferral list, because deferring would silence a real key of
+an unevidenced shape. Deepgram's `Authorization: Token` header was already
+redacted by `generic-token` as `authorization_credential`; the row only adds the
+provider type. Detection, exact spans and incremental parity are pinned by
+`detectors::keyword_gated_keys` and `tests/keyword_gated_provider_keys.rs`. A
+T1 promotion needs a provider document or an issuance check (the checklists in
+the research comments); it is a benchmark-side qualification, not a code change.
 
 ## Rules
 

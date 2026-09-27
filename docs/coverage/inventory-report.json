@@ -3798,12 +3798,171 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "travisci_api_token"
+    },
+    {
+      "detector": "mistral-api-key",
+      "evidence": {
+        "fixtureCount": 20,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "mistral-api-key-positive-dotenv-named",
+        "mistral-api-key-positive-json-named",
+        "mistral-api-key-positive-keyword-adjacent-prose",
+        "mistral-api-key-positive-log-named",
+        "mistral-api-key-positive-python-constructor",
+        "mistral-api-key-positive-shell-export",
+        "mistral-api-key-positive-yaml-named",
+        "mistral-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "mistral_api_key"
+    },
+    {
+      "detector": "cohere-api-key",
+      "evidence": {
+        "fixtureCount": 20,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "cohere-api-key-positive-dotenv-named",
+        "cohere-api-key-positive-json-named",
+        "cohere-api-key-positive-keyword-adjacent-prose",
+        "cohere-api-key-positive-log-named",
+        "cohere-api-key-positive-python-constructor",
+        "cohere-api-key-positive-shell-export",
+        "cohere-api-key-positive-yaml-named",
+        "cohere-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "cohere_api_key"
+    },
+    {
+      "detector": "ai21-api-key",
+      "evidence": {
+        "fixtureCount": 20,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "ai21-api-key-positive-dotenv-named",
+        "ai21-api-key-positive-json-named",
+        "ai21-api-key-positive-keyword-adjacent-prose",
+        "ai21-api-key-positive-log-named",
+        "ai21-api-key-positive-python-constructor",
+        "ai21-api-key-positive-shell-export",
+        "ai21-api-key-positive-yaml-named",
+        "ai21-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "ai21_api_key"
+    },
+    {
+      "detector": "deepgram-api-key",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "deepgram-api-key-positive-dotenv-named",
+        "deepgram-api-key-positive-json-named",
+        "deepgram-api-key-positive-keyword-adjacent-prose",
+        "deepgram-api-key-positive-log-named",
+        "deepgram-api-key-positive-python-constructor",
+        "deepgram-api-key-positive-shell-export",
+        "deepgram-api-key-positive-token-header",
+        "deepgram-api-key-positive-yaml-named",
+        "deepgram-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "deepgram_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 85,
+    "supported": 89,
     "unresolved": 0
   }
 }

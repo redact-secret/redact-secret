@@ -63,7 +63,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-75 built-in detectors emit 85 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+79 built-in detectors emit 89 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -142,6 +142,10 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `heroku-api-key` | `heroku_api_key` | `always-redact` | — |
 | `heroku-api-key-legacy` | `heroku_api_key_legacy` | `confidence-gated` | — |
 | `travisci-api-token` | `travisci_api_token` | `confidence-gated` | — |
+| `mistral-api-key` | `mistral_api_key` | `confidence-gated` | — |
+| `cohere-api-key` | `cohere_api_key` | `confidence-gated` | — |
+| `ai21-api-key` | `ai21_api_key` | `confidence-gated` | — |
+| `deepgram-api-key` | `deepgram_api_key` | `confidence-gated` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

@@ -15,16 +15,17 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 85 |
+| supported | 89 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 96.
+Coverage declarations: 100.
 
 ## Coverage by detector
 
 | Detector | Declared types | Row states |
 | --- | --- | --- |
+| ai21-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | anthropic-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | atlassian-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -33,6 +34,7 @@ Coverage declarations: 96.
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | confluent-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | confluent-cloud-api-secret-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -40,6 +42,7 @@ Coverage declarations: 96.
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| deepgram-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -64,6 +67,7 @@ Coverage declarations: 96.
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| mistral-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | neon-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -105,6 +109,7 @@ Coverage declarations: 96.
 
 | Type | Detector | Behavior class | State | Scheme states | Pending dimensions |
 | --- | --- | --- | --- | --- | --- |
+| ai21_api_key | ai21-api-key | provider | supported | not-applicable | none |
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
 | atlassian_api_token | atlassian-api-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
@@ -114,6 +119,7 @@ Coverage declarations: 96.
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
+| cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
 | confluent_cloud_api_secret | confluent-cloud-api-secret | provider | supported | not-applicable | none |
 | confluent_cloud_api_secret_legacy | confluent-cloud-api-secret-legacy | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
@@ -122,6 +128,7 @@ Coverage declarations: 96.
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
 | datadog_application_key_legacy | datadog-application-key-legacy | provider | supported | not-applicable | none |
+| deepgram_api_key | deepgram-api-key | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
@@ -150,6 +157,7 @@ Coverage declarations: 96.
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
+| mistral_api_key | mistral-api-key | provider | supported | not-applicable | none |
 | neon_api_key | neon-api-key | provider | supported | not-applicable | none |
 | netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |
@@ -215,15 +223,15 @@ Coverage declarations: 96.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 96 | 0 | 0 |
-| boundary | 85 | 0 | 0 |
-| host-context | 85 | 0 | 0 |
+| adversarial | 100 | 0 | 0 |
+| boundary | 89 | 0 | 0 |
+| host-context | 89 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 96 | 0 | 0 |
-| near-miss-negative | 85 | 0 | 0 |
-| overlap | 85 | 0 | 0 |
-| positive | 85 | 0 | 0 |
-| range | 96 | 0 | 0 |
+| malformed | 100 | 0 | 0 |
+| near-miss-negative | 89 | 0 | 0 |
+| overlap | 89 | 0 | 0 |
+| positive | 89 | 0 | 0 |
+| range | 100 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

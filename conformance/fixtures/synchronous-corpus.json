@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2260,
+  "fixtureCount": 2342,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -55027,6 +55027,4630 @@
       "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-token-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
       "expected": [],
       "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A wrong prefix."
+    },
+    {
+      "id": "mistral-api-key-positive-dotenv-named",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 48
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named dotenv key names the credential, so confidence is high."
+    },
+    {
+      "id": "mistral-api-key-positive-json-named",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mistralApiKey\": \"SyntheticRevokedSyntheticRevoked\"}",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 51
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named JSON key names the credential."
+    },
+    {
+      "id": "mistral-api-key-positive-yaml-named",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "mistral_api_key: SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 49
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named YAML key names the credential."
+    },
+    {
+      "id": "mistral-api-key-positive-shell-export",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export MISTRAL_API_KEY=\"SyntheticRevokedSyntheticRevoked\"",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 56
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A quoted shell export under the provider-named variable."
+    },
+    {
+      "id": "mistral-api-key-positive-python-constructor",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(api_key=\"SyntheticRevokedSyntheticRevoked\")",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 58
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+    },
+    {
+      "id": "mistral-api-key-positive-log-named",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-01-01T00:00:00Z INFO loaded MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 49,
+          "end": 81
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named assignment in a log line."
+    },
+    {
+      "id": "mistral-api-key-positive-keyword-adjacent-prose",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# Mistral API key: SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 19,
+          "end": 51
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A credential key within 32 bytes after the provider keyword is medium confidence."
+    },
+    {
+      "id": "mistral-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nMISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked\r\n",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 62
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "mistral-api-key-negative-bare-value-with-no-context",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SyntheticRevokedSyntheticRevoked",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A bare value with no provider context is not reported."
+    },
+    {
+      "id": "mistral-api-key-negative-multi-line-constructor",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(\n    \"SyntheticRevokedSyntheticRevoked\"\n)\n",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Context on another line is not adjacent; the positional argument line names nothing."
+    },
+    {
+      "id": "mistral-api-key-negative-environment-variable-reference",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "MISTRAL_API_KEY=${MISTRAL_API_KEY}",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An environment-variable reference is not a key."
+    },
+    {
+      "id": "mistral-api-key-negative-repeated-character-filler",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "client = Mistral(api_key=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\")",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A repeated filler character is a placeholder."
+    },
+    {
+      "id": "mistral-api-key-negative-identifier-key",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MISTRAL_KEY_ID=SyntheticRevokedSyntheticRevoked",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A key ending in an identifier segment is not a credential name."
+    },
+    {
+      "id": "mistral-api-key-negative-placeholder",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(api_key=\"your_api_key_here\")",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A documentation placeholder is not a key."
+    },
+    {
+      "id": "mistral-api-key-negative-non-credential-argument",
+      "detector": "mistral-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(model=\"SyntheticRevokedSyntheticRevoked\")",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A non-credential keyword argument is not provider context."
+    },
+    {
+      "id": "mistral-api-key-boundary-one-short",
+      "detector": "mistral-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(api_key=\"SyntheticRevokedSyntheticRevoke\")",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+    },
+    {
+      "id": "mistral-api-key-boundary-one-long",
+      "detector": "mistral-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(api_key=\"SyntheticRevokedSyntheticRevoked9\")",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+    },
+    {
+      "id": "mistral-api-key-boundary-underscore-embedded",
+      "detector": "mistral-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Mistral(api_key=\"SyntheticR_vokedSyntheticRevoked\")",
+      "expected": [],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+    },
+    {
+      "id": "mistral-api-key-overlap-generic-named-assignment",
+      "detector": "mistral-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "note MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 53
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The name is also a generic-token high-signal assignment; the provider finding wins the overlap on provider specificity, so the span is reported once."
+    },
+    {
+      "id": "mistral-api-key-adversarial-dense-findings",
+      "detector": "mistral-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked ",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 48
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 97
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 114,
+          "end": 146
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 163,
+          "end": 195
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 212,
+          "end": 244
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 261,
+          "end": 293
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 310,
+          "end": 342
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 359,
+          "end": 391
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 408,
+          "end": 440
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 457,
+          "end": 489
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 506,
+          "end": 538
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 555,
+          "end": 587
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 604,
+          "end": 636
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 653,
+          "end": 685
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 702,
+          "end": 734
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 751,
+          "end": 783
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 800,
+          "end": 832
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 849,
+          "end": 881
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 898,
+          "end": 930
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 947,
+          "end": 979
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 996,
+          "end": 1028
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1045,
+          "end": 1077
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1094,
+          "end": 1126
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1143,
+          "end": 1175
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1192,
+          "end": 1224
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1241,
+          "end": 1273
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1290,
+          "end": 1322
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1339,
+          "end": 1371
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1388,
+          "end": 1420
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1437,
+          "end": 1469
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1486,
+          "end": 1518
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1535,
+          "end": 1567
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1584,
+          "end": 1616
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1633,
+          "end": 1665
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1682,
+          "end": 1714
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1731,
+          "end": 1763
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1780,
+          "end": 1812
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1829,
+          "end": 1861
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1878,
+          "end": 1910
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1927,
+          "end": 1959
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1976,
+          "end": 2008
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2025,
+          "end": 2057
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2074,
+          "end": 2106
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2123,
+          "end": 2155
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2172,
+          "end": 2204
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2221,
+          "end": 2253
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2270,
+          "end": 2302
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2319,
+          "end": 2351
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2368,
+          "end": 2400
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2417,
+          "end": 2449
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2466,
+          "end": 2498
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2515,
+          "end": 2547
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2564,
+          "end": 2596
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2613,
+          "end": 2645
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2662,
+          "end": 2694
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2711,
+          "end": 2743
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2760,
+          "end": 2792
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2809,
+          "end": 2841
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2858,
+          "end": 2890
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2907,
+          "end": 2939
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2956,
+          "end": 2988
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3005,
+          "end": 3037
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3054,
+          "end": 3086
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3103,
+          "end": 3135
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3152,
+          "end": 3184
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3201,
+          "end": 3233
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3250,
+          "end": 3282
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3299,
+          "end": 3331
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3348,
+          "end": 3380
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3397,
+          "end": 3429
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3446,
+          "end": 3478
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3495,
+          "end": 3527
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3544,
+          "end": 3576
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3593,
+          "end": 3625
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3642,
+          "end": 3674
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3691,
+          "end": 3723
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3740,
+          "end": 3772
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3789,
+          "end": 3821
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3838,
+          "end": 3870
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3887,
+          "end": 3919
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3936,
+          "end": 3968
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3985,
+          "end": 4017
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4034,
+          "end": 4066
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4083,
+          "end": 4115
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4132,
+          "end": 4164
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4181,
+          "end": 4213
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4230,
+          "end": 4262
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4279,
+          "end": 4311
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4328,
+          "end": 4360
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4377,
+          "end": 4409
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4426,
+          "end": 4458
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4475,
+          "end": 4507
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4524,
+          "end": 4556
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4573,
+          "end": 4605
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4622,
+          "end": 4654
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4671,
+          "end": 4703
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4720,
+          "end": 4752
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4769,
+          "end": 4801
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4818,
+          "end": 4850
+        },
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4867,
+          "end": 4899
+        }
+      ],
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). 100 named assignments on one line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "cohere-api-key-positive-dotenv-named",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 51
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named dotenv key names the credential, so confidence is high."
+    },
+    {
+      "id": "cohere-api-key-positive-json-named",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"cohereApiKey\": \"SyntheticRevokedSyntheticRevokedSyntheti\"}",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 58
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named JSON key names the credential."
+    },
+    {
+      "id": "cohere-api-key-positive-yaml-named",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "cohere_api_key: SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 56
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named YAML key names the credential."
+    },
+    {
+      "id": "cohere-api-key-positive-shell-export",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CO_API_KEY=\"SyntheticRevokedSyntheticRevokedSyntheti\"",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 59
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A quoted shell export under the provider-named variable."
+    },
+    {
+      "id": "cohere-api-key-positive-python-constructor",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSyntheti\")",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 34,
+          "end": 74
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+    },
+    {
+      "id": "cohere-api-key-positive-log-named",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-01-01T00:00:00Z INFO loaded CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 84
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named assignment in a log line."
+    },
+    {
+      "id": "cohere-api-key-positive-keyword-adjacent-prose",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# Cohere API key: SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 18,
+          "end": 58
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A credential key within 32 bytes after the provider keyword is medium confidence."
+    },
+    {
+      "id": "cohere-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nCO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti\r\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 65
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "cohere-api-key-negative-bare-value-with-no-context",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A bare value with no provider context is not reported."
+    },
+    {
+      "id": "cohere-api-key-negative-multi-line-constructor",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "co = cohere.ClientV2(\n    \"SyntheticRevokedSyntheticRevokedSyntheti\"\n)\n",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Context on another line is not adjacent; the positional argument line names nothing."
+    },
+    {
+      "id": "cohere-api-key-negative-environment-variable-reference",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "CO_API_KEY=${CO_API_KEY}",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An environment-variable reference is not a key."
+    },
+    {
+      "id": "cohere-api-key-negative-repeated-character-filler",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "client = cohere.ClientV2(api_key=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\")",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A repeated filler character is a placeholder."
+    },
+    {
+      "id": "cohere-api-key-negative-identifier-key",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "COHERE_ORG_ID=SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A key ending in an identifier segment is not a credential name."
+    },
+    {
+      "id": "cohere-api-key-negative-placeholder",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = cohere.ClientV2(api_key=\"your_api_key_here\")",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A documentation placeholder is not a key."
+    },
+    {
+      "id": "cohere-api-key-negative-non-credential-argument",
+      "detector": "cohere-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = cohere.ClientV2(base_url=\"SyntheticRevokedSyntheticRevokedSyntheti\")",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A non-credential keyword argument is not provider context."
+    },
+    {
+      "id": "cohere-api-key-boundary-one-short",
+      "detector": "cohere-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSynthet\")",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+    },
+    {
+      "id": "cohere-api-key-boundary-one-long",
+      "detector": "cohere-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSyntheti9\")",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+    },
+    {
+      "id": "cohere-api-key-boundary-underscore-embedded",
+      "detector": "cohere-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = cohere.ClientV2(api_key=\"SyntheticR_vokedSyntheticRevokedSyntheti\")",
+      "expected": [],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+    },
+    {
+      "id": "cohere-api-key-overlap-generic-named-assignment",
+      "detector": "cohere-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "note CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 56
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The name is also a generic-token high-signal assignment; the provider finding wins the overlap on provider specificity, so the span is reported once."
+    },
+    {
+      "id": "cohere-api-key-adversarial-dense-findings",
+      "detector": "cohere-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti CO_API_KEY=SyntheticRevokedSyntheticRevokedSyntheti ",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 51
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 63,
+          "end": 103
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 115,
+          "end": 155
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 167,
+          "end": 207
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 219,
+          "end": 259
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 271,
+          "end": 311
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 323,
+          "end": 363
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 375,
+          "end": 415
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 427,
+          "end": 467
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 479,
+          "end": 519
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 531,
+          "end": 571
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 583,
+          "end": 623
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 635,
+          "end": 675
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 687,
+          "end": 727
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 739,
+          "end": 779
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 791,
+          "end": 831
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 843,
+          "end": 883
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 895,
+          "end": 935
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 947,
+          "end": 987
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 999,
+          "end": 1039
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1051,
+          "end": 1091
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1103,
+          "end": 1143
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1155,
+          "end": 1195
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1207,
+          "end": 1247
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1259,
+          "end": 1299
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1311,
+          "end": 1351
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1363,
+          "end": 1403
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1415,
+          "end": 1455
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1467,
+          "end": 1507
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1519,
+          "end": 1559
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1571,
+          "end": 1611
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1623,
+          "end": 1663
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1675,
+          "end": 1715
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1727,
+          "end": 1767
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1779,
+          "end": 1819
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1831,
+          "end": 1871
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1883,
+          "end": 1923
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1935,
+          "end": 1975
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1987,
+          "end": 2027
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2039,
+          "end": 2079
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2091,
+          "end": 2131
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2143,
+          "end": 2183
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2195,
+          "end": 2235
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2247,
+          "end": 2287
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2299,
+          "end": 2339
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2351,
+          "end": 2391
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2403,
+          "end": 2443
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2455,
+          "end": 2495
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2507,
+          "end": 2547
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2559,
+          "end": 2599
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2611,
+          "end": 2651
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2663,
+          "end": 2703
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2715,
+          "end": 2755
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2767,
+          "end": 2807
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2819,
+          "end": 2859
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2871,
+          "end": 2911
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2923,
+          "end": 2963
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2975,
+          "end": 3015
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3027,
+          "end": 3067
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3079,
+          "end": 3119
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3131,
+          "end": 3171
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3183,
+          "end": 3223
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3235,
+          "end": 3275
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3287,
+          "end": 3327
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3339,
+          "end": 3379
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3391,
+          "end": 3431
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3443,
+          "end": 3483
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3495,
+          "end": 3535
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3547,
+          "end": 3587
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3599,
+          "end": 3639
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3651,
+          "end": 3691
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3703,
+          "end": 3743
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3755,
+          "end": 3795
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3807,
+          "end": 3847
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3859,
+          "end": 3899
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3911,
+          "end": 3951
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3963,
+          "end": 4003
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4015,
+          "end": 4055
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4067,
+          "end": 4107
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4119,
+          "end": 4159
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4171,
+          "end": 4211
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4223,
+          "end": 4263
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4275,
+          "end": 4315
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4327,
+          "end": 4367
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4379,
+          "end": 4419
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4431,
+          "end": 4471
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4483,
+          "end": 4523
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4535,
+          "end": 4575
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4587,
+          "end": 4627
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4639,
+          "end": 4679
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4691,
+          "end": 4731
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4743,
+          "end": 4783
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4795,
+          "end": 4835
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4847,
+          "end": 4887
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4899,
+          "end": 4939
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4951,
+          "end": 4991
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5003,
+          "end": 5043
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5055,
+          "end": 5095
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5107,
+          "end": 5147
+        },
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5159,
+          "end": 5199
+        }
+      ],
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). 100 named assignments on one line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "ai21-api-key-positive-dotenv-named",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AI21_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 45
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named dotenv key names the credential, so confidence is high."
+    },
+    {
+      "id": "ai21-api-key-positive-json-named",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"ai21ApiKey\": \"SyntheticRevokedSyntheticRevoked\"}",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 48
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named JSON key names the credential."
+    },
+    {
+      "id": "ai21-api-key-positive-yaml-named",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "ai21_api_key: SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 46
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named YAML key names the credential."
+    },
+    {
+      "id": "ai21-api-key-positive-shell-export",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export AI21_API_KEY=\"SyntheticRevokedSyntheticRevoked\"",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 53
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A quoted shell export under the provider-named variable."
+    },
+    {
+      "id": "ai21-api-key-positive-python-constructor",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(api_key=\"SyntheticRevokedSyntheticRevoked\")",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 61
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+    },
+    {
+      "id": "ai21-api-key-positive-log-named",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-01-01T00:00:00Z INFO loaded AI21_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 78
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named assignment in a log line."
+    },
+    {
+      "id": "ai21-api-key-positive-keyword-adjacent-prose",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# AI21 API key: SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 16,
+          "end": 48
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A credential key within 32 bytes after the provider keyword is medium confidence."
+    },
+    {
+      "id": "ai21-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "ai21-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nAI21_API_KEY=SyntheticRevokedSyntheticRevoked\r\n",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 59
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "ai21-api-key-negative-bare-value-with-no-context",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SyntheticRevokedSyntheticRevoked",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A bare value with no provider context is not reported."
+    },
+    {
+      "id": "ai21-api-key-negative-multi-line-constructor",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(\n    \"SyntheticRevokedSyntheticRevoked\"\n)\n",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Context on another line is not adjacent; the positional argument line names nothing."
+    },
+    {
+      "id": "ai21-api-key-negative-environment-variable-reference",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "AI21_API_KEY=${AI21_API_KEY}",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An environment-variable reference is not a key."
+    },
+    {
+      "id": "ai21-api-key-negative-repeated-character-filler",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "client = AI21Client(api_key=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\")",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A repeated filler character is a placeholder."
+    },
+    {
+      "id": "ai21-api-key-negative-identifier-key",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AI21_TEAM_ID=SyntheticRevokedSyntheticRevoked",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A key ending in an identifier segment is not a credential name."
+    },
+    {
+      "id": "ai21-api-key-negative-placeholder",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(api_key=\"your_api_key_here\")",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A documentation placeholder is not a key."
+    },
+    {
+      "id": "ai21-api-key-negative-non-credential-argument",
+      "detector": "ai21-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(model=\"SyntheticRevokedSyntheticRevoked\")",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A non-credential keyword argument is not provider context."
+    },
+    {
+      "id": "ai21-api-key-boundary-one-short",
+      "detector": "ai21-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(api_key=\"SyntheticRevokedSyntheticRevoke\")",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+    },
+    {
+      "id": "ai21-api-key-boundary-one-long",
+      "detector": "ai21-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(api_key=\"SyntheticRevokedSyntheticRevoked9\")",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+    },
+    {
+      "id": "ai21-api-key-boundary-underscore-embedded",
+      "detector": "ai21-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = AI21Client(api_key=\"SyntheticR_vokedSyntheticRevoked\")",
+      "expected": [],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+    },
+    {
+      "id": "ai21-api-key-overlap-generic-named-assignment",
+      "detector": "ai21-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "note AI21_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 50
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The name is also a generic-token high-signal assignment; the provider finding wins the overlap on provider specificity, so the span is reported once."
+    },
+    {
+      "id": "ai21-api-key-adversarial-dense-findings",
+      "detector": "ai21-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked AI21_API_KEY=SyntheticRevokedSyntheticRevoked ",
+      "expected": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 45
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 59,
+          "end": 91
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 105,
+          "end": 137
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 151,
+          "end": 183
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 197,
+          "end": 229
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 243,
+          "end": 275
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 289,
+          "end": 321
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 335,
+          "end": 367
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 381,
+          "end": 413
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 427,
+          "end": 459
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 473,
+          "end": 505
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 519,
+          "end": 551
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 565,
+          "end": 597
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 611,
+          "end": 643
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 657,
+          "end": 689
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 703,
+          "end": 735
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 749,
+          "end": 781
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 795,
+          "end": 827
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 841,
+          "end": 873
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 887,
+          "end": 919
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 933,
+          "end": 965
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 979,
+          "end": 1011
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1025,
+          "end": 1057
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1071,
+          "end": 1103
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1117,
+          "end": 1149
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1163,
+          "end": 1195
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1209,
+          "end": 1241
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1255,
+          "end": 1287
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1301,
+          "end": 1333
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1347,
+          "end": 1379
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1393,
+          "end": 1425
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1439,
+          "end": 1471
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1485,
+          "end": 1517
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1531,
+          "end": 1563
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1577,
+          "end": 1609
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1623,
+          "end": 1655
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1669,
+          "end": 1701
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1715,
+          "end": 1747
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1761,
+          "end": 1793
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1807,
+          "end": 1839
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1853,
+          "end": 1885
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1899,
+          "end": 1931
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1945,
+          "end": 1977
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1991,
+          "end": 2023
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2037,
+          "end": 2069
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2083,
+          "end": 2115
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2129,
+          "end": 2161
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2175,
+          "end": 2207
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2221,
+          "end": 2253
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2267,
+          "end": 2299
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2313,
+          "end": 2345
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2359,
+          "end": 2391
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2405,
+          "end": 2437
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2451,
+          "end": 2483
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2497,
+          "end": 2529
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2543,
+          "end": 2575
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2589,
+          "end": 2621
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2635,
+          "end": 2667
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2681,
+          "end": 2713
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2727,
+          "end": 2759
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2773,
+          "end": 2805
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2819,
+          "end": 2851
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2865,
+          "end": 2897
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2911,
+          "end": 2943
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2957,
+          "end": 2989
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3003,
+          "end": 3035
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3049,
+          "end": 3081
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3095,
+          "end": 3127
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3141,
+          "end": 3173
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3187,
+          "end": 3219
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3233,
+          "end": 3265
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3279,
+          "end": 3311
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3325,
+          "end": 3357
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3371,
+          "end": 3403
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3417,
+          "end": 3449
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3463,
+          "end": 3495
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3509,
+          "end": 3541
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3555,
+          "end": 3587
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3601,
+          "end": 3633
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3647,
+          "end": 3679
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3693,
+          "end": 3725
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3739,
+          "end": 3771
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3785,
+          "end": 3817
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3831,
+          "end": 3863
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3877,
+          "end": 3909
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3923,
+          "end": 3955
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3969,
+          "end": 4001
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4015,
+          "end": 4047
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4061,
+          "end": 4093
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4107,
+          "end": 4139
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4153,
+          "end": 4185
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4199,
+          "end": 4231
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4245,
+          "end": 4277
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4291,
+          "end": 4323
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4337,
+          "end": 4369
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4383,
+          "end": 4415
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4429,
+          "end": 4461
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4475,
+          "end": 4507
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4521,
+          "end": 4553
+        },
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4567,
+          "end": 4599
+        }
+      ],
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). 100 named assignments on one line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "deepgram-api-key-positive-dotenv-named",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 57
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named dotenv key names the credential, so confidence is high."
+    },
+    {
+      "id": "deepgram-api-key-positive-json-named",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"deepgramApiKey\": \"syntheticrevokedsyntheticrevokedsyntheti\"}",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named JSON key names the credential."
+    },
+    {
+      "id": "deepgram-api-key-positive-yaml-named",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "deepgram_api_key: syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 58
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named YAML key names the credential."
+    },
+    {
+      "id": "deepgram-api-key-positive-shell-export",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export DEEPGRAM_API_KEY=\"syntheticrevokedsyntheticrevokedsyntheti\"",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 65
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A quoted shell export under the provider-named variable."
+    },
+    {
+      "id": "deepgram-api-key-positive-python-constructor",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(api_key=\"syntheticrevokedsyntheticrevokedsyntheti\")",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 73
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+    },
+    {
+      "id": "deepgram-api-key-positive-log-named",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-01-01T00:00:00Z INFO loaded DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 50,
+          "end": 90
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named assignment in a log line."
+    },
+    {
+      "id": "deepgram-api-key-positive-keyword-adjacent-prose",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# Deepgram API key: syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A credential key within 32 bytes after the provider keyword is medium confidence."
+    },
+    {
+      "id": "deepgram-api-key-positive-token-header",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl",
+        "http"
+      ],
+      "input": "curl --header \"Authorization: Token syntheticrevokedsyntheticrevokedsyntheti\" https://api.deepgram.com/v1/projects",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 36,
+          "end": 76
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An Authorization: Token header on a line naming deepgram is medium confidence."
+    },
+    {
+      "id": "deepgram-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nDEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti\r\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 71
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "deepgram-api-key-negative-bare-value-with-no-context",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A bare value with no provider context is not reported."
+    },
+    {
+      "id": "deepgram-api-key-negative-multi-line-constructor",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "dg = DeepgramClient(\n    \"syntheticrevokedsyntheticrevokedsyntheti\"\n)\n",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). Context on another line is not adjacent; the positional argument line names nothing."
+    },
+    {
+      "id": "deepgram-api-key-negative-environment-variable-reference",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An environment-variable reference is not a key."
+    },
+    {
+      "id": "deepgram-api-key-negative-repeated-character-filler",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "client = DeepgramClient(api_key=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A repeated filler character is a placeholder."
+    },
+    {
+      "id": "deepgram-api-key-negative-identifier-key",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DEEPGRAM_PROJECT_ID=syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A key ending in an identifier segment is not a credential name."
+    },
+    {
+      "id": "deepgram-api-key-negative-placeholder",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(api_key=\"your_api_key_here\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A documentation placeholder is not a key."
+    },
+    {
+      "id": "deepgram-api-key-negative-non-credential-argument",
+      "detector": "deepgram-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(model=\"syntheticrevokedsyntheticrevokedsyntheti\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A non-credential keyword argument is not provider context."
+    },
+    {
+      "id": "deepgram-api-key-boundary-one-short",
+      "detector": "deepgram-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(api_key=\"syntheticrevokedsyntheticrevokedsynthet\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+    },
+    {
+      "id": "deepgram-api-key-boundary-one-long",
+      "detector": "deepgram-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(api_key=\"syntheticrevokedsyntheticrevokedsyntheti9\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+    },
+    {
+      "id": "deepgram-api-key-boundary-underscore-embedded",
+      "detector": "deepgram-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(api_key=\"syntheticr_vokedsyntheticrevokedsyntheti\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+    },
+    {
+      "id": "deepgram-api-key-boundary-uppercase-body",
+      "detector": "deepgram-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = DeepgramClient(api_key=\"SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETI\")",
+      "expected": [],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The inferred alphabet is lowercase alphanumeric; an uppercase body is rejected."
+    },
+    {
+      "id": "deepgram-api-key-overlap-generic-named-assignment",
+      "detector": "deepgram-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "note DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 62
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The name is also a generic-token high-signal assignment; the provider finding wins the overlap on provider specificity, so the span is reported once."
+    },
+    {
+      "id": "deepgram-api-key-adversarial-dense-findings",
+      "detector": "deepgram-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti ",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 57
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 75,
+          "end": 115
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 133,
+          "end": 173
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 191,
+          "end": 231
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 249,
+          "end": 289
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 307,
+          "end": 347
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 365,
+          "end": 405
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 423,
+          "end": 463
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 481,
+          "end": 521
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 539,
+          "end": 579
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 597,
+          "end": 637
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 655,
+          "end": 695
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 713,
+          "end": 753
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 771,
+          "end": 811
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 829,
+          "end": 869
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 887,
+          "end": 927
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 945,
+          "end": 985
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1003,
+          "end": 1043
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1061,
+          "end": 1101
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1119,
+          "end": 1159
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1177,
+          "end": 1217
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1235,
+          "end": 1275
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1293,
+          "end": 1333
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1351,
+          "end": 1391
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1409,
+          "end": 1449
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1467,
+          "end": 1507
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1525,
+          "end": 1565
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1583,
+          "end": 1623
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1641,
+          "end": 1681
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1699,
+          "end": 1739
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1757,
+          "end": 1797
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1815,
+          "end": 1855
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1873,
+          "end": 1913
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1931,
+          "end": 1971
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1989,
+          "end": 2029
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2047,
+          "end": 2087
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2105,
+          "end": 2145
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2163,
+          "end": 2203
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2221,
+          "end": 2261
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2279,
+          "end": 2319
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2337,
+          "end": 2377
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2395,
+          "end": 2435
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2453,
+          "end": 2493
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2511,
+          "end": 2551
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2569,
+          "end": 2609
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2627,
+          "end": 2667
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2685,
+          "end": 2725
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2743,
+          "end": 2783
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2801,
+          "end": 2841
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2859,
+          "end": 2899
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2917,
+          "end": 2957
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2975,
+          "end": 3015
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3033,
+          "end": 3073
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3091,
+          "end": 3131
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3149,
+          "end": 3189
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3207,
+          "end": 3247
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3265,
+          "end": 3305
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3323,
+          "end": 3363
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3381,
+          "end": 3421
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3439,
+          "end": 3479
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3497,
+          "end": 3537
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3555,
+          "end": 3595
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3613,
+          "end": 3653
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3671,
+          "end": 3711
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3729,
+          "end": 3769
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3787,
+          "end": 3827
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3845,
+          "end": 3885
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3903,
+          "end": 3943
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3961,
+          "end": 4001
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4019,
+          "end": 4059
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4077,
+          "end": 4117
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4135,
+          "end": 4175
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4193,
+          "end": 4233
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4251,
+          "end": 4291
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4309,
+          "end": 4349
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4367,
+          "end": 4407
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4425,
+          "end": 4465
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4483,
+          "end": 4523
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4541,
+          "end": 4581
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4599,
+          "end": 4639
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4657,
+          "end": 4697
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4715,
+          "end": 4755
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4773,
+          "end": 4813
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4831,
+          "end": 4871
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4889,
+          "end": 4929
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4947,
+          "end": 4987
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5005,
+          "end": 5045
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5063,
+          "end": 5103
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5121,
+          "end": 5161
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5179,
+          "end": 5219
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5237,
+          "end": 5277
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5295,
+          "end": 5335
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5353,
+          "end": 5393
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5411,
+          "end": 5451
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5469,
+          "end": 5509
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5527,
+          "end": 5567
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5585,
+          "end": 5625
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5643,
+          "end": 5683
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5701,
+          "end": 5741
+        },
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5759,
+          "end": 5799
+        }
+      ],
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). 100 named assignments on one line are each reported once at their own range, within the declared resource bounds."
     }
   ]
 }

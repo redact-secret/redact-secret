@@ -30,6 +30,7 @@ mod gitlab;
 mod grafana;
 mod heroku;
 mod jwt;
+mod keyword_gated_keys;
 mod langfuse;
 mod langsmith;
 mod linear;
@@ -148,6 +149,10 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(heroku::HEROKU_API_KEY),
         Box::new(heroku::HerokuApiKeyLegacyDetector),
         Box::new(travisci::TravisCiApiTokenDetector),
+        Box::new(keyword_gated_keys::MistralApiKeyDetector),
+        Box::new(keyword_gated_keys::CohereApiKeyDetector),
+        Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
+        Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -268,6 +273,10 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("heroku-api-key", Pack::Provider),
     ("heroku-api-key-legacy", Pack::Provider),
     ("travisci-api-token", Pack::Provider),
+    ("mistral-api-key", Pack::Provider),
+    ("cohere-api-key", Pack::Provider),
+    ("ai21-api-key", Pack::Provider),
+    ("deepgram-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -377,6 +386,10 @@ mod tests {
                 "heroku-api-key",
                 "heroku-api-key-legacy",
                 "travisci-api-token",
+                "mistral-api-key",
+                "cohere-api-key",
+                "ai21-api-key",
+                "deepgram-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -697,6 +710,20 @@ mod tests {
         );
         let heroku_api_key_legacy_input = "heroku 01234567-89ab-cdef-0123-456789abcdef";
         let travisci_api_token_input = "travis Syn7hRevok3dTrvCi0Tok1";
+        let mistral_api_key_input =
+            format!("MISTRAL_API_KEY={}", "aB3dE5gH7jK9mN1pQ3sT5vW7yZ9xC2Lq");
+        let cohere_api_key_input = format!(
+            "co = cohere.ClientV2(api_key=\"{}\")",
+            "zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fEaB3dE5gH"
+        );
+        let ai21_api_key_input = format!(
+            "AI21Client(api_key='{}')",
+            "Zz9Yy8Xx7Ww6Vv5Uu4Tt3Ss2Rr1Qq0Pp"
+        );
+        let deepgram_api_key_input = format!(
+            "DEEPGRAM_API_KEY={}",
+            "q7w3e9r1t5y8u2i4o6p0a1s3d5f7g9h2j4k6l8z0"
+        );
         let replicate_api_token_input = format!("r8_{}", "SYNTHETIC_REVOKED-REPLICATE-TOKEN-001");
         let groq_api_key_input = format!(
             "gsk_{}",
@@ -774,6 +801,10 @@ mod tests {
             ("heroku-api-key", heroku_api_key_input.as_str()),
             ("heroku-api-key-legacy", heroku_api_key_legacy_input),
             ("travisci-api-token", travisci_api_token_input),
+            ("mistral-api-key", mistral_api_key_input.as_str()),
+            ("cohere-api-key", cohere_api_key_input.as_str()),
+            ("ai21-api-key", ai21_api_key_input.as_str()),
+            ("deepgram-api-key", deepgram_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

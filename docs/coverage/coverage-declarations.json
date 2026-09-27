@@ -9289,6 +9289,381 @@
       "type": "travisci_api_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "mistral-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "mistral-api-key-positive-dotenv-named",
+            "mistral-api-key-positive-json-named",
+            "mistral-api-key-positive-keyword-adjacent-prose",
+            "mistral-api-key-positive-log-named",
+            "mistral-api-key-positive-python-constructor",
+            "mistral-api-key-positive-shell-export",
+            "mistral-api-key-positive-yaml-named",
+            "mistral-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "mistral-api-key-overlap-generic-named-assignment"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "mistral-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "mistral-api-key-boundary-one-long",
+            "mistral-api-key-boundary-one-short",
+            "mistral-api-key-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "mistral-api-key-negative-bare-value-with-no-context",
+            "mistral-api-key-negative-environment-variable-reference",
+            "mistral-api-key-negative-identifier-key",
+            "mistral-api-key-negative-multi-line-constructor",
+            "mistral-api-key-negative-non-credential-argument",
+            "mistral-api-key-negative-placeholder",
+            "mistral-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "mistral-api-key-boundary-one-long",
+            "mistral-api-key-boundary-one-short",
+            "mistral-api-key-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for mistral_api_key (mistral-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "mistral_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "cohere-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "cohere-api-key-positive-dotenv-named",
+            "cohere-api-key-positive-json-named",
+            "cohere-api-key-positive-keyword-adjacent-prose",
+            "cohere-api-key-positive-log-named",
+            "cohere-api-key-positive-python-constructor",
+            "cohere-api-key-positive-shell-export",
+            "cohere-api-key-positive-yaml-named",
+            "cohere-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "cohere-api-key-overlap-generic-named-assignment"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "cohere-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "cohere-api-key-boundary-one-long",
+            "cohere-api-key-boundary-one-short",
+            "cohere-api-key-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "cohere-api-key-negative-bare-value-with-no-context",
+            "cohere-api-key-negative-environment-variable-reference",
+            "cohere-api-key-negative-identifier-key",
+            "cohere-api-key-negative-multi-line-constructor",
+            "cohere-api-key-negative-non-credential-argument",
+            "cohere-api-key-negative-placeholder",
+            "cohere-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "cohere-api-key-boundary-one-long",
+            "cohere-api-key-boundary-one-short",
+            "cohere-api-key-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for cohere_api_key (cohere-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "cohere_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "ai21-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "ai21-api-key-positive-dotenv-named",
+            "ai21-api-key-positive-json-named",
+            "ai21-api-key-positive-keyword-adjacent-prose",
+            "ai21-api-key-positive-log-named",
+            "ai21-api-key-positive-python-constructor",
+            "ai21-api-key-positive-shell-export",
+            "ai21-api-key-positive-yaml-named",
+            "ai21-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "ai21-api-key-overlap-generic-named-assignment"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "ai21-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "ai21-api-key-boundary-one-long",
+            "ai21-api-key-boundary-one-short",
+            "ai21-api-key-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "ai21-api-key-negative-bare-value-with-no-context",
+            "ai21-api-key-negative-environment-variable-reference",
+            "ai21-api-key-negative-identifier-key",
+            "ai21-api-key-negative-multi-line-constructor",
+            "ai21-api-key-negative-non-credential-argument",
+            "ai21-api-key-negative-placeholder",
+            "ai21-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "ai21-api-key-boundary-one-long",
+            "ai21-api-key-boundary-one-short",
+            "ai21-api-key-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for ai21_api_key (ai21-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "ai21_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "deepgram-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "deepgram-api-key-positive-dotenv-named",
+            "deepgram-api-key-positive-json-named",
+            "deepgram-api-key-positive-keyword-adjacent-prose",
+            "deepgram-api-key-positive-log-named",
+            "deepgram-api-key-positive-python-constructor",
+            "deepgram-api-key-positive-shell-export",
+            "deepgram-api-key-positive-token-header",
+            "deepgram-api-key-positive-yaml-named",
+            "deepgram-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "deepgram-api-key-overlap-generic-named-assignment"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "deepgram-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "deepgram-api-key-boundary-one-long",
+            "deepgram-api-key-boundary-one-short",
+            "deepgram-api-key-boundary-underscore-embedded",
+            "deepgram-api-key-boundary-uppercase-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "deepgram-api-key-negative-bare-value-with-no-context",
+            "deepgram-api-key-negative-environment-variable-reference",
+            "deepgram-api-key-negative-identifier-key",
+            "deepgram-api-key-negative-multi-line-constructor",
+            "deepgram-api-key-negative-non-credential-argument",
+            "deepgram-api-key-negative-placeholder",
+            "deepgram-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "deepgram-api-key-boundary-one-long",
+            "deepgram-api-key-boundary-one-short",
+            "deepgram-api-key-boundary-underscore-embedded",
+            "deepgram-api-key-boundary-uppercase-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for deepgram_api_key (deepgram-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "deepgram_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -9423,6 +9798,7 @@
           "dimension": "adversarial",
           "evidenceFixtureIds": [
             "adversarial-dense-aws-findings",
+            "ai21-api-key-adversarial-dense-findings",
             "anthropic-adversarial-long-suffix",
             "atlassian-api-token-adversarial-long-padding",
             "aws-adversarial-long-suffix",
@@ -9431,6 +9807,7 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
+            "cohere-api-key-adversarial-dense-findings",
             "confluent-cloud-api-secret-adversarial-long-suffix",
             "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
             "connection-adversarial-azure-overlong",
@@ -9442,6 +9819,7 @@
             "datadog-application-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-long-suffix",
             "datadog-application-key-legacy-adversarial-dense-findings",
+            "deepgram-api-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
@@ -9478,6 +9856,7 @@
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "mistral-api-key-adversarial-dense-findings",
             "neon-api-key-adversarial-dense-findings",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
@@ -9856,6 +10235,7 @@
           "dimension": "adversarial",
           "evidenceFixtureIds": [
             "adversarial-dense-aws-findings",
+            "ai21-api-key-adversarial-dense-findings",
             "anthropic-adversarial-long-suffix",
             "atlassian-api-token-adversarial-long-padding",
             "aws-adversarial-long-suffix",
@@ -9864,6 +10244,7 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
+            "cohere-api-key-adversarial-dense-findings",
             "confluent-cloud-api-secret-adversarial-long-suffix",
             "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
             "connection-adversarial-azure-overlong",
@@ -9875,6 +10256,7 @@
             "datadog-application-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-long-suffix",
             "datadog-application-key-legacy-adversarial-dense-findings",
+            "deepgram-api-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
@@ -9911,6 +10293,7 @@
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "mistral-api-key-adversarial-dense-findings",
             "neon-api-key-adversarial-dense-findings",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",

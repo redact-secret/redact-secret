@@ -624,6 +624,34 @@
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "travis Syn7hRevok3dTrvCi0Tok1",
       "schemes": null
+    },
+    {
+      "type": "mistral_api_key",
+      "detector": "mistral-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "schemes": null
+    },
+    {
+      "type": "cohere_api_key",
+      "detector": "cohere-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "co = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSyntheti\")",
+      "schemes": null
+    },
+    {
+      "type": "ai21_api_key",
+      "detector": "ai21-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "AI21Client(api_key='SyntheticRevokedSyntheticRevoked')",
+      "schemes": null
+    },
+    {
+      "type": "deepgram_api_key",
+      "detector": "deepgram-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
+      "schemes": null
     }
   ],
   "consumers": [
