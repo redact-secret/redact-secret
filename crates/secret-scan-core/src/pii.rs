@@ -19,6 +19,7 @@ const AVAILABLE_FAMILIES: &[&str] = &[
     "pii:global:email",
     "pii:global:iban",
     "pii:global:network-address",
+    "pii:global:payment-card",
 ];
 const KNOWN_FAMILIES: &[&str] = &[
     "pii:global:ambiguous-national-id",
@@ -34,6 +35,8 @@ const KNOWN_FAMILIES: &[&str] = &[
 mod pii_email;
 #[path = "pii/pii_iban.rs"]
 mod pii_iban;
+#[path = "pii/pii_payment_card.rs"]
+mod pii_payment_card;
 
 /// A canonical, closed PII selector set for the loaded artifact.
 ///
@@ -195,6 +198,7 @@ pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
             Box::new(pii_email::EmailFamily),
             Box::new(pii_iban::IbanFamily),
             network_address::family(),
+            Box::new(pii_payment_card::PaymentCardFamily),
         ],
     ))
 }
@@ -983,7 +987,7 @@ mod tests {
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
         );
     }
 

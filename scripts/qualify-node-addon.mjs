@@ -303,10 +303,19 @@ function inspectAddon(target) {
 }
 
 function runSmokeTest() {
-  execFileSync(process.execPath, ["smoke-test.mjs"], {
-    cwd: ADDON_DIR,
-    stdio: "inherit",
-  });
+  for (const selector of [
+    undefined,
+    "pii:family:global:payment-card",
+    "pii:global",
+  ]) {
+    const env = { ...process.env };
+    if (selector !== undefined) env.REDACT_SECRET_PAYMENT_CARD_SELECTOR = selector;
+    execFileSync(process.execPath, ["smoke-test.mjs"], {
+      cwd: ADDON_DIR,
+      env,
+      stdio: "inherit",
+    });
+  }
 }
 
 /**
