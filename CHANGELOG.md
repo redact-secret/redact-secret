@@ -23,6 +23,19 @@ evidence is linked from each published version.
 - `generic-token` now redacts a secret passed as an SDK call argument, for
   example `Client(api_key="...")` (#866).
 
+### Performance
+
+- The keyword-gated `mistral-api-key`, `cohere-api-key`, `ai21-api-key` and
+  `deepgram-api-key` detectors (#868) now skip their per-line scan entirely
+  when the whole input carries none of a detector's provider keywords,
+  instead of building a run-length table for every line regardless. This
+  cuts the beta.10 `scale-logs` scan latency regression roughly in half with
+  no change to any finding; the rest is the inherent cost of seven more
+  detectors running (`sk-ant-api01-`/`sk-ant-admin01-` prefix matching, AWS
+  Bedrock base64-body scanning, ElevenLabs/Together/Tavily prefix scanning,
+  the OpenAI admin-key reconciliation, and `generic-token`'s SDK-call-argument
+  path).
+
 ## 0.1.0-beta.9 — 2026-09-26
 
 ### Added

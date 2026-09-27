@@ -315,10 +315,66 @@ fn context(
     None
 }
 
+/// `true` when `haystack` holds `needle` (lowercase ASCII, non-empty) under
+/// ASCII case folding. Boyer-Moore-Horspool over a case-folded shift table:
+/// a byte outside the needle advances the window by the needle's length, so
+/// the common no-match input is read at a fraction of one compare per byte.
+fn contains_ascii_ci(haystack: &[u8], needle: &[u8]) -> bool {
+    let len = needle.len();
+    if len == 0 {
+        return true;
+    }
+    let mut shift = [len; 256];
+    for (index, &byte) in needle[..len - 1].iter().enumerate() {
+        shift[usize::from(byte)] = len - 1 - index;
+        shift[usize::from(byte.to_ascii_uppercase())] = len - 1 - index;
+    }
+    let last = needle[len - 1];
+    let mut at = 0;
+    while at + len <= haystack.len() {
+        let tail = haystack[at + len - 1];
+        if tail.to_ascii_lowercase() == last && haystack[at..at + len].eq_ignore_ascii_case(needle)
+        {
+            return true;
+        }
+        at += shift[usize::from(tail)];
+    }
+    false
+}
+
+/// `true` when `text` can hold a provider context for `spec`: a keyword, or
+/// every `_` segment of an exact name (`co_api_key`), under ASCII case
+/// folding.
+///
+/// Every context [`context`] accepts needs one of these on the value's own
+/// line: a key whose normalized name contains a keyword or exact name, a call
+/// whose callee contains a keyword, a keyword within [`KEYWORD_WINDOW`] bytes
+/// before the key, or (Deepgram header) the keyword on the line.
+/// [`normalize_name`] only lowercases, maps `.`/`-` to `_` and inserts `_`
+/// before an uppercase letter, so a segment contiguous in the normalized name
+/// is contiguous, modulo case, in the original. A text without any of them
+/// therefore yields no candidate, and the run scan can be skipped.
+fn may_have_provider_context(text: &str, spec: &Spec) -> bool {
+    let bytes = text.as_bytes();
+    spec.keywords
+        .iter()
+        .any(|keyword| contains_ascii_ci(bytes, keyword.as_bytes()))
+        || spec.exact_names.iter().any(|name| {
+            name.rsplit('_')
+                .all(|segment| contains_ascii_ci(bytes, segment.as_bytes()))
+        })
+}
+
 fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
     let mut candidates = Vec::new();
+    if !may_have_provider_context(input, spec) {
+        return candidates;
+    }
     for (line_start, line_end) in lines(input) {
         let line = &input[line_start..line_end];
+        if !may_have_provider_context(line, spec) {
+            continue;
+        }
         let runs = scan_runs(line, spec);
         if runs.is_empty() {
             continue;
