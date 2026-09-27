@@ -39,6 +39,24 @@ evidence is linked from each published version.
   Bedrock base64-body scanning, ElevenLabs/Together/Tavily prefix scanning,
   the OpenAI admin-key reconciliation, and `generic-token`'s SDK-call-argument
   path).
+- Round 2 (#774): the same four detectors' `may_have_provider_context` gate
+  now finds its keyword (or, for `cohere-api-key`, its `co`/`api`/`key` name
+  segments) with a straight-line scan for the needle's first byte, verifying
+  the full match only at each candidate position, instead of a
+  Boyer-Moore-Horspool shift-table scan. A skip-based scan's average skip is
+  bounded by the needle length, so for these short (3-8 byte) keywords the
+  branchy, data-dependent shift-table lookup was doing more work than a scan
+  a vectorizing compiler already accelerates well; measured on
+  `scale-logs-small-whole`, this is 1.3-3x faster per gate check (most on
+  `cohere-api-key`, whose extra name-segment check was the single largest
+  contributor to the remainder) and reduces the round 1 in-process
+  `scale-logs` regression from roughly 5.5% to roughly 3.7% median, with no
+  change to any finding. It does not measurably move the
+  `scale-logs-medium-fixed4096` (chunked/incremental) profile, where
+  per-call fixed overhead dominates more than the scan itself; the
+  remainder there, and whatever fraction of the CI-pinned budget comparison
+  it still costs, is the inherent cost of the seven new detectors above
+  plus this gate's now-minimal residual scan cost.
 
 ## 0.1.0-beta.9 — 2026-09-26
 

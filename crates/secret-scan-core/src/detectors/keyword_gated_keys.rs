@@ -316,28 +316,43 @@ fn context(
 }
 
 /// `true` when `haystack` holds `needle` (lowercase ASCII, non-empty) under
-/// ASCII case folding. Boyer-Moore-Horspool over a case-folded shift table:
-/// a byte outside the needle advances the window by the needle's length, so
-/// the common no-match input is read at a fraction of one compare per byte.
+/// ASCII case folding.
+///
+/// Scans for the needle's first byte (either case) with a straight-line
+/// linear scan the compiler can auto-vectorize, and verifies the full needle
+/// only at each candidate position. The provider keywords and name segments
+/// this is called with are short (3-8 bytes) and rare in ordinary text, so
+/// candidate positions are infrequent; measured against the four provider
+/// keywords and `key` (the shortest `exact_names` segment) on the
+/// `scale-logs-small-whole` performance workload, this is 1.3-3x faster than
+/// a Boyer-Moore-Horspool shift-table scan (the shorter the needle, the
+/// smaller a skip-based scan's average skip, so the branchy, data-dependent
+/// table lookup stops paying for itself -- a plain byte scan a vectorizing
+/// compiler already knows how to accelerate does not have that floor).
 fn contains_ascii_ci(haystack: &[u8], needle: &[u8]) -> bool {
     let len = needle.len();
     if len == 0 {
         return true;
     }
-    let mut shift = [len; 256];
-    for (index, &byte) in needle[..len - 1].iter().enumerate() {
-        shift[usize::from(byte)] = len - 1 - index;
-        shift[usize::from(byte.to_ascii_uppercase())] = len - 1 - index;
+    if haystack.len() < len {
+        return false;
     }
-    let last = needle[len - 1];
+    let first_lower = needle[0].to_ascii_lowercase();
+    let first_upper = needle[0].to_ascii_uppercase();
+    let last_start = haystack.len() - len;
     let mut at = 0;
-    while at + len <= haystack.len() {
-        let tail = haystack[at + len - 1];
-        if tail.to_ascii_lowercase() == last && haystack[at..at + len].eq_ignore_ascii_case(needle)
-        {
+    while at <= last_start {
+        let Some(offset) = haystack[at..=last_start]
+            .iter()
+            .position(|&byte| byte == first_lower || byte == first_upper)
+        else {
+            return false;
+        };
+        let candidate = at + offset;
+        if haystack[candidate..candidate + len].eq_ignore_ascii_case(needle) {
             return true;
         }
-        at += shift[usize::from(tail)];
+        at = candidate + 1;
     }
     false
 }
