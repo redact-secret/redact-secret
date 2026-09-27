@@ -100,6 +100,33 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `xai_api_key` | `xai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 <!-- detector-families:end -->
 
+## Policy-based credential contracts
+
+These four generic families remain T3 with `project-policy` evidence. Their
+supported promise is the bounded context, value, span, and default action
+below, not a claim that the value has a provider-issued lexical identity. A
+future `policy-qualified` result may make one of these families stable only by
+testing this promise; it does not relabel the family T1 or T2. The generated
+[support matrix](../support-matrix.md) remains the only source of each
+family's current status.
+
+| Family | Supported trigger and value | Exact span and default action | Exclusions and known blind spots | Product evidence |
+| --- | --- | --- | --- | --- |
+| `generic:bearer-token` | A case-insensitive `Bearer` scheme followed by SP or HTAB, either after an explicit `Authorization:` / `Proxy-Authorization:` header name or in the detector's bounded free-text carrier context. The current RFC 6750 `b64token` alphabet is accepted with at most two trailing `=` bytes. An explicit header lowers the project-policy value floor from 16 bytes to 12; the RFC defines neither floor. | The credential value only, including accepted trailing padding; `bearer_token`, high confidence, default `redact`. RFC 6750 supports the carrier and alphabet, while the floors, HTAB, padding cap, and free-text context are project policy. | Whole-value placeholders, instructional placeholders, repeated filler, wider identifiers, and a newline between scheme and value are excluded. Short values and unsupported encodings are blind spots. RFC 8959 `secret-token:` URI detection is a separate shape outside this claim. | Research [#650](../audits/evidence/650/README.md); exact-span and context cases `bearer-positive-scheme`, `bearer-positive-authorization-extra-whitespace-and-case`, `bearer-token-regression-proxy-authorization-header`; benign/boundary cases `bearer-negative-placeholder-whole-value`, `bearer-boundary-newline-separator`. |
+| `generic:connection-string-password` | One case-insensitive URI scheme from `postgresql`, `postgres`, `mysql`, `mariadb`, `mongodb+srv`, `mongodb`, `redis`, `rediss`, `amqp`, `amqps`, `https`, `http`, `ftps`, or `ftp`; exactly one userinfo `@`; a valid scheme-specific host; and a non-empty password after `:`. Redis and Rediss also accept password-only userinfo. Percent escapes must be valid and are not decoded. | The original undecoded password substring only; `connection_string_password`, high confidence, default `redact`. | Empty, placeholder, filler, tutorial prose, and recognized reference/template values are excluded, as are malformed encodings or hosts, multiple `@` bytes, unsupported schemes, and over-bound authorities or values. Query/property password forms are blind spots. Azure Storage `AccountKey` is a separate semicolon-delimited grammar emitted by the same detector and is outside this userinfo claim. | Research [#651](../audits/evidence/651/README.md); exact-span and context cases `connection-positive-postgres`, `connection-positive-redis-password-only`, `connection-regression-https-userinfo-percent-encoded-password`; benign/boundary cases `connection-negative-host-only`, `connection-boundary-placeholder`, `connection-negative-malformed-percent`. |
+| `generic:otp-seed` | A literal lowercase `otpauth://totp/` or `otpauth://hotp/` envelope whose first exact lowercase `secret` query parameter is an uppercase RFC 4648 Base32 run of at least 16 characters followed by optional `=` padding. The envelope and Base32 alphabet have external documentation; case, the length floor, and accepted padding are project choices. | The first secret value only, including padding; `otpauth_secret`, high confidence, default `redact`. | Bare seeds, lowercase or mixed-case values, encoded padding, an unsupported or differently cased scheme/type/key, an invalid first `secret` value, and a duplicate URI whose first `secret` is invalid are excluded or blind. The detector never falls through to a later duplicate. | Research [#652](../audits/evidence/652/README.md); exact-span and context cases `otpauth-positive-totp-minimal`, `otpauth-positive-hotp-minimal`, `otpauth-positive-duplicate-secret-first-wins`; benign/boundary cases `otpauth-negative-bare-base32-identifier-no-scheme`, `otpauth-boundary-invalid-base32-alphabet`, `otpauth-boundary-percent-encoded-padding-tradeoff`. |
+| `generic:unclassified-assignment-literal` | A direct literal assigned with `=`, `:`, or `:=` to the built-in high-signal or ambiguous name vocabulary, including its documented normalization and generic-prefix rules; URL query/form names use the separately bounded query path. Values are 8–4096 bytes. This does not cover arbitrary assignments. | The value only. A high-signal name emits `contextual_secret` at high confidence and default `redact` only when the existing bounded high-confidence value contract is met; otherwise it emits medium confidence and default `warn`. An ambiguous name must meet the stronger value contract, remains medium confidence, and defaults to `warn`. `block` is never promised. | Whole-value placeholders, references/interpolations, secret-manager/keychain references, SQL binds, source-code expressions, filler and masks, public identifiers, provider-owned names, unsupported names, and non-literal expressions are excluded. Unsupported operators and a real credential under an unrecognized name remain blind spots. | Research [#653](../audits/evidence/653/README.md); exact-span/action cases `contextual-positive-assignment`, `contextual-positive-minimum-length-is-medium-confidence`, `contextual-positive-remaining-declared-names`; benign cases `contextual-negative-shell-placeholder`, `contextual-negative-django-settings-attribute-reference`, `contextual-negative-repeated-asterisk-filler`. |
+
+The cited cases are representative, not a second corpus. They live in
+[`conformance/fixtures/synchronous-corpus.json`](../../conformance/fixtures/synchronous-corpus.json),
+whose exact UTF-8 spans, confidence, detector, and type feed the shared default
+policy and redaction contract. The applicable Rust, Node.js, browser
+WebAssembly, Python, and CLI lanes are described in the
+[conformance contract](../../conformance/README.md). Existing Unicode, CRLF,
+incremental, overlap, and adversarial cases continue to apply. New fixtures
+belong here only for a reviewed behavior gap; benchmark-only variants and raw
+qualification evidence stay in `redact-secret-benchmarks`.
+
 ## Structured PII status
 
 The

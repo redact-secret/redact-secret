@@ -13,7 +13,7 @@ Built-in Rust detection covers these kinds of structure:
 | Provider credentials | API keys and tokens with a recognizable provider-issued format, one detector per provider family (listed below) |
 | Authorization | JWT, Bearer, Basic, and Token credentials |
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
-| Connections | Credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, AMQP URLs |
+| Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
 
 Per-family support status is stated only in the generated
@@ -32,6 +32,25 @@ issues. Exact supported grammars and evidence are recorded in the
 [detection reliability assessment](detection-reliability.md) publishes its
 denominators, results, and limitations without turning them into a universal
 accuracy claim.
+
+### Policy-qualified generic credentials
+
+Four generic credential families have an explicitly bounded T3
+`project-policy` contract: Bearer values, URL-userinfo passwords, OTP seeds in
+`otpauth` URIs, and direct credential-assignment literals. Their complete
+trigger, candidate, exact-span, action, exclusion, and blind-spot definitions
+are in the
+[policy-based credential contracts](../specs/detector-families.md#policy-based-credential-contracts).
+
+If the generated support matrix labels one `Stable · Policy qualified`, that
+means protected evaluation found the bounded context/span/action promise
+reliable enough under its named qualification profile. It does **not** mean
+the value has a provider-documented format, that arbitrary values of the same
+broad kind are detected, or that the family moved from T3 to T1/T2. A family
+that misses any applicable gate remains `Provisional · Project policy`, with
+the failed gates recorded by the benchmark source that generated the matrix.
+The generated [support matrix](../support-matrix.md), not this explanatory
+section, is authoritative for the current status.
 
 ## Built-in detectors
 
