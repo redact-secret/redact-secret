@@ -352,8 +352,8 @@ impl Candidate {
         self
     }
 
-    /// Rejects this candidate when its original range was formed by removing
-    /// a governed invisible run from the detector's normalized scan view.
+    /// Rejects this candidate when a governed invisible run lies inside or
+    /// directly touches its range in the detector's normalized scan view.
     #[must_use]
     pub(crate) const fn reject_invisible_normalization(mut self) -> Self {
         self.reject_invisible_normalization = true;
