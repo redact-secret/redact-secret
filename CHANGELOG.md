@@ -5,6 +5,17 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- The PII context vocabulary is now `pii-context/v2`, and every PII
+  activation identity names it (`vocabulary=pii-context/v2`). A field label
+  associates only with the value after it, so an earlier value on the same
+  line no longer makes it "equidistant" (#924): on dense `k: v k: v` and
+  `a=… b=…` records (`email: … phone: …`, `ip=… card_number=…`), every
+  labelled value is now reported, not only the first. A natural-language label
+  between two values (`… contact details …`) still associates with neither.
+  The released `pii-context/v1` file is kept unchanged as the beta.10 record.
+
 ### Fixed
 
 - PII context association no longer counts a same-range alternative of

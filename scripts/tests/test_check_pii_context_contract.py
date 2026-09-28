@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for the pii-context/v1 live contract."""
+"""Tests for the pii-context/v2 live contract."""
 
 from __future__ import annotations
 
@@ -132,6 +132,37 @@ class SchemaAndSemantics(unittest.TestCase):
             ),
             "card",
         )
+
+    def test_field_label_ignores_an_earlier_candidate_when_judging_equidistance(self) -> None:
+        occurrence = {
+            "start": 5,
+            "end": 10,
+            "entry": {
+                "kind": "field-label",
+                "domains": ["phone"],
+            },
+        }
+        candidates = {
+            "email": {"domain": "email"},
+            "phone": {"domain": "phone"},
+        }
+        view = "TEST phone TEST"
+        self.assertEqual(
+            CHECK.associate_occurrence(occurrence, view, {"email": 4, "phone": 11}, candidates),
+            "phone",
+        )
+        natural = dict(occurrence, entry={"kind": "natural-language-label", "domains": ["phone"]})
+        self.assertIsNone(
+            CHECK.associate_occurrence(natural, view, {"email": 4, "phone": 11}, candidates)
+        )
+
+    def test_equidistance_scope_is_part_of_the_versioned_schema(self) -> None:
+        changed = copy.deepcopy(CONTRACT)
+        changed["association"]["fieldLabel"]["equidistanceAmong"] = "candidates-on-either-side"
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
+        changed = copy.deepcopy(CONTRACT)
+        changed["format"] = "redact-secret/pii-context/v1"
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
 
     def test_unknown_fields_and_runtime_status_drift_are_rejected(self) -> None:
         changed = copy.deepcopy(CONTRACT)

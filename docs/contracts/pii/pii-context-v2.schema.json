@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/redact-secret/redact-secret/blob/main/docs/contracts/pii/pii-context-v2.schema.json",
+  "title": "Redact Secret PII context vocabulary v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "format", "status", "evidenceGroup", "use", "normalization", "association", "precedence", "languages", "entries", "fixtures"],
+  "properties": {
+    "$schema": { "const": "./pii-context-v2.schema.json" },
+    "format": { "const": "redact-secret/pii-context/v2" },
+    "status": { "const": "runtime-compiled" },
+    "evidenceGroup": { "const": "contextual" },
+    "use": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loadedAtRuntime", "shippedInPackages", "establishesIdentity", "publicApi"],
+      "properties": {
+        "loadedAtRuntime": { "const": false },
+        "shippedInPackages": { "const": false },
+        "establishesIdentity": { "const": false },
+        "publicApi": { "const": false }
+      }
+    },
+    "normalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unicode", "removeGovernedInvisible", "englishCase", "koreanCase", "tokenSeparators"],
+      "properties": {
+        "unicode": { "const": "NFC" },
+        "removeGovernedInvisible": { "const": true },
+        "englishCase": { "const": "ascii-lower" },
+        "koreanCase": { "const": "none" },
+        "tokenSeparators": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": { "enum": ["whitespace", "underscore", "hyphen", "colon", "equals"] }
+        }
+      }
+    },
+    "association": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "sameLogicalLine", "maxDistance", "stopAtAnotherCandidate", "equidistant", "fieldLabel", "naturalLanguageLabel"],
+      "properties": {
+        "unit": { "const": "normalized-unicode-scalar" },
+        "sameLogicalLine": { "const": true },
+        "maxDistance": { "const": 64 },
+        "stopAtAnotherCandidate": { "const": true },
+        "equidistant": { "const": "unassociated" },
+        "fieldLabel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["direction", "maxDistance", "gap", "equidistanceAmong"],
+          "properties": {
+            "direction": { "const": "before" },
+            "maxDistance": { "const": 16 },
+            "gap": { "const": "separators-and-quotes-only" },
+            "equidistanceAmong": { "const": "following-candidates" }
+          }
+        },
+        "naturalLanguageLabel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["direction", "maxDistance", "equidistanceAmong"],
+          "properties": {
+            "direction": { "const": "either" },
+            "maxDistance": { "const": 64 },
+            "equidistanceAmong": { "const": "candidates-on-either-side" }
+          }
+        }
+      }
+    },
+    "precedence": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": { "enum": ["longest-token-span", "high-signal-first", "negative-positive-neutral", "entry-id-bytewise"] }
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "enum": ["en", "ko"] }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "fixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/fixture" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "domain": { "enum": ["email", "payment-card", "network-address", "iban", "phone", "national-id"] },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "language", "kind", "class", "strength", "domains", "forms", "provenance"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "language": { "enum": ["en", "ko"] },
+        "kind": { "enum": ["field-label", "natural-language-label"] },
+        "class": { "enum": ["positive", "neutral", "negative"] },
+        "strength": { "enum": ["high-signal", "ambiguous"] },
+        "domains": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/domain" } },
+        "forms": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "provenance": { "const": "synthetic-contract-example" }
+      }
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "language", "template", "candidates", "expectedAssociations"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "language": { "enum": ["en", "ko"] },
+        "template": { "type": "string", "minLength": 1 },
+        "candidates": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/candidate" } },
+        "expectedAssociations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/association" } }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "domain", "identityEstablished"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "domain": { "$ref": "#/$defs/domain" },
+        "identityEstablished": { "type": "boolean" }
+      }
+    },
+    "association": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate", "matches", "effect"],
+      "properties": {
+        "candidate": { "$ref": "#/$defs/id" },
+        "matches": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "effect": { "enum": ["positive-evidence", "negative-evidence", "neutral-evidence", "no-evidence", "not-established-without-identity"] }
+      }
+    }
+  }
+}

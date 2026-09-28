@@ -52,7 +52,7 @@ export function createFakeBinding(
   const redacted = options.redacted ?? "<SECRET_1>";
   let lastLimits: NativeWholeInputLimits | undefined;
   let lastRuleset: Uint8Array | undefined;
-  let activation = "credentials=full;selectors=off;families=;vocabulary=pii-context/v1";
+  let activation = "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
 
   function session(): NativeIncrementalSanitizer {
     let state: IncrementalSanitizerState = "accepting";
@@ -117,7 +117,7 @@ export function createFakeBinding(
         ...(global || selectors.includes("pii:family:global:phone") ? ["pii:global:phone"] : []),
         ...(jurisdiction || selectors.includes("pii:family:us:ssn") ? ["pii:us:ssn"] : []),
       ].join(",");
-      const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;
+      const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v2`;
       if (activation !== next && calls.filter((call) => call === "initialize").length > 1) {
         throw Object.assign(new Error("conflict"), { code: "PII_ACTIVATION_CONFLICT" });
       }

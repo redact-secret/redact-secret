@@ -130,7 +130,7 @@ fn check_header(line: &str, family: &str) {
         json!({
             "format": "redact-secret/pii-identity-evaluation/1",
             "family": family,
-            "vocabulary": "pii-context/v1",
+            "vocabulary": "pii-context/v2",
             "activationIdentity": registry.activation_identity(),
         })
     );

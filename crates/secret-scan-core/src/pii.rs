@@ -904,6 +904,7 @@ fn context_matches(
                         if equidistant_from_candidates(
                             input,
                             entry.language,
+                            entry.kind,
                             line_start,
                             line_end,
                             occurrence_start,
@@ -994,9 +995,19 @@ fn logical_line_bounds(input: &str, range: ByteRange) -> (usize, usize) {
     (line_start, line_end)
 }
 
+/// Whether a context occurrence is equally near two candidate occurrences
+/// it could associate with. A field label only associates with a candidate
+/// after it, so a candidate that ends before the label never makes it
+/// equidistant (`pii-context/v2`, issue #924); a natural-language label may
+/// associate either way and keeps the two-sided rule.
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one bounded association question over the same line view"
+)]
 fn equidistant_from_candidates(
     input: &str,
     language: ContextLanguage,
+    kind: ContextKind,
     line_start: usize,
     line_end: usize,
     occurrence_start: usize,
@@ -1019,6 +1030,9 @@ fn equidistant_from_candidates(
             + normalize_context(&input[range.start()..range.end()], language)
                 .chars()
                 .count();
+        if kind == ContextKind::FieldLabel && candidate_end <= occurrence_start {
+            continue;
+        }
         let distance = if candidate_end <= occurrence_start {
             occurrence_start - candidate_end
         } else {
@@ -1166,12 +1180,12 @@ mod tests {
     fn activation_identity_is_canonical_and_off_is_distinct() {
         assert_eq!(
             PiiSelection::default().activation_identity(crate::Profile::Full),
-            "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+            "credentials=full;selectors=off;families=;vocabulary=pii-context/v2"
         );
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
         );
     }
 
@@ -1550,6 +1564,67 @@ mod tests {
             ],
         );
         assert!(mixed_domains.iter().all(Vec::is_empty));
+    }
+
+    #[test]
+    fn field_label_after_an_earlier_candidate_associates_forward() {
+        // Issue #924: a field label only associates with the candidate after
+        // it, so the candidate before it on the same line never makes it
+        // equidistant.
+        for (input, first, second, first_entry, second_entry) in [
+            (
+                "email: AAAA phone: BBBB",
+                IdentityDomain::Email,
+                IdentityDomain::Phone,
+                "en-email-field",
+                "en-phone-field",
+            ),
+            (
+                "ip=AAAA card_number=BBBB",
+                IdentityDomain::NetworkAddress,
+                IdentityDomain::PaymentCard,
+                "en-network-address-field",
+                "en-payment-card-field",
+            ),
+            (
+                "ip: AAAA ip: BBBB",
+                IdentityDomain::NetworkAddress,
+                IdentityDomain::NetworkAddress,
+                "en-network-address-field",
+                "en-network-address-field",
+            ),
+        ] {
+            let a = input.find("AAAA").unwrap();
+            let b = input.find("BBBB").unwrap();
+            let matches = context_matches(
+                input,
+                &[
+                    (ByteRange::new(a, a + 4).unwrap(), first),
+                    (ByteRange::new(b, b + 4).unwrap(), second),
+                ],
+            );
+            assert!(
+                matches[0].iter().any(|item| item.entry_id == first_entry),
+                "{input}"
+            );
+            assert!(
+                matches[1].iter().any(|item| item.entry_id == second_entry),
+                "{input}"
+            );
+        }
+        // A label of another domain after the first value reaches nothing.
+        let other_domain = context_matches(
+            "ip: AAAA order_id=BBBB",
+            &[
+                (
+                    ByteRange::new(4, 8).unwrap(),
+                    IdentityDomain::NetworkAddress,
+                ),
+                (ByteRange::new(18, 22).unwrap(), IdentityDomain::PaymentCard),
+            ],
+        );
+        assert!(!other_domain[0].is_empty());
+        assert!(other_domain[1].is_empty());
     }
 
     #[test]
@@ -1961,7 +2036,7 @@ mod tests {
     fn identity_evaluator_accepts_exactly_one_production_family() {
         for family in AVAILABLE_FAMILIES {
             let evaluator = IdentityEvaluator::new(family).unwrap();
-            assert_eq!(IdentityEvaluator::vocabulary(), "pii-context/v1");
+            assert_eq!(IdentityEvaluator::vocabulary(), "pii-context/v2");
             assert_eq!(
                 IDENTITY_EVALUATION_FORMAT,
                 "redact-secret/pii-identity-evaluation/1"
@@ -1981,7 +2056,7 @@ mod tests {
             IdentityEvaluator::new("pii:us:ssn")
                 .unwrap()
                 .activation_identity(),
-            "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v2"
         );
         for other in [
             "",

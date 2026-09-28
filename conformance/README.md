@@ -115,7 +115,8 @@ depend on `src/`.
   deterministic syntactically valid values with no real-world provenance.
 - [`fixtures/pii-cross-family-v1.json`](./fixtures/pii-cross-family-v1.json) —
   context association when several families run together under `pii:us`:
-  one value read by two families at one range, and its benign controls. Each case names the issue that
+  one value read by two families at one range, labels on dense same-line
+  key/value records, and their benign controls. Each case names the issue that
   added it. The Rust consumer, with whole-input, every-partition and PII-off
   checks, is `crates/secret-scan-core/tests/pii_cross_family_conformance.rs`.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —

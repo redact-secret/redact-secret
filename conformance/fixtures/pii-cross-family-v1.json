@@ -8,7 +8,14 @@
       "issue": 922,
       "input": "card_number=4005550183",
       "expected": [
-        {"detector": "pii-domain", "type": "pii_global_payment_card", "confidence": "high", "action": "redact", "start": 12, "end": 22}
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_payment_card",
+          "confidence": "high",
+          "action": "redact",
+          "start": 12,
+          "end": 22
+        }
       ]
     },
     {
@@ -16,7 +23,14 @@
       "issue": 922,
       "input": "card_number=4000425050",
       "expected": [
-        {"detector": "pii-domain", "type": "pii_global_payment_card", "confidence": "high", "action": "redact", "start": 12, "end": 22}
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_payment_card",
+          "confidence": "high",
+          "action": "redact",
+          "start": 12,
+          "end": 22
+        }
       ]
     },
     {
@@ -24,7 +38,14 @@
       "issue": 922,
       "input": "phone: 4004251569",
       "expected": [
-        {"detector": "pii-domain", "type": "pii_global_phone", "confidence": "high", "action": "redact", "start": 7, "end": 17}
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 17
+        }
       ]
     },
     {
@@ -32,7 +53,14 @@
       "issue": 922,
       "input": "phone: 4004251560",
       "expected": [
-        {"detector": "pii-domain", "type": "pii_global_phone", "confidence": "high", "action": "redact", "start": 7, "end": 17}
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 17
+        }
       ]
     },
     {
@@ -46,6 +74,182 @@
       "issue": 922,
       "input": "555-234-5678 contact details 555-234-5678",
       "expected": []
+    },
+    {
+      "id": "dense-colon-line-email-then-phone",
+      "issue": 924,
+      "input": "email: fixture876-q7m9@x4z8v2n6.synthetic phone: 555-234-5678",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 41
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 49,
+          "end": 61
+        }
+      ]
+    },
+    {
+      "id": "dense-colon-line-repeated-email-label",
+      "issue": 924,
+      "input": "email: fixture876-q7m9@x4z8v2n6.synthetic email: fixture901-b2c3@x4z8v2n6.synthetic",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 41
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 49,
+          "end": 83
+        }
+      ]
+    },
+    {
+      "id": "dense-equals-line-address-then-card",
+      "issue": 924,
+      "input": "ip=192.168.1.7 card_number=4000008770000003",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 3,
+          "end": 14
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_payment_card",
+          "confidence": "high",
+          "action": "redact",
+          "start": 27,
+          "end": 43
+        }
+      ]
+    },
+    {
+      "id": "dense-colon-line-repeated-ip-label",
+      "issue": 924,
+      "input": "ip: 192.168.1.7 ip: 10.0.0.8",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 4,
+          "end": 15
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 20,
+          "end": 28
+        }
+      ]
+    },
+    {
+      "id": "dense-equals-line-card-then-iban",
+      "issue": 924,
+      "input": "card_number=4000008770000003 iban=GB18SYNX00000000000000",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_payment_card",
+          "confidence": "high",
+          "action": "redact",
+          "start": 12,
+          "end": 28
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_iban",
+          "confidence": "high",
+          "action": "redact",
+          "start": 34,
+          "end": 56
+        }
+      ]
+    },
+    {
+      "id": "dense-equals-line-phone-then-ssn",
+      "issue": 924,
+      "input": "phone=555-234-5678 ssn=890-62-6879",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 6,
+          "end": 18
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_jurisdiction_us_ssn",
+          "confidence": "high",
+          "action": "redact",
+          "start": 23,
+          "end": 34
+        }
+      ]
+    },
+    {
+      "id": "dense-line-comma-twin",
+      "issue": 924,
+      "input": "email: fixture876-q7m9@x4z8v2n6.synthetic, phone: 555-234-5678",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 41
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 50,
+          "end": 62
+        }
+      ]
+    },
+    {
+      "id": "dense-line-unlabelled-second-value-benign-control",
+      "issue": 924,
+      "input": "ip: 192.168.1.7 order_id=4000008770000003",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 4,
+          "end": 15
+        }
+      ]
     }
   ]
 }

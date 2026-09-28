@@ -96,6 +96,6 @@ import redact_secret
 
 redact_secret.initialize(pii=("pii",))
 assert redact_secret.pii_activation() == (
-    "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
+    "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
 )
 ```

@@ -1,10 +1,10 @@
-//! Generated `pii-context/v1` vocabulary. Do not edit by hand.
+//! Generated `pii-context/v2` vocabulary. Do not edit by hand.
 
 use super::{
     ContextClass, ContextEntry, ContextKind, ContextLanguage, ContextStrength, IdentityDomain,
 };
 
-pub(super) const CONTEXT_VERSION: &str = "pii-context/v1";
+pub(super) const CONTEXT_VERSION: &str = "pii-context/v2";
 
 #[rustfmt::skip]
 pub(super) const CONTEXT_ENTRIES: &[ContextEntry] = &[

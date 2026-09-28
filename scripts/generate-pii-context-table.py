@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the core's compiled pii-context/v1 vocabulary table."""
+"""Generate the core's compiled pii-context/v2 vocabulary table."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT = Path("docs/contracts/pii/pii-context-v1.json")
+CONTRACT = Path("docs/contracts/pii/pii-context-v2.json")
 OUTPUT = Path("crates/secret-scan-core/src/pii_context_table.rs")
 
 DOMAIN = {
@@ -31,13 +31,13 @@ def rust_string(value: str) -> str:
 
 def render(contract: dict) -> str:
     lines = [
-        "//! Generated `pii-context/v1` vocabulary. Do not edit by hand.",
+        "//! Generated `pii-context/v2` vocabulary. Do not edit by hand.",
         "",
         "use super::{",
         "    ContextClass, ContextEntry, ContextKind, ContextLanguage, ContextStrength, IdentityDomain,",
         "};",
         "",
-        'pub(super) const CONTEXT_VERSION: &str = "pii-context/v1";',
+        'pub(super) const CONTEXT_VERSION: &str = "pii-context/v2";',
         "",
         "#[rustfmt::skip]",
         "pub(super) const CONTEXT_ENTRIES: &[ContextEntry] = &[",

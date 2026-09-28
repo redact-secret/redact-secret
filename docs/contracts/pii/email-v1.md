@@ -90,7 +90,7 @@ RFC 2606 sections 2–3 and RFC 6761 sections 6.2–6.5 are the typed
 resemblance do not suppress: `notexample.com`, `example.com.invalidated`, and
 an `example` word outside the parsed domain are not whole-domain matches. The
 family also names only `en-example-label` and `ko-example-label` from
-`pii-context/v1` as occurrence-level exclusions.
+`pii-context/v2` as occurrence-level exclusions.
 
 ## Safe fixture plan
 

@@ -716,7 +716,7 @@ runtime/profile/artifact-size and cross-domain qualification evidence. That
 model keeps type evidence separate from sensitivity, uses explicit global or
 jurisdictional scope, and makes PII activation orthogonal to the existing
 `full`/`common` credential profiles. Its English/Korean context input is the
-validated, non-runtime [`pii-context/v1` contract](./docs/contracts/pii/pii-context-v1.json),
+validated, non-runtime [`pii-context/v2` contract](./docs/contracts/pii/pii-context-v2.json),
 and support claims remain gated by the
 [`pii-v1` qualification contract](./docs/decisions/2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md).
 Beta.9 ships no PII detector and makes no PII support claim; the

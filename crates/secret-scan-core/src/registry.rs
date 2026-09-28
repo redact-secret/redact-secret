@@ -574,7 +574,7 @@ mod tests {
         assert_eq!(full.profile(), Some(Profile::Full));
         assert_eq!(
             full.activation_identity(),
-            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
         );
         assert_eq!(
             full.register(Box::new(Named("pii-domain")))
@@ -591,7 +591,7 @@ mod tests {
         assert!(!full.contains("pii-domain"));
         assert_eq!(
             full.activation_identity(),
-            "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+            "credentials=full;selectors=off;families=;vocabulary=pii-context/v2"
         );
     }
 }

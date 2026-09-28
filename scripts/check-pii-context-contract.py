@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate pii-context/v1 semantics against its pinned Unicode inputs and fixtures."""
+"""Validate pii-context/v2 semantics against its pinned Unicode inputs and fixtures."""
 
 from __future__ import annotations
 
@@ -11,8 +11,8 @@ import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ARTIFACT = Path("docs/contracts/pii/pii-context-v1.json")
-SCHEMA = Path("docs/contracts/pii/pii-context-v1.schema.json")
+ARTIFACT = Path("docs/contracts/pii/pii-context-v2.json")
+SCHEMA = Path("docs/contracts/pii/pii-context-v2.schema.json")
 INVISIBLE_TABLE = Path("crates/secret-scan-core/src/invisible_table.rs")
 UCD_DIR = Path("crates/secret-scan-core/ucd")
 MARKER = re.compile(r"\{\{candidate:([a-z][a-z0-9-]*)\}\}")
@@ -126,6 +126,12 @@ def associate_occurrence(occurrence: dict, view: str, positions: dict[str, int],
     """Honor domain, direction, bounds, intervening candidates, and ties."""
     entry = occurrence["entry"]
     limit = 16 if entry["kind"] == "field-label" else 64
+    if entry["kind"] == "field-label":
+        # A field label associates only forward, so only a candidate after it
+        # can compete for it (pii-context/v2, issue #924).
+        positions = {
+            candidate_id: position for candidate_id, position in positions.items() if position >= occurrence["end"]
+        }
     eligible: list[tuple[int, str]] = []
     for candidate_id, position in positions.items():
         if candidates[candidate_id]["domain"] not in entry["domains"]:

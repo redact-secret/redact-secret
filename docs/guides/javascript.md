@@ -37,7 +37,7 @@ import { initialize, piiActivation } from "@redact-secret/core";
 
 await initialize({ pii: ["pii", "pii:global"] });
 console.log(piiActivation());
-// credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1
+// credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2
 ```
 
 `scan(input)` returns findings. `redact(input, findings)` uses findings from

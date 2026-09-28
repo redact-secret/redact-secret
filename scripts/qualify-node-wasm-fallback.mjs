@@ -141,10 +141,10 @@ async function qualifyPhone(api, selectorKind) {
   assertEqual(api.artifact(), "wasm", `${selectorKind} phone artifact`);
   const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
   const activation = selectorKind === "exact"
-    ? "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v1"
+    ? "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v2"
     : selectorKind === "global"
-      ? `credentials=full;selectors=pii:global;families=${globals};vocabulary=pii-context/v1`
-      : "credentials=full;selectors=off;families=;vocabulary=pii-context/v1";
+      ? `credentials=full;selectors=pii:global;families=${globals};vocabulary=pii-context/v2`
+      : "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
   assertEqual(api.piiActivation(), activation, `${selectorKind} phone activation`);
 
   for (const testCase of fixture.cases) {

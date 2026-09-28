@@ -27,7 +27,7 @@ selections use fixed input-free diagnostics.
 
 ```bash
 redact-secret --pii pii --print-pii-activation
-# credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1
+# credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2
 ```
 
 With no paths, the CLI reads standard input. With paths, check mode reads each
