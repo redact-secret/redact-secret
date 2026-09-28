@@ -49,6 +49,14 @@ from those descriptions.
   [issuecomment-5871306275](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5871306275).
 - Step 2 selection and the beta.9 generic-coverage probe:
   [issuecomment-5852451907](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5852451907).
+- Maintainer rulings R9 (dated code: a generator or validator in provider
+  code is T1 as of its date, until a newer provider source contradicts it:
+  yes) and R10 (policy fill: where the provider states a length or floor but
+  not the whole grammar, policy may fill the rest, at least as wide as any
+  provider-stated class: yes, for Cerebras and RunPod only), with the
+  dispositions of the issuance-gate research (2026-09-28, after this index):
+  [issuecomment-5880547337](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5880547337).
+  The research is frozen in [issuance-research/](issuance-research/README.md).
 
 ## Verdict
 
@@ -61,10 +69,14 @@ from those descriptions.
 | 34 | `helicone:api-key` | [helicone.md](helicone.md) | **READY** | new detector | read-write key (`sk-`); write-only key (`pk-`), redacted |
 | 04 | `firecrawl:api-key` | [firecrawl.md](firecrawl.md) | **READY** | new detector | one |
 | 31 | `composio:api-key` | [composio.md](composio.md) | **READY** (`ak_`, `oak_`, `uak_`; step 2's `uak_` gate is lifted by R6, see the family document) | new detector | project key; org key; user key |
-| 32 | `daytona:api-key` | [daytona.md](daytona.md) | **ISSUANCE-GATED** | new detector | one |
-| 42 | `clickhouse-cloud:api-key` | [clickhouse-cloud.md](clickhouse-cloud.md) | **ISSUANCE-GATED** | new detector | one (the key secret; the key ID stays unclaimed) |
-| 15 | `weaviate:cloud-api-key` | [weaviate.md](weaviate.md) | **ISSUANCE-GATED** | new detector | one |
+| 32 | `daytona:api-key` | [daytona.md](daytona.md) | **READY** (ruling R9, 2026-09-28; was ISSUANCE-GATED) | new detector | one |
+| 42 | `clickhouse-cloud:api-key` | [clickhouse-cloud.md](clickhouse-cloud.md) | **READY** (issuance research under R3, 2026-09-28; was ISSUANCE-GATED) | new detector | one (the key secret; the key ID stays unclaimed) |
+| 15 | `weaviate:cloud-api-key` | [weaviate.md](weaviate.md) | **ISSUANCE-GATED** (researched 2026-09-28; [still gated](issuance-research/weaviate.md)) | new detector | one |
 | 10 | `baseten:api-key` | [baseten.md](baseten.md) | **DATE-GATED** (no `b10_` key exists before 2026-10-01 15:00 GMT) | new detector | one |
+
+Daytona and ClickHouse Cloud moved to READY after the
+[issuance-gate research](issuance-research/README.md); both are scheduled for
+Beta.12 with the Tier B families NVIDIA, Browserbase, Cerebras and RunPod.
 
 Every row is a **new registry detector with its own finding type(s)**. None is
 an extension of an existing detector: no current detector claims any of these

@@ -4,7 +4,8 @@
 [Issue #860](https://github.com/redact-secret/redact-secret/issues/860) ·
 [Benchmarks counterpart #376](https://github.com/redact-secret/redact-secret-benchmarks/issues/376) ·
 [Spec: detector families](../../../specs/detector-families.md) ·
-[All-50 disposition](disposition.md)
+[All-50 disposition](disposition.md) ·
+[Issuance research and R9–R10](issuance-research/README.md)
 
 Frozen record, written 2026-09-28. It re-ranks the 13 Tier B candidates from
 step 2 of #860 after the maintainer's rulings R2 and R4–R8, and it writes
@@ -47,6 +48,12 @@ complete key-shaped example appears. Test values are generated at run time.
   [issuecomment-5871306275](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5871306275).
 - Tier A step 3:
   [issuecomment-5871361534](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5871361534).
+- Issuance-gate research, rulings R9 (dated provider code is T1 as of its
+  date) and R10 (policy may fill a partly stated grammar, for Cerebras and
+  RunPod only), and the per-family dispositions (added 2026-09-28, after this
+  re-rank):
+  [issuecomment-5880547337](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5880547337);
+  frozen in [issuance-research/](issuance-research/README.md).
 
 Desk research was not repeated. A source was re-checked on 2026-09-28 only
 where a ruling hinges on it: every R2 authorship, the R5 examples for
@@ -98,12 +105,12 @@ Priority is the order below. The rule each fact rests on is in brackets.
 | 4 | 02 | `resend:api-key` | `re_` (CLI code + README) | 8 + `_` + 24 = 36 [R5: docs response example + SDK fixtures] | `[A-Za-z0-9]` superset by example; `_` at offset 11 | **READY** | [resend.md](resend.md). Mixed-case guard for the short prefix |
 | 5 | 13 | `apify:api-token` | `apify_api_` [R4 docs placeholder; the `apify_ui_` branch is R6] | at least 20, open-ended [R2]; cap 128 by policy | `[A-Za-z0-9]` [R2] | **READY** (open-ended) | [apify.md](apify.md) |
 | 6 | 37 | `wandb:api-key` (`wandb_v1_`) | `wandb_v1_` [R5 test constant] | total 86 [R5 SDK/Weave fixtures + docs "about 86"] | `[A-Za-z0-9_]` [R1 validator + error text] | **READY** (the legacy 40-hex key is NOT SELECTED) | [wandb.md](wandb.md). Issuance check recommended for the "about" |
-| 7 | 01 | `nvidia:ngc-api-key` | `nvapi-` (docs + NGC CLI `SCOPED_KEY_PREFIX`) | not T1: 64 is tool-only; NemoClaw redaction floors of 10/12/16 are far too low for bare detection | not T1 (tool `[A-Za-z0-9_-]`) | **ISSUANCE-GATED** | body length after `nvapi-` and its alphabet, for a Personal, a Service and a build.nvidia.com key. Short floors would claim `nvapi-` SDK and crate names |
+| 7 | 01 | `nvidia:ngc-api-key` | `nvapi-` (docs + NGC CLI `SCOPED_KEY_PREFIX`) | not T1: 64 is tool-only; NemoClaw redaction floors of 10/12/16 are far too low for bare detection | not T1 (tool `[A-Za-z0-9_-]`) | **ISSUANCE-GATED** → **READY** after the issuance research (R2 floor 60, `[A-Za-z0-9_-]`) | [nvidia.md](nvidia.md). Was gated on body length and alphabet. Short floors would claim `nvapi-` SDK and crate names |
 | 8 | 43 | `planetscale:service-token` | `pscale_tkn_` (docs + CLI/MCP code) | 32–64 per a staff statement of **2022-05** [R3]; not fixed | `[A-Za-z0-9=_.-]` per the same staff diff [R3] | **ISSUANCE-GATED** | whether a token issued today has a suffix inside 32–64 (trufflehog says 43), and which of `= . - _` occur. The only T1 source is 4+ years old and self-described as "very likely to change". A maintainer may instead accept the R3 range as-is; that would make it READY |
-| 9 | 09 | `runpod:api-key` | `rpa_` (blog/docs + scrubber) [R2] | at least 16 [R2]; 46 empirical; a docs example of 48 without `_` [R5] contradicts it | `[A-Za-z0-9]` [R2] | **ISSUANCE-GATED** | exact body length (46?) and the 40-upper/6-lower layout. An exact width is needed to keep Redirect.pizza's `rpa_` + 30 from being reported as RunPod |
-| 10 | 08 | `cerebras:inference-api-key` | `csk-` (docs: "starts with `csk-`") | not T1: 48 is tool-only | not T1: `[a-z0-9]` is tool-only | **ISSUANCE-GATED** | body length (48?) and alphabet (a reduced lowercase set?). Pinecone's `pcsk-` contains `csk-`, and the leading boundary handles it |
+| 9 | 09 | `runpod:api-key` | `rpa_` (blog/docs + scrubber) [R2] | at least 16 [R2]; 46 empirical; a docs example of 48 without `_` [R5] contradicts it | `[A-Za-z0-9]` [R2] | **ISSUANCE-GATED** → **READY** by R10 (policy floor 31) | [runpod.md](runpod.md). Was gated on exact body length (46?) and the 40-upper/6-lower layout, needed to keep Redirect.pizza's `rpa_` + 30 from being reported as RunPod; the policy floor does that instead |
+| 10 | 08 | `cerebras:inference-api-key` | `csk-` (docs: "starts with `csk-`") | not T1: 48 is tool-only | not T1: `[a-z0-9]` is tool-only | **ISSUANCE-GATED** → **READY** by R10 (validator length 48, `csk_` by staff statement, policy alphabet) | [cerebras.md](cerebras.md). Was gated on body length (48?) and alphabet. Pinecone's `pcsk-` contains `csk-`, and the leading boundary handles it |
 | 11 | 17 | `cartesia:api-key` | `sk_car_`, `sk_car_admin_` (docs + runtime `startswith`) [R6] | fixtures 22 + `.` + 36 [R5], but conflicting: short `abc.def` fixtures, and a 2025-02 committed undotted `sk_car_` + 21 `[A-Za-z0-9_]` | the `<id>.<secret>` code comment is T2 [R6] | **ISSUANCE-GATED** | whether a key issued today contains `.`, its segment lengths, and whether `_` appears. The undotted 2025 shape suggests drift |
-| 12 | 06 | `browserbase:api-key` | `bb_live_` / `bb_test_` (docs placeholders [R4] + redaction regex [R2]) | none: the regex floor is 5 | `[A-Za-z0-9_-]` with the first 4 alphanumeric [R2] | **ISSUANCE-GATED** | body length. A floor of 5 would claim `bb_test_data_…` identifiers. Also whether `bb_test_` is issued to customers |
+| 12 | 06 | `browserbase:api-key` | `bb_live_` / `bb_test_` (docs placeholders [R4] + redaction regex [R2]) | none: the regex floor is 5 | `[A-Za-z0-9_-]` with the first 4 alphanumeric [R2] | **ISSUANCE-GATED** → **READY** for `bb_live_` after the issuance research (R2 floor 20, alphanumeric); `bb_test_` stays gated | [browserbase.md](browserbase.md). Was gated on body length: a floor of 5 would claim `bb_test_data_…` identifiers. Whether `bb_test_` is issued to customers is still open |
 | 13 | 33 | `arcade:api-key` | `arc_` [R6 runtime `startsWith`]; `arc_proj_` [R4 provider example-repo placeholders]; the code comment is T2 | none | none (empirical mixed-case alphanumeric) | **ISSUANCE-GATED** for `arc_proj_` only. Bare `arc_` is **NOT SELECTED** | whether a project key issued today starts `arc_proj_`, its body length and alphabet, and the read-only key's sub-prefix. Bare `arc_` is shared by at least 3 other issuers (Arcauthic, ArcAgent, Arcane), and personal keys are deprecated |
 
 **What changed since step 2.**
@@ -117,6 +124,20 @@ Priority is the order below. The rule each fact rests on is in brackets.
   their length.
 - Cartesia's R5 fixtures conflict with an older undotted value, so it stays
   gated on drift.
+
+**What changed after the issuance research and R9–R10 (2026-09-28).** See
+[issuance-research/](issuance-research/README.md).
+
+- NVIDIA and Browserbase (`bb_live_`) closed as open-ended grammars under R2
+  from newly found provider-authored rules. Their caps are policy (128), as
+  for Apify.
+- Cerebras and RunPod became READY by R10: the provider states a length
+  (Cerebras 48) or a floor (RunPod 16), and policy fills the rest (Cerebras
+  alphabet `[A-Za-z0-9_-]`; RunPod floor 31).
+- PlanetScale (the 2022 range was not accepted), Cartesia, Arcade,
+  `bb_test_` and Convex's cloud body stay ISSUANCE-GATED.
+- Six families now have step-3 handoffs for Beta.12: the four above plus
+  the Tier A Daytona (R9) and ClickHouse Cloud handoffs, updated in place.
 
 ## Current coverage on `main`
 
@@ -185,12 +206,12 @@ It is never averaged into a wider grammar.
 | # | Issue | Record |
 | ---: | --- | --- |
 | 48 | one prod and one preview deploy key; optionally one dashboard admin key | see [convex.md](convex.md#issuance-checklist--gate-for-the-cloud-body-structure-only) |
-| 01 | one NGC Personal key, one NGC Service key, one build.nvidia.com key | total length; body length after `nvapi-`; alphabet classes incl. `-` and `_` |
+| 01 | optional since R2 research: one NGC Personal key, one NGC Service key, one build.nvidia.com key | total length; body length after `nvapi-`; alphabet classes incl. `-` and `_` |
 | 43 | one service token (and its ID) | suffix length after `pscale_tkn_`; alphabet classes incl. `=` `.` `-` `_`; ID length and classes |
-| 09 | one All key and one Read Only key (optionally one S3 `rps_` secret) | body length after `rpa_`; the length of the leading run with no lowercase; tail length and classes; any `_` |
-| 08 | one inference key; note whether the Management API key uses `csk-` | body length after `csk-`; alphabet classes |
+| 09 | optional since R10: one All key and one Read Only key (optionally one S3 `rps_` secret) | body length after `rpa_`; the length of the leading run with no lowercase; tail length and classes; any `_` |
+| 08 | optional since R10: one inference key; note whether the Management API key uses `csk-` | body length after `csk-`; alphabet classes |
 | 17 | one standard and one admin key | presence and offset of `.`; both segment lengths; alphabet classes incl. `_` |
-| 06 | one `bb_live_` key (and whether a `bb_test_` key can be created) | body length; alphabet classes incl. `_` and `-` |
+| 06 | optional for `bb_live_`; still the gate for `bb_test_`: one `bb_live_` key, and whether a `bb_test_` key can be created | body length; alphabet classes incl. `_` and `-` |
 | 33 | one project key and one read-only project key | the literal sub-prefix after `arc_`; body length; alphabet classes |
 
 After a check matches, each contract would be:
@@ -273,6 +294,8 @@ No support status is claimed.
 - [x] A final disposition for all 50 candidates, consolidating Tier A:
   [disposition.md](disposition.md).
 - [x] No credential value or real-derived material appears.
+- [x] Issuance-gate research frozen and rulings R9–R10 applied (2026-09-28):
+  NVIDIA, Browserbase `bb_live_`, Cerebras and RunPod have handoffs.
 
 ## Authority
 

@@ -1,10 +1,13 @@
 # #860 handoff: `daytona:api-key`
 
 [#860 handoff index](README.md) ·
-[Research table #32](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5852386808)
+[Research table #32](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5852386808) ·
+[Issuance research](issuance-research/daytona.md)
 
-**Readiness: ISSUANCE-GATED.** **Route:** new detector `daytona-api-key`,
-finding type `daytona_api_key`, after the issuance check.
+**Readiness: READY** (ruling R9, 2026-09-28; was ISSUANCE-GATED).
+**Route:** new detector `daytona-api-key`, finding type `daytona_api_key`.
+Scheduled for Beta.12; no detector code merges to `main` until
+`0.1.0-beta.11` is released.
 
 ## Role and blast radius
 
@@ -12,7 +15,7 @@ A Daytona API key (`DAYTONA_API_KEY`, `Authorization: Bearer`) creates and
 controls agent sandboxes for an organization. The same generator also mints
 region proxy, SSH-gateway and runner keys, which are lexically identical.
 
-## Proposed shape (not frozen)
+## Supported shape
 
 Source: daytonaio/daytona provider code, last public at v0.190.0
 ([`01c502b`](https://github.com/daytonaio/daytona/blob/01c502bb1f1ff8f2885d0cd490e043736083dca8/apps/api/src/common/utils/api-key.ts#L8-L18)):
@@ -24,20 +27,29 @@ The same inline form has existed since
 | Part | Grammar | Provenance | Tier |
 | --- | --- | --- | --- |
 | Prefix | `dtn_` | provider docs + code | T1 |
-| Body | exactly 64 | provider generator (R1), **public only up to 2026-06-23** | T1 as of v0.190.0 |
-| Alphabet | lowercase hex `[0-9a-f]` | provider generator (R1), same caveat | T1 as of v0.190.0 |
+| Body | exactly 64 | provider generator (R1), public up to 2026-06-23 | T1 as of v0.190.0 (R9) |
+| Alphabet | lowercase hex `[0-9a-f]` | provider generator (R1), same date | T1 as of v0.190.0 (R9) |
 | Separators / checksum | none | — | — |
 
 Total length 68.
 
-## Why it is gated
+## Why it is READY (ruling R9)
 
-The generator is T1 under R1, but core development moved to a private codebase
-in June 2026. Nothing public shows whether the live cloud still issues
-`dtn_` + 64 lowercase hex. This is the date-sensitivity R3 applies to staff
-statements, carried over to code that went dark: the last public code is 3
-months old, and a format change since would be invisible. The step-2
-selection made issuance a requirement before the contract freezes.
+The generator is T1 under R1, but core development moved to a private
+codebase in June 2026, so nothing public shows whether the live cloud still
+issues `dtn_` + 64 lowercase hex. Step 2 therefore gated the contract on an
+issued key.
+
+The 2026-09-28 [issuance research](issuance-research/daytona.md) found no
+newer provider source: every post-v0.190.0 source (the new `daytona/clients`
+OpenAPI and CLI, helm-charts scripts, SDK 0.218.0, the docs dump) is prefix
+only, and none contradicts the generator. Ruling R9
+([issuecomment-5880547337](https://github.com/redact-secret/redact-secret/issues/860#issuecomment-5880547337))
+extends R3's date rule to provider code: a generator counts as T1 as of its
+date until a newer provider source contradicts it. The contract is frozen as
+of v0.190.0 (2026-06-23). The research also confirmed that self-provisioned
+runner keys are unprefixed 64 hex (`openssl rand -hex 32`), which stays
+excluded.
 
 ## Excluded shapes
 
@@ -58,7 +70,7 @@ selection made issuance a requirement before the contract freezes.
   Bearer `bearer_token`; bare, chat and JSON `"token"` are missed.
 - **Planned output.** Provider type, high confidence, always redact.
 
-## Implementation notes (after the gate)
+## Implementation notes
 
 `PrefixShape::exact("dtn_", 64, is_lower_hex, …)` with the `[A-Za-z0-9_-]`
 boundary. Signals: `daytona-documented-prefix`, `daytona-generator-length`.
@@ -91,18 +103,19 @@ boundary. Signals: `daytona-documented-prefix`, `daytona-generator-length`.
 ## False-positive / false-negative boundary
 
 - **False negatives:**
-  - any post-v0.190.0 format change (the reason for the gate);
+  - any post-v0.190.0 format change (accepted under R9; an issuance check
+    would detect it);
   - legacy self-hosted keys;
   - custom-provisioned values.
 - **False positives:** `dtn_` + exactly 64 lowercase hex that is not a key.
   None is known.
 
-## Issuance checklist — gate (structure only)
+## Issuance checklist (optional confirmation; structure only)
 
 1. Issue one organization API key at app.daytona.io today.
 2. Record: total length (expect 68), body length (expect 64), alphabet
    classes (expect lowercase hex only), whether any separator appears,
    `rawValueRetained: false`, revoked.
-3. If it matches, freeze the proposed shape unchanged, with the issuance date
-   as its "as of". If it differs, record the observed structure and do not
-   freeze; the research re-opens for the new shape.
+3. If it matches, move the contract's "as of" to the issuance date. If it
+   differs, record the observed structure; under R9 that newer source
+   supersedes v0.190.0 and the contract re-opens for the new shape.
