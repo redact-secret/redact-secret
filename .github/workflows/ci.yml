@@ -260,6 +260,14 @@ jobs:
           WASM_BINDGEN_TEST_ONLY_NODE: "1"
         run: cargo test -p redact-secret-wasm --no-default-features --target wasm32-unknown-unknown --locked
 
+      # Issue #929. Build the real `full` and `common` release artifacts and
+      # check the profile guards of scripts/measure-wasm-profiles.mjs:
+      # `common` is smaller, links every `common` detector and no `provider`
+      # detector, and exports the same surface. Before this ran in CI, #884
+      # made every provider detector reachable from `common` unnoticed.
+      - name: Guard the common WASM profile against provider code
+        run: node scripts/measure-wasm-profiles.mjs --guard-only
+
       # Issue #772. The shadow scorer is crate-internal, so the shipped
       # wasm32-unknown-unknown binding cannot reach it. The same core source
       # compiled for wasm32-wasip1 can, and runs here on V8's WebAssembly

@@ -201,7 +201,7 @@ impl DetectorRegistry {
     ///
     /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
     pub fn with_built_in_and_pii(selection: &PiiSelection) -> Result<Self, SecretScanError> {
-        Self::with_profile_and_pii(Profile::Full, selection, std::iter::empty())
+        Self::with_built_in([])?.with_pii_and_custom(Profile::Full, selection, std::iter::empty())
     }
 
     /// Creates the `common` credential profile plus the selected PII-domain
@@ -211,7 +211,11 @@ impl DetectorRegistry {
     ///
     /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
     pub fn with_common_built_in_and_pii(selection: &PiiSelection) -> Result<Self, SecretScanError> {
-        Self::with_profile_and_pii(Profile::Common, selection, std::iter::empty())
+        Self::with_common_built_in([])?.with_pii_and_custom(
+            Profile::Common,
+            selection,
+            std::iter::empty(),
+        )
     }
 
     /// Creates `full` + PII + custom detectors, preserving profile identity.
@@ -227,7 +231,7 @@ impl DetectorRegistry {
     where
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
-        Self::with_profile_and_pii(Profile::Full, selection, custom)
+        Self::with_built_in([])?.with_pii_and_custom(Profile::Full, selection, custom)
     }
 
     /// Creates `common` + PII + custom detectors, preserving profile identity.
@@ -243,10 +247,19 @@ impl DetectorRegistry {
     where
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
-        Self::with_profile_and_pii(Profile::Common, selection, custom)
+        Self::with_common_built_in([])?.with_pii_and_custom(Profile::Common, selection, custom)
     }
 
-    fn with_profile_and_pii<I>(
+    /// Adds the PII-domain adapter and `custom` detectors to `self`, a
+    /// registry the caller built from exactly one credential profile.
+    ///
+    /// The caller names the profile's constructor directly rather than
+    /// passing a runtime [`Profile`] to dispatch on: a `common` build must
+    /// not make the `full` constructor, and with it every `provider`
+    /// detector, reachable (#929, the reachability rule of
+    /// `decision-define-detector-profile-and-pack-contract`).
+    fn with_pii_and_custom<I>(
+        self,
         profile: Profile,
         selection: &PiiSelection,
         custom: I,
@@ -254,10 +267,8 @@ impl DetectorRegistry {
     where
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
-        let mut registry = match profile {
-            Profile::Full => Self::with_built_in([])?,
-            Profile::Common => Self::with_common_built_in([])?,
-        };
+        debug_assert_eq!(self.profile, Some(profile));
+        let mut registry = self;
         if !selection.is_off() {
             registry.detectors.push(RegisteredDetector {
                 id: "pii-domain".to_owned(),
