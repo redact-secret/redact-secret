@@ -76,6 +76,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `heroku_api_key` | `heroku-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #740 adds the documented 41-character `HRKU-` + lower-case UUID generation beside `HRKU-AA` + 58, grammar in `detectors::heroku`'s module doc |
 | `heroku_api_key_legacy` | `heroku-api-key-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository; issue #714 excludes a UUID assigned to an identifier-shaped key (last word `id` or `uuid`, e.g. `HEROKU_APP_ID`) from the `heroku` keyword gate, grammar in `detectors::heroku`'s module doc; issue #743 also accepts two documented multi-line layouts (a Heroku `.netrc` entry's `password`, `heroku auth:token` output, held open by an incremental retention hint) and excludes a UUID that is a URL path segment |
 | `huggingface_token` | `huggingface-token` | `always-redact` | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `inngest_signing_key` | `inngest-signing-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Inngest provider code constants, docs generation command and SDK fixtures), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `jwt` | `jwt` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
 | `langfuse_secret_key` | `langfuse-secret-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `langsmith_api_key` | `langsmith-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -584,6 +585,7 @@ core conformance and the benchmarks arrival and profile evidence.
 | --- | --- | --- | --- | --- |
 | `convex:deployment-key` | `convex-deployment-key` | optional `prod:`/`dev:` + cloud name `[a-z]+-[a-z]+-[0-9]+`, or `preview:`/`project:` + `<slug>:<slug>`; or an untyped `[a-z0-9][a-z0-9-]{0,62}` name; then one `\|`, then `01` + lowercase hex, even length 74–96. The whole key, lead and name included, is the span. The key must start at the input start or after a byte outside `[A-Za-z0-9_:-]` | `convex_deployment_key` | T1 (backend `format_admin_key` and key broker; the 74–96 range is derived from the generator) |
 | `onepassword:service-account-token` | `onepassword-service-account-token` | `ops_eyJ` + at least 250 Base64url `[A-Za-z0-9_-]` bytes, no upper bound, plus up to two `=` inside the span; after the padding the next byte must not be `[A-Za-z0-9_-]`, `+`, `/` or `=` | `onepassword_service_account_token` | T1 (provider docs: `ops_` prefix and Base64url-encoded JSON; floor is policy) |
+| `inngest:signing-key` | `inngest-signing-key` | `signkey-prod-`\|`signkey-test-`\|`signkey-branch-` + exactly 64 lowercase hex | `inngest_signing_key` (raw key, rotation fallback and hashed wire form) | T1 (provider code constants; 64 from the docs `openssl rand -hex 32` and SDK fixtures, R5) |
 
 Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
 [handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
@@ -616,6 +618,20 @@ floor by a log line limit, and a glued standard-Base64 tail. False positives:
 token; none is known. Cost: one literal search and one run per occurrence;
 the scan resumes after the run, so it stays linear.
 
+Inngest ([#914](https://github.com/redact-secret/redact-secret/issues/914),
+[handoff](../audits/evidence/860/inngest.md)). One type covers the raw key,
+`INNGEST_SIGNING_KEY_FALLBACK` and the hashed `Authorization: Bearer` wire
+form (`signkey-<env>-` + SHA-256 hex of the key): they are lexically
+identical and each authenticates. Before this, `INNGEST_SIGNING_KEY=` gave only
+a medium, warned `contextual_secret` (`signing_key` is an ambiguous name); the
+provider finding now wins and is redacted. `inngest` is not deferred, because
+the self-hosted bare-hex key has no prefix and only generic context sees it.
+False negatives: other environment labels, an uppercase-hex copy, a body
+other than 64, a glued value, and self-hosted bare-hex keys outside named
+contexts. False positives: `signkey-<label>-` + exactly 64 lowercase hex that
+is not an Inngest key; none is known. Cost: one prefix table on the shared
+known-format scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -634,6 +650,7 @@ the scan resumes after the run, so it stays linear.
 | Composio `ak_` + 20 (mixed-case guard), `oak_` + 20 and `uak_` + 43 `[A-Za-z0-9_-]` keys are reported as three finding types at provider specificity, bare or in any context; `ck_`, `cak_` and `uak_` at other widths stay unclaimed ([#909](https://github.com/redact-secret/redact-secret/issues/909), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family, with the `uak_` width fixed by ruling R6 |
 | Convex `<name>\|01<hex>` deployment and admin keys (typed `prod`/`dev`/`preview`/`project` lead or untyped self-hosted name; even 74–96 lowercase hex body led by `01`) are reported as `convex_deployment_key` at provider specificity over the whole key; the `eyJ2` cloud body stays unclaimed until its issuance check ([#912](https://github.com/redact-secret/redact-secret/issues/912), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | 1Password `ops_eyJ` service-account tokens (at least 250 Base64url bytes after the lead, up to two `=` inside the span) are reported as `onepassword_service_account_token` at provider specificity, bare or in any context ([#913](https://github.com/redact-secret/redact-secret/issues/913), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Inngest `signkey-prod-`/`signkey-test-`/`signkey-branch-` + 64 lowercase hex signing keys (raw, fallback and hashed wire form) are reported as `inngest_signing_key` at provider specificity, bare or in any context ([#914](https://github.com/redact-secret/redact-secret/issues/914), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

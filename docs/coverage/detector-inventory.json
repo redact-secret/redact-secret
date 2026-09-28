@@ -813,6 +813,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u006fps_eyJSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixture",
       "schemes": null
+    },
+    {
+      "type": "inngest_signing_key",
+      "detector": "inngest-signing-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073ignkey-test-5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
     }
   ],
   "consumers": [

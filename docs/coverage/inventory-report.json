@@ -4970,12 +4970,67 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "onepassword_service_account_token"
+    },
+    {
+      "detector": "inngest-signing-key",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "inngest-signing-key-positive-bare",
+        "inngest-signing-key-positive-chat-sentence",
+        "inngest-signing-key-positive-crlf-unicode-prefix",
+        "inngest-signing-key-positive-curl-bearer",
+        "inngest-signing-key-positive-dotenv",
+        "inngest-signing-key-positive-fallback-dotenv",
+        "inngest-signing-key-positive-json-config",
+        "inngest-signing-key-positive-json-token-key",
+        "inngest-signing-key-positive-label-branch",
+        "inngest-signing-key-positive-label-branch-dotenv",
+        "inngest-signing-key-positive-label-test",
+        "inngest-signing-key-positive-label-test-dotenv",
+        "inngest-signing-key-positive-log",
+        "inngest-signing-key-positive-punctuation-adjacent",
+        "inngest-signing-key-positive-python-sdk-call",
+        "inngest-signing-key-positive-repeated-value",
+        "inngest-signing-key-positive-sdk-constructor",
+        "inngest-signing-key-positive-shell-export",
+        "inngest-signing-key-positive-tool-call-arguments",
+        "inngest-signing-key-positive-x-api-key-header",
+        "inngest-signing-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "inngest_signing_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 112,
+    "supported": 113,
     "unresolved": 0
   }
 }

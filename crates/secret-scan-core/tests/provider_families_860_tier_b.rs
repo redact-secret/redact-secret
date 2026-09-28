@@ -280,3 +280,76 @@ mod onepassword {
         assert_partition_parity(&format!("{}==", token(300, 12)));
     }
 }
+
+mod inngest {
+    use super::*;
+
+    const DETECTOR: &str = "inngest-signing-key";
+    const TYPE: &str = "inngest_signing_key";
+
+    fn key(label: &str, len: usize, seed: usize) -> String {
+        format!("signkey-{label}-{}", filler(LOWER_HEX, len, seed))
+    }
+
+    #[test]
+    fn every_label_wins_every_context_as_the_sole_finding() {
+        for (seed, label) in ["prod", "test", "branch"].into_iter().enumerate() {
+            let key = key(label, 64, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("INNGEST_SIGNING_KEY={key}\n"),
+                format!("INNGEST_SIGNING_KEY_FALLBACK={key}\n"),
+                format!("export INNGEST_SIGNING_KEY={key}\n"),
+                format!("new Inngest({{ id: \"app\", signingKey: \"{key}\" }});\n"),
+                format!("curl -H \"Authorization: Bearer {key}\" https://example.invalid/v1\n"),
+                format!("vercel env ls\n  INNGEST_SIGNING_KEY  {key}  Production\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(LOWER_HEX, 64, 4);
+        let mut upper = body.clone();
+        upper.replace_range(30..31, "A");
+        let mut non_hex = body.clone();
+        non_hex.replace_range(30..31, "g");
+        let base = format!("signkey-prod-{body}");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key("prod", 63, 4),
+                key("prod", 65, 4),
+                format!("signkey-prod-{upper}"),
+                format!("signkey-prod-{non_hex}"),
+                format!("signkey-preview-{body}"),
+                format!("signkey_prod_{body}"),
+                format!("SIGNKEY-prod-{body}"),
+                format!("x{base}"),
+                format!("{base}x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "INNGEST_SIGNING_KEY=signkey-prod-<YOUR-SIGNING-KEY>\n".to_owned(),
+            "signingKey: \"signkey-test-12345\"\n".to_owned(),
+            "INNGEST_SIGNING_KEY=${INNGEST_SIGNING_KEY}\n".to_owned(),
+            format!("sha256 {}\n", filler(LOWER_HEX, 64, 5)),
+            "INNGEST_EVENT_KEY=local\n".to_owned(),
+            "eventKey = NO_EVENT_KEY_SET\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key("prod", 64, 6));
+        assert_partition_parity(&key("branch", 64, 7));
+    }
+}

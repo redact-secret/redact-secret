@@ -57,6 +57,9 @@ evidence is linked from each published version.
   - `onepassword-service-account-token` (#913): 1Password `ops_eyJ`
     service-account tokens (`onepassword_service_account_token`), Base64url
     body of at least 250 bytes with its padding inside the span.
+  - `inngest-signing-key` (#914): Inngest `signkey-<prod|test|branch>-`
+    + 64-hex signing keys (`inngest_signing_key`), which replaces the
+    medium, warned `contextual_secret` under `INNGEST_SIGNING_KEY=`.
 
 ### Fixed
 

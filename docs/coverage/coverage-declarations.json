@@ -12175,6 +12175,125 @@
       "type": "onepassword_service_account_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "inngest-signing-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "inngest-signing-key-positive-bare",
+            "inngest-signing-key-positive-chat-sentence",
+            "inngest-signing-key-positive-crlf-unicode-prefix",
+            "inngest-signing-key-positive-curl-bearer",
+            "inngest-signing-key-positive-dotenv",
+            "inngest-signing-key-positive-fallback-dotenv",
+            "inngest-signing-key-positive-json-config",
+            "inngest-signing-key-positive-json-token-key",
+            "inngest-signing-key-positive-label-branch",
+            "inngest-signing-key-positive-label-branch-dotenv",
+            "inngest-signing-key-positive-label-test",
+            "inngest-signing-key-positive-label-test-dotenv",
+            "inngest-signing-key-positive-log",
+            "inngest-signing-key-positive-punctuation-adjacent",
+            "inngest-signing-key-positive-python-sdk-call",
+            "inngest-signing-key-positive-repeated-value",
+            "inngest-signing-key-positive-sdk-constructor",
+            "inngest-signing-key-positive-shell-export",
+            "inngest-signing-key-positive-tool-call-arguments",
+            "inngest-signing-key-positive-x-api-key-header",
+            "inngest-signing-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "inngest-signing-key-overlap-ambiguous-name-warn",
+            "inngest-signing-key-overlap-bearer-header",
+            "inngest-signing-key-overlap-context",
+            "inngest-signing-key-overlap-label-branch-bearer",
+            "inngest-signing-key-overlap-label-test-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "inngest-signing-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "inngest-signing-key-boundary-glued-prefix",
+            "inngest-signing-key-boundary-glued-suffix",
+            "inngest-signing-key-boundary-long-body",
+            "inngest-signing-key-boundary-non-hex-byte",
+            "inngest-signing-key-boundary-short-body",
+            "inngest-signing-key-boundary-underscore-separators",
+            "inngest-signing-key-boundary-unknown-label",
+            "inngest-signing-key-boundary-uppercase-hex",
+            "inngest-signing-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "inngest-signing-key-negative-bare-digest",
+            "inngest-signing-key-negative-event-key-sentinels",
+            "inngest-signing-key-negative-placeholders",
+            "inngest-signing-key-negative-shell-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "inngest-signing-key-boundary-glued-prefix",
+            "inngest-signing-key-boundary-glued-suffix",
+            "inngest-signing-key-boundary-long-body",
+            "inngest-signing-key-boundary-non-hex-byte",
+            "inngest-signing-key-boundary-short-body",
+            "inngest-signing-key-boundary-underscore-separators",
+            "inngest-signing-key-boundary-unknown-label",
+            "inngest-signing-key-boundary-uppercase-hex",
+            "inngest-signing-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for inngest_signing_key (inngest-signing-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "inngest_signing_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12356,6 +12475,7 @@
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
+            "inngest-signing-key-adversarial-long-run",
             "invisible-adversarial-dense-seams",
             "invisible-class-bidi-override",
             "invisible-class-hangul-filler",
@@ -12803,6 +12923,7 @@
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
+            "inngest-signing-key-adversarial-long-run",
             "invisible-adversarial-dense-seams",
             "invisible-class-bidi-override",
             "invisible-class-hangul-filler",

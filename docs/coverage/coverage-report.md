@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 112 |
+| supported | 113 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 123.
+Coverage declarations: 124.
 
 ## Coverage by detector
 
@@ -66,6 +66,7 @@ Coverage declarations: 123.
 | heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| inngest-signing-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | langfuse-secret-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | langsmith-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -176,6 +177,7 @@ Coverage declarations: 123.
 | heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
+| inngest_signing_key | inngest-signing-key | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | langfuse_secret_key | langfuse-secret-key | provider | supported | not-applicable | none |
 | langsmith_api_key | langsmith-api-key | provider | supported | not-applicable | none |
@@ -255,15 +257,15 @@ Coverage declarations: 123.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 123 | 0 | 0 |
-| boundary | 112 | 0 | 0 |
-| host-context | 112 | 0 | 0 |
+| adversarial | 124 | 0 | 0 |
+| boundary | 113 | 0 | 0 |
+| host-context | 113 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 123 | 0 | 0 |
-| near-miss-negative | 112 | 0 | 0 |
-| overlap | 112 | 0 | 0 |
-| positive | 112 | 0 | 0 |
-| range | 123 | 0 | 0 |
+| malformed | 124 | 0 | 0 |
+| near-miss-negative | 113 | 0 | 0 |
+| overlap | 113 | 0 | 0 |
+| positive | 113 | 0 | 0 |
+| range | 124 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

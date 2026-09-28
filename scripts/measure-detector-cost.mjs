@@ -80,6 +80,7 @@ export const CANONICAL_IDS = [
   "doppler-token", "trigger-dev-token", "e2b-api-key", "posthog-token", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
   "convex-deployment-key",
   "onepassword-service-account-token",
+  "inngest-signing-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -112,6 +113,7 @@ export const GROUPS = {
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
     "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
+    "inngest-signing-key",
   ],
   "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
   saas: [
