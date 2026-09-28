@@ -30,6 +30,7 @@ mod generic_token;
 mod github;
 mod gitlab;
 mod grafana;
+mod helicone;
 mod heroku;
 mod jwt;
 mod keyword_gated_keys;
@@ -161,6 +162,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(trigger_dev::TRIGGER_DEV),
         Box::new(e2b::E2B),
         Box::new(posthog::POSTHOG),
+        Box::new(helicone::HELICONE),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -289,6 +291,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("trigger-dev-token", Pack::Provider),
     ("e2b-api-key", Pack::Provider),
     ("posthog-token", Pack::Provider),
+    ("helicone-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -406,6 +409,7 @@ mod tests {
                 "trigger-dev-token",
                 "e2b-api-key",
                 "posthog-token",
+                "helicone-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -763,6 +767,7 @@ mod tests {
         let trigger_dev_token_input = format!("tr_prod_sk_{}", "SyntheticRevokedTrigger0");
         let e2b_api_key_input = format!("e2b_{}", "0123456789abcdef0123456789abcdef01234567");
         let posthog_token_input = format!("phx_{}", "SyntheticRevokedPosthogPersonalKeyFixture01");
+        let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -830,6 +835,7 @@ mod tests {
             ("trigger-dev-token", trigger_dev_token_input.as_str()),
             ("e2b-api-key", e2b_api_key_input.as_str()),
             ("posthog-token", posthog_token_input.as_str()),
+            ("helicone-api-key", helicone_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

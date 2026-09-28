@@ -4558,12 +4558,102 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "posthog_project_secret_api_key"
+    },
+    {
+      "detector": "helicone-api-key",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "helicone-api-key-positive-bare",
+        "helicone-api-key-positive-bearer-header",
+        "helicone-api-key-positive-chat-sentence",
+        "helicone-api-key-positive-crlf-unicode-prefix",
+        "helicone-api-key-positive-curl-bearer",
+        "helicone-api-key-positive-dotenv",
+        "helicone-api-key-positive-eu-rl-segments",
+        "helicone-api-key-positive-eu-rl-segments-dotenv",
+        "helicone-api-key-positive-json-config",
+        "helicone-api-key-positive-json-token-key",
+        "helicone-api-key-positive-log",
+        "helicone-api-key-positive-proxy-key",
+        "helicone-api-key-positive-proxy-key-dotenv",
+        "helicone-api-key-positive-punctuation-adjacent",
+        "helicone-api-key-positive-python-sdk-call",
+        "helicone-api-key-positive-repeated-value",
+        "helicone-api-key-positive-shell-export",
+        "helicone-api-key-positive-tool-call-arguments",
+        "helicone-api-key-positive-x-api-key-header",
+        "helicone-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "helicone_api_key"
+    },
+    {
+      "detector": "helicone-api-key",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "helicone-api-key-positive-write-key",
+        "helicone-api-key-positive-write-key-dotenv",
+        "helicone-api-key-positive-write-key-eu",
+        "helicone-api-key-positive-write-key-eu-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "helicone_write_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 104,
+    "supported": 106,
     "unresolved": 0
   }
 }

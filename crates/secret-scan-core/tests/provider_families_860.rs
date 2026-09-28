@@ -391,3 +391,77 @@ mod posthog {
         assert_partition_parity(&format!("phs_{}", filler(ALNUM, 42, 2)));
     }
 }
+
+mod helicone {
+    use super::*;
+
+    const DETECTOR: &str = "helicone-api-key";
+    const LOWER: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
+
+    fn body() -> String {
+        (0..4)
+            .map(|seed| filler(LOWER, 7, seed))
+            .collect::<Vec<_>>()
+            .join("-")
+    }
+
+    #[test]
+    fn every_prefix_wins_every_context_as_the_sole_finding() {
+        for (role, type_name) in [("sk", "helicone_api_key"), ("pk", "helicone_write_api_key")] {
+            for segment in ["", "eu-", "rl-", "eu-rl-"] {
+                assert_sole_provider_finding(
+                    DETECTOR,
+                    type_name,
+                    &format!("{role}-helicone-{segment}{}", body()),
+                );
+            }
+        }
+        assert_sole_provider_finding(
+            DETECTOR,
+            "helicone_api_key",
+            &format!(
+                "sk-helicone-proxy-{}-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+                body()
+            ),
+        );
+    }
+
+    #[test]
+    fn the_gateway_url_path_and_helicone_auth_header_are_claimed_once() {
+        let key = format!("pk-helicone-{}", body());
+        for input in [
+            format!("https://gateway.helicone.ai/{key}/v1/chat/completions"),
+            format!("Helicone-Auth: Bearer {key}\n"),
+        ] {
+            let (text, findings) = whole_input(&input);
+            assert_eq!(findings.len(), 1, "{input}: {findings:?}");
+            assert_eq!(findings[0].type_name(), "helicone_write_api_key");
+            assert!(!text.contains(&key));
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = body();
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("sk-helicone-{}", &body[..30]),
+                format!("sk-helicone-{body}-abcdefg"),
+                format!("sk-helicone-{}", body.replace('-', "_")),
+                format!("sk-helicone-rl-eu-{body}"),
+                format!("sk-heliconeX-{body}"),
+                format!("SK-HELICONE-{body}"),
+                format!("sk-{body}"),
+                format!("sk-cp-{body}"),
+                format!("xsk-helicone-{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("sk-helicone-eu-rl-{}", body()));
+        assert_partition_parity(&format!("pk-helicone-{}", body()));
+    }
+}

@@ -31,6 +31,11 @@ evidence is linked from each published version.
     project secret API keys (42–49 alphanumeric body) as
     `posthog_personal_api_key` and `posthog_project_secret_api_key`. The
     public `phc_` project token is never claimed.
+  - `helicone-api-key` (#907): Helicone `sk-helicone-` read-write keys
+    (optional `-eu`/`-rl` segments, and the `sk-helicone-proxy-` key) as
+    `helicone_api_key`, and `pk-helicone-` write-only keys as
+    `helicone_write_api_key`, redacted by default. Legacy bare `sk-`, `-cp-`
+    and `-gov` forms stay unclaimed.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

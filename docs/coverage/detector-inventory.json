@@ -757,6 +757,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0070hs_SyntheticRevokedPosthogPersonalKeyFixture01",
       "schemes": null
+    },
+    {
+      "type": "helicone_api_key",
+      "detector": "helicone-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "schemes": null
+    },
+    {
+      "type": "helicone_write_api_key",
+      "detector": "helicone-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070k-helicone-synthet-icrevok-edfixtr-helico1",
+      "schemes": null
     }
   ],
   "consumers": [

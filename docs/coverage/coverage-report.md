@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 104 |
+| supported | 106 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 115.
+Coverage declarations: 117.
 
 ## Coverage by detector
 
@@ -59,6 +59,7 @@ Coverage declarations: 115.
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | groq-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| helicone-api-key | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -161,6 +162,8 @@ Coverage declarations: 115.
 | grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
 | grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
 | groq_api_key | groq-api-key | provider | supported | not-applicable | none |
+| helicone_api_key | helicone-api-key | provider | supported | not-applicable | none |
+| helicone_write_api_key | helicone-api-key | provider | supported | not-applicable | none |
 | heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
@@ -242,15 +245,15 @@ Coverage declarations: 115.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 115 | 0 | 0 |
-| boundary | 104 | 0 | 0 |
-| host-context | 104 | 0 | 0 |
+| adversarial | 117 | 0 | 0 |
+| boundary | 106 | 0 | 0 |
+| host-context | 106 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 115 | 0 | 0 |
-| near-miss-negative | 104 | 0 | 0 |
-| overlap | 104 | 0 | 0 |
-| positive | 104 | 0 | 0 |
-| range | 115 | 0 | 0 |
+| malformed | 117 | 0 | 0 |
+| near-miss-negative | 106 | 0 | 0 |
+| overlap | 106 | 0 | 0 |
+| positive | 106 | 0 | 0 |
+| range | 117 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

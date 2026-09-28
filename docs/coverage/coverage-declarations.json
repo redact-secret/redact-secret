@@ -11243,6 +11243,221 @@
       "type": "posthog_project_secret_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "helicone-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "helicone-api-key-positive-bare",
+            "helicone-api-key-positive-bearer-header",
+            "helicone-api-key-positive-chat-sentence",
+            "helicone-api-key-positive-crlf-unicode-prefix",
+            "helicone-api-key-positive-curl-bearer",
+            "helicone-api-key-positive-dotenv",
+            "helicone-api-key-positive-eu-rl-segments",
+            "helicone-api-key-positive-eu-rl-segments-dotenv",
+            "helicone-api-key-positive-json-config",
+            "helicone-api-key-positive-json-token-key",
+            "helicone-api-key-positive-log",
+            "helicone-api-key-positive-proxy-key",
+            "helicone-api-key-positive-proxy-key-dotenv",
+            "helicone-api-key-positive-punctuation-adjacent",
+            "helicone-api-key-positive-python-sdk-call",
+            "helicone-api-key-positive-repeated-value",
+            "helicone-api-key-positive-shell-export",
+            "helicone-api-key-positive-tool-call-arguments",
+            "helicone-api-key-positive-x-api-key-header",
+            "helicone-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "helicone-api-key-overlap-context",
+            "helicone-api-key-overlap-eu-rl-segments-bearer",
+            "helicone-api-key-overlap-proxy-key-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "helicone-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "helicone-api-key-boundary-five-groups",
+            "helicone-api-key-boundary-glued-suffix",
+            "helicone-api-key-boundary-gov-segment",
+            "helicone-api-key-boundary-malformed-proxy-uuid",
+            "helicone-api-key-boundary-reversed-segments",
+            "helicone-api-key-boundary-short-group",
+            "helicone-api-key-boundary-three-groups",
+            "helicone-api-key-boundary-underscore-joins",
+            "helicone-api-key-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "helicone-api-key-negative-customer-portal",
+            "helicone-api-key-negative-embedded-in-wider-identifier",
+            "helicone-api-key-negative-legacy-bare-sk",
+            "helicone-api-key-negative-placeholder-and-urls"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "helicone-api-key-boundary-five-groups",
+            "helicone-api-key-boundary-glued-suffix",
+            "helicone-api-key-boundary-gov-segment",
+            "helicone-api-key-boundary-malformed-proxy-uuid",
+            "helicone-api-key-boundary-reversed-segments",
+            "helicone-api-key-boundary-short-group",
+            "helicone-api-key-boundary-three-groups",
+            "helicone-api-key-boundary-underscore-joins",
+            "helicone-api-key-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for helicone_api_key (helicone-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "helicone_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "helicone-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "helicone-api-key-positive-write-key",
+            "helicone-api-key-positive-write-key-dotenv",
+            "helicone-api-key-positive-write-key-eu",
+            "helicone-api-key-positive-write-key-eu-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "helicone-api-key-overlap-write-key-bearer",
+            "helicone-api-key-overlap-write-key-eu-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "helicone-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "helicone-api-key-boundary-five-groups",
+            "helicone-api-key-boundary-glued-suffix",
+            "helicone-api-key-boundary-gov-segment",
+            "helicone-api-key-boundary-malformed-proxy-uuid",
+            "helicone-api-key-boundary-reversed-segments",
+            "helicone-api-key-boundary-short-group",
+            "helicone-api-key-boundary-three-groups",
+            "helicone-api-key-boundary-underscore-joins",
+            "helicone-api-key-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "helicone-api-key-negative-customer-portal",
+            "helicone-api-key-negative-embedded-in-wider-identifier",
+            "helicone-api-key-negative-legacy-bare-sk",
+            "helicone-api-key-negative-placeholder-and-urls"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "helicone-api-key-boundary-five-groups",
+            "helicone-api-key-boundary-glued-suffix",
+            "helicone-api-key-boundary-gov-segment",
+            "helicone-api-key-boundary-malformed-proxy-uuid",
+            "helicone-api-key-boundary-reversed-segments",
+            "helicone-api-key-boundary-short-group",
+            "helicone-api-key-boundary-three-groups",
+            "helicone-api-key-boundary-underscore-joins",
+            "helicone-api-key-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for helicone_write_api_key (helicone-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "helicone_write_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -11416,6 +11631,7 @@
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
             "groq-api-key-adversarial-long-suffix",
+            "helicone-api-key-adversarial-long-suffix",
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
@@ -11857,6 +12073,7 @@
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
             "groq-api-key-adversarial-long-suffix",
+            "helicone-api-key-adversarial-long-suffix",
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",

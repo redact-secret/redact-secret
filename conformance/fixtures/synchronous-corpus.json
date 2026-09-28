@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2547,
+  "fixtureCount": 2590,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -63581,6 +63581,839 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "helicone-api-key-positive-bare",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 43
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "helicone-api-key-positive-dotenv",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HELICONE_API_KEY=\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 60
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-shell-export",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export HELICONE_API_KEY=\"\u0073k-helicone-synthet-icrevok-edfixtr-helico1\"\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 68
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "helicone-api-key-positive-yaml",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: \u0073k-helicone-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 64
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-json-config",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"\u0073k-helicone-synthet-icrevok-edfixtr-helico1\"\n}\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 59
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-json-token-key",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0073k-helicone-synthet-icrevok-edfixtr-helico1\"}",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 54
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-python-sdk-call",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0073k-helicone-synthet-icrevok-edfixtr-helico1\")\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 68
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-bearer-header",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0073k-helicone-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 65
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-x-api-key-header",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0073k-helicone-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 54
+        }
+      ],
+      "note": "An X-API-Key header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-curl-bearer",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0073k-helicone-synthet-icrevok-edfixtr-helico1\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 74
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-tool-call-arguments",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0073k-helicone-synthet-icrevok-edfixtr-helico1\"}}",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 81
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-chat-sentence",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0073k-helicone-synthet-icrevok-edfixtr-helico1 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 58
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-log",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0073k-helicone-synthet-icrevok-edfixtr-helico1 for request 7",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 98
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-positive-punctuation-adjacent",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0073k-helicone-synthet-icrevok-edfixtr-helico1).",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 44
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "helicone-api-key-positive-crlf-unicode-prefix",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0073k-helicone-synthet-icrevok-edfixtr-helico1\n\r\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 67
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "helicone-api-key-positive-repeated-value",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1 \u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 43
+        },
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 87
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "helicone-api-key-overlap-context",
+      "detector": "helicone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 56
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "helicone-api-key-positive-write-key",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070k-helicone-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 43
+        }
+      ],
+      "note": "A pk- write-only key is a credential and reports its own, redacted, finding type."
+    },
+    {
+      "id": "helicone-api-key-positive-write-key-dotenv",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HELICONE_API_KEY=\u0070k-helicone-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 60
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-overlap-write-key-bearer",
+      "detector": "helicone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070k-helicone-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 65
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "helicone-api-key-positive-eu-rl-segments",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-eu-rl-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "The optional -eu and -rl segments, in order, are inside the span."
+    },
+    {
+      "id": "helicone-api-key-positive-eu-rl-segments-dotenv",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HELICONE_API_KEY=\u0073k-helicone-eu-rl-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 66
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-overlap-eu-rl-segments-bearer",
+      "detector": "helicone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0073k-helicone-eu-rl-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 71
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "helicone-api-key-positive-write-key-eu",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070k-helicone-eu-synthet-icrevok-edfixtr-helico1",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "An EU write-only key reports the write-only type."
+    },
+    {
+      "id": "helicone-api-key-positive-write-key-eu-dotenv",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HELICONE_API_KEY=\u0070k-helicone-eu-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 63
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-overlap-write-key-eu-bearer",
+      "detector": "helicone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070k-helicone-eu-synthet-icrevok-edfixtr-helico1\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 68
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "helicone-api-key-positive-proxy-key",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-proxy-synthet-icrevok-edfixtr-helico1-00000000-0000-4000-8000-000000000000",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 86
+        }
+      ],
+      "note": "The proxy key, four groups plus a lowercase UUID, is the read-write type."
+    },
+    {
+      "id": "helicone-api-key-positive-proxy-key-dotenv",
+      "detector": "helicone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HELICONE_API_KEY=\u0073k-helicone-proxy-synthet-icrevok-edfixtr-helico1-00000000-0000-4000-8000-000000000000\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 103
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "helicone-api-key-overlap-proxy-key-bearer",
+      "detector": "helicone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0073k-helicone-proxy-synthet-icrevok-edfixtr-helico1-00000000-0000-4000-8000-000000000000\n",
+      "expected": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 108
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "helicone-api-key-boundary-short-group",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthe-icrevok-edfixtr-helico1x",
+      "expected": [],
+      "note": "A group of 6 bytes is not the validator's 7-byte group."
+    },
+    {
+      "id": "helicone-api-key-boundary-three-groups",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthet-icrevok-edfixtr",
+      "expected": [],
+      "note": "Three groups are not the validator's four."
+    },
+    {
+      "id": "helicone-api-key-boundary-five-groups",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1-abcdefg",
+      "expected": [],
+      "note": "A fifth group makes a wider run, not a token."
+    },
+    {
+      "id": "helicone-api-key-boundary-underscore-joins",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthet_icrevok_edfixtr_helico1",
+      "expected": [],
+      "note": "Groups joined by _ are not the reviewed shape."
+    },
+    {
+      "id": "helicone-api-key-boundary-uppercase",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SK-HELICONE-SYNTHET-ICREVOK-EDFIXTR-HELICO1",
+      "expected": [],
+      "note": "The generator lowercases the whole key."
+    },
+    {
+      "id": "helicone-api-key-boundary-reversed-segments",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-rl-eu-synthet-icrevok-edfixtr-helico1",
+      "expected": [],
+      "note": "Segments out of the documented order are not claimed."
+    },
+    {
+      "id": "helicone-api-key-boundary-gov-segment",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-gov-synthet-icrevok-edfixtr-helico1",
+      "expected": [],
+      "note": "A -gov combination is matched by no worker regex and is not claimed."
+    },
+    {
+      "id": "helicone-api-key-boundary-malformed-proxy-uuid",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-proxy-synthet-icrevok-edfixtr-helico1-00000000-0000-4000-8000-00000000000",
+      "expected": [],
+      "note": "A proxy key whose UUID is one byte short is not claimed."
+    },
+    {
+      "id": "helicone-api-key-boundary-glued-suffix",
+      "detector": "helicone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "helicone-api-key-negative-legacy-bare-sk",
+      "detector": "helicone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-synthet-icrevok-edfixtr-helico1",
+      "expected": [],
+      "note": "The legacy bare sk- 4x7 form carries no provider token and is not attributable."
+    },
+    {
+      "id": "helicone-api-key-negative-customer-portal",
+      "detector": "helicone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-cp-synthet-icrevok-edfixtr-helico1",
+      "expected": [],
+      "note": "The customer-portal -cp- form carries no provider token."
+    },
+    {
+      "id": "helicone-api-key-negative-embedded-in-wider-identifier",
+      "detector": "helicone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "helicone-api-key-negative-placeholder-and-urls",
+      "detector": "helicone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Use \u0073k-helicone-... with base https://oai.helicone.ai/v1 per the docs.",
+      "expected": [],
+      "note": "Placeholders and Helicone URLs carry no key-width body."
+    },
+    {
+      "id": "helicone-api-key-adversarial-long-suffix",
+      "detector": "helicone-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }
