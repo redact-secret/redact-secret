@@ -274,6 +274,11 @@ export interface RedactSecretRuntime {
  * (`decision-define-detector-profile-and-pack-contract`), and every
  * synchronous operation below fails with `NOT_INITIALIZED` until exactly one
  * call has succeeded. A failed attempt is not cached: a caller may retry.
+ *
+ * The PII selection of the call that loads also picks which artifact a
+ * WebAssembly runtime loads (issue #937): the default one without the PII
+ * runtime, or the `pii` one. Activation is one-shot on both, so a later,
+ * different selection is `PII_ACTIVATION_CONFLICT` exactly as before.
  */
 export function createRedactSecretRuntime(
   loadNativeBinding: NativeBindingLoader,
@@ -316,7 +321,11 @@ export function createRedactSecretRuntime(
   async function load(pii: readonly string[]): Promise<void> {
     let loaded: NativeBinding;
     try {
-      loaded = await loadNativeBinding();
+      // Issue #937: only a PII selection loads the PII-capable artifact, so
+      // a WebAssembly runtime that never enables PII never fetches it. The
+      // selectors themselves are still validated by the artifact, so an
+      // invalid one reports the same `PII_SELECTOR_*` code as before.
+      loaded = await loadNativeBinding({ pii: pii.length > 0 });
       if (loaded.version() !== VERSION) {
         throw new SecretScanError("INITIALIZATION_FAILED");
       }

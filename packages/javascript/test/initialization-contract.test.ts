@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 
 import { SecretScanError } from "../src/errors.js";
+import type { NativeBindingLoadOptions } from "../src/native.js";
 import { createRedactSecretRuntime } from "../src/runtime.js";
 import { VERSION } from "../src/version.js";
 import { createFakeBinding, sampleFinding } from "./fake-binding.js";
@@ -222,6 +223,101 @@ describe("initialization contract", () => {
     await runtime.initialize();
 
     expect(runtime.artifact()).toBe("addon");
+  });
+});
+
+/**
+ * Issue #937: a WebAssembly runtime loads its profile's `pii` artifact only
+ * when the loading `initialize()` carries a PII selection; the default
+ * artifact links no PII runtime. These tests model the two artifacts with
+ * one PII-less and one PII-capable double and assert that the public
+ * contract is the same as with one PII-capable artifact.
+ */
+describe("PII artifact selection", () => {
+  function twoArtifacts(profile: "full" | "common" = "full") {
+    const loads: NativeBindingLoadOptions[] = [];
+    const loader = async (options: NativeBindingLoadOptions) => {
+      loads.push(options);
+      return createFakeBinding({ profile, piiRuntime: options.pii });
+    };
+    return { loads, runtime: createRedactSecretRuntime(loader, profile) };
+  }
+
+  it("loads the default artifact for no or an empty selection, and the pii artifact for a selection", async () => {
+    for (const options of [undefined, {}, { pii: [] }]) {
+      const { loads, runtime } = twoArtifacts();
+      await runtime.initialize(options);
+      expect(loads).toEqual([{ pii: false }]);
+      expect(runtime.piiActivation()).toBe(
+        "credentials=full;selectors=off;families=;vocabulary=pii-context/v1",
+      );
+    }
+    for (const profile of ["full", "common"] as const) {
+      const { loads, runtime } = twoArtifacts(profile);
+      await runtime.initialize({ pii: ["pii:family:global:phone"] });
+      await runtime.initialize({ pii: ["pii:family:global:phone"] });
+      expect(loads).toEqual([{ pii: true }]);
+      expect(runtime.piiActivation()).toBe(
+        `credentials=${profile};selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v1`,
+      );
+    }
+  });
+
+  it("replays the shared PII activation fixture unchanged across the two artifacts", async () => {
+    for (const testCase of PII_FIXTURE.activationCases) {
+      const { runtime } = twoArtifacts();
+      await runtime.initialize({ pii: testCase.selectors });
+      expect(runtime.piiActivation()).toBe(testCase.expected);
+    }
+    for (const testCase of PII_FIXTURE.errorCases) {
+      const { runtime } = twoArtifacts();
+      await expect(runtime.initialize({ pii: testCase.selectors })).rejects.toMatchObject({
+        code: testCase.code,
+        message: testCase.message,
+      });
+    }
+  });
+
+  it("keeps a later different selection an activation conflict after a PII-off load", async () => {
+    const { loads, runtime } = twoArtifacts();
+    await runtime.initialize();
+    await expect(runtime.initialize({ pii: ["pii"] })).rejects.toMatchObject({
+      code: "PII_ACTIVATION_CONFLICT",
+      message: "PII activation is already initialized differently.",
+    });
+    expect(loads).toEqual([{ pii: false }]);
+  });
+
+  it("keeps a concurrent different selection an activation conflict, loading once", async () => {
+    const { loads, runtime } = twoArtifacts();
+    const results = await Promise.allSettled([
+      runtime.initialize({ pii: ["pii:global"] }),
+      runtime.initialize(),
+    ]);
+    expect(results[0].status).toBe("fulfilled");
+    expect(results[1]).toMatchObject({
+      status: "rejected",
+      reason: expect.objectContaining({ code: "PII_ACTIVATION_CONFLICT" }),
+    });
+    expect(loads).toEqual([{ pii: true }]);
+  });
+
+  it("does not cache a failed pii artifact load, so a caller may retry either way", async () => {
+    let failNext = true;
+    const loads: NativeBindingLoadOptions[] = [];
+    const runtime = createRedactSecretRuntime(async (options) => {
+      loads.push(options);
+      if (options.pii && failNext) {
+        failNext = false;
+        throw new Error("fetch failed");
+      }
+      return createFakeBinding({ piiRuntime: options.pii });
+    }, "full");
+    await expect(runtime.initialize({ pii: ["pii"] })).rejects.toMatchObject({
+      code: "INITIALIZATION_FAILED",
+    });
+    await runtime.initialize({ pii: ["pii"] });
+    expect(loads).toEqual([{ pii: true }, { pii: true }]);
   });
 });
 

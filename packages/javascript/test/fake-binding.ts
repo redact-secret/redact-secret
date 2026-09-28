@@ -24,6 +24,12 @@ export interface FakeBindingOptions {
   readonly redacted?: string;
   readonly throwOnScan?: unknown;
   readonly throwOnInitialize?: unknown;
+  /**
+   * `false` models a WebAssembly artifact built without the PII runtime
+   * (issue #937): after the same selector checks, a non-empty selection
+   * that is not an activation conflict fails `PII_SELECTOR_UNAVAILABLE`.
+   */
+  readonly piiRuntime?: boolean;
 }
 
 export interface FakeBinding extends NativeBinding {
@@ -120,6 +126,11 @@ export function createFakeBinding(
       const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;
       if (activation !== next && calls.filter((call) => call === "initialize").length > 1) {
         throw Object.assign(new Error("conflict"), { code: "PII_ACTIVATION_CONFLICT" });
+      }
+      if (options.piiRuntime === false && selectors.length > 0) {
+        throw Object.assign(new Error("PII selection is unavailable in this artifact."), {
+          code: "PII_SELECTOR_UNAVAILABLE",
+        });
       }
       activation = next;
     },

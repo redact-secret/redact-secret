@@ -5,7 +5,12 @@ import { describe, expect, it } from "vitest";
 const PACKAGE_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 /** The artifacts a browser build resolves lazily, at `initialize()` time. */
-const EXTERNAL_ARTIFACTS = ["@redact-secret/wasm", "@redact-secret/wasm/common"];
+const EXTERNAL_ARTIFACTS = [
+  "@redact-secret/wasm",
+  "@redact-secret/wasm/common",
+  "@redact-secret/wasm/pii",
+  "@redact-secret/wasm/common/pii",
+];
 
 async function bundleForBrowser(contents: string): Promise<string> {
   const result = await build({
@@ -147,6 +152,7 @@ describe("browser package import", () => {
     // The issue #416 assertion: a `/common` browser bundle with streams
     // never references the `full` artifact specifier, only its own.
     expect(output).not.toContain('import("@redact-secret/wasm")');
+    expect(output).not.toContain('import("@redact-secret/wasm/pii")');
   });
 
   it("refuses synchronous operations before initialize succeeds", async () => {

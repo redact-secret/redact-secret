@@ -32,26 +32,48 @@ pub(crate) const PROFILE: Profile = Profile::Full;
 #[cfg(not(feature = "full"))]
 pub(crate) const PROFILE: Profile = Profile::Common;
 
+/// Whether this artifact links the PII domain runtime (issue #937): `true`
+/// under the off-by-default `pii` Cargo feature. Without it, [`initialize`]
+/// rejects every non-empty PII selection with `PII_SELECTOR_UNAVAILABLE`,
+/// and no constructor that references the `pii-domain` adapter is linked.
+pub(crate) const PII_RUNTIME: bool = cfg!(feature = "pii");
+
 /// Builds this artifact's profile registry with no custom detectors.
 ///
 /// Exactly one registry constructor is referenced per build, selected at
 /// compile time rather than by a runtime `match` on [`PROFILE`]: the
 /// reachability rule that keeps every `provider` detector out of the
 /// `common` artifact's linked code, with no reliance on constant
-/// propagation.
+/// propagation. The same rule keeps the PII domain runtime out of an
+/// artifact built without the `pii` feature (issue #937): the PII-off
+/// constructors never name the `pii-domain` adapter, where the `*_and_pii`
+/// ones name it even for an off selection.
 ///
 /// This has no input and no side effect beyond the returned value, so its
 /// failure (today, never observed: the built-in detectors always register
 /// cleanly) is fixed and input-free by construction.
-#[cfg(feature = "full")]
+#[cfg(all(feature = "full", feature = "pii"))]
 fn build_registry(selection: &PiiSelection) -> Result<DetectorRegistry, WasmErrorCode> {
     DetectorRegistry::with_built_in_and_pii(selection).map_err(WasmErrorCode::from)
 }
 
-/// See the `full` variant above.
-#[cfg(not(feature = "full"))]
+/// See the `full` + `pii` variant above.
+#[cfg(all(not(feature = "full"), feature = "pii"))]
 fn build_registry(selection: &PiiSelection) -> Result<DetectorRegistry, WasmErrorCode> {
     DetectorRegistry::with_common_built_in_and_pii(selection).map_err(WasmErrorCode::from)
+}
+
+/// See the `full` + `pii` variant above. [`initialize`] admits only the off
+/// selection here, so the registry is the PII-off profile registry.
+#[cfg(all(feature = "full", not(feature = "pii")))]
+fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErrorCode> {
+    DetectorRegistry::with_built_in([]).map_err(WasmErrorCode::from)
+}
+
+/// See the `full` + `pii` variant above.
+#[cfg(all(not(feature = "full"), not(feature = "pii")))]
+fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErrorCode> {
+    DetectorRegistry::with_common_built_in([]).map_err(WasmErrorCode::from)
 }
 
 /// Builds a registry over this artifact's compiled profile's built-ins,
@@ -62,14 +84,19 @@ fn build_registry(selection: &PiiSelection) -> Result<DetectorRegistry, WasmErro
 /// registry is the same value every time. The compile-time profile
 /// selection is the same reachability rule [`build_registry`] documents, so
 /// a ruleset scanned by the `common` artifact still links no `provider`
-/// detector.
+/// detector, and one scanned by a PII-off artifact links no PII runtime.
+///
+/// The PII-off constructors validate custom detectors exactly as the
+/// `*_and_pii_custom` ones do for an off selection: a malformed, duplicate,
+/// built-in (including a `provider` id in `common`), or reserved PII id is
+/// rejected either way.
 ///
 /// # Errors
 ///
 /// A [`WasmErrorCode::Ruleset`] when `ruleset` does not parse, or
 /// [`WasmErrorCode::InitializationFailed`] on the same never-observed
 /// built-in registration failure [`build_registry`] documents.
-#[cfg(feature = "full")]
+#[cfg(all(feature = "full", feature = "pii"))]
 pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
     let selection = active_selection()?;
@@ -78,8 +105,8 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
     )?)
 }
 
-/// See the `full` variant above.
-#[cfg(not(feature = "full"))]
+/// See the `full` + `pii` variant above.
+#[cfg(all(not(feature = "full"), feature = "pii"))]
 pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
     let selection = active_selection()?;
@@ -88,44 +115,86 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
     )?)
 }
 
+/// See the `full` + `pii` variant above.
+#[cfg(all(feature = "full", not(feature = "pii")))]
+pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+    let detectors = redact_secret::load_ruleset(ruleset)?;
+    active_selection()?;
+    Ok(DetectorRegistry::with_built_in(detectors)?)
+}
+
+/// See the `full` + `pii` variant above.
+#[cfg(all(not(feature = "full"), not(feature = "pii")))]
+pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+    let detectors = redact_secret::load_ruleset(ruleset)?;
+    active_selection()?;
+    Ok(DetectorRegistry::with_common_built_in(detectors)?)
+}
+
+/// The selection captured by the last successful [`initialize`], as the
+/// core error an incremental constructor reports.
+fn active_selection_for_session() -> Result<PiiSelection, SecretScanError> {
+    active_selection().map_err(|code| match code {
+        WasmErrorCode::Core(core) => SecretScanError::from(core),
+        _ => SecretScanErrorCode::InvalidState.into(),
+    })
+}
+
 /// Creates an incremental session over this artifact's profile's built-in
 /// detectors: the incremental counterpart of [`build_registry`], selected
 /// the same compile-time way so the `common` artifact's streaming path
-/// neither behaves as `full` nor links a `provider` detector.
+/// neither behaves as `full` nor links a `provider` detector, and a PII-off
+/// artifact's links no PII runtime.
 ///
 /// # Errors
 ///
 /// Returns the core's error when the built-in registry cannot be built,
 /// which cannot happen for the detectors the core ships.
-#[cfg(feature = "full")]
+#[cfg(all(feature = "full", feature = "pii"))]
 pub(crate) fn new_incremental_session(
     limits: IncrementalLimits,
     policy: Box<dyn IncrementalPolicy>,
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
-    let selection = active_selection().map_err(|code| match code {
-        WasmErrorCode::Core(core) => SecretScanError::from(core),
-        _ => SecretScanErrorCode::InvalidState.into(),
-    })?;
+    let selection = active_selection_for_session()?;
     IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
         limits, &selection, policy, formatter,
     )
 }
 
-/// See the `full` variant above.
-#[cfg(not(feature = "full"))]
+/// See the `full` + `pii` variant above.
+#[cfg(all(not(feature = "full"), feature = "pii"))]
 pub(crate) fn new_incremental_session(
     limits: IncrementalLimits,
     policy: Box<dyn IncrementalPolicy>,
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
-    let selection = active_selection().map_err(|code| match code {
-        WasmErrorCode::Core(core) => SecretScanError::from(core),
-        _ => SecretScanErrorCode::InvalidState.into(),
-    })?;
+    let selection = active_selection_for_session()?;
     IncrementalSanitizer::with_common_built_in_and_pii_policy_and_formatter(
         limits, &selection, policy, formatter,
     )
+}
+
+/// See the `full` + `pii` variant above.
+#[cfg(all(feature = "full", not(feature = "pii")))]
+pub(crate) fn new_incremental_session(
+    limits: IncrementalLimits,
+    policy: Box<dyn IncrementalPolicy>,
+    formatter: Box<dyn PlaceholderFormatter>,
+) -> Result<IncrementalSanitizer, SecretScanError> {
+    active_selection_for_session()?;
+    IncrementalSanitizer::with_policy_and_formatter(limits, policy, formatter)
+}
+
+/// See the `full` + `pii` variant above.
+#[cfg(all(not(feature = "full"), not(feature = "pii")))]
+pub(crate) fn new_incremental_session(
+    limits: IncrementalLimits,
+    policy: Box<dyn IncrementalPolicy>,
+    formatter: Box<dyn PlaceholderFormatter>,
+) -> Result<IncrementalSanitizer, SecretScanError> {
+    active_selection_for_session()?;
+    IncrementalSanitizer::with_common_built_in_policy_and_formatter(limits, policy, formatter)
 }
 
 thread_local! {
@@ -142,6 +211,13 @@ thread_local! {
 /// Returns [`WasmErrorCode::InitializationFailed`] when the registry cannot
 /// be built. The failure is fixed and does not depend on any input, and it is
 /// reported identically on every subsequent call.
+///
+/// Selector errors come first, then activation conflicts, in every build.
+/// An artifact without the PII runtime ([`PII_RUNTIME`] `false`) then
+/// rejects a valid non-empty selection with `PII_SELECTOR_UNAVAILABLE`,
+/// without caching it, so a later PII-off call can still succeed; once it
+/// has been initialized PII-off, a different selection is the same
+/// `PII_ACTIVATION_CONFLICT` a PII-capable artifact reports.
 pub(crate) fn initialize(selectors: &[String]) -> Result<(), WasmErrorCode> {
     let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
     let selection = PiiSelection::parse(&borrowed)?;
@@ -153,6 +229,9 @@ pub(crate) fn initialize(selectors: &[String]) -> Result<(), WasmErrorCode> {
                 Ok(_) => Err(SecretScanErrorCode::PiiActivationConflict.into()),
                 Err(code) => Err(*code),
             };
+        }
+        if !PII_RUNTIME && !selection.is_off() {
+            return Err(SecretScanErrorCode::PiiSelectorUnavailable.into());
         }
         let registry = build_registry(&selection);
         let outcome = registry.as_ref().map(|_| ()).map_err(|code| *code);
@@ -234,6 +313,7 @@ mod tests {
         assert_eq!(ensure_initialized(), Ok(()));
     }
 
+    #[cfg(feature = "pii")]
     #[test]
     fn pii_activation_is_canonical_and_conflict_checked() {
         assert_eq!(
@@ -266,5 +346,40 @@ mod tests {
             Profile::Common
         };
         assert_eq!(PROFILE, expected);
+    }
+
+    /// Issue #937: an artifact built without the `pii` feature parses a
+    /// selector exactly as a PII-capable one does, rejects a valid PII
+    /// selection as unavailable without caching the failure, and after a
+    /// PII-off initialization reports a different selection as the same
+    /// activation conflict.
+    #[cfg(not(feature = "pii"))]
+    #[test]
+    fn a_pii_off_artifact_rejects_pii_selection_as_unavailable() {
+        assert_eq!(
+            initialize(&["pii:global".to_owned()]).unwrap_err(),
+            WasmErrorCode::Core(SecretScanErrorCode::PiiSelectorUnavailable)
+        );
+        assert_eq!(
+            initialize(&["not a selector".to_owned()]).unwrap_err(),
+            WasmErrorCode::Core(SecretScanErrorCode::PiiSelectorInvalid)
+        );
+        assert_eq!(
+            ensure_initialized().unwrap_err(),
+            WasmErrorCode::NotInitialized
+        );
+        assert_eq!(initialize(&[]), Ok(()));
+        assert_eq!(
+            pii_activation().unwrap(),
+            format!(
+                "credentials={};selectors=off;families=;vocabulary=pii-context/v1",
+                PROFILE.as_str()
+            )
+        );
+        assert_eq!(
+            initialize(&["pii".to_owned()]).unwrap_err(),
+            WasmErrorCode::Core(SecretScanErrorCode::PiiActivationConflict)
+        );
+        assert!(!with_registry(|registry| registry.contains("pii-domain")).unwrap());
     }
 }
