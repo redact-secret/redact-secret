@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2980,
+  "fixtureCount": 2983,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16212,6 +16212,45 @@
       "input": "client_secret=replaceme",
       "expected": [],
       "note": "The literal placeholder value 'replaceme' remains excluded even though it meets the minimum length, covering a second placeholder-word family distinct from 'redacted' and 'changeme'."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-counting-digits",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RESEND_API_KEY=re_123456789\n",
+      "expected": [],
+      "note": "Issue #949: a short vendor prefix followed by a counting run of digits (at least four, each one more than the last) is a documentation placeholder, as the Resend and Inngest handoffs list; a random numeric body is never a counting run."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-sdk-counting-digits",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const inngest = new Inngest({ id: \"test\", signingKey: \"signkey-test-12345\" });\n",
+      "expected": [],
+      "note": "Issue #949: the Inngest SDK test placeholder signkey-test-12345 is a vendor prefix before a counting digit run and is not a secret."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-glued-your-word",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "resend.api_key = \"re_yourkey\"\n",
+      "expected": [],
+      "note": "Issue #949: an instructional placeholder glued into one word (your + key) behind a vendor prefix is not a secret. Applied only behind a vendor prefix; a leftover letter or digit keeps the value detected."
     },
     {
       "id": "contextual-negative-hash-non-credential-name",

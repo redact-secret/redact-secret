@@ -5411,6 +5411,9 @@
             "contextual-negative-typescript-config-member-reference",
             "contextual-negative-unqualified-random-text",
             "contextual-negative-vals-vault-reference",
+            "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-sdk-counting-digits",
             "contextual-negative-windows-env-reference-excluded",
             "regression-yaml-nested-key-no-crossing-newline"
           ],
@@ -5482,6 +5485,9 @@
             "contextual-negative-typescript-config-member-reference",
             "contextual-negative-unqualified-random-text",
             "contextual-negative-vals-vault-reference",
+            "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-sdk-counting-digits",
             "contextual-negative-windows-env-reference-excluded",
             "contextual-overlap-nested-assignment",
             "contextual-positive-assignment",
@@ -5752,6 +5758,9 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-sdk-counting-digits",
             "generic-token-vendor-prefix-low-entropy-control"
           ],
           "state": "supported"

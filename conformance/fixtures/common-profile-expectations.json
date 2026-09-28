@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2980,
+  "fixtureCount": 2983,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -783,6 +783,9 @@
     {"expected":[],"id":"contextual-negative-generic-name-high-entropy"},
     {"expected":[],"id":"contextual-negative-placeholder-redacted"},
     {"expected":[],"id":"contextual-negative-placeholder-replaceme"},
+    {"expected":[],"id":"contextual-negative-vendor-prefix-counting-digits"},
+    {"expected":[],"id":"contextual-negative-vendor-prefix-sdk-counting-digits"},
+    {"expected":[],"id":"contextual-negative-vendor-prefix-glued-your-word"},
     {"expected":[],"id":"contextual-negative-hash-non-credential-name"},
     {"expected":[],"id":"contextual-negative-identifier-non-credential-name"},
     {"expected":[],"id":"contextual-negative-prose-colon-unrecognized-name"},

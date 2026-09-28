@@ -2055,7 +2055,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 252,
+        "fixtureCount": 255,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2187,7 +2187,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 252,
+        "fixtureCount": 255,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2263,7 +2263,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 252,
+        "fixtureCount": 255,
         "hostContextsExercised": [
           "chat",
           "curl",
