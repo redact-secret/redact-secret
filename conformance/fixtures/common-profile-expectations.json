@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2964,
+  "fixtureCount": 2967,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2968,6 +2968,9 @@
     {"expected":[],"id":"wandb-api-key-positive-host-label"},
     {"expected":[],"id":"wandb-api-key-positive-login-call"},
     {"expected":[],"id":"wandb-api-key-positive-netrc"},
-    {"expected":[],"id":"wandb-api-key-adversarial-long-run"}
+    {"expected":[],"id":"wandb-api-key-adversarial-long-run"},
+    {"expected":[],"id":"bearer-token-negative-lead-glued-angle-placeholder"},
+    {"expected":[],"id":"bearer-token-negative-lead-glued-shell-reference"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":40,"start":11,"type":"bearer_token"}],"id":"bearer-token-positive-token-before-html-tag"}
   ]
 }

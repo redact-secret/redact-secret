@@ -137,6 +137,43 @@ fn joined_value_end(
     (end, runs)
 }
 
+/// `true` when the value ending at `value_end` is glued, directly or through
+/// one `:`/`|` join, to a placeholder or reference it cannot read: an
+/// `<ANGLE>` placeholder (`signkey-prod-<YOUR-SIGNING-KEY>`), a `$VAR` /
+/// `${VAR}` reference (`prod:<name>|${CONVEX_BODY}`) or a `{{ }}` template.
+/// The run before it is then the public lead of a placeholder, and reporting
+/// it would be a partial span over a non-secret (issue #918 follow-up).
+///
+/// An HTML tag after a real token (`</td>`, `<br>`) is not a placeholder:
+/// the angle content must be `[A-Za-z0-9_-]+`, closed by `>` within 64
+/// bytes, and carry an uppercase letter, `_` or `-`.
+fn is_glued_to_placeholder(bytes: &[u8], value_end: usize) -> bool {
+    let mut at = value_end;
+    if bytes.get(at).copied().is_some_and(is_value_join) {
+        at += 1;
+    }
+    match bytes.get(at) {
+        Some(b'$') => bytes
+            .get(at + 1)
+            .is_some_and(|&next| next == b'{' || next == b'_' || next.is_ascii_alphabetic()),
+        Some(b'{') => bytes.get(at + 1) == Some(&b'{'),
+        Some(b'<') => {
+            let inner_len = bytes[at + 1..]
+                .iter()
+                .take(64)
+                .take_while(|&&byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+                .count();
+            let inner = &bytes[at + 1..at + 1 + inner_len];
+            inner_len > 0
+                && bytes.get(at + 1 + inner_len) == Some(&b'>')
+                && inner
+                    .iter()
+                    .any(|&byte| byte.is_ascii_uppercase() || matches!(byte, b'_' | b'-'))
+        }
+        _ => false,
+    }
+}
+
 fn is_space_or_tab(byte: u8) -> bool {
     byte == b' ' || byte == b'\t'
 }
@@ -352,6 +389,7 @@ impl Detector for BearerTokenDetector {
                 .all(|&(start, end)| is_non_secret_bearer_value(&input[start..end]));
             if !boundary_blocked
                 && !non_secret
+                && !is_glued_to_placeholder(bytes, value_end)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 candidates.push(
@@ -713,6 +751,43 @@ mod tests {
         ] {
             let candidates = detect(input);
             assert_eq!(only_range(&candidates), (22, input.len()), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_lead_glued_to_a_placeholder_or_reference_is_not_a_partial_span() {
+        for input in [
+            "Authorization: Bearer signkey-prod-<YOUR-SIGNING-KEY>",
+            "Authorization: Bearer signkey-prod-<your-signing-key>",
+            "Authorization: Bearer prod:happy-otter-123|${CONVEX_BODY}",
+            "Authorization: Bearer convex-self-hosted|$ADMIN_KEY",
+            "Authorization: Bearer SYNTHETIC_REVOKED_LEAD_{{ token }}",
+            "Authorization: Bearer 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:<FAL_KEY_SECRET>",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // A real token before an HTML tag, a `$` price or a lone `<` stays.
+        for (input, value) in [
+            (
+                "<td>Bearer SYNTHETIC_REVOKED_BEARER_VALUE</td>",
+                "SYNTHETIC_REVOKED_BEARER_VALUE",
+            ),
+            (
+                "Bearer SYNTHETIC_REVOKED_BEARER_VALUE<br>",
+                "SYNTHETIC_REVOKED_BEARER_VALUE",
+            ),
+            (
+                "Bearer SYNTHETIC_REVOKED_BEARER_VALUE<3",
+                "SYNTHETIC_REVOKED_BEARER_VALUE",
+            ),
+            (
+                "Bearer SYNTHETIC_REVOKED_BEARER_VALUE$5",
+                "SYNTHETIC_REVOKED_BEARER_VALUE",
+            ),
+        ] {
+            let candidates = detect(input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
         }
     }
 

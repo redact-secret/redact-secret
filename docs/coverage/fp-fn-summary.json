@@ -79,7 +79,7 @@
       "detector": "bearer-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 24,
+        "count": 25,
         "fixtureIds": [
           "bearer-boundary-prose-long-word-tradeoff",
           "bearer-positive-authorization-extra-whitespace-and-case",
@@ -98,6 +98,7 @@
           "bearer-token-positive-pipe-joined-name-secret",
           "bearer-token-positive-placeholder-lead-real-tail",
           "bearer-token-positive-short-lead-joined",
+          "bearer-token-positive-token-before-html-tag",
           "bearer-token-regression-base64url-value-still-detected",
           "bearer-token-regression-header-anchored-fifteen-byte-value",
           "bearer-token-regression-placeholder-lead-word-with-random-suffix",
@@ -109,7 +110,7 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 18,
+        "count": 20,
         "fixtureIds": [
           "bearer-negative-identifier",
           "bearer-negative-missing-value",
@@ -124,6 +125,8 @@
           "bearer-token-negative-header-value-below-twelve-bytes",
           "bearer-token-negative-insert-access-token-placeholder",
           "bearer-token-negative-joined-placeholders",
+          "bearer-token-negative-lead-glued-angle-placeholder",
+          "bearer-token-negative-lead-glued-shell-reference",
           "bearer-token-negative-prose-url",
           "bearer-token-negative-secret-token-placeholder-body",
           "bearer-token-negative-secret-token-scheme-without-body",
@@ -140,6 +143,7 @@
         "markdown",
         "plain-text",
         "toml",
+        "xml",
         "yaml"
       ]
     },

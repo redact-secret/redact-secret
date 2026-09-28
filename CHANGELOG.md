@@ -72,7 +72,9 @@ evidence is linked from each published version.
 - `bearer-token` selects an `Authorization: Bearer <id>:<secret>` or
   `<name>|<secret>` value whole (#918). The span used to stop at the first
   `:` or `|`, redacting the non-secret left half and leaving the secret right
-  half readable in sanitized output.
+  half readable in sanitized output. A lead glued to an `<ANGLE>`
+  placeholder or a `$VAR`/`${VAR}` reference is no longer reported as a
+  partial span.
 - `generic-token` recognizes `FAL_KEY`, `CONVEX_DEPLOY_KEY` and
   `CONVEX_SELF_HOSTED_ADMIN_KEY` as exact credential names, and fal's
   `Authorization: Key <id>:<secret>` scheme, reporting the whole value

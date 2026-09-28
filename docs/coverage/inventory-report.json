@@ -1788,7 +1788,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 55,
+        "fixtureCount": 58,
         "hostContextsExercised": [
           "curl",
           "dotenv",
@@ -1798,6 +1798,7 @@
           "markdown",
           "plain-text",
           "toml",
+          "xml",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -1830,6 +1831,7 @@
         "bearer-token-positive-pipe-joined-name-secret",
         "bearer-token-positive-placeholder-lead-real-tail",
         "bearer-token-positive-short-lead-joined",
+        "bearer-token-positive-token-before-html-tag",
         "bearer-token-regression-base64url-value-still-detected",
         "bearer-token-regression-header-anchored-fifteen-byte-value",
         "bearer-token-regression-placeholder-lead-word-with-random-suffix",

@@ -118,6 +118,30 @@ mod bearer_joined_value {
     }
 
     #[test]
+    fn a_lead_glued_to_a_placeholder_or_reference_yields_no_partial_span() {
+        // Benchmarks #436: the lead before a glued placeholder is public.
+        for input in [
+            "Authorization: Bearer signkey-prod-<YOUR-SIGNING-KEY>\n",
+            "Authorization: Bearer prod:happy-otter-123|${CONVEX_BODY}\n",
+            "curl -H \"Authorization: Bearer convex-self-hosted|$CONVEX_ADMIN_KEY\" https://example.invalid\n",
+        ] {
+            let (_, findings) = whole_input(input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+        // Twin: the same lead with a literal secret part is redacted whole.
+        let value = format!(
+            "prod:happy-otter-123|SyntheticRevokedJoinedSecretValue{}",
+            "0".repeat(4)
+        );
+        assert_whole_value(
+            &format!("Authorization: Bearer {value}\n"),
+            &value,
+            "bearer-token",
+            "bearer_token",
+        );
+    }
+
+    #[test]
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&format!("Authorization: Bearer {}\n", id_secret()));
         assert_partition_parity(&format!("Authorization: Bearer {}\n", name_secret()));
