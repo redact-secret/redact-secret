@@ -150,6 +150,15 @@ evidence is linked from each published version.
   (`deepgram.NewRESTWithDefaults(ctx, "<key>")`), and a Java builder method
   named for the credential (`Cohere.builder().token("<key>")`). A key under
   a `masked_api_key=` field stays unreported by policy.
+- Three context-gated legacy detectors read provider context from a bounded
+  window of previous lines in one CLI or config layout each (#933), with an
+  incremental retention hint so streamed and whole-input scans agree:
+  `heroku-api-key-legacy` reads the `Token:` row of `heroku
+  authorizations:info` output, `twilio-auth-token` the `Auth Token` column
+  of `twilio profiles:list` output, and `confluent-cloud-api-secret-legacy`
+  a Schema Registry `basic.auth.user.info=<key id>:<secret>` property below
+  a Confluent-named URL. These were missed because the provider name was
+  only on an earlier line. They report at medium confidence (warn).
 
 ## 0.1.0-beta.10 — 2026-09-28
 

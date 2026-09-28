@@ -265,3 +265,67 @@ fn issue_932_same_line_provider_forms_are_detected_through_the_pipeline() {
         );
     }
 }
+
+// ---------------------------------------------------------------- #933
+
+#[test]
+fn issue_933_previous_line_provider_context_is_read_in_bounded_layouts() {
+    let uuid = legacy_uuid();
+    let twilio = synthetic(LOWER_HEX, 32, 13);
+    let key_id = synthetic(b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789", 16, 1);
+    let confluent = synthetic(
+        b"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789+/",
+        64,
+        5,
+    );
+    for (input, value, type_name) in [
+        (
+            format!(
+                "$ heroku authorizations:info $AUTH_ID\nClient:      <none>\nDescription: ci deploy\nScope:       global\nToken:       {uuid}\nUpdated at:  2026-09-02T10:14:31Z\n"
+            ),
+            uuid.clone(),
+            "heroku_api_key_legacy",
+        ),
+        (
+            format!(
+                "schema.registry.url=https://psrc-7q2x1.us-east-2.aws.confluent.cloud\nbasic.auth.credentials.source=USER_INFO\nbasic.auth.user.info={key_id}:{confluent}\n"
+            ),
+            confluent.clone(),
+            "confluent_cloud_api_secret_legacy",
+        ),
+        (
+            format!(
+                "$ twilio profiles:list --properties authToken\nID     Auth Token\nprod   {twilio}\n"
+            ),
+            twilio.clone(),
+            "twilio_auth_token",
+        ),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+        assert_eq!(span(&input, &findings[0]), value);
+        assert_eq!(findings[0].type_name(), type_name, "{input:?}");
+    }
+    // Twins: the value row relabelled, another registry host, the column
+    // relabelled.
+    for input in [
+        format!(
+            "$ heroku authorizations:info $AUTH_ID\nScope:       global\nClient ID:   {uuid}\n"
+        ),
+        format!(
+            "schema.registry.url=https://registry.example.test\nbasic.auth.user.info={key_id}:{confluent}\n"
+        ),
+        format!(
+            "$ twilio profiles:list --properties authToken\nID     Account SID\nprod   {twilio}\n"
+        ),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert!(
+            findings.iter().all(|f| !matches!(
+                f.type_name(),
+                "heroku_api_key_legacy" | "confluent_cloud_api_secret_legacy" | "twilio_auth_token"
+            )),
+            "{input:?}: {findings:?}"
+        );
+    }
+}

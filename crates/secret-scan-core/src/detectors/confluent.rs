@@ -62,6 +62,16 @@
 //!   names Confluent but carries a container image digest, and Confluent
 //!   documents no form in which an API secret follows such a label.
 //!
+//!   A Schema Registry client config names Confluent only on the
+//!   `schema.registry.url` line, above the credential line (issue #933).
+//!   A legacy secret that is the secret half of a
+//!   `basic.auth.user.info=<key id>:<secret>` property is therefore also
+//!   reported, at [`Confidence::Medium`], when one of the at most
+//!   [`PROPERTIES_LOOKBACK_LINES`] property lines directly above it names
+//!   `confluent`. A blank or non-property line ends the block, and no
+//!   other property name is read this way. The incremental session holds
+//!   such a block open ([`has_open_confluent_properties`]).
+//!
 //! No code from either tool is reproduced here; this module's matching and
 //! context-gating logic is authored independently.
 //!
@@ -250,6 +260,78 @@ fn scan_bare_legacy_runs(
     matches
 }
 
+/// How many lines above a `basic.auth.user.info` property the Confluent
+/// context may sit (issue #933): the `schema.registry.url` line, the
+/// `basic.auth.credentials.source` line, and one more property.
+const PROPERTIES_LOOKBACK_LINES: usize = 3;
+
+/// `true` for a Java `.properties` (or `.conf`) line: a comment (`#`, `!`)
+/// or a `name=value` / `name: value` property whose name is `[A-Za-z0-9._-]+`.
+fn is_properties_line(line: &str) -> bool {
+    let trimmed = line.trim_start_matches([' ', '\t']);
+    if trimmed.starts_with(['#', '!']) {
+        return true;
+    }
+    let name_len = trimmed
+        .bytes()
+        .take_while(|&byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b'-'))
+        .count();
+    name_len > 0 && matches!(trimmed.as_bytes().get(name_len), Some(b'=' | b':'))
+}
+
+/// `true` when `previous` (the lines before the value's line, oldest first)
+/// ends with at most [`PROPERTIES_LOOKBACK_LINES`] property lines, one of
+/// which names `confluent` (`schema.registry.url=https://psrc-...confluent.cloud`).
+fn ends_inside_confluent_properties(previous: &[&str]) -> bool {
+    for line in previous.iter().rev().take(PROPERTIES_LOOKBACK_LINES) {
+        if !is_properties_line(line) {
+            return false;
+        }
+        if line_contains_ci(line, CONTEXT_KEYWORD) {
+            return true;
+        }
+    }
+    false
+}
+
+/// `true` when the value at `value_start` is the secret half of a Schema
+/// Registry `basic.auth.user.info=<key id>:<secret>` property (or its
+/// `schema.registry.`-prefixed client form): the line is that property, and
+/// only an alphanumeric key id and `:` sit between its operator and the
+/// value.
+fn is_basic_auth_user_info_secret(line: &str, value_start: usize) -> bool {
+    let trimmed_start = line.len() - line.trim_start_matches([' ', '\t']).len();
+    let Some(operator) = line[trimmed_start..]
+        .find(['=', ':'])
+        .map(|at| trimmed_start + at)
+    else {
+        return false;
+    };
+    let name = line[trimmed_start..operator].trim_end_matches([' ', '\t']);
+    let key_id = line[operator + 1..value_start]
+        .trim_start_matches([' ', '\t'])
+        .strip_suffix(':');
+    name.to_ascii_lowercase().ends_with("basic.auth.user.info")
+        && key_id
+            .is_some_and(|id| !id.is_empty() && id.bytes().all(|byte| byte.is_ascii_alphanumeric()))
+}
+
+/// Internal retention hint for the built-in incremental scanner: `true` when
+/// the retained lines end inside a Confluent properties block
+/// ([`ends_inside_confluent_properties`]), so the session keeps the unit
+/// open while a `basic.auth.user.info` line can still follow (issue #933).
+/// The window it holds is exactly the one
+/// [`ConfluentLegacyApiSecretDetector`] reads back.
+pub(crate) fn has_open_confluent_properties(input: &str) -> bool {
+    let complete = input.strip_suffix('\n').unwrap_or(input);
+    let mut tail: Vec<&str> = complete
+        .rsplit('\n')
+        .take(PROPERTIES_LOOKBACK_LINES)
+        .collect();
+    tail.reverse();
+    ends_inside_confluent_properties(&tail)
+}
+
 /// Detects a legacy (pre-`cflt`) Confluent Cloud API secret: a bare 64-byte
 /// base64-body run on the same line as a case-insensitive `confluent`
 /// substring. Never emitted without that context; see the module doc.
@@ -266,14 +348,30 @@ impl Detector for ConfluentLegacyApiSecretDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (line_start, line_end) in lines(input) {
+        let all_lines: Vec<(usize, usize)> = lines(input).collect();
+        for (index, &(line_start, line_end)) in all_lines.iter().enumerate() {
             let line = &input[line_start..line_end];
             let raw_matches =
                 scan_bare_legacy_runs(line, pattern::is_base64_body, is_confluent_secret_boundary);
-            if raw_matches.is_empty() || !line_contains_ci(line, CONTEXT_KEYWORD) {
+            if raw_matches.is_empty() {
+                continue;
+            }
+            let same_line = line_contains_ci(line, CONTEXT_KEYWORD);
+            let in_properties_block = !same_line && {
+                let previous: Vec<&str> = all_lines
+                    [index.saturating_sub(PROPERTIES_LOOKBACK_LINES)..index]
+                    .iter()
+                    .map(|&(start, end)| &input[start..end])
+                    .collect();
+                ends_inside_confluent_properties(&previous)
+            };
+            if !same_line && !in_properties_block {
                 continue;
             }
             for (relative_start, relative_end) in raw_matches {
+                if !same_line && !is_basic_auth_user_info_secret(line, relative_start) {
+                    continue;
+                }
                 let value = &line[relative_start..relative_end];
                 // A `cflt`-led run is the current generation's shape, which
                 // `CONFLUENT_CLOUD_API_SECRET` alone judges: legacy secrets
@@ -291,13 +389,17 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                 else {
                     continue;
                 };
-                let (confidence, signal) =
-                    if text::is_provider_named_assignment(line, relative_start, &[CONTEXT_KEYWORD])
-                    {
-                        (Confidence::High, "confluent-named-assignment")
-                    } else {
-                        (Confidence::Medium, "confluent-keyword-cooccurrence")
-                    };
+                let (confidence, signal) = if !same_line {
+                    (Confidence::Medium, "confluent-properties-block")
+                } else if text::is_provider_named_assignment(
+                    line,
+                    relative_start,
+                    &[CONTEXT_KEYWORD],
+                ) {
+                    (Confidence::High, "confluent-named-assignment")
+                } else {
+                    (Confidence::Medium, "confluent-keyword-cooccurrence")
+                };
                 candidates.push(
                     Candidate::new("confluent_cloud_api_secret_legacy", confidence, range)
                         .with_specificity(Specificity::Provider)
@@ -623,5 +725,70 @@ mod tests {
     fn stays_bounded_over_a_long_context_free_line_packed_with_candidates() {
         let input = format!("{LEGACY_BODY} ").repeat(10_000);
         assert_eq!(detect_legacy(&input).len(), 0);
+    }
+
+    fn schema_registry_config(url: &str, separator: &str, secret: &str) -> String {
+        format!(
+            "schema.registry.url={url}\n{separator}basic.auth.credentials.source=USER_INFO\n\
+             basic.auth.user.info={KEY_ID}:{secret}\n"
+        )
+    }
+
+    #[test]
+    fn detects_a_basic_auth_user_info_secret_below_a_confluent_registry_url() {
+        // Issue #933.
+        let url = "https://psrc-3n9vd.us-east-2.aws.confluent.cloud";
+        for input in [
+            schema_registry_config(url, "", LEGACY_BODY),
+            schema_registry_config(url, "# client\n", LEGACY_BODY),
+            format!(
+                "schema.registry.url: {url}\nschema.registry.basic.auth.user.info: {KEY_ID}:{LEGACY_BODY}"
+            ),
+            schema_registry_config(url, "", LEGACY_BODY).replace('\n', "\r\n"),
+        ] {
+            let found = detect_legacy(&input);
+            assert_eq!(found.len(), 1, "{input:?}");
+            let range = found[0].range();
+            assert_eq!(&input[range.start()..range.end()], LEGACY_BODY);
+            assert_eq!(found[0].confidence(), Confidence::Medium);
+        }
+    }
+
+    #[test]
+    fn rejects_a_properties_block_without_confluent_context_nearby() {
+        let url = "https://psrc-3n9vd.us-east-2.aws.confluent.cloud";
+        for input in [
+            // Another registry host, a blank line, a free-text line, and a
+            // confluent line too far above.
+            schema_registry_config("https://registry.example.test", "", LEGACY_BODY),
+            schema_registry_config(url, "\n", LEGACY_BODY),
+            schema_registry_config(url, "see the wiki for rotation\n", LEGACY_BODY),
+            schema_registry_config(url, "a=1\nb=2\n", LEGACY_BODY),
+            // Another property name, and no key id in front.
+            format!("schema.registry.url={url}\nssl.truststore.password={LEGACY_BODY}\n"),
+            format!("schema.registry.url={url}\nbasic.auth.user.info={LEGACY_BODY}\n"),
+        ] {
+            assert!(detect_legacy(&input).is_empty(), "{input:?}");
+        }
+    }
+
+    #[test]
+    fn the_retention_hint_holds_exactly_the_properties_window_open() {
+        for open in [
+            "bootstrap.servers=pkc-1.confluent.cloud:9092\n",
+            "schema.registry.url=https://psrc-1.confluent.cloud\na=1\nb=2\n",
+            "# confluent cloud\n",
+        ] {
+            assert!(has_open_confluent_properties(open), "{open:?}");
+        }
+        for closed in [
+            "",
+            "schema.registry.url=https://registry.example.test\n",
+            "schema.registry.url=https://psrc-1.confluent.cloud\na=1\nb=2\nc=3\n",
+            "schema.registry.url=https://psrc-1.confluent.cloud\n\n",
+            "we use confluent cloud\n",
+        ] {
+            assert!(!has_open_confluent_properties(closed), "{closed:?}");
+        }
     }
 }

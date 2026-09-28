@@ -80,6 +80,7 @@ use connection_string::ConnectionStringDetector;
 use private_key::PrivateKeyDetector;
 
 pub(crate) use bearer_token::has_open_bearer_authorization;
+pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{
     RULESET_NAMES_DETECTOR_ID, generic_token_ruleset_names_detector,
     has_open_contextual_assignment, is_reserved_name, normalize_name,
@@ -87,6 +88,7 @@ pub(crate) use generic_token::{
 pub(crate) use heroku::has_open_heroku_legacy_context;
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
+pub(crate) use twilio::has_open_twilio_cli_table;
 
 /// Every built-in detector, in canonical registration order.
 #[must_use]

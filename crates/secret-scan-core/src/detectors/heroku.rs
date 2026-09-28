@@ -90,9 +90,9 @@
 //!   a Platform API resource id and is never reported (issue #743). The
 //!   token itself never appears as a path segment of a Heroku URL.
 //!
-//!   Two documented places put the `heroku` context on a different line
-//!   from the token, and the same-line gate alone would miss both (issue
-//!   #743). Each is accepted only in its exact documented layout:
+//!   Three documented places put the `heroku` context on a different line
+//!   from the token, and the same-line gate alone would miss them (issues
+//!   #743 and #933). Each is accepted only in its exact documented layout:
 //!
 //!   - **A multi-line `.netrc` entry**, as the Heroku CLI writes it: a line
 //!     `machine <host>` whose host contains `heroku`, at most
@@ -103,8 +103,16 @@
 //!     whitespace aside) and the line right before it ends with the
 //!     `heroku auth:token` command.
 //!
+//!   - **`heroku authorizations:<verb>` table output** (issue #933): the
+//!     UUID is the whole value of a `Token:` row, and the lines above it are
+//!     at most [`AUTHORIZATIONS_MAX_ROWS`] `Label:  value` rows back to the
+//!     `heroku authorizations:info` (or `:create`, `:rotate`, `:update`)
+//!     command line. A UUID on any other row (`ID:`, `Client ID:`) is not
+//!     reported; a blank or free-text line, or a longer table, ends the
+//!     window.
+//!
 //!   A bare UUID after any other line stays clean, so the wider window never
-//!   turns into an unconditional UUID match. Both layouts cross a line
+//!   turns into an unconditional UUID match. Every layout crosses a line
 //!   terminator, so the incremental session keeps such a unit open until
 //!   the line that can carry the token arrives
 //!   ([`has_open_heroku_legacy_context`]).
@@ -420,25 +428,93 @@ fn is_whole_line(line: &[u8], start: usize, end: usize) -> bool {
         && line[end..].iter().all(|&byte| is_token_space(byte))
 }
 
+/// The most table rows `heroku authorizations:info` (or `:create`,
+/// `:rotate`, `:update`) prints between its command line and the `Token:`
+/// row: `Client`, `ID`, `Description`, `Scope`, and room for two more
+/// (issue #933).
+const AUTHORIZATIONS_MAX_ROWS: usize = 6;
+
+/// How many lines before the value's line any multi-line layout reads.
+const LOOKBACK_LINES: usize = AUTHORIZATIONS_MAX_ROWS + 1;
+
+/// `true` when `line` runs a `heroku authorizations:<verb>` command, after
+/// any shell prompt (`$ heroku authorizations:info $AUTH_ID`).
+fn is_heroku_authorizations_command(line: &str) -> bool {
+    let words: Vec<&str> = tokens(line).collect();
+    words.windows(2).any(|pair| {
+        pair[0] == "heroku"
+            && pair[1]
+                .strip_prefix("authorizations:")
+                .is_some_and(|verb| !verb.is_empty())
+    })
+}
+
+/// The label of a `Label:   value` CLI table row (`Client:`, `Updated at:`):
+/// one to three words of ASCII letters at the start of the line, a `:`, then
+/// whitespace or the end of the line. `None` for any other line.
+fn cli_table_label(line: &str) -> Option<&str> {
+    let (label, rest) = line.split_once(':')?;
+    let words: Vec<&str> = label.split(' ').collect();
+    let well_formed = !label.is_empty()
+        && label.len() <= 24
+        && words.len() <= 3
+        && words
+            .iter()
+            .all(|word| !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_alphabetic()));
+    (well_formed && rest.bytes().next().is_none_or(is_token_space)).then_some(label)
+}
+
+/// `true` when `previous` (the lines before the value's line, oldest first)
+/// ends with a `heroku authorizations:<verb>` command followed by at most
+/// [`AUTHORIZATIONS_MAX_ROWS`] CLI table rows.
+fn ends_inside_heroku_authorizations_table(previous: &[&str]) -> bool {
+    for (gap, line) in previous.iter().rev().enumerate() {
+        if is_heroku_authorizations_command(line) {
+            return true;
+        }
+        if gap >= AUTHORIZATIONS_MAX_ROWS || cli_table_label(line).is_none() {
+            return false;
+        }
+    }
+    false
+}
+
+/// `true` when the value starting at `value_start` of `line` is the whole
+/// value of the table's `Token:` row: the row's label is exactly `Token`,
+/// and only whitespace surrounds the value.
+fn is_token_table_row_value(line: &str, value_start: usize, value_end: usize) -> bool {
+    let Some(label) = cli_table_label(line) else {
+        return false;
+    };
+    let bytes = line.as_bytes();
+    let after_colon = label.len() + 1;
+    label.eq_ignore_ascii_case("token")
+        && value_start >= after_colon
+        && bytes[after_colon..value_start]
+            .iter()
+            .all(|&byte| is_token_space(byte))
+        && bytes[value_end..].iter().all(|&byte| is_token_space(byte))
+}
+
 /// Internal retention hint for the built-in incremental scanner: `true`
 /// when the last complete line of `input` leaves a multi-line legacy-token
 /// layout open -- a Heroku `.netrc` entry still waiting for its `password`
 /// line, or a `heroku auth:token` command still waiting for its output
-/// line -- so the session keeps the unit open rather than closing the
-/// context line away from the token (issue #743). The window it holds is
+/// line, or a `heroku authorizations:<verb>` table still within its row
+/// budget (issue #933) -- so the session keeps the unit open rather than
+/// closing the context line away from the token (issue #743). The window it
+/// holds is
 /// exactly the one [`HerokuApiKeyLegacyDetector`] reads back, so the unit
 /// always contains the context line whenever the whole-input scan would use
 /// it.
 pub(crate) fn has_open_heroku_legacy_context(input: &str) -> bool {
     let complete = input.strip_suffix('\n').unwrap_or(input);
-    let mut tail: Vec<&str> = complete
-        .rsplit('\n')
-        .take(NETRC_MAX_CONTINUATION_LINES + 1)
-        .collect();
+    let mut tail: Vec<&str> = complete.rsplit('\n').take(LOOKBACK_LINES).collect();
     tail.reverse();
     tail.last()
         .is_some_and(|last| is_heroku_auth_token_command(last))
         || ends_inside_heroku_netrc_entry(&tail)
+        || ends_inside_heroku_authorizations_table(&tail)
 }
 
 /// Detects a legacy (pre-`HRKU-`) Heroku API token: a bare UUID-shaped run
@@ -469,8 +545,7 @@ impl Detector for HerokuApiKeyLegacyDetector {
                 continue;
             }
             let same_line = line_contains_ci(line, CONTEXT_KEYWORD);
-            let previous: Vec<&str> = all_lines
-                [index.saturating_sub(NETRC_MAX_CONTINUATION_LINES + 1)..index]
+            let previous: Vec<&str> = all_lines[index.saturating_sub(LOOKBACK_LINES)..index]
                 .iter()
                 .map(|&(start, end)| &input[start..end])
                 .collect();
@@ -482,7 +557,9 @@ impl Detector for HerokuApiKeyLegacyDetector {
                     || (is_whole_line(bytes, relative_start, relative_end)
                         && previous
                             .last()
-                            .is_some_and(|line| is_heroku_auth_token_command(line)));
+                            .is_some_and(|line| is_heroku_auth_token_command(line)))
+                    || (is_token_table_row_value(line, relative_start, relative_end)
+                        && ends_inside_heroku_authorizations_table(&previous));
                 if !in_context
                     || !is_uuid_shape(bytes, relative_start, relative_end, pattern::is_hex)
                     || is_filler_uuid(&line[relative_start..relative_end])
@@ -992,9 +1069,69 @@ mod tests {
         assert_eq!(detect_legacy(&input).len(), 1);
     }
 
+    fn authorizations_table(token_row: &str) -> String {
+        format!(
+            "$ heroku authorizations:info $AUTH_ID\nClient:      <none>\nID:          \
+             {LEGACY_UUID}\nDescription: ci deploy\nScope:       global\n{token_row}\n\
+             Updated at:  2026-09-02T10:14:31Z\n"
+        )
+    }
+
+    #[test]
+    fn detects_the_token_row_of_a_heroku_authorizations_table() {
+        // Issue #933. The `ID:` row carries a UUID too; only `Token:` counts.
+        let value = "0123abcd-89ab-cdef-0123-456789abcdef";
+        for row in [format!("Token:       {value}"), format!("token: {value}  ")] {
+            let input = authorizations_table(&row);
+            let found = detect_legacy(&input);
+            assert_eq!(found.len(), 1, "{input:?}");
+            let range = found[0].range();
+            assert_eq!(&input[range.start()..range.end()], value);
+            assert_eq!(found[0].confidence(), Confidence::Medium);
+        }
+        let crlf = authorizations_table(&format!("Token:       {value}")).replace('\n', "\r\n");
+        assert_eq!(detect_legacy(&crlf).len(), 1);
+        for command in [
+            "heroku authorizations:create -d ci",
+            "user@host:~$ heroku authorizations:rotate $ID",
+        ] {
+            let input = format!("{command}\nScope:       global\nToken:       {value}\n");
+            assert_eq!(detect_legacy(&input).len(), 1, "{input:?}");
+        }
+    }
+
+    #[test]
+    fn rejects_a_uuid_outside_the_token_row_or_the_table_window() {
+        let value = "0123abcd-89ab-cdef-0123-456789abcdef";
+        for input in [
+            // Another row label (the benchmark's `Client ID` twin).
+            authorizations_table(&format!("Client ID:   {value}")),
+            // No command line, another command, and a blank line in between.
+            format!("Scope:       global\nToken:       {value}\n"),
+            format!("$ heroku apps:info\nScope:       global\nToken:       {value}\n"),
+            format!("$ heroku authorizations:info $ID\n\nToken:       {value}\n"),
+            // Free text in the row, or more than the row budget.
+            format!("$ heroku authorizations:info $ID\nToken:       {value} (expired)\n"),
+            format!(
+                "$ heroku authorizations:info $ID\n{}Token:       {value}\n",
+                "Scope:       global\n".repeat(AUTHORIZATIONS_MAX_ROWS + 1)
+            ),
+        ] {
+            assert!(detect_legacy(&input).is_empty(), "{input:?}");
+        }
+        // Exactly the row budget still counts.
+        let input = format!(
+            "$ heroku authorizations:info $ID\n{}Token:       {value}\n",
+            "Scope:       global\n".repeat(AUTHORIZATIONS_MAX_ROWS)
+        );
+        assert_eq!(detect_legacy(&input).len(), 1);
+    }
+
     #[test]
     fn the_retention_hint_holds_exactly_the_multi_line_layouts_open() {
         for open in [
+            "$ heroku authorizations:info $ID\n",
+            "$ heroku authorizations:info $ID\nClient:      <none>\nScope:       global\n",
             "machine api.heroku.com\n",
             "machine api.heroku.com\n  login a@example.invalid\n",
             "machine api.heroku.com\n  login a\n  account b\n",
@@ -1011,6 +1148,9 @@ mod tests {
             "machine api.heroku.com\n  password x\n",
             "$ heroku auth:token\nx\n",
             "heroku apps\n",
+            "$ heroku authorizations:info $ID\nfree text\n",
+            "$ heroku authorizations:info $ID\n\n",
+            "heroku authorizations\n",
         ] {
             assert!(!has_open_heroku_legacy_context(closed), "{closed:?}");
         }
