@@ -256,11 +256,12 @@ pub(super) fn run_ends(bytes: &[u8], alphabet: Alphabet) -> Vec<usize> {
 pub(super) fn find_literal(bytes: &[u8], needle: &[u8], from: usize) -> Option<usize> {
     let (&first, rest) = needle.split_first()?;
     let last_start = bytes.len().checked_sub(needle.len())?;
+    let lead = LeadBytes::of(std::iter::once(needle));
+    let candidates = &bytes[..=last_start];
     let mut at = from;
     while at <= last_start {
-        at += bytes[at..=last_start]
-            .iter()
-            .position(|&byte| byte == first)?;
+        at = lead.find(candidates, at)?;
+        debug_assert_eq!(bytes[at], first);
         if bytes[at + 1..at + needle.len()] == *rest {
             return Some(at);
         }
@@ -307,17 +308,96 @@ pub(super) fn open_floor_run_end(
     }
 }
 
-/// The bytes that can begin one of `prefixes`: every prefix's first byte, or
-/// every byte when a prefix is empty (an empty prefix matches everywhere).
-fn prefix_first_bytes<'a>(prefixes: impl Iterator<Item = &'a str>) -> [bool; 256] {
-    let mut first_bytes = [false; 256];
-    for prefix in prefixes {
-        match prefix.as_bytes().first() {
-            Some(&byte) => first_bytes[usize::from(byte)] = true,
-            None => return [true; 256],
+/// The most distinct lead bytes [`LeadBytes::find`] searches for a word at
+/// a time; a set with more falls back to a byte-at-a-time table scan.
+const WORD_SEARCH_LEADS: usize = 4;
+
+/// `0x01` in every byte of a `u64`.
+const LOW_BITS: u64 = u64::from_le_bytes([0x01; 8]);
+/// `0x80` in every byte of a `u64`.
+const HIGH_BITS: u64 = u64::from_le_bytes([0x80; 8]);
+
+/// The bytes that can begin one of a scan's literal prefixes, and a search
+/// for the next input offset holding one.
+///
+/// A prefixed scan spends most of its time looking for a byte that can start
+/// a prefix, once per detector over the whole input. Most prefix sets start
+/// with one to four distinct bytes, so [`find`](Self::find) tests eight
+/// input bytes per step for equality with each of them (the "has a zero
+/// byte" word trick) instead of one table lookup per byte; a larger set, or
+/// an empty prefix, which can begin anywhere, uses the table. Both searches
+/// return the same offset (issue #950).
+pub(super) struct LeadBytes {
+    table: [bool; 256],
+    leads: [u8; WORD_SEARCH_LEADS],
+    /// How many of `leads` are set, or `None` when the set is too large for
+    /// the word search (or is every byte).
+    lead_count: Option<usize>,
+}
+
+impl LeadBytes {
+    /// Every prefix's first byte, or every byte when a prefix is empty (an
+    /// empty prefix matches everywhere).
+    pub(super) fn of<'a>(prefixes: impl Iterator<Item = &'a [u8]>) -> Self {
+        let mut lead_bytes = Self {
+            table: [false; 256],
+            leads: [0; WORD_SEARCH_LEADS],
+            lead_count: Some(0),
+        };
+        for prefix in prefixes {
+            let Some(&byte) = prefix.first() else {
+                lead_bytes.table = [true; 256];
+                lead_bytes.lead_count = None;
+                return lead_bytes;
+            };
+            if lead_bytes.table[usize::from(byte)] {
+                continue;
+            }
+            lead_bytes.table[usize::from(byte)] = true;
+            lead_bytes.lead_count = lead_bytes
+                .lead_count
+                .filter(|&count| count < WORD_SEARCH_LEADS)
+                .map(|count| {
+                    lead_bytes.leads[count] = byte;
+                    count + 1
+                });
         }
+        lead_bytes
     }
-    first_bytes
+
+    /// The first offset at or after `from` whose byte is in the set.
+    pub(super) fn find(&self, bytes: &[u8], from: usize) -> Option<usize> {
+        let mut at = from;
+        if let Some(count) = self.lead_count {
+            let leads = &self.leads[..count];
+            while let Some(word) = bytes.get(at..at + 8) {
+                let word = u64::from_le_bytes(word.try_into().ok()?);
+                let mut hits = 0u64;
+                for &lead in leads {
+                    let difference = word ^ (u64::from(lead) * LOW_BITS);
+                    hits |= difference.wrapping_sub(LOW_BITS) & !difference & HIGH_BITS;
+                }
+                // The lowest flagged byte is always a true match: a
+                // borrow can only flag bytes above the first equal one.
+                if hits != 0 {
+                    return Some(at + (hits.trailing_zeros() / 8) as usize);
+                }
+                at += 8;
+            }
+        }
+        bytes
+            .get(at..)?
+            .iter()
+            .position(|&byte| self.table[usize::from(byte)])
+            .map(|offset| at + offset)
+    }
+}
+
+/// `bytes[at..].starts_with(prefix)`, compared a byte at a time so a
+/// mismatch in the first byte or two, the usual outcome, returns without a
+/// `memcmp` call.
+fn has_prefix_at(bytes: &[u8], at: usize, prefix: &[u8]) -> bool {
+    bytes.len() - at >= prefix.len() && bytes[at..].iter().zip(prefix).all(|(a, b)| a == b)
 }
 
 /// Finds every non-overlapping `(prefix, run)` match, left to right, the way
@@ -338,8 +418,10 @@ pub(super) fn scan_prefixed_runs(
 ) -> Vec<(usize, usize)> {
     // A call over input with no byte that can begin a prefix returns before
     // building the shape list (issue #950); see `scan_prefixed_shapes`.
-    let first_bytes = prefix_first_bytes(prefixes.iter().copied());
-    if !input.bytes().any(|byte| first_bytes[usize::from(byte)]) {
+    if LeadBytes::of(prefixes.iter().map(|prefix| prefix.as_bytes()))
+        .find(input.as_bytes(), 0)
+        .is_none()
+    {
         return Vec::new();
     }
     let shapes: Vec<PrefixShape<'_>> = prefixes
@@ -383,15 +465,12 @@ pub(super) fn scan_prefixed_shapes(
     // Bytes that can begin some prefix. A position outside this set cannot
     // match any shape, so it skips the per-shape comparison entirely. An
     // empty prefix matches everywhere and disables the filter.
-    let first_bytes = prefix_first_bytes(shapes.iter().map(|shape| shape.prefix));
+    let lead_bytes = LeadBytes::of(shapes.iter().map(|shape| shape.prefix.as_bytes()));
     // The scan starts at the first byte that can begin a prefix. Input with
     // none, the common case, returns here, before the per-scan tables below
     // are allocated: a whole scan pays that setup once, but an incremental
     // session calls every detector once per closed line (issue #950).
-    let Some(mut start) = bytes
-        .iter()
-        .position(|&byte| first_bytes[usize::from(byte)])
-    else {
+    let Some(mut start) = lead_bytes.find(bytes, 0) else {
         return Vec::new();
     };
     // Run-end tables are built on first use, one per distinct alphabet:
@@ -407,13 +486,15 @@ pub(super) fn scan_prefixed_shapes(
 
     let mut matches = Vec::new();
     while start < bytes.len() {
-        if !first_bytes[usize::from(bytes[start])] {
-            start += 1;
-            continue;
-        }
+        // Offsets whose byte cannot begin a prefix are skipped in one search;
+        // they could only have advanced the scan by one byte each.
+        let Some(lead) = lead_bytes.find(bytes, start) else {
+            break;
+        };
+        start = lead;
         let Some(shape) = shapes
             .iter()
-            .filter(|shape| bytes[start..].starts_with(shape.prefix.as_bytes()))
+            .filter(|shape| has_prefix_at(bytes, start, shape.prefix.as_bytes()))
             .max_by_key(|shape| shape.prefix.len())
         else {
             start += 1;
@@ -475,6 +556,48 @@ pub(super) fn scan_prefixed_shapes(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn lead_bytes_find_the_same_offset_as_a_byte_at_a_time_scan() {
+        // Bytes around the word trick's edges (0x00, 0x01, 0x7f, 0x80,
+        // 0xff), at every alignment, for lead sets on both sides of the
+        // word-search limit and an empty prefix.
+        let mut haystack: Vec<u8> = Vec::new();
+        for round in 0u8..40 {
+            haystack.extend_from_slice(&[0x00, 0x01, 0x7f, 0x80, 0xff, b'a', b's', b'k', b'_']);
+            haystack.extend(std::iter::repeat_n(
+                round.wrapping_mul(37),
+                usize::from(round % 11),
+            ));
+        }
+        let prefix_sets: [&[&[u8]]; 7] = [
+            &[b"s"],
+            &[b"sk_", b"sk-", b"rk_"],
+            &[b"\x00", b"\x01"],
+            &[b"\x80\x81", b"\xff"],
+            &[b"a", b"k", b"s", b"_"],
+            &[b"a", b"k", b"s", b"_", b"\x7f"],
+            &[b"x", b""],
+        ];
+        for prefixes in prefix_sets {
+            let lead_bytes = LeadBytes::of(prefixes.iter().copied());
+            for end in [0, 1, 7, 8, 9, 63, haystack.len()] {
+                let bytes = &haystack[..end];
+                for from in 0..=end + 1 {
+                    let expected = (from..end).find(|&at| {
+                        prefixes
+                            .iter()
+                            .any(|prefix| prefix.first().is_none_or(|&lead| lead == bytes[at]))
+                    });
+                    assert_eq!(
+                        lead_bytes.find(bytes, from),
+                        expected,
+                        "{prefixes:?} end {end} from {from}"
+                    );
+                }
+            }
+        }
+    }
 
     #[test]
     fn find_literal_returns_the_first_occurrence_at_or_after_the_offset() {
