@@ -64,6 +64,8 @@ evidence is linked from each published version.
     (`resend_api_key`), with a mixed-case guard against `re_` identifiers.
   - `apify-api-token` (#916): Apify `apify_api_` + 20–128 alphanumeric
     API tokens (`apify_api_token`), the provider's own open-ended rule.
+  - `wandb-api-key` (#917): W&B `wandb_v1_` API keys (`wandb_api_key`),
+    with a tolerant 64–96 body band around the documented width.
 
 ### Fixed
 

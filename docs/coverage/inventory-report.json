@@ -5134,12 +5134,69 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "apify_api_token"
+    },
+    {
+      "detector": "wandb-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "wandb-api-key-positive-bare",
+        "wandb-api-key-positive-body-64",
+        "wandb-api-key-positive-body-64-dotenv",
+        "wandb-api-key-positive-body-96",
+        "wandb-api-key-positive-body-96-dotenv",
+        "wandb-api-key-positive-chat-sentence",
+        "wandb-api-key-positive-crlf-unicode-prefix",
+        "wandb-api-key-positive-curl-bearer",
+        "wandb-api-key-positive-dotenv",
+        "wandb-api-key-positive-host-label",
+        "wandb-api-key-positive-inner-underscore-split",
+        "wandb-api-key-positive-inner-underscore-split-dotenv",
+        "wandb-api-key-positive-json-config",
+        "wandb-api-key-positive-json-token-key",
+        "wandb-api-key-positive-log",
+        "wandb-api-key-positive-login-call",
+        "wandb-api-key-positive-netrc",
+        "wandb-api-key-positive-punctuation-adjacent",
+        "wandb-api-key-positive-python-sdk-call",
+        "wandb-api-key-positive-repeated-value",
+        "wandb-api-key-positive-shell-export",
+        "wandb-api-key-positive-tool-call-arguments",
+        "wandb-api-key-positive-x-api-key-header",
+        "wandb-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "wandb_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 115,
+    "supported": 116,
     "unresolved": 0
   }
 }

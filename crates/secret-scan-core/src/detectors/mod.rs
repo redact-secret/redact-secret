@@ -73,6 +73,7 @@ mod travisci;
 mod trigger_dev;
 mod twilio;
 mod vault;
+mod wandb;
 
 use crate::types::Detector;
 use connection_string::ConnectionStringDetector;
@@ -177,6 +178,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(inngest::INNGEST_SIGNING_KEY),
         Box::new(resend::RESEND_API_KEY),
         Box::new(apify::APIFY_API_TOKEN),
+        Box::new(wandb::WANDB_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -313,6 +315,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("inngest-signing-key", Pack::Provider),
     ("resend-api-key", Pack::Provider),
     ("apify-api-token", Pack::Provider),
+    ("wandb-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -438,6 +441,7 @@ mod tests {
                 "inngest-signing-key",
                 "resend-api-key",
                 "apify-api-token",
+                "wandb-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -798,6 +802,10 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let wandb_api_key_input = format!(
+            "wandb_v1_{}",
+            &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
+        );
         let apify_api_token_input = format!("apify_api_{}", "SyntheticRevokedApifyToken0000000000");
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
@@ -885,6 +893,7 @@ mod tests {
             ("inngest-signing-key", inngest_signing_key_input.as_str()),
             ("resend-api-key", resend_api_key_input.as_str()),
             ("apify-api-token", apify_api_token_input.as_str()),
+            ("wandb-api-key", wandb_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

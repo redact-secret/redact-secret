@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2920,
+  "fixtureCount": 2964,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -70710,6 +70710,852 @@
       "input": "apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_",
       "expected": [],
       "note": "Repeated prefixes with no body never reach the floor, and the scan stays linear and bounded."
+    },
+    {
+      "id": "wandb-api-key-positive-bare",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 86
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "wandb-api-key-positive-dotenv",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "WANDB_API_KEY=\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 100
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-shell-export",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export WANDB_API_KEY=\"\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\"\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 108
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-yaml",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  WANDB_API_KEY: \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 108
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-json-config",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"WANDB_API_KEY\": \"\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\"}",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 105
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-json-token-key",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\"}",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 97
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-python-sdk-call",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\")",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 111
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-overlap-bearer-header",
+      "detector": "wandb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 108
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "wandb-api-key-positive-x-api-key-header",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 97
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-curl-bearer",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 117
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-tool-call-arguments",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\"}}",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 124
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-chat-sentence",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 101
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-log",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic for request 7",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 141
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-positive-punctuation-adjacent",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic).",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 87
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "wandb-api-key-positive-crlf-unicode-prefix",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\n\r\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 110
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "wandb-api-key-overlap-context",
+      "detector": "wandb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 99
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "wandb-api-key-positive-repeated-value",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 86
+        },
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 87,
+          "end": 173
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "wandb-api-key-positive-body-64",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFix",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 73
+        }
+      ],
+      "note": "The body-64 shape is reported on its own."
+    },
+    {
+      "id": "wandb-api-key-positive-body-64-dotenv",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "WANDB_API_KEY=\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFix",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 87
+        }
+      ],
+      "note": "The body-64 shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-overlap-body-64-bearer",
+      "detector": "wandb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFix\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 95
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "wandb-api-key-positive-body-96",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyF",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 105
+        }
+      ],
+      "note": "The body-96 shape is reported on its own."
+    },
+    {
+      "id": "wandb-api-key-positive-body-96-dotenv",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "WANDB_API_KEY=\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyF",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 119
+        }
+      ],
+      "note": "The body-96 shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-overlap-body-96-bearer",
+      "detector": "wandb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyF\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 127
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "wandb-api-key-positive-inner-underscore-split",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKey_ixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 86
+        }
+      ],
+      "note": "The inner-underscore-split shape is reported on its own."
+    },
+    {
+      "id": "wandb-api-key-positive-inner-underscore-split-dotenv",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "WANDB_API_KEY=\u0077andb_v1_SyntheticRevokedWandbApiKey_ixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 100
+        }
+      ],
+      "note": "The inner-underscore-split shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "wandb-api-key-overlap-inner-underscore-split-bearer",
+      "detector": "wandb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0077andb_v1_SyntheticRevokedWandbApiKey_ixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 108
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "wandb-api-key-boundary-under-band",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFi",
+      "expected": [],
+      "note": "A 63-byte body is under the tolerant 64-96 band around the documented 77."
+    },
+    {
+      "id": "wandb-api-key-boundary-over-band",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFi",
+      "expected": [],
+      "note": "A 97-byte body is over the tolerant band; it is rejected whole, never truncated."
+    },
+    {
+      "id": "wandb-api-key-boundary-dash-in-body",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFix-ureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "A dash is outside the validator's letters, digits and underscores; the run before it is under the band and the dash rejects it."
+    },
+    {
+      "id": "wandb-api-key-boundary-uppercase-prefix",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "WANDB_V1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "The provider prefix is lowercase."
+    },
+    {
+      "id": "wandb-api-key-boundary-future-version",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "wandb_v2_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "Only the v1 prefix is evidenced."
+    },
+    {
+      "id": "wandb-api-key-boundary-dash-prefix",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "wandb-v1-SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "The provider prefix uses underscores."
+    },
+    {
+      "id": "wandb-api-key-boundary-glued-prefix",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "A letter glued before the prefix makes it part of a wider identifier."
+    },
+    {
+      "id": "wandb-api-key-boundary-underscore-glued-prefix",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "An underscore glued before the prefix makes it part of a wider identifier."
+    },
+    {
+      "id": "wandb-api-key-boundary-dash-glued-suffix",
+      "detector": "wandb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic-1",
+      "expected": [],
+      "note": "A dash glued after the body makes it part of a wider identifier."
+    },
+    {
+      "id": "wandb-api-key-negative-placeholders",
+      "detector": "wandb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Set WANDB_API_KEY to wandb_v1_... from the settings page.",
+      "expected": [],
+      "note": "A truncated placeholder fails the band."
+    },
+    {
+      "id": "wandb-api-key-negative-short-test-constant",
+      "detector": "wandb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The fixture uses \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureS as a stand-in.",
+      "expected": [],
+      "note": "The 44-character test-constant shape is under the band."
+    },
+    {
+      "id": "wandb-api-key-negative-git-sha",
+      "detector": "wandb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "commit 0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [],
+      "note": "A 40-hex git SHA has no anchor; legacy 40-hex keys stay with generic context."
+    },
+    {
+      "id": "wandb-api-key-negative-shell-reference",
+      "detector": "wandb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "WANDB_API_KEY=${WANDB_API_KEY}\n",
+      "expected": [],
+      "note": "A shell reference is not a key."
+    },
+    {
+      "id": "wandb-api-key-negative-migration-identifier",
+      "detector": "wandb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "def wandb_version_1_migration():\n    pass\n",
+      "expected": [],
+      "note": "A wandb_version_ identifier is not the prefix."
+    },
+    {
+      "id": "wandb-api-key-positive-host-label",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export WANDB_KEY_HOST=local-\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 114
+        }
+      ],
+      "note": "A self-managed <host>- label before the key stays outside the span."
+    },
+    {
+      "id": "wandb-api-key-positive-login-call",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "wandb.login(key=\"\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\")\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 103
+        }
+      ],
+      "note": "The SDK login keyword argument is reported at exactly the key."
+    },
+    {
+      "id": "wandb-api-key-positive-netrc",
+      "detector": "wandb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "machine api.wandb.ai\n  login user\n  password \u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\n",
+      "expected": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 45,
+          "end": 131
+        }
+      ],
+      "note": "A .netrc password line for api.wandb.ai is reported at exactly the key."
+    },
+    {
+      "id": "wandb-api-key-adversarial-long-run",
+      "detector": "wandb-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "expected": [],
+      "note": "A long run of glued keys is one over-long body: rejected whole, never carved into a valid-looking key, and the scan stays linear and bounded."
     }
   ]
 }

@@ -118,7 +118,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-91 built-in detectors emit 115 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+92 built-in detectors emit 116 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -213,6 +213,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `inngest-signing-key` | `inngest_signing_key` | `always-redact` | — |
 | `resend-api-key` | `resend_api_key` | `always-redact` | — |
 | `apify-api-token` | `apify_api_token` | `always-redact` | — |
+| `wandb-api-key` | `wandb_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

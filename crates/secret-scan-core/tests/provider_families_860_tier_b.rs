@@ -502,3 +502,86 @@ mod apify {
         assert_partition_parity(&token(36, 5));
     }
 }
+
+mod wandb {
+    use super::*;
+
+    const DETECTOR: &str = "wandb-api-key";
+    const TYPE: &str = "wandb_api_key";
+
+    fn key(len: usize, seed: usize) -> String {
+        format!("wandb_v1_{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_in_the_band_wins_every_context_as_the_sole_finding() {
+        let body = filler(ALNUM, 77, 9);
+        let split = format!("wandb_v1_{}_{}", &body[..27], &body[28..]);
+        for key in [key(64, 1), key(77, 2), key(96, 3), split] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("WANDB_API_KEY={key}\n"),
+                format!("wandb.login(key=\"{key}\")\n"),
+                format!("machine api.wandb.ai\n  login user\n  password {key}\n"),
+                format!("export WANDB_BASE=local-{key}\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn a_host_label_under_a_credential_name_leaves_no_part_of_the_key_in_clear() {
+        let key = key(77, 4);
+        let input = format!("WANDB_API_KEY=local-{key}\n");
+        let (text, findings) = whole_input(&input);
+        assert!(!findings.is_empty(), "{input}");
+        assert!(!text.contains(&key), "{input}");
+        assert!(
+            findings
+                .iter()
+                .all(|finding| finding.action() == Action::Redact),
+            "{findings:?}"
+        );
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 77, 5);
+        let base = format!("wandb_v1_{body}");
+        let mut dashed = body.clone();
+        dashed.replace_range(30..31, "-");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key(63, 5),
+                key(97, 5),
+                format!("wandb_v1_{dashed}"),
+                format!("WANDB_V1_{body}"),
+                format!("wandb_v2_{body}"),
+                format!("wandb-v1-{body}"),
+                format!("x{base}"),
+                format!("_{base}"),
+                format!("{base}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "WANDB_API_KEY=wandb_v1_...\n".to_owned(),
+            format!("KEY = \"{}\"\n", key(35, 6)),
+            "commit 0123456789abcdef0123456789abcdef01234567\n".to_owned(),
+            "WANDB_API_KEY=${WANDB_API_KEY}\n".to_owned(),
+            "def wandb_version_1_migration(): pass\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(77, 7));
+    }
+}

@@ -834,6 +834,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0061pify_api_SyntheticRevokedApifyToken0000000000",
       "schemes": null
+    },
+    {
+      "type": "wandb_api_key",
+      "detector": "wandb-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "schemes": null
     }
   ],
   "consumers": [

@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 115 |
+| supported | 116 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 126.
+Coverage declarations: 127.
 
 ## Coverage by detector
 
@@ -115,6 +115,7 @@ Coverage declarations: 126.
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vercel-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| wandb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | xai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 
 ## Coverage by finding type
@@ -235,6 +236,7 @@ Coverage declarations: 126.
 | vault_token | vault-token | provider | supported | not-applicable | none |
 | vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
+| wandb_api_key | wandb-api-key | provider | supported | not-applicable | none |
 | xai_api_key | xai-api-key | provider | supported | not-applicable | none |
 
 ## Coverage by scheme
@@ -261,15 +263,15 @@ Coverage declarations: 126.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 126 | 0 | 0 |
-| boundary | 115 | 0 | 0 |
-| host-context | 115 | 0 | 0 |
+| adversarial | 127 | 0 | 0 |
+| boundary | 116 | 0 | 0 |
+| host-context | 116 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 126 | 0 | 0 |
-| near-miss-negative | 115 | 0 | 0 |
-| overlap | 115 | 0 | 0 |
-| positive | 115 | 0 | 0 |
-| range | 126 | 0 | 0 |
+| malformed | 127 | 0 | 0 |
+| near-miss-negative | 116 | 0 | 0 |
+| overlap | 116 | 0 | 0 |
+| positive | 116 | 0 | 0 |
+| range | 127 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

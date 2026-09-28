@@ -12528,6 +12528,129 @@
       "type": "apify_api_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "wandb-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "wandb-api-key-positive-bare",
+            "wandb-api-key-positive-body-64",
+            "wandb-api-key-positive-body-64-dotenv",
+            "wandb-api-key-positive-body-96",
+            "wandb-api-key-positive-body-96-dotenv",
+            "wandb-api-key-positive-chat-sentence",
+            "wandb-api-key-positive-crlf-unicode-prefix",
+            "wandb-api-key-positive-curl-bearer",
+            "wandb-api-key-positive-dotenv",
+            "wandb-api-key-positive-host-label",
+            "wandb-api-key-positive-inner-underscore-split",
+            "wandb-api-key-positive-inner-underscore-split-dotenv",
+            "wandb-api-key-positive-json-config",
+            "wandb-api-key-positive-json-token-key",
+            "wandb-api-key-positive-log",
+            "wandb-api-key-positive-login-call",
+            "wandb-api-key-positive-netrc",
+            "wandb-api-key-positive-punctuation-adjacent",
+            "wandb-api-key-positive-python-sdk-call",
+            "wandb-api-key-positive-repeated-value",
+            "wandb-api-key-positive-shell-export",
+            "wandb-api-key-positive-tool-call-arguments",
+            "wandb-api-key-positive-x-api-key-header",
+            "wandb-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "wandb-api-key-overlap-bearer-header",
+            "wandb-api-key-overlap-body-64-bearer",
+            "wandb-api-key-overlap-body-96-bearer",
+            "wandb-api-key-overlap-context",
+            "wandb-api-key-overlap-inner-underscore-split-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "wandb-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "wandb-api-key-boundary-dash-glued-suffix",
+            "wandb-api-key-boundary-dash-in-body",
+            "wandb-api-key-boundary-dash-prefix",
+            "wandb-api-key-boundary-future-version",
+            "wandb-api-key-boundary-glued-prefix",
+            "wandb-api-key-boundary-over-band",
+            "wandb-api-key-boundary-under-band",
+            "wandb-api-key-boundary-underscore-glued-prefix",
+            "wandb-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "wandb-api-key-negative-git-sha",
+            "wandb-api-key-negative-migration-identifier",
+            "wandb-api-key-negative-placeholders",
+            "wandb-api-key-negative-shell-reference",
+            "wandb-api-key-negative-short-test-constant"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "wandb-api-key-boundary-dash-glued-suffix",
+            "wandb-api-key-boundary-dash-in-body",
+            "wandb-api-key-boundary-dash-prefix",
+            "wandb-api-key-boundary-future-version",
+            "wandb-api-key-boundary-glued-prefix",
+            "wandb-api-key-boundary-over-band",
+            "wandb-api-key-boundary-under-band",
+            "wandb-api-key-boundary-underscore-glued-prefix",
+            "wandb-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for wandb_api_key (wandb-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "wandb_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12773,6 +12896,7 @@
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix",
+            "wandb-api-key-adversarial-long-run",
             "xai-api-key-adversarial-long-suffix"
           ],
           "state": "supported"
@@ -13223,6 +13347,7 @@
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix",
+            "wandb-api-key-adversarial-long-run",
             "xai-api-key-adversarial-long-suffix"
           ],
           "state": "supported"
