@@ -56,6 +56,21 @@
     {"id":"email-english-email-address-label","input":"email address: fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":15,"end":49}]},
     {"id":"email-korean-email-address-label","input":"이메일 주소: fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":18,"end":52}]},
     {"id":"email-logfmt-email-address-label-key","input":"email_address=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":14,"end":48}]},
-    {"id":"email-bare-address-label-control","input":"address: fixture876-q7m9@x4z8v2n6.synthetic","expected":[]}
+    {"id":"email-bare-address-label-control","input":"address: fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-pipe-record-label-key-splits-from-local-part","input":"a|b|email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":10,"end":44}]},
+    {"id":"email-pipe-record-after-earlier-pairs","input":"id=7|email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":11,"end":45}]},
+    {"id":"email-pipe-record-colon-label","input":"x|email: fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":9,"end":43}]},
+    {"id":"email-pipe-table-label-cell","input":"| email | fixture876-q7m9@x4z8v2n6.synthetic |","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":10,"end":44}]},
+    {"id":"email-pipe-record-label-prefix-is-not-a-whole-token","input":"user|emailx=fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-pipe-record-dotted-key-stays-joined","input":"user|user.email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-pipe-table-header-label-does-not-reach-a-later-row","input":"| email |\n| --- |\n| fixture876-q7m9@x4z8v2n6.synthetic |","expected":[]},
+    {"id":"email-pipe-record-reserved-domain-control","input":"a|b|email=identity@example.com","expected":[]},
+    {"id":"email-bare-pipe-label-splits-from-local-part","input":"email|fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":6,"end":40}]},
+    {"id":"email-bare-pipe-label-table-cell","input":"|email|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":7,"end":41}]},
+    {"id":"email-bare-pipe-prefixed-label","input":"|customer_email|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":16,"end":50}]},
+    {"id":"email-bare-pipe-korean-label","input":"|이메일|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":11,"end":45}]},
+    {"id":"email-bare-pipe-label-prefix-is-not-a-whole-token","input":"|emailx|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[]},
+    {"id":"email-bare-pipe-unreviewed-fields-stay-joined","input":"|user|a|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[]},
+    {"id":"email-bare-pipe-reserved-domain-control","input":"|email|person@example.com|","expected":[]}
   ]
 }

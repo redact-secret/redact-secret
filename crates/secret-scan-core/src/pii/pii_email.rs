@@ -102,14 +102,30 @@ fn detect_email_candidates(input: &str) -> Vec<Alternative> {
 /// a reviewed high-signal email field label of the context vocabulary (the
 /// whole key or its last separator-delimited tokens, after the context-only
 /// normalization: `email`, `customer_email`, `이메일`), that run and the `=`
-/// are a label, not local part. Returns their byte length. Any other `=`
-/// stays local-part syntax.
+/// are a label, not local part. Returns their byte length.
+///
+/// `atext` also includes `|`, so in a pipe-delimited record the scan runs
+/// back over earlier fields (`id=7|email=local@domain`). A `|` starts a new
+/// field, and the run from it to that field's first `=` is judged the same
+/// way (issue #940). A field key may also end at a bare `|`
+/// (`email|local@domain`, `|email|local@domain|`): when that key is a
+/// reviewed label by the same rule, the `|` is a field boundary, not local
+/// part (issue #943). The first field, from the left, whose key is a label
+/// ends the label. Any other `=` or `|` stays local-part syntax, so
+/// `|emailx|local@domain` and `|user|a|b@domain` keep the RFC reading.
 fn email_label_key_length(local: &str) -> Option<usize> {
-    let separator = local.find('=')?;
-    let key = &local[..separator];
-    if key.is_empty() {
-        return None;
-    }
+    std::iter::once(0)
+        .chain(local.match_indices('|').map(|(index, _)| index + 1))
+        .find_map(|field_start| {
+            let field = &local[field_start..];
+            let separator = field.find(['=', '|'])?;
+            let key = &field[..separator];
+            (!key.is_empty() && is_email_label_key(key)).then_some(field_start + separator + 1)
+        })
+}
+
+fn is_email_label_key(key: &str) -> bool {
+    let view = normalize_context(key);
     pii_context_table::CONTEXT_ENTRIES
         .iter()
         .filter(|entry| {
@@ -119,7 +135,6 @@ fn email_label_key_length(local: &str) -> Option<usize> {
                 && entry.domains.contains(&IdentityDomain::Email)
         })
         .any(|entry| {
-            let view = normalize_context(key);
             entry.forms.iter().any(|form| {
                 let form = normalize_context(form);
                 view == form
@@ -128,7 +143,6 @@ fn email_label_key_length(local: &str) -> Option<usize> {
                         .is_some_and(|head| head.ends_with(' '))
             })
         })
-        .then_some(separator + 1)
 }
 
 fn scan_local_start(input: &str, at: usize) -> Option<usize> {
@@ -431,6 +445,40 @@ mod tests {
         assert_eq!(ranges(&input), [(6, input.len())]);
         // Keys that are not a whole reviewed label keep the joined candidate.
         for key in ["user", "emailx", "myemail", "user.email", "contact"] {
+            let input = format!("{key}={address}");
+            assert_eq!(ranges(&input), [(0, input.len())], "{input:?}");
+        }
+        // Issue #940: a `|` field delimiter ends the earlier fields of the key.
+        for key in [
+            "x|email",
+            "a|b|email",
+            "|email",
+            "a|customer_email",
+            "x|이메일",
+        ] {
+            let input = format!("{key}={address}");
+            assert_eq!(ranges(&input), [(key.len() + 1, input.len())], "{input:?}");
+        }
+        // Issue #943: a reviewed label joined to the address by a bare `|`.
+        for key in [
+            "email",
+            "|email",
+            "id=7|email",
+            "a|customer_email",
+            "|이메일",
+            "EMAIL",
+        ] {
+            let input = format!("{key}|{address}");
+            assert_eq!(ranges(&input), [(key.len() + 1, input.len())], "{input:?}");
+        }
+        // The first label field wins even when a later field has an `=`.
+        let input = format!("email|x={address}");
+        assert_eq!(ranges(&input), [(6, input.len())]);
+        for prefix in ["|emailx|", "|user|a|", "|email.x|", "|myemail|"] {
+            let input = format!("{prefix}{address}");
+            assert_eq!(ranges(&input), [(0, input.len())], "{input:?}");
+        }
+        for key in ["user|emailx", "user|user.email", "id=7|emailx"] {
             let input = format!("{key}={address}");
             assert_eq!(ranges(&input), [(0, input.len())], "{input:?}");
         }

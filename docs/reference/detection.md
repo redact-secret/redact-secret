@@ -34,6 +34,26 @@ issues. Exact supported grammars and evidence are recorded in the
 denominators, results, and limitations without turning them into a universal
 accuracy claim.
 
+### Opt-in PII: availability is not support
+
+A PII selector makes a family available: once selected, its detector runs.
+That is all activation means. Qualified support is a separate `pii-v1` status
+of `pending`, `provisional`, or `stable`, and only exact-artifact benchmark
+evidence under the
+[`pii-v1` qualification profile](../decisions/2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md)
+can move a family past `pending`. All six families below are `pending` today;
+none is `provisional` or `stable`. Each family's beta.11 disposition is recorded
+in
+[redact-secret-benchmarks#428](https://github.com/redact-secret/redact-secret-benchmarks/issues/428).
+
+The six families are `pii:global:email`, `pii:global:iban`,
+`pii:global:network-address`, `pii:global:payment-card`, `pii:global:phone`,
+and `pii:us:ssn`. US SSN is the only jurisdictional family, selected by
+`pii:us` or `pii:family:us:ssn`. No other jurisdiction and no other national
+identifier is available. These are six bounded structured families, not
+general PII coverage: names, postal addresses, dates of birth, free-text
+personal data, and every form a family's contract excludes stay undetected.
+
 ### Opt-in email PII
 
 PII is off by default. The global or exact email selector registers one
@@ -86,7 +106,34 @@ high-group allocation, or identity. Reviewed English or Korean SSN field
 context is required for sensitivity; generic identifier and number labels do
 not qualify. The [US SSN family contract](../contracts/pii/us-ssn-v1.md)
 freezes grammar, boundaries, sources, safe fixtures, and tradeoffs. The family
-remains `pending` until counterpart #392 qualifies the exact merged artifact.
+remains `pending` until exact-artifact `pii-v1` benchmark evidence is reviewed.
+
+### Opt-in IBAN PII
+
+The global or exact IBAN selector accepts an uppercase compact IBAN or the
+exact four-character ASCII-space print grouping. The country code must have a
+SWIFT Registry Release 103 length row, and the value must pass `iban-mod97` v1.
+Reviewed IBAN context is required for sensitivity; a checksum-valid value with
+no context stays identity-only. Lowercase, tabs, hyphens, repeated or
+non-breaking spaces, mixed grouping, and unknown or wrong country lengths are
+excluded. It does not look up banks, account ownership, or account status. The
+[IBAN family contract](../contracts/pii/iban-v1.md) freezes the rest. The
+family remains `pending` until exact-artifact `pii-v1` benchmark evidence is
+reviewed.
+
+### Opt-in network-address PII
+
+The global or exact network-address selector is one family for canonical
+dotted IPv4 and full, compressed, or IPv4-embedded IPv6. Zone ids and
+leading-zero IPv4 octets are rejected. A reviewed network-address field label
+is required for sensitivity. Only the frozen documentation, test, and
+benchmarking ranges and named non-endpoint constants (such as `0.0.0.0`,
+loopback, multicast, and broadcast) are non-sensitive; being private or
+special-purpose alone does not make an address non-sensitive. The frozen
+contract is the
+[network-address evidence record](../audits/evidence/875/README.md). The
+family remains `pending` until exact-artifact `pii-v1` benchmark evidence is
+reviewed.
 
 ### Policy-qualified generic credentials
 
