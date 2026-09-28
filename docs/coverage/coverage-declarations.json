@@ -11570,6 +11570,317 @@
       "type": "firecrawl_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "composio-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "composio-api-key-positive-bare",
+            "composio-api-key-positive-bearer-header",
+            "composio-api-key-positive-body-ending-in-dash",
+            "composio-api-key-positive-body-ending-in-dash-dotenv",
+            "composio-api-key-positive-chat-sentence",
+            "composio-api-key-positive-crlf-unicode-prefix",
+            "composio-api-key-positive-curl-bearer",
+            "composio-api-key-positive-dotenv",
+            "composio-api-key-positive-json-config",
+            "composio-api-key-positive-json-token-key",
+            "composio-api-key-positive-log",
+            "composio-api-key-positive-punctuation-adjacent",
+            "composio-api-key-positive-python-sdk-call",
+            "composio-api-key-positive-repeated-value",
+            "composio-api-key-positive-shell-export",
+            "composio-api-key-positive-tool-call-arguments",
+            "composio-api-key-positive-x-api-key-header",
+            "composio-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "composio-api-key-overlap-body-ending-in-dash-bearer",
+            "composio-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "composio-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "composio-api-key-boundary-all-lowercase-ak-body",
+            "composio-api-key-boundary-all-uppercase-ak-body",
+            "composio-api-key-boundary-byte-outside-alphabet",
+            "composio-api-key-boundary-dash-separator",
+            "composio-api-key-boundary-long-body",
+            "composio-api-key-boundary-short-body",
+            "composio-api-key-boundary-user-key-20",
+            "composio-api-key-boundary-user-key-44",
+            "composio-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "composio-api-key-negative-ak-inside-cak",
+            "composio-api-key-negative-ak-inside-xak",
+            "composio-api-key-negative-other-key-placeholders",
+            "composio-api-key-negative-other-provider-ak-hex",
+            "composio-api-key-negative-snake-case-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "composio-api-key-boundary-all-lowercase-ak-body",
+            "composio-api-key-boundary-all-uppercase-ak-body",
+            "composio-api-key-boundary-byte-outside-alphabet",
+            "composio-api-key-boundary-dash-separator",
+            "composio-api-key-boundary-long-body",
+            "composio-api-key-boundary-short-body",
+            "composio-api-key-boundary-user-key-20",
+            "composio-api-key-boundary-user-key-44",
+            "composio-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for composio_project_api_key (composio-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "composio_project_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "composio-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "composio-api-key-positive-org-key",
+            "composio-api-key-positive-org-key-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "composio-api-key-overlap-org-key-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "composio-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "composio-api-key-boundary-all-lowercase-ak-body",
+            "composio-api-key-boundary-all-uppercase-ak-body",
+            "composio-api-key-boundary-byte-outside-alphabet",
+            "composio-api-key-boundary-dash-separator",
+            "composio-api-key-boundary-long-body",
+            "composio-api-key-boundary-short-body",
+            "composio-api-key-boundary-user-key-20",
+            "composio-api-key-boundary-user-key-44",
+            "composio-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "composio-api-key-negative-ak-inside-cak",
+            "composio-api-key-negative-ak-inside-xak",
+            "composio-api-key-negative-other-key-placeholders",
+            "composio-api-key-negative-other-provider-ak-hex",
+            "composio-api-key-negative-snake-case-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "composio-api-key-boundary-all-lowercase-ak-body",
+            "composio-api-key-boundary-all-uppercase-ak-body",
+            "composio-api-key-boundary-byte-outside-alphabet",
+            "composio-api-key-boundary-dash-separator",
+            "composio-api-key-boundary-long-body",
+            "composio-api-key-boundary-short-body",
+            "composio-api-key-boundary-user-key-20",
+            "composio-api-key-boundary-user-key-44",
+            "composio-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for composio_org_api_key (composio-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "composio_org_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "composio-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "composio-api-key-positive-user-key",
+            "composio-api-key-positive-user-key-dotenv",
+            "composio-api-key-positive-user-key-ending-in-underscore",
+            "composio-api-key-positive-user-key-ending-in-underscore-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "composio-api-key-overlap-user-key-bearer",
+            "composio-api-key-overlap-user-key-ending-in-underscore-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "composio-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "composio-api-key-boundary-all-lowercase-ak-body",
+            "composio-api-key-boundary-all-uppercase-ak-body",
+            "composio-api-key-boundary-byte-outside-alphabet",
+            "composio-api-key-boundary-dash-separator",
+            "composio-api-key-boundary-long-body",
+            "composio-api-key-boundary-short-body",
+            "composio-api-key-boundary-user-key-20",
+            "composio-api-key-boundary-user-key-44",
+            "composio-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "composio-api-key-negative-ak-inside-cak",
+            "composio-api-key-negative-ak-inside-xak",
+            "composio-api-key-negative-other-key-placeholders",
+            "composio-api-key-negative-other-provider-ak-hex",
+            "composio-api-key-negative-snake-case-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "composio-api-key-boundary-all-lowercase-ak-body",
+            "composio-api-key-boundary-all-uppercase-ak-body",
+            "composio-api-key-boundary-byte-outside-alphabet",
+            "composio-api-key-boundary-dash-separator",
+            "composio-api-key-boundary-long-body",
+            "composio-api-key-boundary-short-body",
+            "composio-api-key-boundary-user-key-20",
+            "composio-api-key-boundary-user-key-44",
+            "composio-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for composio_user_api_key (composio-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "composio_user_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -11714,6 +12025,7 @@
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
+            "composio-api-key-adversarial-long-suffix",
             "confluent-cloud-api-secret-adversarial-long-suffix",
             "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
             "connection-adversarial-azure-overlong",
@@ -12157,6 +12469,7 @@
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
+            "composio-api-key-adversarial-long-suffix",
             "confluent-cloud-api-secret-adversarial-long-suffix",
             "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
             "connection-adversarial-azure-overlong",

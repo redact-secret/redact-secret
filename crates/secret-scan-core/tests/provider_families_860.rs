@@ -537,3 +537,111 @@ mod firecrawl {
         assert_partition_parity(&format!("fc-{}", body(2)));
     }
 }
+
+mod composio {
+    use super::*;
+
+    const DETECTOR: &str = "composio-api-key";
+    const NANOID: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+
+    /// A nanoid body that is guaranteed mixed case, so the `ak_` guard holds.
+    fn body(len: usize, seed: usize) -> String {
+        format!("Xq{}", filler(NANOID, len - 2, seed))
+    }
+
+    #[test]
+    fn every_prefix_wins_every_context_as_the_sole_finding() {
+        for seed in 0..3 {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "composio_project_api_key",
+                &format!("ak_{}", body(20, seed)),
+            );
+            assert_sole_provider_finding(
+                DETECTOR,
+                "composio_org_api_key",
+                &format!("oak_{}", body(20, seed)),
+            );
+            assert_sole_provider_finding(
+                DETECTOR,
+                "composio_user_api_key",
+                &format!("uak_{}", body(43, seed)),
+            );
+        }
+    }
+
+    #[test]
+    fn a_body_ending_in_dash_or_underscore_is_exact_in_json_and_prose() {
+        for edge in ["-", "_"] {
+            let key = format!("uak_{}{edge}", body(42, 5));
+            for input in [
+                format!("{{\"token\": \"{key}\"}}"),
+                format!("{key}, then"),
+                format!("{key} next"),
+                key.clone(),
+            ] {
+                let (_, findings) = whole_input(&input);
+                assert_eq!(findings.len(), 1, "{input}: {findings:?}");
+                let start = input.find(&key).unwrap();
+                assert_eq!(findings[0].type_name(), "composio_user_api_key");
+                assert_eq!(
+                    (findings[0].range().start(), findings[0].range().end()),
+                    (start, start + key.len())
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn no_project_key_finding_fires_inside_a_longer_prefix() {
+        let body = body(20, 1);
+        for prefix in ["oak_", "uak_", "cak_", "xak_"] {
+            let input = format!("{prefix}{body}");
+            let (_, findings) = whole_input(&input);
+            assert!(
+                findings
+                    .iter()
+                    .all(|f| f.type_name() != "composio_project_api_key"),
+                "{input}: {findings:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let b20 = body(20, 1);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("ak_{}", &b20[..19]),
+                format!("ak_{b20}A"),
+                format!("ak_{}", b20.to_lowercase()),
+                format!("ak_{}", b20.to_uppercase()),
+                format!("AK_{b20}"),
+                format!("ak-{b20}"),
+                format!("uak_{b20}"),
+                format!("uak_{}", body(42, 1)),
+                format!("uak_{}", body(44, 1)),
+                format!("cak_{b20}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "COMPOSIO_API_KEY=ak_...\n".to_owned(),
+            "ck_test_dummy cak_e2e_agent\n".to_owned(),
+            format!("ak_{}\n", "0123456789abcdef".repeat(4)),
+            "let ak_session_token_value_xy = 1;\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("ak_{}", body(20, 2)));
+        assert_partition_parity(&format!("uak_{}", body(43, 2)));
+    }
+}

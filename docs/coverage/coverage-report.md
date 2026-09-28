@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 107 |
+| supported | 110 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 118.
+Coverage declarations: 121.
 
 ## Coverage by detector
 
@@ -35,6 +35,7 @@ Coverage declarations: 118.
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| composio-api-key | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | confluent-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | confluent-cloud-api-secret-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -128,6 +129,9 @@ Coverage declarations: 118.
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
+| composio_org_api_key | composio-api-key | provider | supported | not-applicable | none |
+| composio_project_api_key | composio-api-key | provider | supported | not-applicable | none |
+| composio_user_api_key | composio-api-key | provider | supported | not-applicable | none |
 | confluent_cloud_api_secret | confluent-cloud-api-secret | provider | supported | not-applicable | none |
 | confluent_cloud_api_secret_legacy | confluent-cloud-api-secret-legacy | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
@@ -247,15 +251,15 @@ Coverage declarations: 118.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 118 | 0 | 0 |
-| boundary | 107 | 0 | 0 |
-| host-context | 107 | 0 | 0 |
+| adversarial | 121 | 0 | 0 |
+| boundary | 110 | 0 | 0 |
+| host-context | 110 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 118 | 0 | 0 |
-| near-miss-negative | 107 | 0 | 0 |
-| overlap | 107 | 0 | 0 |
-| positive | 107 | 0 | 0 |
-| range | 118 | 0 | 0 |
+| malformed | 121 | 0 | 0 |
+| near-miss-negative | 110 | 0 | 0 |
+| overlap | 110 | 0 | 0 |
+| positive | 110 | 0 | 0 |
+| range | 121 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

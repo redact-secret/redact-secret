@@ -40,6 +40,12 @@ evidence is linked from each published version.
     lowercase UUIDv4 (version and variant nibbles enforced), as
     `firecrawl_api_key`. Legacy dashed UUIDs, `fco_` and `fcmcp_` stay
     unclaimed.
+  - `composio-api-key` (#909): Composio `ak_` project keys (20-byte nanoid
+    body with at least one uppercase and one lowercase letter), `oak_`
+    organization keys (20) and `uak_` user keys (43) as
+    `composio_project_api_key`, `composio_org_api_key` and
+    `composio_user_api_key`. `ck_`, `cak_` and `uak_` at other widths stay
+    unclaimed.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

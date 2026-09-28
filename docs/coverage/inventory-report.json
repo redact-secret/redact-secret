@@ -4699,12 +4699,135 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "firecrawl_api_key"
+    },
+    {
+      "detector": "composio-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "composio-api-key-positive-bare",
+        "composio-api-key-positive-bearer-header",
+        "composio-api-key-positive-body-ending-in-dash",
+        "composio-api-key-positive-body-ending-in-dash-dotenv",
+        "composio-api-key-positive-chat-sentence",
+        "composio-api-key-positive-crlf-unicode-prefix",
+        "composio-api-key-positive-curl-bearer",
+        "composio-api-key-positive-dotenv",
+        "composio-api-key-positive-json-config",
+        "composio-api-key-positive-json-token-key",
+        "composio-api-key-positive-log",
+        "composio-api-key-positive-punctuation-adjacent",
+        "composio-api-key-positive-python-sdk-call",
+        "composio-api-key-positive-repeated-value",
+        "composio-api-key-positive-shell-export",
+        "composio-api-key-positive-tool-call-arguments",
+        "composio-api-key-positive-x-api-key-header",
+        "composio-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "composio_project_api_key"
+    },
+    {
+      "detector": "composio-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "composio-api-key-positive-org-key",
+        "composio-api-key-positive-org-key-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "composio_org_api_key"
+    },
+    {
+      "detector": "composio-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "composio-api-key-positive-user-key",
+        "composio-api-key-positive-user-key-dotenv",
+        "composio-api-key-positive-user-key-ending-in-underscore",
+        "composio-api-key-positive-user-key-ending-in-underscore-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "composio_user_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 107,
+    "supported": 110,
     "unresolved": 0
   }
 }

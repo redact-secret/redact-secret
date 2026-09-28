@@ -778,6 +778,27 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0066c-0123456789ab4def8123456789abcdef",
       "schemes": null
+    },
+    {
+      "type": "composio_project_api_key",
+      "detector": "composio-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0061k_Synthetic_Revoked-Ak",
+      "schemes": null
+    },
+    {
+      "type": "composio_org_api_key",
+      "detector": "composio-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006fak_Synthetic_Revoked-Oa",
+      "schemes": null
+    },
+    {
+      "type": "composio_user_api_key",
+      "detector": "composio-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0075ak_Synthetic_Revoked-ComposioUserKeyFixture-01",
+      "schemes": null
     }
   ],
   "consumers": [

@@ -31,6 +31,9 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
+| `composio_org_api_key` | `composio-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and a dated staff statement under R3; `uak_` width under R6), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `composio_project_api_key` | `composio-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and a dated staff statement under R3; `uak_` width under R6), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `composio_user_api_key` | `composio-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and a dated staff statement under R3; `uak_` width under R6), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `confluent_cloud_api_secret` | `confluent-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `confluent_cloud_api_secret_legacy` | `confluent-cloud-api-secret-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `connection_string_password` | `connection-string` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
@@ -451,6 +454,7 @@ conformance and the benchmarks arrival and profile evidence.
 | `posthog:personal-api-key` | `posthog-token` | `phx_` or `phs_` + 42–49 `[0-9A-Za-z]` (the union of the prefixed base57 and base62 generator eras); `phc_` never claimed | `posthog_personal_api_key`; `posthog_project_secret_api_key` | T1 (provider generator code and unit tests under R1; the length band is derived from the T1 algorithm) |
 | `helicone:api-key` | `helicone-api-key` | `sk-` or `pk-` + `helicone` + optional `-eu` then optional `-rl` + `-` + four groups of exactly 7 `[a-z0-9]` joined by `-`; `sk-helicone-proxy-` + the four groups + `-` + a lowercase 8-4-4-4-12 UUID | `helicone_api_key` (`sk-`, read-write, and the proxy key); `helicone_write_api_key` (`pk-`, write-only, redacted) | T1 (provider worker validation regexes and generators; proxy key under R1) |
 | `firecrawl:api-key` | `firecrawl-api-key` | `fc-` + exactly 32 lowercase hex forming a dashless UUIDv4 (body byte 12 is `4`, byte 16 is one of `8 9 a b`) | `firecrawl_api_key` | prefix T1 (docs, SDK and MCP code); body T1 (server normalizer, schema default and generator under R1) |
+| `composio:api-key` | `composio-api-key` | `ak_` + exactly 20 `[A-Za-z0-9_-]` with at least one uppercase and one lowercase letter; `oak_` + exactly 20; `uak_` + exactly 43 | `composio_project_api_key`; `composio_org_api_key`; `composio_user_api_key` | T1 (prefixes from provider docs, `OpenAPI` and SDK; widths and alphabet from the 2026-09-17 provider-staff statement under R3; `uak_` + 43 per R6) |
 
 Doppler ([#903](https://github.com/redact-secret/redact-secret/issues/903),
 [handoff](../audits/evidence/860/doppler.md)). One type per documented role
@@ -535,6 +539,24 @@ authentication off. False positives: an unrelated `fc-` + dashless lowercase
 UUIDv4, such as an `fc-`-prefixed record id minted from a v4 UUID; plausible
 but rare, and the cost is redacting an identifier.
 
+Composio ([#909](https://github.com/redact-secret/redact-secret/issues/909),
+[handoff](../audits/evidence/860/composio.md)). A provider CLI code comment
+showing `uak_` + 20 is T2 under ruling R6 and does not override the staff
+statement, so `uak_` is 43 only; the issuance check in the handoff stays as
+confirmation. `ak_` is short and its alphabet includes `_` and `-`, so an
+`ak_` body must hold at least one uppercase and one lowercase letter
+(maintainer-accepted guard): the false-negative cost is about 6e-5 for a
+uniform nanoid body, and every all-lowercase or all-uppercase identifier
+(`ak_` + a snake_case run) is removed. The body and boundary alphabets are
+the same, so the exact width rejects every over-long or glued run, and a body
+ending in `-` or `_` is still exact. `oak_` and `uak_` contain `ak_`, but the
+preceding `o` or `u` fails the leading boundary, so no project-key finding
+fires inside them (or inside `cak_`/`xak_`). False negatives: `uak_` at any
+other width (including a possible legacy 20, which named contexts still
+redact), `ck_` and `cak_` keys (no known shape), and single-case `ak_` bodies.
+False positives: `ak_` + a 20-byte mixed-case identifier with a boundary on
+both sides, and `oak_` + any 20-byte alphabet run.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -550,6 +572,7 @@ but rare, and the cost is redacting an identifier.
 | PostHog `phx_` personal and `phs_` project secret API keys (42–49 alphanumeric) are reported as two finding types at provider specificity, bare or in any context; the public `phc_` project token is never claimed ([#906](https://github.com/redact-secret/redact-secret/issues/906), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent (Stripe `pk_`) to one more family |
 | Helicone `sk-`/`pk-` + `helicone` + optional `-eu`/`-rl` + four 7-byte `[a-z0-9]` groups, and the `sk-helicone-proxy-` key with a trailing UUID, are reported as `helicone_api_key` (`sk-`) and `helicone_write_api_key` (`pk-`, redacted by default) at provider specificity, bare or in any context; legacy bare `sk-`, `-cp-` and `-gov` forms stay unclaimed ([#907](https://github.com/redact-secret/redact-secret/issues/907), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family, with the group alphabet fixed by ruling R8 |
 | Firecrawl `fc-` + a dashless lowercase UUIDv4 (32 hex, version and variant nibbles enforced) is reported as `firecrawl_api_key` at provider specificity, bare or in any context; legacy dashed UUIDs, `fco_` and `fcmcp_` stay unclaimed ([#908](https://github.com/redact-secret/redact-secret/issues/908), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| Composio `ak_` + 20 (mixed-case guard), `oak_` + 20 and `uak_` + 43 `[A-Za-z0-9_-]` keys are reported as three finding types at provider specificity, bare or in any context; `ck_`, `cak_` and `uak_` at other widths stay unclaimed ([#909](https://github.com/redact-secret/redact-secret/issues/909), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family, with the `uak_` width fixed by ruling R6 |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

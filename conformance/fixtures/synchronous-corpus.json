@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2624,
+  "fixtureCount": 2668,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -65049,6 +65049,852 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef\u0066c-0123456789ab4def8123456789abcdef",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "composio-api-key-positive-bare",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_Synthetic_Revoked-Ak",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 23
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "composio-api-key-positive-dotenv",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "COMPOSIO_API_KEY=\u0061k_Synthetic_Revoked-Ak",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 40
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-shell-export",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export COMPOSIO_API_KEY=\"\u0061k_Synthetic_Revoked-Ak\"\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 48
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "composio-api-key-positive-yaml",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: \u0061k_Synthetic_Revoked-Ak\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 44
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-json-config",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"\u0061k_Synthetic_Revoked-Ak\"\n}\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 39
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-json-token-key",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0061k_Synthetic_Revoked-Ak\"}",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 34
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-python-sdk-call",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0061k_Synthetic_Revoked-Ak\")\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 48
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-bearer-header",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0061k_Synthetic_Revoked-Ak\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 45
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-x-api-key-header",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0061k_Synthetic_Revoked-Ak\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 34
+        }
+      ],
+      "note": "An X-API-Key header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-curl-bearer",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0061k_Synthetic_Revoked-Ak\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 54
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-tool-call-arguments",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0061k_Synthetic_Revoked-Ak\"}}",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 61
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-chat-sentence",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0061k_Synthetic_Revoked-Ak can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 38
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-log",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0061k_Synthetic_Revoked-Ak for request 7",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 78
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-positive-punctuation-adjacent",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0061k_Synthetic_Revoked-Ak).",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 24
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "composio-api-key-positive-crlf-unicode-prefix",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0061k_Synthetic_Revoked-Ak\n\r\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 47
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "composio-api-key-positive-repeated-value",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_Synthetic_Revoked-Ak \u0061k_Synthetic_Revoked-Ak",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 23
+        },
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 47
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "composio-api-key-overlap-context",
+      "detector": "composio-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0061k_Synthetic_Revoked-Ak",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 36
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "composio-api-key-positive-org-key",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006f\u0061k_Synthetic_Revoked-Oa",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_org_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 24
+        }
+      ],
+      "note": "An \u006f\u0061k_ organization key reports its own finding type."
+    },
+    {
+      "id": "composio-api-key-positive-org-key-dotenv",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "COMPOSIO_API_KEY=\u006f\u0061k_Synthetic_Revoked-Oa\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_org_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 41
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-overlap-org-key-bearer",
+      "detector": "composio-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006f\u0061k_Synthetic_Revoked-Oa\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_org_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 46
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "composio-api-key-positive-user-key",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-01",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 47
+        }
+      ],
+      "note": "A \u0075\u0061k_ user key, 43 body bytes per the provider-staff statement, reports its own finding type."
+    },
+    {
+      "id": "composio-api-key-positive-user-key-dotenv",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "COMPOSIO_API_KEY=\u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-01\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 64
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-overlap-user-key-bearer",
+      "detector": "composio-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-01\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 69
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "composio-api-key-positive-body-ending-in-dash",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_Synthetic_Revoked-A-",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 23
+        }
+      ],
+      "note": "A nanoid body may end in -; the exact width keeps the whole key in the span."
+    },
+    {
+      "id": "composio-api-key-positive-body-ending-in-dash-dotenv",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "COMPOSIO_API_KEY=\u0061k_Synthetic_Revoked-A-\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 40
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-overlap-body-ending-in-dash-bearer",
+      "detector": "composio-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0061k_Synthetic_Revoked-A-\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 45
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "composio-api-key-positive-user-key-ending-in-underscore",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-0_",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 47
+        }
+      ],
+      "note": "A nanoid body may end in _; the exact width keeps the whole key in the span."
+    },
+    {
+      "id": "composio-api-key-positive-user-key-ending-in-underscore-dotenv",
+      "detector": "composio-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "COMPOSIO_API_KEY=\u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-0_\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 64
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "composio-api-key-overlap-user-key-ending-in-underscore-bearer",
+      "detector": "composio-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-0_\n",
+      "expected": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 69
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "composio-api-key-boundary-short-body",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_Synthetic_Revoked-A",
+      "expected": [],
+      "note": "A body one byte short of the exact width is not the reviewed shape."
+    },
+    {
+      "id": "composio-api-key-boundary-long-body",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_Synthetic_Revoked-Akx",
+      "expected": [],
+      "note": "A body one byte over the exact width is a wider run, not a token."
+    },
+    {
+      "id": "composio-api-key-boundary-byte-outside-alphabet",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_Synth.tic_Revoked-Ak",
+      "expected": [],
+      "note": "A byte outside the nanoid alphabet breaks the run."
+    },
+    {
+      "id": "composio-api-key-boundary-all-lowercase-ak-body",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_synthetic_revoked-ak",
+      "expected": [],
+      "note": "The \u0061k_ guard requires an uppercase and a lowercase letter; a single-case body is not claimed."
+    },
+    {
+      "id": "composio-api-key-boundary-all-uppercase-ak-body",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_SYNTHETIC_REVOKED-AK",
+      "expected": [],
+      "note": "The \u0061k_ guard requires an uppercase and a lowercase letter; a single-case body is not claimed."
+    },
+    {
+      "id": "composio-api-key-boundary-wrong-case-prefix",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AK_Synthetic_Revoked-Ak",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "composio-api-key-boundary-dash-separator",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ak-Synthetic_Revoked-Ak",
+      "expected": [],
+      "note": "A different separator is not the reviewed prefix."
+    },
+    {
+      "id": "composio-api-key-boundary-user-key-20",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0075\u0061k_Synthetic_Revoked-Ak",
+      "expected": [],
+      "note": "A \u0075\u0061k_ body of 20 bytes is outside the contract (43 only)."
+    },
+    {
+      "id": "composio-api-key-boundary-user-key-44",
+      "detector": "composio-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0075\u0061k_Synthetic_Revoked-ComposioUserKeyFixture-01x",
+      "expected": [],
+      "note": "A \u0075\u0061k_ body of 44 bytes is a wider run, not a token."
+    },
+    {
+      "id": "composio-api-key-negative-ak-inside-cak",
+      "detector": "composio-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "c\u0061k_Synthetic_Revoked-Ak",
+      "expected": [],
+      "note": "An \u0061k_ project key never fires inside c\u0061k_: the byte before \u0061k_ continues an identifier."
+    },
+    {
+      "id": "composio-api-key-negative-ak-inside-xak",
+      "detector": "composio-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0061k_Synthetic_Revoked-Ak",
+      "expected": [],
+      "note": "An \u0061k_ project key never fires inside a wider identifier."
+    },
+    {
+      "id": "composio-api-key-negative-other-key-placeholders",
+      "detector": "composio-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like \u0061k_..., ck_..., ck_test_dummy or c\u0061k_e2e_agent in examples.",
+      "expected": [],
+      "note": "Placeholders and unsupported ck_/c\u0061k_ forms are not claimed."
+    },
+    {
+      "id": "composio-api-key-negative-other-provider-ak-hex",
+      "detector": "composio-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061k_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "Another provider's \u0061k_ + 64 hex fails the exact 20-byte body."
+    },
+    {
+      "id": "composio-api-key-negative-snake-case-identifier",
+      "detector": "composio-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "let \u0061k_session_token_value_xy = 1;\n",
+      "expected": [],
+      "note": "A snake_case identifier after \u0061k_ is not claimed."
+    },
+    {
+      "id": "composio-api-key-adversarial-long-suffix",
+      "detector": "composio-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }
