@@ -64,3 +64,21 @@ export function hostCpu() {
 export function readPackageVersion(packageJsonPath) {
   return JSON.parse(readFileSync(packageJsonPath, "utf8")).version;
 }
+
+/**
+ * Maps the JavaScript package's `artifact()` ("addon" | "wasm") to the
+ * assessment provenance's `resolvedArtifact` ("node-addon" | "wasm"). Throws on
+ * anything else, so a node performance result never goes out unattributed.
+ */
+export function resolvedNodeArtifact(kind) {
+  if (kind === "addon") return "node-addon";
+  if (kind === "wasm") return "wasm";
+  throw new Error(`artifact() returned ${JSON.stringify(kind)}; expected "addon" or "wasm"`);
+}
+
+/** The one resolved artifact every sample of a run agrees on; throws when samples differ or none exist. */
+export function agreedResolvedArtifact(kinds) {
+  const resolved = new Set(kinds.map(resolvedNodeArtifact));
+  if (resolved.size !== 1) throw new Error(`samples resolved ${resolved.size === 0 ? "no" : [...resolved].join(" and ")} artifact(s); expected exactly one`);
+  return [...resolved][0];
+}

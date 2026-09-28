@@ -158,6 +158,12 @@ export interface AssessmentProvenance {
   readonly command: string;
   /** Standard Cargo profile; absent in historical results and non-Rust adapters. */
   readonly buildProfile?: "debug" | "release";
+  /**
+   * Node performance runs only: which artifact `initialize()` actually loaded
+   * (`artifact()`), since the loader can fall back from the N-API addon to
+   * WebAssembly. Absent in historical results and other surfaces.
+   */
+  readonly resolvedArtifact?: "node-addon" | "wasm";
 }
 
 /**
@@ -497,7 +503,8 @@ export function validateAssessmentResults(
       provenance.runtime.length === 0 ||
       typeof provenance.command !== "string" ||
       provenance.command.length === 0 ||
-      (provenance.buildProfile !== undefined && !["debug", "release"].includes(provenance.buildProfile))
+      (provenance.buildProfile !== undefined && !["debug", "release"].includes(provenance.buildProfile)) ||
+      (provenance.resolvedArtifact !== undefined && !["node-addon", "wasm"].includes(provenance.resolvedArtifact))
     ) {
       invalid(id, "invalid-provenance");
     }
