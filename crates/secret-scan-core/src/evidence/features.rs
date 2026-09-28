@@ -34,15 +34,18 @@
 //!
 //! The exact formula of every feature is documented once, for the product
 //! and for the benchmark-side dataset (redact-secret-benchmarks#254), in
-//! `docs/specs/engine.md#shadow-evidence-feature-schema`. Any change to a
+//! `docs/specs/engine.md#shadow-evidence-feature-schema` (features 0 to 26)
+//! and `docs/specs/engine.md#shadow-evidence-residual-features` (features
+//! 27 to 29, computed by [`crate::evidence::residual`], #829). Any change to a
 //! formula, a unit, a bound or the vector order is a new
 //! [`FEATURE_SCHEMA_VERSION`].
 
 use super::fixed_point::{log2_q16, permille};
+use super::residual::{RESIDUAL_FEATURE_NAMES, ResidualFeatures, residual_features};
 
 /// Identity of the feature semantics below. A benchmark dataset or scoring
 /// artifact keyed to one identity is stale under any other.
-pub(crate) const FEATURE_SCHEMA_VERSION: &str = "evidence-features/v1";
+pub(crate) const FEATURE_SCHEMA_VERSION: &str = "evidence-features/v2";
 
 /// The most Unicode scalar values extraction reads from one value.
 pub(crate) const MAX_ANALYSED_CHARS: usize = 256;
@@ -52,7 +55,7 @@ pub(crate) const MAX_ANALYSED_CHARS: usize = 256;
 pub(crate) const MAX_AUTOCORRELATION_LAG: usize = 32;
 
 /// Number of entries in [`EvidenceFeatures::to_vector`].
-pub(crate) const FEATURE_COUNT: usize = 27;
+pub(crate) const FEATURE_COUNT: usize = 30;
 
 /// Feature names in vector order. The order is part of
 /// [`FEATURE_SCHEMA_VERSION`].
@@ -84,6 +87,9 @@ pub(crate) const FEATURE_NAMES: [&str; FEATURE_COUNT] = [
     "smallest_period",
     "max_autocorrelation_permille",
     "max_autocorrelation_lag",
+    RESIDUAL_FEATURE_NAMES[0],
+    RESIDUAL_FEATURE_NAMES[1],
+    RESIDUAL_FEATURE_NAMES[2],
 ];
 
 /// Character classes, in [`EvidenceFeatures::class_counts`] order.
@@ -179,6 +185,8 @@ pub(crate) struct EvidenceFeatures {
     /// Smallest lag reaching [`Self::max_autocorrelation_permille`], or `0`
     /// when no lag is examined or no lag has a match.
     pub(crate) max_autocorrelation_lag: u32,
+    /// The residual features, [`crate::evidence::residual`] (#829).
+    pub(crate) residual: ResidualFeatures,
 }
 
 impl EvidenceFeatures {
@@ -214,6 +222,9 @@ impl EvidenceFeatures {
             self.smallest_period,
             self.max_autocorrelation_permille,
             self.max_autocorrelation_lag,
+            self.residual.symbols,
+            self.residual.entropy_q16,
+            self.residual.min_entropy_q16,
         ];
         let mut vector = [("", 0); FEATURE_COUNT];
         for (slot, (name, value)) in vector.iter_mut().zip(FEATURE_NAMES.iter().zip(values)) {
@@ -256,6 +267,7 @@ pub(crate) fn extract_features(value: &str) -> EvidenceFeatures {
     add_class_features(&mut features, symbols, &histogram);
     add_repetition_features(&mut features, symbols);
     add_periodicity_features(&mut features, symbols);
+    features.residual = residual_features(symbols);
     features
 }
 
@@ -422,49 +434,49 @@ mod tests {
             "aaaaaaaaaaaaaaaa",
             [
                 16, 16, 0, 1, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 62, 62, 16, 1000,
-                933, 1, 1000, 2,
+                933, 1, 1000, 2, 1, 0, 0,
             ],
         ),
         (
             "abcabcabcabcabcabc",
             [
                 18, 18, 0, 3, 6, 103_872, 103_872, 1_869_696, 18, 0, 0, 0, 0, 0, 1, 0, 26, 1000,
-                337, 166, 70, 1, 0, 823, 3, 1000, 3,
+                337, 166, 70, 1, 0, 823, 3, 1000, 3, 4, 65_536, 65_536,
             ],
         ),
         (
             "XXXX-XXXX-XXXX-XXXX",
             [
                 19, 19, 0, 2, 16, 41_239, 16_248, 783_541, 0, 16, 0, 3, 0, 0, 2, 6, 58, 629, 107,
-                105, 74, 4, 666, 833, 5, 1000, 5,
+                105, 74, 4, 666, 833, 5, 1000, 5, 2, 65_536, 65_536,
             ],
         ),
         (
             "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa",
             [
                 32, 32, 0, 32, 1, 327_680, 327_680, 10_485_760, 12, 12, 8, 0, 0, 0, 3, 31, 62,
-                1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0,
+                1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0, 32, 327_680, 327_680,
             ],
         ),
         (
             "\u{1F600}a\u{1F603}b\u{1F600}a\u{1F603}b",
             [
                 20, 8, 0, 4, 2, 131_072, 131_072, 1_048_576, 4, 0, 0, 0, 0, 4, 2, 7, 28, 1000, 416,
-                500, 31, 1, 0, 428, 4, 1000, 4,
+                500, 31, 1, 0, 428, 4, 1000, 4, 6, 125_718, 103_872,
             ],
         ),
         (
             "ab",
             [
                 2, 2, 0, 2, 1, 65_536, 65_536, 131_072, 2, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 212,
-                1000, 7, 1, 0, 0, 0, 0, 0,
+                1000, 7, 1, 0, 0, 0, 0, 0, 2, 65_536, 65_536,
             ],
         ),
         (
             "aabc",
             [
                 4, 4, 0, 3, 2, 98_304, 65_536, 393_216, 4, 0, 0, 0, 0, 0, 1, 0, 26, 946, 319, 750,
-                15, 2, 333, 0, 0, 0, 0,
+                15, 2, 333, 0, 0, 0, 0, 2, 65_536, 65_536,
             ],
         ),
     ];
@@ -509,7 +521,7 @@ mod tests {
         for (index, name) in FEATURE_NAMES.iter().enumerate() {
             assert!(!FEATURE_NAMES[..index].contains(name), "duplicate {name}");
         }
-        assert_eq!(FEATURE_SCHEMA_VERSION, "evidence-features/v1");
+        assert_eq!(FEATURE_SCHEMA_VERSION, "evidence-features/v2");
     }
 
     #[test]

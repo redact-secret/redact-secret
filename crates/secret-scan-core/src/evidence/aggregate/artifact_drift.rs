@@ -89,28 +89,28 @@ const fn listed(grammar: ExclusionGrammar, class: ContextClass) -> (usize, usize
 /// artifact revision (`docs/specs/engine.md`, "Shadow scoring artifact").
 const REVIEWED_MODEL_JSON: &str = r##"{
   "featureSchema": {
-    "id": "evidence-features/v1",
+    "id": "evidence-features/v2",
     "maxAnalysedChars": 256,
     "maxAutocorrelationLag": 32,
     "fixedPointFractionBits": 16,
-    "features": ["byte_len", "analysed_chars", "truncated", "distinct_symbols", "max_symbol_count", "shannon_entropy_q16", "min_entropy_q16", "information_bits_q16", "class_lower", "class_upper", "class_digit", "class_symbol", "class_space_control", "class_non_ascii", "class_count", "class_transitions", "class_alphabet_size", "entropy_efficiency_permille", "alphabet_efficiency_permille", "distinct_ratio_permille", "length_permille", "longest_run", "adjacent_repeat_permille", "repeated_bigram_permille", "smallest_period", "max_autocorrelation_permille", "max_autocorrelation_lag"],
+    "features": ["byte_len", "analysed_chars", "truncated", "distinct_symbols", "max_symbol_count", "shannon_entropy_q16", "min_entropy_q16", "information_bits_q16", "class_lower", "class_upper", "class_digit", "class_symbol", "class_space_control", "class_non_ascii", "class_count", "class_transitions", "class_alphabet_size", "entropy_efficiency_permille", "alphabet_efficiency_permille", "distinct_ratio_permille", "length_permille", "longest_run", "adjacent_repeat_permille", "repeated_bigram_permille", "smallest_period", "max_autocorrelation_permille", "max_autocorrelation_lag", "residual_symbols", "residual_entropy_q16", "residual_min_entropy_q16"],
     "goldenVectors": [
-      {"input": "", "vector": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-      {"input": "aaaaaaaaaaaaaaaa", "vector": [16, 16, 0, 1, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 62, 62, 16, 1000, 933, 1, 1000, 2]},
-      {"input": "abcabcabcabcabcabc", "vector": [18, 18, 0, 3, 6, 103872, 103872, 1869696, 18, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 337, 166, 70, 1, 0, 823, 3, 1000, 3]},
-      {"input": "XXXX-XXXX-XXXX-XXXX", "vector": [19, 19, 0, 2, 16, 41239, 16248, 783541, 0, 16, 0, 3, 0, 0, 2, 6, 58, 629, 107, 105, 74, 4, 666, 833, 5, 1000, 5]},
-      {"input": "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa", "vector": [32, 32, 0, 32, 1, 327680, 327680, 10485760, 12, 12, 8, 0, 0, 0, 3, 31, 62, 1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0]},
-      {"input": "\ud83d\ude00a\ud83d\ude03b\ud83d\ude00a\ud83d\ude03b", "vector": [20, 8, 0, 4, 2, 131072, 131072, 1048576, 4, 0, 0, 0, 0, 4, 2, 7, 28, 1000, 416, 500, 31, 1, 0, 428, 4, 1000, 4]},
-      {"input": "ab", "vector": [2, 2, 0, 2, 1, 65536, 65536, 131072, 2, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 212, 1000, 7, 1, 0, 0, 0, 0, 0]},
-      {"input": "aabc", "vector": [4, 4, 0, 3, 2, 98304, 65536, 393216, 4, 0, 0, 0, 0, 0, 1, 0, 26, 946, 319, 750, 15, 2, 333, 0, 0, 0, 0]}
+      {"input": "", "vector": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+      {"input": "aaaaaaaaaaaaaaaa", "vector": [16, 16, 0, 1, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 62, 62, 16, 1000, 933, 1, 1000, 2, 1, 0, 0]},
+      {"input": "abcabcabcabcabcabc", "vector": [18, 18, 0, 3, 6, 103872, 103872, 1869696, 18, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 337, 166, 70, 1, 0, 823, 3, 1000, 3, 4, 65536, 65536]},
+      {"input": "XXXX-XXXX-XXXX-XXXX", "vector": [19, 19, 0, 2, 16, 41239, 16248, 783541, 0, 16, 0, 3, 0, 0, 2, 6, 58, 629, 107, 105, 74, 4, 666, 833, 5, 1000, 5, 2, 65536, 65536]},
+      {"input": "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa", "vector": [32, 32, 0, 32, 1, 327680, 327680, 10485760, 12, 12, 8, 0, 0, 0, 3, 31, 62, 1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0, 32, 327680, 327680]},
+      {"input": "\ud83d\ude00a\ud83d\ude03b\ud83d\ude00a\ud83d\ude03b", "vector": [20, 8, 0, 4, 2, 131072, 131072, 1048576, 4, 0, 0, 0, 0, 4, 2, 7, 28, 1000, 416, 500, 31, 1, 0, 428, 4, 1000, 4, 6, 125718, 103872]},
+      {"input": "ab", "vector": [2, 2, 0, 2, 1, 65536, 65536, 131072, 2, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 212, 1000, 7, 1, 0, 0, 0, 0, 0, 2, 65536, 65536]},
+      {"input": "aabc", "vector": [4, 4, 0, 3, 2, 98304, 65536, 393216, 4, 0, 0, 0, 0, 0, 1, 0, 26, 946, 319, 750, 15, 2, 333, 0, 0, 0, 0, 2, 65536, 65536]}
     ]
   },
   "aggregation": {
-    "id": "evidence-aggregation/v2",
-    "featureSchema": "evidence-features/v1",
+    "id": "evidence-aggregation/v3",
+    "featureSchema": "evidence-features/v2",
     "maxGroupSignals": 4,
     "groups": [
-      {"group": "randomness", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 30, "signals": [{"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 226998, "hi": 265935, "max": 30}]},
+      {"group": "randomness", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 30, "signals": [{"kind": "feature-ramp", "signal": "residual_entropy_q16", "feature": 28, "lo": 234123, "hi": 263562, "max": 30}]},
       {"group": "lexical", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 0, "signals": []},
       {"group": "contextual", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 50, "signals": [{"kind": "context", "signal": "credential-context", "classes": ["credential-name", "authorization-header", "url-userinfo"], "points": 50}]},
       {"group": "validation", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 50, "signals": []},
