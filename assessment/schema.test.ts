@@ -299,6 +299,15 @@ describe("validateAssessmentResults (issue #192)", () => {
     );
   });
 
+  test("accepts a recorded resolved artifact and rejects an unknown one (benchmarks #405/#415)", () => {
+    const result = baseResult();
+    for (const resolvedArtifact of ["node-addon", "wasm"] as const) {
+      expect(() => validateAssessmentResults([{ ...result, provenance: { ...result.provenance, resolvedArtifact } }])).not.toThrow();
+    }
+    const tampered = { ...result, provenance: { ...result.provenance, resolvedArtifact: "addon" } } as unknown as AssessmentResult;
+    expect(() => validateAssessmentResults([tampered])).toThrow(/invalid-provenance/);
+  });
+
   test("rejects a malformed commit", () => {
     const result = baseResult();
     const tampered: AssessmentResult = {

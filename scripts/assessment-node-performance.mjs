@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { buildAndEmitPerformanceResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
 import { loadTsModule } from "./lib/load-ts-module.mjs";
 import {
-  gitCommit, hostCpu, hostOs, loadWorkloadProfiles, readPackageVersion,
+  agreedResolvedArtifact, gitCommit, hostCpu, hostOs, loadWorkloadProfiles, readPackageVersion,
   REPO_ROOT, workloadProfilesHash,
 } from "./lib/assessment-provenance.mjs";
 
@@ -101,6 +101,8 @@ async function measureOne(profile) {
     () => performance.now(),
     () => api.initialize(),
   );
+  // Which artifact served this sample: the loader can fall back from the addon to WebAssembly.
+  const artifact = api.artifact();
 
   processInput(api, input, chunks, profile.chunkProfile, inputLimit);
   const baseline = process.memoryUsage();
@@ -112,6 +114,7 @@ async function measureOne(profile) {
   if (!Number.isSafeInteger(processing.value)) fail("processing did not complete");
   if (processing.elapsedMs <= 0) fail("processing duration was not positive");
   return {
+    artifact,
     initializationMs: initialization.elapsedMs,
     processingMs: processing.elapsedMs,
     throughputBytesPerSecond: inputBytes / (processing.elapsedMs / 1000),
@@ -143,6 +146,12 @@ async function main() {
   } finally {
     if (addonLink !== undefined) rmSync(addonLink, { recursive: true, force: true });
   }
+  let resolvedArtifact;
+  try {
+    resolvedArtifact = agreedResolvedArtifact(samples.map((sample) => sample.artifact));
+  } catch (error) {
+    fail(`node performance: ${error.message}`);
+  }
   const metrics = await loadTsModule(join(REPO_ROOT, "assessment", "adapters", "performance.ts"));
   const unavailable = (reason) => metrics.unavailableMemory(reason, "No samples were available.");
   const performanceMetrics = {
@@ -168,10 +177,11 @@ async function main() {
       corpusVersion: "1", corpusHash: workloadProfilesHash(),
       os: hostOs(), cpu: hostCpu(), runtime: `node-${process.version.slice(1)}`,
       command: `node scripts/assessment-node-performance.mjs ${process.argv.slice(2).join(" ")}`.trim(),
+      resolvedArtifact,
     },
     jsonOut: options.jsonOut, markdownOut: options.markdownOut,
   });
-  console.error(`node performance: ${result.performance.processing.samples.length} run(s), median ${result.performance.processing.median} ms`);
+  console.error(`node performance: ${result.performance.processing.samples.length} run(s), median ${result.performance.processing.median} ms, artifact ${resolvedArtifact}`);
 }
 
 await main();
