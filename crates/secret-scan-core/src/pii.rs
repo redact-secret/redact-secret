@@ -1003,8 +1003,12 @@ fn equidistant_from_candidates(
     occurrence_end: usize,
     candidates: &[(ByteRange, IdentityDomain)],
 ) -> bool {
+    // Equidistance separates two occurrences. Alternatives of different
+    // identity domains at one exact range are one occurrence with two
+    // interpretations, so each range counts once (issue #922).
+    let ranges: BTreeSet<ByteRange> = candidates.iter().map(|(range, _)| *range).collect();
     let mut distances = Vec::new();
-    for (range, _) in candidates {
+    for range in &ranges {
         if range.start() < line_start || range.end() > line_end {
             continue;
         }
@@ -1546,6 +1550,37 @@ mod tests {
             ],
         );
         assert!(mixed_domains.iter().all(Vec::is_empty));
+    }
+
+    #[test]
+    fn same_range_alternative_of_another_domain_is_not_equidistant() {
+        // Issue #922: one occurrence read as both a payment card and a phone
+        // number is one candidate position, not two equidistant candidates.
+        for (input, domain, entry) in [
+            (
+                "card_number=TEST",
+                IdentityDomain::PaymentCard,
+                "en-payment-card-field",
+            ),
+            ("phone: TEST", IdentityDomain::Phone, "en-phone-field"),
+        ] {
+            let start = input.find("TEST").unwrap();
+            let range = ByteRange::new(start, start + 4).unwrap();
+            let candidates = [
+                (range, IdentityDomain::PaymentCard),
+                (range, IdentityDomain::Phone),
+            ];
+            let matches = context_matches(input, &candidates);
+            let index = candidates
+                .iter()
+                .position(|(_, candidate)| *candidate == domain)
+                .unwrap();
+            assert!(
+                matches[index].iter().any(|item| item.entry_id == entry),
+                "{input}"
+            );
+            assert!(matches[1 - index].is_empty(), "{input}");
+        }
     }
 
     #[test]

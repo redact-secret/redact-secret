@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "selector": "pii:us",
+  "purpose": "context association when several PII families are selected together; every value is synthetic or an authority-reserved control",
+  "cases": [
+    {
+      "id": "card-label-keeps-a-nanp-shaped-ten-digit-card",
+      "issue": 922,
+      "input": "card_number=4005550183",
+      "expected": [
+        {"detector": "pii-domain", "type": "pii_global_payment_card", "confidence": "high", "action": "redact", "start": 12, "end": 22}
+      ]
+    },
+    {
+      "id": "card-label-control-not-nanp-shaped",
+      "issue": 922,
+      "input": "card_number=4000425050",
+      "expected": [
+        {"detector": "pii-domain", "type": "pii_global_payment_card", "confidence": "high", "action": "redact", "start": 12, "end": 22}
+      ]
+    },
+    {
+      "id": "phone-label-keeps-a-luhn-valid-phone",
+      "issue": 922,
+      "input": "phone: 4004251569",
+      "expected": [
+        {"detector": "pii-domain", "type": "pii_global_phone", "confidence": "high", "action": "redact", "start": 7, "end": 17}
+      ]
+    },
+    {
+      "id": "phone-label-luhn-failing-twin",
+      "issue": 922,
+      "input": "phone: 4004251560",
+      "expected": [
+        {"detector": "pii-domain", "type": "pii_global_phone", "confidence": "high", "action": "redact", "start": 7, "end": 17}
+      ]
+    },
+    {
+      "id": "unlabelled-card-and-phone-shaped-value-benign-control",
+      "issue": 922,
+      "input": "order_id=4005550183",
+      "expected": []
+    },
+    {
+      "id": "natural-language-context-between-two-occurrences-stays-unassociated",
+      "issue": 922,
+      "input": "555-234-5678 contact details 555-234-5678",
+      "expected": []
+    }
+  ]
+}

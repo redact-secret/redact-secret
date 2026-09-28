@@ -148,7 +148,9 @@ def associate_occurrence(occurrence: dict, view: str, positions: dict[str, int],
     if not eligible:
         return None
     nearest = min(distance for distance, _ in eligible)
-    if sum(occurrence_distance(occurrence, position) == nearest for position in positions.values()) > 1:
+    # Candidates at one position are one occurrence with several domain
+    # interpretations; each position counts once (issue #922).
+    if sum(occurrence_distance(occurrence, position) == nearest for position in set(positions.values())) > 1:
         return None
     winners = [candidate_id for distance, candidate_id in eligible if distance == nearest]
     return winners[0] if len(winners) == 1 else None

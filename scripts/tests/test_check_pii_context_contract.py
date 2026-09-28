@@ -110,6 +110,29 @@ class SchemaAndSemantics(unittest.TestCase):
             )
         )
 
+    def test_same_position_alternatives_of_another_domain_are_not_equidistant(self) -> None:
+        occurrence = {
+            "start": 0,
+            "end": 11,
+            "entry": {
+                "kind": "field-label",
+                "domains": ["payment-card"],
+            },
+        }
+        candidates = {
+            "card": {"domain": "payment-card"},
+            "phone": {"domain": "phone"},
+        }
+        self.assertEqual(
+            CHECK.associate_occurrence(
+                occurrence,
+                "card number ",
+                {"card": 12, "phone": 12},
+                candidates,
+            ),
+            "card",
+        )
+
     def test_unknown_fields_and_runtime_status_drift_are_rejected(self) -> None:
         changed = copy.deepcopy(CONTRACT)
         changed["runtimeVocabulary"] = True

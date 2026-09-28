@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Fixed
+
+- PII context association no longer counts a same-range alternative of
+  another identity domain as a second candidate (#922). A labelled 10-digit
+  card that is also NANP-shaped (`card_number=…`), or a labelled phone number
+  that happens to pass Luhn (`phone: …`), is now reported under `pii:global`
+  and `pii:us` exactly as under its exact-family selector. Equidistance
+  between occurrences at different positions is unchanged.
+
 ## 0.1.0-beta.10 — 2026-09-28
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.10/README.md).
