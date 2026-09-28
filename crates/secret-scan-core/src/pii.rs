@@ -198,8 +198,14 @@ pub(crate) fn is_reserved_detector_id(id: &str) -> bool {
 }
 
 pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
-    Box::new(PiiDomain::new(
-        selection.clone(),
+    Box::new(production_domain(selection.clone()))
+}
+
+/// The production families behind `selection`, the one arbitration the
+/// public adapter and the maintainer-local [`IdentityEvaluator`] share.
+fn production_domain(selection: PiiSelection) -> PiiDomain {
+    PiiDomain::new(
+        selection,
         vec![
             Box::new(pii_email::EmailFamily),
             Box::new(pii_iban::IbanFamily),
@@ -208,7 +214,7 @@ pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
             Box::new(pii_phone::PhoneFamily),
             Box::new(pii_us_ssn::UsSsnFamily),
         ],
-    ))
+    )
 }
 
 #[path = "pii_network_address.rs"]
@@ -315,20 +321,13 @@ impl PiiDomain {
             families,
         }
     }
-}
 
-impl Detector for PiiDomain {
-    fn id(&self) -> &str {
-        ADAPTER_ID
-    }
-
-    #[allow(
-        clippy::too_many_lines,
-        reason = "the arbitration stages stay visibly ordered"
-    )]
-    fn detect(&self, input: &str, _: &DetectorContext) -> Result<Vec<Candidate>, DetectorFailure> {
-        let mut grouped: BTreeMap<(usize, usize, IdentityDomain), Vec<Alternative>> =
-            BTreeMap::new();
+    /// Every alternative the selected families report for `input`, in
+    /// family then detection order, after the context contract has been
+    /// applied to each established one. The context contract can still
+    /// demote an alternative's identity, so a caller that joins alternatives
+    /// reads `identity` afterwards.
+    fn contextualized(&self, input: &str) -> Vec<Alternative> {
         let mut detected = Vec::new();
         for family in &self.families {
             for mut alternative in family.detect(input) {
@@ -353,6 +352,7 @@ impl Detector for PiiDomain {
             .into_iter()
             .collect();
         let contexts = context_matches(input, &context_candidates);
+        let mut contextualized = Vec::with_capacity(detected.len());
         for mut item in detected {
             let alternative = &mut item.alternative;
             if alternative.identity == IdentityState::Established {
@@ -367,16 +367,35 @@ impl Detector for PiiDomain {
                     item.occurrence_exclusions,
                     item.reinforced_sensitivity_confidence,
                 );
-                if alternative.identity == IdentityState::Established {
-                    grouped
-                        .entry((
-                            alternative.range.start(),
-                            alternative.range.end(),
-                            alternative.domain,
-                        ))
-                        .or_default()
-                        .push(item.alternative);
-                }
+            }
+            contextualized.push(item.alternative);
+        }
+        contextualized
+    }
+}
+
+impl Detector for PiiDomain {
+    fn id(&self) -> &str {
+        ADAPTER_ID
+    }
+
+    #[allow(
+        clippy::too_many_lines,
+        reason = "the arbitration stages stay visibly ordered"
+    )]
+    fn detect(&self, input: &str, _: &DetectorContext) -> Result<Vec<Candidate>, DetectorFailure> {
+        let mut grouped: BTreeMap<(usize, usize, IdentityDomain), Vec<Alternative>> =
+            BTreeMap::new();
+        for alternative in self.contextualized(input) {
+            if alternative.identity == IdentityState::Established {
+                grouped
+                    .entry((
+                        alternative.range.start(),
+                        alternative.range.end(),
+                        alternative.domain,
+                    ))
+                    .or_default()
+                    .push(alternative);
             }
         }
 
@@ -476,6 +495,157 @@ impl Detector for PiiDomain {
                 ))
         });
         Ok(output.into_iter().map(|(_, candidate)| candidate).collect())
+    }
+}
+
+/// Identity of the JSON Lines format `examples/pii_identity_evaluation.rs`
+/// writes from [`IdentityEvaluator`]. A change to a field or its meaning is a
+/// new identity.
+#[cfg_attr(
+    not(test),
+    allow(
+        dead_code,
+        reason = "read only by examples/pii_identity_evaluation.rs, which compiles the core source as its own crate"
+    )
+)]
+pub(crate) const IDENTITY_EVALUATION_FORMAT: &str = "redact-secret/pii-identity-evaluation/1";
+
+/// The joined identity and sensitivity of one caller-authored candidate
+/// range, as the closed wire words of `redact-secret/pii-identity-evaluation/1`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct IdentityOutcome {
+    /// `established` or `unmatched`.
+    pub(crate) identity: &'static str,
+    /// `sensitive`, `non-sensitive` or `not-established`.
+    pub(crate) sensitivity: &'static str,
+}
+
+/// Maintainer-local identity/sensitivity evaluation of one production PII
+/// family (issue #910).
+///
+/// It runs the family's own detector, context vocabulary and join through
+/// the same [`PiiDomain`] the public adapter uses, and reports, for one
+/// caller-authored candidate range, the alternative the join keeps for
+/// exactly that range: the first established alternative, in detection
+/// order, whose range equals the candidate. That alternative's sensitivity
+/// is the one the public adapter would act on, so `sensitive` here is the
+/// adapter emitting a candidate for that range. The outcome carries only the
+/// two closed words, never a confidence, specificity, obfuscation, other
+/// range or any input byte.
+///
+/// No public item reaches this type. Its only non-test caller is
+/// `examples/pii_identity_evaluation.rs`, which compiles this source as its
+/// own crate, so the core library's own build sees no caller.
+#[cfg_attr(
+    not(test),
+    allow(
+        dead_code,
+        reason = "called only by examples/pii_identity_evaluation.rs, which compiles the core source as its own crate"
+    )
+)]
+pub(crate) struct IdentityEvaluator {
+    family: &'static str,
+    activation_identity: String,
+    domain: PiiDomain,
+}
+
+#[cfg_attr(
+    not(test),
+    allow(
+        dead_code,
+        reason = "called only by examples/pii_identity_evaluation.rs, which compiles the core source as its own crate"
+    )
+)]
+impl IdentityEvaluator {
+    /// The evaluator for exactly `family`, one of the production families
+    /// compiled into this artifact (`pii:global:email`, `pii:us:ssn`, …),
+    /// under the `full` credential profile's activation identity. `None`
+    /// for any other string.
+    pub(crate) fn new(family: &str) -> Option<Self> {
+        let family = AVAILABLE_FAMILIES
+            .iter()
+            .copied()
+            .find(|id| *id == family)?;
+        let selector = format!("pii:family:{}", family.strip_prefix("pii:")?);
+        let selection = PiiSelection::parse(&[selector.as_str()]).ok()?;
+        if selection.families != [family] {
+            return None;
+        }
+        let activation_identity = selection.activation_identity(crate::Profile::Full);
+        Some(Self {
+            family,
+            activation_identity,
+            domain: production_domain(selection),
+        })
+    }
+
+    /// The family id this evaluator runs.
+    pub(crate) const fn family(&self) -> &'static str {
+        self.family
+    }
+
+    /// The canonical activation identity of the equivalent public registry
+    /// (`DetectorRegistry::with_built_in_and_pii` with this one family).
+    pub(crate) fn activation_identity(&self) -> &str {
+        &self.activation_identity
+    }
+
+    /// The context vocabulary version the family's join reads.
+    pub(crate) const fn vocabulary() -> &'static str {
+        pii_context_table::CONTEXT_VERSION
+    }
+
+    /// The outcome for `candidate`, a caller-authored UTF-8 byte range of
+    /// `input`. `None`, a range no alternative has, or a range that is not
+    /// even a valid slice of `input` reports `unmatched` / `not-established`.
+    ///
+    /// The family runs where the public pipeline runs it
+    /// (`crate::pipeline::detect`): on the scan copy with governed invisible
+    /// code points removed, its ranges translated back into `input`. An
+    /// alternative the pipeline drops before overlap resolution (a family
+    /// that rejects invisible normalization touching a removed run, or a
+    /// known vendor placeholder literal) is no alternative here either.
+    pub(crate) fn evaluate(
+        &self,
+        input: &str,
+        candidate: Option<(usize, usize)>,
+    ) -> IdentityOutcome {
+        let unmatched = IdentityOutcome {
+            identity: "unmatched",
+            sensitivity: "not-established",
+        };
+        let Some((start, end)) = candidate else {
+            return unmatched;
+        };
+        let normalized = crate::normalize::NormalizedInput::new(input);
+        let scanned = normalized.text();
+        self.domain
+            .contextualized(scanned)
+            .into_iter()
+            .find(|alternative| {
+                alternative.identity == IdentityState::Established
+                    && normalized
+                        .to_original(alternative.range)
+                        .is_some_and(|range| range.start() == start && range.end() == end)
+            })
+            .filter(|alternative| {
+                let range = alternative.range;
+                let dropped_by_pipeline = (alternative.reject_invisible_normalization
+                    && normalized.touches_removed_run(range))
+                    || (range.is_char_aligned_in(scanned)
+                        && crate::pipeline::is_known_vendor_placeholder_literal(
+                            &scanned[range.start()..range.end()],
+                        ));
+                !dropped_by_pipeline
+            })
+            .map_or(unmatched, |alternative| IdentityOutcome {
+                identity: "established",
+                sensitivity: match alternative.sensitivity {
+                    SensitivityState::Sensitive => "sensitive",
+                    SensitivityState::NonSensitive => "non-sensitive",
+                    SensitivityState::NotEstablished => "not-established",
+                },
+            })
     }
 }
 
@@ -1417,5 +1587,379 @@ mod tests {
             candidates[0].obfuscation(),
             Obfuscation::InvisibleCharacters
         );
+    }
+
+    /// Issue #910: one authored case of the maintainer-local identity
+    /// evaluation, with the outcome the family contract fixes for it.
+    struct IdentityCase {
+        family: &'static str,
+        input: &'static str,
+        candidate: &'static str,
+        identity: &'static str,
+        sensitivity: &'static str,
+    }
+
+    const fn identity_case(
+        family: &'static str,
+        input: &'static str,
+        candidate: &'static str,
+        identity: &'static str,
+        sensitivity: &'static str,
+    ) -> IdentityCase {
+        IdentityCase {
+            family,
+            input,
+            candidate,
+            identity,
+            sensitivity,
+        }
+    }
+
+    /// Per family: a synthetic sensitive positive, the authority-reserved
+    /// benign control (or, for IBAN and US SSN, which reserve no
+    /// non-sensitive value in `pii-v1`, a valid identity without context),
+    /// and a one-property twin that is not a family identity. Synthetic and
+    /// reserved values only; each `candidate` is the authored value itself.
+    const IDENTITY_CASES: &[IdentityCase] = &[
+        identity_case(
+            "pii:global:payment-card",
+            "card_number=4000008770000003",
+            "4000008770000003",
+            "established",
+            "sensitive",
+        ),
+        identity_case(
+            "pii:global:payment-card",
+            "card_number=4111111111111111",
+            "4111111111111111",
+            "established",
+            "non-sensitive",
+        ),
+        identity_case(
+            "pii:global:payment-card",
+            "card_number=4000008770000004",
+            "4000008770000004",
+            "unmatched",
+            "not-established",
+        ),
+        identity_case(
+            "pii:global:email",
+            "email: fixture876-q7m9@x4z8v2n6.synthetic",
+            "fixture876-q7m9@x4z8v2n6.synthetic",
+            "established",
+            "sensitive",
+        ),
+        identity_case(
+            "pii:global:email",
+            "email: identity@example.com",
+            "identity@example.com",
+            "established",
+            "non-sensitive",
+        ),
+        identity_case(
+            "pii:global:email",
+            "email: user@domain",
+            "user@domain",
+            "unmatched",
+            "not-established",
+        ),
+        identity_case(
+            "pii:global:email",
+            "email: postgres://user:pass@x4z8v2n6.synthetic/database",
+            "pass@x4z8v2n6.synthetic",
+            "unmatched",
+            "not-established",
+        ),
+        identity_case(
+            "pii:global:phone",
+            "phone_number=212-555-2345",
+            "212-555-2345",
+            "established",
+            "sensitive",
+        ),
+        identity_case(
+            "pii:global:phone",
+            "phone=212-555-0100",
+            "212-555-0100",
+            "established",
+            "non-sensitive",
+        ),
+        identity_case(
+            "pii:global:phone",
+            "phone=211-555-2345",
+            "211-555-2345",
+            "unmatched",
+            "not-established",
+        ),
+        identity_case(
+            "pii:global:iban",
+            "iban: GB18SYNX00000000000000",
+            "GB18SYNX00000000000000",
+            "established",
+            "sensitive",
+        ),
+        identity_case(
+            "pii:global:iban",
+            "GB18SYNX00000000000000",
+            "GB18SYNX00000000000000",
+            "established",
+            "not-established",
+        ),
+        identity_case(
+            "pii:global:iban",
+            "iban: GB00SYNX00000000000000",
+            "GB00SYNX00000000000000",
+            "unmatched",
+            "not-established",
+        ),
+        identity_case(
+            "pii:us:ssn",
+            "ssn=890626879",
+            "890626879",
+            "established",
+            "sensitive",
+        ),
+        identity_case(
+            "pii:us:ssn",
+            "890-62-6879",
+            "890-62-6879",
+            "established",
+            "not-established",
+        ),
+        identity_case(
+            "pii:us:ssn",
+            "ssn=666-62-6879",
+            "666-62-6879",
+            "unmatched",
+            "not-established",
+        ),
+        identity_case(
+            "pii:global:network-address",
+            "client_ip=10.0.0.8",
+            "10.0.0.8",
+            "established",
+            "sensitive",
+        ),
+        identity_case(
+            "pii:global:network-address",
+            "client_ip=192.0.2.1",
+            "192.0.2.1",
+            "established",
+            "non-sensitive",
+        ),
+        identity_case(
+            "pii:global:network-address",
+            "client_ip=010.0.0.8",
+            "010.0.0.8",
+            "unmatched",
+            "not-established",
+        ),
+    ];
+
+    fn candidate_range(case: &IdentityCase) -> (usize, usize) {
+        let start = case.input.find(case.candidate).unwrap();
+        (start, start + case.candidate.len())
+    }
+
+    /// Public findings of `family`'s own type at exactly `range`, through the
+    /// public registry the evaluator's activation identity names.
+    fn public_findings_at(family: &str, input: &str, range: (usize, usize)) -> usize {
+        let selector = format!("pii:family:{}", family.strip_prefix("pii:").unwrap());
+        let selection = PiiSelection::parse(&[selector.as_str()]).unwrap();
+        let registry = crate::DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        let findings = crate::scan(input, &registry, &crate::DefaultPolicy).unwrap();
+        findings
+            .iter()
+            .filter(|finding| {
+                finding.type_name() == public_type(family)
+                    && (finding.range().start(), finding.range().end()) == range
+            })
+            .count()
+    }
+
+    #[test]
+    fn identity_evaluation_reports_the_joined_state_of_the_authored_candidate() {
+        for case in IDENTITY_CASES {
+            let evaluator = IdentityEvaluator::new(case.family).unwrap();
+            assert_eq!(evaluator.family(), case.family);
+            let range = candidate_range(case);
+            let outcome = evaluator.evaluate(case.input, Some(range));
+            assert_eq!(
+                (outcome.identity, outcome.sensitivity),
+                (case.identity, case.sensitivity),
+                "{} {:?}",
+                case.family,
+                case.candidate
+            );
+            // Source equivalence: `sensitive` iff the public surface reports
+            // exactly one finding of this family at exactly this range.
+            assert_eq!(
+                outcome.sensitivity == "sensitive",
+                public_findings_at(case.family, case.input, range) == 1,
+                "{} {:?}",
+                case.family,
+                case.candidate
+            );
+            // The evaluation is a pure function of its inputs.
+            assert_eq!(evaluator.evaluate(case.input, Some(range)), outcome);
+        }
+        // Every family is exercised with all three outcomes it can reach.
+        for family in AVAILABLE_FAMILIES {
+            let reached: BTreeSet<(&str, &str)> = IDENTITY_CASES
+                .iter()
+                .filter(|case| case.family == *family)
+                .map(|case| (case.identity, case.sensitivity))
+                .collect();
+            assert!(reached.contains(&("established", "sensitive")), "{family}");
+            assert!(
+                reached.contains(&("unmatched", "not-established")),
+                "{family}"
+            );
+            assert!(
+                reached.contains(&("established", "non-sensitive"))
+                    || reached.contains(&("established", "not-established")),
+                "{family}"
+            );
+        }
+    }
+
+    #[test]
+    fn identity_evaluation_never_establishes_credential_uri_userinfo_as_email() {
+        let input = "email: postgres://user:pass@x4z8v2n6.synthetic/database";
+        let evaluator = IdentityEvaluator::new("pii:global:email").unwrap();
+        assert!(
+            evaluator
+                .domain
+                .contextualized(input)
+                .iter()
+                .all(|alternative| alternative.identity != IdentityState::Established)
+        );
+        let unmatched = IdentityOutcome {
+            identity: "unmatched",
+            sensitivity: "not-established",
+        };
+        assert_eq!(evaluator.evaluate(input, None), unmatched);
+        for start in 0..=input.len() {
+            for end in start..=input.len() {
+                assert_eq!(evaluator.evaluate(input, Some((start, end))), unmatched);
+            }
+        }
+    }
+
+    #[test]
+    fn identity_evaluation_reports_unmatched_for_null_and_misaligned_candidates() {
+        let unmatched = IdentityOutcome {
+            identity: "unmatched",
+            sensitivity: "not-established",
+        };
+        for case in IDENTITY_CASES {
+            let evaluator = IdentityEvaluator::new(case.family).unwrap();
+            let (start, end) = candidate_range(case);
+            assert_eq!(evaluator.evaluate(case.input, None), unmatched);
+            let widened_left = if start == 0 {
+                (start, end + 1)
+            } else {
+                (start - 1, end)
+            };
+            for misaligned in [
+                (start + 1, end),
+                (start, end - 1),
+                widened_left,
+                (start, end + 1),
+                (end, start),
+                (start, start),
+                (0, case.input.len() + 1),
+                (usize::MAX, usize::MAX),
+            ] {
+                assert_eq!(
+                    evaluator.evaluate(case.input, Some(misaligned)),
+                    unmatched,
+                    "{} {misaligned:?}",
+                    case.family
+                );
+            }
+        }
+        // A range inside a multi-byte character is not a slice boundary;
+        // the evaluation compares offsets and never slices with them.
+        let evaluator = IdentityEvaluator::new("pii:global:email").unwrap();
+        assert_eq!(
+            evaluator.evaluate("email: 고객876@x4z8v2n6.synthetic", Some((8, 30))),
+            unmatched
+        );
+    }
+
+    #[test]
+    fn identity_evaluation_uses_the_pipeline_scan_copy_and_its_rejections() {
+        // A governed invisible code point inside an address: the pipeline
+        // scans the copy without it and reports the translated original
+        // range, so the evaluation does too.
+        let input = "client_ip=192.168.1.\u{200b}7";
+        let evaluator = IdentityEvaluator::new("pii:global:network-address").unwrap();
+        let range = (10, input.len());
+        assert_eq!(
+            evaluator.evaluate(input, Some(range)),
+            IdentityOutcome {
+                identity: "established",
+                sensitivity: "sensitive",
+            }
+        );
+        assert_eq!(
+            public_findings_at("pii:global:network-address", input, range),
+            1
+        );
+        // Email rejects invisible normalization: the pipeline drops the
+        // alternative before overlap resolution, and so does the evaluation.
+        let input = "email: fixture876-q7m9@x4z8v2n6\u{200b}.synthetic";
+        let evaluator = IdentityEvaluator::new("pii:global:email").unwrap();
+        let range = (7, input.len());
+        assert_eq!(
+            evaluator.evaluate(input, Some(range)),
+            IdentityOutcome {
+                identity: "unmatched",
+                sensitivity: "not-established",
+            }
+        );
+        assert_eq!(public_findings_at("pii:global:email", input, range), 0);
+    }
+
+    #[test]
+    fn identity_evaluator_accepts_exactly_one_production_family() {
+        for family in AVAILABLE_FAMILIES {
+            let evaluator = IdentityEvaluator::new(family).unwrap();
+            assert_eq!(IdentityEvaluator::vocabulary(), "pii-context/v1");
+            assert_eq!(
+                IDENTITY_EVALUATION_FORMAT,
+                "redact-secret/pii-identity-evaluation/1"
+            );
+            let selector = format!("pii:family:{}", family.strip_prefix("pii:").unwrap());
+            let selection = PiiSelection::parse(&[selector.as_str()]).unwrap();
+            assert_eq!(
+                evaluator.activation_identity(),
+                crate::DetectorRegistry::with_built_in_and_pii(&selection)
+                    .unwrap()
+                    .activation_identity()
+            );
+            assert_eq!(evaluator.domain.families.len(), 1);
+            assert_eq!(evaluator.domain.families[0].id(), *family);
+        }
+        assert_eq!(
+            IdentityEvaluator::new("pii:us:ssn")
+                .unwrap()
+                .activation_identity(),
+            "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1"
+        );
+        for other in [
+            "",
+            "pii",
+            "pii:global",
+            "pii:us",
+            "pii:family:global:email",
+            "pii:global:us-ssn",
+            "pii:global:ambiguous-national-id",
+            "PII:GLOBAL:EMAIL",
+            "pii:global:email ",
+        ] {
+            assert!(IdentityEvaluator::new(other).is_none(), "{other:?}");
+        }
     }
 }
