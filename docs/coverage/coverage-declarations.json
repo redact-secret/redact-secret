@@ -10026,6 +10026,694 @@
       "type": "deepgram_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-bare",
+            "doppler-token-positive-bearer-header",
+            "doppler-token-positive-body-40",
+            "doppler-token-positive-body-40-dotenv",
+            "doppler-token-positive-body-44",
+            "doppler-token-positive-body-44-dotenv",
+            "doppler-token-positive-chat-sentence",
+            "doppler-token-positive-crlf-unicode-prefix",
+            "doppler-token-positive-curl-bearer",
+            "doppler-token-positive-dotenv",
+            "doppler-token-positive-json-config",
+            "doppler-token-positive-json-token-key",
+            "doppler-token-positive-log",
+            "doppler-token-positive-punctuation-adjacent",
+            "doppler-token-positive-python-sdk-call",
+            "doppler-token-positive-repeated-value",
+            "doppler-token-positive-service-token-environment-segment",
+            "doppler-token-positive-service-token-environment-segment-dotenv",
+            "doppler-token-positive-shell-export",
+            "doppler-token-positive-tool-call-arguments",
+            "doppler-token-positive-x-api-key-header",
+            "doppler-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-body-40-bearer",
+            "doppler-token-overlap-body-44-bearer",
+            "doppler-token-overlap-context",
+            "doppler-token-overlap-service-token-environment-segment-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_service_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_service_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-type-pt",
+            "doppler-token-positive-type-pt-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-type-pt-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_personal_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_personal_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-type-ct",
+            "doppler-token-positive-type-ct-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-type-ct-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_cli_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_cli_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-type-sa",
+            "doppler-token-positive-type-sa-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-type-sa-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_service_account_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_service_account_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-type-said",
+            "doppler-token-positive-type-said-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-type-said-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_service_account_identity_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_service_account_identity_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-type-scim",
+            "doppler-token-positive-type-scim-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-type-scim-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_scim_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_scim_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "doppler-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "doppler-token-positive-type-audit",
+            "doppler-token-positive-type-audit-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "doppler-token-overlap-type-audit-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "doppler-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "doppler-token-negative-ci-secret-reference",
+            "doppler-token-negative-cli-command",
+            "doppler-token-negative-embedded-in-wider-identifier",
+            "doppler-token-negative-placeholder",
+            "doppler-token-negative-preview"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "doppler-token-boundary-dash-inside-body",
+            "doppler-token-boundary-glued-suffix",
+            "doppler-token-boundary-long-body",
+            "doppler-token-boundary-segment-on-personal-token",
+            "doppler-token-boundary-short-body",
+            "doppler-token-boundary-unknown-type",
+            "doppler-token-boundary-uppercase-segment",
+            "doppler-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for doppler_audit_token (doppler-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "doppler_audit_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -10185,6 +10873,7 @@
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
+            "doppler-token-adversarial-long-suffix",
             "elevenlabs-api-key-adversarial-dense-findings",
             "elevenlabs-api-key-adversarial-long-glued-region",
             "elevenlabs-api-key-adversarial-repeated-prefix",
@@ -10622,6 +11311,7 @@
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
+            "doppler-token-adversarial-long-suffix",
             "elevenlabs-api-key-adversarial-dense-findings",
             "elevenlabs-api-key-adversarial-long-glued-region",
             "elevenlabs-api-key-adversarial-repeated-prefix",

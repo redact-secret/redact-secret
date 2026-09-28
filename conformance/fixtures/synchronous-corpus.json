@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2375,
+  "fixtureCount": 2433,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -60224,6 +60224,1169 @@
       "input": "Pass your key as Client(api_key=...) when constructing it.",
       "expected": [],
       "note": "Issue #866: A prose mention has no literal value."
+    },
+    {
+      "id": "doppler-token-positive-bare",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "doppler-token-positive-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 63
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-shell-export",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export DOPPLER_TOKEN=\"\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\"\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 71
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "doppler-token-positive-yaml",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: \u0064p.st.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 70
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-json-config",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\"\n}\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 65
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-json-token-key",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\"}",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 60
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-python-sdk-call",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\")\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 74
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-bearer-header",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.st.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 71
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-x-api-key-header",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0064p.st.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 60
+        }
+      ],
+      "note": "An X-API-Key header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-curl-bearer",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0064p.st.SyntheticRevokedDopplerServiceToken00000000\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 80
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-tool-call-arguments",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\"}}",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 87
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-chat-sentence",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0064p.st.SyntheticRevokedDopplerServiceToken00000000 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 64
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-log",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0064p.st.SyntheticRevokedDopplerServiceToken00000000 for request 7",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 104
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-positive-punctuation-adjacent",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0064p.st.SyntheticRevokedDopplerServiceToken00000000).",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 50
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "doppler-token-positive-crlf-unicode-prefix",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\n\r\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 73
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "doppler-token-positive-repeated-value",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000000 \u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        },
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 50,
+          "end": 99
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "doppler-token-overlap-context",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 62
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "doppler-token-positive-type-pt",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.pt.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "The \u0064p.pt. prefix reports its own finding type."
+    },
+    {
+      "id": "doppler-token-positive-type-pt-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.pt.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 63
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-type-pt-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.pt.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 71
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-type-ct",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.ct.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_cli_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "The \u0064p.ct. prefix reports its own finding type."
+    },
+    {
+      "id": "doppler-token-positive-type-ct-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.ct.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_cli_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 63
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-type-ct-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.ct.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_cli_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 71
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-type-sa",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.sa.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "The \u0064p.sa. prefix reports its own finding type."
+    },
+    {
+      "id": "doppler-token-positive-type-sa-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.sa.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 63
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-type-sa-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.sa.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 71
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-type-said",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.said.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_identity_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "The \u0064p.said. prefix reports its own finding type."
+    },
+    {
+      "id": "doppler-token-positive-type-said-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.said.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_identity_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 65
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-type-said-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.said.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_identity_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 73
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-type-scim",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.scim.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_scim_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "The \u0064p.scim. prefix reports its own finding type."
+    },
+    {
+      "id": "doppler-token-positive-type-scim-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.scim.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_scim_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 65
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-type-scim-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.scim.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_scim_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 73
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-type-audit",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.audit.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_audit_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 52
+        }
+      ],
+      "note": "The \u0064p.audit. prefix reports its own finding type."
+    },
+    {
+      "id": "doppler-token-positive-type-audit-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.audit.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_audit_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 66
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-type-audit-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.audit.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_audit_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 74
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-service-token-environment-segment",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.prd.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 53
+        }
+      ],
+      "note": "A service token's optional environment segment is inside the span."
+    },
+    {
+      "id": "doppler-token-positive-service-token-environment-segment-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.st.prd.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 67
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-service-token-environment-segment-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.st.prd.SyntheticRevokedDopplerServiceToken00000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 75
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-body-40",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The documented 40-byte body floor is claimed."
+    },
+    {
+      "id": "doppler-token-positive-body-40-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.st.SyntheticRevokedDopplerServiceToken00000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 60
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-body-40-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.st.SyntheticRevokedDopplerServiceToken00000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 68
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-positive-body-44",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken000000000",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        }
+      ],
+      "note": "The documented 44-byte body ceiling is claimed."
+    },
+    {
+      "id": "doppler-token-positive-body-44-dotenv",
+      "detector": "doppler-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=\u0064p.st.SyntheticRevokedDopplerServiceToken000000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 64
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "doppler-token-overlap-body-44-bearer",
+      "detector": "doppler-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064p.st.SyntheticRevokedDopplerServiceToken000000000\n",
+      "expected": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 72
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "doppler-token-boundary-short-body",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken0000",
+      "expected": [],
+      "note": "A body one byte under the documented 40-44 band is not the reviewed shape."
+    },
+    {
+      "id": "doppler-token-boundary-long-body",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken0000000000",
+      "expected": [],
+      "note": "A body one byte over the documented band is a wider run, not a token."
+    },
+    {
+      "id": "doppler-token-boundary-dash-inside-body",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopp-erServiceToken00000000",
+      "expected": [],
+      "note": "The body alphabet is alphanumeric; a dash breaks the run."
+    },
+    {
+      "id": "doppler-token-boundary-unknown-type",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dp.xx.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "An undocumented type literal is not claimed."
+    },
+    {
+      "id": "doppler-token-boundary-wrong-case-prefix",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DP.ST.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "doppler-token-boundary-segment-on-personal-token",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.pt.prd.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "Only a service token carries an environment segment."
+    },
+    {
+      "id": "doppler-token-boundary-uppercase-segment",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.Prd.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "A segment outside [a-z0-9_-]{2,35} is not the documented grammar."
+    },
+    {
+      "id": "doppler-token-boundary-glued-suffix",
+      "detector": "doppler-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken000000000_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "doppler-token-negative-embedded-in-wider-identifier",
+      "detector": "doppler-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacy\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "doppler-token-negative-preview",
+      "detector": "doppler-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "token: dp.st…Ab12Cd",
+      "expected": [],
+      "note": "The dashboard and CLI preview (ellipsis plus six bytes) is a non-secret display form."
+    },
+    {
+      "id": "doppler-token-negative-placeholder",
+      "detector": "doppler-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Tokens look like \u0064p.st.xxxx or \u0064p.st.<config>.* in the docs.",
+      "expected": [],
+      "note": "Documentation placeholders never reach the documented body width."
+    },
+    {
+      "id": "doppler-token-negative-ci-secret-reference",
+      "detector": "doppler-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN }}\n",
+      "expected": [],
+      "note": "A CI secret reference carries no token."
+    },
+    {
+      "id": "doppler-token-negative-cli-command",
+      "detector": "doppler-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "doppler configs tokens create ci --plain\ndoppler run -- npm start\n",
+      "expected": [],
+      "note": "Doppler CLI commands carry no prefixed token."
+    },
+    {
+      "id": "doppler-token-adversarial-long-suffix",
+      "detector": "doppler-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }
   ]
 }

@@ -673,6 +673,55 @@
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
       "schemes": null
+    },
+    {
+      "type": "doppler_service_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_personal_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.pt.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_cli_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.ct.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_service_account_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.sa.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_service_account_identity_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.said.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_scim_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.scim.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_audit_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.audit.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
     }
   ],
   "consumers": [

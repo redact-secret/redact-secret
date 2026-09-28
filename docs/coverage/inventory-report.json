@@ -4062,12 +4062,277 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "deepgram_api_key"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-bare",
+        "doppler-token-positive-bearer-header",
+        "doppler-token-positive-body-40",
+        "doppler-token-positive-body-40-dotenv",
+        "doppler-token-positive-body-44",
+        "doppler-token-positive-body-44-dotenv",
+        "doppler-token-positive-chat-sentence",
+        "doppler-token-positive-crlf-unicode-prefix",
+        "doppler-token-positive-curl-bearer",
+        "doppler-token-positive-dotenv",
+        "doppler-token-positive-json-config",
+        "doppler-token-positive-json-token-key",
+        "doppler-token-positive-log",
+        "doppler-token-positive-punctuation-adjacent",
+        "doppler-token-positive-python-sdk-call",
+        "doppler-token-positive-repeated-value",
+        "doppler-token-positive-service-token-environment-segment",
+        "doppler-token-positive-service-token-environment-segment-dotenv",
+        "doppler-token-positive-shell-export",
+        "doppler-token-positive-tool-call-arguments",
+        "doppler-token-positive-x-api-key-header",
+        "doppler-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_service_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-pt",
+        "doppler-token-positive-type-pt-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_personal_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-ct",
+        "doppler-token-positive-type-ct-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_cli_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-sa",
+        "doppler-token-positive-type-sa-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_service_account_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-said",
+        "doppler-token-positive-type-said-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_service_account_identity_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-scim",
+        "doppler-token-positive-type-scim-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_scim_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-audit",
+        "doppler-token-positive-type-audit-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_audit_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 92,
+    "supported": 99,
     "unresolved": 0
   }
 }

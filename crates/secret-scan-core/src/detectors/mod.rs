@@ -22,6 +22,7 @@ mod connection_string;
 mod databricks;
 mod datadog;
 mod discord;
+mod doppler;
 mod elevenlabs;
 mod firebase;
 mod generic_token;
@@ -153,6 +154,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(keyword_gated_keys::CohereApiKeyDetector),
         Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
         Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
+        Box::new(doppler::DopplerTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -277,6 +279,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("cohere-api-key", Pack::Provider),
     ("ai21-api-key", Pack::Provider),
     ("deepgram-api-key", Pack::Provider),
+    ("doppler-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -390,6 +393,7 @@ mod tests {
                 "cohere-api-key",
                 "ai21-api-key",
                 "deepgram-api-key",
+                "doppler-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -742,6 +746,8 @@ mod tests {
             "0123456789abcdef".repeat(4)[..63].to_owned()
         );
         let gitlab_runner_input = "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct";
+        let doppler_token_input =
+            format!("dp.st.{}", "SyntheticRevokedDopplerServiceToken00000000");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -805,6 +811,7 @@ mod tests {
             ("cohere-api-key", cohere_api_key_input.as_str()),
             ("ai21-api-key", ai21_api_key_input.as_str()),
             ("deepgram-api-key", deepgram_api_key_input.as_str()),
+            ("doppler-token", doppler_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

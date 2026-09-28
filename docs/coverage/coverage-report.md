@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 92 |
+| supported | 99 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 103.
+Coverage declarations: 110.
 
 ## Coverage by detector
 
@@ -46,6 +46,7 @@ Coverage declarations: 103.
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| doppler-token | 7 | supported: 7, intentionally-unsupported: 0, unresolved: 0 |
 | elevenlabs-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | fireworks-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -134,6 +135,13 @@ Coverage declarations: 103.
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
+| doppler_audit_token | doppler-token | provider | supported | not-applicable | none |
+| doppler_cli_token | doppler-token | provider | supported | not-applicable | none |
+| doppler_personal_token | doppler-token | provider | supported | not-applicable | none |
+| doppler_scim_token | doppler-token | provider | supported | not-applicable | none |
+| doppler_service_account_identity_token | doppler-token | provider | supported | not-applicable | none |
+| doppler_service_account_token | doppler-token | provider | supported | not-applicable | none |
+| doppler_service_token | doppler-token | provider | supported | not-applicable | none |
 | elevenlabs_api_key | elevenlabs-api-key | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
 | fireworks_ai_api_key | fireworks-ai-api-key | provider | supported | not-applicable | none |
@@ -226,15 +234,15 @@ Coverage declarations: 103.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 103 | 0 | 0 |
-| boundary | 92 | 0 | 0 |
-| host-context | 92 | 0 | 0 |
+| adversarial | 110 | 0 | 0 |
+| boundary | 99 | 0 | 0 |
+| host-context | 99 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 103 | 0 | 0 |
-| near-miss-negative | 92 | 0 | 0 |
-| overlap | 92 | 0 | 0 |
-| positive | 92 | 0 | 0 |
-| range | 103 | 0 | 0 |
+| malformed | 110 | 0 | 0 |
+| near-miss-negative | 99 | 0 | 0 |
+| overlap | 99 | 0 | 0 |
+| positive | 99 | 0 | 0 |
+| range | 110 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

@@ -5,6 +5,21 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- New provider detectors from the #860 Tier A handoffs, each always redacted
+  at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences generic
+  detection missed:
+  - `doppler-token` (#903): the seven documented `dp.<type>.` Doppler token
+    types, one finding type each (`doppler_service_token`,
+    `doppler_personal_token`, `doppler_cli_token`,
+    `doppler_service_account_token`,
+    `doppler_service_account_identity_token`, `doppler_scim_token`,
+    `doppler_audit_token`), with the optional service-token environment
+    segment inside the span.
+
 ## 0.1.0-beta.10 — 2026-09-28
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.10/README.md).

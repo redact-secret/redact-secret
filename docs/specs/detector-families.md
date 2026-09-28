@@ -43,6 +43,13 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `digitalocean_token` | `digitalocean-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `discord_bot_token` | `discord-bot-token` | `always-redact` | [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `docker_token` | `docker-token` | `always-redact` | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `doppler_audit_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `doppler_cli_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `doppler_personal_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `doppler_scim_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `doppler_service_account_identity_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `doppler_service_account_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `doppler_service_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `elevenlabs_api_key` | `elevenlabs-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `fireworks_ai_api_key` | `fireworks-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -401,6 +408,51 @@ provider type. Detection, exact spans and incremental parity are pinned by
 T1 promotion needs a provider document or an issuance check (the checklists in
 the research comments); it is a benchmark-side qualification, not a code change.
 
+## Tier A provider families (#860)
+
+Issue [#860](https://github.com/redact-secret/redact-secret/issues/860)
+selected provider credential families whose value today was covered only
+by generic detection under a credential name or a `Bearer` header, and missed
+bare, in chat text, and under a JSON `"token"` key. Each landed family below
+is a new detector with its own finding type(s), `Provider` specificity, high
+confidence and always redacted, so overlap resolution reports one provider
+finding per span over `contextual_secret`, `bearer_token` and
+`authorization_credential`. The frozen contract for each family, with its
+sources, tier rationale, excluded shapes and issuance checklist, is its step-3
+handoff under [`docs/audits/evidence/860/`](../audits/evidence/860/README.md);
+this section records only the implemented grammar and its trade-offs.
+
+Shared rules: a value is rejected when the byte before the prefix or after the
+body continues an identifier (`[A-Za-z0-9_-]`, widened per family where
+noted), so an embedded, over-long or glued value is an intentional false
+negative, never a truncated match. A placeholder shorter than the exact width
+or with a byte outside the alphabet is unclaimed by construction; one padded
+to the exact width with alphabet bytes is claimed, because no length-preserving
+placeholder exclusion is evidenced (the #867 precedent). None of these
+providers is added to `generic-token`'s dedicated-provider deferral list:
+each has documented shapes these contracts exclude, and deferral would turn a
+provider-named assignment of one into a silent miss. JWT siblings stay with
+`jwt`. No row is a support-status claim; promotion stays gated on core
+conformance and the benchmarks arrival and profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `doppler:service-token` | `doppler-token` | `dp.` + `st`\|`pt`\|`ct`\|`sa`\|`said`\|`scim`\|`audit` + `.` + 40–44 `[A-Za-z0-9]`; `dp.st.` only may carry one `[a-z0-9_-]{2,35}` + `.` environment segment, inside the span. Leading boundary also rejects `.` | one per type: `doppler_service_token`, `doppler_personal_token`, `doppler_cli_token`, `doppler_service_account_token`, `doppler_service_account_identity_token`, `doppler_scim_token`, `doppler_audit_token` | T1 (Doppler token-format page, per-type regex) |
+
+Doppler ([#903](https://github.com/redact-secret/redact-secret/issues/903),
+[handoff](../audits/evidence/860/doppler.md)). One type per documented role
+follows
+[the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md):
+a personal or CLI token acts for the user, a service token reads one config.
+False negatives: a body outside 40–44, a body with `_` or `-`, a segment
+outside its grammar (uppercase, 1 byte, 36+ bytes), a segment on any type but
+`st`, an undocumented future type, an uppercase prefix, and a token glued to an
+identifier. `dp.said.` is never read as `dp.sa.` plus a body. The CLI and
+dashboard preview (`dp.st…` plus six bytes) fails the grammar. False
+positives: a non-Doppler `dp.<documented type>.` plus a bounded 40–44
+alphanumeric run; none is known. Cost: one literal `dp.` search, then a scan
+capped at 36 segment and 45 body bytes per candidate.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -410,6 +462,7 @@ the research comments); it is a benchmark-side qualification, not a code change.
 | `pii:global:payment-card` contract v1 is exposed only through `pii-domain` as `pii_global_payment_card`. It accepts the frozen 10–19-digit payment-brand subset after bounded display normalization and a Luhn v1 pass, requires a reviewed English or Korean payment-card field label for sensitivity, and excludes exact whole Visa Acceptance test-service PANs. `pan` is a label only through the shared bounded field-label grammar, never free prose. Frozen contract and evidence: `docs/contracts/pii/payment-card-v1.md` and `docs/audits/evidence/877/README.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #877 |
 | `pii:global:phone` contract v1 is exposed only through `pii-domain` as `pii_global_phone`. It accepts only the frozen `+1` / NANP displays and narrow extensions, excludes actual `N11` codes while retaining structurally valid `988`, requires reviewed high-signal phone context, and treats only exact whole-candidate `555-01xx` exchange/line values as non-sensitive. Frozen contract and evidence: `docs/contracts/pii/phone-v1.md` and `docs/audits/evidence/880/README.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #880 |
 | `pii:us:ssn` contract v1 is exposed only through `pii-domain` as `pii_jurisdiction_us_ssn`. It accepts nine ASCII digits in compact or exact ASCII-hyphenated `3-2-4` form, requires `us-ssn-allocation` v1 and a reviewed English or Korean SSN field label, and rejects only the current SSA structural exclusions. `ssn` is a label only through the bounded field-label grammar. No issuance, identity, geography, or pre-2011 allocation claim is made. Frozen contract and evidence: `docs/contracts/pii/us-ssn-v1.md` and `docs/audits/evidence/879/README.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #879 |
+| Doppler `dp.<type>.` tokens (seven documented types, 40–44 alphanumeric body, optional `dp.st.` environment segment) are reported as one finding type per type at provider specificity, bare or in any context ([#903](https://github.com/redact-secret/redact-secret/issues/903), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the GitHub one-type-per-family precedent to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
