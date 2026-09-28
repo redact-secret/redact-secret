@@ -77,7 +77,7 @@ export const CANONICAL_IDS = [
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
   "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
-  "doppler-token", "trigger-dev-token",
+  "doppler-token", "trigger-dev-token", "e2b-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -94,7 +94,7 @@ export const GROUPS = {
   ai: [
     "openai-token", "anthropic-token", "huggingface-token", "replicate-api-token", "groq-api-key",
     "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "langsmith-api-key",
-    "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
+    "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key", "e2b-api-key",
   ],
   cloud: [
     "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",

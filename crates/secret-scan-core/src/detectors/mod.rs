@@ -23,6 +23,7 @@ mod databricks;
 mod datadog;
 mod discord;
 mod doppler;
+mod e2b;
 mod elevenlabs;
 mod firebase;
 mod generic_token;
@@ -157,6 +158,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
         Box::new(doppler::DopplerTokenDetector),
         Box::new(trigger_dev::TRIGGER_DEV),
+        Box::new(e2b::E2B),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -283,6 +285,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("deepgram-api-key", Pack::Provider),
     ("doppler-token", Pack::Provider),
     ("trigger-dev-token", Pack::Provider),
+    ("e2b-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -398,6 +401,7 @@ mod tests {
                 "deepgram-api-key",
                 "doppler-token",
                 "trigger-dev-token",
+                "e2b-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -753,6 +757,7 @@ mod tests {
         let doppler_token_input =
             format!("dp.st.{}", "SyntheticRevokedDopplerServiceToken00000000");
         let trigger_dev_token_input = format!("tr_prod_sk_{}", "SyntheticRevokedTrigger0");
+        let e2b_api_key_input = format!("e2b_{}", "0123456789abcdef0123456789abcdef01234567");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -818,6 +823,7 @@ mod tests {
             ("deepgram-api-key", deepgram_api_key_input.as_str()),
             ("doppler-token", doppler_token_input.as_str()),
             ("trigger-dev-token", trigger_dev_token_input.as_str()),
+            ("e2b-api-key", e2b_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

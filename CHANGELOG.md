@@ -24,6 +24,9 @@ evidence is linked from each published version.
     four documented env slugs) as `trigger_dev_secret_api_key`, and
     `tr_pat_` personal access tokens as `trigger_dev_personal_access_token`.
     Public `pk_<env>_` keys, `tr_oat_` and JWT forms stay unclaimed.
+  - `e2b-api-key` (#905): E2B API keys, `e2b_` + exactly 40 lowercase hex,
+    as `e2b_api_key`. Retired `sk_e2b_` tokens and `e2b_` module names stay
+    unclaimed.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

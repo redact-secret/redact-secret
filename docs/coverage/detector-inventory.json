@@ -736,6 +736,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0074r_pat_syntheticrevokedtriggerpatfixture1234567",
       "schemes": null
+    },
+    {
+      "type": "e2b_api_key",
+      "detector": "e2b-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
     }
   ],
   "consumers": [

@@ -272,3 +272,55 @@ mod trigger_dev {
         assert_partition_parity(&pat());
     }
 }
+
+mod e2b {
+    use super::*;
+
+    const DETECTOR: &str = "e2b-api-key";
+    const HEX: &[u8] = b"0123456789abcdef";
+
+    fn key() -> String {
+        format!("e2b_{}", filler(HEX, 40, 1))
+    }
+
+    #[test]
+    fn the_key_wins_every_context_as_the_sole_finding() {
+        assert_sole_provider_finding(DETECTOR, "e2b_api_key", &key());
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(HEX, 40, 1);
+        let mut upper = body.clone();
+        upper.replace_range(5..6, "A");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("e2b_{}", &body[..39]),
+                format!("e2b_{body}0"),
+                format!("e2b_{upper}"),
+                format!("E2B_{body}"),
+                format!("e2b-{body}"),
+                format!("sk_e2b_{body}"),
+                format!("xe2b_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "from e2b_code_interpreter import Sandbox\n".to_owned(),
+            "E2B_API_KEY=e2b_...\n".to_owned(),
+            "E2B_API_KEY=${E2B_API_KEY}\n".to_owned(),
+            format!("commit {}\n", filler(HEX, 40, 2)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key());
+    }
+}

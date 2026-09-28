@@ -4417,12 +4417,63 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "trigger_dev_personal_access_token"
+    },
+    {
+      "detector": "e2b-api-key",
+      "evidence": {
+        "fixtureCount": 33,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "e2b-api-key-positive-bare",
+        "e2b-api-key-positive-bearer-header",
+        "e2b-api-key-positive-chat-sentence",
+        "e2b-api-key-positive-crlf-unicode-prefix",
+        "e2b-api-key-positive-curl-bearer",
+        "e2b-api-key-positive-dotenv",
+        "e2b-api-key-positive-json-config",
+        "e2b-api-key-positive-json-token-key",
+        "e2b-api-key-positive-log",
+        "e2b-api-key-positive-punctuation-adjacent",
+        "e2b-api-key-positive-python-sdk-call",
+        "e2b-api-key-positive-repeated-value",
+        "e2b-api-key-positive-second-body",
+        "e2b-api-key-positive-second-body-dotenv",
+        "e2b-api-key-positive-shell-export",
+        "e2b-api-key-positive-tool-call-arguments",
+        "e2b-api-key-positive-x-api-key-header",
+        "e2b-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "e2b_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 101,
+    "supported": 102,
     "unresolved": 0
   }
 }

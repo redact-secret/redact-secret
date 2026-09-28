@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2476,
+  "fixtureCount": 2509,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -62218,6 +62218,628 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "e2b-api-key-positive-bare",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "e2b-api-key-positive-dotenv",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "E2B_API_KEY=\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 56
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-shell-export",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export E2B_API_KEY=\"\u00652b_0123456789abcdef0123456789abcdef01234567\"\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 64
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "e2b-api-key-positive-yaml",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: \u00652b_0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 65
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-json-config",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"\u00652b_0123456789abcdef0123456789abcdef01234567\"\n}\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 60
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-json-token-key",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u00652b_0123456789abcdef0123456789abcdef01234567\"}",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 55
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-python-sdk-call",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u00652b_0123456789abcdef0123456789abcdef01234567\")\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 69
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-bearer-header",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u00652b_0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 66
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-x-api-key-header",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u00652b_0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 55
+        }
+      ],
+      "note": "An X-API-Key header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-curl-bearer",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u00652b_0123456789abcdef0123456789abcdef01234567\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 75
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-tool-call-arguments",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u00652b_0123456789abcdef0123456789abcdef01234567\"}}",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 82
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-chat-sentence",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u00652b_0123456789abcdef0123456789abcdef01234567 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 59
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-log",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u00652b_0123456789abcdef0123456789abcdef01234567 for request 7",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 99
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-positive-punctuation-adjacent",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u00652b_0123456789abcdef0123456789abcdef01234567).",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 45
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "e2b-api-key-positive-crlf-unicode-prefix",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u00652b_0123456789abcdef0123456789abcdef01234567\n\r\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 68
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "e2b-api-key-positive-repeated-value",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789abcdef0123456789abcdef01234567 \u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        },
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 45,
+          "end": 89
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "e2b-api-key-overlap-context",
+      "detector": "e2b-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 57
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "e2b-api-key-positive-second-body",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_76543210fedcba9876543210fedcba9876543210",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        }
+      ],
+      "note": "A second synthetic body reports the same finding type."
+    },
+    {
+      "id": "e2b-api-key-positive-second-body-dotenv",
+      "detector": "e2b-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "E2B_API_KEY=\u00652b_76543210fedcba9876543210fedcba9876543210\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 56
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "e2b-api-key-overlap-second-body-bearer",
+      "detector": "e2b-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u00652b_76543210fedcba9876543210fedcba9876543210\n",
+      "expected": [
+        {
+          "detector": "e2b-api-key",
+          "type": "\u00652b_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 66
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "e2b-api-key-boundary-short-body",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789abcdef0123456789abcdef0123456",
+      "expected": [],
+      "note": "A body one byte short of the exact width is not the reviewed shape."
+    },
+    {
+      "id": "e2b-api-key-boundary-long-body",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789abcdef0123456789abcdef012345678",
+      "expected": [],
+      "note": "A body one byte over the exact width is a wider run, not a token."
+    },
+    {
+      "id": "e2b-api-key-boundary-uppercase-hex",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789Abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "The generator emits lowercase hex only; an uppercase byte is not claimed."
+    },
+    {
+      "id": "e2b-api-key-boundary-non-hex-byte",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789gbcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "A byte outside lowercase hex breaks the run."
+    },
+    {
+      "id": "e2b-api-key-boundary-wrong-case-prefix",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "E2B_0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "e2b-api-key-boundary-dash-separator",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "e2b-0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "A different separator is not the reviewed prefix."
+    },
+    {
+      "id": "e2b-api-key-boundary-glued-suffix",
+      "detector": "e2b-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u00652b_0123456789abcdef0123456789abcdef01234567_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "e2b-api-key-negative-retired-user-access-token",
+      "detector": "e2b-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "The retired sk_\u00652b_ user access token is not claimed as an API key: the byte before \u00652b_ continues an identifier."
+    },
+    {
+      "id": "e2b-api-key-negative-embedded-in-wider-identifier",
+      "detector": "e2b-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "e2b-api-key-negative-package-names",
+      "detector": "e2b-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "from \u00652b_code_interpreter import Sandbox\nimport \u00652b_desktop\n",
+      "expected": [],
+      "note": "Package and module names fail the exact-width hex body."
+    },
+    {
+      "id": "e2b-api-key-negative-placeholder",
+      "detector": "e2b-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like \u00652b_... or \u00652b_*** in the docs.",
+      "expected": [],
+      "note": "Documentation placeholders never reach the exact width."
+    },
+    {
+      "id": "e2b-api-key-negative-git-sha",
+      "detector": "e2b-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "commit 0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [],
+      "note": "A bare 40-hex git SHA carries no prefix."
+    },
+    {
+      "id": "e2b-api-key-adversarial-long-suffix",
+      "detector": "e2b-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }

@@ -10929,6 +10929,116 @@
       "type": "trigger_dev_personal_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "e2b-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "e2b-api-key-positive-bare",
+            "e2b-api-key-positive-bearer-header",
+            "e2b-api-key-positive-chat-sentence",
+            "e2b-api-key-positive-crlf-unicode-prefix",
+            "e2b-api-key-positive-curl-bearer",
+            "e2b-api-key-positive-dotenv",
+            "e2b-api-key-positive-json-config",
+            "e2b-api-key-positive-json-token-key",
+            "e2b-api-key-positive-log",
+            "e2b-api-key-positive-punctuation-adjacent",
+            "e2b-api-key-positive-python-sdk-call",
+            "e2b-api-key-positive-repeated-value",
+            "e2b-api-key-positive-second-body",
+            "e2b-api-key-positive-second-body-dotenv",
+            "e2b-api-key-positive-shell-export",
+            "e2b-api-key-positive-tool-call-arguments",
+            "e2b-api-key-positive-x-api-key-header",
+            "e2b-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "e2b-api-key-overlap-context",
+            "e2b-api-key-overlap-second-body-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "e2b-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "e2b-api-key-boundary-dash-separator",
+            "e2b-api-key-boundary-glued-suffix",
+            "e2b-api-key-boundary-long-body",
+            "e2b-api-key-boundary-non-hex-byte",
+            "e2b-api-key-boundary-short-body",
+            "e2b-api-key-boundary-uppercase-hex",
+            "e2b-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "e2b-api-key-negative-embedded-in-wider-identifier",
+            "e2b-api-key-negative-git-sha",
+            "e2b-api-key-negative-package-names",
+            "e2b-api-key-negative-placeholder",
+            "e2b-api-key-negative-retired-user-access-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "e2b-api-key-boundary-dash-separator",
+            "e2b-api-key-boundary-glued-suffix",
+            "e2b-api-key-boundary-long-body",
+            "e2b-api-key-boundary-non-hex-byte",
+            "e2b-api-key-boundary-short-body",
+            "e2b-api-key-boundary-uppercase-hex",
+            "e2b-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for e2b_api_key (e2b-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "e2b_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -11089,6 +11199,7 @@
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
             "doppler-token-adversarial-long-suffix",
+            "e2b-api-key-adversarial-long-suffix",
             "elevenlabs-api-key-adversarial-dense-findings",
             "elevenlabs-api-key-adversarial-long-glued-region",
             "elevenlabs-api-key-adversarial-repeated-prefix",
@@ -11528,6 +11639,7 @@
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
             "doppler-token-adversarial-long-suffix",
+            "e2b-api-key-adversarial-long-suffix",
             "elevenlabs-api-key-adversarial-dense-findings",
             "elevenlabs-api-key-adversarial-long-glued-region",
             "elevenlabs-api-key-adversarial-repeated-prefix",
