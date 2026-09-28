@@ -273,6 +273,369 @@
           "end": 70
         }
       ]
+    },
+    {
+      "id": "pipe-record-email-equals",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "a|b|email=fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 10,
+          "end": 44
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-email-colon",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "a|b|email: fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 11,
+          "end": 45
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-email-cell",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| email | fixture876-q7m9@x4z8v2n6.synthetic |",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 10,
+          "end": 44
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-phone-colon",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "x|phone: 555-234-5678",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 9,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-phone-cell",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| phone | 555-234-5678 |",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 10,
+          "end": 22
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-ssn-equals",
+      "issue": 940,
+      "input": "x|ssn=890-62-6879",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_jurisdiction_us_ssn",
+          "confidence": "high",
+          "action": "redact",
+          "start": 6,
+          "end": 17
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-ssn-cell",
+      "issue": 940,
+      "input": "| ssn | 890-62-6879 |",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_jurisdiction_us_ssn",
+          "confidence": "high",
+          "action": "redact",
+          "start": 8,
+          "end": 19
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-network-address-equals",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "x|ip=192.168.1.7",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 5,
+          "end": 16
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-network-address-cell",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| client ip | 192.168.1.7 |",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 14,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-payment-card-colon",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "x|card_number: 4000008770000003",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_payment_card",
+          "confidence": "high",
+          "action": "redact",
+          "start": 15,
+          "end": 31
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-payment-card-cell",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| card number | 4000008770000003 |",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_payment_card",
+          "confidence": "high",
+          "action": "redact",
+          "start": 16,
+          "end": 32
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-iban-equals",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "x|iban=GB18SYNX00000000000000",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_iban",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 29
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-iban-cell",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| iban | GB18SYNX00000000000000 |",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_iban",
+          "confidence": "high",
+          "action": "redact",
+          "start": 9,
+          "end": 31
+        }
+      ]
+    },
+    {
+      "id": "pipe-record-several-labelled-fields",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "id=7|email=fixture876-q7m9@x4z8v2n6.synthetic|phone=555-234-5678|ip=192.168.1.7",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 11,
+          "end": 45
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 52,
+          "end": 64
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 68,
+          "end": 79
+        }
+      ]
+    },
+    {
+      "id": "pipe-table-header-without-value-benign-control",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| email | phone |",
+      "expected": []
+    },
+    {
+      "id": "pipe-table-header-and-separator-rows-benign-control",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| email | phone |\n| --- | --- |",
+      "expected": []
+    },
+    {
+      "id": "pipe-table-header-label-does-not-reach-a-later-row",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| email | phone |\n| --- | --- |\n| fixture876-q7m9@x4z8v2n6.synthetic | 555-234-5678 |",
+      "expected": []
+    },
+    {
+      "id": "pipe-record-label-prefix-twin",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "user|emailx=fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": []
+    },
+    {
+      "id": "pipe-record-dotted-key-twin",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "user|user.email=fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": []
+    },
+    {
+      "id": "pipe-table-another-cell-in-gap-twin",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| email | name | fixture876-q7m9@x4z8v2n6.synthetic |",
+      "expected": []
+    },
+    {
+      "id": "pipe-table-cells-do-not-join-into-one-label-twin",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "| card | number | 4000008770000003 |",
+      "expected": []
+    },
+    {
+      "id": "pipe-adds-no-negative-association",
+      "issue": 940,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "x|example email: fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 17,
+          "end": 51
+        }
+      ]
     }
   ]
 }

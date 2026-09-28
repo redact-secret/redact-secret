@@ -51,12 +51,13 @@
         "fieldLabel": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["direction", "maxDistance", "gap", "equidistanceAmong"],
+          "required": ["direction", "maxDistance", "gap", "equidistanceAmong", "pipeDelimiter"],
           "properties": {
             "direction": { "const": "before" },
             "maxDistance": { "const": 16 },
             "gap": { "const": "separators-and-quotes-only" },
-            "equidistanceAmong": { "const": "following-candidates" }
+            "equidistanceAmong": { "const": "following-candidates" },
+            "pipeDelimiter": { "const": "positive-field-labels" }
           }
         },
         "naturalLanguageLabel": {

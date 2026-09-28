@@ -872,11 +872,11 @@ fn context_matches(
                         let boundary_ok = view[..position]
                             .chars()
                             .next_back()
-                            .is_none_or(|character| is_context_boundary(entry.kind, character))
+                            .is_none_or(|character| is_context_boundary(entry, character))
                             && view[byte_end..]
                                 .chars()
                                 .next()
-                                .is_none_or(|character| is_context_boundary(entry.kind, character));
+                                .is_none_or(|character| is_context_boundary(entry, character));
                         if !boundary_ok {
                             continue;
                         }
@@ -894,7 +894,9 @@ fn context_matches(
                             continue;
                         }
                         if entry.kind == ContextKind::FieldLabel
-                            && !view[byte_end..].chars().all(is_field_gap)
+                            && !view[byte_end..]
+                                .chars()
+                                .all(|character| is_field_gap(entry, character))
                         {
                             continue;
                         }
@@ -962,12 +964,28 @@ fn context_matches(
     result
 }
 
-fn is_context_boundary(kind: ContextKind, character: char) -> bool {
+fn is_context_boundary(entry: &ContextEntry, character: char) -> bool {
     character.is_whitespace()
-        || (kind == ContextKind::FieldLabel && matches!(character, '"' | '\''))
+        || (entry.kind == ContextKind::FieldLabel && matches!(character, '"' | '\''))
+        || is_positive_field_label_pipe(entry, character)
 }
-fn is_field_gap(character: char) -> bool {
-    character.is_whitespace() || matches!(character, '"' | '\'')
+fn is_field_gap(entry: &ContextEntry, character: char) -> bool {
+    character.is_whitespace()
+        || matches!(character, '"' | '\'')
+        || is_positive_field_label_pipe(entry, character)
+}
+
+/// A `|` field or cell delimiter bounds a positive field label and may sit
+/// in its gap, as whitespace does, so `a|b|email=V`, `x|phone: V`, and the
+/// `| ssn | V |` cells of a pipe table associate (`pii-context/v2`,
+/// `association.fieldLabel.pipeDelimiter: positive-field-labels`, issue #940).
+/// It is not a token separator, so two cells never join into one multi-word
+/// form. A negative or neutral entry and a natural-language label keep the
+/// whitespace-only boundary: a pipe adds association, never a suppression.
+fn is_positive_field_label_pipe(entry: &ContextEntry, character: char) -> bool {
+    character == '|'
+        && entry.kind == ContextKind::FieldLabel
+        && entry.class == ContextClass::Positive
 }
 
 fn is_logical_line_break(character: char) -> bool {
@@ -1562,6 +1580,103 @@ mod tests {
             ],
         );
         assert!(mixed_domains.iter().all(Vec::is_empty));
+    }
+
+    #[test]
+    fn positive_field_label_after_a_pipe_associates_like_after_whitespace() {
+        // Issue #940: a `|` field or cell delimiter bounds a positive field
+        // label and may sit in its gap.
+        for (input, domain, expected) in [
+            ("x|email: TEST", IdentityDomain::Email, "en-email-field"),
+            ("a|b|email=TEST", IdentityDomain::Email, "en-email-field"),
+            (
+                "a|b|customer_email=TEST",
+                IdentityDomain::Email,
+                "en-email-field",
+            ),
+            ("x|phone=TEST", IdentityDomain::Phone, "en-phone-field"),
+            (
+                "| ssn | TEST |",
+                IdentityDomain::NationalId,
+                "en-us-ssn-field",
+            ),
+            (
+                "|ip|TEST|",
+                IdentityDomain::NetworkAddress,
+                "en-network-address-field",
+            ),
+            (
+                "| card number | TEST |",
+                IdentityDomain::PaymentCard,
+                "en-payment-card-field",
+            ),
+            ("x|iban: TEST", IdentityDomain::Iban, "en-iban-field"),
+            ("x|이메일=TEST", IdentityDomain::Email, "ko-email-field"),
+        ] {
+            let start = input.find("TEST").unwrap();
+            let matches = context_matches(
+                input,
+                &[(ByteRange::new(start, start + 4).unwrap(), domain)],
+            );
+            assert!(
+                matches[0].iter().any(|item| item.entry_id == expected),
+                "{input}"
+            );
+        }
+        // Benign twins: not a whole label token, another cell in the gap, two
+        // cells joined into one form, or the label on a header line.
+        for (input, domain) in [
+            ("user|emailx=TEST", IdentityDomain::Email),
+            ("user|user.email=TEST", IdentityDomain::Email),
+            ("| email | name | TEST |", IdentityDomain::Email),
+            ("| card | number | TEST |", IdentityDomain::PaymentCard),
+            (
+                "| email | phone |\n| --- | --- |\n| TEST |",
+                IdentityDomain::Email,
+            ),
+        ] {
+            let start = input.find("TEST").unwrap();
+            let matches = context_matches(
+                input,
+                &[(ByteRange::new(start, start + 4).unwrap(), domain)],
+            );
+            assert!(matches[0].is_empty(), "{input}");
+        }
+        // A pipe adds no suppression: a negative or natural-language entry
+        // keeps the whitespace-only boundary.
+        let input = "x|example email: TEST";
+        let start = input.find("TEST").unwrap();
+        let matches = context_matches(
+            input,
+            &[(
+                ByteRange::new(start, start + 4).unwrap(),
+                IdentityDomain::Email,
+            )],
+        );
+        assert!(
+            matches[0]
+                .iter()
+                .all(|item| item.class != ContextClass::Negative)
+        );
+        assert!(
+            matches[0]
+                .iter()
+                .any(|item| item.entry_id == "en-email-field")
+        );
+        let input = "x|not_ssn=TEST";
+        let start = input.find("TEST").unwrap();
+        let matches = context_matches(
+            input,
+            &[(
+                ByteRange::new(start, start + 4).unwrap(),
+                IdentityDomain::NationalId,
+            )],
+        );
+        assert!(
+            matches[0]
+                .iter()
+                .all(|item| item.class != ContextClass::Negative)
+        );
     }
 
     #[test]

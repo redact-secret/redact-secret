@@ -54,7 +54,14 @@ limits:
   `=` are a label, and the candidate starts after the `=`. The remainder must
   still be a valid local part, or there is no candidate. Any other key
   (`user=`, `emailx=`, `user.email=`) and any later `=` stay local-part
-  syntax. A combining mark or governed invisible
+  syntax. `atext` also includes `|`, so in a pipe-delimited record
+  (`id=7|email=local@domain`) the run starts at the first field
+  ([#940](https://github.com/redact-secret/redact-secret/issues/940)): each
+  `|` starts a new field, the run from it to that field's first `=` is judged
+  by the same label rule, and the first field from the left whose key is a
+  label ends the label. A `|` inside a key that is not a label (`user|emailx=`,
+  `user|user.email=`) changes nothing. A label glued to the address by `|`
+  alone (`email|local@domain`) is not split. A combining mark or governed invisible
   scalar is not accepted as either boundary, and a Unicode alphabetic or
   numeric scalar is not accepted on the domain side; the detector rejects the
   whole occurrence rather than matching a suffix or prefix. A URL
@@ -132,6 +139,8 @@ The logfmt label split (`email=local@domain`) removes the false negative of
 a labelled `key=value` record. Its cost is a real local part that literally
 begins with a reviewed email label and `=`: it is read as that label plus a
 shorter address, which is still redacted, so the range loses only the key.
+The pipe-field split (#940) has the same cost for a local part that contains
+`|label=`.
 
 False negatives include every unsupported RFC form above, single-label/local
 delivery domains, combining-mark SMTPUTF8 spellings, an address without

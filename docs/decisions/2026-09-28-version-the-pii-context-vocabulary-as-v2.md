@@ -84,3 +84,57 @@ identifier grammar never change.
   consumer that pinned `vocabulary=pii-context/v1` sees the change instead of
   a silent behaviour difference. Credential-only activation (`selectors=off`)
   carries the new vocabulary string but scans exactly as before.
+
+## Amendment: a pipe delimiter bounds a positive field label (#940)
+
+Verification of the Beta.11 batch found that a reviewed field label directly
+after a `|` never associated
+([#940](https://github.com/redact-secret/redact-secret/issues/940)). In
+`x|email=V`, `a|b|ssn: V`, or the `| phone | V |` cells of a pipe table the
+label's left neighbour is `|`, which was neither a boundary nor a separator,
+and in a pipe table the ` | ` between label and value was not an allowed gap.
+Every family was affected under `pii:us` and `pii:global`. Pipe-delimited
+records (log lines, Markdown tables, CSV-like dumps) are common in agent
+output.
+
+`pii-context/v2` now declares `association.fieldLabel.pipeDelimiter:
+positive-field-labels`: a `|` bounds a positive field-label form on either
+side and may appear in its gap, as whitespace does. It is deliberately not a
+fifth token separator:
+
+- two cells never join into one multi-word form, so `| card | number | V |`
+  stays unlabelled, and another cell in the gap (`| email | name | V |`)
+  still blocks association; a label on a header row never reaches a value on
+  a later row, because association stays on one logical line;
+- negative, neutral, and natural-language entries keep the whitespace-only
+  boundary, so the pipe adds association but never a suppression.
+  `x|example email: V` and `x|not_ssn=V` were reported before and still are.
+  Extending named negatives across pipes would trade redaction for precision,
+  which #940 did not ask for.
+
+The email family applies the same reading to its `=` label split: RFC 5322
+`atext` includes `|`, so a pipe record's local-part scan runs back over
+earlier fields, and each `|` starts a field whose key is judged by the #926
+label rule ([`email-v1`](../contracts/pii/email-v1.md)). A label glued to the
+address by `|` alone (`email|local@domain`) is not split and stays a false
+negative.
+
+**Why this amends v2 in place instead of versioning v3.** The vocabulary
+contract says a matching change requires a new version. That rule exists so a
+consumer or a frozen record that pinned an identity sees a behaviour change
+instead of a silent one. `pii-context/v2` has never been released: it exists
+only on `main` since #930, no tag, release, or published package compiles it,
+and the released beta.10 record names `pii-context/v1`, which stays
+unchanged. No frozen benchmark evidence names v2; the benchmark arrival test
+that pins the v2 identity string pins an unreleased candidate and stays
+valid. A v3 now would name a version that no release ever compiled next to
+one that no release compiled either. So the unreleased v2 is amended, and the
+version rule applies from the first release that carries it: after that, a
+further matching change is `pii-context/v3`.
+
+- False negatives removed: labelled values in pipe-delimited records and pipe
+  tables, for every PII family.
+- False positives: association alone adds none. The label must still be a
+  whole reviewed positive high-signal form of the value's own domain, directly
+  in front of it with only separators, quotes, or pipes between, within 16
+  scalars on the same line.
