@@ -90,6 +90,10 @@ WRITE_SCOPE_ALLOWLIST = {
     # read, and code-scanning upload availability is never the enforcement
     # signal.
     ("sast.yml", "opengrep", "security-events"),
+    # OpenSSF Scorecard: `security-events` uploads its SARIF to code scanning
+    # and `id-token` lets it publish signed results for the public badge.
+    ("scorecard.yml", "analysis", "security-events"),
+    ("scorecard.yml", "analysis", "id-token"),
 }
 
 # A named top-level job block: `  <job-name>:` through the line before the
