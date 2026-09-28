@@ -722,6 +722,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0064p.audit.SyntheticRevokedDopplerServiceToken00000000",
       "schemes": null
+    },
+    {
+      "type": "trigger_dev_secret_api_key",
+      "detector": "trigger-dev-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "schemes": null
+    },
+    {
+      "type": "trigger_dev_personal_access_token",
+      "detector": "trigger-dev-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0074r_pat_syntheticrevokedtriggerpatfixture1234567",
+      "schemes": null
     }
   ],
   "consumers": [

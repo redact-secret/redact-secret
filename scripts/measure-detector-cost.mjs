@@ -77,7 +77,7 @@ export const CANONICAL_IDS = [
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
   "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
-  "doppler-token",
+  "doppler-token", "trigger-dev-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -107,7 +107,7 @@ export const GROUPS = {
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
-    "atlassian-api-token", "linear-token", "travisci-api-token",
+    "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
   ],
   "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
   saas: [

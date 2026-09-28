@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 99 |
+| supported | 101 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 110.
+Coverage declarations: 112.
 
 ## Coverage by detector
 
@@ -100,6 +100,7 @@ Coverage declarations: 110.
 | terraform-cloud-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | together-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | travisci-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| trigger-dev-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -203,6 +204,8 @@ Coverage declarations: 110.
 | terraform_cloud_token | terraform-cloud-token | provider | supported | not-applicable | none |
 | together_ai_api_key | together-ai-api-key | provider | supported | not-applicable | none |
 | travisci_api_token | travisci-api-token | provider | supported | not-applicable | none |
+| trigger_dev_personal_access_token | trigger-dev-token | provider | supported | not-applicable | none |
+| trigger_dev_secret_api_key | trigger-dev-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
@@ -234,15 +237,15 @@ Coverage declarations: 110.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 110 | 0 | 0 |
-| boundary | 99 | 0 | 0 |
-| host-context | 99 | 0 | 0 |
+| adversarial | 112 | 0 | 0 |
+| boundary | 101 | 0 | 0 |
+| host-context | 101 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 110 | 0 | 0 |
-| near-miss-negative | 99 | 0 | 0 |
-| overlap | 99 | 0 | 0 |
-| positive | 99 | 0 | 0 |
-| range | 110 | 0 | 0 |
+| malformed | 112 | 0 | 0 |
+| near-miss-negative | 101 | 0 | 0 |
+| overlap | 101 | 0 | 0 |
+| positive | 101 | 0 | 0 |
+| range | 112 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

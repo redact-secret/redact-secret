@@ -60,6 +60,7 @@ mod terraform;
 mod text;
 mod together_tavily;
 mod travisci;
+mod trigger_dev;
 mod twilio;
 mod vault;
 
@@ -155,6 +156,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
         Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
         Box::new(doppler::DopplerTokenDetector),
+        Box::new(trigger_dev::TRIGGER_DEV),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -280,6 +282,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("ai21-api-key", Pack::Provider),
     ("deepgram-api-key", Pack::Provider),
     ("doppler-token", Pack::Provider),
+    ("trigger-dev-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -394,6 +397,7 @@ mod tests {
                 "ai21-api-key",
                 "deepgram-api-key",
                 "doppler-token",
+                "trigger-dev-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -748,6 +752,7 @@ mod tests {
         let gitlab_runner_input = "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct";
         let doppler_token_input =
             format!("dp.st.{}", "SyntheticRevokedDopplerServiceToken00000000");
+        let trigger_dev_token_input = format!("tr_prod_sk_{}", "SyntheticRevokedTrigger0");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -812,6 +817,7 @@ mod tests {
             ("ai21-api-key", ai21_api_key_input.as_str()),
             ("deepgram-api-key", deepgram_api_key_input.as_str()),
             ("doppler-token", doppler_token_input.as_str()),
+            ("trigger-dev-token", trigger_dev_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

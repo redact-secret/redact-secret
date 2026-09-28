@@ -19,6 +19,11 @@ evidence is linked from each published version.
     `doppler_service_account_identity_token`, `doppler_scim_token`,
     `doppler_audit_token`), with the optional service-token environment
     segment inside the span.
+  - `trigger-dev-token` (#904): Trigger.dev environment secret keys
+    (`tr_<env>_sk_` + 24 and root `tr_<env>_` + 24 or legacy 20, for the
+    four documented env slugs) as `trigger_dev_secret_api_key`, and
+    `tr_pat_` personal access tokens as `trigger_dev_personal_access_token`.
+    Public `pk_<env>_` keys, `tr_oat_` and JWT forms stay unclaimed.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

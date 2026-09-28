@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2433,
+  "fixtureCount": 2476,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -61385,6 +61385,839 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "trigger-dev-token-positive-bare",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 35
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "trigger-dev-token-positive-dotenv",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRIGGER_SECRET_KEY=\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 54
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-shell-export",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export TRIGGER_SECRET_KEY=\"\u0074r_prod_sk_SyntheticRevokedTrigger0\"\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 62
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "trigger-dev-token-positive-yaml",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: \u0074r_prod_sk_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 56
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-json-config",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"\u0074r_prod_sk_SyntheticRevokedTrigger0\"\n}\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 51
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-json-token-key",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0074r_prod_sk_SyntheticRevokedTrigger0\"}",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 46
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-python-sdk-call",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0074r_prod_sk_SyntheticRevokedTrigger0\")\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 60
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-bearer-header",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0074r_prod_sk_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 57
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-x-api-key-header",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0074r_prod_sk_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 46
+        }
+      ],
+      "note": "An X-API-Key header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-curl-bearer",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0074r_prod_sk_SyntheticRevokedTrigger0\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 66
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-tool-call-arguments",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0074r_prod_sk_SyntheticRevokedTrigger0\"}}",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 73
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-chat-sentence",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0074r_prod_sk_SyntheticRevokedTrigger0 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 50
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-log",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0074r_prod_sk_SyntheticRevokedTrigger0 for request 7",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 90
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-positive-punctuation-adjacent",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0074r_prod_sk_SyntheticRevokedTrigger0).",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 36
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "trigger-dev-token-positive-crlf-unicode-prefix",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0074r_prod_sk_SyntheticRevokedTrigger0\n\r\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 59
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "trigger-dev-token-positive-repeated-value",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigger0 \u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 35
+        },
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 71
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "trigger-dev-token-overlap-context",
+      "detector": "trigger-dev-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 48
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "trigger-dev-token-positive-personal-access-token",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_pat_syntheticrevokedtriggerpatfixture1234567",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 47
+        }
+      ],
+      "note": "A \u0074r_pat_ personal access token reports its own finding type."
+    },
+    {
+      "id": "trigger-dev-token-positive-personal-access-token-dotenv",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRIGGER_SECRET_KEY=\u0074r_pat_syntheticrevokedtriggerpatfixture1234567\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 66
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-overlap-personal-access-token-bearer",
+      "detector": "trigger-dev-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0074r_pat_syntheticrevokedtriggerpatfixture1234567\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 69
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "trigger-dev-token-positive-root-key",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_dev_SyntheticRevokedTrigger0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 31
+        }
+      ],
+      "note": "A current 24-byte root key is the environment secret key type."
+    },
+    {
+      "id": "trigger-dev-token-positive-root-key-dotenv",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRIGGER_SECRET_KEY=\u0074r_dev_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 50
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-overlap-root-key-bearer",
+      "detector": "trigger-dev-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0074r_dev_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 53
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "trigger-dev-token-positive-legacy-root-key",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_stg_SyntheticRevokedTrg0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 27
+        }
+      ],
+      "note": "A legacy 20-byte root key is the environment secret key type."
+    },
+    {
+      "id": "trigger-dev-token-positive-legacy-root-key-dotenv",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRIGGER_SECRET_KEY=\u0074r_stg_SyntheticRevokedTrg0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 46
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-overlap-legacy-root-key-bearer",
+      "detector": "trigger-dev-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0074r_stg_SyntheticRevokedTrg0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 49
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "trigger-dev-token-positive-preview-additional-key",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_preview_sk_SyntheticRevokedTrigger0",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "The preview env slug is one of the four documented slugs."
+    },
+    {
+      "id": "trigger-dev-token-positive-preview-additional-key-dotenv",
+      "detector": "trigger-dev-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRIGGER_SECRET_KEY=\u0074r_preview_sk_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 57
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "trigger-dev-token-overlap-preview-additional-key-bearer",
+      "detector": "trigger-dev-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0074r_preview_sk_SyntheticRevokedTrigger0\n",
+      "expected": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 60
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "trigger-dev-token-boundary-short-body",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigger",
+      "expected": [],
+      "note": "An additional-key body one byte short is not the reviewed shape."
+    },
+    {
+      "id": "trigger-dev-token-boundary-additional-key-21",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigg",
+      "expected": [],
+      "note": "An additional key with a 21-byte body matches neither the additional nor the root shape."
+    },
+    {
+      "id": "trigger-dev-token-boundary-long-body",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigger00",
+      "expected": [],
+      "note": "A body one byte over the exact width is a wider run, not a token."
+    },
+    {
+      "id": "trigger-dev-token-boundary-root-22",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_SyntheticRevokedTrigge",
+      "expected": [],
+      "note": "A root key width other than 20 or 24 is not claimed."
+    },
+    {
+      "id": "trigger-dev-token-boundary-dash-inside-body",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticR-vokedTrigger0",
+      "expected": [],
+      "note": "The body alphabet is alphanumeric; a dash breaks the run."
+    },
+    {
+      "id": "trigger-dev-token-boundary-unknown-env",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tr_test_SyntheticRevokedTrigger0",
+      "expected": [],
+      "note": "An env slug outside dev, stg, prod and preview is not claimed."
+    },
+    {
+      "id": "trigger-dev-token-boundary-wrong-case-prefix",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "TR_PROD_SK_SyntheticRevokedTrigger0",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "trigger-dev-token-boundary-pat-with-zero",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_pat_0yntheticrevokedtriggerpatfixture1234567",
+      "expected": [],
+      "note": "The personal-access-token alphabet excludes 0 and l."
+    },
+    {
+      "id": "trigger-dev-token-boundary-glued-suffix",
+      "detector": "trigger-dev-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigger0_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "trigger-dev-token-negative-embedded-in-wider-identifier",
+      "detector": "trigger-dev-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "s\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "trigger-dev-token-negative-public-key",
+      "detector": "trigger-dev-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The browser uses pk_prod_SyntheticRevokedTrg0 as its public key.",
+      "expected": [],
+      "note": "The pk_ public key is public by design and is never claimed."
+    },
+    {
+      "id": "trigger-dev-token-negative-placeholder",
+      "detector": "trigger-dev-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like \u0074r_dev_sk_xxxxxxxxxx or \u0074r_dev_... in the docs.",
+      "expected": [],
+      "note": "Documentation placeholders never reach the exact width."
+    },
+    {
+      "id": "trigger-dev-token-negative-identifiers",
+      "detector": "trigger-dev-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "if (\u0074r_dev_mode) { load(tr_proj_abcdefghij); }\n",
+      "expected": [],
+      "note": "Code identifiers and project refs carry no prefixed key-width run."
+    },
+    {
+      "id": "trigger-dev-token-adversarial-long-suffix",
+      "detector": "trigger-dev-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0\u0074r_prod_sk_SyntheticRevokedTrigger0",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }

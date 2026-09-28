@@ -10714,6 +10714,221 @@
       "type": "doppler_audit_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "trigger-dev-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-positive-bare",
+            "trigger-dev-token-positive-bearer-header",
+            "trigger-dev-token-positive-chat-sentence",
+            "trigger-dev-token-positive-crlf-unicode-prefix",
+            "trigger-dev-token-positive-curl-bearer",
+            "trigger-dev-token-positive-dotenv",
+            "trigger-dev-token-positive-json-config",
+            "trigger-dev-token-positive-json-token-key",
+            "trigger-dev-token-positive-legacy-root-key",
+            "trigger-dev-token-positive-legacy-root-key-dotenv",
+            "trigger-dev-token-positive-log",
+            "trigger-dev-token-positive-preview-additional-key",
+            "trigger-dev-token-positive-preview-additional-key-dotenv",
+            "trigger-dev-token-positive-punctuation-adjacent",
+            "trigger-dev-token-positive-python-sdk-call",
+            "trigger-dev-token-positive-repeated-value",
+            "trigger-dev-token-positive-root-key",
+            "trigger-dev-token-positive-root-key-dotenv",
+            "trigger-dev-token-positive-shell-export",
+            "trigger-dev-token-positive-tool-call-arguments",
+            "trigger-dev-token-positive-x-api-key-header",
+            "trigger-dev-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-overlap-context",
+            "trigger-dev-token-overlap-legacy-root-key-bearer",
+            "trigger-dev-token-overlap-preview-additional-key-bearer",
+            "trigger-dev-token-overlap-root-key-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-boundary-additional-key-21",
+            "trigger-dev-token-boundary-dash-inside-body",
+            "trigger-dev-token-boundary-glued-suffix",
+            "trigger-dev-token-boundary-long-body",
+            "trigger-dev-token-boundary-pat-with-zero",
+            "trigger-dev-token-boundary-root-22",
+            "trigger-dev-token-boundary-short-body",
+            "trigger-dev-token-boundary-unknown-env",
+            "trigger-dev-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-negative-embedded-in-wider-identifier",
+            "trigger-dev-token-negative-identifiers",
+            "trigger-dev-token-negative-placeholder",
+            "trigger-dev-token-negative-public-key"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-boundary-additional-key-21",
+            "trigger-dev-token-boundary-dash-inside-body",
+            "trigger-dev-token-boundary-glued-suffix",
+            "trigger-dev-token-boundary-long-body",
+            "trigger-dev-token-boundary-pat-with-zero",
+            "trigger-dev-token-boundary-root-22",
+            "trigger-dev-token-boundary-short-body",
+            "trigger-dev-token-boundary-unknown-env",
+            "trigger-dev-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for trigger_dev_secret_api_key (trigger-dev-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "trigger_dev_secret_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "trigger-dev-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-positive-personal-access-token",
+            "trigger-dev-token-positive-personal-access-token-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-overlap-personal-access-token-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-boundary-additional-key-21",
+            "trigger-dev-token-boundary-dash-inside-body",
+            "trigger-dev-token-boundary-glued-suffix",
+            "trigger-dev-token-boundary-long-body",
+            "trigger-dev-token-boundary-pat-with-zero",
+            "trigger-dev-token-boundary-root-22",
+            "trigger-dev-token-boundary-short-body",
+            "trigger-dev-token-boundary-unknown-env",
+            "trigger-dev-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-negative-embedded-in-wider-identifier",
+            "trigger-dev-token-negative-identifiers",
+            "trigger-dev-token-negative-placeholder",
+            "trigger-dev-token-negative-public-key"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "trigger-dev-token-boundary-additional-key-21",
+            "trigger-dev-token-boundary-dash-inside-body",
+            "trigger-dev-token-boundary-glued-suffix",
+            "trigger-dev-token-boundary-long-body",
+            "trigger-dev-token-boundary-pat-with-zero",
+            "trigger-dev-token-boundary-root-22",
+            "trigger-dev-token-boundary-short-body",
+            "trigger-dev-token-boundary-unknown-env",
+            "trigger-dev-token-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for trigger_dev_personal_access_token (trigger-dev-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "trigger_dev_personal_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -10943,6 +11158,7 @@
             "terraform-cloud-token-adversarial-near-miss-suffix",
             "together-ai-api-key-adversarial-long-suffix",
             "travisci-api-token-adversarial-dense-findings",
+            "trigger-dev-token-adversarial-long-suffix",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
@@ -11381,6 +11597,7 @@
             "terraform-cloud-token-adversarial-near-miss-suffix",
             "together-ai-api-key-adversarial-long-suffix",
             "travisci-api-token-adversarial-dense-findings",
+            "trigger-dev-token-adversarial-long-suffix",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",

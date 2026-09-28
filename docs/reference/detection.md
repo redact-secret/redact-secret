@@ -118,7 +118,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-80 built-in detectors emit 99 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+81 built-in detectors emit 101 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -202,6 +202,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `ai21-api-key` | `ai21_api_key` | `confidence-gated` | — |
 | `deepgram-api-key` | `deepgram_api_key` | `confidence-gated` | — |
 | `doppler-token` | `doppler_service_token`, `doppler_personal_token`, `doppler_cli_token`, `doppler_service_account_token`, `doppler_service_account_identity_token`, `doppler_scim_token`, `doppler_audit_token` | `always-redact` | — |
+| `trigger-dev-token` | `trigger_dev_secret_api_key`, `trigger_dev_personal_access_token` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

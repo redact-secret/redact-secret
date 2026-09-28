@@ -187,3 +187,88 @@ mod doppler {
         assert_partition_parity(&key("said", None, 44));
     }
 }
+
+mod trigger_dev {
+    use super::*;
+
+    const DETECTOR: &str = "trigger-dev-token";
+    const SECRET: &str = "trigger_dev_secret_api_key";
+    const PAT_TYPE: &str = "trigger_dev_personal_access_token";
+    const PAT_ALPHABET: &[u8] = b"123456789abcdefghijkmnopqrstuvwxyz";
+
+    fn additional(env: &str) -> String {
+        format!("tr_{env}_sk_{}", filler(ALNUM, 24, 1))
+    }
+
+    fn root(env: &str, len: usize) -> String {
+        format!("tr_{env}_{}", filler(ALNUM, len, 2))
+    }
+
+    fn pat() -> String {
+        format!("tr_pat_{}", filler(PAT_ALPHABET, 40, 3))
+    }
+
+    #[test]
+    fn every_shape_wins_every_context_as_the_sole_finding() {
+        for env in ["dev", "stg", "prod", "preview"] {
+            assert_sole_provider_finding(DETECTOR, SECRET, &additional(env));
+            assert_sole_provider_finding(DETECTOR, SECRET, &root(env, 24));
+            assert_sole_provider_finding(DETECTOR, SECRET, &root(env, 20));
+        }
+        assert_sole_provider_finding(DETECTOR, PAT_TYPE, &pat());
+    }
+
+    #[test]
+    fn no_stripe_or_elevenlabs_finding_fires_on_a_trigger_dev_key() {
+        for key in [additional("prod"), additional("dev"), root("prod", 24)] {
+            for input in contexts(&key) {
+                let (_, findings) = whole_input(&input);
+                assert!(
+                    findings
+                        .iter()
+                        .all(|f| f.detector() != "stripe-token"
+                            && f.detector() != "elevenlabs-api-key"),
+                    "{input}: {findings:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 24, 2);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("tr_prod_sk_{}", filler(ALNUM, 21, 1)),
+                format!("tr_prod_sk_{}", filler(ALNUM, 25, 1)),
+                root("prod", 22),
+                format!("tr_test_{body}"),
+                format!("TR_PROD_{body}"),
+                format!("str_prod_{body}"),
+                format!("tr_pat_{}", filler(PAT_ALPHABET, 39, 3)),
+                format!("tr_pat_0{}", filler(PAT_ALPHABET, 39, 3)),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let public = filler(ALNUM, 20, 4);
+        for input in [
+            format!("pk_dev_{public}"),
+            format!("TRIGGER_PUBLIC_KEY=pk_prod_{public}\n"),
+            "TRIGGER_SECRET_KEY=tr_dev_sk_xxxxxxxxxx\n".to_owned(),
+            "project ref tr_proj_abcdefghij\n".to_owned(),
+            "if (tr_dev_mode) { start(); }\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&additional("preview"));
+        assert_partition_parity(&pat());
+    }
+}

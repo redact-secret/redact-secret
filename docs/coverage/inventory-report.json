@@ -4327,12 +4327,102 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "doppler_audit_token"
+    },
+    {
+      "detector": "trigger-dev-token",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "trigger-dev-token-positive-bare",
+        "trigger-dev-token-positive-bearer-header",
+        "trigger-dev-token-positive-chat-sentence",
+        "trigger-dev-token-positive-crlf-unicode-prefix",
+        "trigger-dev-token-positive-curl-bearer",
+        "trigger-dev-token-positive-dotenv",
+        "trigger-dev-token-positive-json-config",
+        "trigger-dev-token-positive-json-token-key",
+        "trigger-dev-token-positive-legacy-root-key",
+        "trigger-dev-token-positive-legacy-root-key-dotenv",
+        "trigger-dev-token-positive-log",
+        "trigger-dev-token-positive-preview-additional-key",
+        "trigger-dev-token-positive-preview-additional-key-dotenv",
+        "trigger-dev-token-positive-punctuation-adjacent",
+        "trigger-dev-token-positive-python-sdk-call",
+        "trigger-dev-token-positive-repeated-value",
+        "trigger-dev-token-positive-root-key",
+        "trigger-dev-token-positive-root-key-dotenv",
+        "trigger-dev-token-positive-shell-export",
+        "trigger-dev-token-positive-tool-call-arguments",
+        "trigger-dev-token-positive-x-api-key-header",
+        "trigger-dev-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "trigger_dev_secret_api_key"
+    },
+    {
+      "detector": "trigger-dev-token",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "trigger-dev-token-positive-personal-access-token",
+        "trigger-dev-token-positive-personal-access-token-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "trigger_dev_personal_access_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 99,
+    "supported": 101,
     "unresolved": 0
   }
 }
