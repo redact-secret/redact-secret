@@ -114,13 +114,15 @@ The binding and package layout is:
 
 Host integrations live in that separate repository, not here, so a host-SDK
 release never re-qualifies this repository's own release matrix
-(`decision-graduate-adapters-to-a-separate-repository`). MCP is deliberately
-excluded from that repository: `examples/mcp-redact/` wraps the incremental
-sanitizer, a stateful surface materially wider than the four-item core
-contract (`initialize()`, `scanAndRedact()`'s result shape, `finding.action`,
-`findings` as an array) that repository's adapters depend on, and it is not
-protected by any declared host version range. It stays an example in this
-repository.
+(`decision-graduate-adapters-to-a-separate-repository`). The
+`examples/mcp-redact/` example is deliberately excluded from that repository:
+it wraps the incremental sanitizer, a stateful surface materially wider than
+the four-item core contract (`initialize()`, `scanAndRedact()`'s result shape,
+`finding.action`, `findings` as an array) that repository's adapters depend
+on, and it is not protected by any declared host version range. It stays an
+example in this repository. The `@redact-secret/adapter-mcp` package that
+implements the MCP boundary itself does live in the adapters repository (see
+below); only the example wrapper is excluded.
 
 The AI-context boundary is the one deliberate widening of that surface
 (`decision-define-the-framework-neutral-ai-context-boundary-contract`):
@@ -704,12 +706,14 @@ the deterministic core or create another authoritative detector implementation.
 
 Structured PII whose shape can be decided deterministically (email address,
 payment card, IPv4/IPv6 address, IBAN, US SSN, and phone number in constrained
-context) is not excluded. It is planned for beta.10 on the shared evidence
-foundation under the accepted
+context) is not excluded. All six families are implemented on the shared
+evidence foundation under the accepted
 [`pii-v1` domain, scope, arbitration, and activation contract](./docs/decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
 ([#578](https://github.com/redact-secret/redact-secret/issues/578),
-[#579](https://github.com/redact-secret/redact-secret/issues/579)). That model
-keeps type evidence separate from sensitivity, uses explicit global or
+[#579](https://github.com/redact-secret/redact-secret/issues/579)), merged
+into the unreleased beta.10 candidate pending #579's remaining
+runtime/profile/artifact-size and cross-domain qualification evidence. That
+model keeps type evidence separate from sensitivity, uses explicit global or
 jurisdictional scope, and makes PII activation orthogonal to the existing
 `full`/`common` credential profiles. Its English/Korean context input is the
 validated, non-runtime [`pii-context/v1` contract](./docs/contracts/pii/pii-context-v1.json),
