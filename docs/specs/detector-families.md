@@ -91,6 +91,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `notion_integration_token` | `notion-token` | `always-redact` | [Freeze the Notion integration token grammar as two exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `npm_access_token` | `npm-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `okta_api_token` | `okta-api-token` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::okta`'s own module doc, per issue #315 |
+| `onepassword_service_account_token` | `onepassword-service-account-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (1Password docs: prefix and Base64url encoding; the 250-byte floor is project policy), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `openai_admin_api_key` | `openai-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #774 splits the `sk-admin-` namespace out of the shared `openai_api_key` type (materially different blast radius: an organization Admin API key, not a project/service-account key). Grammar untouched: still the T2 marker-gated 58/74-byte contract from [#863](https://github.com/redact-secret/redact-secret/issues/863), [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `openai_api_key` | `openai-token` | `always-redact` | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `openrouter_api_key` | `openrouter-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -582,6 +583,7 @@ core conformance and the benchmarks arrival and profile evidence.
 | Family | Detector | Contract | Finding types | Tier |
 | --- | --- | --- | --- | --- |
 | `convex:deployment-key` | `convex-deployment-key` | optional `prod:`/`dev:` + cloud name `[a-z]+-[a-z]+-[0-9]+`, or `preview:`/`project:` + `<slug>:<slug>`; or an untyped `[a-z0-9][a-z0-9-]{0,62}` name; then one `\|`, then `01` + lowercase hex, even length 74–96. The whole key, lead and name included, is the span. The key must start at the input start or after a byte outside `[A-Za-z0-9_:-]` | `convex_deployment_key` | T1 (backend `format_admin_key` and key broker; the 74–96 range is derived from the generator) |
+| `onepassword:service-account-token` | `onepassword-service-account-token` | `ops_eyJ` + at least 250 Base64url `[A-Za-z0-9_-]` bytes, no upper bound, plus up to two `=` inside the span; after the padding the next byte must not be `[A-Za-z0-9_-]`, `+`, `/` or `=` | `onepassword_service_account_token` | T1 (provider docs: `ops_` prefix and Base64url-encoded JSON; floor is policy) |
 
 Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
 [handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
@@ -600,6 +602,20 @@ untyped key claimed from the name on. False positives: a non-Convex
 Cost: one scan for `|`, then at most 97 bytes right and 137 bytes left per
 candidate.
 
+1Password ([#913](https://github.com/redact-secret/redact-secret/issues/913),
+[handoff](../audits/evidence/860/onepassword.md)). The token is serialized
+user data, so there is no fixed length (the one T1 example is 634 bytes); the
+250-byte floor only rejects identifiers and placeholders and matches the
+gitleaks floor. The alphabet is the provider's stated Base64url class, not
+the alphanumeric samples', so a token containing `-` or `_` is never
+truncated. Connect server tokens stay with `jwt`, and `op://` references stay
+excluded by `generic-token`. False negatives: a token under the floor, a
+future serialization without the `eyJ` lead, a token truncated below the
+floor by a log line limit, and a glued standard-Base64 tail. False positives:
+`ops_` + any Base64url JSON blob of 250+ bytes that is not a service-account
+token; none is known. Cost: one literal search and one run per occurrence;
+the scan resumes after the run, so it stays linear.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -617,6 +633,7 @@ candidate.
 | Firecrawl `fc-` + a dashless lowercase UUIDv4 (32 hex, version and variant nibbles enforced) is reported as `firecrawl_api_key` at provider specificity, bare or in any context; legacy dashed UUIDs, `fco_` and `fcmcp_` stay unclaimed ([#908](https://github.com/redact-secret/redact-secret/issues/908), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | Composio `ak_` + 20 (mixed-case guard), `oak_` + 20 and `uak_` + 43 `[A-Za-z0-9_-]` keys are reported as three finding types at provider specificity, bare or in any context; `ck_`, `cak_` and `uak_` at other widths stay unclaimed ([#909](https://github.com/redact-secret/redact-secret/issues/909), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family, with the `uak_` width fixed by ruling R6 |
 | Convex `<name>\|01<hex>` deployment and admin keys (typed `prod`/`dev`/`preview`/`project` lead or untyped self-hosted name; even 74–96 lowercase hex body led by `01`) are reported as `convex_deployment_key` at provider specificity over the whole key; the `eyJ2` cloud body stays unclaimed until its issuance check ([#912](https://github.com/redact-secret/redact-secret/issues/912), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| 1Password `ops_eyJ` service-account tokens (at least 250 Base64url bytes after the lead, up to two `=` inside the span) are reported as `onepassword_service_account_token` at provider specificity, bare or in any context ([#913](https://github.com/redact-secret/redact-secret/issues/913), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 111 |
+| supported | 112 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 122.
+Coverage declarations: 123.
 
 ## Coverage by detector
 
@@ -81,6 +81,7 @@ Coverage declarations: 122.
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | okta-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| onepassword-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -190,6 +191,7 @@ Coverage declarations: 122.
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
 | okta_api_token | okta-api-token | provider | supported | not-applicable | none |
+| onepassword_service_account_token | onepassword-service-account-token | provider | supported | not-applicable | none |
 | openai_admin_api_key | openai-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
@@ -253,15 +255,15 @@ Coverage declarations: 122.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 122 | 0 | 0 |
-| boundary | 111 | 0 | 0 |
-| host-context | 111 | 0 | 0 |
+| adversarial | 123 | 0 | 0 |
+| boundary | 112 | 0 | 0 |
+| host-context | 112 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 122 | 0 | 0 |
-| near-miss-negative | 111 | 0 | 0 |
-| overlap | 111 | 0 | 0 |
-| positive | 111 | 0 | 0 |
-| range | 122 | 0 | 0 |
+| malformed | 123 | 0 | 0 |
+| near-miss-negative | 112 | 0 | 0 |
+| overlap | 112 | 0 | 0 |
+| positive | 112 | 0 | 0 |
+| range | 123 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

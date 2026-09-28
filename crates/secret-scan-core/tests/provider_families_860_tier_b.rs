@@ -198,3 +198,85 @@ mod convex {
         assert_partition_parity(&format!("preview:acme-team:web-app|{}", body(80, 9)));
     }
 }
+
+mod onepassword {
+    use super::*;
+
+    const DETECTOR: &str = "onepassword-service-account-token";
+    const TYPE: &str = "onepassword_service_account_token";
+
+    fn token(len: usize, seed: usize) -> String {
+        format!("ops_eyJ{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        let mut dashed = filler(ALNUM, 600, 4);
+        dashed.replace_range(100..101, "-");
+        dashed.replace_range(300..301, "_");
+        for key in [
+            token(250, 1),
+            token(627, 2),
+            token(866, 3),
+            format!("ops_eyJ{dashed}"),
+            format!("{}=", token(626, 5)),
+            format!("{}==", token(625, 6)),
+        ] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("OP_SERVICE_ACCOUNT_TOKEN={key}\n"),
+                format!("jobs:\n  deploy:\n    env:\n      OP_SERVICE_ACCOUNT_TOKEN: {key}\n"),
+                format!("OP_SERVICE_ACCOUNT_TOKEN={key} op item get deploy --vault ci\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"op\":{{\"env\":{{\"OP_SERVICE_ACCOUNT_TOKEN\":\"{key}\"}}}}}}}}"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 600, 7);
+        let mut plus = body.clone();
+        plus.replace_range(200..201, "+");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token(249, 7),
+                format!("ops_eyj{body}"),
+                format!("OPS_eyJ{body}"),
+                format!("ops-eyJ{body}"),
+                format!("ops_eyJ{plus}"),
+                format!("xops_eyJ{body}"),
+                format!("ops_eyJ{body}/"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let connect_jwt = format!(
+            "eyJ{}.eyJ{}.{}",
+            filler(ALNUM, 40, 8),
+            filler(ALNUM, 520, 9),
+            filler(ALNUM, 43, 10)
+        );
+        for input in [
+            "OP_SERVICE_ACCOUNT_TOKEN=ops_...\n".to_owned(),
+            "op read op://Private/item/credential\n".to_owned(),
+            "fn ops_function_name() {}\n".to_owned(),
+            "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_TOKEN }}\n".to_owned(),
+            format!("OP_CONNECT_TOKEN={connect_jwt}\n"),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&token(260, 11));
+        assert_partition_parity(&format!("{}==", token(300, 12)));
+    }
+}

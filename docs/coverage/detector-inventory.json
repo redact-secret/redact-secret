@@ -806,6 +806,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0063onvex-self-hosted|01deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
       "schemes": null
+    },
+    {
+      "type": "onepassword_service_account_token",
+      "detector": "onepassword-service-account-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006fps_eyJSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixture",
+      "schemes": null
     }
   ],
   "consumers": [

@@ -12050,6 +12050,131 @@
       "type": "convex_deployment_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "onepassword-service-account-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "onepassword-service-account-token-positive-b64url-mix",
+            "onepassword-service-account-token-positive-b64url-mix-dotenv",
+            "onepassword-service-account-token-positive-bare",
+            "onepassword-service-account-token-positive-body-866",
+            "onepassword-service-account-token-positive-body-866-dotenv",
+            "onepassword-service-account-token-positive-body-floor",
+            "onepassword-service-account-token-positive-body-floor-dotenv",
+            "onepassword-service-account-token-positive-chat-sentence",
+            "onepassword-service-account-token-positive-crlf-unicode-prefix",
+            "onepassword-service-account-token-positive-curl-bearer",
+            "onepassword-service-account-token-positive-dotenv",
+            "onepassword-service-account-token-positive-double-padding",
+            "onepassword-service-account-token-positive-double-padding-dotenv",
+            "onepassword-service-account-token-positive-github-actions-env",
+            "onepassword-service-account-token-positive-json-config",
+            "onepassword-service-account-token-positive-json-token-key",
+            "onepassword-service-account-token-positive-log",
+            "onepassword-service-account-token-positive-mcp-env-block",
+            "onepassword-service-account-token-positive-punctuation-adjacent",
+            "onepassword-service-account-token-positive-python-sdk-call",
+            "onepassword-service-account-token-positive-repeated-value",
+            "onepassword-service-account-token-positive-shell-export",
+            "onepassword-service-account-token-positive-single-padding",
+            "onepassword-service-account-token-positive-single-padding-dotenv",
+            "onepassword-service-account-token-positive-tool-call-arguments",
+            "onepassword-service-account-token-positive-x-api-key-header",
+            "onepassword-service-account-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "onepassword-service-account-token-overlap-b64url-mix-bearer",
+            "onepassword-service-account-token-overlap-bearer-header",
+            "onepassword-service-account-token-overlap-body-866-bearer",
+            "onepassword-service-account-token-overlap-body-floor-bearer",
+            "onepassword-service-account-token-overlap-context",
+            "onepassword-service-account-token-overlap-double-padding-bearer",
+            "onepassword-service-account-token-overlap-single-padding-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "onepassword-service-account-token-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "onepassword-service-account-token-boundary-dash-prefix",
+            "onepassword-service-account-token-boundary-glued-prefix",
+            "onepassword-service-account-token-boundary-glued-slash-suffix",
+            "onepassword-service-account-token-boundary-lowercase-json-lead",
+            "onepassword-service-account-token-boundary-standard-base64-plus",
+            "onepassword-service-account-token-boundary-triple-padding",
+            "onepassword-service-account-token-boundary-under-floor",
+            "onepassword-service-account-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "onepassword-service-account-token-negative-ci-secret-reference",
+            "onepassword-service-account-token-negative-identifier",
+            "onepassword-service-account-token-negative-placeholders",
+            "onepassword-service-account-token-negative-secret-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "onepassword-service-account-token-boundary-dash-prefix",
+            "onepassword-service-account-token-boundary-glued-prefix",
+            "onepassword-service-account-token-boundary-glued-slash-suffix",
+            "onepassword-service-account-token-boundary-lowercase-json-lead",
+            "onepassword-service-account-token-boundary-standard-base64-plus",
+            "onepassword-service-account-token-boundary-triple-padding",
+            "onepassword-service-account-token-boundary-under-floor",
+            "onepassword-service-account-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for onepassword_service_account_token (onepassword-service-account-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "onepassword_service_account_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12257,6 +12382,7 @@
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "okta-api-token-adversarial-dense-findings",
+            "onepassword-service-account-token-adversarial-long-run",
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
@@ -12703,6 +12829,7 @@
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "okta-api-token-adversarial-dense-findings",
+            "onepassword-service-account-token-adversarial-long-run",
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",

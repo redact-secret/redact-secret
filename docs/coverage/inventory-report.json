@@ -4909,12 +4909,73 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "convex_deployment_key"
+    },
+    {
+      "detector": "onepassword-service-account-token",
+      "evidence": {
+        "fixtureCount": 47,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "onepassword-service-account-token-positive-b64url-mix",
+        "onepassword-service-account-token-positive-b64url-mix-dotenv",
+        "onepassword-service-account-token-positive-bare",
+        "onepassword-service-account-token-positive-body-866",
+        "onepassword-service-account-token-positive-body-866-dotenv",
+        "onepassword-service-account-token-positive-body-floor",
+        "onepassword-service-account-token-positive-body-floor-dotenv",
+        "onepassword-service-account-token-positive-chat-sentence",
+        "onepassword-service-account-token-positive-crlf-unicode-prefix",
+        "onepassword-service-account-token-positive-curl-bearer",
+        "onepassword-service-account-token-positive-dotenv",
+        "onepassword-service-account-token-positive-double-padding",
+        "onepassword-service-account-token-positive-double-padding-dotenv",
+        "onepassword-service-account-token-positive-github-actions-env",
+        "onepassword-service-account-token-positive-json-config",
+        "onepassword-service-account-token-positive-json-token-key",
+        "onepassword-service-account-token-positive-log",
+        "onepassword-service-account-token-positive-mcp-env-block",
+        "onepassword-service-account-token-positive-punctuation-adjacent",
+        "onepassword-service-account-token-positive-python-sdk-call",
+        "onepassword-service-account-token-positive-repeated-value",
+        "onepassword-service-account-token-positive-shell-export",
+        "onepassword-service-account-token-positive-single-padding",
+        "onepassword-service-account-token-positive-single-padding-dotenv",
+        "onepassword-service-account-token-positive-tool-call-arguments",
+        "onepassword-service-account-token-positive-x-api-key-header",
+        "onepassword-service-account-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "onepassword_service_account_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 111,
+    "supported": 112,
     "unresolved": 0
   }
 }

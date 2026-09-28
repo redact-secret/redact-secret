@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2757,
+  "fixtureCount": 2804,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -67576,6 +67576,936 @@
       "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
       "expected": [],
       "note": "A long run of glued keys is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-bare",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 634
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-dotenv",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OP_SERVICE_ACCOUNT_TOKEN=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 659
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-shell-export",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export OP_SERVICE_ACCOUNT_TOKEN=\"\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\"\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 667
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-yaml",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  OP_SERVICE_ACCOUNT_TOKEN: \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 667
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-json-config",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"OP_SERVICE_ACCOUNT_TOKEN\": \"\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\"}",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 664
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-json-token-key",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\"}",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 645
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-python-sdk-call",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\")",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 659
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-bearer-header",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 656
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-x-api-key-header",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 645
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-curl-bearer",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 665
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-tool-call-arguments",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\"}}",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 672
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-chat-sentence",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 649
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-log",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur for request 7",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 689
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-punctuation-adjacent",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur).",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 635
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-crlf-unicode-prefix",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\n\r\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 658
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-context",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 647
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-repeated-value",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 634
+        },
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 635,
+          "end": 1269
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-body-floor",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOn",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 257
+        }
+      ],
+      "note": "The body-floor shape is reported on its own."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-body-floor-dotenv",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OP_SERVICE_ACCOUNT_TOKEN=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOn",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 282
+        }
+      ],
+      "note": "The body-floor shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-body-floor-bearer",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOn\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 279
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-body-866",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture012345",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 873
+        }
+      ],
+      "note": "The body-866 shape is reported on its own."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-body-866-dotenv",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OP_SERVICE_ACCOUNT_TOKEN=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture012345",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 898
+        }
+      ],
+      "note": "The body-866 shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-body-866-bearer",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture012345\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 895
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-b64url-mix",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF-xture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticR_vokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 607
+        }
+      ],
+      "note": "A Base64url body carrying - and _ is reported whole on its own."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-b64url-mix-dotenv",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OP_SERVICE_ACCOUNT_TOKEN=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF-xture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticR_vokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 632
+        }
+      ],
+      "note": "A Base64url body carrying - and _ in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-b64url-mix-bearer",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF-xture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticR_vokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 629
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-single-padding",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtu=",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 634
+        }
+      ],
+      "note": "The single-padding shape is reported on its own."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-single-padding-dotenv",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OP_SERVICE_ACCOUNT_TOKEN=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtu=",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 659
+        }
+      ],
+      "note": "The single-padding shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-single-padding-bearer",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtu=\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 656
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-double-padding",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixt==",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 634
+        }
+      ],
+      "note": "The double-padding shape is reported on its own."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-double-padding-dotenv",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OP_SERVICE_ACCOUNT_TOKEN=\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixt==",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 659
+        }
+      ],
+      "note": "The double-padding shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "onepassword-service-account-token-overlap-double-padding-bearer",
+      "detector": "onepassword-service-account-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixt==\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 656
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-under-floor",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedO",
+      "expected": [],
+      "note": "249 Base64url bytes after \u006fps_eyJ is under the 250-byte floor."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-lowercase-json-lead",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ops_eyjSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [],
+      "note": "The body must begin eyJ, the Base64 of a JSON object."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-uppercase-prefix",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "OPS_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [],
+      "note": "The documented prefix is lowercase ops_."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-dash-prefix",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ops-eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [],
+      "note": "The documented separator is an underscore."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-standard-base64-plus",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswor+ServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [],
+      "note": "A standard-Base64 + ends the run under the floor; the rest is not claimed."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-glued-prefix",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP",
+      "expected": [],
+      "note": "A byte glued before the prefix makes it part of a wider identifier."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-glued-slash-suffix",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP/",
+      "expected": [],
+      "note": "A glued standard-Base64 / rejects the match rather than truncating it."
+    },
+    {
+      "id": "onepassword-service-account-token-boundary-triple-padding",
+      "detector": "onepassword-service-account-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOneP===",
+      "expected": [],
+      "note": "Base64 has at most two padding bytes; a third rejects the match."
+    },
+    {
+      "id": "onepassword-service-account-token-negative-placeholders",
+      "detector": "onepassword-service-account-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Set OP_SERVICE_ACCOUNT_TOKEN to ops_... (shown as ops_*** in the console).",
+      "expected": [],
+      "note": "Placeholders and masks fail the eyJ lead or the floor."
+    },
+    {
+      "id": "onepassword-service-account-token-negative-secret-reference",
+      "detector": "onepassword-service-account-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "op read \"op://Private/deploy-item/credential\"\n",
+      "expected": [],
+      "note": "An op:// secret reference names an item; it is not a token."
+    },
+    {
+      "id": "onepassword-service-account-token-negative-identifier",
+      "detector": "onepassword-service-account-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fn ops_function_name() -> Result<(), Error> { Ok(()) }\n",
+      "expected": [],
+      "note": "An ops_ identifier fails the eyJ lead."
+    },
+    {
+      "id": "onepassword-service-account-token-negative-ci-secret-reference",
+      "detector": "onepassword-service-account-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_TOKEN }}\n",
+      "expected": [],
+      "note": "A CI secret reference is not a token."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-github-actions-env",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "jobs:\n  deploy:\n    env:\n      OP_SERVICE_ACCOUNT_TOKEN: \u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\n    steps:\n      - run: op run -- ./deploy.sh\n",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 57,
+          "end": 691
+        }
+      ],
+      "note": "A GitHub Actions env map is reported at exactly the token."
+    },
+    {
+      "id": "onepassword-service-account-token-positive-mcp-env-block",
+      "detector": "onepassword-service-account-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\":{\"1password\":{\"command\":\"op-mcp\",\"env\":{\"OP_SERVICE_ACCOUNT_TOKEN\":\"\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountFixtur\"}}}}",
+      "expected": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 82,
+          "end": 716
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the token."
+    },
+    {
+      "id": "onepassword-service-account-token-adversarial-long-run",
+      "detector": "onepassword-service-account-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+\u006fps_eyJSyntheticRevokedOnePasswordServiceAccountFixture0123456789SyntheticRevokedOnePasswordServiceAccountF+",
+      "expected": [],
+      "note": "Prefixed runs broken by a standard-Base64 byte never reach the floor; the scan reads each byte once and stays bounded."
     }
   ]
 }

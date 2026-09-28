@@ -54,6 +54,9 @@ evidence is linked from each published version.
   - `convex-deployment-key` (#912): Convex `<name>|01<hex>` deployment
     and admin keys (`convex_deployment_key`), typed lead and name inside the
     span; the issuance-gated `eyJ2` cloud body stays unclaimed.
+  - `onepassword-service-account-token` (#913): 1Password `ops_eyJ`
+    service-account tokens (`onepassword_service_account_token`), Base64url
+    body of at least 250 bytes with its padding inside the span.
 
 ### Fixed
 
