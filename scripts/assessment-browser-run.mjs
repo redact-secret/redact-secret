@@ -129,6 +129,9 @@ async function bundleHarness(artifactDir, outFile) {
     alias: {
       "@redact-secret/core": PACKAGE_ENTRY,
       "@redact-secret/wasm": join(artifactDir, "redact_secret_wasm.js"),
+      // Named by the facade's PII-only dynamic import (#937); this PII-off
+      // harness never fetches it.
+      "@redact-secret/wasm/pii": join(artifactDir, "redact_secret_wasm_pii.js"),
     },
     logLevel: "silent",
   });
