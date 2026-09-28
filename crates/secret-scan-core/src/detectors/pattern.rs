@@ -307,6 +307,19 @@ pub(super) fn open_floor_run_end(
     }
 }
 
+/// The bytes that can begin one of `prefixes`: every prefix's first byte, or
+/// every byte when a prefix is empty (an empty prefix matches everywhere).
+fn prefix_first_bytes<'a>(prefixes: impl Iterator<Item = &'a str>) -> [bool; 256] {
+    let mut first_bytes = [false; 256];
+    for prefix in prefixes {
+        match prefix.as_bytes().first() {
+            Some(&byte) => first_bytes[usize::from(byte)] = true,
+            None => return [true; 256],
+        }
+    }
+    first_bytes
+}
+
 /// Finds every non-overlapping `(prefix, run)` match, left to right, the way
 /// a global regex of `(?:prefix1|prefix2|...)run{...}` would: at each
 /// position, the longest literal prefix that matches wins (the prefix sets
@@ -323,6 +336,12 @@ pub(super) fn scan_prefixed_runs(
     alphabet: Alphabet,
     boundary: Alphabet,
 ) -> Vec<(usize, usize)> {
+    // A call over input with no byte that can begin a prefix returns before
+    // building the shape list (issue #950); see `scan_prefixed_shapes`.
+    let first_bytes = prefix_first_bytes(prefixes.iter().copied());
+    if !input.bytes().any(|byte| first_bytes[usize::from(byte)]) {
+        return Vec::new();
+    }
     let shapes: Vec<PrefixShape<'_>> = prefixes
         .iter()
         .map(|prefix| PrefixShape {
@@ -361,63 +380,56 @@ pub(super) fn scan_prefixed_shapes(
     boundary: Alphabet,
 ) -> Vec<(usize, usize, &'static [&'static str])> {
     let bytes = input.as_bytes();
-    // Function-pointer identity (`std::ptr::fn_addr_eq`, not `==`, whose
-    // result the compiler does not guarantee is meaningful) is enough here:
-    // grouping and lookup both use it, so a same-address false positive
-    // between two distinct `Alphabet` functions would only make this scan
-    // share a run-ends table those functions' identical code already makes
-    // interchangeable. `shape_table[i]` records, once, which table each
-    // `shapes[i]` resolved to, so matching a shape later is a plain index
-    // rather than a fallible re-lookup.
-    let mut alphabets: Vec<Alphabet> = Vec::new();
-    let shape_table: Vec<usize> = shapes
-        .iter()
-        .map(|shape| {
-            if let Some(index) = alphabets
-                .iter()
-                .position(|&a| std::ptr::fn_addr_eq(a, shape.alphabet))
-            {
-                index
-            } else {
-                alphabets.push(shape.alphabet);
-                alphabets.len() - 1
-            }
-        })
-        .collect();
-    // Run-end tables are built on first use: most inputs contain no prefix
-    // at all, and an eager table costs a pass and an allocation per alphabet.
-    let mut tables: Vec<Option<Vec<usize>>> = vec![None; alphabets.len()];
     // Bytes that can begin some prefix. A position outside this set cannot
     // match any shape, so it skips the per-shape comparison entirely. An
     // empty prefix matches everywhere and disables the filter.
-    let mut first_bytes = [false; 256];
-    for shape in shapes {
-        match shape.prefix.as_bytes().first() {
-            Some(&byte) => first_bytes[usize::from(byte)] = true,
-            None => first_bytes = [true; 256],
-        }
-    }
+    let first_bytes = prefix_first_bytes(shapes.iter().map(|shape| shape.prefix));
+    // The scan starts at the first byte that can begin a prefix. Input with
+    // none, the common case, returns here, before the per-scan tables below
+    // are allocated: a whole scan pays that setup once, but an incremental
+    // session calls every detector once per closed line (issue #950).
+    let Some(mut start) = bytes
+        .iter()
+        .position(|&byte| first_bytes[usize::from(byte)])
+    else {
+        return Vec::new();
+    };
+    // Run-end tables are built on first use, one per distinct alphabet:
+    // most inputs contain no prefix at all, and an eager table costs a pass
+    // and an allocation per alphabet. Function-pointer identity
+    // (`std::ptr::fn_addr_eq`, not `==`, whose result the compiler does not
+    // guarantee is meaningful) is enough to share a table: a same-address
+    // false positive between two distinct `Alphabet` functions would only
+    // share a table those functions' identical code already makes
+    // interchangeable. `Vec::new` does not allocate, so a scan that finds no
+    // prefix never allocates here (issue #950).
+    let mut tables: Vec<(Alphabet, Vec<usize>)> = Vec::new();
 
     let mut matches = Vec::new();
-    let mut start = 0;
     while start < bytes.len() {
         if !first_bytes[usize::from(bytes[start])] {
             start += 1;
             continue;
         }
-        let Some((shape_index, shape)) = shapes
+        let Some(shape) = shapes
             .iter()
-            .enumerate()
-            .filter(|(_, shape)| bytes[start..].starts_with(shape.prefix.as_bytes()))
-            .max_by_key(|(_, shape)| shape.prefix.len())
+            .filter(|shape| bytes[start..].starts_with(shape.prefix.as_bytes()))
+            .max_by_key(|shape| shape.prefix.len())
         else {
             start += 1;
             continue;
         };
 
-        let table_index = shape_table[shape_index];
-        let ends =
-            tables[table_index].get_or_insert_with(|| run_ends(bytes, alphabets[table_index]));
+        let table_index = if let Some(index) = tables
+            .iter()
+            .position(|&(alphabet, _)| std::ptr::fn_addr_eq(alphabet, shape.alphabet))
+        {
+            index
+        } else {
+            tables.push((shape.alphabet, run_ends(bytes, shape.alphabet)));
+            tables.len() - 1
+        };
+        let ends = &tables[table_index].1;
         let suffix_start = start + shape.prefix.len();
         let available = ends[suffix_start] - suffix_start;
         let matched_len = match shape.run {
