@@ -341,25 +341,28 @@ langfuse = Langfuse(mask=mask_secrets)
 Wire the same detection into application logging, alongside pino's own
 path-based `redact` or Python's standard `logging`, so a secret in a
 message, a field, or an error's text never reaches a log destination, with
-the released [`@redact-secret/adapter-pino`](https://www.npmjs.com/package/@redact-secret/adapter-pino).
-See the [logging reference](examples/logging-redaction/) for the trust zone,
-the failure behavior, and what it does not cover, and for the Python
-`logging.Filter`.
+the released [`@redact-secret/adapter-pino`](https://www.npmjs.com/package/@redact-secret/adapter-pino)
+or the released [`redact-secret-adapters`](https://pypi.org/project/redact-secret-adapters/)
+`logging.Filter`. See the [logging reference](examples/logging-redaction/)
+for the trust zone, the failure behavior, and what it does not cover.
 
 ```js
 import pino from "pino";
-import { createRedactingLogMethod } from "@redact-secret/adapter-pino";
+import { createRedactingLogMethod, createRedactingStreamWrite } from "@redact-secret/adapter-pino";
 
-const logMethod = await createRedactingLogMethod();
-const logger = pino({ hooks: { logMethod } });
+const logger = pino({
+  hooks: {
+    logMethod: await createRedactingLogMethod(),
+    streamWrite: await createRedactingStreamWrite(), // bindings and mixin() output never pass logMethod
+  },
+});
 ```
 
 ```python
 import logging
-import redact_secret
-from logging_filter import RedactSecretFilter
+from redact_secret_adapters.logging_filter import RedactSecretFilter
 
-handler.addFilter(RedactSecretFilter(redact_secret.scan_and_redact))
+handler.addFilter(RedactSecretFilter())
 ```
 
 ## CLI quick start
