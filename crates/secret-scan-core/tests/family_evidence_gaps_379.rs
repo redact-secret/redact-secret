@@ -329,3 +329,76 @@ fn issue_933_previous_line_provider_context_is_read_in_bounded_layouts() {
         );
     }
 }
+
+// ---------------------------------------------------------------- #931
+
+fn mailchimp_key(datacenter: &str) -> String {
+    format!("{}-{datacenter}", synthetic(LOWER_HEX, 32, 3))
+}
+
+#[test]
+fn issue_931_a_complete_mailchimp_key_warns_without_a_same_line_keyword() {
+    for (input, value) in [
+        {
+            let k = mailchimp_key("us14");
+            (
+                format!(
+                    "import requests\n\nresp = requests.get(\n    \"https://us14.api.mailchimp.com/3.0/lists\",\n    auth=(\"anystring\", \"{k}\"),\n    timeout=10,\n)\n"
+                ),
+                k,
+            )
+        },
+        {
+            let k = mailchimp_key("us6");
+            (
+                format!(
+                    "The nightly export broke after the account move. The key in the runbook is {k}. Can someone confirm it was revoked?\n"
+                ),
+                k,
+            )
+        },
+        {
+            let k = mailchimp_key("us19");
+            (
+                format!(
+                    "> GET /3.0/campaigns HTTP/1.1\n> Host: us19.api.mailchimp.com\n> Authorization: apikey {k}\n"
+                ),
+                k,
+            )
+        },
+    ] {
+        let findings = findings_with_parity(&input);
+        let mailchimp: Vec<&Finding> = findings
+            .iter()
+            .filter(|f| f.type_name() == "mailchimp_api_key")
+            .collect();
+        assert_eq!(mailchimp.len(), 1, "{input:?}: {findings:?}");
+        assert_eq!(span(&input, mailchimp[0]), value);
+        assert_eq!(mailchimp[0].action(), Action::Warn, "{input:?}");
+    }
+    // A Mailchimp-named key stays high and redacted.
+    let k = mailchimp_key("us6");
+    let input = format!("MAILCHIMP_API_KEY={k}\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].action(), Action::Redact);
+    // Benign twins: no suffix, a region label, a hostname label, a path
+    // segment, and the benchmark's underscore-suffix and suffix-removed twins.
+    let hex = synthetic(LOWER_HEX, 32, 3);
+    for input in [
+        format!("etag: {hex}\n"),
+        format!("bucket {hex}-us-east-1 created\n"),
+        format!("GET https://{hex}-us1.cdn.example.test/logo.png\n"),
+        format!("GET /v1/objects/{hex}-us1 HTTP/1.1\n"),
+        format!("key {hex}_us14\n"),
+        format!("key {hex}\n"),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert!(
+            findings
+                .iter()
+                .all(|f| f.type_name() != "mailchimp_api_key"),
+            "{input:?}: {findings:?}"
+        );
+    }
+}

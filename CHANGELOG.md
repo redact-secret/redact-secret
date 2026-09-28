@@ -159,6 +159,13 @@ evidence is linked from each published version.
   a Schema Registry `basic.auth.user.info=<key id>:<secret>` property below
   a Confluent-named URL. These were missed because the provider name was
   only on an earlier line. They report at medium confidence (warn).
+- `mailchimp-api-key` reports a complete Marketing API key
+  (`<32 hex>-us<1–3 digits>`) with no Mailchimp keyword on its line (#931),
+  at medium confidence (warn). Keys under a `requests` Basic-auth tuple, an
+  `Authorization: apikey` header or pasted into prose were missed. A
+  same-line keyword and a Mailchimp-named key behave as before (medium and
+  high). A 32-hex value without the `-us<N>` suffix, and a keyword-free
+  match used as a hostname label or URL path segment, stay unreported.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

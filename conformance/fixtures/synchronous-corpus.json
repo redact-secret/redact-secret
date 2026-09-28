@@ -26854,30 +26854,48 @@
       "note": "A multi-byte Unicode prefix and CRLF line ending on the line before the keyword and key do not defeat detection."
     },
     {
-      "id": "mailchimp-api-key-negative-bare-value-with-no-context",
+      "id": "mailchimp-api-key-positive-bare-suffix-shape",
       "detector": "mailchimp-api-key",
-      "kind": "negative",
-      "support": "intentionally-unsupported",
-      "tier": "negative",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
       "contexts": [
         "plain-text"
       ],
       "input": "0123456789abcdef0123456789abcdef-us6",
-      "expected": [],
-      "note": "A bare key with no mailchimp keyword anywhere on its line is indistinguishable from an opaque hex blob followed by a coincidental region-style suffix and is not classified; this is an accepted, documented gap."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Since issue #931 the complete shape (32 hex, -us, 1-3 digit datacenter) is evidence on its own and is classified at medium confidence with no mailchimp keyword; until #931 this was a negative fixture recording the keyword gate."
     },
     {
-      "id": "mailchimp-api-key-negative-context-on-a-different-line",
+      "id": "mailchimp-api-key-positive-keyword-on-another-line",
       "detector": "mailchimp-api-key",
-      "kind": "negative",
-      "support": "intentionally-unsupported",
-      "tier": "negative",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
       "contexts": [
         "plain-text"
       ],
       "input": "# mailchimp\n0123456789abcdef0123456789abcdef-us6\n",
-      "expected": [],
-      "note": "The mailchimp keyword on a different line than the candidate value is a documented gap, the same line-scoped tradeoff new-relic-license-key already accepts."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 12,
+          "end": 48
+        }
+      ],
+      "note": "Since issue #931 the complete shape is classified at medium confidence whether or not a mailchimp keyword is on its line; the keyword on another line adds nothing. Until #931 this was a negative fixture."
     },
     {
       "id": "mailchimp-api-key-negative-environment-variable-reference",

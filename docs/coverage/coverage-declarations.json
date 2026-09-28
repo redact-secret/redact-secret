@@ -6844,8 +6844,10 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "mailchimp-api-key-positive-bare-suffix-shape",
             "mailchimp-api-key-positive-dotenv-keyword",
             "mailchimp-api-key-positive-json-keyword",
+            "mailchimp-api-key-positive-keyword-on-another-line",
             "mailchimp-api-key-positive-log-keyword",
             "mailchimp-api-key-positive-shell-quoted",
             "mailchimp-api-key-positive-yaml-keyword",
