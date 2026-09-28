@@ -28,7 +28,7 @@
  * the bundler can discover and include them statically.
  */
 
-import type { NativeBinding } from "../native.js";
+import type { NativeBindingLoader } from "../native.js";
 import {
   assertWasmModuleShape,
   createBindingFromWasmModule,
@@ -37,21 +37,38 @@ import {
 
 export * from "./wasm-binding.js";
 
-async function loadCompiledWasmModule(): Promise<
-  readonly [WasmModule, object]
-> {
-  const [module, artifact] = await Promise.all([
-    import("@redact-secret/wasm") as unknown as Promise<Partial<WasmModule>>,
-    import(
-      "@redact-secret/wasm/redact_secret_wasm_bg.wasm"
-    ) as unknown as Promise<{ default: object }>,
-  ]);
+/**
+ * The default `full` build, or its `pii` build when the first `initialize()`
+ * carries a PII selection (issue #937). Each branch keeps its own literal
+ * glue and `.wasm` specifiers, so the bundler compiles both and `workerd`
+ * instantiates only the one selected.
+ */
+async function loadCompiledWasmModule(
+  pii: boolean,
+): Promise<readonly [WasmModule, object]> {
+  const [module, artifact] = pii
+    ? await Promise.all([
+        import("@redact-secret/wasm/pii") as unknown as Promise<
+          Partial<WasmModule>
+        >,
+        import(
+          "@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm"
+        ) as unknown as Promise<{ default: object }>,
+      ])
+    : await Promise.all([
+        import("@redact-secret/wasm") as unknown as Promise<
+          Partial<WasmModule>
+        >,
+        import(
+          "@redact-secret/wasm/redact_secret_wasm_bg.wasm"
+        ) as unknown as Promise<{ default: object }>,
+      ]);
   assertWasmModuleShape(module);
   return [module, artifact.default];
 }
 
-export const loadNativeBinding = async (): Promise<NativeBinding> => {
-  const [wasm, compiled] = await loadCompiledWasmModule();
+export const loadNativeBinding: NativeBindingLoader = async ({ pii }) => {
+  const [wasm, compiled] = await loadCompiledWasmModule(pii);
   await wasm.default({ module_or_path: compiled });
   return createBindingFromWasmModule(wasm);
 };

@@ -3276,26 +3276,17 @@
       "note": "A shell/template interpolation reference immediately after the secret prefix breaks the alphabet run before the minimum length, so a variable reference is not misread as a literal secret."
     },
     {
-      "id": "stripe-positive-doc-style-placeholder",
+      "id": "stripe-negative-repeated-filler-placeholder",
       "detector": "stripe-token",
-      "kind": "positive",
+      "kind": "negative",
       "support": "supported",
-      "tier": "canonical",
+      "tier": "negative",
       "contexts": [
         "plain-text"
       ],
       "input": "sk_live_xxxxxxxxxxxxxxxxxxxxxxxx",
-      "expected": [
-        {
-          "detector": "stripe-token",
-          "type": "stripe_credential",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 32
-        }
-      ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+      "expected": [],
+      "note": "A documentation placeholder whose body is one repeated character is not classified (issue #934): a random key body is never one repeated character, so the filler exclusion generic-token applies holds here too. Until #934 this was a positive fixture recording the opposite tradeoff."
     },
     {
       "id": "stripe-positive-mixed-public-and-secret",
@@ -16151,7 +16142,7 @@
         {
           "detector": "generic-token",
           "type": "contextual_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "contextual",
           "start": 394,
           "end": 425
@@ -16181,7 +16172,7 @@
           "end": 556
         }
       ],
-      "note": "Every remaining declared high-signal and ambiguous credential name (apikey, secret, refresh_token, session_token, passwd, private_key, client_secret, webhook_secret, auth, auth_token, credential, credentials, signing_key) carries its own positive evidence, completing representative coverage of the accepted credential-name set."
+      "note": "Every remaining declared high-signal and ambiguous credential name (apikey, secret, refresh_token, session_token, passwd, private_key, client_secret, webhook_secret, auth_token (high-signal since #941), auth, credential, credentials, signing_key) carries its own positive evidence, completing representative coverage of the accepted credential-name set."
     },
     {
       "id": "contextual-negative-generic-name-high-entropy",
@@ -26863,30 +26854,48 @@
       "note": "A multi-byte Unicode prefix and CRLF line ending on the line before the keyword and key do not defeat detection."
     },
     {
-      "id": "mailchimp-api-key-negative-bare-value-with-no-context",
+      "id": "mailchimp-api-key-positive-bare-suffix-shape",
       "detector": "mailchimp-api-key",
-      "kind": "negative",
-      "support": "intentionally-unsupported",
-      "tier": "negative",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
       "contexts": [
         "plain-text"
       ],
       "input": "0123456789abcdef0123456789abcdef-us6",
-      "expected": [],
-      "note": "A bare key with no mailchimp keyword anywhere on its line is indistinguishable from an opaque hex blob followed by a coincidental region-style suffix and is not classified; this is an accepted, documented gap."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Since issue #931 the complete shape (32 hex, -us, 1-3 digit datacenter) is evidence on its own and is classified at medium confidence with no mailchimp keyword; until #931 this was a negative fixture recording the keyword gate."
     },
     {
-      "id": "mailchimp-api-key-negative-context-on-a-different-line",
+      "id": "mailchimp-api-key-positive-keyword-on-another-line",
       "detector": "mailchimp-api-key",
-      "kind": "negative",
-      "support": "intentionally-unsupported",
-      "tier": "negative",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
       "contexts": [
         "plain-text"
       ],
       "input": "# mailchimp\n0123456789abcdef0123456789abcdef-us6\n",
-      "expected": [],
-      "note": "The mailchimp keyword on a different line than the candidate value is a documented gap, the same line-scoped tradeoff new-relic-license-key already accepts."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 12,
+          "end": 48
+        }
+      ],
+      "note": "Since issue #931 the complete shape is classified at medium confidence whether or not a mailchimp keyword is on its line; the keyword on another line adds nothing. Until #931 this was a negative fixture."
     },
     {
       "id": "mailchimp-api-key-negative-environment-variable-reference",

@@ -54,8 +54,9 @@
 //! gate its rule on a same-line `mailchimp` keyword is corroborating
 //! evidence that the shape alone is not considered specific enough in
 //! practice. Per the issue's own "ambiguous unprefixed values require
-//! reliable context" instruction, this detector requires a case-insensitive
-//! `mailchimp` substring ([`CONTEXT_KEYWORD`]) anywhere on the same line --
+//! reliable context" instruction, this detector originally required a
+//! case-insensitive `mailchimp` substring ([`CONTEXT_KEYWORD`]) anywhere on
+//! the same line (see "Keyword-free shape" below for the #931 revision) --
 //! the same "same line" scope [`super::new_relic`] and [`super::twilio`]
 //! already use for their own bare-hex formats, for the same
 //! incremental-consistency reason documented there. `Provider` specificity,
@@ -120,11 +121,33 @@
 //!   email API is a separate product from Mailchimp Marketing, not named by
 //!   this issue, and out of scope.
 //!
+//! ## Keyword-free shape (issue #931)
+//!
+//! The #313 gate missed complete keys whose Mailchimp context was on another
+//! line (a `requests` Basic-auth tuple under a `usNN.api.mailchimp.com`
+//! URL, an `Authorization: apikey` header under its `Host:` line) or absent
+//! (a key pasted into support-ticket prose). The gate is relaxed only for
+//! the **complete** shape -- exactly 32 hex bytes, the literal `-us`, and a
+//! 1-3 digit datacenter, whole between boundaries -- because that suffix is
+//! the one part of the grammar the bare hex body lacks: a hash, a UUID
+//! without dashes or a hex id carries no `-us<N>` of its own, and
+//! trufflehog 3.97.4 already matches this shape with no keyword. Such a
+//! match is [`Confidence::Medium`] (`mailchimp-suffix-shape`), so the
+//! confidence-gated default policy warns rather than redacts; a same-line
+//! keyword keeps today's medium signal, and a Mailchimp-named key stays
+//! high. Without a keyword, a match that is a DNS label
+//! (`<hex>-us1.example.test`) or a URL path segment (`/<hex>-us1`) is an
+//! identifier position and is not reported.
+//!
+//! FN removed: complete keys with no same-line keyword. FP added: a
+//! non-secret 32-hex value that happens to be followed by `-us<1-3 digits>`
+//! outside a hostname or path (a region-sharded resource id in prose or a
+//! log field), reported as a warning.
+//!
 //! ## Consequences and known gaps
 //!
-//! - A key with no `mailchimp` keyword anywhere on its own line goes
-//!   undetected -- the same accepted tradeoff [`super::new_relic`]'s own
-//!   License Key already carries.
+//! - A bare 32-hex body with no `-us<N>` suffix is never reported, with or
+//!   without a keyword.
 //! - A benign 32-byte hex value immediately followed by a
 //!   coincidental `-us<N>` (for example a region-sharded resource id) that
 //!   happens to share a line with the word "mailchimp" would false
@@ -211,9 +234,23 @@ fn match_datacenter_suffix(bytes: &[u8], hex_end: usize) -> Option<usize> {
         .then_some(digits_end)
 }
 
-/// Detects a Mailchimp Marketing API key: a bare 32-byte lowercase-hex run
-/// immediately followed by a `-us<1-2 digits>` datacenter suffix, on a line
-/// that also carries [`CONTEXT_KEYWORD`].
+/// `true` when a keyword-free match at `bytes[start..end]` sits in a
+/// structure that holds an identifier, not a key (issue #931): a DNS label
+/// (the suffix is followed by `.` and an alphanumeric byte,
+/// `<hex>-us1.example.test`) or a URL path segment (a `/` right before it,
+/// `/objects/<hex>-us1`). A same-line `mailchimp` keyword overrides this,
+/// as before.
+fn is_non_credential_structure(bytes: &[u8], start: usize, end: usize) -> bool {
+    let dns_label =
+        bytes.get(end) == Some(&b'.') && bytes.get(end + 1).is_some_and(u8::is_ascii_alphanumeric);
+    let path_segment = start > 0 && bytes[start - 1] == b'/';
+    dns_label || path_segment
+}
+
+/// Detects a Mailchimp Marketing API key: a bare 32-byte hex run immediately
+/// followed by a `-us<1-3 digits>` datacenter suffix. The complete shape
+/// alone is a medium finding (issue #931); a same-line [`CONTEXT_KEYWORD`]
+/// keeps its medium keyword signal, and a Mailchimp-named key is high.
 pub(super) struct MailchimpMarketingApiKeyDetector;
 
 impl Detector for MailchimpMarketingApiKeyDetector {
@@ -229,9 +266,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
         let mut candidates = Vec::new();
         for (line_start, line_end) in lines(input) {
             let line = &input[line_start..line_end];
-            if !line_has_context_keyword(line) {
-                continue;
-            }
+            let has_keyword = line_has_context_keyword(line);
 
             let bytes = line.as_bytes();
             let ends = pattern::run_ends(bytes, is_key_hex);
@@ -246,14 +281,16 @@ impl Detector for MailchimpMarketingApiKeyDetector {
                     && let Some(full_end) = match_datacenter_suffix(bytes, hex_end)
                     && pattern::boundary_ok(bytes, start, full_end, BOUNDARY)
                     && !text::is_repeated_character_filler(&line[start..hex_end])
+                    && (has_keyword || !is_non_credential_structure(bytes, start, full_end))
                     && let Some(range) = ByteRange::new(line_start + start, line_start + full_end)
                 {
-                    let (confidence, context_signal) =
-                        if text::is_provider_named_assignment(line, start, &[CONTEXT_KEYWORD]) {
-                            (Confidence::High, "mailchimp-named-assignment")
-                        } else {
-                            (Confidence::Medium, "mailchimp-keyword-cooccurrence")
-                        };
+                    let (confidence, context_signal) = if !has_keyword {
+                        (Confidence::Medium, "mailchimp-suffix-shape")
+                    } else if text::is_provider_named_assignment(line, start, &[CONTEXT_KEYWORD]) {
+                        (Confidence::High, "mailchimp-named-assignment")
+                    } else {
+                        (Confidence::Medium, "mailchimp-keyword-cooccurrence")
+                    };
                     candidates.push(
                         Candidate::new("mailchimp_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
@@ -324,14 +361,55 @@ mod tests {
     }
 
     #[test]
-    fn rejects_a_bare_value_with_no_context() {
-        assert!(detect(&key()).is_empty());
+    fn reports_the_complete_shape_with_no_keyword_at_medium() {
+        // Issue #931: the complete `-us<dc>` shape alone is evidence.
+        for input in [
+            key(),
+            format!("# mailchimp\n{}\n", key()),
+            format!("auth=(\"anystring\", \"{}\"),", key()),
+            format!("> Authorization: apikey {}", key()),
+            format!("The key in the runbook is {}. Revoked?", key()),
+        ] {
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            let range = candidates[0].range();
+            assert_eq!(&input[range.start()..range.end()], key());
+            assert_eq!(candidates[0].confidence(), Confidence::Medium, "{input}");
+            assert!(
+                candidates[0]
+                    .signals()
+                    .iter()
+                    .any(|signal| signal == "mailchimp-suffix-shape"),
+                "{input}"
+            );
+        }
     }
 
     #[test]
-    fn rejects_context_on_a_different_line() {
-        let input = format!("# mailchimp\n{}\n", key());
-        assert!(detect(&input).is_empty());
+    fn keyword_free_benign_twins_stay_silent() {
+        for input in [
+            // Hex, a dashless and a dashed UUID with no `-us<N>` suffix.
+            KEY_HEX.to_owned(),
+            "0123abcd-89ab-cdef-0123-456789abcdef".to_owned(),
+            format!("request_id={KEY_HEX}"),
+            // `-us` region labels that are not a 1-3 digit datacenter.
+            format!("{KEY_HEX}-us-east-1"),
+            format!("bucket {KEY_HEX}-us"),
+            format!("{KEY_HEX}-us1234"),
+            // The shape as a DNS label or a URL path segment.
+            format!("https://{}.cdn.example.test/a.png", key()),
+            format!("GET /v1/objects/{} HTTP/1.1", key()),
+            // A wider identifier and a 31-byte body.
+            format!("x{}", key()),
+            format!("{}-us6", &KEY_HEX[1..]),
+        ] {
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+        // A same-line keyword still overrides the structural exclusions.
+        assert_eq!(
+            detect(&format!("mailchimp https://{}.cdn.example.test", key())).len(),
+            1
+        );
     }
 
     #[test]
@@ -465,7 +543,11 @@ mod tests {
 
     #[test]
     fn stays_bounded_over_a_long_context_free_line_packed_with_candidates() {
+        // Since #931 every complete shape is reported; the line is still
+        // scanned once.
         let input = format!("{} ", key()).repeat(10_000);
-        assert_eq!(detect(&input).len(), 0);
+        assert_eq!(detect(&input).len(), 10_000);
+        let near_misses = format!("{KEY_HEX}-us ").repeat(10_000);
+        assert!(detect(&near_misses).is_empty());
     }
 }

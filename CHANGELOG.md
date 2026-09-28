@@ -77,6 +77,35 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The default browser WebAssembly artifacts no longer carry the PII domain
+  runtime (#937). Since 0.1.0-beta.10 every WASM build linked the
+  `pii-domain` adapter, its families, and their Unicode normalization
+  tables, so a browser that never enabled PII downloaded about twice the
+  bytes. Each profile now ships two builds in `@redact-secret/wasm`: the
+  default one (`redact_secret_wasm*`, `redact_secret_wasm_common*`), which
+  links no PII runtime, and a `pii` one (`redact_secret_wasm_pii*`,
+  `redact_secret_wasm_common_pii*`, subpaths `./pii` and `./common/pii`),
+  built with the `redact-secret-wasm` crate's new off-by-default `pii` Cargo
+  feature. `@redact-secret/core` loads the `pii` build only when the
+  `initialize()` call that loads the binding carries a non-empty `pii`
+  selection; the Node addon, Python, Rust and CLI are unchanged. Release
+  `.wasm` sizes (raw / gzip level 9) move from 741,780 / 275,500 B to
+  468,090 / 159,706 B for `full` and from 590,801 / 229,049 B to
+  317,150 / 113,968 B for `common`; the `pii` builds are 741,825 / 275,512 B
+  and 590,846 / 229,048 B. Both default builds remain above the
+  0.1.0-beta.8 size budgets (137,639 and 100,058 B gzip, +5%): the rest of
+  the growth predates the PII runtime. The `measure-wasm-profiles.mjs --guard-only` CI
+  guard now fails when a default build links any part of the PII runtime.
+- Migration: the public PII API is unchanged. `initialize({ pii: [...] })`,
+  `piiActivation()`, the selector grammar, error codes, and the one-shot
+  `PII_ACTIVATION_CONFLICT` behave as before on every entry point. Two
+  things are new. A bundler now emits each profile's `pii` build as a second,
+  lazily loaded `.wasm` asset next to the default one; only the build the
+  page selects is fetched. Code that imports `@redact-secret/wasm` directly
+  (the package is documented as not intended for direct use) must import
+  `@redact-secret/wasm/pii` or `@redact-secret/wasm/common/pii` to select
+  PII: the default builds now answer a valid PII selection with
+  `PII_SELECTOR_UNAVAILABLE`.
 - The PII context vocabulary is now `pii-context/v2`, and every PII
   activation identity names it (`vocabulary=pii-context/v2`). A field label
   associates only with the value after it, so an earlier value on the same
@@ -129,6 +158,51 @@ evidence is linked from each published version.
   (`email=`, `customer_email=`, `이메일=`) is read as a label, not as local
   part, so the finding starts after the `=`. Other keys (`user=`, `emailx=`)
   are unchanged.
+- `heroku-api-key-legacy` and `stripe-token` no longer redact repeated-filler
+  documentation placeholders (#934): an all-one-digit UUID under Heroku
+  context (`HEROKU_API_KEY=00000000-0000-0000-0000-000000000000`), and a
+  Stripe key or `whsec_` secret whose body is one repeated character
+  (`sk_test_` plus a run of `x`). A body one character off the filler is
+  still reported.
+- `connection-string` reports the password in a SQLAlchemy
+  `dialect+driver://` URL (#935): `postgresql+psycopg://`,
+  `postgres+asyncpg://`, `mysql+pymysql://` and `mariadb+<driver>://` were
+  missed because the scheme did not match. The driver is 1–32
+  `[A-Za-z0-9_]` bytes; other schemes with a `+` suffix stay unsupported.
+- `generic-token` treats `auth_token` as a high-signal credential name
+  (#941). A secret-shaped value under `auth_token` is reported at high
+  confidence and redacted instead of warned, and `twilio auth_token=<value>`
+  is a high `twilio_auth_token`. Placeholder, reference and identifier
+  values stay silent; `auth` stays ambiguous.
+- `bearer-token` no longer joins the next field of a delimited record onto a
+  Bearer value (#939). `Bearer <tok>|email=<addr>` and `Bearer <tok>|x=1`
+  used to redact `<tok>|email=` and leave the value after it readable; the
+  span is now `<tok>`. `=` counts as padding only where it ends the token.
+  `Authorization: Bearer name@host` is selected whole, host included,
+  instead of redacting only the local part.
+- The keyword-gated `deepgram-api-key` and `cohere-api-key` detectors
+  recognize three more same-line forms (#932): HTTPie's
+  `'Authorization:Token <key>'` with no space after the colon, a Go SDK call
+  that takes the key as its last positional argument
+  (`deepgram.NewRESTWithDefaults(ctx, "<key>")`), and a Java builder method
+  named for the credential (`Cohere.builder().token("<key>")`). A key under
+  a `masked_api_key=` field stays unreported by policy.
+- Three context-gated legacy detectors read provider context from a bounded
+  window of previous lines in one CLI or config layout each (#933), with an
+  incremental retention hint so streamed and whole-input scans agree:
+  `heroku-api-key-legacy` reads the `Token:` row of `heroku
+  authorizations:info` output, `twilio-auth-token` the `Auth Token` column
+  of `twilio profiles:list` output, and `confluent-cloud-api-secret-legacy`
+  a Schema Registry `basic.auth.user.info=<key id>:<secret>` property below
+  a Confluent-named URL. These were missed because the provider name was
+  only on an earlier line. They report at medium confidence (warn).
+- `mailchimp-api-key` reports a complete Marketing API key
+  (`<32 hex>-us<1–3 digits>`) with no Mailchimp keyword on its line (#931),
+  at medium confidence (warn). Keys under a `requests` Basic-auth tuple, an
+  `Authorization: apikey` header or pasted into prose were missed. A
+  same-line keyword and a Mailchimp-named key behave as before (medium and
+  high). A 32-hex value without the `-us<N>` suffix, and a keyword-free
+  match used as a hostname label or URL path segment, stay unreported.
 - A PII field label directly after a `|` delimiter now labels its value, as
   one after whitespace does (#940): pipe-delimited records (`a|b|email=…`,
   `x|phone: …`, `id=7|ssn=…`) and pipe-table cells (`| iban | … |`) are

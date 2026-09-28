@@ -39,6 +39,7 @@ const DETECTOR_PROFILES = Object.fromEntries(
     {
       glue: wasmProfile.glue,
       binary: wasmProfile.binary,
+      piiGlue: wasmProfile.pii.glue,
       defaultArtifactDir: join(REPO_ROOT, wasmProfile.relativeDir),
       buildCommand: wasmProfile.buildCommand,
     },
@@ -90,10 +91,21 @@ async function stage(artifactDir, detectorProfile, profile) {
     detectorProfile === "common"
       ? join(SCRIPTS_DIR, "assessment-browser-performance-harness-common.mjs")
       : join(SCRIPTS_DIR, "assessment-browser-performance-harness.mjs");
+  // The facade names the profile's `pii` build in its own dynamic import
+  // (#937); it must resolve for the bundle to build, though this PII-off
+  // harness never fetches it.
   const alias =
     detectorProfile === "common"
-      ? { "@redact-secret/core/common": packageEntry, "@redact-secret/wasm/common": join(artifactDir, artifact.glue) }
-      : { "@redact-secret/core": packageEntry, "@redact-secret/wasm": join(artifactDir, artifact.glue) };
+      ? {
+          "@redact-secret/core/common": packageEntry,
+          "@redact-secret/wasm/common": join(artifactDir, artifact.glue),
+          "@redact-secret/wasm/common/pii": join(artifactDir, artifact.piiGlue),
+        }
+      : {
+          "@redact-secret/core": packageEntry,
+          "@redact-secret/wasm": join(artifactDir, artifact.glue),
+          "@redact-secret/wasm/pii": join(artifactDir, artifact.piiGlue),
+        };
   await build({
     entryPoints: [harnessEntry],
     outfile: join(directory, "harness.js"), bundle: true, format: "esm", platform: "browser",

@@ -5,8 +5,10 @@
 //! window is closed: a chunk boundary, a minimum token length, or a
 //! provisional match is never a closing boundary by itself. An open logical
 //! line, structural authorization header, contextual assignment, PEM-style
-//! private-key block, or Heroku `.netrc` entry or `heroku auth:token`
-//! command awaiting its token line is retained until it closes or a
+//! private-key block, or bounded provider layout awaiting its token line (a
+//! Heroku `.netrc` entry, `heroku auth:token` command or `heroku
+//! authorizations` table, a `twilio` CLI table with an `Auth Token` column,
+//! or a Confluent properties block) is retained until it closes or a
 //! configured limit fails. Because retained plaintext is scanned fresh only once per
 //! closed unit and never rescanned once finalized, whole-input acceptance
 //! does not depend on how the caller partitions it into chunks.
@@ -65,8 +67,8 @@
 use std::collections::HashMap;
 
 use crate::detectors::{
-    PrivateKeyRetentionTracker, has_open_bearer_authorization, has_open_contextual_assignment,
-    has_open_heroku_legacy_context,
+    PrivateKeyRetentionTracker, has_open_bearer_authorization, has_open_confluent_properties,
+    has_open_contextual_assignment, has_open_heroku_legacy_context, has_open_twilio_cli_table,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 #[cfg(test)]
@@ -99,6 +101,13 @@ const LOOKAROUND_BYTES: usize = 128;
 /// layouts need a retention hint; a session whose profile omits it (the
 /// `common` profile) never holds a unit open for them.
 const HEROKU_LEGACY_DETECTOR_ID: &str = "heroku-api-key-legacy";
+
+/// The built-in detectors whose previous-line layouts (issue #933) need a
+/// retention hint: a `twilio` CLI table's Auth Token column, and a Confluent
+/// Schema Registry properties block. A session without the detector never
+/// holds a unit open for its layout.
+const TWILIO_AUTH_TOKEN_DETECTOR_ID: &str = "twilio-auth-token";
+const CONFLUENT_LEGACY_DETECTOR_ID: &str = "confluent-cloud-api-secret-legacy";
 
 /// Explicit, positive byte limits every incremental session requires. There
 /// are no environment-derived or silent defaults.
@@ -604,6 +613,10 @@ impl IncrementalSanitizer {
             || has_open_bearer_authorization(&scanned)
             || (self.registry.contains(HEROKU_LEGACY_DETECTOR_ID)
                 && has_open_heroku_legacy_context(&scanned))
+            || (self.registry.contains(TWILIO_AUTH_TOKEN_DETECTOR_ID)
+                && has_open_twilio_cli_table(&scanned))
+            || (self.registry.contains(CONFLUENT_LEGACY_DETECTOR_ID)
+                && has_open_confluent_properties(&scanned))
     }
 
     fn append_retained(&mut self, piece: &str, closes_line: bool) -> Result<(), SecretScanError> {

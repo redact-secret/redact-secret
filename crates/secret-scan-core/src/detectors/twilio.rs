@@ -68,6 +68,16 @@
 //! [`super::generic_token::has_open_contextual_assignment`], which is also
 //! scoped to the tail of a single retained line).
 //!
+//! One multi-line layout is read for the Auth Token only (issue #933): the
+//! table the `twilio` CLI prints for `twilio profiles:list --properties
+//! authToken`. A value that is the whole cell under an `Auth Token` column
+//! header is reported at [`Confidence::Medium`] when the header row directly
+//! follows a `twilio <topic:command>` line and at most
+//! [`CLI_TABLE_MAX_DATA_ROWS`] data rows separate the header from it. A
+//! blank line, a new command, or a longer table ends the window, and the
+//! incremental session holds exactly that window open
+//! ([`has_open_twilio_cli_table`]).
+//!
 //! A candidate that is a single repeated character
 //! ([`text::is_repeated_character_filler`]) is excluded even when context
 //! matches: unlike every other provider grammar in this crate, this one has
@@ -186,6 +196,114 @@ fn scan_bare_secret_runs(
     matches
 }
 
+/// The most data rows a `twilio` CLI table may print between its header row
+/// and the row that carries the value (issue #933): one per stored profile,
+/// bounded so the incremental session never holds more than a few lines.
+const CLI_TABLE_MAX_DATA_ROWS: usize = 4;
+
+/// How many lines before the value's line the CLI-table layout reads: the
+/// command line, the header row and up to [`CLI_TABLE_MAX_DATA_ROWS`] - 1
+/// earlier data rows.
+const CLI_TABLE_LOOKBACK_LINES: usize = CLI_TABLE_MAX_DATA_ROWS + 1;
+
+/// The column header of the Auth Token in `twilio profiles:list --properties
+/// authToken` output (`ID     Auth Token`).
+const AUTH_TOKEN_COLUMN: &str = "auth token";
+
+/// The whitespace-separated words of one line (`\r` included, for CRLF).
+fn words(line: &str) -> impl Iterator<Item = &str> {
+    line.split([' ', '\t', '\r'])
+        .filter(|word| !word.is_empty())
+}
+
+/// `true` when `line` runs a `twilio` CLI `topic:command`: `twilio` as the
+/// first word, or after a shell prompt word (ending in `$`, `%`, `>` or
+/// `#`), followed by a word with a `:` (`$ twilio profiles:list --properties
+/// authToken`, `twilio api:core:keys:list`).
+fn is_twilio_cli_command(line: &str) -> bool {
+    let mut words = words(line).peekable();
+    if words
+        .peek()
+        .is_some_and(|first| *first != "twilio" && first.ends_with(['$', '%', '>', '#']))
+    {
+        words.next();
+    }
+    words.next() == Some("twilio") && words.next().is_some_and(|command| command.contains(':'))
+}
+
+/// The byte column of an [`AUTH_TOKEN_COLUMN`] header in `line`, as a whole
+/// pair of words (case-insensitive).
+fn auth_token_column(line: &str) -> Option<usize> {
+    let bytes = line.as_bytes();
+    let len = AUTH_TOKEN_COLUMN.len();
+    (0..=bytes.len().checked_sub(len)?).find(|&at| {
+        text::starts_with_ci(line, at, AUTH_TOKEN_COLUMN)
+            && (at == 0 || matches!(bytes[at - 1], b' ' | b'\t'))
+            && bytes
+                .get(at + len)
+                .is_none_or(|&byte| matches!(byte, b' ' | b'\t' | b'\r'))
+    })
+}
+
+/// A data row of a CLI table: any non-blank line that is not a new command.
+fn is_cli_table_data_row(line: &str) -> bool {
+    words(line).next().is_some() && !is_twilio_cli_command(line)
+}
+
+/// The Auth Token column when `previous` (the lines before the value's line,
+/// oldest first) ends inside a `twilio` CLI table with room for one more
+/// data row: a `twilio` command line, a header row naming
+/// [`AUTH_TOKEN_COLUMN`], then fewer than [`CLI_TABLE_MAX_DATA_ROWS`] data
+/// rows (issue #933).
+fn open_cli_table_column(previous: &[&str]) -> Option<usize> {
+    for (rows, index) in (0..previous.len()).rev().enumerate() {
+        if rows >= CLI_TABLE_MAX_DATA_ROWS {
+            return None;
+        }
+        let line = previous[index];
+        if index > 0
+            && is_twilio_cli_command(previous[index - 1])
+            && let Some(column) = auth_token_column(line)
+        {
+            return Some(column);
+        }
+        if !is_cli_table_data_row(line) {
+            return None;
+        }
+    }
+    None
+}
+
+/// Internal retention hint for the built-in incremental scanner: `true` when
+/// the last complete line of `input` is a `twilio` CLI command, or leaves a
+/// `twilio` CLI table with an Auth Token column open for another data row,
+/// so the session keeps the unit open until the row that can carry the token
+/// arrives (issue #933). The window it holds is exactly the one
+/// [`TwilioAuthTokenDetector`] reads back.
+pub(crate) fn has_open_twilio_cli_table(input: &str) -> bool {
+    let complete = input.strip_suffix('\n').unwrap_or(input);
+    let mut tail: Vec<&str> = complete
+        .rsplit('\n')
+        .take(CLI_TABLE_LOOKBACK_LINES)
+        .collect();
+    tail.reverse();
+    tail.last().is_some_and(|last| is_twilio_cli_command(last))
+        || open_cli_table_column(&tail).is_some()
+}
+
+/// `true` when the value `line[start..end]` is the whole cell under the Auth
+/// Token column: it starts at `column` and whitespace follows it.
+fn is_cell_at_column(line: &str, start: usize, end: usize, column: usize) -> bool {
+    start == column
+        && line.as_bytes()[..start]
+            .last()
+            .is_none_or(|&byte| matches!(byte, b' ' | b'\t'))
+        && line
+            .as_bytes()
+            .get(end)
+            .is_none_or(|&byte| matches!(byte, b' ' | b'\t' | b'\r'))
+}
+
 /// Shared implementation for both context-gated detectors below.
 ///
 /// Processes one line at a time: a line's bare candidates, its paired-
@@ -193,6 +311,11 @@ fn scan_bare_secret_runs(
 /// per line, not once per candidate, so a line packed with many candidates
 /// costs no more than a line with one -- the same bounded-work guarantee
 /// [`scan_bare_secret_runs`] gives a single alphabet run.
+///
+/// `cli_table` enables the multi-line `twilio` CLI table layout (Auth Token
+/// only, issue #933): a value in the Auth Token column of a table printed by
+/// a `twilio` command is reported at medium confidence.
+#[allow(clippy::too_many_arguments)]
 fn detect_context_gated(
     input: &str,
     alphabet: Alphabet,
@@ -201,23 +324,38 @@ fn detect_context_gated(
     identifier_alphabet: Alphabet,
     type_name: &str,
     identifier_signal: &str,
+    cli_table: bool,
 ) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    for (line_start, line_end) in lines(input) {
+    let all_lines: Vec<(usize, usize)> = lines(input).collect();
+    for (index, &(line_start, line_end)) in all_lines.iter().enumerate() {
         let line = &input[line_start..line_end];
         let raw_matches = scan_bare_secret_runs(line, alphabet, boundary);
         if raw_matches.is_empty() {
             continue;
         }
 
-        let (confidence, signal) =
+        let line_context =
             if line_has_paired_identifier(line, identifier_prefix, identifier_alphabet) {
-                (Confidence::High, identifier_signal)
+                Some((Confidence::High, identifier_signal))
             } else if line_contains_ci(line, CONTEXT_KEYWORD) {
-                (Confidence::Medium, "twilio-keyword-cooccurrence")
+                Some((Confidence::Medium, "twilio-keyword-cooccurrence"))
             } else {
-                continue;
+                None
             };
+        let table_column = if line_context.is_none() && cli_table {
+            let previous: Vec<&str> = all_lines
+                [index.saturating_sub(CLI_TABLE_LOOKBACK_LINES)..index]
+                .iter()
+                .map(|&(start, end)| &input[start..end])
+                .collect();
+            open_cli_table_column(&previous)
+        } else {
+            None
+        };
+        if line_context.is_none() && table_column.is_none() {
+            continue;
+        }
 
         for (relative_start, relative_end) in raw_matches {
             if text::is_repeated_character_filler(&line[relative_start..relative_end])
@@ -225,12 +363,22 @@ fn detect_context_gated(
             {
                 continue;
             }
+            let (confidence, signal) = match (line_context, table_column) {
+                (Some(context), _) => context,
+                (None, Some(column))
+                    if is_cell_at_column(line, relative_start, relative_end, column) =>
+                {
+                    (Confidence::Medium, "twilio-cli-table")
+                }
+                _ => continue,
+            };
             let Some(range) =
                 ByteRange::new(line_start + relative_start, line_start + relative_end)
             else {
                 continue;
             };
             let (confidence, signal) = if confidence == Confidence::Medium
+                && line_context.is_some()
                 && text::is_provider_named_assignment(line, relative_start, &[CONTEXT_KEYWORD])
             {
                 (Confidence::High, "twilio-named-assignment")
@@ -269,6 +417,7 @@ impl Detector for TwilioAuthTokenDetector {
             is_lower_hex,
             "twilio_auth_token",
             "twilio-account-sid-cooccurrence",
+            true,
         ))
     }
 }
@@ -295,6 +444,7 @@ impl Detector for TwilioApiKeySecretDetector {
             pattern::is_alnum,
             "twilio_api_key_secret",
             "twilio-api-key-sid-cooccurrence",
+            false,
         ))
     }
 }
@@ -534,6 +684,88 @@ mod tests {
             format!("twilio xmd5={AUTH_TOKEN}"),
         ] {
             assert_eq!(detect_auth_token(&input).len(), 1, "{input}");
+        }
+    }
+
+    fn profiles_table(header: &str, rows: &str) -> String {
+        format!("$ twilio profiles:list --properties authToken\n{header}\n{rows}")
+    }
+
+    #[test]
+    fn detects_an_auth_token_in_the_auth_token_column_of_a_twilio_cli_table() {
+        // Issue #933.
+        for rows in [
+            format!("prod   {AUTH_TOKEN}\n"),
+            format!("dev    fedcba98\nprod   {AUTH_TOKEN}\n"),
+            format!("prod   {AUTH_TOKEN}"),
+        ] {
+            let input = profiles_table("ID     Auth Token", &rows);
+            let found = detect_auth_token(&input);
+            assert_eq!(found.len(), 1, "{input:?}");
+            let range = found[0].range();
+            assert_eq!(&input[range.start()..range.end()], AUTH_TOKEN);
+            assert_eq!(found[0].confidence(), Confidence::Medium);
+        }
+        let crlf = profiles_table("ID     Auth Token", &format!("prod   {AUTH_TOKEN}\n"))
+            .replace('\n', "\r\n");
+        assert_eq!(detect_auth_token(&crlf).len(), 1);
+    }
+
+    #[test]
+    fn rejects_a_cli_table_value_outside_the_auth_token_column_or_window() {
+        for input in [
+            // The benchmark's twin: the column relabelled.
+            profiles_table("ID     Account SID", &format!("prod   {AUTH_TOKEN}\n")),
+            // Not under the column, no command above the header, another
+            // command, a blank line, and past the row budget.
+            profiles_table("ID     Auth Token", &format!("prod {AUTH_TOKEN}\n")),
+            format!("ID     Auth Token\nprod   {AUTH_TOKEN}\n"),
+            format!("$ gh auth status\nID     Auth Token\nprod   {AUTH_TOKEN}\n"),
+            profiles_table("ID     Auth Token", &format!("\nprod   {AUTH_TOKEN}\n")),
+            profiles_table(
+                "ID     Auth Token",
+                &format!(
+                    "{}prod   {AUTH_TOKEN}\n",
+                    "dev    x\n".repeat(CLI_TABLE_MAX_DATA_ROWS)
+                ),
+            ),
+        ] {
+            assert!(detect_auth_token(&input).is_empty(), "{input:?}");
+        }
+        // Exactly the row budget still counts, and the API Key Secret
+        // detector never reads the table.
+        let input = profiles_table(
+            "ID     Auth Token",
+            &format!(
+                "{}prod   {AUTH_TOKEN}\n",
+                "dev    x\n".repeat(CLI_TABLE_MAX_DATA_ROWS - 1)
+            ),
+        );
+        assert_eq!(detect_auth_token(&input).len(), 1);
+        assert!(detect_api_key_secret(&input).is_empty());
+    }
+
+    #[test]
+    fn the_retention_hint_holds_exactly_the_cli_table_window_open() {
+        for open in [
+            "$ twilio profiles:list --properties authToken\n",
+            "twilio api:core:messages:list\n",
+            "$ twilio profiles:list\nID     Auth Token\n",
+            "$ twilio profiles:list\nID     Auth Token\ndev    x\n",
+        ] {
+            assert!(has_open_twilio_cli_table(open), "{open:?}");
+        }
+        for closed in [
+            "",
+            "twilio is a provider\n",
+            "$ twilio profiles:list\nID     Account SID\n",
+            "$ twilio profiles:list\nID     Auth Token\n\n",
+            &format!(
+                "$ twilio profiles:list\nID     Auth Token\n{}",
+                "dev    x\n".repeat(CLI_TABLE_MAX_DATA_ROWS)
+            ),
+        ] {
+            assert!(!has_open_twilio_cli_table(closed), "{closed:?}");
         }
     }
 }

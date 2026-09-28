@@ -132,13 +132,13 @@
     "id": "ruleset-cannot-overturn-a-built-in",
     "description": "A ruleset detector claiming the identical range, specificity, and (fixed) confidence as a built-in's own candidate must still lose the tie: built-ins register before any ruleset detector (decision-define-declarative-detector-ruleset-contract, 'Ordering and the specificity cap').",
     "ruleset": "ruleset-revision: 1\ndetector: acme-tok-companion\nspecificity: contextual\nprefix: \"tok_\"\nalphabet: alnum\nrun: at-least 4\nvalidator: none\n",
-    "input": "AUTH_TOKEN=tok_a1B2c3D4e5F6g7H8i9\n",
+    "input": "SIGNING_KEY=tok_a1B2c3D4e5F6g7H8i9\n",
     "expectedWinner": {
       "detector": "generic-token",
       "type": "contextual_secret",
       "confidence": "medium",
-      "start": 11,
-      "end": 33
+      "start": 12,
+      "end": 34
     }
   },
   "rejections": [

@@ -15,12 +15,12 @@ import {
   loadCommonAddon,
   loadWasmFallback,
 } from "./node.js";
-import type { NativeBinding } from "../native.js";
+import type { NativeBindingLoader } from "../native.js";
 
-export const loadNativeBinding = async (): Promise<NativeBinding> => {
+export const loadNativeBinding: NativeBindingLoader = async ({ pii }) => {
   try {
     return createBindingFromCommonAddon(loadCommonAddon());
   } catch {
-    return loadWasmFallback("common");
+    return loadWasmFallback("common", pii);
   }
 };

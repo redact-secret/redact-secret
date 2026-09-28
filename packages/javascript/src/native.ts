@@ -142,5 +142,20 @@ export interface NativeBinding {
   ): NativeIncrementalSanitizer;
 }
 
-/** Loads and prepares this runtime's binding. Called at most once. */
-export type NativeBindingLoader = () => Promise<NativeBinding>;
+/**
+ * What {@link NativeBindingLoader} is asked to load (issue #937).
+ *
+ * `pii` is `true` when the first `initialize()` carries a non-empty PII
+ * selection. A WebAssembly loader then loads its profile's `pii` artifact,
+ * the only build that links the PII runtime; otherwise it loads the default
+ * artifact, which rejects any PII selection with `PII_SELECTOR_UNAVAILABLE`.
+ * The Node addon links the PII runtime in every build and ignores it.
+ */
+export interface NativeBindingLoadOptions {
+  readonly pii: boolean;
+}
+
+/** Loads and prepares this runtime's binding. Called at most once per successful load. */
+export type NativeBindingLoader = (
+  options: NativeBindingLoadOptions,
+) => Promise<NativeBinding>;

@@ -194,8 +194,8 @@ export async function startCandidateRegistry(packages) {
  * The installed `@redact-secret` packages must be exactly the wrapper, the
  * WebAssembly package, this host's addon package, and any `additional`
  * names; each must have come from the expected registry at the expected
- * integrity; and each package's files -- the addon and both `.wasm` builds
- * included -- must be the candidate's bytes (or, from the public registry,
+ * integrity; and each package's files -- the addon and all four `.wasm`
+ * builds included -- must be the candidate's bytes (or, from the public registry,
  * carry every declared runtime file). `candidate` supplies the expected
  * tarball of every one of those packages when it is defined.
  */
@@ -261,7 +261,11 @@ export async function verifyNpmInstall(project, version, candidate, registryUrl,
       if (file.endsWith(".node") || file.endsWith(".wasm")) binaries.push({ package: name, file, sha256: digest });
     }
   }
-  assert(binaries.filter((binary) => binary.file.endsWith(".wasm")).length === 2, "the wasm package does not carry both profiles");
+  // Both profiles, each as its default build and its `pii` build (issue #937).
+  assert(
+    binaries.filter((binary) => binary.file.endsWith(".wasm")).length === 4,
+    "the wasm package does not carry both profiles' default and pii builds",
+  );
   return { hostAddon, packages, binaries };
 }
 

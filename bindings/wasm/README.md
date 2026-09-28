@@ -33,6 +33,17 @@
   (`bindings/wasm/npm/package.json`). Measurements are in
   `docs/audits/evidence/381/README.md`; qualification and the package export
   are in `docs/audits/evidence/382/README.md`.
+- A second, off-by-default Cargo feature, `pii` (#937), links the PII domain
+  runtime: the `pii-domain` adapter, its families, and the Unicode
+  normalization tables they use. Without it the artifact links none of that,
+  still parses PII selectors (a malformed one fails with the same code), and
+  answers a valid non-empty selection with `PII_SELECTOR_UNAVAILABLE`.
+  `npm run wasm:build` and `npm run wasm:build:common` each emit both builds
+  of their profile into one directory: the default build and
+  `<outName>_pii{.js,.d.ts,_bg.wasm,_bg.wasm.d.ts}`. The package exports them
+  as `./pii` and `./common/pii`, and `@redact-secret/core` imports one only
+  when `initialize()` carries a PII selection. All four builds export the
+  same surface.
 - `initialize` is this crate's own synchronous, idempotent setup step (it
   builds and caches the built-in detector registry) — distinct from, and in
   addition to, wasm-bindgen's own generated `init()`/default export, which a

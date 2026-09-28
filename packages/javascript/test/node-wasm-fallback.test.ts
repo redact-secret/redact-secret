@@ -28,14 +28,24 @@ describe("Node WebAssembly fallback: unavailable artifact", () => {
     );
   });
 
+  it("fails the same way for each profile's pii artifact (#937)", async () => {
+    for (const profile of ["full", "common"] as const) {
+      await expect(loadWasmFallback(profile, true)).rejects.toThrowError(
+        new SecretScanError("INITIALIZATION_FAILED"),
+      );
+    }
+  });
+
   it("still fails with INITIALIZATION_FAILED end to end when both the addon and the fallback are unavailable", async () => {
     // In this checkout the addon is never built and the wasm package is
     // never installed, so `loadNativeBinding` exercises exactly the
     // "nothing at all is usable" host this fallback does not change the
     // outcome for: it must still fail cleanly, not throw a different error
     // or hang.
-    await expect(loadNativeBinding()).rejects.toThrowError(
-      new SecretScanError("INITIALIZATION_FAILED"),
-    );
+    for (const pii of [false, true]) {
+      await expect(loadNativeBinding({ pii })).rejects.toThrowError(
+        new SecretScanError("INITIALIZATION_FAILED"),
+      );
+    }
   });
 });

@@ -9,10 +9,14 @@ import {
   classifyModules,
   detectorImplementations,
   detectorModules,
+  ARTIFACTS,
+  artifactBuild,
   guardFailures,
   loadModulePacks,
   modulePacks,
   percentChange,
+  piiGuardFailures,
+  piiRuntime,
   PROFILES,
 } from "../measure-wasm-profiles.mjs";
 
@@ -100,6 +104,20 @@ test("both profiles have a build configuration", () => {
   assert.notEqual(DETECTOR_PROFILES.full.outName, DETECTOR_PROFILES.common.outName);
 });
 
+test("each profile has a pii variant built with the pii feature under its own names (#937)", () => {
+  assert.deepEqual(DETECTOR_PROFILES.full.pii.cargoArgs, ["--features", "pii"]);
+  assert.deepEqual(DETECTOR_PROFILES.common.pii.cargoArgs, ["--no-default-features", "--features", "pii"]);
+  assert.equal(DETECTOR_PROFILES.full.pii.outName, "redact_secret_wasm_pii");
+  assert.equal(DETECTOR_PROFILES.common.pii.outName, "redact_secret_wasm_common_pii");
+  const names = ARTIFACTS.map((name) => artifactBuild(name).outName);
+  assert.equal(new Set(names).size, 4, "four distinct wasm-bindgen out names");
+  assert.throws(() => artifactBuild("full-tiny"), /unknown artifact/);
+  const manifest = JSON.parse(readFileSync(join(REPO_ROOT, "bindings", "wasm", "npm", "package.json"), "utf8"));
+  for (const name of ARTIFACTS) {
+    for (const file of artifactBuild(name).files) assert.ok(manifest.files.includes(file), `${file} is published`);
+  }
+});
+
 test("detectorModules reads module names from mangled name-section symbols", () => {
   const section = [
     "<redact_secret[7f632526a786e8f3]::detectors::jwt::JwtDetector as redact_secret[7f632526a786e8f3]::types::Detector>::detect",
@@ -176,4 +194,77 @@ test("guardFailures rejects a missing common detector, an undeclared module and 
     guardFailures(full, artifact(220_000, COMMON_MODULES, COMMON_MODULES, ["initialize", "scan"]), PACKS),
     ["full and common export different surfaces"],
   );
+});
+
+const NUL = String.fromCharCode(0);
+
+test("piiRuntime reads the adapter, family implementations and unicode_normalization (#937)", () => {
+  const section = [
+    "<redact_secret[7f632526a786e8f3]::pii::PiiDomain as redact_secret[7f632526a786e8f3]::types::Detector>::detect",
+    "<redact_secret[7f632526a786e8f3]::pii::pii_email::EmailFamily as redact_secret[7f632526a786e8f3]::pii::PiiFamily>::detect",
+    "<redact_secret[7f632526a786e8f3]::pii::network_address::NetworkAddress as redact_secret[7f632526a786e8f3]::pii::PiiFamily>::id",
+    "<unicode_normalization[0c9a1a7c1f3b1d2e]::recompose::Recompositions<I> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::next",
+    "<redact_secret[7f632526a786e8f3]::pii::PiiSelection>::parse",
+  ].join(NUL);
+  assert.deepEqual(piiRuntime(section), ["EmailFamily", "NetworkAddress", "PiiDomain", "unicode_normalization"]);
+  assert.deepEqual(
+    piiRuntime(["<redact_secret[7f632526a786e8f3]::pii::PiiSelection>::parse", "redact_secret[7f632526a786e8f3]::pii::valid_slug"].join(NUL)),
+    [],
+    "selector parsing is not the PII runtime",
+  );
+});
+
+const PII_RUNTIME = ["EmailFamily", "PiiDomain", "unicode_normalization"];
+
+function withPii(base, raw, parts) {
+  return { ...base, sizes: { wasmRawBytes: raw }, piiRuntime: parts };
+}
+
+function fourArtifacts() {
+  const full = { ...artifact(280_000, [...COMMON_MODULES, "aws"]), piiRuntime: [] };
+  const common = { ...artifact(220_000, COMMON_MODULES), piiRuntime: [] };
+  return {
+    full,
+    common,
+    "full-pii": withPii(full, 400_000, PII_RUNTIME),
+    "common-pii": withPii(common, 340_000, PII_RUNTIME),
+  };
+}
+
+test("piiGuardFailures accepts PII-free defaults and PII-linking variants", () => {
+  const artifacts = fourArtifacts();
+  assert.deepEqual(piiGuardFailures(artifacts, PACKS), []);
+  assert.deepEqual(guardFailures(artifacts.full, artifacts.common, PACKS), []);
+});
+
+test("piiGuardFailures rejects a default artifact that links the PII runtime", () => {
+  const artifacts = fourArtifacts();
+  artifacts.full = { ...artifacts.full, piiRuntime: ["PiiDomain", "unicode_normalization"] };
+  artifacts.common = { ...artifacts.common, piiRuntime: ["unicode_normalization"] };
+  assert.deepEqual(piiGuardFailures(artifacts, PACKS), [
+    "full links the PII runtime: PiiDomain, unicode_normalization",
+    "common links the PII runtime: unicode_normalization",
+  ]);
+});
+
+test("piiGuardFailures rejects a pii variant without the runtime, a provider in common-pii, and a different surface", () => {
+  const artifacts = fourArtifacts();
+  artifacts["full-pii"] = { ...artifacts["full-pii"], piiRuntime: ["unicode_normalization"] };
+  artifacts["common-pii"] = {
+    ...withPii(artifact(410_000, [...COMMON_MODULES, "aws"], undefined, ["initialize"]), 410_000, PII_RUNTIME),
+  };
+  const failures = piiGuardFailures(artifacts, PACKS).join("\n");
+  assert.match(failures, /full-pii does not link the PII runtime/);
+  assert.match(failures, /common-pii \.wasm \(410000 B\) is not smaller than full-pii/);
+  assert.match(failures, /common-pii links provider detector implementations: aws/);
+  assert.match(failures, /full-pii and common-pii export different surfaces/);
+  assert.match(failures, /common-pii exports a different surface than full/);
+});
+
+test("piiGuardFailures rejects a default build that is not smaller than its pii variant", () => {
+  const artifacts = fourArtifacts();
+  artifacts["common-pii"] = withPii(artifacts.common, 220_000, PII_RUNTIME);
+  assert.deepEqual(piiGuardFailures(artifacts, PACKS), [
+    "common .wasm (220000 B) is not smaller than common-pii (220000 B)",
+  ]);
 });

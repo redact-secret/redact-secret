@@ -537,7 +537,11 @@ accepted in
   `--no-default-features`, linking only the `common` ones. Each artifact
   reports its profile through its own `profile()` export. Measured savings
   and build evidence are in
-  [the #381 record](./docs/audits/evidence/381/README.md).
+  [the #381 record](./docs/audits/evidence/381/README.md). A second,
+  off-by-default feature, `pii` (#937), links the PII domain runtime; every
+  profile ships a default build without it and a `pii` build with it, and
+  `@redact-secret/core` loads the `pii` build only when `initialize()` is
+  given a PII selection.
 - **Node addon (`bindings/node`).** One compiled addon serves both
   profiles: it exports `profile()` plus a `common` counterpart to every
   registry-backed export (`initializeCommon`/`scanCommon`/

@@ -33,6 +33,9 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
     "private_key",
     "client_secret",
     "webhook_secret",
+    // An `auth_token` assignment names a credential (Twilio calls its
+    // account secret the "Auth Token"); ambiguous until issue #941.
+    "auth_token",
     // RFC 7636 PKCE verifier: the secret half of the code challenge
     // (issue #816).
     "code_verifier",
@@ -58,13 +61,7 @@ const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
     "convex_self_hosted_admin_key",
 ];
 
-const AMBIGUOUS_NAMES: &[&str] = &[
-    "auth",
-    "auth_token",
-    "credential",
-    "credentials",
-    "signing_key",
-];
+const AMBIGUOUS_NAMES: &[&str] = &["auth", "credential", "credentials", "signing_key"];
 
 /// Names that are credential-bearing only as a URL query, fragment or form
 /// parameter (`?code=`, `&code=`), and then only in the ambiguous bucket:
@@ -4611,6 +4608,43 @@ mod tests {
             assert!(is_reserved_name(name), "{name}");
         }
         assert!(!is_reserved_name("corp_passphrase"));
+    }
+
+    // --- auth_token is a high-signal name (issue #941) -------------------
+
+    #[test]
+    fn auth_token_is_a_high_signal_name_and_its_neighbours_are_unchanged() {
+        for name in ["auth_token", "authToken", "AUTH_TOKEN", "app_auth_token"] {
+            assert!(is_high_signal_name(&normalize_name(name)), "{name}");
+            assert!(!is_ambiguous_name(&normalize_name(name)), "{name}");
+        }
+        assert!(is_high_signal_name("oauth_token"));
+        assert!(is_ambiguous_name("auth"));
+        assert!(!is_high_signal_name("auth"));
+        assert!(!is_high_signal_name("csrf_token"));
+    }
+
+    #[test]
+    fn an_auth_token_literal_is_high_and_placeholders_stay_silent() {
+        let value = "Rk7vQ2mX9pL4tW8nB5cD1fG6hJ3sY0aZ";
+        let input = format!("auth_token={value}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1, "{candidates:?}");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(
+            &input[candidates[0].range().start()..candidates[0].range().end()],
+            value
+        );
+        for silent in [
+            "auth_token=your_auth_token",
+            "auth_token=<AUTH_TOKEN>",
+            "auth_token=${AUTH_TOKEN}",
+            "auth_token=TWILIO_AUTH_TOKEN",
+            "auth_token: {{ auth_token }}",
+            "auth_token=xxxxxxxxxxxxxxxxxxxxxxxx",
+        ] {
+            assert!(detect(silent).is_empty(), "{silent}");
+        }
     }
 
     // --- bare vendor-prefixed policy candidates (issue #552) ------------

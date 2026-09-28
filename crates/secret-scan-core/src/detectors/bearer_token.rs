@@ -18,7 +18,10 @@
 //! `<name>|<secret>`) is selected whole, through the last joined run
 //! (issue #918). Stopping at the first byte outside the RFC 6750 alphabet
 //! used to redact the non-secret left half and leave the secret right half
-//! readable. See [`joined_value_end`].
+//! readable. See [`joined_value_end`]. A join is not taken onto the key of
+//! a delimited record's next field (`<tok>|email=<addr>`), `=` is padding
+//! only at the end of a body, and a `name@host` value is selected whole,
+//! host included (issue #939).
 
 use super::generic_token::is_vendor_prefixed_placeholder;
 use super::text::{
@@ -95,11 +98,72 @@ fn is_value_join(byte: u8) -> bool {
 }
 
 /// The number of `=` padding bytes (at most [`MAX_TRAILING_EQUALS`]) at
-/// `at`.
+/// `at`, or 0 when the `=` opens a field value instead of ending a body
+/// ([`opens_field_value`]): RFC 6750 allows `=` only at the end of a
+/// `b64token`, so `x=1` is a `key=value` field, not padding (issue #939).
 fn trailing_equals_at(bytes: &[u8], at: usize) -> usize {
-    (0..MAX_TRAILING_EQUALS)
+    let count = (0..MAX_TRAILING_EQUALS)
         .take_while(|&offset| bytes.get(at + offset) == Some(&b'='))
-        .count()
+        .count();
+    if count > 0 && opens_field_value(bytes, at + count) {
+        0
+    } else {
+        count
+    }
+}
+
+/// `true` when the byte at `at`, right after an `=`, starts a field value
+/// rather than ending a padded body: a token byte, `@`, `$`, `<`, `{` or
+/// `[` (`email=alice@...`, `x=1`, `v=${X}`), or a quote that opens one
+/// (`note="..."`). A quote that closes the value (`"Bearer <b64>=="`) is
+/// followed by a terminator instead.
+fn opens_field_value(bytes: &[u8], at: usize) -> bool {
+    let opens = |byte: u8| is_token_char(byte) || matches!(byte, b'@' | b'$' | b'<' | b'{' | b'[');
+    match bytes.get(at) {
+        Some(&byte) if opens(byte) => true,
+        Some(b'"' | b'\'') => bytes.get(at + 1).copied().is_some_and(opens),
+        _ => false,
+    }
+}
+
+/// `true` when the run ending at `run_end` is the key of a delimited-record
+/// field rather than a credential body (issue #939): it is followed by `=`
+/// that opens a field value (`|email=alice@...`, `|x=1`). `=` before
+/// whitespace is read as padding, so `|ts= <value>` stays a joined run: a
+/// padded body before a space is the far more common reading.
+///
+/// A run followed by `:` and whitespace (`|user: alice`) is deliberately
+/// *not* a field key: the same bytes end the secret half of
+/// `<id>:<secret>: see docs`, and dropping that run would leave the secret
+/// readable. The cost is a span that also covers the label (`<tok>|user`).
+fn is_field_key(bytes: &[u8], run_end: usize) -> bool {
+    if bytes.get(run_end) != Some(&b'=') {
+        return false;
+    }
+    let equals = bytes[run_end..]
+        .iter()
+        .take_while(|&&byte| byte == b'=')
+        .count();
+    opens_field_value(bytes, run_end + equals)
+}
+
+/// `[A-Za-z0-9.-]`: the bytes of a host after `@` in a `name@host` value.
+fn is_host_char(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'-')
+}
+
+/// The end of a `@host` tail at `at` (`Bearer name@host`, issue #939): `@`,
+/// then a host that starts alphanumeric, with a trailing sentence `.`
+/// excluded. `None` when there is no such tail.
+fn host_tail_end(bytes: &[u8], at: usize) -> Option<usize> {
+    if bytes.get(at) != Some(&b'@') || !bytes.get(at + 1).is_some_and(u8::is_ascii_alphanumeric) {
+        return None;
+    }
+    let mut end = at + 1 + ascii_run_len(bytes, at + 1, is_host_char);
+    while bytes[end - 1] == b'.' {
+        end -= 1;
+    }
+    Some(end)
 }
 
 /// The end of a Bearer value whose first token run ends at `first_end`
@@ -111,7 +175,15 @@ fn trailing_equals_at(bytes: &[u8], at: usize) -> usize {
 /// judge the floor and the placeholder exclusions on the runs. A join with
 /// nothing after it (`<token>:` at a line end, `<token>: prose`) and a
 /// `://` URL separator are not part of the value, so ordinary headers and
-/// prose keep today's span.
+/// prose keep today's span. A join whose run is the key of a delimited
+/// record's next field (`<tok>|email=<addr>`, `<tok>|x=1`) is not taken
+/// either ([`is_field_key`], issue #939).
+///
+/// A `name@host` value (`Bearer svc-deploy@example.test`) is selected whole,
+/// host included (issue #939): `@` is outside the RFC 6750 alphabet, and
+/// stopping at it used to redact only the local part. The host is not a
+/// run, so the floor and the placeholder exclusions still judge the
+/// credential part.
 ///
 /// The cost is linear: every byte is read at most once, and the scan never
 /// crosses whitespace.
@@ -131,8 +203,17 @@ fn joined_value_end(
             break;
         }
         let run_end = run_start + run_len;
+        if is_field_key(bytes, run_end) {
+            break;
+        }
         runs.push((run_start, run_end));
         end = run_end + trailing_equals_at(bytes, run_end);
+    }
+    let last_run_end = runs.last().map_or(first_run_end, |&(_, run_end)| run_end);
+    if end == last_run_end
+        && let Some(host_end) = host_tail_end(bytes, end)
+    {
+        end = host_end;
     }
     (end, runs)
 }
@@ -681,6 +762,7 @@ mod tests {
                 format!("use Bearer {value}, then retry"),
             ] {
                 let candidates = detect(&input);
+                assert_eq!(candidates.len(), 1, "{input}");
                 let (start, end) = only_range(&candidates);
                 assert_eq!(&input[start..end], value, "{input}");
             }
@@ -733,6 +815,108 @@ mod tests {
         assert!(detect("an OAuth bearer https://example.invalid/rfc6750").is_empty());
         assert!(detect("The bearer of: this letter").is_empty());
         assert!(detect("The bearer 10:30 train").is_empty());
+    }
+
+    #[test]
+    fn a_join_never_absorbs_the_next_field_of_a_delimited_record() {
+        // Issue #939: `|email=` used to be read as a joined run plus `=`
+        // padding, redacting `<tok>|email=` and leaving the address.
+        const TOKEN: &str = "SYNTHETIC_REVOKED_BEARER_VALUE";
+        for tail in [
+            "|email=fixture@example.test",
+            "|x=1",
+            "|x==1",
+            "|note=\"see docs\"",
+            "|v=${NEXT}",
+            ":scope=read",
+        ] {
+            for input in [
+                format!("Authorization: Bearer {TOKEN}{tail}"),
+                format!("level=info auth=\"Bearer {TOKEN}{tail}\""),
+            ] {
+                let candidates = detect(&input);
+                let (start, end) = only_range(&candidates);
+                assert_eq!(&input[start..end], TOKEN, "{input}");
+            }
+        }
+        // Padding that ends a base64 body is still part of the value, before
+        // a closing quote, a join or the end of the line.
+        for value in [
+            "SYNTHETICq8vN3xR7tLm2Qw==",
+            "SYNTHETICq8vN3xR7tLm2Qw=",
+            "SYNTHID|SYNTHETICq8vN3xR7tLm2Qw==",
+            "SYNTHETICq8vN3xR7==:SYNTHETICtLm2Qw",
+        ] {
+            for input in [
+                format!("Authorization: Bearer {value}"),
+                format!("{{\"Authorization\": \"Bearer {value}\"}}"),
+                format!("Authorization: Bearer {value} next"),
+            ] {
+                let candidates = detect(&input);
+                assert_eq!(candidates.len(), 1, "{input}");
+                let (start, end) = only_range(&candidates);
+                assert_eq!(&input[start..end], value, "{input}");
+            }
+        }
+        // `=` that opens a value after the first run is not padding either.
+        let input = format!("Bearer {TOKEN}=1");
+        let candidates = detect(&input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], TOKEN);
+    }
+
+    #[test]
+    fn a_colon_label_after_a_joined_secret_never_drops_the_secret() {
+        // `<id>:<secret>: note` must keep the secret half inside the span
+        // (#939 follow-up): `:` plus whitespace is not a field-key signal.
+        let input = "Authorization: Bearer SYNTHID:SYNTHETIC_REVOKED_SECRET: see docs";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHID:SYNTHETIC_REVOKED_SECRET");
+        let input = "Authorization: Bearer SYNTHETIC_REVOKED_BEARER_VALUE|user: alice";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_BEARER_VALUE|user");
+    }
+
+    #[test]
+    fn a_name_at_host_value_is_selected_whole() {
+        // Issue #939: the span used to stop at `@`, redacting only the local
+        // part and leaving the host.
+        for (input, value) in [
+            (
+                "Authorization: Bearer svc-deploy-bot@example.test",
+                "svc-deploy-bot@example.test",
+            ),
+            (
+                "Authorization: Bearer svc-deploy-bot@example.test.",
+                "svc-deploy-bot@example.test",
+            ),
+            (
+                "curl -H 'Authorization: Bearer svc-deploy-bot@ci.example.test' https://x.invalid",
+                "svc-deploy-bot@ci.example.test",
+            ),
+            (
+                "Bearer SYNTHETIC_REVOKED_VALUE@example.test",
+                "SYNTHETIC_REVOKED_VALUE@example.test",
+            ),
+        ] {
+            let candidates = detect(input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+        }
+        // The floor still judges the part before `@`, so a short local part
+        // is no finding rather than a partial one; a bare `@` is not a host.
+        for input in [
+            "Authorization: Bearer ops@example.test",
+            "Bearer alice@example.test",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        let input = "Authorization: Bearer SYNTHETIC_REVOKED_VALUE@ trailing";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_VALUE");
     }
 
     #[test]

@@ -21,9 +21,19 @@ crate-type = ["cdylib", "rlib"]
 # a leaf nothing depends on, so feature unification cannot reach it from
 # outside; forgetting `--no-default-features` yields `full` (more detection,
 # never less), which the artifact's `profile()` export makes detectable.
+#
+# `pii` (issue #937, off by default) links the PII domain runtime: the
+# `pii-domain` adapter, its families, and the Unicode normalization tables
+# they need. Without it the artifact still parses PII selectors (so a bad
+# selector reports the same `PII_SELECTOR_INVALID`/`_UNSUPPORTED` code), but
+# rejects any non-empty selection with `PII_SELECTOR_UNAVAILABLE` and links
+# no PII detection code, so a browser that never enables PII never downloads
+# it. `@redact-secret/core` loads the `pii` build only when `initialize()` is
+# given a PII selection.
 [features]
 default = ["full"]
 full = []
+pii = []
 
 [dependencies]
 redact-secret.workspace = true
