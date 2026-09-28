@@ -128,22 +128,23 @@ fn opens_field_value(bytes: &[u8], at: usize) -> bool {
 
 /// `true` when the run ending at `run_end` is the key of a delimited-record
 /// field rather than a credential body (issue #939): it is followed by `=`
-/// that opens a field value (`|email=alice@...`, `|x=1`), or by `:` and
-/// horizontal whitespace (`|user: alice`). `=` before whitespace is read as
-/// padding, so `|ts= <value>` stays a joined run: a padded body before a
-/// space is the far more common reading.
+/// that opens a field value (`|email=alice@...`, `|x=1`). `=` before
+/// whitespace is read as padding, so `|ts= <value>` stays a joined run: a
+/// padded body before a space is the far more common reading.
+///
+/// A run followed by `:` and whitespace (`|user: alice`) is deliberately
+/// *not* a field key: the same bytes end the secret half of
+/// `<id>:<secret>: see docs`, and dropping that run would leave the secret
+/// readable. The cost is a span that also covers the label (`<tok>|user`).
 fn is_field_key(bytes: &[u8], run_end: usize) -> bool {
-    match bytes.get(run_end) {
-        Some(b'=') => {
-            let equals = bytes[run_end..]
-                .iter()
-                .take_while(|&&byte| byte == b'=')
-                .count();
-            opens_field_value(bytes, run_end + equals)
-        }
-        Some(b':') => bytes.get(run_end + 1).copied().is_some_and(is_space_or_tab),
-        _ => false,
+    if bytes.get(run_end) != Some(&b'=') {
+        return false;
     }
+    let equals = bytes[run_end..]
+        .iter()
+        .take_while(|&&byte| byte == b'=')
+        .count();
+    opens_field_value(bytes, run_end + equals)
 }
 
 /// `[A-Za-z0-9.-]`: the bytes of a host after `@` in a `name@host` value.
@@ -175,8 +176,8 @@ fn host_tail_end(bytes: &[u8], at: usize) -> Option<usize> {
 /// nothing after it (`<token>:` at a line end, `<token>: prose`) and a
 /// `://` URL separator are not part of the value, so ordinary headers and
 /// prose keep today's span. A join whose run is the key of a delimited
-/// record's next field (`<tok>|email=<addr>`, `<tok>|x=1`, `<tok>|user:
-/// alice`) is not taken either ([`is_field_key`], issue #939).
+/// record's next field (`<tok>|email=<addr>`, `<tok>|x=1`) is not taken
+/// either ([`is_field_key`], issue #939).
 ///
 /// A `name@host` value (`Bearer svc-deploy@example.test`) is selected whole,
 /// host included (issue #939): `@` is outside the RFC 6750 alphabet, and
@@ -827,7 +828,6 @@ mod tests {
             "|x==1",
             "|note=\"see docs\"",
             "|v=${NEXT}",
-            "|user: alice",
             ":scope=read",
         ] {
             for input in [
@@ -863,6 +863,20 @@ mod tests {
         let candidates = detect(&input);
         let (start, end) = only_range(&candidates);
         assert_eq!(&input[start..end], TOKEN);
+    }
+
+    #[test]
+    fn a_colon_label_after_a_joined_secret_never_drops_the_secret() {
+        // `<id>:<secret>: note` must keep the secret half inside the span
+        // (#939 follow-up): `:` plus whitespace is not a field-key signal.
+        let input = "Authorization: Bearer SYNTHID:SYNTHETIC_REVOKED_SECRET: see docs";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHID:SYNTHETIC_REVOKED_SECRET");
+        let input = "Authorization: Bearer SYNTHETIC_REVOKED_BEARER_VALUE|user: alice";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_BEARER_VALUE|user");
     }
 
     #[test]

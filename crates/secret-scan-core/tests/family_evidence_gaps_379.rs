@@ -183,7 +183,7 @@ fn issue_939_a_bearer_join_stops_before_the_next_record_field() {
         32,
         6,
     );
-    for tail in ["|email=fixture@example.test", "|x=1", "|user: alice"] {
+    for tail in ["|email=fixture@example.test", "|x=1"] {
         let input = format!("Authorization: Bearer {token}{tail}\n");
         let findings = findings_with_parity(&input);
         assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
