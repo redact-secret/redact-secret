@@ -4849,6 +4849,7 @@
             "connection-positive-postgresql",
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
+            "connection-positive-sqlalchemy-driver-ipv6-host",
             "connection-positive-unclosed-command-substitution-still-detected",
             "connection-regression-http-proxy-userinfo-password",
             "connection-regression-https-userinfo-percent-encoded-password",
@@ -5093,6 +5094,7 @@
             "connection-positive-postgresql",
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
+            "connection-positive-sqlalchemy-driver-ipv6-host",
             "connection-positive-unclosed-command-substitution-still-detected",
             "connection-regression-http-proxy-userinfo-password",
             "connection-regression-https-userinfo-percent-encoded-password",
@@ -5411,6 +5413,9 @@
             "contextual-negative-typescript-config-member-reference",
             "contextual-negative-unqualified-random-text",
             "contextual-negative-vals-vault-reference",
+            "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-sdk-counting-digits",
             "contextual-negative-windows-env-reference-excluded",
             "regression-yaml-nested-key-no-crossing-newline"
           ],
@@ -5482,6 +5487,9 @@
             "contextual-negative-typescript-config-member-reference",
             "contextual-negative-unqualified-random-text",
             "contextual-negative-vals-vault-reference",
+            "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-sdk-counting-digits",
             "contextual-negative-windows-env-reference-excluded",
             "contextual-overlap-nested-assignment",
             "contextual-positive-assignment",
@@ -5752,6 +5760,9 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-sdk-counting-digits",
             "generic-token-vendor-prefix-low-entropy-control"
           ],
           "state": "supported"
@@ -5896,6 +5907,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "twilio-auth-token-positive-bare-with-account-sid",
+            "twilio-auth-token-positive-cli-table-auth-token-column",
             "twilio-auth-token-positive-dotenv-keyword",
             "twilio-auth-token-positive-json-keyword",
             "twilio-auth-token-positive-yaml-keyword",
@@ -6846,6 +6858,7 @@
           "evidenceFixtureIds": [
             "mailchimp-api-key-positive-bare-suffix-shape",
             "mailchimp-api-key-positive-dotenv-keyword",
+            "mailchimp-api-key-positive-hostname-label-with-keyword",
             "mailchimp-api-key-positive-json-keyword",
             "mailchimp-api-key-positive-keyword-on-another-line",
             "mailchimp-api-key-positive-log-keyword",
@@ -8745,6 +8758,7 @@
           "evidenceFixtureIds": [
             "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
             "confluent-cloud-api-secret-legacy-positive-dotenv-keyword",
+            "confluent-cloud-api-secret-legacy-positive-registry-user-info",
             "confluent-cloud-api-secret-legacy-positive-yaml-keyword"
           ],
           "state": "supported"
@@ -9521,6 +9535,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "heroku-api-key-legacy-positive-auth-token-output",
+            "heroku-api-key-legacy-positive-authorizations-table",
             "heroku-api-key-legacy-positive-bare-with-keyword",
             "heroku-api-key-legacy-positive-dotenv-keyword",
             "heroku-api-key-legacy-positive-netrc-multi-line",
@@ -9559,7 +9574,8 @@
             "heroku-api-key-legacy-negative-bare-no-context",
             "heroku-api-key-legacy-negative-different-line",
             "heroku-api-key-legacy-negative-heroku-app-id",
-            "heroku-api-key-legacy-negative-uuid-without-heroku-context"
+            "heroku-api-key-legacy-negative-uuid-without-heroku-context",
+            "heroku-api-key-legacy-negative-zero-uuid-placeholder"
           ],
           "state": "supported"
         },
@@ -9794,6 +9810,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "cohere-api-key-positive-dotenv-named",
+            "cohere-api-key-positive-java-builder-token",
             "cohere-api-key-positive-json-named",
             "cohere-api-key-positive-keyword-adjacent-prose",
             "cohere-api-key-positive-log-named",
@@ -9980,12 +9997,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "deepgram-api-key-positive-dotenv-named",
+            "deepgram-api-key-positive-go-last-positional-argument",
+            "deepgram-api-key-positive-httpie-token-header",
             "deepgram-api-key-positive-json-named",
             "deepgram-api-key-positive-keyword-adjacent-prose",
             "deepgram-api-key-positive-log-named",
             "deepgram-api-key-positive-python-constructor",
             "deepgram-api-key-positive-shell-export",
             "deepgram-api-key-positive-token-header",
+            "deepgram-api-key-positive-token-header-keyword-only",
             "deepgram-api-key-positive-yaml-named",
             "deepgram-api-key-regression-crlf-and-unicode-prefix"
           ],

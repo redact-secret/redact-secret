@@ -66,9 +66,11 @@
 //!   `schema.registry.url` line, above the credential line (issue #933).
 //!   A legacy secret that is the secret half of a
 //!   `basic.auth.user.info=<key id>:<secret>` property is therefore also
-//!   reported, at [`Confidence::Medium`], when one of the at most
-//!   [`PROPERTIES_LOOKBACK_LINES`] property lines directly above it names
-//!   `confluent`. A blank or non-property line ends the block, and no
+//!   reported when one of the at most [`PROPERTIES_LOOKBACK_LINES`]
+//!   property lines directly above it names `confluent`, at
+//!   [`Confidence::High`] since issue #936 (the property names the
+//!   credential and the block binds it to Confluent, as a Confluent-named
+//!   key does; #933 reported it at medium, which only warned). A blank or non-property line ends the block, and no
 //!   other property name is read this way. The incremental session holds
 //!   such a block open ([`has_open_confluent_properties`]).
 //!
@@ -390,7 +392,10 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                     continue;
                 };
                 let (confidence, signal) = if !same_line {
-                    (Confidence::Medium, "confluent-properties-block")
+                    // Issue #936: `basic.auth.user.info` names the
+                    // credential and the Confluent-named property above binds
+                    // it, as a Confluent-named key does.
+                    (Confidence::High, "confluent-properties-block")
                 } else if text::is_provider_named_assignment(
                     line,
                     relative_start,
@@ -750,7 +755,8 @@ mod tests {
             assert_eq!(found.len(), 1, "{input:?}");
             let range = found[0].range();
             assert_eq!(&input[range.start()..range.end()], LEGACY_BODY);
-            assert_eq!(found[0].confidence(), Confidence::Medium);
+            // Issue #936: high, so the default policy redacts it.
+            assert_eq!(found[0].confidence(), Confidence::High);
         }
     }
 

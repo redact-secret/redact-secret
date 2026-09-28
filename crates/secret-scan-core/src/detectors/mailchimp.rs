@@ -63,7 +63,8 @@
 //! confidence-gated (not in `ALWAYS_REDACT_TYPES`): `Medium` for a keyword
 //! anywhere on the line, and `High` when the value is assigned to a key that
 //! names Mailchimp (`decision-redact-provider-named-credential-assignments`,
-//! issue #702).
+//! issue #702). Since issue #936 the complete shape outside a hostname or
+//! path is `High` with or without a keyword (see "Confidence" below).
 //!
 //! ## Unresolved provider facts (issues #697, #698, #699)
 //!
@@ -131,18 +132,28 @@
 //! 1-3 digit datacenter, whole between boundaries -- because that suffix is
 //! the one part of the grammar the bare hex body lacks: a hash, a UUID
 //! without dashes or a hex id carries no `-us<N>` of its own, and
-//! trufflehog 3.97.4 already matches this shape with no keyword. Such a
-//! match is [`Confidence::Medium`] (`mailchimp-suffix-shape`), so the
-//! confidence-gated default policy warns rather than redacts; a same-line
-//! keyword keeps today's medium signal, and a Mailchimp-named key stays
-//! high. Without a keyword, a match that is a DNS label
-//! (`<hex>-us1.example.test`) or a URL path segment (`/<hex>-us1`) is an
-//! identifier position and is not reported.
+//! trufflehog 3.97.4 already matches this shape with no keyword. Without a
+//! keyword, a match that is a DNS label (`<hex>-us1.example.test`) or a URL
+//! path segment (`/<hex>-us1`) is an identifier position and is not
+//! reported.
 //!
-//! FN removed: complete keys with no same-line keyword. FP added: a
-//! non-secret 32-hex value that happens to be followed by `-us<1-3 digits>`
-//! outside a hostname or path (a region-sharded resource id in prose or a
-//! log field), reported as a warning.
+//! ## Confidence (issue #936)
+//!
+//! #931 reported the keyword-free shape at [`Confidence::Medium`], so the
+//! confidence-gated default policy only warned and the key stayed in the
+//! sanitized output. Under the security-first default (redact over warn),
+//! the complete shape outside an identifier position is
+//! [`Confidence::High`] (`mailchimp-suffix-shape`) whether or not a
+//! `mailchimp` keyword shares its line: a keyword cannot make the same
+//! value less of a key. A Mailchimp-named key stays high
+//! (`mailchimp-named-assignment`). Only a DNS-label or URL-path match that
+//! a same-line keyword keeps reporting stays [`Confidence::Medium`]
+//! (`mailchimp-keyword-cooccurrence`, warn).
+//!
+//! FN removed: complete keys with no same-line keyword (#931), now
+//! redacted (#936). FP added: a non-secret 32-hex value that happens to be
+//! followed by `-us<1-3 digits>` outside a hostname or path (a
+//! region-sharded resource id in prose or a log field) is redacted.
 //!
 //! ## Consequences and known gaps
 //!
@@ -249,8 +260,9 @@ fn is_non_credential_structure(bytes: &[u8], start: usize, end: usize) -> bool {
 
 /// Detects a Mailchimp Marketing API key: a bare 32-byte hex run immediately
 /// followed by a `-us<1-3 digits>` datacenter suffix. The complete shape
-/// alone is a medium finding (issue #931); a same-line [`CONTEXT_KEYWORD`]
-/// keeps its medium keyword signal, and a Mailchimp-named key is high.
+/// alone is a high finding (issues #931, #936); a same-line
+/// [`CONTEXT_KEYWORD`] only keeps a DNS-label or URL-path match reported, at
+/// medium.
 pub(super) struct MailchimpMarketingApiKeyDetector;
 
 impl Detector for MailchimpMarketingApiKeyDetector {
@@ -284,10 +296,15 @@ impl Detector for MailchimpMarketingApiKeyDetector {
                     && (has_keyword || !is_non_credential_structure(bytes, start, full_end))
                     && let Some(range) = ByteRange::new(line_start + start, line_start + full_end)
                 {
-                    let (confidence, context_signal) = if !has_keyword {
-                        (Confidence::Medium, "mailchimp-suffix-shape")
-                    } else if text::is_provider_named_assignment(line, start, &[CONTEXT_KEYWORD]) {
+                    let identifier_position = is_non_credential_structure(bytes, start, full_end);
+                    let (confidence, context_signal) = if has_keyword
+                        && text::is_provider_named_assignment(line, start, &[CONTEXT_KEYWORD])
+                    {
                         (Confidence::High, "mailchimp-named-assignment")
+                    } else if !identifier_position {
+                        // Issue #936: the complete shape outside a hostname
+                        // or path is the key, keyword or not.
+                        (Confidence::High, "mailchimp-suffix-shape")
                     } else {
                         (Confidence::Medium, "mailchimp-keyword-cooccurrence")
                     };
@@ -332,12 +349,9 @@ mod tests {
             let candidates = detect(&input);
             assert_eq!(candidates.len(), 1, "{input}");
             assert_eq!(candidates[0].type_name(), "mailchimp_api_key");
-            let expected = if input.starts_with('#') {
-                Confidence::Medium
-            } else {
-                Confidence::High
-            };
-            assert_eq!(candidates[0].confidence(), expected, "{input}");
+            // Issue #936: a keyword elsewhere on the line no longer lowers
+            // the complete shape to medium.
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
             assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
             let start = input.rfind(&key()).unwrap();
             assert_eq!(
@@ -361,8 +375,9 @@ mod tests {
     }
 
     #[test]
-    fn reports_the_complete_shape_with_no_keyword_at_medium() {
-        // Issue #931: the complete `-us<dc>` shape alone is evidence.
+    fn reports_the_complete_shape_with_no_keyword_at_high() {
+        // Issue #931: the complete `-us<dc>` shape alone is evidence; issue
+        // #936: it is high, so the default policy redacts it.
         for input in [
             key(),
             format!("# mailchimp\n{}\n", key()),
@@ -374,7 +389,7 @@ mod tests {
             assert_eq!(candidates.len(), 1, "{input}");
             let range = candidates[0].range();
             assert_eq!(&input[range.start()..range.end()], key());
-            assert_eq!(candidates[0].confidence(), Confidence::Medium, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
             assert!(
                 candidates[0]
                     .signals()
@@ -405,11 +420,16 @@ mod tests {
         ] {
             assert!(detect(&input).is_empty(), "{input}");
         }
-        // A same-line keyword still overrides the structural exclusions.
-        assert_eq!(
-            detect(&format!("mailchimp https://{}.cdn.example.test", key())).len(),
-            1
-        );
+        // A same-line keyword still overrides the structural exclusions, at
+        // medium only (issue #936): the position is an identifier's.
+        for input in [
+            format!("mailchimp https://{}.cdn.example.test", key()),
+            format!("mailchimp GET /v1/objects/{}", key()),
+        ] {
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::Medium, "{input}");
+        }
     }
 
     #[test]
@@ -537,7 +557,7 @@ mod tests {
         assert!(
             candidates
                 .iter()
-                .all(|candidate| candidate.confidence() == Confidence::Medium)
+                .all(|candidate| candidate.confidence() == Confidence::High)
         );
     }
 

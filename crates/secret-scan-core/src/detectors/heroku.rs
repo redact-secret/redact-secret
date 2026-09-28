@@ -111,6 +111,13 @@
 //!     reported; a blank or free-text line, or a longer table, ends the
 //!     window.
 //!
+//!   Each layout names the value's credential slot and binds it to Heroku
+//!   by structure, as a Heroku-named key does, so a UUID read through one is
+//!   reported at [`Confidence::High`] (`heroku-cli-layout`) and the default
+//!   policy redacts it (issue #936; until then these were medium and only
+//!   warned). The same-line keyword path stays medium unless the key names
+//!   Heroku.
+//!
 //!   A bare UUID after any other line stays clean, so the wider window never
 //!   turns into an unconditional UUID match. Every layout crosses a line
 //!   terminator, so the incremental session keeps such a unit open until
@@ -551,16 +558,18 @@ impl Detector for HerokuApiKeyLegacyDetector {
                 .collect();
             let bytes = line.as_bytes();
             for (relative_start, relative_end) in raw_matches {
-                let in_context = same_line
-                    || (follows_netrc_password_token(bytes, relative_start)
-                        && ends_inside_heroku_netrc_entry(&previous))
+                // A documented multi-line layout names the credential slot
+                // (a `.netrc` `password`, the whole `heroku auth:token`
+                // output, the `Token:` row) and binds it to Heroku.
+                let in_layout = (follows_netrc_password_token(bytes, relative_start)
+                    && ends_inside_heroku_netrc_entry(&previous))
                     || (is_whole_line(bytes, relative_start, relative_end)
                         && previous
                             .last()
                             .is_some_and(|line| is_heroku_auth_token_command(line)))
                     || (is_token_table_row_value(line, relative_start, relative_end)
                         && ends_inside_heroku_authorizations_table(&previous));
-                if !in_context
+                if !(same_line || in_layout)
                     || !is_uuid_shape(bytes, relative_start, relative_end, pattern::is_hex)
                     || is_filler_uuid(&line[relative_start..relative_end])
                     || is_identifier_key(assigned_key(bytes, relative_start))
@@ -577,6 +586,10 @@ impl Detector for HerokuApiKeyLegacyDetector {
                     && text::is_provider_named_assignment(line, relative_start, &[CONTEXT_KEYWORD])
                 {
                     (Confidence::High, "heroku-named-assignment")
+                } else if in_layout {
+                    // Issue #936: the layout is as specific as a
+                    // provider-named key, so the default policy redacts it.
+                    (Confidence::High, "heroku-cli-layout")
                 } else {
                     (Confidence::Medium, "heroku-keyword-cooccurrence")
                 };
@@ -995,7 +1008,10 @@ mod tests {
             ),
             format!("machine api.heroku.com\n  login a@example.invalid password {LEGACY_UUID}\n"),
         ] {
-            assert_eq!(detect_legacy(&input).len(), 1, "{input:?}");
+            let found = detect_legacy(&input);
+            assert_eq!(found.len(), 1, "{input:?}");
+            // Issue #936: a layout-bound token is high (redacted).
+            assert_eq!(found[0].confidence(), Confidence::High, "{input:?}");
         }
     }
 
@@ -1032,7 +1048,9 @@ mod tests {
             format!("heroku auth:token\r\n{LEGACY_UUID}\r\n"),
             format!("user@host:~$ heroku auth:token\n  {LEGACY_UUID}"),
         ] {
-            assert_eq!(detect_legacy(&input).len(), 1, "{input:?}");
+            let found = detect_legacy(&input);
+            assert_eq!(found.len(), 1, "{input:?}");
+            assert_eq!(found[0].confidence(), Confidence::High, "{input:?}");
         }
     }
 
@@ -1087,7 +1105,8 @@ mod tests {
             assert_eq!(found.len(), 1, "{input:?}");
             let range = found[0].range();
             assert_eq!(&input[range.start()..range.end()], value);
-            assert_eq!(found[0].confidence(), Confidence::Medium);
+            // Issue #936: high, so the default policy redacts it.
+            assert_eq!(found[0].confidence(), Confidence::High);
         }
         let crlf = authorizations_table(&format!("Token:       {value}")).replace('\n', "\r\n");
         assert_eq!(detect_legacy(&crlf).len(), 1);

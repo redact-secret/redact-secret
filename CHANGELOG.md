@@ -119,6 +119,22 @@ evidence is linked from each published version.
   labels `email address`, `e-mail address`, `이메일 주소`, `카드번호`,
   `신용카드번호`, and `직불카드번호` (#927). A bare `address` or `주소` is
   still not a label.
+- Keyword-gated provider values read through a structure that names their
+  credential slot and binds the provider are now reported at high
+  confidence and redacted instead of warned (#936). A warning leaves the
+  value in the sanitized output. This covers a complete Mailchimp
+  `<32 hex>-us<1–3 digits>` key outside a hostname or URL path, with or
+  without a Mailchimp keyword on its line; the Heroku `.netrc` `password`,
+  `heroku auth:token` output and `heroku authorizations` `Token:` row; the
+  `Auth Token` column of a `twilio` CLI table; the Schema Registry
+  `basic.auth.user.info` secret below a Confluent-named property; and a
+  Deepgram `Authorization: Token` header on a request to a
+  `*.deepgram.com` API host. No new value is matched. A keyword elsewhere
+  on the line with no such structure, a Deepgram header naming `deepgram`
+  only as a word, and a keyword-kept Mailchimp hostname or path match stay
+  medium (warn). Cost: a non-credential value in one of these exact slots
+  (a 32-hex id with a `-us<N>` suffix in prose) is redacted instead of
+  warned.
 
 ### Fixed
 
@@ -169,6 +185,13 @@ evidence is linked from each published version.
   `postgres+asyncpg://`, `mysql+pymysql://` and `mariadb+<driver>://` were
   missed because the scheme did not match. The driver is 1–32
   `[A-Za-z0-9_]` bytes; other schemes with a `+` suffix stay unsupported.
+- `generic-token` no longer warns on vendor-prefixed documentation
+  placeholders from the Inngest and Resend handoffs (#949):
+  `signkey-test-12345`, `re_123456789` and `re_yourkey`. The part after a
+  short lowercase vendor prefix may now be a counting run of at least four
+  digits or a `your…` credential phrase glued into one word. Any other
+  digit sequence, a leftover letter or digit, and an unlisted word stay
+  reported, and the glued form is not read on a bare value.
 - `generic-token` treats `auth_token` as a high-signal credential name
   (#941). A secret-shaped value under `auth_token` is reported at high
   confidence and redacted instead of warned, and `twilio auth_token=<value>`
@@ -195,13 +218,13 @@ evidence is linked from each published version.
   of `twilio profiles:list` output, and `confluent-cloud-api-secret-legacy`
   a Schema Registry `basic.auth.user.info=<key id>:<secret>` property below
   a Confluent-named URL. These were missed because the provider name was
-  only on an earlier line. They report at medium confidence (warn).
+  only on an earlier line. They report at high confidence (redacted) since
+  #936.
 - `mailchimp-api-key` reports a complete Marketing API key
   (`<32 hex>-us<1–3 digits>`) with no Mailchimp keyword on its line (#931),
-  at medium confidence (warn). Keys under a `requests` Basic-auth tuple, an
-  `Authorization: apikey` header or pasted into prose were missed. A
-  same-line keyword and a Mailchimp-named key behave as before (medium and
-  high). A 32-hex value without the `-us<N>` suffix, and a keyword-free
+  at high confidence (redacted) since #936. Keys under a `requests`
+  Basic-auth tuple, an `Authorization: apikey` header or pasted into prose
+  were missed. A 32-hex value without the `-us<N>` suffix, and a keyword-free
   match used as a hostname label or URL path segment, stay unreported.
 - A PII field label directly after a `|` delimiter now labels its value, as
   one after whitespace does (#940): pipe-delimited records (`a|b|email=…`,

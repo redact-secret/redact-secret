@@ -27,9 +27,16 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// A keyword elsewhere on the line reports [`Confidence::Medium`] and warns.
 /// A value assigned to a key that names the provider reports
 /// [`Confidence::High`] (issue #702,
-/// `decision-redact-provider-named-credential-assignments`), and so does
-/// `okta_api_token` under a same-line `SSWS` scheme; this default policy
-/// already redacts both without needing a carve-out here. Overlap resolution's resolved-action
+/// `decision-redact-provider-named-credential-assignments`), and so do
+/// `okta_api_token` under a same-line `SSWS` scheme and, since issue #936,
+/// a value whose structure names its credential slot and binds the provider:
+/// the complete `mailchimp_api_key` shape outside a hostname or path, the
+/// `heroku_api_key_legacy` `.netrc`/`auth:token`/`authorizations` layouts,
+/// the `twilio_auth_token` CLI-table column, the
+/// `confluent_cloud_api_secret_legacy` `basic.auth.user.info` property, and
+/// a `deepgram_api_key` `Token` header on a request to the Deepgram API
+/// host. This default policy already redacts every high finding without
+/// needing a carve-out here. Overlap resolution's resolved-action
 /// severity ranking
 /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
 /// exists precisely so this list does not have to be exhaustive over every
