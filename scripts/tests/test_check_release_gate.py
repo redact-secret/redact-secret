@@ -72,6 +72,9 @@ jobs:
           if (profile() !== "full") { throw new Error("not full"); }
           await initCommon(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm"));
           if (profileCommon() !== "common") { throw new Error("not common"); }
+          if (piiCode(initialize) !== "PII_SELECTOR_UNAVAILABLE") { throw new Error("default links PII"); }
+          const pii = await import("./bindings/wasm/npm/redact_secret_wasm_pii.js");
+          const commonPii = await import("./bindings/wasm/npm/redact_secret_wasm_common_pii.js");
           NODE_VERIFY
 
       - name: Pack, content-check, publish, and verify
@@ -350,6 +353,9 @@ class ReleaseGateTests(unittest.TestCase):
             "          if (profile() !== \"full\") { throw new Error(\"not full\"); }\n"
             "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
             "          if (profileCommon() !== \"common\") { throw new Error(\"not common\"); }\n"
+            "          if (piiCode(initialize) !== \"PII_SELECTOR_UNAVAILABLE\") { throw new Error(\"default links PII\"); }\n"
+            "          const pii = await import(\"./bindings/wasm/npm/redact_secret_wasm_pii.js\");\n"
+            "          const commonPii = await import(\"./bindings/wasm/npm/redact_secret_wasm_common_pii.js\");\n"
             "          NODE_VERIFY\n\n",
             "",
         )
@@ -389,6 +395,9 @@ class ReleaseGateTests(unittest.TestCase):
             "          if (profile() !== \"full\") { throw new Error(\"not full\"); }\n"
             "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
             "          if (profileCommon() !== \"common\") { throw new Error(\"not common\"); }\n"
+            "          if (piiCode(initialize) !== \"PII_SELECTOR_UNAVAILABLE\") { throw new Error(\"default links PII\"); }\n"
+            "          const pii = await import(\"./bindings/wasm/npm/redact_secret_wasm_pii.js\");\n"
+            "          const commonPii = await import(\"./bindings/wasm/npm/redact_secret_wasm_common_pii.js\");\n"
             "          NODE_VERIFY\n\n"
         )
         publish_step = "      - name: Pack, content-check, publish, and verify\n        run: echo noop\n\n"
@@ -428,6 +437,32 @@ class ReleaseGateTests(unittest.TestCase):
                 'does not assert the common artifact reports "common"' in error
                 for error in errors
             )
+        )
+
+    def test_profile_verification_step_not_refusing_pii_in_defaults_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            '          if (piiCode(initialize) !== "PII_SELECTOR_UNAVAILABLE") { throw new Error("default links PII"); }\n',
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any("does not assert the default artifacts refuse PII as unavailable" in error for error in errors)
+        )
+
+    def test_profile_verification_step_skipping_a_pii_artifact_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            '          const commonPii = await import("./bindings/wasm/npm/redact_secret_wasm_common_pii.js");\n',
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertIn(
+            ".github/workflows/release.yml: 'Verify the root artifact reports the full profile' "
+            "does not check the pii artifact redact_secret_wasm_common_pii.js",
+            errors,
         )
 
     def test_wrapper_identity_before_build_is_an_error(self) -> None:

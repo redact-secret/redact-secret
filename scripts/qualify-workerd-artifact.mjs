@@ -35,11 +35,16 @@
  *
  *     node scripts/qualify-workerd-artifact.mjs --wasm-dir bindings/wasm/pkg
  *     node scripts/qualify-workerd-artifact.mjs --wasm-dir bindings/wasm/pkg-common --detector-profile common
+ *     node scripts/qualify-workerd-artifact.mjs --wasm-dir bindings/wasm/pkg --pii
+ *
+ * `--pii` (issue #937) initializes with a PII selection, so the worker
+ * instantiates the profile's `pii` build instead of the default one, and
+ * checks the activation identity and a synthetic phone finding.
  */
 
 import { spawn } from "node:child_process";
 import { existsSync, rmSync, symlinkSync } from "node:fs";
-import { cp, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -68,7 +73,7 @@ function assert(condition, message) {
 }
 
 function parseArguments(argv) {
-  const options = { wasmDir: undefined, detectorProfile: "full" };
+  const options = { wasmDir: undefined, detectorProfile: "full", pii: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--wasm-dir") {
@@ -77,13 +82,15 @@ function parseArguments(argv) {
     } else if (argument === "--detector-profile") {
       index += 1;
       options.detectorProfile = argv[index];
+    } else if (argument === "--pii") {
+      options.pii = true;
     } else {
       throw new Error(`unknown argument: ${argument}`);
     }
   }
   if (options.wasmDir === undefined) {
     throw new Error(
-      "usage: qualify-workerd-artifact.mjs --wasm-dir <dir> [--detector-profile full|common]",
+      "usage: qualify-workerd-artifact.mjs --wasm-dir <dir> [--detector-profile full|common] [--pii]",
     );
   }
   if (options.detectorProfile !== "full" && options.detectorProfile !== "common") {
@@ -121,16 +128,22 @@ async function linkWasmPackage(wasmDir) {
  * rather than throwing, so a real assertion failure is visible in the
  * response body instead of an opaque `workerd` 500.
  */
-function renderWorkerSource(detectorProfile, fixture, expectedVersion) {
+function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
   const entry =
     detectorProfile === "common" ? "@redact-secret/core/common" : "@redact-secret/core";
   return `
-    import { initialize, artifact, scan, redact, scanAndRedact, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
+    import { initialize, artifact, piiActivation, scan, redact, scanAndRedact, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
 
     const FIXTURE = ${JSON.stringify(fixture.input)};
     const EXPECTED_FINDING_COUNT = ${fixture.expected.length};
     const EXPECTED_VERSION = ${JSON.stringify(expectedVersion)};
     const EXPECTED_PROFILE = ${JSON.stringify(detectorProfile)};
+    const INITIALIZE_OPTIONS = ${JSON.stringify(pii === undefined ? {} : { pii: [pii.selector] })};
+    const EXPECTED_ACTIVATION = ${JSON.stringify(
+      pii === undefined
+        ? `credentials=${detectorProfile};selectors=off;families=;vocabulary=pii-context/v1`
+        : `credentials=${detectorProfile};selectors=${pii.selector};families=${pii.family};vocabulary=pii-context/v1`,
+    )};
     const GENEROUS_LIMITS = {
       maxInputCodeUnits: 1_000_000,
       maxBufferedCodeUnits: 16_512,
@@ -152,9 +165,12 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion) {
         const checks = [];
         let findings = [];
         try {
-          await initialize();
+          await initialize(INITIALIZE_OPTIONS);
           checks.push(check("artifact() reports wasm", () => {
             if (artifact() !== "wasm") throw new Error("artifact() was " + artifact());
+          }));
+          checks.push(check("piiActivation() reports the requested activation", () => {
+            if (piiActivation() !== EXPECTED_ACTIVATION) throw new Error("activation identity disagreed");
           }));
           checks.push(check("VERSION/PROFILE match the built package", () => {
             if (VERSION !== EXPECTED_VERSION) throw new Error("VERSION " + VERSION);
@@ -213,14 +229,14 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion) {
   `;
 }
 
-async function stageWorkerProject(detectorProfile, fixture, expectedVersion) {
+async function stageWorkerProject(detectorProfile, fixture, expectedVersion, pii) {
   const directory = await mkdtemp(join(tmpdir(), "redact-secret-workerd-"));
   const scope = join(directory, "node_modules", "@redact-secret");
   await mkdir(scope, { recursive: true });
   symlinkSync(JS_PACKAGE_DIR, join(scope, "core"), "junction");
   await writeFile(
     join(directory, "worker.mjs"),
-    renderWorkerSource(detectorProfile, fixture, expectedVersion),
+    renderWorkerSource(detectorProfile, fixture, expectedVersion, pii),
   );
   await writeFile(
     join(directory, "wrangler.toml"),
@@ -311,7 +327,7 @@ async function stopWrangler(child) {
 }
 
 async function main() {
-  const { wasmDir, detectorProfile } = parseArguments(process.argv.slice(2));
+  const { wasmDir, detectorProfile, pii: piiMode } = parseArguments(process.argv.slice(2));
   const packageEntry = join(
     JS_PACKAGE_DIR,
     "dist",
@@ -324,31 +340,48 @@ async function main() {
 
   const fixtureId =
     detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
-  const fixture = await loadCanonicalFixture(fixtureId);
   const expectedVersion = await packageVersion();
+  // With `--pii`, a synthetic phone fixture replaces the canonical one: its
+  // one expected finding comes from the PII runtime only the `pii` build
+  // links, so a worker that instantiated the default build fails here.
+  let fixture = await loadCanonicalFixture(fixtureId);
+  let pii;
+  if (piiMode) {
+    const phone = JSON.parse(
+      await readFile(join(REPO_ROOT_PATH, "conformance", "fixtures", "pii-phone-v1.json"), "utf8"),
+    );
+    const positive = phone.cases.find(({ id }) => id === "phone-sensitive-national-hyphen-exact-selector");
+    assert(positive !== undefined, "pii-phone-v1.json: representative positive is missing");
+    fixture = positive;
+    pii = { selector: phone.selector, family: phone.family };
+  }
+  const label = piiMode ? `${detectorProfile}, pii` : detectorProfile;
 
   const link = await linkWasmPackage(wasmDir);
   let directory;
   try {
-    directory = await stageWorkerProject(detectorProfile, fixture, expectedVersion);
+    directory = await stageWorkerProject(detectorProfile, fixture, expectedVersion, pii);
     const port = 8700 + Math.floor(Math.random() * 300);
     const child = await startWrangler(directory, port);
     try {
       const response = await fetch(`http://127.0.0.1:${port}/`);
       const body = await response.json();
       for (const entry of body.checks ?? []) {
-        console.log(`${entry.ok ? "ok" : "not ok"} - workerd (${detectorProfile}) · ${entry.name}`);
+        console.log(`${entry.ok ? "ok" : "not ok"} - workerd (${label}) · ${entry.name}`);
         if (!entry.ok) console.error(`    ${entry.detail}`);
       }
-      assert(body.ok === true, `workerd qualification (${detectorProfile}) reported failures`);
-      if (detectorProfile !== "common") {
+      assert(body.ok === true, `workerd qualification (${label}) reported failures`);
+      if (piiMode) {
+        assert(body.findings.length === 1, `expected exactly one PII finding, got ${body.findings.length}`);
+        assert(body.findings[0].detector === "pii-domain", "the PII finding came from another detector");
+      } else if (detectorProfile !== "common") {
         // The `common` registry resolves this fixture to a different action;
         // only the `full` profile's finding shape is asserted exactly.
         assert(body.findings.length === 1, `expected exactly one finding, got ${body.findings.length}`);
         assertMatchesFixture(body.findings[0], fixture);
       }
       console.log(
-        `qualified the Cloudflare Workers runtime path (${detectorProfile} profile) against a real workerd sandbox.`,
+        `qualified the Cloudflare Workers runtime path (${label} profile) against a real workerd sandbox.`,
       );
     } finally {
       await stopWrangler(child);

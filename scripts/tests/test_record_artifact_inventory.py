@@ -98,6 +98,8 @@ def clean_install_report(lane: str) -> dict:
             _built("redact-secret.darwin-arm64.node"),
             _built("redact_secret_wasm_bg.wasm"),
             _built("redact_secret_wasm_common_bg.wasm"),
+            _built("redact_secret_wasm_pii_bg.wasm"),
+            _built("redact_secret_wasm_common_pii_bg.wasm"),
         ]
     )
     return {
@@ -179,10 +181,17 @@ class Artifacts:
             "cli-x86_64-pc-windows-msvc": ["redact-secret.exe"],
             "python-wheel-aarch64-apple-darwin": ["package-cp310-abi3-macosx.whl"],
             "python-sdist": ["package-0.1.0.tar.gz"],
-            "wasm-web": ["redact_secret_wasm.js", "redact_secret_wasm_bg.wasm"],
+            "wasm-web": [
+                "redact_secret_wasm.js",
+                "redact_secret_wasm_bg.wasm",
+                "redact_secret_wasm_pii.js",
+                "redact_secret_wasm_pii_bg.wasm",
+            ],
             "wasm-web-common": [
                 "redact_secret_wasm_common.js",
                 "redact_secret_wasm_common_bg.wasm",
+                "redact_secret_wasm_common_pii.js",
+                "redact_secret_wasm_common_pii_bg.wasm",
             ],
             "installed-javascript-node-20": ["installed-javascript-node-20.json"],
             "installed-javascript-node-22": ["installed-javascript-node-22.json"],
@@ -316,6 +325,22 @@ class InventoryTests(unittest.TestCase):
         )
         self.assertEqual(entry["family"], "browser-common")
         self.assertIsNone(entry["target"])
+
+    def test_each_profiles_pii_build_is_recorded_with_its_profile_family(self) -> None:
+        # Issue #937: each profile's `pii` build ships in the same upload as
+        # its default build, so it is inventoried under the same family.
+        families = {
+            item["file"]: item["family"]
+            for item in self.collect()
+            if item["file"].endswith("_pii_bg.wasm")
+        }
+        self.assertEqual(
+            families,
+            {
+                "redact_secret_wasm_pii_bg.wasm": "browser",
+                "redact_secret_wasm_common_pii_bg.wasm": "browser-common",
+            },
+        )
 
     def test_a_missing_common_browser_artifact_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:

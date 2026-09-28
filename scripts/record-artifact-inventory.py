@@ -373,7 +373,7 @@ def require_clean_install_qualification(
             )
         binaries = result.get("binaries") or []
         suffixes = sorted(Path(str(binary.get("file", ""))).suffix for binary in binaries)
-        expected_suffixes = [".whl"] if lane == "python" else [".node", ".wasm", ".wasm"]
+        expected_suffixes = [".whl"] if lane == "python" else [".node", ".wasm", ".wasm", ".wasm", ".wasm"]
         if suffixes != expected_suffixes:
             errors.append(f"{label}: expected binaries {expected_suffixes}, reported {suffixes}")
         for binary in binaries:
@@ -615,7 +615,7 @@ def require_golden_path_qualification(
                 errors.append(f"{label}: {check} did not pass")
         binaries = result.get("binaries") or []
         suffixes = sorted(Path(str(binary.get("file", ""))).suffix for binary in binaries)
-        expected_suffixes = [".node", ".wasm", ".wasm"]
+        expected_suffixes = [".node", ".wasm", ".wasm", ".wasm", ".wasm"]
         if suffixes != expected_suffixes:
             errors.append(f"{label}: expected binaries {expected_suffixes}, reported {suffixes}")
         for binary in binaries:
