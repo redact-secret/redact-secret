@@ -27,8 +27,9 @@ Checks, in order:
    matches the ``MSRV`` value exercised by the CI workflow.
 6. Public API: the names the core crate root exports, and the names its
    documented "Public surface" table cites, both match ``core-public-api``
-   exactly — so nothing joins or leaves the published surface without a
-   manifest change to review, and the documentation cannot fall behind it.
+   exactly, and so do the names in the crate README's "Public API" table —
+   so nothing joins or leaves the published surface without a manifest
+   change to review, and the documentation cannot fall behind it.
 7. Source boundary: no core source names a runtime I/O, environment,
    process, clock, or thread facility, and no core source reaches for a
    binding crate. This is the compile-time half of the "no runtime I/O"
@@ -102,6 +103,9 @@ TEST_MODULE = re.compile(r"^#\[cfg\(test\)\]", re.M)
 # `[`Name`]` / `Name` items they cite.
 DOC_TABLE_ROW = re.compile(r"^//! \|.*\|$", re.M)
 DOC_TABLE_ITEM = re.compile(r"`([A-Za-z_][A-Za-z0-9_]*)`")
+# The crate README's "## Public API" section and the table rows inside it.
+README_API_SECTION = re.compile(r"^## Public API\n(?P<body>.*?)(?=^## |\Z)", re.M | re.S)
+README_TABLE_ROW = re.compile(r"^\|.*\|$", re.M)
 
 # Facilities a side-effect-free core must never name. `env!` is deliberately
 # absent: it is resolved by the compiler and reads nothing at runtime.
@@ -435,6 +439,24 @@ def check_core_public_api(root: Path, metadata: dict, policy: dict) -> list[str]
         errors.append(f"{relative}: {name} is public but absent from the documented public-surface table")
     for name in sorted(documented - expected):
         errors.append(f"{relative}: the public-surface table cites {name}, which is not in core-public-api")
+
+    # The crate README (published on crates.io) states the same claim in its
+    # "Public API" section, so its table is held to the same exact match (#954).
+    readme_path = crate / "README.md"
+    if readme_path.is_file():
+        readme = readme_path.read_text(encoding="utf-8")
+        readme_relative = readme_path.relative_to(root)
+        section = README_API_SECTION.search(readme)
+        readme_names: set[str] = set()
+        if section:
+            for row in README_TABLE_ROW.findall(section.group("body")):
+                readme_names |= set(DOC_TABLE_ITEM.findall(row))
+        if not readme_names:
+            errors.append(f"{readme_relative}: the Public API section must carry an API table")
+        for name in sorted(expected - readme_names):
+            errors.append(f"{readme_relative}: {name} is public but absent from the README API table")
+        for name in sorted(readme_names - expected):
+            errors.append(f"{readme_relative}: the README API table cites {name}, which is not in core-public-api")
     return errors
 
 

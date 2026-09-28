@@ -40,6 +40,19 @@ mod tests {
     pub use types::NotPublic;
 }
 """
+README = """# redact-secret
+
+## Public API
+
+| Concern | API |
+| --- | --- |
+| Scan | `scan`, `Finding` |
+| Version | `VERSION` |
+
+## Behavior
+
+Prose naming `notAnExport` is outside the table.
+"""
 CORE_API = ["Finding", "VERSION", "scan"]
 CORE_MANIFEST = '[package]\nname = "redact-secret"\ninclude = ["src/**/*.rs", "README.md"]\n[lints]\nworkspace = true\n'
 PACKAGE_GLOBS = ["Cargo.toml", "README.md", "src/**/*.rs"]
@@ -403,6 +416,26 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
         errors = self.run_check(configure)
         self.assertTrue(any("sneak is public but not in core-public-api" in error for error in errors), errors)
+
+    def test_a_readme_table_missing_an_export_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write("crates/secret-scan-core/README.md", README.replace("| Version | `VERSION` |", "| Version | none |"))
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("VERSION is public but absent from the README API table" in e for e in errors), errors)
+
+    def test_a_readme_table_citing_an_unknown_name_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write("crates/secret-scan-core/README.md", README.replace("`VERSION`", "`VERSION`, `ghost`"))
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("README API table cites ghost" in e for e in errors), errors)
+
+    def test_a_readme_matching_the_exports_is_accepted(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write("crates/secret-scan-core/README.md", README)
+
+        self.assertEqual(self.run_check(configure), [])
 
     # -- no public score surface (#768) -----------------------------------
 
