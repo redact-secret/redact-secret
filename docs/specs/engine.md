@@ -66,6 +66,72 @@ evidence policy. It does not add a detector or make a PII support claim.
   remain a later PII decision; checksum success alone never selects policy or
   proves that an occurrence is sensitive.
 
+## Maintainer-local PII identity evaluation
+
+Issue [#910](https://github.com/redact-secret/redact-secret/issues/910). A
+public PII finding says only that the product decided an occurrence is
+sensitive. Its absence does not say whether the family recognized the
+authored value as a non-sensitive identity (an RFC 2606 domain, a NANPA
+555-01xx line, an IANA documentation range), recognized it without
+establishing sensitivity, or did not recognize it. The adapter holds that
+distinction internally, and this evaluation path lets benchmarks measure it
+without adding any public item.
+
+`crates/secret-scan-core/examples/pii_identity_evaluation.rs` is outside the
+published package. Like `shadow_evaluation`, it compiles the core's own source
+files as modules of the executable, so it runs the product's family detector,
+`pii-context/v1` vocabulary and join at the same commit rather than a
+reimplementation:
+
+```bash
+cargo run --release --locked -p redact-secret --example pii_identity_evaluation -- \
+  --family pii:global:email < cases.jsonl > identity.jsonl
+```
+
+- **Selection.** Exactly the family named by `--family` (one of the production
+  families compiled into the build), vocabulary `pii-context/v1`, and the
+  `full` credential profile's activation identity. An unknown or
+  non-production family fails with exit status 2.
+- **Input.** JSON Lines. Each line has exactly the keys `id`, `family` (equal
+  to `--family`), `text`, and `candidate`, where `candidate` is
+  `{"start": <utf8 byte>, "end": <utf8 byte>}` or `null`. The candidate is
+  the benchmark's authored range, never product output. Malformed input fails
+  with exit status 2. The error names the line number and key, never input
+  content.
+- **Output.** One header line
+  `{"format": "redact-secret/pii-identity-evaluation/1", "family", "vocabulary", "activationIdentity"}`,
+  then exactly one `{"id", "family", "identity", "sensitivity"}` line per
+  input, in input order. `identity` is `established` or `unmatched`, and
+  `sensitivity` is `sensitive`, `non-sensitive` or `not-established`. No line
+  carries a confidence, specificity, obfuscation, score, threshold, feature,
+  other alternative, other range, or any input text.
+- **Semantics.** The family runs on the same scan copy as the public
+  pipeline, with governed invisible code points removed and ranges translated
+  back to the input. The line reports the alternative the join keeps for
+  exactly the candidate range: the first established alternative whose
+  translated range equals it. The pipeline drops some alternatives before
+  overlap resolution: one from a family that rejects invisible normalization
+  when it touches a removed run, and a known vendor placeholder literal. The
+  evaluation reports none of those. A null candidate, a range no kept
+  alternative has, or a range that is not a slice of `text` reads
+  `unmatched` / `not-established`. The core has no invalid identity state, so
+  an invalid lookalike and unrecognized text both read `unmatched`.
+  Benchmarks keeps valid, invalid and not-established as authored truth and
+  compares only `valid` with `established`.
+- **Equivalence.** `sensitivity` is `sensitive` exactly when the public
+  surface reports one finding of that family at exactly that range.
+  `crates/secret-scan-core/tests/pii_identity_evaluation.rs` checks this for
+  the built example over every character-boundary range, plus a null
+  candidate, of every case in the six family conformance fixtures. It also
+  pins the exact header and line key sets, checks that no line repeats an
+  input, and checks that malformed input fails closed. The `pii::tests` unit
+  tests cover, for each family, a synthetic positive, the authority-reserved
+  benign control (for IBAN and US SSN, which reserve no non-sensitive
+  `pii-v1` value, a valid identity without context), a one-property twin,
+  email credential URI userinfo, and null or misaligned candidates.
+  Benchmarks repeats the equivalence check against the installed Node and
+  Wasm artifacts on every run.
+
 ## Shadow evidence feature schema
 
 Schema identity **`evidence-features/v2`** (issues
