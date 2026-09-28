@@ -19,10 +19,12 @@ evidence is linked from each published version.
   feature. `@redact-secret/core` loads the `pii` build only when the
   `initialize()` call that loads the binding carries a non-empty `pii`
   selection; the Node addon, Python, Rust and CLI are unchanged. Release
-  `.wasm` sizes (raw / gzip -9) move from 741,780 / 272,379 B to
-  468,090 / 159,706 B for `full` and from 590,801 / 225,983 B to
+  `.wasm` sizes (raw / gzip level 9) move from 741,780 / 275,500 B to
+  468,090 / 159,706 B for `full` and from 590,801 / 229,049 B to
   317,150 / 113,968 B for `common`; the `pii` builds are 741,825 / 275,512 B
-  and 590,846 / 229,048 B. The `measure-wasm-profiles.mjs --guard-only` CI
+  and 590,846 / 229,048 B. Both default builds remain above the
+  0.1.0-beta.8 size budgets (137,639 and 100,058 B gzip, +5%): the rest of
+  the growth predates the PII runtime. The `measure-wasm-profiles.mjs --guard-only` CI
   guard now fails when a default build links any part of the PII runtime.
 - Migration: the public PII API is unchanged. `initialize({ pii: [...] })`,
   `piiActivation()`, the selector grammar, error codes, and the one-shot
