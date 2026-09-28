@@ -1481,7 +1481,6 @@
       "benchmarkFixtureIds": [
         "beta8-379--deepgram-api-key-httpie-token",
         "beta8-379--deepgram-api-key-go-client-literal",
-        "beta8-379--cohere-api-key-litellm-proxy-debug",
         "beta8-379--cohere-api-key-java-builder-token"
       ],
       "corpusHashes": [
@@ -1517,7 +1516,34 @@
           "evidence": []
         }
       },
-      "note": "Found by the Beta.11 family-evidence corpus (redact-secret-benchmarks#379, category beta8-379, corpus edda5888...4e15) on published 0.1.0-beta.10 and candidate b0be64b. False negative: three same-line Deepgram/Cohere forms were not recognized. The fixing commit (PR #947, merged at main 1127bf9) reads HTTPie's 'Authorization:Token <key>', the last positional literal of a deepgram-named call, and the sole argument of a credential-named Cohere builder method, each high except the HTTPie header, which the #936 upgrade (this product batch) raises from medium to high because its line names the Deepgram API host. The LiteLLM row (value under masked_api_key=) stays unreported by policy (decision-redact-provider-named-credential-assignments section 2: a masked_-led key is not a credential name) and is recorded here as a policy note, not a fix. Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36480272622 at main 1db8ff3, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, and the Python wheel). benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the fixed-candidate rerun is recorded on develop until develop is promoted."
+      "note": "Found by the Beta.11 family-evidence corpus (redact-secret-benchmarks#379, category beta8-379, corpus edda5888...4e15) on published 0.1.0-beta.10 and candidate b0be64b. False negative: three same-line Deepgram/Cohere forms were not recognized. The fixing commit (PR #947, merged at main 1127bf9) reads HTTPie's 'Authorization:Token <key>', the last positional literal of a deepgram-named call, and the sole argument of a credential-named Cohere builder method, each high except the HTTPie header, which the #936 upgrade (this product batch) raises from medium to high because its line names the Deepgram API host. The LiteLLM row (value under masked_api_key=) stays unreported by policy (decision-redact-provider-named-credential-assignments section 2: a masked_-led key is not a credential name); it is not a fix and moved to benchmark-gap-932-masked-key-policy. Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36480272622 at main 1db8ff3, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, and the Python wheel). benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the fixed-candidate rerun is recorded on develop until develop is promoted."
+    },
+    {
+      "id": "benchmark-gap-932-masked-key-policy",
+      "benchmarkRecordId": "product-932-masked-key-policy",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/932",
+      "benchmarkFixtureIds": [
+        "beta8-379--cohere-api-key-litellm-proxy-debug"
+      ],
+      "corpusHashes": [
+        "edda588827848135829e423fe9b1c77fa2f43e6932f0232b679779e3efbb4e15"
+      ],
+      "canonicalFixtures": {
+        "synchronous": [],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "Policy decision, not a regression: split from benchmark-gap-932 (redact-secret-benchmarks known-gap record product-932-masked-key-policy, status policy-decision). The #379 LiteLLM proxy debug row puts a Cohere-shaped value under masked_api_key=; decision-redact-provider-named-credential-assignments section 2 says a prefix whose first segment says the value is not the secret (masked_, redacted_, hashed_, ...) does not make a high-signal name, so no detector reports it, and the #932 fix left it unreported by design. There is no fixing commit and no canonical fixture; both gates stay pending because a policy decision has nothing to pass. The corpus hash is the beta8-379 hash at the pinned benchmarks revision."
     },
     {
       "id": "benchmark-gap-933",
