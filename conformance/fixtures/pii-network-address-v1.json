@@ -65,6 +65,56 @@
       "id": "network-address-governed-invisible-does-not-create-boundary",
       "input": "client_ip=192.168.1.7​suffix",
       "expected": []
+    },
+    {
+      "id": "network-address-ipv4-sentence-final-period",
+      "input": "ip: 192.168.1.7.",
+      "expected": [{"start": 4, "end": 15}]
+    },
+    {
+      "id": "network-address-ipv6-sentence-final-period",
+      "input": "client_ip=fd00::1.",
+      "expected": [{"start": 10, "end": 17}]
+    },
+    {
+      "id": "network-address-ipv4-period-before-closing-quote",
+      "input": "client_ip=\"10.0.0.8.\"",
+      "expected": [{"start": 11, "end": 19}]
+    },
+    {
+      "id": "network-address-port-suffix-unchanged",
+      "input": "ip: 192.168.1.7:8080",
+      "expected": [{"start": 4, "end": 15}]
+    },
+    {
+      "id": "network-address-documentation-control-with-period",
+      "input": "ip: 192.0.2.7.",
+      "expected": []
+    },
+    {
+      "id": "network-address-fifth-dotted-part-twin",
+      "input": "ip: 192.168.1.7.5",
+      "expected": []
+    },
+    {
+      "id": "network-address-period-then-label-twin",
+      "input": "client_ip=192.168.1.7.example",
+      "expected": []
+    },
+    {
+      "id": "network-address-unlabelled-sentence-period-control",
+      "input": "The client ip was 192.168.1.7.",
+      "expected": []
+    },
+    {
+      "id": "network-address-korean-form-uppercase-ascii",
+      "input": "IP 주소: 192.168.1.7",
+      "expected": [{"start": 11, "end": 22}]
+    },
+    {
+      "id": "network-address-korean-bare-address-word-control",
+      "input": "주소: 192.168.1.7",
+      "expected": []
     }
   ]
 }

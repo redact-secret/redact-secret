@@ -91,6 +91,9 @@
     {"id":"payment-card-phone-like-luhn-collision","input":"phone=4000008773","expected":[]},
     {"id":"payment-card-random-number-collision","input":"random_number=4000008770000003","expected":[]},
     {"id":"payment-card-cooking-pan-prose-collision","input":"Put the pan beside object number 4000008770000003.","expected":[]},
-    {"id":"payment-card-url-query-collision","input":"https://synthetic.invalid/pay?card_number=4000008770000003","expected":[]}
+    {"id":"payment-card-url-query-collision","input":"https://synthetic.invalid/pay?card_number=4000008770000003","expected":[]},
+    {"id":"payment-card-korean-unspaced-card-number-label","input":"카드번호: 4000008770000003","expected":[{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":14,"end":30}]},
+    {"id":"payment-card-korean-unspaced-credit-card-number-label","input":"신용카드번호: 4000008770000003","expected":[{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":20,"end":36}]},
+    {"id":"payment-card-korean-unspaced-label-example-negative-wins","input":"카드번호 예시 4000008770000003","expected":[]}
   ]
 }

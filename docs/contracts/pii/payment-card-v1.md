@@ -95,7 +95,9 @@ PAN structure establishes identity only. A public finding is emitted only when
 the shared context matcher associates a reviewed high-signal payment-card field
 label with the candidate. V1 English forms are `payment card`, `card number`,
 `credit card number`, `debit card number`, and `pan`; Korean forms are
-`결제 카드`, `카드 번호`, `신용 카드 번호`, and `직불 카드 번호`. Generic `card`,
+`결제 카드`, `카드 번호`, `신용 카드 번호`, and `직불 카드 번호`, plus, since
+`pii-context/v2` ([#927](https://github.com/redact-secret/redact-secret/issues/927)),
+the unspaced `카드번호`, `신용카드번호`, and `직불카드번호`. Generic `card`,
 `number`, `account`, `order`, and `reference` language has no sensitivity
 authority. `pan` participates only through the shared bounded field-label
 association (`before`, at most 16 normalized scalars, separators/quotes-only

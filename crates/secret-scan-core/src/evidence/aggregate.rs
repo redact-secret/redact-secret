@@ -5,7 +5,7 @@
 //! An [`AggregationModel`] is plain data: five evidence groups, each with a
 //! list of [`SignalRule`]s, a [`GroupRule`] and a cap, plus integer band
 //! thresholds. [`SHADOW_MODEL`] is the reviewed shadow configuration the
-//! benchmark calibration selected (redact-secret-benchmarks#300). Its
+//! benchmark calibration selected (#829, redact-secret-benchmarks PR #437). Its
 //! invariants are checked at compile time ([`AggregationModel::violation`]),
 //! so a model that breaks the contract does not build.
 //!
@@ -231,12 +231,25 @@ pub(crate) struct AggregationModel {
 }
 
 /// Index of `shannon_entropy_q16` in [`FEATURE_NAMES`].
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "evidence-aggregation/v3 reads the residual entropy; tests still build models over Shannon entropy"
+    )
+)]
 pub(crate) const SHANNON_ENTROPY_FEATURE: usize = 5;
 
+/// Index of `residual_entropy_q16` in [`FEATURE_NAMES`] (#829).
+pub(crate) const RESIDUAL_ENTROPY_FEATURE: usize = 28;
+
+/// The randomness group of `evidence-aggregation/v3`: one ramp over the
+/// residual entropy, which replaces the Shannon entropy ramp of `v2`
+/// (#829).
 const PRODUCT_RANDOMNESS: [SignalRule; 1] = [SignalRule::FeatureRamp {
-    feature: SHANNON_ENTROPY_FEATURE,
-    lo: 226_998,
-    hi: 265_935,
+    feature: RESIDUAL_ENTROPY_FEATURE,
+    lo: 234_123,
+    hi: 263_562,
     max: 30,
 }];
 
@@ -254,8 +267,8 @@ const PRODUCT_CONTEXTUAL: [SignalRule; 1] = [SignalRule::Context {
 const PRODUCT_NEGATIVE: [SignalRule; 1] = [SignalRule::StrictExclusion { points: 130 }];
 
 /// The reviewed shadow configuration, as selected by the benchmark
-/// calibration (redact-secret-benchmarks#300, merged in benchmark PR #330 at
-/// `e18efa2d0802c030925b9306a5dca33057185936`). The
+/// calibration for #829 (redact-secret-benchmarks PR #437, merged at
+/// `5823751c16df4776035f5a0bd6f9640f8013a6a7`). The
 /// `validation` cap is a placeholder: no validation signal exists yet, so it
 /// contributes `0` and was not fitted. None of these values is secret, and
 /// security does not depend on them being unknown
@@ -266,7 +279,7 @@ const PRODUCT_NEGATIVE: [SignalRule; 1] = [SignalRule::StrictExclusion { points:
 /// here (#798). A test fails when the two disagree, and changing any value
 /// needs a new `id` (`docs/specs/engine.md`, "Shadow scoring artifact").
 pub(crate) const SHADOW_MODEL: AggregationModel = AggregationModel {
-    id: "evidence-aggregation/v2",
+    id: "evidence-aggregation/v3",
     feature_schema: FEATURE_SCHEMA_VERSION,
     groups: [
         GroupConfig {

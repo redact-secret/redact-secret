@@ -17,6 +17,7 @@ use crate::evidence::aggregate::ShadowAuthority;
 use crate::evidence::features::{
     EvidenceFeatures, FEATURE_COUNT, MAX_ANALYSED_CHARS, extract_features,
 };
+use crate::evidence::residual::extract_residual_features;
 use crate::evidence::shadow::ShadowComparison;
 use crate::incremental::{IncrementalLimits, IncrementalSanitizer};
 use crate::registry::DetectorRegistry;
@@ -152,35 +153,35 @@ const HOSTILE_VECTORS: [(&str, [u32; FEATURE_COUNT]); 7] = [
         "period-32",
         [
             4096, 256, 1, 32, 8, 327_680, 327_680, 83_886_080, 96, 96, 64, 0, 0, 0, 3, 255, 62,
-            1000, 839, 125, 1000, 1, 0, 874, 32, 1000, 32,
+            1000, 839, 125, 1000, 1, 0, 874, 32, 1000, 32, 34, 325_701, 267_875,
         ],
     ),
     (
         "period-33",
         [
             4096, 256, 1, 33, 8, 330_442, 327_680, 84_593_152, 93, 100, 63, 0, 0, 0, 3, 248, 62,
-            999, 846, 128, 1000, 1, 0, 870, 33, 0, 0,
+            999, 846, 128, 1000, 1, 0, 870, 33, 0, 0, 35, 328_663, 270_616,
         ],
     ),
     (
         "late-period-break",
         [
             4096, 256, 1, 2, 255, 2418, 371, 619_008, 256, 0, 0, 0, 0, 0, 1, 0, 26, 36, 7, 7, 1000,
-            255, 996, 992, 0, 996, 2,
+            255, 996, 992, 0, 996, 2, 2, 65_536, 65_536,
         ],
     ),
     (
         "distinct-bigrams",
         [
             4096, 256, 1, 62, 62, 294_241, 134_074, 75_325_696, 52, 52, 152, 0, 0, 0, 3, 208, 62,
-            754, 754, 242, 1000, 2, 11, 0, 0, 488, 2,
+            754, 754, 242, 1000, 2, 11, 0, 0, 488, 2, 15, 182_838, 152_169,
         ],
     ),
     (
         "single-symbol",
         [
             4096, 256, 1, 1, 256, 0, 0, 0, 256, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 3, 1000, 256, 1000,
-            996, 1, 1000, 2,
+            996, 1, 1000, 2, 1, 0, 0,
         ],
     ),
     (
@@ -213,13 +214,16 @@ const HOSTILE_VECTORS: [(&str, [u32; FEATURE_COUNT]); 7] = [
             0,
             0,
             0,
+            2,
+            65_536,
+            65_536,
         ],
     ),
     (
         "max-length",
         [
             4096, 256, 1, 61, 10, 378_000, 306_583, 96_768_000, 125, 97, 34, 0, 0, 0, 3, 149, 62,
-            972, 968, 238, 1000, 2, 11, 19, 0, 30, 24,
+            972, 968, 238, 1000, 2, 11, 19, 0, 30, 24, 251, 378_355, 304_718,
         ],
     ),
 ];
@@ -230,6 +234,36 @@ fn hostile_values_have_pinned_feature_vectors() {
     {
         assert_eq!(name, pinned_name);
         assert_eq!(vector(extract_features(&value)), pinned, "{name}");
+    }
+}
+
+/// The residual features (#829) of the same hostile values, pinned, and
+/// read from the first 256 symbols only. `max-length` (random material,
+/// almost nothing predicted) drives the context-copy rule's quadratic scan
+/// to its longest path.
+const HOSTILE_RESIDUALS: [(&str, [u32; 3]); 7] = [
+    ("period-32", [34, 325_701, 267_875]),
+    ("period-33", [35, 328_663, 270_616]),
+    ("late-period-break", [2, 65_536, 65_536]),
+    ("distinct-bigrams", [15, 182_838, 152_169]),
+    ("single-symbol", [1, 0, 0]),
+    ("astral-distinct", [2, 65_536, 65_536]),
+    ("max-length", [251, 378_355, 304_718]),
+];
+
+#[test]
+fn hostile_values_have_pinned_residual_features() {
+    for ((name, value), (pinned_name, pinned)) in
+        hostile_values().into_iter().zip(HOSTILE_RESIDUALS)
+    {
+        assert_eq!(name, pinned_name);
+        let whole = extract_residual_features(&value);
+        assert_eq!(whole.to_vector().map(|(_, v)| v), pinned, "{name}");
+        assert_eq!(
+            whole,
+            extract_residual_features(analysed_prefix(&value)),
+            "{name}"
+        );
     }
 }
 

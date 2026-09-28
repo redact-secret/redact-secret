@@ -113,6 +113,12 @@ depend on `src/`.
   `555-01xx` controls, English/Korean context, collisions, Unicode offsets,
   selector closure, and every incremental partition. Sensitive fixtures are
   deterministic syntactically valid values with no real-world provenance.
+- [`fixtures/pii-cross-family-v1.json`](./fixtures/pii-cross-family-v1.json) —
+  context association when several families run together under `pii:us`:
+  one value read by two families at one range, labels on dense same-line
+  key/value records, and their benign controls. Each case names the issue that
+  added it. The Rust consumer, with whole-input, every-partition and PII-off
+  checks, is `crates/secret-scan-core/tests/pii_cross_family_conformance.rs`.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):

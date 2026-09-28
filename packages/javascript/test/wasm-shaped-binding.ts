@@ -71,7 +71,7 @@ export function createWasmShapedBinding(
   const calls: string[] = [];
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
-  let activation = `credentials=${options.profile ?? "full"};selectors=off;families=;vocabulary=pii-context/v1`;
+  let activation = `credentials=${options.profile ?? "full"};selectors=off;families=;vocabulary=pii-context/v2`;
 
   const module: WasmModule = {
     default: async () => {
@@ -103,7 +103,7 @@ export function createWasmShapedBinding(
         ...(global || selectors.includes("pii:family:global:phone") ? ["pii:global:phone"] : []),
         ...(jurisdiction || selectors.includes("pii:family:us:ssn") ? ["pii:us:ssn"] : []),
       ].join(",");
-      activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;
+      activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v2`;
     },
     scan: (input, policy) => {
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);

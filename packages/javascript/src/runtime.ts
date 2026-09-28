@@ -372,7 +372,7 @@ export function createRedactSecretRuntime(
 
   function piiActivation(): string {
     const native = active();
-    return native.piiActivation?.() ?? `credentials=${expectedProfile};selectors=off;families=;vocabulary=pii-context/v1`;
+    return native.piiActivation?.() ?? `credentials=${expectedProfile};selectors=off;families=;vocabulary=pii-context/v2`;
   }
 
   function scan(

@@ -25,7 +25,7 @@ fn network_address_fixture_matches_whole_input_and_metadata() {
     let registry = redact_secret::DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
     assert_eq!(
         registry.activation_identity(),
-        "credentials=full;selectors=pii:family:global:network-address;families=pii:global:network-address;vocabulary=pii-context/v1"
+        "credentials=full;selectors=pii:family:global:network-address;families=pii:global:network-address;vocabulary=pii-context/v2"
     );
     for case in fixture()["cases"].as_array().unwrap() {
         let input = case["input"].as_str().unwrap();
@@ -110,6 +110,6 @@ fn pii_off_keeps_network_addresses_unreported() {
     );
     assert_eq!(
         selection().activation_identity(Profile::Common),
-        "credentials=common;selectors=pii:family:global:network-address;families=pii:global:network-address;vocabulary=pii-context/v1"
+        "credentials=common;selectors=pii:family:global:network-address;families=pii:global:network-address;vocabulary=pii-context/v2"
     );
 }

@@ -9,12 +9,16 @@
 //! [`context`] and [`exclusion`]. [`shadow`] compares that band with the
 //! legacy decision of each candidate the pipeline selects, only when a
 //! maintainer-local caller asks for it, and renders the comparison (#771).
+//! [`residual`] extracts the residual randomness features that
+//! `evidence-features/v2` appends (#829) and `evidence-aggregation/v3`
+//! reads.
 
 pub(crate) mod aggregate;
 pub(crate) mod context;
 pub(crate) mod exclusion;
 pub(crate) mod features;
 pub(crate) mod fixed_point;
+pub(crate) mod residual;
 // `ShadowComparison::shifted` serves only the incremental session's
 // test-only recording (#772), so a non-test build sees no caller.
 #[cfg_attr(

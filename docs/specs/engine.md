@@ -29,8 +29,9 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | The beta.9 evidence scorer is shadow-only. It computes an internal integer evidence score and a shadow band (`none < low < medium < high`) for `contextual` and `entropy` candidates, and neither value is ever a probability. It never changes a candidate's `Confidence`, specificity, range, overlap weight or action, never removes a deterministic positive, and is not consulted for `private-key`, `provider` or `structural` candidates. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | Evidence signals belong to five groups (`randomness`, `lexical`, `contextual`, `validation`, `negative`). A group's signals combine with halving diminishing returns under a cap, no single group and not `randomness` plus `lexical` can reach `high`, and negative evidence applies only when the whole value matches a reviewed exclusion grammar. The scorer is monotone in its signals. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | Scorer arithmetic from features to band is integer fixed-point with no floating point or `libm` calls, so every host produces identical scores and bands. Maintainer diagnostics carry signal and group identifiers and integer values only, never matched bytes or hashes of them. No public item, field or benchmark projection carries a score, probability, threshold, weight or contribution (`scripts/check-rust-workspace.py` check 10), and changing the scoring model's identity invalidates evidence keyed to the old one. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
-| The shadow scorer's `randomness` and `lexical` inputs are the integer statistical features of schema `evidence-features/v1`, defined exactly in the "Shadow evidence feature schema" section below. Extraction is not a detector: it reads at most 256 Unicode scalar values of one candidate value, allocates nothing, stores no part of the value, and changes no finding, `Confidence`, overlap weight or action. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
-| The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v2`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The shadow scorer's `randomness` and `lexical` inputs are the integer statistical features of schema `evidence-features/v2`, defined exactly in the "Shadow evidence feature schema" (features 0 to 26) and "Shadow evidence residual features" (features 27 to 29) sections below. Extraction is not a detector: it reads at most 256 Unicode scalar values of one candidate value, allocates nothing, stores no part of the value, and changes no finding, `Confidence`, overlap weight or action. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The residual randomness features that feature schema `evidence-features/v2` appends to `v1` (the symbols no repetition, constant step or earlier copy predicts, and their Shannon and min-entropy) are defined in the "Shadow evidence residual features" section below. Extraction has the `v1` bounds and integer arithmetic. The reviewed model `evidence-aggregation/v3` reads the residual entropy (feature 28) as its only randomness signal, in place of Shannon entropy (#829). | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v3`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer runs next to `generic-token`'s legacy decision without enforcing anything, defined in the "Maintainer-local shadow evaluation" section below. The pipeline evaluates the candidates that overlap resolution selects only when the maintainer-local evaluation path asks for it; every public entry point asks for nothing, so findings, `Confidence`, actions, overlap and every public API are unchanged and the scorer never runs on the public path. The path is an unpublished example that compiles the core's own source and writes JSON Lines holding identifiers and integers only, never matched bytes or hashes of them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | No shipped artifact links the shadow scorer: outside tests the incremental session calls `run_detector_pipeline`, so only the evaluation example and tests compile it. Its integer scores and bands are byte-identical on Linux, macOS, Windows and `wasm32` for the conformance corpora and a hostile battery (CI job `shadow-determinism`), no scorer source outside tests names floating point (`scripts/check-rust-workspace.py` check 11), and its worst cases are bounded by the 4,096-byte contextual value and the 256-symbol analysis limit. Defined in the "Shadow scorer qualification" section below. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
@@ -65,10 +66,79 @@ evidence policy. It does not add a detector or make a PII support claim.
   remain a later PII decision; checksum success alone never selects policy or
   proves that an occurrence is sensitive.
 
+## Maintainer-local PII identity evaluation
+
+Issue [#910](https://github.com/redact-secret/redact-secret/issues/910). A
+public PII finding says only that the product decided an occurrence is
+sensitive. Its absence does not say whether the family recognized the
+authored value as a non-sensitive identity (an RFC 2606 domain, a NANPA
+555-01xx line, an IANA documentation range), recognized it without
+establishing sensitivity, or did not recognize it. The adapter holds that
+distinction internally, and this evaluation path lets benchmarks measure it
+without adding any public item.
+
+`crates/secret-scan-core/examples/pii_identity_evaluation.rs` is outside the
+published package. Like `shadow_evaluation`, it compiles the core's own source
+files as modules of the executable, so it runs the product's family detector,
+`pii-context/v2` vocabulary and join at the same commit rather than a
+reimplementation:
+
+```bash
+cargo run --release --locked -p redact-secret --example pii_identity_evaluation -- \
+  --family pii:global:email < cases.jsonl > identity.jsonl
+```
+
+- **Selection.** Exactly the family named by `--family` (one of the production
+  families compiled into the build), vocabulary `pii-context/v2`, and the
+  `full` credential profile's activation identity. An unknown or
+  non-production family fails with exit status 2.
+- **Input.** JSON Lines. Each line has exactly the keys `id`, `family` (equal
+  to `--family`), `text`, and `candidate`, where `candidate` is
+  `{"start": <utf8 byte>, "end": <utf8 byte>}` or `null`. The candidate is
+  the benchmark's authored range, never product output. Malformed input fails
+  with exit status 2. The error names the line number and key, never input
+  content.
+- **Output.** One header line
+  `{"format": "redact-secret/pii-identity-evaluation/1", "family", "vocabulary", "activationIdentity"}`,
+  then exactly one `{"id", "family", "identity", "sensitivity"}` line per
+  input, in input order. `identity` is `established` or `unmatched`, and
+  `sensitivity` is `sensitive`, `non-sensitive` or `not-established`. No line
+  carries a confidence, specificity, obfuscation, score, threshold, feature,
+  other alternative, other range, or any input text.
+- **Semantics.** The family runs on the same scan copy as the public
+  pipeline, with governed invisible code points removed and ranges translated
+  back to the input. The line reports the alternative the join keeps for
+  exactly the candidate range: the first established alternative whose
+  translated range equals it. The pipeline drops some alternatives before
+  overlap resolution: one from a family that rejects invisible normalization
+  when it touches a removed run, and a known vendor placeholder literal. The
+  evaluation reports none of those. A null candidate, a range no kept
+  alternative has, or a range that is not a slice of `text` reads
+  `unmatched` / `not-established`. The core has no invalid identity state, so
+  an invalid lookalike and unrecognized text both read `unmatched`.
+  Benchmarks keeps valid, invalid and not-established as authored truth and
+  compares only `valid` with `established`.
+- **Equivalence.** `sensitivity` is `sensitive` exactly when the public
+  surface reports one finding of that family at exactly that range.
+  `crates/secret-scan-core/tests/pii_identity_evaluation.rs` checks this for
+  the built example over every character-boundary range, plus a null
+  candidate, of every case in the six family conformance fixtures. It also
+  pins the exact header and line key sets, checks that no line repeats an
+  input, and checks that malformed input fails closed. The `pii::tests` unit
+  tests cover, for each family, a synthetic positive, the authority-reserved
+  benign control (for IBAN and US SSN, which reserve no non-sensitive
+  `pii-v1` value, a valid identity without context), a one-property twin,
+  email credential URI userinfo, and null or misaligned candidates.
+  Benchmarks repeats the equivalence check against the installed Node and
+  Wasm artifacts on every run.
+
 ## Shadow evidence feature schema
 
-Schema identity **`evidence-features/v1`** (issue
-[#769](https://github.com/redact-secret/redact-secret/issues/769)). The Rust
+Schema identity **`evidence-features/v2`** (issues
+[#769](https://github.com/redact-secret/redact-secret/issues/769) and
+[#829](https://github.com/redact-secret/redact-secret/issues/829)). This
+section defines features 0 to 26, the whole of `v1`; `v2` appends features
+27 to 29, defined in "Shadow evidence residual features" below. The Rust
 core is authoritative: `crates/secret-scan-core/src/evidence/features.rs`
 (`extract_features`, `EvidenceFeatures::to_vector`, `FEATURE_NAMES`,
 `FEATURE_SCHEMA_VERSION`) and `crates/secret-scan-core/src/evidence/fixed_point.rs`
@@ -190,11 +260,124 @@ written from this page reproduces them. Values are synthetic.
 | `ab` | `2,2,0,2,1,65536,65536,131072,2,0,0,0,0,0,1,0,26,1000,212,1000,7,1,0,0,0,0,0` |
 | `aabc` | `4,4,0,3,2,98304,65536,393216,4,0,0,0,0,0,1,0,26,946,319,750,15,2,333,0,0,0,0` |
 
+## Shadow evidence residual features
+
+Issue [#829](https://github.com/redact-secret/redact-secret/issues/829).
+These three features are the only difference between feature schema
+**`evidence-features/v2`** and `v1`: `v2` is the `v1` vector above with
+features 27 to 29 below appended, and features 0 to 26 keep their `v1`
+definitions and positions. The Rust core is authoritative:
+`crates/secret-scan-core/src/evidence/residual.rs`
+(`extract_residual_features`, `RESIDUAL_FEATURE_NAMES`), with the same
+input, symbol, 256-symbol bound and integer arithmetic as the section above.
+Every item is `pub(crate)`; none is public API. The benchmark-side
+candidate-feature dataset reproduces `v2` from this section.
+
+`extract_features` appends these features to the `v1` vector
+(`residual_features` over the same analysed symbols), and the reviewed
+model below, `evidence-aggregation/v3`, reads feature 28 as its only
+randomness signal. Like every feature, they change no finding,
+`Confidence`, overlap weight or action.
+
+### Why
+
+The reviewed model's `randomness` group is a ramp over Shannon entropy per
+symbol (feature 5). The attacker-known evaluation
+([redact-secret-benchmarks#289](https://github.com/redact-secret/redact-secret-benchmarks/issues/289))
+and #829 found two faults in that measure:
+
+- it rates a benign periodic or sequence value as high as random material
+  (`abcdefghijklmnopqrstuvwxyz` has about 4.7 bits per symbol, and
+  `0123456789abcdef` twice has 4), so such a value in a credential-bearing
+  context reaches the top band;
+- it falls when repetition, padding or a period is inserted into real
+  material, which is the first reshaping an attacker who has read the
+  scorer would try.
+
+The residual keeps only the symbols that no repetition, constant step or
+earlier copy explains. A benign periodic or sequence value keeps a residual
+of a few symbols, and inserting a run of one symbol adds at most one
+residual symbol, so the residual entropy of reshaped random material stays
+close to that of the original.
+
+### Residual predictor
+
+Position `i` of `s` is **predicted** when any of these holds, comparing code
+points as unsigned integers:
+
+1. repeat: `i ≥ 1` and `s[i] = s[i−1]`;
+2. constant step: `i ≥ 2` and `s[i] + s[i−2] = 2 × s[i−1]` (runs, and
+   ascending or descending sequences such as `abc`, `987`, `ace`);
+3. constant step at lag 2: `i ≥ 4` and `s[i] + s[i−4] = 2 × s[i−2]`
+   (interleaved sequences such as `aAbBcC`, `1a2b3c`);
+4. context copy: `i ≥ 2` and some `j ∈ [2, i)` has
+   `(s[j−2], s[j−1], s[j]) = (s[i−2], s[i−1], s[i])`: the two symbols before
+   `i` were followed by `s[i]` before (tiled, copied and periodic bodies).
+
+The **residual** is the subsequence of symbols at unpredicted positions, in
+order, and `r` its length. Each rule reads only `s[i]` and the symbols
+before it, so the residual of a prefix is a prefix of the residual. Work is
+bounded by `256²` trigram comparisons.
+
+### Features, in `v2` vector order
+
+| # | Name | Definition |
+| --- | --- | --- |
+| 27 | `residual_symbols` | `r` |
+| 28 | `residual_entropy_q16` | Shannon entropy of the residual: feature 5's formula over the residual symbol counts, with `r` in place of `n`; `0` when `r = 0` |
+| 29 | `residual_min_entropy_q16` | `log2_q16(r) ⊖ log2_q16(c'_max)`, `c'_max` the largest residual symbol count; `0` when `r = 0` |
+
+Golden values for the golden inputs of the section above, as features
+27, 28, 29 (reproduced by an independent reimplementation written from this
+page):
+
+| Input | Features 27–29 |
+| --- | --- |
+| empty | `0,0,0` |
+| `aaaaaaaaaaaaaaaa` | `1,0,0` |
+| `abcabcabcabcabcabc` | `4,65536,65536` |
+| `XXXX-XXXX-XXXX-XXXX` | `2,65536,65536` |
+| `Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa` | `32,327680,327680` |
+| U+1F600 `a` U+1F603 `b`, twice | `6,125718,103872` |
+| `ab` | `2,65536,65536` |
+| `aabc` | `2,65536,65536` |
+
+### Measure choice and trade-offs
+
+Feature 28, the residual's Shannon entropy, replaces feature 5 in the
+`randomness` group of `evidence-aggregation/v3`. Feature 29 is the
+min-entropy variant #829 also named. It is recorded for comparison and not
+used: min-entropy
+is set by the single most frequent symbol, so one inserted separator
+repeated between blocks (not in runs, so every copy is residual) lowers it
+by a bit or more while feature 28 moves by less than half a bit. The unit
+tests pin that contrast, together with benign periodic and sequence values
+whose residual is at most a few symbols and random material whose residual
+entropy stays within half a bit under inserted runs and padding.
+
+What the residual does not remove:
+
+- mapping material into fewer character classes (all lower case, or
+  digits) lowers every per-symbol measure, residual or not, because it
+  removes information;
+- a mirrored body is not a copy, so its second half stays residual (which
+  keeps the measure high, not low);
+- keyboard walks (`qwerty`) and other benign shapes that are not steps or
+  copies stay residual;
+- random material has a few accidental steps or trigram repeats, so its
+  residual is slightly shorter than its length (at least 56 of 64 symbols in
+  the unit tests).
+
+The false-positive and false-negative effect depends on the ramp that reads
+the feature, which the calibration fits; these features alone change no
+shipped or shadow outcome.
+
 ## Shadow evidence aggregation
 
-Model identity **`evidence-aggregation/v2`** over feature schema
-`evidence-features/v1` (issue
-[#770](https://github.com/redact-secret/redact-secret/issues/770)). The Rust
+Model identity **`evidence-aggregation/v3`** over feature schema
+`evidence-features/v2` (issues
+[#770](https://github.com/redact-secret/redact-secret/issues/770) and
+[#829](https://github.com/redact-secret/redact-secret/issues/829)). The Rust
 core is authoritative: `crates/secret-scan-core/src/evidence/aggregate.rs`
 (`SHADOW_MODEL`, `AggregationModel`, `aggregate`, `shadow_evidence`,
 `halving_sum`, `EvidenceExplanation`), `evidence/context.rs`
@@ -204,16 +387,21 @@ existing contract
 ([`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md),
 sections 2 to 6) to one reviewed configuration. It is not a new decision.
 
-The configuration is the one the benchmark calibration selected
-([redact-secret-benchmarks#300](https://github.com/redact-secret/redact-secret-benchmarks/issues/300),
-merged in PR #330). Its method is stated in
-[`docs/specs/calibration-experiments.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/docs/specs/calibration-experiments.md)
+The configuration is the one the benchmark calibration selected for #829
+(redact-secret-benchmarks PR #437, merged to `develop` at
+`5823751c16df4776035f5a0bd6f9640f8013a6a7`). Its method,
+`calibration-experiments/2`, is stated in
+[`docs/specs/calibration-experiments.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/5823751c16df4776035f5a0bd6f9640f8013a6a7/docs/specs/calibration-experiments.md)
 and its context and negative classes in
-[`docs/specs/candidate-features.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/docs/specs/candidate-features.md).
+[`docs/specs/candidate-features.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/5823751c16df4776035f5a0bd6f9640f8013a6a7/docs/specs/candidate-features.md).
+It differs from `v2`, the #300 selection, only in the randomness signal:
+the residual entropy replaces Shannon entropy per symbol, with its own
+fitted ramp. The caps and bands are the ones the same selection rule chose
+again.
 The reviewed scoring artifact
 ([#798](https://github.com/redact-secret/redact-secret/issues/798), "Shadow
 scoring artifact" below) records these values with drift detection. Changing any of them is a new model
-identity, and evidence keyed to `v1` is stale under it.
+identity, and evidence keyed to `v1` or `v2` is stale under it.
 
 The values below are published on purpose. Redact Secret is open source,
 the contract assumes an attacker has read the scorer, and security does not
@@ -234,13 +422,14 @@ the decision boundary over its corpora, not these constants.
 
 | Group | Signal | Points | Cap |
 | --- | --- | --- | --- |
-| `randomness` | `shannon_entropy_q16` (feature 5) | ramp: `0` at or below `226998`, `30` at or above `265935`, otherwise `floor(30 * (H - 226998) / (265935 - 226998))` | 30 |
+| `randomness` | `residual_entropy_q16` (feature 28) | ramp: `0` at or below `234123`, `30` at or above `263562`, otherwise `floor(30 * (R - 234123) / (263562 - 234123))` | 30 |
 | `lexical` | none | `0` | 0 |
 | `contextual` | `credential-context` | `50` when the context class is `credential-name`, `authorization-header` or `url-userinfo`, otherwise `0` | 50 |
 | `validation` | none yet | `0` | 50 (placeholder, not fitted) |
 | `negative` | `strict-exclusion` | `130` when the whole value matches the strict exclusion grammar, otherwise `0` | 130 |
 
-The ramp ends are Q16 bits per symbol, about 3.46 and 4.06 bits. Within
+The ramp ends are Q16 bits per residual symbol, about 3.57 and 4.02 bits.
+Within
 every group the contract's halving rule applies: signal points sorted in
 descending order, the `k`-th (from `0`) counts `points >> k`, the sum
 saturates and is then capped. A group with one signal is that signal's
@@ -352,11 +541,24 @@ and it enforces nothing: it changes no finding, `Confidence`, overlap weight
 or action, so it adds no false positive or false negative to shipped
 behavior.
 
-The #300 selection generalizes poorly: its development medium-band balanced
-error is `0.055228960396039604`, while evaluation balanced error is
-`0.6228352283569377`, a gap of `0.5676062679608981`; the worst
+The selection generalizes poorly: its development medium-band balanced
+error is `0.049172226340499135`, while evaluation balanced error is
+`0.6244338423530675`, a gap of `0.5752616160125684`; the worst
 leave-one-category-out balanced error is `0.6666666666666666`. Those results
-are a limitation, not promotion evidence. The scorer therefore remains
+are a limitation, not promotion evidence.
+
+The randomness signal matters only at `high`. Randomness alone is capped
+below `low`, and context alone reaches `medium`, so whether a candidate is
+at least `medium` depends only on its context and the exclusion grammar.
+Replacing Shannon entropy therefore changes which contextual candidates
+reach `high`: benign periodic and sequence values in a credential-bearing
+context, which reached `high` under `v2`, stay at `medium`, and inserted
+repetition or padding no longer lowers random material from `high`. It
+cannot change an outcome read at `medium`, including the future-promotion
+Q4 projection of redact-secret-benchmarks#289, where a statistical
+candidate without credential-bearing context never reaches `medium` under
+either model. That Q4 failure is structural to this operating point, not to
+the randomness measure. The scorer therefore remains
 shadow-only, non-enforcing, absent from the public API, and incapable of
 changing a finding, confidence, overlap weight, policy decision, or action.
 
@@ -377,12 +579,12 @@ sections 8 to 11). It is not a new decision.
 | Field | Content |
 | --- | --- |
 | `artifact` | `redact-secret/shadow-scoring-artifact` and an integer `revision` |
-| `model.featureSchema` | the feature schema identity (`evidence-features/v1`), its bounds and fixed-point scale, the feature names in vector order, and the compiled feature vector of each golden input above |
-| `model.aggregation` | the model identity (`evidence-aggregation/v2`) and every group, direction, rule, cap, signal rule, context class, exclusion grammar and vocabulary word, and the band thresholds, as the compiled `SHADOW_MODEL` holds them |
+| `model.featureSchema` | the feature schema identity (`evidence-features/v2`), its bounds and fixed-point scale, the feature names in vector order, and the compiled feature vector of each golden input above |
+| `model.aggregation` | the model identity (`evidence-aggregation/v3`) and every group, direction, rule, cap, signal rule, context class, exclusion grammar and vocabulary word, and the band thresholds, as the compiled `SHADOW_MODEL` holds them |
 | `modelFingerprint` | SHA-256 of `model` as canonical JSON (keys sorted, no whitespace, UTF-8) |
 | `identityLedger` | every model identity the artifact has recorded, each with the one fingerprint it stands for; append-only |
-| `sources` | SHA-256 of the "Shadow evidence feature schema", "Shadow evidence aggregation" and "Maintainer-local shadow evaluation" sections of this page, and of `features.rs`, `fixed_point.rs`, `context.rs`, `exclusion.rs`, `aggregate.rs` and `shadow.rs` under `crates/secret-scan-core/src/evidence/` |
-| `calibration` | the redact-secret-benchmarks#300 run it came from: repository, issue, pull request, 40-hex `develop` commit, method permalink, selected configuration, selection method and source hash, feature dataset (extractor version, extractor source hash, dataset hash, the core commit its features were pinned to) and scoring identity with its component hashes |
+| `sources` | SHA-256 of the "Shadow evidence feature schema", "Shadow evidence residual features", "Shadow evidence aggregation" and "Maintainer-local shadow evaluation" sections of this page, and of `features.rs`, `residual.rs`, `fixed_point.rs`, `context.rs`, `exclusion.rs`, `aggregate.rs` and `shadow.rs` under `crates/secret-scan-core/src/evidence/` |
+| `calibration` | the benchmark calibration run it came from (for `v3`, the #829 run merged in redact-secret-benchmarks PR #437): repository, issue, pull request, 40-hex `develop` commit, method permalink, selected configuration, selection method and source hash, feature dataset (extractor version, extractor source hash, dataset hash, the core commit its features were pinned to) and scoring identity with its component hashes |
 | `corpora` | the benchmark pin manifest's hash and every tuning and evaluation corpus hash |
 | `tuningManifest` | the redact-secret-benchmarks#256 tuning manifest: `pending` with `hash: null` until it is bound, plus the deterministic identity of its draft |
 | `productRevision` | how a candidate's source commit is bound (below) |
@@ -498,6 +700,13 @@ at the commit, and is stale for any candidate where one of them differs.
   `tuningManifestHash: null`. This is an explicit provenance limitation, not
   an indication that the candidate or its qualification is missing. Binding a
   manifest later requires a new artifact revision and candidate identity.
+- Randomness alone stays below `low` and context alone reaches `medium`, so
+  no randomness signal can change an outcome read at `medium`. The
+  future-promotion Q4 projection reads `medium`, and a statistical
+  candidate without credential-bearing context never reaches it, so Q4
+  cannot pass at this operating point whichever randomness measure the
+  model uses (#829). Changing the operating point is a calibration decision
+  and a new model identity.
 
 ## Maintainer-local shadow evaluation
 
@@ -514,7 +723,9 @@ Final adversarial and release-candidate evidence is frozen in the
 [beta.9 qualification record](https://github.com/redact-secret/redact-secret-benchmarks/blob/3fb195818eb31c481aaebc0257384386d17b2d7c/evidence/767/09e1d7f8/README.md)
 for product source `09e1d7f85cd2ada9f387cc5c9beef3b29023d17d`. All four
 attacker-known invariants held, but the future-promotion Q4 gate failed, so
-the scorer remains shadow-only and non-enforcing.
+the scorer remains shadow-only and non-enforcing. That record covers
+`evidence-aggregation/v2`; evidence for `v3` (#829) is regenerated against
+the product commit that carries it and is pending.
 
 ### Where the comparison is computed
 
@@ -622,8 +833,8 @@ The first line is the header:
 | `record` | `"shadow-evaluation"` |
 | `format` | `"redact-secret/shadow-evaluation/1"` |
 | `productVersion` | the core crate version |
-| `model` | `SHADOW_MODEL.id`, `"evidence-aggregation/v2"` |
-| `featureSchema` | `"evidence-features/v1"` |
+| `model` | `SHADOW_MODEL.id`, `"evidence-aggregation/v3"` |
+| `featureSchema` | `"evidence-features/v2"` |
 | `artifactRevision` | `artifact.revision` of the artifact read |
 | `modelFingerprint` | `modelFingerprint` of the artifact read |
 | `profile` | `"full"` or `"common"` |

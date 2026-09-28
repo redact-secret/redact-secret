@@ -48,7 +48,7 @@ fn detect_addresses(input: &str) -> Vec<Alternative> {
         if bytes[index].is_ascii_digit()
             && ipv4_left_boundary(bytes, index)
             && let Some((end, octets)) = parse_ipv4_at(bytes, index)
-            && ipv4_right_boundary(bytes, end)
+            && (ipv4_right_boundary(bytes, end) || sentence_final_period(bytes, end))
         {
             let sensitive = ipv4_sensitive(octets);
             if let Some(candidate) = alternative(index, end, sensitive) {
@@ -72,8 +72,13 @@ fn detect_addresses(input: &str) -> Vec<Alternative> {
                 index = end;
                 continue;
             }
+            // The body scan admits `.` for an embedded IPv4 tail, so it also
+            // takes a sentence-final period; that period is punctuation.
+            if end > index + 1 && bytes[end - 1] == b'.' && sentence_final_period(bytes, end - 1) {
+                end -= 1;
+            }
             if input[index..end].contains(':')
-                && ipv6_right_boundary(bytes, end)
+                && (ipv6_right_boundary(bytes, end) || sentence_final_period(bytes, end))
                 && let Some(address) = parse_ipv6(&input[index..end])
             {
                 let sensitive = ipv6_sensitive(address);
@@ -146,6 +151,18 @@ fn ipv4_left_boundary(bytes: &[u8], start: usize) -> bool {
 fn ipv4_right_boundary(bytes: &[u8], end: usize) -> bool {
     end == bytes.len()
         || !(bytes[end].is_ascii_alphanumeric() || matches!(bytes[end], b'.' | b'_' | b'%'))
+}
+
+/// One `.` directly after an address that ends the input or is followed by
+/// whitespace or a closing quote or bracket is sentence punctuation, not part
+/// of a longer dotted run (issue #925). The period stays outside the range. A
+/// period followed by anything else (a digit, a letter, another period) keeps
+/// the address unmatched, so a longer malformed address never yields a prefix.
+fn sentence_final_period(bytes: &[u8], end: usize) -> bool {
+    bytes.get(end) == Some(&b'.')
+        && bytes.get(end + 1).is_none_or(|next| {
+            next.is_ascii_whitespace() || matches!(next, b'"' | b'\'' | b')' | b']' | b'}' | b'>')
+        })
 }
 
 fn is_hex(byte: u8) -> bool {
@@ -306,6 +323,24 @@ mod tests {
         );
         assert!(parse_ipv6(&format!("{}::1", "a".repeat(46))).is_none());
         assert!(detect_addresses(&format!("client_ip={}::1", "a".repeat(46))).is_empty());
+        let ranges = |input: &str| {
+            detect_addresses(input)
+                .iter()
+                .map(|alternative| (alternative.range.start(), alternative.range.end()))
+                .collect::<Vec<_>>()
+        };
+        // Issue #925: a sentence-final period is a right boundary.
+        assert_eq!(ranges("client_ip=10.0.0.8."), [(10, 18)]);
+        assert_eq!(ranges("ip: 192.168.1.7.\n"), [(4, 15)]);
+        assert_eq!(ranges("(ip 192.168.1.7.)"), [(4, 15)]);
+        assert_eq!(ranges("client_ip=fd00::1."), [(10, 17)]);
+        assert_eq!(ranges("source_ip=::ffff:192.168.1.7. next"), [(10, 28)]);
+        assert_eq!(ranges("ip: 192.168.1.7:8080"), [(4, 15)]);
+        assert!(ranges("ip: 192.168.1.7.5").is_empty());
+        assert!(ranges("client_ip=192.168.1.7.example").is_empty());
+        assert!(ranges("client_ip=192.168.1.7..").is_empty());
+        assert!(ranges("client_ip=fd00::1.x").is_empty());
+        assert!(ranges("client_ip=fd00::1..").is_empty());
         let mapped = detect_addresses("source_ip=::ffff:192.168.1.7");
         assert_eq!(mapped.len(), 1);
         assert_eq!(mapped[0].range, ByteRange::new(10, 28).unwrap());
