@@ -5,6 +5,10 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.10 — 2026-09-28
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.10/README.md).
+
 ### Added
 
 - Opt-in US Social Security number PII detection (#879) through the shared
@@ -148,6 +152,8 @@ evidence is linked from each published version.
   including process-startup cost.
 
 ## 0.1.0-beta.9 — 2026-09-26
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.9/README.md).
 
 ### Added
 

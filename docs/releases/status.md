@@ -3,8 +3,9 @@
 Every published version has one durable record under `docs/releases/<version>/`:
 [beta.1](0.1.0-beta.1/README.md), [beta.2](0.1.0-beta.2/README.md),
 [beta.3](0.1.0-beta.3/README.md), [beta.4](0.1.0-beta.4/README.md),
-[beta.5](0.1.0-beta.5/README.md), [beta.6](0.1.0-beta.6/README.md), [beta.7](0.1.0-beta.7/README.md), and
-[beta.8](0.1.0-beta.8/README.md).
+[beta.5](0.1.0-beta.5/README.md), [beta.6](0.1.0-beta.6/README.md), [beta.7](0.1.0-beta.7/README.md),
+[beta.8](0.1.0-beta.8/README.md), [beta.9](0.1.0-beta.9/README.md), and
+[beta.10](0.1.0-beta.10/README.md).
 Beta.1 through beta.3 were also observed together on 2026-09-16: the
 [registry observation](registry-observation.json) records their version
 availability, npm integrity values, crate and Python checksums, npm dist-tags,
@@ -22,6 +23,8 @@ and a GitHub Release page are separate facts.
 | 0.1.0-beta.6 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `079095e766e4a71e2b7e29413ed17be37bb3315d` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.6) 2026-09-24 |
 | 0.1.0-beta.7 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `2b98027bbf38d63f07b75129fe2864ef32ed4732` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.7) 2026-09-24 |
 | 0.1.0-beta.8 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `5639a0ea02e0eefbd1533bea23a05c749b529bef` | Not created |
+| 0.1.0-beta.9 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `f726f2ffb0fd854cc3eeb4c35798695fde3161d3` | Not created |
+| 0.1.0-beta.10 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `af7f863f29f9fe482dd233c8b7bc5b77dc427314` | Not created |
 
 Observed on 2026-09-24, npm `beta` points to beta.7 and `latest` points to
 beta.6 for `@redact-secret/core`, `@redact-secret/wasm` and all eight native
@@ -31,6 +34,8 @@ or `@redact-secret/core@beta` to select the current beta. Python spells beta.7
 as `0.1.0b7`.
 
 Observed on 2026-09-25, `@redact-secret/core` has npm `beta` at beta.8 and `latest` at beta.7; the beta.8 release did not change `latest`. Use `@redact-secret/core@0.1.0-beta.8` or `@redact-secret/core@beta` to select the current beta. Python spells beta.8 as `0.1.0b8`. Beta.8's manifest is reconstructed, because its run's manifest job failed ([#799](https://github.com/redact-secret/redact-secret/issues/799)); no publication was partial.
+
+Observed on 2026-09-28, `@redact-secret/core` has npm `beta` at beta.10 and `latest` at beta.8 (moved from beta.7 at some point after 2026-09-25, outside the release workflows, the same way earlier `latest` moves in this file were). Use `@redact-secret/core@0.1.0-beta.10` or `@redact-secret/core@beta` to select the current beta. Python spells beta.9 as `0.1.0b9` and beta.10 as `0.1.0b10`. Beta.9's release run failed only at its `npm:@redact-secret/core` publish job's pre-publish `release:check` gate, on an unrelated `examples/mcp-redact` dependency, not the actual `npm publish` step or a redact-secret artifact defect; Reconcile Release repaired it. Both beta.9's and beta.10's manifests are reconstructed, because this repository's manifest job has never itself populated the tag/registry/verification evidence a durable record requires (see each [record](0.1.0-beta.9/README.md) for what each reconstruction corrects). No beta.9 or beta.10 publication was partial by the time of publication.
 
 Beta.2's [durable release record](0.1.0-beta.2/README.md) preserves its initial
 partial failure and subsequent authorized repair. Beta.3 also had a failed
