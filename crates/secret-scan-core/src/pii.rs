@@ -682,6 +682,10 @@ enum ContextStrength {
 
 struct ContextEntry {
     id: &'static str,
+    #[allow(
+        dead_code,
+        reason = "reviewed contract metadata; pii-context/v2 matching no longer depends on the language"
+    )]
     language: ContextLanguage,
     kind: ContextKind,
     class: ContextClass,
@@ -715,7 +719,12 @@ impl ContextEntry {
 #[path = "pii_context_table.rs"]
 mod pii_context_table;
 
-fn normalize_context(value: &str, language: ContextLanguage) -> String {
+/// The context-only comparison view: governed invisible code points removed,
+/// NFC, ASCII case folded, and every separator run collapsed to one space.
+/// `pii-context/v2` folds ASCII case in every language, so the ASCII part of
+/// a Korean form (`ip 주소`, `클라이언트 ip`) matches in any case (issue #927);
+/// Hangul has no case and is unchanged.
+fn normalize_context(value: &str) -> String {
     let visible = value.chars().filter(|character| {
         let code_point = *character as u32;
         !crate::invisible_table::INVISIBLE_RANGES
@@ -724,13 +733,10 @@ fn normalize_context(value: &str, language: ContextLanguage) -> String {
     });
     let mut tokenized = String::new();
     let mut in_separator = false;
-    for character in visible.nfc().map(|character| {
-        if language == ContextLanguage::English && character.is_ascii_uppercase() {
-            character.to_ascii_lowercase()
-        } else {
-            character
-        }
-    }) {
+    for character in visible
+        .nfc()
+        .map(|character| character.to_ascii_lowercase())
+    {
         let separator = character.is_whitespace() || matches!(character, '_' | '-' | ':' | '=');
         if separator {
             if !in_separator {
@@ -843,25 +849,24 @@ fn context_matches(
             .min()
             .unwrap_or(line_end);
         let mut found = Vec::new();
+        let before = normalize_context(&input[before_barrier..range.start()]);
+        let after = normalize_context(&input[range.end()..after_barrier]);
+        let before_offset = normalize_context(&input[line_start..before_barrier])
+            .chars()
+            .count();
+        let after_offset = normalize_context(&input[line_start..range.end()])
+            .chars()
+            .count();
         for entry in pii_context_table::CONTEXT_ENTRIES
             .iter()
             .filter(|entry| entry.domains.contains(&domain))
         {
-            let before = normalize_context(&input[before_barrier..range.start()], entry.language);
-            let after = normalize_context(&input[range.end()..after_barrier], entry.language);
-            let before_offset =
-                normalize_context(&input[line_start..before_barrier], entry.language)
-                    .chars()
-                    .count();
-            let after_offset = normalize_context(&input[line_start..range.end()], entry.language)
-                .chars()
-                .count();
             for form in entry.forms {
                 for (side, view) in [(0usize, before.as_str()), (1usize, after.as_str())] {
                     if entry.kind == ContextKind::FieldLabel && side == 1 {
                         continue;
                     }
-                    let normalized_form = normalize_context(form, entry.language);
+                    let normalized_form = normalize_context(form);
                     for (position, _) in view.match_indices(&normalized_form) {
                         let byte_end = position + normalized_form.len();
                         let boundary_ok = view[..position]
@@ -903,7 +908,7 @@ fn context_matches(
                         let occurrence_end = occurrence_start + scalar_span;
                         if equidistant_from_candidates(
                             input,
-                            entry.language,
+                            entry.kind,
                             line_start,
                             line_end,
                             occurrence_start,
@@ -994,27 +999,39 @@ fn logical_line_bounds(input: &str, range: ByteRange) -> (usize, usize) {
     (line_start, line_end)
 }
 
+/// Whether a context occurrence is equally near two candidate occurrences
+/// it could associate with. A field label only associates with a candidate
+/// after it, so a candidate that ends before the label never makes it
+/// equidistant (`pii-context/v2`, issue #924); a natural-language label may
+/// associate either way and keeps the two-sided rule.
 fn equidistant_from_candidates(
     input: &str,
-    language: ContextLanguage,
+    kind: ContextKind,
     line_start: usize,
     line_end: usize,
     occurrence_start: usize,
     occurrence_end: usize,
     candidates: &[(ByteRange, IdentityDomain)],
 ) -> bool {
+    // Equidistance separates two occurrences. Alternatives of different
+    // identity domains at one exact range are one occurrence with two
+    // interpretations, so each range counts once (issue #922).
+    let ranges: BTreeSet<ByteRange> = candidates.iter().map(|(range, _)| *range).collect();
     let mut distances = Vec::new();
-    for (range, _) in candidates {
+    for range in &ranges {
         if range.start() < line_start || range.end() > line_end {
             continue;
         }
-        let candidate_start = normalize_context(&input[line_start..range.start()], language)
+        let candidate_start = normalize_context(&input[line_start..range.start()])
             .chars()
             .count();
         let candidate_end = candidate_start
-            + normalize_context(&input[range.start()..range.end()], language)
+            + normalize_context(&input[range.start()..range.end()])
                 .chars()
                 .count();
+        if kind == ContextKind::FieldLabel && candidate_end <= occurrence_start {
+            continue;
+        }
         let distance = if candidate_end <= occurrence_start {
             occurrence_start - candidate_end
         } else {
@@ -1162,12 +1179,12 @@ mod tests {
     fn activation_identity_is_canonical_and_off_is_distinct() {
         assert_eq!(
             PiiSelection::default().activation_identity(crate::Profile::Full),
-            "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+            "credentials=full;selectors=off;families=;vocabulary=pii-context/v2"
         );
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
         );
     }
 
@@ -1441,11 +1458,10 @@ mod tests {
             ],
         );
         assert!(barriers.iter().all(Vec::is_empty));
-        assert_eq!(
-            normalize_context("e\u{301}", ContextLanguage::English),
-            normalize_context("é", ContextLanguage::English)
-        );
-        assert_eq!(normalize_context("ASCII", ContextLanguage::Korean), "ASCII");
+        assert_eq!(normalize_context("e\u{301}"), normalize_context("é"));
+        // pii-context/v2 folds ASCII case in every language (issue #927).
+        assert_eq!(normalize_context("IP 주소"), "ip 주소");
+        assert_eq!(normalize_context("클라이언트_IP"), "클라이언트 ip");
 
         let quoted_natural = context_matches(
             "\"contact details\" TEST",
@@ -1546,6 +1562,98 @@ mod tests {
             ],
         );
         assert!(mixed_domains.iter().all(Vec::is_empty));
+    }
+
+    #[test]
+    fn field_label_after_an_earlier_candidate_associates_forward() {
+        // Issue #924: a field label only associates with the candidate after
+        // it, so the candidate before it on the same line never makes it
+        // equidistant.
+        for (input, first, second, first_entry, second_entry) in [
+            (
+                "email: AAAA phone: BBBB",
+                IdentityDomain::Email,
+                IdentityDomain::Phone,
+                "en-email-field",
+                "en-phone-field",
+            ),
+            (
+                "ip=AAAA card_number=BBBB",
+                IdentityDomain::NetworkAddress,
+                IdentityDomain::PaymentCard,
+                "en-network-address-field",
+                "en-payment-card-field",
+            ),
+            (
+                "ip: AAAA ip: BBBB",
+                IdentityDomain::NetworkAddress,
+                IdentityDomain::NetworkAddress,
+                "en-network-address-field",
+                "en-network-address-field",
+            ),
+        ] {
+            let a = input.find("AAAA").unwrap();
+            let b = input.find("BBBB").unwrap();
+            let matches = context_matches(
+                input,
+                &[
+                    (ByteRange::new(a, a + 4).unwrap(), first),
+                    (ByteRange::new(b, b + 4).unwrap(), second),
+                ],
+            );
+            assert!(
+                matches[0].iter().any(|item| item.entry_id == first_entry),
+                "{input}"
+            );
+            assert!(
+                matches[1].iter().any(|item| item.entry_id == second_entry),
+                "{input}"
+            );
+        }
+        // A label of another domain after the first value reaches nothing.
+        let other_domain = context_matches(
+            "ip: AAAA order_id=BBBB",
+            &[
+                (
+                    ByteRange::new(4, 8).unwrap(),
+                    IdentityDomain::NetworkAddress,
+                ),
+                (ByteRange::new(18, 22).unwrap(), IdentityDomain::PaymentCard),
+            ],
+        );
+        assert!(!other_domain[0].is_empty());
+        assert!(other_domain[1].is_empty());
+    }
+
+    #[test]
+    fn same_range_alternative_of_another_domain_is_not_equidistant() {
+        // Issue #922: one occurrence read as both a payment card and a phone
+        // number is one candidate position, not two equidistant candidates.
+        for (input, domain, entry) in [
+            (
+                "card_number=TEST",
+                IdentityDomain::PaymentCard,
+                "en-payment-card-field",
+            ),
+            ("phone: TEST", IdentityDomain::Phone, "en-phone-field"),
+        ] {
+            let start = input.find("TEST").unwrap();
+            let range = ByteRange::new(start, start + 4).unwrap();
+            let candidates = [
+                (range, IdentityDomain::PaymentCard),
+                (range, IdentityDomain::Phone),
+            ];
+            let matches = context_matches(input, &candidates);
+            let index = candidates
+                .iter()
+                .position(|(_, candidate)| *candidate == domain)
+                .unwrap();
+            assert!(
+                matches[index].iter().any(|item| item.entry_id == entry),
+                "{input}"
+            );
+            assert!(matches[1 - index].is_empty(), "{input}");
+        }
     }
 
     #[test]
@@ -1926,7 +2034,7 @@ mod tests {
     fn identity_evaluator_accepts_exactly_one_production_family() {
         for family in AVAILABLE_FAMILIES {
             let evaluator = IdentityEvaluator::new(family).unwrap();
-            assert_eq!(IdentityEvaluator::vocabulary(), "pii-context/v1");
+            assert_eq!(IdentityEvaluator::vocabulary(), "pii-context/v2");
             assert_eq!(
                 IDENTITY_EVALUATION_FORMAT,
                 "redact-secret/pii-identity-evaluation/1"
@@ -1946,7 +2054,7 @@ mod tests {
             IdentityEvaluator::new("pii:us:ssn")
                 .unwrap()
                 .activation_identity(),
-            "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v2"
         );
         for other in [
             "",

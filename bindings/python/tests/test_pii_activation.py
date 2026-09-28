@@ -130,14 +130,14 @@ print(json.dumps({
         (
             "pii:family:global:payment-card",
             "credentials=full;selectors=pii:family:global:payment-card;families="
-            "pii:global:payment-card;vocabulary=pii-context/v1",
+            "pii:global:payment-card;vocabulary=pii-context/v2",
         ),
         (
             "pii:global",
             "credentials=full;selectors=pii:global;families=pii:global:email,"
             "pii:global:iban,pii:global:network-address,pii:global:payment-card,"
             "pii:global:phone;"
-            "vocabulary=pii-context/v1",
+            "vocabulary=pii-context/v2",
         ),
     ]
     for ordinal, (selector, activation) in enumerate(cases):
@@ -198,7 +198,7 @@ print(json.dumps({
     )
     actual = json.loads(completed.stdout)
     assert actual["activation"] == (
-        "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+        "credentials=full;selectors=off;families=;vocabulary=pii-context/v2"
     )
     assert actual["wholeTypes"] == []
     assert all(row == {"textEqual": True, "types": []} for row in actual["partitions"])
@@ -246,17 +246,17 @@ print(json.dumps({
         (
             "pii:family:global:phone",
             "credentials=full;selectors=pii:family:global:phone;families="
-            "pii:global:phone;vocabulary=pii-context/v1",
+            "pii:global:phone;vocabulary=pii-context/v2",
             ["pii_global_phone"],
         ),
         (
             "pii:global",
             "credentials=full;selectors=pii:global;families=pii:global:email,"
             "pii:global:iban,pii:global:network-address,pii:global:payment-card,"
-            "pii:global:phone;vocabulary=pii-context/v1",
+            "pii:global:phone;vocabulary=pii-context/v2",
             ["pii_global_phone"],
         ),
-        ("off", "credentials=full;selectors=off;families=;vocabulary=pii-context/v1", []),
+        ("off", "credentials=full;selectors=off;families=;vocabulary=pii-context/v2", []),
     ]
     for selector, activation, types in cases:
         completed = subprocess.run(

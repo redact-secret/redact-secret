@@ -726,7 +726,7 @@ fn pii_activation_is_public_with_the_available_global_families() {
     );
     assert_eq!(
         registry.activation_identity(),
-        "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
+        "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
     );
 }
 

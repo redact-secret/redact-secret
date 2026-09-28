@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for the pii-context/v1 live contract."""
+"""Tests for the pii-context/v2 live contract."""
 
 from __future__ import annotations
 
@@ -33,6 +33,8 @@ class RepositoryContract(unittest.TestCase):
 
     def test_english_case_separator_and_korean_nfc_normalize_together(self) -> None:
         self.assertEqual(CHECK.normalize("EMAIL_KEY", "en"), "email key")
+        self.assertEqual(CHECK.normalize("IP 주소", "ko"), "ip 주소")
+        self.assertEqual(CHECK.normalize("클라이언트_IP", "ko"), "클라이언트 ip")
         self.assertEqual(CHECK.normalize("이메일", "ko"), "이메일")
         self.assertEqual(CHECK.normalize("이\u200b메일", "ko"), "이메일")
         self.assertEqual(CHECK.normalize("이\ufe0f메일", "ko"), "이메일")
@@ -109,6 +111,65 @@ class SchemaAndSemantics(unittest.TestCase):
                 candidates,
             )
         )
+
+    def test_same_position_alternatives_of_another_domain_are_not_equidistant(self) -> None:
+        occurrence = {
+            "start": 0,
+            "end": 11,
+            "entry": {
+                "kind": "field-label",
+                "domains": ["payment-card"],
+            },
+        }
+        candidates = {
+            "card": {"domain": "payment-card"},
+            "phone": {"domain": "phone"},
+        }
+        self.assertEqual(
+            CHECK.associate_occurrence(
+                occurrence,
+                "card number ",
+                {"card": 12, "phone": 12},
+                candidates,
+            ),
+            "card",
+        )
+
+    def test_field_label_ignores_an_earlier_candidate_when_judging_equidistance(self) -> None:
+        occurrence = {
+            "start": 5,
+            "end": 10,
+            "entry": {
+                "kind": "field-label",
+                "domains": ["phone"],
+            },
+        }
+        candidates = {
+            "email": {"domain": "email"},
+            "phone": {"domain": "phone"},
+        }
+        view = "TEST phone TEST"
+        self.assertEqual(
+            CHECK.associate_occurrence(occurrence, view, {"email": 4, "phone": 11}, candidates),
+            "phone",
+        )
+        natural = dict(occurrence, entry={"kind": "natural-language-label", "domains": ["phone"]})
+        self.assertIsNone(
+            CHECK.associate_occurrence(natural, view, {"email": 4, "phone": 11}, candidates)
+        )
+
+    def test_korean_ascii_case_folding_is_part_of_the_versioned_schema(self) -> None:
+        changed = copy.deepcopy(CONTRACT)
+        changed["normalization"]["koreanCase"] = "none"
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
+
+    def test_equidistance_scope_is_part_of_the_versioned_schema(self) -> None:
+        changed = copy.deepcopy(CONTRACT)
+        changed["association"]["fieldLabel"]["equidistanceAmong"] = "candidates-on-either-side"
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
+        changed = copy.deepcopy(CONTRACT)
+        changed["format"] = "redact-secret/pii-context/v1"
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
 
     def test_unknown_fields_and_runtime_status_drift_are_rejected(self) -> None:
         changed = copy.deepcopy(CONTRACT)

@@ -25,6 +25,7 @@ Current rules: `docs/specs/contextual-detection.md`.
 - [Warn unconditionally on high-signal contextual-name assignments despite prose false positives](2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md)
 - [Redact a value assigned to a provider-named credential name](2026-09-24-redact-provider-named-credential-assignments.md)
 - [Define the versioned English and Korean PII context vocabulary contract](2026-09-26-define-the-pii-context-vocabulary-contract.md)
+- [Version the PII context vocabulary as pii-context/v2 with forward-only field labels and ASCII case folding in every language](2026-09-28-version-the-pii-context-vocabulary-as-v2.md)
 
 ## Engine
 

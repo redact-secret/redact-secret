@@ -80,7 +80,7 @@ without adding any public item.
 `crates/secret-scan-core/examples/pii_identity_evaluation.rs` is outside the
 published package. Like `shadow_evaluation`, it compiles the core's own source
 files as modules of the executable, so it runs the product's family detector,
-`pii-context/v1` vocabulary and join at the same commit rather than a
+`pii-context/v2` vocabulary and join at the same commit rather than a
 reimplementation:
 
 ```bash
@@ -89,7 +89,7 @@ cargo run --release --locked -p redact-secret --example pii_identity_evaluation 
 ```
 
 - **Selection.** Exactly the family named by `--family` (one of the production
-  families compiled into the build), vocabulary `pii-context/v1`, and the
+  families compiled into the build), vocabulary `pii-context/v2`, and the
   `full` credential profile's activation identity. An unknown or
   non-production family fails with exit status 2.
 - **Input.** JSON Lines. Each line has exactly the keys `id`, `family` (equal

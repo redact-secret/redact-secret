@@ -44,14 +44,14 @@ export async function qualify(fixtures, selector, fixtureKey) {
   check("PII selector has the canonical activation identity", () => {
     const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
     const expected = selector === null
-      ? `credentials=${fixtures.profile};selectors=off;families=;vocabulary=pii-context/v1`
+      ? `credentials=${fixtures.profile};selectors=off;families=;vocabulary=pii-context/v2`
       : selector === "pii:global"
-      ? `credentials=${fixtures.profile};selectors=pii:global;families=${globals};vocabulary=pii-context/v1`
+      ? `credentials=${fixtures.profile};selectors=pii:global;families=${globals};vocabulary=pii-context/v2`
       : selector === "pii:us"
-        ? `credentials=${fixtures.profile};selectors=pii:us;families=${globals},pii:us:ssn;vocabulary=pii-context/v1`
+        ? `credentials=${fixtures.profile};selectors=pii:us;families=${globals},pii:us:ssn;vocabulary=pii-context/v2`
         : selector === "pii:family:us:ssn"
-          ? `credentials=${fixtures.profile};selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1`
-          : `credentials=${fixtures.profile};selectors=${selector};families=${fixture.family};vocabulary=pii-context/v1`;
+          ? `credentials=${fixtures.profile};selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v2`
+          : `credentials=${fixtures.profile};selectors=${selector};families=${fixture.family};vocabulary=pii-context/v2`;
     assert(piiActivation() === expected, "activation identity disagreed");
   });
 

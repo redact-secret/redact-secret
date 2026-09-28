@@ -352,7 +352,7 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
       if (addon.initializePii !== undefined) addon.initializePii(pii);
       else addon.initialize();
     },
-    piiActivation: () => addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v1",
+    piiActivation: () => addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
     scan: (input, policy, limits, ruleset) =>
       addon.scan(input, policy, limits, ruleset),
     scanAndRedact: (input, policy, formatter, limits, ruleset) =>
@@ -380,7 +380,7 @@ export function createBindingFromCommonAddon(
       if (addon.initializeCommonPii !== undefined) addon.initializeCommonPii(pii);
       else addon.initializeCommon();
     },
-    piiActivation: () => addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v1",
+    piiActivation: () => addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
     scan: (input, policy, limits, ruleset) =>
       addon.scanCommon(input, policy, limits, ruleset),
     scanAndRedact: (input, policy, formatter, limits, ruleset) =>

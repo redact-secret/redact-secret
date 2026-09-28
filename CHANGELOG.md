@@ -5,6 +5,40 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- The PII context vocabulary is now `pii-context/v2`, and every PII
+  activation identity names it (`vocabulary=pii-context/v2`). A field label
+  associates only with the value after it, so an earlier value on the same
+  line no longer makes it "equidistant" (#924): on dense `k: v k: v` and
+  `a=… b=…` records (`email: … phone: …`, `ip=… card_number=…`), every
+  labelled value is now reported, not only the first. A natural-language label
+  between two values (`… contact details …`) still associates with neither.
+  The released `pii-context/v1` file is kept unchanged as the beta.10 record.
+- `pii-context/v2` also folds ASCII case in Korean context, so `IP 주소:` and
+  `클라이언트_IP=` label an address like `ip 주소:` does, and adds the field
+  labels `email address`, `e-mail address`, `이메일 주소`, `카드번호`,
+  `신용카드번호`, and `직불카드번호` (#927). A bare `address` or `주소` is
+  still not a label.
+
+### Fixed
+
+- PII context association no longer counts a same-range alternative of
+  another identity domain as a second candidate (#922). A labelled 10-digit
+  card that is also NANP-shaped (`card_number=…`), or a labelled phone number
+  that happens to pass Luhn (`phone: …`), is now reported under `pii:global`
+  and `pii:us` exactly as under its exact-family selector. Equidistance
+  between occurrences at different positions is unchanged.
+- A labelled IPv4 or IPv6 address followed by a sentence-final period
+  (`client_ip=10.0.0.8.`) is now reported, as it already was before a `:port`
+  suffix (#925). The period stays outside the range, and a period followed by
+  a digit, a letter, or another period still leaves the dotted run unmatched.
+- A logfmt or `.env` style `email=address` is now reported as an email
+  finding (#926). A reviewed email field label glued to the address by `=`
+  (`email=`, `customer_email=`, `이메일=`) is read as a label, not as local
+  part, so the finding starts after the `=`. Other keys (`user=`, `emailx=`)
+  are unchanged.
+
 ## 0.1.0-beta.10 — 2026-09-28
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.10/README.md).
