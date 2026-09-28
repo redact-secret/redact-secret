@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2509,
+  "fixtureCount": 2547,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -62840,6 +62840,747 @@
         "maxRuntimeMs": 250
       },
       "input": "\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "posthog-token-positive-bare",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 47
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "posthog-token-positive-dotenv",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTHOG_PERSONAL_API_KEY=\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 72
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-shell-export",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export POSTHOG_PERSONAL_API_KEY=\"\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\"\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 80
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "posthog-token-positive-yaml",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 68
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-json-config",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\"\n}\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 63
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-json-token-key",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\"}",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 58
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-python-sdk-call",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\")\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 72
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-bearer-header",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 69
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-x-api-key-header",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 58
+        }
+      ],
+      "note": "An X-API-Key header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-curl-bearer",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 78
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-tool-call-arguments",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\"}}",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 85
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-chat-sentence",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 62
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-log",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01 for request 7",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 102
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-positive-punctuation-adjacent",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01).",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 48
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "posthog-token-positive-crlf-unicode-prefix",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\n\r\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 71
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "posthog-token-positive-repeated-value",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01 \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 47
+        },
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 95
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "posthog-token-overlap-context",
+      "detector": "posthog-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 60
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "posthog-token-positive-project-secret-key",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hs_SyntheticRevokedPosthogPersonalKeyFixture0123456",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_project_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 52
+        }
+      ],
+      "note": "A \u0070hs_ project secret key reports its own finding type."
+    },
+    {
+      "id": "posthog-token-positive-project-secret-key-dotenv",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTHOG_PERSONAL_API_KEY=\u0070hs_SyntheticRevokedPosthogPersonalKeyFixture0123456\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_project_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 77
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-overlap-project-secret-key-bearer",
+      "detector": "posthog-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070hs_SyntheticRevokedPosthogPersonalKeyFixture0123456\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_project_secret_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 74
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "posthog-token-positive-body-42",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture0",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The 42-byte floor keeps short renderings of the 32-byte base62 era."
+    },
+    {
+      "id": "posthog-token-positive-body-42-dotenv",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTHOG_PERSONAL_API_KEY=\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture0\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 71
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-overlap-body-42-bearer",
+      "detector": "posthog-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture0\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 68
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "posthog-token-positive-body-49",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01234567",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 53
+        }
+      ],
+      "note": "A 49-byte base57-era body is claimed."
+    },
+    {
+      "id": "posthog-token-positive-body-49-dotenv",
+      "detector": "posthog-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTHOG_PERSONAL_API_KEY=\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01234567\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 78
+        }
+      ],
+      "note": "A dotenv assignment of this type is reported at exactly the value."
+    },
+    {
+      "id": "posthog-token-overlap-body-49-bearer",
+      "detector": "posthog-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01234567\n",
+      "expected": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 75
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "posthog-token-boundary-short-body",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture",
+      "expected": [],
+      "note": "A body under the 42-49 band is not claimed."
+    },
+    {
+      "id": "posthog-token-boundary-long-body",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture012345678",
+      "expected": [],
+      "note": "A 50-byte body is a wider run, not a token."
+    },
+    {
+      "id": "posthog-token-boundary-underscore-inside-body",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPost_ogPersonalKeyFixture01",
+      "expected": [],
+      "note": "No generator era emits _ or - in the body."
+    },
+    {
+      "id": "posthog-token-boundary-wrong-case-prefix",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PHX_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "posthog-token-boundary-dash-separator",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "phx-SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [],
+      "note": "A different separator is not the reviewed prefix."
+    },
+    {
+      "id": "posthog-token-boundary-unknown-prefix",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "phy_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [],
+      "note": "An undocumented prefix is not claimed."
+    },
+    {
+      "id": "posthog-token-boundary-glued-suffix",
+      "detector": "posthog-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "posthog-token-negative-public-project-token",
+      "detector": "posthog-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "posthog.init('\u0070hc_SyntheticRevokedPosthogPersonalKeyFixture010', { api_host: 'https://us.i.posthog.com' })\n",
+      "expected": [],
+      "note": "The \u0070hc_ project token is public by design and is never claimed."
+    },
+    {
+      "id": "posthog-token-negative-public-project-token-html",
+      "detector": "posthog-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "<script>posthog.init(\"\u0070hc_SyntheticRevokedPosthogPersonalKeyFixture01\")</script>\n",
+      "expected": [],
+      "note": "A \u0070hc_ project token in an HTML snippet is never claimed."
+    },
+    {
+      "id": "posthog-token-negative-embedded-in-wider-identifier",
+      "detector": "posthog-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "posthog-token-negative-masked",
+      "detector": "posthog-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Your key \u0070hx_***1234 was created; see \u0070hx_... in the docs.",
+      "expected": [],
+      "note": "Masked displays and placeholders carry no key-width body."
+    },
+    {
+      "id": "posthog-token-adversarial-long-suffix",
+      "detector": "posthog-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }

@@ -27,6 +27,10 @@ evidence is linked from each published version.
   - `e2b-api-key` (#905): E2B API keys, `e2b_` + exactly 40 lowercase hex,
     as `e2b_api_key`. Retired `sk_e2b_` tokens and `e2b_` module names stay
     unclaimed.
+  - `posthog-token` (#906): PostHog `phx_` personal API keys and `phs_`
+    project secret API keys (42–49 alphanumeric body) as
+    `posthog_personal_api_key` and `posthog_project_secret_api_key`. The
+    public `phc_` project token is never claimed.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

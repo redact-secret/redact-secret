@@ -90,6 +90,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `otpauth_secret` | `otpauth-uri` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `perplexity_api_key` | `perplexity-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `pinecone_api_key` | `pinecone-api-key` | `always-redact` | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
+| `posthog_personal_api_key` | `posthog-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code and unit tests under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `posthog_project_secret_api_key` | `posthog-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code and unit tests under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `postman_api_key` | `postman-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `postman_collection_access_key` | `postman-collection-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `private_key` | `private-key` | `block` | generic policy default, no dedicated ADR in this repository |
@@ -443,6 +445,7 @@ conformance and the benchmarks arrival and profile evidence.
 | `doppler:service-token` | `doppler-token` | `dp.` + `st`\|`pt`\|`ct`\|`sa`\|`said`\|`scim`\|`audit` + `.` + 40–44 `[A-Za-z0-9]`; `dp.st.` only may carry one `[a-z0-9_-]{2,35}` + `.` environment segment, inside the span. Leading boundary also rejects `.` | one per type: `doppler_service_token`, `doppler_personal_token`, `doppler_cli_token`, `doppler_service_account_token`, `doppler_service_account_identity_token`, `doppler_scim_token`, `doppler_audit_token` | T1 (Doppler token-format page, per-type regex) |
 | `trigger-dev:secret-api-key` | `trigger-dev-token` | `tr_` + `dev`\|`stg`\|`prod`\|`preview` + `_sk_` + exactly 24 `[0-9A-Za-z]` (additional key); `tr_<env>_` + exactly 24 or 20 `[0-9A-Za-z]` (root key, current and legacy); `tr_pat_` + exactly 40 `[1-9a-km-z]` | `trigger_dev_secret_api_key` (root and additional); `trigger_dev_personal_access_token` | T1 (published SDK regex; provider generator code under R1) |
 | `e2b:api-key` | `e2b-api-key` | `e2b_` + exactly 40 lowercase hex | `e2b_api_key` | T1 (provider key generator and seed test under R1; docs corroborate the prefix) |
+| `posthog:personal-api-key` | `posthog-token` | `phx_` or `phs_` + 42–49 `[0-9A-Za-z]` (the union of the prefixed base57 and base62 generator eras); `phc_` never claimed | `posthog_personal_api_key`; `posthog_project_secret_api_key` | T1 (provider generator code and unit tests under R1; the length band is derived from the T1 algorithm) |
 
 Doppler ([#903](https://github.com/redact-secret/redact-secret/issues/903),
 [handoff](../audits/evidence/860/doppler.md)). One type per documented role
@@ -484,6 +487,17 @@ sandbox tokens. False positives: an unrelated `e2b_` + exactly 40 lowercase
 hex, such as an identifier suffixing a SHA-1; rare, and the cost is redacting
 a digest.
 
+PostHog ([#906](https://github.com/redact-secret/redact-secret/issues/906),
+[handoff](../audits/evidence/860/posthog.md)). The project token `phc_` is
+public by design ("ok to be public") and the detector never emits a finding
+for it; a credential-named assignment of one is still `generic-token`'s
+name-driven verdict, unchanged here. The alphabet is the base62 union rather
+than base57 so every live era stays claimed. False negatives: base62-era keys
+that rendered at 41 bytes or fewer (under 0.03% of any era), unprefixed
+era-1 keys outside named contexts, OAuth `pha_`/`phr_` tokens (deferred), and
+a body with `_` or `-`. False positives: an unrelated `phx_`/`phs_` + 42–49
+alphanumeric value; none is known.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -496,6 +510,7 @@ a digest.
 | Doppler `dp.<type>.` tokens (seven documented types, 40–44 alphanumeric body, optional `dp.st.` environment segment) are reported as one finding type per type at provider specificity, bare or in any context ([#903](https://github.com/redact-secret/redact-secret/issues/903), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the GitHub one-type-per-family precedent to one more family |
 | Trigger.dev `tr_<env>_sk_` + 24 and `tr_<env>_` + 24 or 20 alphanumeric secret keys (four documented env slugs), and `tr_pat_` + 40 `[1-9a-km-z]` personal access tokens, are reported as two finding types at provider specificity, bare or in any context; `pk_<env>_`, `tr_oat_` and JWT forms stay unclaimed ([#904](https://github.com/redact-secret/redact-secret/issues/904), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | E2B `e2b_` + exactly 40 lowercase hex API keys are reported as `e2b_api_key` at provider specificity, bare or in any context; retired `sk_e2b_` tokens and `e2b_` module names stay unclaimed ([#905](https://github.com/redact-secret/redact-secret/issues/905), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| PostHog `phx_` personal and `phs_` project secret API keys (42–49 alphanumeric) are reported as two finding types at provider specificity, bare or in any context; the public `phc_` project token is never claimed ([#906](https://github.com/redact-secret/redact-secret/issues/906), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent (Stripe `pk_`) to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

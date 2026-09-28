@@ -324,3 +324,70 @@ mod e2b {
         assert_partition_parity(&key());
     }
 }
+
+mod posthog {
+    use super::*;
+
+    const DETECTOR: &str = "posthog-token";
+
+    #[test]
+    fn both_prefixes_win_every_context_as_the_sole_finding() {
+        for len in [42, 43, 47, 48, 49] {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "posthog_personal_api_key",
+                &format!("phx_{}", filler(ALNUM, len, len)),
+            );
+            assert_sole_provider_finding(
+                DETECTOR,
+                "posthog_project_secret_api_key",
+                &format!("phs_{}", filler(ALNUM, len, len)),
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 47, 1);
+        let mut dashed = body.clone();
+        dashed.replace_range(20..21, "-");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("phx_{}", filler(ALNUM, 41, 1)),
+                format!("phx_{}", filler(ALNUM, 50, 1)),
+                format!("phx_{dashed}"),
+                format!("PHX_{body}"),
+                format!("phx-{body}"),
+                format!("xphx_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn the_public_project_token_is_never_claimed() {
+        for len in [43, 44] {
+            let token = format!("phc_{}", filler(ALNUM, len, 3));
+            for input in [
+                token.clone(),
+                format!("posthog.init('{token}', {{ api_host: 'https://us.i.posthog.com' }})"),
+                format!("<script>posthog.init(\"{token}\")</script>"),
+            ] {
+                assert_unclaimed(DETECTOR, &input);
+            }
+        }
+        for input in [
+            "POSTHOG_PERSONAL_API_KEY=phx_...\n",
+            "POSTHOG_API_KEY=${POSTHOG_API_KEY}\n",
+            "POSTHOG_HOST=https://eu.posthog.com\n",
+        ] {
+            assert_unclaimed(DETECTOR, input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("phx_{}", filler(ALNUM, 49, 2)));
+        assert_partition_parity(&format!("phs_{}", filler(ALNUM, 42, 2)));
+    }
+}

@@ -743,6 +743,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u00652b_0123456789abcdef0123456789abcdef01234567",
       "schemes": null
+    },
+    {
+      "type": "posthog_personal_api_key",
+      "detector": "posthog-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "schemes": null
+    },
+    {
+      "type": "posthog_project_secret_api_key",
+      "detector": "posthog-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070hs_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "schemes": null
     }
   ],
   "consumers": [

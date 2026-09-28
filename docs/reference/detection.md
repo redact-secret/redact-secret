@@ -118,7 +118,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-82 built-in detectors emit 102 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+83 built-in detectors emit 104 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -204,6 +204,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `doppler-token` | `doppler_service_token`, `doppler_personal_token`, `doppler_cli_token`, `doppler_service_account_token`, `doppler_service_account_identity_token`, `doppler_scim_token`, `doppler_audit_token` | `always-redact` | — |
 | `trigger-dev-token` | `trigger_dev_secret_api_key`, `trigger_dev_personal_access_token` | `always-redact` | — |
 | `e2b-api-key` | `e2b_api_key` | `always-redact` | — |
+| `posthog-token` | `posthog_personal_api_key`, `posthog_project_secret_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

@@ -4468,12 +4468,102 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "e2b_api_key"
+    },
+    {
+      "detector": "posthog-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "posthog-token-positive-bare",
+        "posthog-token-positive-bearer-header",
+        "posthog-token-positive-body-42",
+        "posthog-token-positive-body-42-dotenv",
+        "posthog-token-positive-body-49",
+        "posthog-token-positive-body-49-dotenv",
+        "posthog-token-positive-chat-sentence",
+        "posthog-token-positive-crlf-unicode-prefix",
+        "posthog-token-positive-curl-bearer",
+        "posthog-token-positive-dotenv",
+        "posthog-token-positive-json-config",
+        "posthog-token-positive-json-token-key",
+        "posthog-token-positive-log",
+        "posthog-token-positive-punctuation-adjacent",
+        "posthog-token-positive-python-sdk-call",
+        "posthog-token-positive-repeated-value",
+        "posthog-token-positive-shell-export",
+        "posthog-token-positive-tool-call-arguments",
+        "posthog-token-positive-x-api-key-header",
+        "posthog-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "posthog_personal_api_key"
+    },
+    {
+      "detector": "posthog-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "posthog-token-positive-project-secret-key",
+        "posthog-token-positive-project-secret-key-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "posthog_project_secret_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 102,
+    "supported": 104,
     "unresolved": 0
   }
 }

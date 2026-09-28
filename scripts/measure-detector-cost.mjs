@@ -77,7 +77,7 @@ export const CANONICAL_IDS = [
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
   "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
-  "doppler-token", "trigger-dev-token", "e2b-api-key",
+  "doppler-token", "trigger-dev-token", "e2b-api-key", "posthog-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -113,7 +113,7 @@ export const GROUPS = {
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
-    "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
+    "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token", "posthog-token",
   ],
 };
 

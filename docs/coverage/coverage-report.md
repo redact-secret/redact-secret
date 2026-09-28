@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 102 |
+| supported | 104 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 113.
+Coverage declarations: 115.
 
 ## Coverage by detector
 
@@ -82,6 +82,7 @@ Coverage declarations: 113.
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| posthog-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -184,6 +185,8 @@ Coverage declarations: 113.
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
+| posthog_personal_api_key | posthog-token | provider | supported | not-applicable | none |
+| posthog_project_secret_api_key | posthog-token | provider | supported | not-applicable | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
 | postman_collection_access_key | postman-collection-access-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
@@ -239,15 +242,15 @@ Coverage declarations: 113.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 113 | 0 | 0 |
-| boundary | 102 | 0 | 0 |
-| host-context | 102 | 0 | 0 |
+| adversarial | 115 | 0 | 0 |
+| boundary | 104 | 0 | 0 |
+| host-context | 104 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 113 | 0 | 0 |
-| near-miss-negative | 102 | 0 | 0 |
-| overlap | 102 | 0 | 0 |
-| positive | 102 | 0 | 0 |
-| range | 113 | 0 | 0 |
+| malformed | 115 | 0 | 0 |
+| near-miss-negative | 104 | 0 | 0 |
+| overlap | 104 | 0 | 0 |
+| positive | 104 | 0 | 0 |
+| range | 115 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
