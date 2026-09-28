@@ -9,6 +9,10 @@
 | `ImportError: redact-secret could not load its native extension` in Python | No wheel for this platform or Python build, or an incomplete install; reinstall with `--only-binary=:all:` on a platform in the [wheel matrix](python-packaging.md) |
 | Node runs on WebAssembly, not the addon | `artifact()` returns `"wasm"` after `initialize()`: the host has no matching `@redact-secret/node-<platform>` package, its optional-dependency install failed, or the addon could not load |
 | `INITIALIZATION_FAILED` in browser | Browser import conditions, Wasm asset URL, HTTP response, MIME type, and an artifact whose version and profile match the entry point (`@redact-secret/core` or `/common`) |
+| `INITIALIZATION_FAILED` in browser only when `pii` is set | The PII build is a second, lazily loaded asset (`redact_secret_wasm_pii_bg.wasm`, or `redact_secret_wasm_common_pii_bg.wasm` for `/common`) fetched only when the first `initialize()` passes a non-empty `pii` selection. Confirm the bundler emitted it, it is served with `application/wasm`, and its version and profile match the entry point; a page without `pii` never requests it. See [browser loading](guides/javascript.md#browser-loading) |
+| `PII_SELECTOR_INVALID` | A `pii` selector is malformed (for example uppercase `PII`); use `pii`, `pii:global`, `pii:us` or `pii:family:<jurisdiction>:<family>` in lowercase |
+| `PII_SELECTOR_UNSUPPORTED` | The selector is well formed but its jurisdiction or family is not supported (for example `pii:kr`) |
+| `PII_SELECTOR_UNAVAILABLE` | The loaded artifact has no PII runtime or the family is unavailable. Through `@redact-secret/core` this should not occur for a supported selector; if you import `@redact-secret/wasm` directly, use `@redact-secret/wasm/pii` or `@redact-secret/wasm/common/pii` |
 | `UNPAIRED_SURROGATE` | JavaScript text contains an invalid standalone UTF-16 surrogate; correct input handling before scanning |
 | `INVALID_FINDINGS` | Findings belong to the same original text, have valid native-unit bounds, and do not overlap |
 | `INVALID_PLACEHOLDER` | Formatter output is non-empty, no more than 256 UTF-8 bytes, and does not reproduce a replaced value |

@@ -554,10 +554,14 @@ accepted in
   with `INITIALIZATION_FAILED` if the artifact it loaded reports a different
   profile than the entry point that loaded it — the same detail-free
   rejection an unusable or version-mismatched artifact already gets.
-- **`@redact-secret/wasm`.** The published package carries two built
+- **`@redact-secret/wasm`.** The published package carries four built
   artifacts under one identity: the unchanged root (`full`) glue and
-  `.wasm`, and a `common` subpath shipping the `common` build's own glue and
-  `.wasm` beside them.
+  `.wasm`, a `./common` subpath shipping the `common` build's own glue and
+  `.wasm`, and, since #937, a `./pii` and a `./common/pii` build. The two
+  default builds link no PII runtime and answer a valid PII selection with
+  `PII_SELECTOR_UNAVAILABLE`; the two `pii` builds link it.
+  `@redact-secret/core` loads a `pii` build only when the `initialize()`
+  call that loads the binding carries a non-empty `pii` selection.
 
 **Stream subpaths.** `@redact-secret/core/web-stream` and `/node-stream`'s
 convenience `createWebStreamSanitizer`/`createNodeStreamSanitizer` always

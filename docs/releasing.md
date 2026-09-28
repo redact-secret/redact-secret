@@ -111,13 +111,18 @@ The exact matrices belong to
 `Cargo.toml`'s `[workspace.metadata.redact-secret]`; see
 [qualification](qualification.md) and [Python packaging](python-packaging.md).
 
-`@redact-secret/wasm` carries two built artifacts under one package identity:
-the unchanged root (`full`) glue and `.wasm`, and a `common` subpath shipping
-the opt-in `common`-profile build's own glue and `.wasm` beside them. One
-pack/publish step covers both. Before publishing, the workflow instantiates
-the downloaded root artifact and asks it — rather than trusting the download's
-artifact name — that `profile() === "full"`, refusing to publish a `common`
-or otherwise non-`full` build under the `full`/default package identity. See
+`@redact-secret/wasm` carries four built artifacts under one package identity
+(`bindings/wasm/npm/package.json`): the unchanged root (`full`) glue and
+`.wasm`, the `./common` subpath's opt-in `common`-profile build, and, since
+#937, a `pii` build of each profile (`./pii` and `./common/pii`) that links
+the PII runtime. One pack/publish step covers all four. Before publishing,
+the workflow instantiates the downloaded artifacts and asks each — rather
+than trusting the download's artifact name — for its `profile()`, refusing to
+publish a `common` or otherwise non-`full` build under the `full`/default
+package identity (and the reverse for `common`). It also checks the PII split:
+each default build must answer a `pii` selection with
+`PII_SELECTOR_UNAVAILABLE` (a default build that links the PII runtime is
+refused), and each `pii` build must report its profile and accept one. See
 [detector profiles](reference/api-contract.md#detector-profiles).
 
 The workflows create an annotated Git tag after verification. They do not

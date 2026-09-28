@@ -177,6 +177,24 @@ WebAssembly asset referenced by the generated glue. Serve that asset over HTTP
 with the correct URL and `application/wasm` content type. Check asset requests
 if `initialize()` fails. There is no public custom-Wasm-URL initialization option.
 
+The package ships two `.wasm` assets per profile. The default one
+(`redact_secret_wasm_bg.wasm`, or `redact_secret_wasm_common_bg.wasm` for
+`/common`) links no PII runtime and is the only one fetched when `initialize()`
+has no `pii` option. A second, lazily loaded asset (`redact_secret_wasm_pii_bg.wasm`,
+or `redact_secret_wasm_common_pii_bg.wasm`) is fetched only when the first
+`initialize()` call passes a non-empty `pii` selection. Make sure your bundler
+emits both and that your server serves both with `application/wasm`; a page
+that never enables PII never requests the PII asset. Raw release sizes and the
+rest of the split are in [detector profiles](../reference/api-contract.md#detector-profiles).
+
+A PII selection fails with one of three fixed, input-free errors:
+
+| Code | Meaning |
+| --- | --- |
+| `PII_SELECTOR_INVALID` | A selector is malformed, for example uppercase `"PII"`. Use lowercase `pii`, `pii:global`, `pii:us`, or `pii:family:<jurisdiction>:<family>`. |
+| `PII_SELECTOR_UNSUPPORTED` | The selector is well formed but names a jurisdiction or family this release does not support (for example `pii:kr`). |
+| `PII_SELECTOR_UNAVAILABLE` | The selector is valid but the loaded artifact has no PII runtime, or the family is not available. `@redact-secret/core` loads the PII-capable build for you; you see this only when importing `@redact-secret/wasm` directly, which must use `@redact-secret/wasm/pii` or `@redact-secret/wasm/common/pii` to select PII. |
+
 Loading the artifact may fetch a local/site asset; secret detection itself
 performs no network lookup. Scan on the device before constructing the request
 body, and scan again at the authoritative server boundary.
