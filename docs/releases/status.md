@@ -9,8 +9,8 @@ Every published version has one durable record under `docs/releases/<version>/`:
 Beta.1 through beta.3 were also observed together on 2026-09-16: the
 [registry observation](registry-observation.json) records their version
 availability, npm integrity values, crate and Python checksums, npm dist-tags,
-and annotated tag targets. The npm dist-tags below were observed on
-2026-09-24. Registry publication, workflow completion,
+and annotated tag targets. The npm dist-tags below were last observed on
+2026-09-28. Registry publication, workflow completion,
 and a GitHub Release page are separate facts.
 
 | Version | Registry artifacts | Annotated source tag | GitHub Release |
@@ -26,16 +26,28 @@ and a GitHub Release page are separate facts.
 | 0.1.0-beta.9 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `f726f2ffb0fd854cc3eeb4c35798695fde3161d3` | Not created |
 | 0.1.0-beta.10 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `af7f863f29f9fe482dd233c8b7bc5b77dc427314` | Not created |
 
-Observed on 2026-09-24, npm `beta` points to beta.7 and `latest` points to
-beta.6 for `@redact-secret/core`, `@redact-secret/wasm` and all eight native
-addon packages. `latest` was moved from beta.1 (beta.5 for the musl addons) on
-that date, outside the release workflows. Use `@redact-secret/core@0.1.0-beta.7`
-or `@redact-secret/core@beta` to select the current beta. Python spells beta.7
-as `0.1.0b7`.
+Observed on 2026-09-28 (`npm view <package> dist-tags`), all ten npm
+packages (`@redact-secret/core`, `@redact-secret/wasm` and the eight native
+addons) have `beta` and `latest` both at `0.1.0-beta.10`. The release workflow
+publishes prereleases with `--tag beta` only, so it never sets `latest`; every
+`latest` value in this file was set by hand, outside the release workflows.
+The history of that hand-moved tag, as observed: beta.1 (beta.5 for the musl
+addons) until 2026-09-24, beta.6 on 2026-09-24, beta.7 on 2026-09-25, beta.8 at
+an unrecorded time after 2026-09-25, and beta.10 at an unrecorded time on or
+before 2026-09-28 (an earlier revision of this page recorded beta.8 as the
+2026-09-28 value; the registry showed beta.10 when re-observed the same day). Use
+`@redact-secret/core@0.1.0-beta.10` or `@redact-secret/core@beta` to select the
+current beta. Python spells beta.7 as `0.1.0b7`, beta.9 as `0.1.0b9` and beta.10
+as `0.1.0b10`; PyPI has no dist-tag equivalent, so `pip install redact-secret`
+resolves the newest version, and `--pre` is needed only because every release is
+a prerelease.
 
-Observed on 2026-09-25, `@redact-secret/core` has npm `beta` at beta.8 and `latest` at beta.7; the beta.8 release did not change `latest`. Use `@redact-secret/core@0.1.0-beta.8` or `@redact-secret/core@beta` to select the current beta. Python spells beta.8 as `0.1.0b8`. Beta.8's manifest is reconstructed, because its run's manifest job failed ([#799](https://github.com/redact-secret/redact-secret/issues/799)); no publication was partial.
+The `latest` policy for Beta.11 is recorded in
+[releasing](../releasing.md#npm-dist-tag-policy): the Beta.11 publish does not
+move `latest`, so after it a bare `npm i @redact-secret/core` still resolves
+beta.10 until `latest` is moved again as a separate, explicitly approved action.
 
-Observed on 2026-09-28, `@redact-secret/core` has npm `beta` at beta.10 and `latest` at beta.8 (moved from beta.7 at some point after 2026-09-25, outside the release workflows, the same way earlier `latest` moves in this file were). Use `@redact-secret/core@0.1.0-beta.10` or `@redact-secret/core@beta` to select the current beta. Python spells beta.9 as `0.1.0b9` and beta.10 as `0.1.0b10`. Beta.9's release run failed only at its `npm:@redact-secret/core` publish job's pre-publish `release:check` gate, on an unrelated `examples/mcp-redact` dependency, not the actual `npm publish` step or a redact-secret artifact defect; Reconcile Release repaired it. Both beta.9's and beta.10's manifests are reconstructed, because this repository's manifest job has never itself populated the tag/registry/verification evidence a durable record requires (see each [record](0.1.0-beta.9/README.md) for what each reconstruction corrects). No beta.9 or beta.10 publication was partial by the time of publication.
+Beta.8's manifest is reconstructed, because its run's manifest job failed ([#799](https://github.com/redact-secret/redact-secret/issues/799)); no publication was partial. Beta.9's release run failed only at its `npm:@redact-secret/core` publish job's pre-publish `release:check` gate, on an unrelated `examples/mcp-redact` dependency, not the actual `npm publish` step or a redact-secret artifact defect; Reconcile Release repaired it. Both beta.9's and beta.10's manifests are reconstructed, because this repository's manifest job has never itself populated the tag/registry/verification evidence a durable record requires (see each [record](0.1.0-beta.9/README.md) for what each reconstruction corrects). No beta.8, beta.9 or beta.10 publication was partial by the time of publication.
 
 Beta.2's [durable release record](0.1.0-beta.2/README.md) preserves its initial
 partial failure and subsequent authorized repair. Beta.3 also had a failed
@@ -76,21 +88,31 @@ new binary attachments. Security fixes target the latest beta under
 The adapters are released from
 [`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
 on their own versions, not in lockstep with the core. Observed on the
-registries on 2026-09-24:
+registries on 2026-09-28 (`npm view` for npm, the PyPI JSON API for PyPI):
 
 | Package | Registry | Published version | Published | Requires core |
 | --- | --- | --- | --- | --- |
-| `@redact-secret/adapter` | npm | `0.1.0` (`latest`) | 2026-09-22 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
-| `@redact-secret/adapter-pino` | npm | `0.1.0` (`latest`) | 2026-09-22 | `@redact-secret/core ^0.1.0-beta.6`; peer `pino ^10.0.0` |
-| `@redact-secret/adapter-otel` | npm | `0.1.0` (`latest`) | 2026-09-22 | `@redact-secret/core ^0.1.0-beta.6`; peer `@opentelemetry/sdk-trace-base ^2.0.0` |
+| `@redact-secret/adapter` | npm | `0.1.2` (`latest`) | 2026-09-26 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
+| `@redact-secret/adapter-pino` | npm | `0.1.1` (`latest`) | 2026-09-25 | `@redact-secret/core ^0.1.0-beta.6`; peer `pino ^10.0.0` |
+| `@redact-secret/adapter-otel` | npm | `0.1.1` (`latest`) | 2026-09-25 | `@redact-secret/core ^0.1.0-beta.6`; peer `@opentelemetry/sdk-trace-base ^2.0.0` |
+| `@redact-secret/adapter-ai-context` | npm | `0.1.0-alpha.1` (`alpha`, also `latest`) | 2026-09-26 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
+| `@redact-secret/adapter-mcp` | npm | `0.1.0-alpha.1` (`alpha`, also `latest`) | 2026-09-26 | `@redact-secret/core ^0.1.0-beta.6` (peer); MCP SDK peers |
 | `redact-secret-adapters` | PyPI | `0.1.0` | 2026-09-22 | `redact-secret>=0.1.0b6,<0.2`; `[otel]` extra `opentelemetry-sdk>=1.16.0,<2` |
 
 Source tags `adapter@0.1.0`, `adapter-pino@0.1.0`, `adapter-otel@0.1.0` and
-`redact-secret-adapters@0.1.0` are on that repository, with the
+`redact-secret-adapters@0.1.0` came with the
 [`train/2026.09.22`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.22)
-GitHub Release. These commands were run from empty directories against the
-public registries on 2026-09-24; each resolved core 0.1.0-beta.6 and redacted
-a synthetic value through the adapter:
+GitHub Release. `adapter@0.1.1`, `adapter-pino@0.1.1` and `adapter-otel@0.1.1`
+came with
+[`train/2026.09.25`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.25)
+(`ea92c2ab`); `adapter@0.1.2`, `adapter-ai-context@0.1.0-alpha.1` and
+`adapter-mcp@0.1.0-alpha.1` came with
+[`train/2026.09.26`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.26)
+(`be3f2ad5`). The PyPI package has only `0.1.0`; the later trains published
+npm packages only. The install commands below were run from empty directories
+against the public registries on 2026-09-24 (before the 0.1.1 and 0.1.2
+publications) and each resolved core 0.1.0-beta.6 and redacted a synthetic
+value through the adapter; they were not re-run for the later versions:
 
 ```bash
 npm install @redact-secret/core @redact-secret/adapter-pino pino
@@ -99,7 +121,27 @@ python -m pip install redact-secret redact-secret-adapters
 python -m pip install redact-secret "redact-secret-adapters[otel]"
 ```
 
-Published 0.1.0 of `@redact-secret/adapter-pino` exports
-`createRedactingLogMethod`, `createRedactingLogMethodWith` and
-`formatPinoMessage` only. The `createRedactingStreamWrite` hook shown in the
-adapters repository's `main` README is unreleased.
+`@redact-secret/adapter-pino@0.1.0` exported `createRedactingLogMethod`,
+`createRedactingLogMethodWith` and `formatPinoMessage` only. Since
+`@redact-secret/adapter-pino@0.1.1` (2026-09-25), the published package also
+ships the `createRedactingStreamWrite` hook.
+
+## Vault
+
+The opt-in, in-memory vault is released from
+[`redact-secret-vault`](https://github.com/redact-secret/redact-secret-vault),
+on its own alpha versions, not in lockstep with the core. Observed on the
+registries on 2026-09-28:
+
+| Package | Registry | Published version | Published | Requires core |
+| --- | --- | --- | --- | --- |
+| `@redact-secret/vault` | npm | `0.1.0-alpha.3` (`alpha`, also `latest`) | 2026-09-28 | peer `@redact-secret/core` exactly `0.1.0-beta.10` |
+| `@redact-secret/vault-server` | npm | `0.1.0-alpha.3` (`alpha`, also `latest`) | 2026-09-28 | peer `@redact-secret/core` exactly `0.1.0-beta.10`; depends on `@redact-secret/vault` exactly `0.1.0-alpha.3` |
+| `redact-secret-vault` | PyPI | `0.1.0a3` | 2026-09-28 | no `redact-secret` dependency: it declares only the `test` and `lint` extras |
+
+Source tag `v0.1.0-alpha.3` (`bd01c061`) is on the vault repository. The npm
+pin is exact, not a range, so each core release needs a matching vault release
+before the two install together; the vault's core pin, unlike the adapters'
+`^0.1.0-beta.6` range, moves with the core. The Python package is the native
+server-authority counterpart of `@redact-secret/vault-server` and does not
+import the core.
