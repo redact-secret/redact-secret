@@ -5896,6 +5896,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "twilio-auth-token-positive-bare-with-account-sid",
+            "twilio-auth-token-positive-cli-table-auth-token-column",
             "twilio-auth-token-positive-dotenv-keyword",
             "twilio-auth-token-positive-json-keyword",
             "twilio-auth-token-positive-yaml-keyword",
@@ -6846,6 +6847,7 @@
           "evidenceFixtureIds": [
             "mailchimp-api-key-positive-bare-suffix-shape",
             "mailchimp-api-key-positive-dotenv-keyword",
+            "mailchimp-api-key-positive-hostname-label-with-keyword",
             "mailchimp-api-key-positive-json-keyword",
             "mailchimp-api-key-positive-keyword-on-another-line",
             "mailchimp-api-key-positive-log-keyword",
@@ -8745,6 +8747,7 @@
           "evidenceFixtureIds": [
             "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
             "confluent-cloud-api-secret-legacy-positive-dotenv-keyword",
+            "confluent-cloud-api-secret-legacy-positive-registry-user-info",
             "confluent-cloud-api-secret-legacy-positive-yaml-keyword"
           ],
           "state": "supported"
@@ -9521,6 +9524,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "heroku-api-key-legacy-positive-auth-token-output",
+            "heroku-api-key-legacy-positive-authorizations-table",
             "heroku-api-key-legacy-positive-bare-with-keyword",
             "heroku-api-key-legacy-positive-dotenv-keyword",
             "heroku-api-key-legacy-positive-netrc-multi-line",
@@ -9986,6 +9990,7 @@
             "deepgram-api-key-positive-python-constructor",
             "deepgram-api-key-positive-shell-export",
             "deepgram-api-key-positive-token-header",
+            "deepgram-api-key-positive-token-header-keyword-only",
             "deepgram-api-key-positive-yaml-named",
             "deepgram-api-key-regression-crlf-and-unicode-prefix"
           ],

@@ -245,7 +245,16 @@ fn issue_932_same_line_provider_forms_are_detected_through_the_pipeline() {
         assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
         assert_eq!(span(&input, &findings[0]), value);
         assert_eq!(findings[0].type_name(), type_name, "{input:?}");
+        // Issue #936: the HTTPie header names the Deepgram API host, so it is
+        // high and redacted like the constructor forms.
+        assert_eq!(findings[0].action(), Action::Redact, "{input:?}");
     }
+    // `deepgram` only as a word on the header's line stays medium (warn).
+    let input = format!("# deepgram smoke: Authorization: Token {deepgram}\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].type_name(), "deepgram_api_key");
+    assert_eq!(findings[0].action(), Action::Warn);
     // Twins: another host, and a 39-byte value beside the same call.
     for input in [
         format!(
@@ -305,6 +314,10 @@ fn issue_933_previous_line_provider_context_is_read_in_bounded_layouts() {
         assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
         assert_eq!(span(&input, &findings[0]), value);
         assert_eq!(findings[0].type_name(), type_name, "{input:?}");
+        // Issue #936: each layout names the credential slot and binds the
+        // provider, so it is high and redacted, not a warning that leaks.
+        assert_eq!(findings[0].action(), Action::Redact, "{input:?}");
+        assert!(!whole_input(&input).0.contains(&value), "{input:?}");
     }
     // Twins: the value row relabelled, another registry host, the column
     // relabelled.
@@ -337,7 +350,9 @@ fn mailchimp_key(datacenter: &str) -> String {
 }
 
 #[test]
-fn issue_931_a_complete_mailchimp_key_warns_without_a_same_line_keyword() {
+fn issue_931_a_complete_mailchimp_key_is_redacted_without_a_same_line_keyword() {
+    // #931 reported these at medium (warn); #936 raised the complete shape to
+    // high, so the default policy redacts them and they leave no plaintext.
     for (input, value) in [
         {
             let k = mailchimp_key("us14");
@@ -374,8 +389,27 @@ fn issue_931_a_complete_mailchimp_key_warns_without_a_same_line_keyword() {
             .collect();
         assert_eq!(mailchimp.len(), 1, "{input:?}: {findings:?}");
         assert_eq!(span(&input, mailchimp[0]), value);
-        assert_eq!(mailchimp[0].action(), Action::Warn, "{input:?}");
+        assert_eq!(mailchimp[0].action(), Action::Redact, "{input:?}");
+        assert!(
+            !whole_input(&input).0.contains(&value),
+            "{input:?}: key left in the output"
+        );
     }
+    // A keyword on the line changes nothing; a keyword that keeps a hostname
+    // label reported leaves it at warn (an identifier position).
+    let k = mailchimp_key("us6");
+    let findings = findings_with_parity(&format!(
+        "# Mailchimp API key: {k}
+"
+    ));
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].action(), Action::Redact);
+    let findings = findings_with_parity(&format!(
+        "mailchimp asset https://{k}.cdn.example.test/a.png
+"
+    ));
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].action(), Action::Warn);
     // A Mailchimp-named key stays high and redacted.
     let k = mailchimp_key("us6");
     let input = format!("MAILCHIMP_API_KEY={k}\n");

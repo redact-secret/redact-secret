@@ -2353,12 +2353,13 @@
     {
       "detector": "twilio-auth-token",
       "evidence": {
-        "fixtureCount": 14,
+        "fixtureCount": 15,
         "hostContextsExercised": [
           "dotenv",
           "json",
           "plain-text",
           "shell",
+          "terminal",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -2374,6 +2375,7 @@
       },
       "evidenceFixtureIds": [
         "twilio-auth-token-positive-bare-with-account-sid",
+        "twilio-auth-token-positive-cli-table-auth-token-column",
         "twilio-auth-token-positive-dotenv-keyword",
         "twilio-auth-token-positive-json-keyword",
         "twilio-auth-token-positive-yaml-keyword",
@@ -2741,7 +2743,7 @@
     {
       "detector": "mailchimp-api-key",
       "evidence": {
-        "fixtureCount": 21,
+        "fixtureCount": 22,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2765,6 +2767,7 @@
       "evidenceFixtureIds": [
         "mailchimp-api-key-positive-bare-suffix-shape",
         "mailchimp-api-key-positive-dotenv-keyword",
+        "mailchimp-api-key-positive-hostname-label-with-keyword",
         "mailchimp-api-key-positive-json-keyword",
         "mailchimp-api-key-positive-keyword-on-another-line",
         "mailchimp-api-key-positive-log-keyword",
@@ -3532,7 +3535,7 @@
     {
       "detector": "confluent-cloud-api-secret-legacy",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 12,
         "hostContextsExercised": [
           "dotenv",
           "plain-text",
@@ -3552,6 +3555,7 @@
       "evidenceFixtureIds": [
         "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
         "confluent-cloud-api-secret-legacy-positive-dotenv-keyword",
+        "confluent-cloud-api-secret-legacy-positive-registry-user-info",
         "confluent-cloud-api-secret-legacy-positive-yaml-keyword"
       ],
       "policyClass": "confidence-gated",
@@ -3860,7 +3864,7 @@
     {
       "detector": "heroku-api-key-legacy",
       "evidence": {
-        "fixtureCount": 16,
+        "fixtureCount": 17,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -3882,6 +3886,7 @@
       },
       "evidenceFixtureIds": [
         "heroku-api-key-legacy-positive-auth-token-output",
+        "heroku-api-key-legacy-positive-authorizations-table",
         "heroku-api-key-legacy-positive-bare-with-keyword",
         "heroku-api-key-legacy-positive-dotenv-keyword",
         "heroku-api-key-legacy-positive-netrc-multi-line",
@@ -4054,7 +4059,7 @@
     {
       "detector": "deepgram-api-key",
       "evidence": {
-        "fixtureCount": 22,
+        "fixtureCount": 23,
         "hostContextsExercised": [
           "curl",
           "dotenv",
@@ -4085,6 +4090,7 @@
         "deepgram-api-key-positive-python-constructor",
         "deepgram-api-key-positive-shell-export",
         "deepgram-api-key-positive-token-header",
+        "deepgram-api-key-positive-token-header-keyword-only",
         "deepgram-api-key-positive-yaml-named",
         "deepgram-api-key-regression-crlf-and-unicode-prefix"
       ],

@@ -107,3 +107,48 @@ answered it for one family only.
   and `starts_with_digest_label`.
 - `conformance/fixtures/synchronous-corpus.json`: 32 keyword positives and
   overlaps go from medium to high. No negative or control fixture changes.
+
+## Amendment: structural provider context is high (#936)
+
+The Beta.11 family-evidence corpus recorded keyword-gated positives that were
+detected exactly but reported `medium`, so the default policy only warned and
+the value stayed in the sanitized output
+([#936](https://github.com/redact-secret/redact-secret/issues/936)). Some of
+them are the section 1 rule working as written (a keyword elsewhere on the
+line). Others are read through a structure that does what a provider-named key
+does: it names the value's credential slot and binds it to the provider. Under
+the project's security-first default (redact over warn), those are `high`:
+
+- **Mailchimp.** Since [#931](https://github.com/redact-secret/redact-secret/issues/931)
+  the complete `<32 hex>-us<1–3 digits>` shape is evidence on its own. Outside
+  a DNS label or URL path it is `high` with or without a `mailchimp` keyword;
+  a keyword cannot make the same value less of a key. A DNS-label or path
+  match that a same-line keyword keeps reported stays `medium`.
+- **Heroku, Twilio, Confluent layouts** (#743, [#933](https://github.com/redact-secret/redact-secret/issues/933)):
+  a `.netrc` `password` under a Heroku `machine` line, `heroku auth:token`
+  output, the `Token:` row of `heroku authorizations:<verb>`, the `Auth Token`
+  column of a `twilio` CLI table, and the secret half of `basic.auth.user.info`
+  below a Confluent-named property.
+- **Deepgram.** An `Authorization: Token` header on a line that names a host
+  under the Deepgram API domain (`api.deepgram.com`, `api.eu.deepgram.com`):
+  the value is in the key's documented slot of a request to the provider.
+  With `deepgram` only as a word on the line the header stays `medium`.
+
+Section 1's rule still holds for the other families: a provider keyword
+elsewhere on the line, with no name and no such structure, stays `medium`
+(`# Twilio token <value>`). Its `# Mailchimp API key <value>` example is
+superseded by the Mailchimp bullet above, because that shape no longer needs
+the keyword at all.
+
+What this costs. No new value is matched: the grammars, windows and benign
+twins are unchanged, and only the action changes. A non-credential value in
+one of these exact slots is now redacted instead of warned: a 32-hex
+region-sharded id followed by `-us<N>` in prose or a log field, or a
+non-secret 32-hex cell under an `Auth Token` column. The benefit is that
+seven benchmark positives (the three #931 Mailchimp forms, the three #933
+layouts, and the #932 Deepgram HTTPie header) no longer leave plaintext
+credentials in the output. Types stay confidence-gated; `ALWAYS_REDACT_TYPES`
+is unchanged. Tests: the detector modules' unit tests and
+`tests/family_evidence_gaps_379.rs`; conformance: the affected
+`synchronous-corpus.json` expectations, plus five new fixtures for the
+layouts and the medium twins.
