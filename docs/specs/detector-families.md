@@ -392,9 +392,9 @@ provider context is adjacent on the same line, never as a bare 32/40-byte run.
 | Family | Shape (scanner-inferred, not issuer-backed) | Context that qualifies the value | Status |
 | --- | --- | --- | --- |
 | `mistral:studio-api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `mistral`; `Mistral(...)` call argument; `mistral` then a credential key within 32 bytes | landed, `mistral-api-key` |
-| `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional | landed, `cohere-api-key` |
+| `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional; a credential-named builder method, `Cohere.builder().token("...")` (#932) | landed, `cohere-api-key` |
 | `ai21:api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `ai21`; `AI21Client(...)` argument | landed, `ai21-api-key` |
-| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; `Authorization: Token <v>` on a line naming `deepgram` | landed, `deepgram-api-key` |
+| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; the last positional literal of a `deepgram.` call, `deepgram.NewRESTWithDefaults(ctx, "...")` (#932); `Authorization: Token <v>` or HTTPie `Authorization:Token <v>` on a line naming `deepgram` | landed, `deepgram-api-key` |
 | `exa:api-key` | none: no source states any shape (only the key *id* is documented, as a UUID) | none | **not landed**; stays with `generic-token` (env, JSON, YAML, `x-api-key`, `Bearer`), its SDK-call keyword-argument form is read by `generic-token` since #866; a positional `Exa("...")` stays out (no credential name) |
 
 Confidence: a named assignment (`MISTRAL_API_KEY=`, `"deepgramApiKey":`) or an

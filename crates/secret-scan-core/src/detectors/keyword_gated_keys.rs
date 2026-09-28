@@ -38,13 +38,24 @@
 //!    whose callee name carries the provider keyword and whose key is a
 //!    credential word (`Mistral(api_key="...")`,
 //!    `cohere.ClientV2(api_key=...)`, `new CohereClient({ token: "..." })`),
-//!    or the sole positional string (`DeepgramClient("...")`).
+//!    or the sole positional string (`DeepgramClient("...")`). Since issue
+//!    #932 also a quoted string that is the last positional argument of a
+//!    call on a provider-named callee, past closed argument groups
+//!    (`deepgram.NewRESTWithDefaults(context.Background(), "...")`), and the
+//!    sole quoted argument of a credential-named method on a provider
+//!    builder chain (`Cohere.builder().token("...")`).
 //! 3. **Keyword-adjacent key** (Medium): a credential-word key
 //!    (`api_key:`) within 32 bytes after the provider keyword with only
 //!    name-like bytes between them (`# Mistral API key: ...`).
 //! 4. **Header** (Medium, Deepgram only): `Authorization: Token <value>` on a
-//!    line that also names `deepgram` (`api.deepgram.com`). `Bearer` forms
-//!    are already `bearer-token`'s.
+//!    line that also names `deepgram` (`api.deepgram.com`), with or without
+//!    a space after the colon (`HTTPie`'s `'Authorization:Token <value>'`,
+//!    issue #932). `Bearer` forms are already `bearer-token`'s.
+//!
+//! A value under a `masked_`-led key (`masked_api_key=`, a `LiteLLM` debug
+//! field) is not claimed: the key is not a credential name
+//! (`decision-redact-provider-named-credential-assignments` section 2) and
+//! the provider keyword is not adjacent. This is policy, not a gap.
 //!
 //! A key ending in an identifier or location segment (`_id`, `_url`,
 //! `_org`, ...) never qualifies (`MISTRAL_KEY_ID=`, `DEEPGRAM_PROJECT_ID=`),
@@ -244,6 +255,89 @@ fn inside_provider_call(line: &str, spec: &Spec, end: usize) -> bool {
     false
 }
 
+/// `true` when `bytes[start..end]` is a whole quoted string literal that is
+/// the last argument of a call: an opening `"`/`'` right before it, the same
+/// quote right after it, then optional horizontal whitespace and `)`.
+fn is_closed_string_argument(bytes: &[u8], start: usize, end: usize) -> bool {
+    let Some(&quote) = start.checked_sub(1).and_then(|at| bytes.get(at)) else {
+        return false;
+    };
+    if !matches!(quote, b'"' | b'\'') || bytes.get(end) != Some(&quote) {
+        return false;
+    }
+    let after = end + 1 + ascii_space_len(&bytes[end + 1..]);
+    bytes.get(after) == Some(&b')')
+}
+
+fn ascii_space_len(bytes: &[u8]) -> usize {
+    bytes
+        .iter()
+        .take_while(|&&byte| matches!(byte, b' ' | b'\t'))
+        .count()
+}
+
+/// The `(` of the innermost call still open at `end`, skipping balanced
+/// `(...)` groups (`context.Background()`), within [`CALL_WINDOW`] bytes.
+fn enclosing_call_open(bytes: &[u8], end: usize) -> Option<usize> {
+    let floor = end.saturating_sub(CALL_WINDOW);
+    let mut depth = 0usize;
+    let mut cursor = end;
+    while cursor > floor {
+        cursor -= 1;
+        match bytes[cursor] {
+            b')' => depth += 1,
+            b'(' if depth == 0 => return Some(cursor),
+            b'(' => depth -= 1,
+            _ => {}
+        }
+    }
+    None
+}
+
+/// The callee expression before the `(` at `open`, with the contents of any
+/// call group removed: identifier bytes and `.`, plus the balanced `(...)`
+/// groups of a method chain (`Cohere.builder().token` reads
+/// `Cohere.builder().token`, `load("x").token` reads `load().token`), within
+/// [`CALL_WINDOW`] bytes. The flag is `true` when the chain crosses at least
+/// one call group. Group contents are dropped so a provider name inside an
+/// argument never counts as the callee.
+fn callee_chain(line: &str, open: usize) -> (String, bool) {
+    let bytes = line.as_bytes();
+    let floor = open.saturating_sub(CALL_WINDOW);
+    let mut start = open;
+    let mut pieces: Vec<&str> = Vec::new();
+    let mut piece_end = open;
+    let mut crossed_call = false;
+    while start > floor {
+        let byte = bytes[start - 1];
+        if byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.') {
+            start -= 1;
+        } else if byte == b')' {
+            // Only a group that follows a chain segment continues the chain.
+            let Some(group_open) = enclosing_call_open(bytes, start - 1) else {
+                break;
+            };
+            if group_open == 0 || !is_chain_byte(bytes[group_open - 1]) {
+                break;
+            }
+            pieces.push(&line[start..piece_end]);
+            pieces.push("()");
+            start = group_open;
+            piece_end = group_open;
+            crossed_call = true;
+        } else {
+            break;
+        }
+    }
+    pieces.push(&line[start..piece_end]);
+    pieces.reverse();
+    (pieces.concat(), crossed_call)
+}
+
+fn is_chain_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || byte == b'_'
+}
+
 fn contains_keyword_ci(window: &str, spec: &Spec) -> Option<usize> {
     let lowered = window.to_ascii_lowercase();
     spec.keywords
@@ -257,6 +351,7 @@ fn context(
     line: &str,
     spec: &Spec,
     start: usize,
+    end: usize,
     line_has_keyword: bool,
 ) -> Option<(Confidence, &'static str)> {
     let bytes = line.as_bytes();
@@ -295,12 +390,42 @@ fn context(
     if cursor > 0 && bytes[cursor - 1] == b'(' && inside_provider_call(line, spec, cursor) {
         return Some((Confidence::High, spec.constructor_signal));
     }
+    if is_closed_string_argument(bytes, start, end) {
+        // A builder method named for the credential on a provider chain:
+        // `Cohere.builder().token("...")` (issue #932).
+        if cursor > 0 && bytes[cursor - 1] == b'(' {
+            let (chain, crossed_call) = callee_chain(line, cursor - 1);
+            if crossed_call
+                && contains_keyword_ci(&chain, spec).is_some()
+                && chain
+                    .rsplit('.')
+                    .next()
+                    .is_some_and(|method| is_credential_name(&normalize_name(method)))
+            {
+                return Some((Confidence::High, spec.constructor_signal));
+            }
+        }
+        // The last positional argument of a provider call:
+        // `deepgram.NewRESTWithDefaults(ctx, "...")` (issue #932).
+        if cursor > 0
+            && bytes[cursor - 1] == b','
+            && let Some(open) = enclosing_call_open(bytes, cursor - 1)
+        {
+            let (chain, _) = callee_chain(line, open);
+            if contains_keyword_ci(&chain, spec).is_some() {
+                return Some((Confidence::High, spec.constructor_signal));
+            }
+        }
+    }
     if spec.token_header && cursor < start {
         let before = String::from_utf8_lossy(&bytes[cursor.saturating_sub(HEADER_WINDOW)..cursor])
             .to_ascii_lowercase();
         let scheme = before.trim_end();
+        // `Authorization: Token <key>`, or HTTPie's `Header:value` form
+        // with no space after the colon, `'Authorization:Token <key>'`
+        // (issue #932).
         if let Some(head) = scheme.strip_suffix("token")
-            && head.ends_with([' ', '\t', '"', '\''])
+            && head.ends_with([' ', '\t', '"', '\'', ':', '='])
         {
             let head = head.trim_end_matches([' ', '\t', '"', '\'']);
             let header = head
@@ -412,7 +537,8 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
             {
                 continue;
             }
-            let Some((confidence, signal)) = context(line, spec, start, line_has_keyword) else {
+            let Some((confidence, signal)) = context(line, spec, start, end, line_has_keyword)
+            else {
                 continue;
             };
             let Some(range) = ByteRange::new(line_start + start, line_start + end) else {
@@ -576,6 +702,83 @@ mod tests {
             &d,
             Confidence::High,
         );
+    }
+
+    #[test]
+    fn issue_932_same_line_forms_are_recognized() {
+        let c = alnum40();
+        let d = lower40();
+        // HTTPie `Header:value`, no space after the colon.
+        assert_exact(
+            &DEEPGRAM,
+            &format!(
+                "http --verbose POST https://api.deepgram.com/v1/listen 'Authorization:Token {d}' < a.wav"
+            ),
+            &d,
+            Confidence::Medium,
+        );
+        // Go: the last positional argument of a call on the provider alias,
+        // past a closed `context.Background()` group.
+        assert_exact(
+            &DEEPGRAM,
+            &format!("var client = deepgram.NewRESTWithDefaults(context.Background(), \"{d}\")"),
+            &d,
+            Confidence::High,
+        );
+        assert_exact(
+            &DEEPGRAM,
+            &format!("c := deepgram.New(ctx, `x`, \"{d}\" )"),
+            &d,
+            Confidence::High,
+        );
+        // Java: a credential-named builder method on a provider chain.
+        assert_exact(
+            &COHERE,
+            &format!(
+                "Cohere cohere = Cohere.builder().token(\"{c}\").clientName(\"search-api\").build();"
+            ),
+            &c,
+            Confidence::High,
+        );
+        assert_exact(
+            &COHERE,
+            &format!("var co = CohereClient.builder().apiKey('{c}').build();"),
+            &c,
+            Confidence::High,
+        );
+    }
+
+    #[test]
+    fn issue_932_benign_twins_stay_silent() {
+        let c = alnum40();
+        let d = lower40();
+        for input in [
+            // Another host, and the Bearer scheme (bearer-token's).
+            format!(
+                "http POST https://api.example-speech.test/v1/listen 'Authorization:Token {d}'"
+            ),
+            format!("http POST https://api.deepgram.com/v1/listen 'Authorization:Bearer {d}'"),
+            // Not the last argument, a call on another package, an unquoted
+            // argument, and a 39-byte value.
+            format!("deepgram.NewRESTWithDefaults(ctx, \"{d}\", opts)"),
+            format!("speech.NewRESTWithDefaults(context.Background(), \"{d}\")"),
+            format!("deepgram.NewRESTWithDefaults(ctx, {d})"),
+            format!("deepgram.NewRESTWithDefaults(ctx, \"{}\")", &d[..39]),
+            // A non-credential builder method, another provider's builder,
+            // and a provider name only inside an argument group.
+            format!("Cohere.builder().clientName(\"{d}\").build();"),
+            format!("Other.builder().token(\"{d}\").build();"),
+            format!("load(\"cohere\").token(\"{d}\")"),
+            // Policy (decision-redact-provider-named-credential-assignments
+            // section 2): a `masked_`-led key is not a credential name, and
+            // the provider keyword is too far from the key.
+            format!(
+                "DEBUG: router.py:1841 - cohere/command-r-plus call failed; masked_api_key={c} reason=AuthenticationError"
+            ),
+        ] {
+            assert!(run(&DEEPGRAM, &input).is_empty(), "{input}");
+            assert!(run(&COHERE, &input).is_empty(), "{input}");
+        }
     }
 
     #[test]

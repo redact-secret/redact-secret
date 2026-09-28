@@ -143,6 +143,13 @@ evidence is linked from each published version.
   span is now `<tok>`. `=` counts as padding only where it ends the token.
   `Authorization: Bearer name@host` is selected whole, host included,
   instead of redacting only the local part.
+- The keyword-gated `deepgram-api-key` and `cohere-api-key` detectors
+  recognize three more same-line forms (#932): HTTPie's
+  `'Authorization:Token <key>'` with no space after the colon, a Go SDK call
+  that takes the key as its last positional argument
+  (`deepgram.NewRESTWithDefaults(ctx, "<key>")`), and a Java builder method
+  named for the credential (`Cohere.builder().token("<key>")`). A key under
+  a `masked_api_key=` field stays unreported by policy.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

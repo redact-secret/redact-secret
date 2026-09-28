@@ -207,3 +207,61 @@ fn issue_939_a_bearer_name_at_host_value_is_covered_whole() {
     // A short local part stays below the floor: no finding, not a partial.
     assert!(findings_with_parity("Authorization: Bearer ops@example.test\n").is_empty());
 }
+
+// ---------------------------------------------------------------- #932
+
+#[test]
+fn issue_932_same_line_provider_forms_are_detected_through_the_pipeline() {
+    let deepgram = synthetic(b"abcdefghijklmnopqrstuvwxyz0123456789", 40, 2);
+    let cohere = synthetic(
+        b"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789",
+        40,
+        8,
+    );
+    for (input, value, type_name) in [
+        (
+            format!(
+                "http --verbose POST https://api.deepgram.com/v1/listen model==nova-3 'Authorization:Token {deepgram}' < call.wav\n"
+            ),
+            deepgram.clone(),
+            "deepgram_api_key",
+        ),
+        (
+            format!(
+                "package transcribe\n\nvar client = deepgram.NewRESTWithDefaults(context.Background(), \"{deepgram}\")\n"
+            ),
+            deepgram.clone(),
+            "deepgram_api_key",
+        ),
+        (
+            format!(
+                "Cohere cohere = Cohere.builder().token(\"{cohere}\").clientName(\"search-api\").build();\n"
+            ),
+            cohere.clone(),
+            "cohere_api_key",
+        ),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+        assert_eq!(span(&input, &findings[0]), value);
+        assert_eq!(findings[0].type_name(), type_name, "{input:?}");
+    }
+    // Twins: another host, and a 39-byte value beside the same call.
+    for input in [
+        format!(
+            "http POST https://api.example-speech.test/v1/listen 'Authorization:Token {deepgram}'\n"
+        ),
+        format!(
+            "var client = deepgram.NewRESTWithDefaults(context.Background(), \"{}\")\n",
+            &deepgram[..39]
+        ),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert!(
+            findings
+                .iter()
+                .all(|f| !f.type_name().starts_with("deepgram")),
+            "{input:?}: {findings:?}"
+        );
+    }
+}
