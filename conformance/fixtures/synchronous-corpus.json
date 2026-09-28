@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2967,
+  "fixtureCount": 2975,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -71604,6 +71604,128 @@
         }
       ],
       "note": "Issue #918 follow-up control: an HTML tag after a real token is not a placeholder; the token stays reported."
+    },
+    {
+      "id": "generic-token-negative-convex-docs-placeholder-pair",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:your-deployment-name|your-admin-key\n",
+      "expected": [],
+      "note": "Issue #919 follow-up (benchmarks #436): a composite value whose secret part is a lowercase credential-noun phrase is a docs placeholder."
+    },
+    {
+      "id": "generic-token-negative-convex-docs-example-pair",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:adjective-animal-123|super-secret-key\n",
+      "expected": [],
+      "note": "Issue #919 follow-up (benchmarks #436): the docs example body is a credential-noun phrase, not key material."
+    },
+    {
+      "id": "generic-token-negative-convex-body-shell-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:happy-otter-123|${CONVEX_BODY}\n",
+      "expected": [],
+      "note": "Issue #919 follow-up (benchmarks #436): a ${VAR} reference in the secret part is resolved later; the lead is public."
+    },
+    {
+      "id": "generic-token-negative-convex-body-template",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "CONVEX_SELF_HOSTED_ADMIN_KEY: \"convex-self-hosted|{{ convex_admin_key }}\"\n",
+      "expected": [],
+      "note": "Issue #919 follow-up (benchmarks #436): a {{ }} template in the secret part is rendered later."
+    },
+    {
+      "id": "generic-token-negative-fal-placeholder-pair",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FAL_KEY=your-fal-key-id:your-fal-key-secret\n",
+      "expected": [],
+      "note": "Issue #919 follow-up (benchmarks #436): an instructional placeholder in the secret half makes the pair a placeholder."
+    },
+    {
+      "id": "generic-token-negative-fal-reference-pair",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FAL_KEY=${FAL_KEY_ID}:${FAL_KEY_SECRET}\n",
+      "expected": [],
+      "note": "Issue #919 follow-up (benchmarks #436): a pair of references is not a literal."
+    },
+    {
+      "id": "generic-token-positive-fal-placeholder-id-real-secret",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FAL_KEY=your-fal-key-id:5a1ed0ff5e7c0dedfeedbadacef00d42\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 56
+        }
+      ],
+      "note": "Issue #919 follow-up (benchmarks #436): twin: a real-shaped secret half keeps the whole pair high/redact."
+    },
+    {
+      "id": "generic-token-positive-convex-lead-literal-body",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:happy-otter-123|eyJ2SyntheticRevokedGatedCloudBody0Aq7Zx9\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 18,
+          "end": 80
+        }
+      ],
+      "note": "Issue #919 follow-up (benchmarks #436): twin: the issuance-gated eyJ2 cloud body stays claimed by the exact name, whole value."
     }
   ]
 }

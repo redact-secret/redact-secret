@@ -2056,7 +2056,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 244,
+        "fixtureCount": 252,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2130,9 +2130,11 @@
         "contextual-positive-template-prefix-only-still-detected",
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-positive-convex-deploy-key-dotenv",
+        "generic-token-positive-convex-lead-literal-body",
         "generic-token-positive-convex-self-hosted-admin-key-compose",
         "generic-token-positive-fal-key-dotenv",
         "generic-token-positive-fal-key-shell-export",
+        "generic-token-positive-fal-placeholder-id-real-secret",
         "generic-token-positive-literal-keychain-case",
         "generic-token-positive-literal-keyword-argument",
         "generic-token-positive-literal-lookup-term",
@@ -2186,7 +2188,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 244,
+        "fixtureCount": 252,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2262,7 +2264,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 244,
+        "fixtureCount": 252,
         "hostContextsExercised": [
           "chat",
           "curl",

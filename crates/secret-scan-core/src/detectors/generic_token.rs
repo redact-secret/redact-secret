@@ -1172,6 +1172,7 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_quoted_reference(value, form)
         || (form == ValueForm::Unquoted && is_credential_variable_name_value(value))
         || is_reverse_dns_identifier(value)
+        || is_composite_with_placeholder_secret_part(value)
 }
 
 /// Final segments that make an `UPPER_SNAKE` identifier the *name* of a
@@ -1217,6 +1218,84 @@ fn is_credential_variable_name_value(value: &str) -> bool {
             .rsplit('_')
             .next()
             .is_some_and(|tail| CREDENTIAL_NAME_TAIL_WORDS.contains(&tail))
+}
+
+/// Credential nouns that end a lowercase placeholder phrase.
+const CREDENTIAL_PHRASE_TAIL_WORDS: &[&str] = &[
+    "key",
+    "secret",
+    "token",
+    "password",
+    "passwd",
+    "passphrase",
+    "credential",
+    "credentials",
+];
+
+/// `true` for a lowercase word phrase naming a credential rather than
+/// holding one: two or more `[a-z]+` words joined by `-` or `_`, ending in a
+/// credential noun (`your-admin-key`, `super-secret-key`,
+/// `your-fal-key-secret`). Used only for the secret part of a composite
+/// value ([`is_composite_with_placeholder_secret_part`]).
+fn is_credential_noun_phrase(value: &str) -> bool {
+    let words: Vec<&str> = value.split(['-', '_']).collect();
+    words.len() >= 2
+        && words
+            .iter()
+            .all(|word| !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_lowercase()))
+        && words
+            .last()
+            .is_some_and(|tail| CREDENTIAL_PHRASE_TAIL_WORDS.contains(tail))
+}
+
+/// `true` for a composite value, runs joined by `|` or `:` such as a Convex
+/// `<lead>|<body>` key or a fal `<id>:<secret>` key, whose last run (the
+/// secret part) is a reference or a placeholder: a `$VAR`/`${VAR}`
+/// reference, a `{{ }}` template, an interpolation, an `<angle>`
+/// placeholder, placeholder vocabulary, an instructional placeholder,
+/// filler, or a lowercase credential-noun phrase
+/// (`prod:<name>|${CONVEX_BODY}`, `prod:adjective-animal-123|super-secret-key`,
+/// `your-fal-key-id:your-fal-key-secret`), issue #919 follow-up. The lead
+/// runs are public names, so they never make the value a secret on their
+/// own.
+///
+/// Only a value with no whitespace, `/` or `@` (outside a `{{ }}` secret
+/// part) qualifies, so a URL, a
+/// connection string or a `user:pass@host` credential keeps today's reading,
+/// and a digits-only last run (a port) is never treated as a placeholder. A
+/// real-shaped secret part keeps the whole value high/redact.
+fn is_composite_with_placeholder_secret_part(value: &str) -> bool {
+    let plain = |part: &str| {
+        !part
+            .bytes()
+            .any(|byte| byte.is_ascii_whitespace() || matches!(byte, b'/' | b'@'))
+    };
+    let Some(last) = value.rsplit(['|', ':']).next() else {
+        return false;
+    };
+    if last.len() == value.len() {
+        return false;
+    }
+    let head = &value[..value.len() - last.len() - 1];
+    // Only a `{{ ... }}` template secret part may carry spaces.
+    if head.is_empty()
+        || last.is_empty()
+        || !plain(head)
+        || !(plain(last) || is_template_reference(last))
+    {
+        return false;
+    }
+    let lower = last.to_ascii_lowercase();
+    starts_with_env_reference(last)
+        || is_template_reference(last)
+        || is_interpolation_reference(last)
+        || starts_with_angle_bracket_reference(last)
+        || is_generic_placeholder_word(&lower)
+        || is_instructional_token_placeholder(last)
+        || is_repeated_character_filler(last)
+        || is_credential_noun_phrase(last)
+        // A `${VAR}` reference whose braces were split by the `:` join.
+        || (last.ends_with('}') && head.contains("${"))
 }
 
 /// Leading labels of a reverse-DNS identifier (`com.example.app.apiToken`).
@@ -3268,6 +3347,60 @@ mod tests {
             let (start, end) = only_range(&candidates);
             assert_eq!(&input[start..end], value, "{input}");
             assert_eq!(candidates[0].type_name(), "contextual_secret");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+        }
+    }
+
+    #[test]
+    fn a_composite_value_with_a_placeholder_or_reference_secret_part_is_excluded() {
+        // Issue #919 follow-up (benchmarks #436): the Convex and fal docs
+        // placeholders and interpolations under the new exact names.
+        for input in [
+            "CONVEX_DEPLOY_KEY=prod:your-deployment-name|your-admin-key",
+            "CONVEX_DEPLOY_KEY=prod:adjective-animal-123|super-secret-key",
+            "CONVEX_DEPLOY_KEY=prod:happy-otter-123|${CONVEX_BODY}",
+            "CONVEX_SELF_HOSTED_ADMIN_KEY=convex-self-hosted|$ADMIN_KEY",
+            "CONVEX_SELF_HOSTED_ADMIN_KEY: \"convex-self-hosted|{{ admin_key }}\"",
+            "CONVEX_DEPLOY_KEY=preview:acme:web|<DEPLOY_KEY_BODY>",
+            "CONVEX_DEPLOY_KEY=prod:happy-otter-123|xxxxxxxxxxxxxxxxxxxx",
+            "FAL_KEY=your-fal-key-id:your-fal-key-secret",
+            "FAL_KEY=${FAL_KEY_ID}:${FAL_KEY_SECRET}",
+            "Authorization: Key your-fal-key-id:your-fal-key-secret",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // Twins: a real-shaped secret part keeps the whole value high.
+        let hex: String = (0..76)
+            .map(|i| char::from(b"0123456789abcdef"[(i * 7 + 3) % 16]))
+            .collect();
+        for (input, value) in [
+            (
+                format!("CONVEX_DEPLOY_KEY=prod:happy-otter-123|01{hex}"),
+                format!("prod:happy-otter-123|01{hex}"),
+            ),
+            (
+                "CONVEX_DEPLOY_KEY=prod:happy-otter-123|eyJ2SyntheticRevokedGatedCloudBody0Aq7Zx9"
+                    .to_owned(),
+                "prod:happy-otter-123|eyJ2SyntheticRevokedGatedCloudBody0Aq7Zx9".to_owned(),
+            ),
+            (
+                "FAL_KEY=your-fal-key-id:5a1ed0ff5e7c0dedfeedbadacef00d42".to_owned(),
+                "your-fal-key-id:5a1ed0ff5e7c0dedfeedbadacef00d42".to_owned(),
+            ),
+            // A lowercase phrase that is not the last run, and a port-like
+            // last run, do not make a value a placeholder.
+            (
+                "FAL_KEY=super-secret-key:Zx81QpVn4Lk7Tr2Wm9Hs6Dc3".to_owned(),
+                "super-secret-key:Zx81QpVn4Lk7Tr2Wm9Hs6Dc3".to_owned(),
+            ),
+            (
+                "password=Zx81QpVn4Lk7Tr2Wm9Hs6Dc3:5432".to_owned(),
+                "Zx81QpVn4Lk7Tr2Wm9Hs6Dc3:5432".to_owned(),
+            ),
+        ] {
+            let candidates = detect(&input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
             assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
         }
     }

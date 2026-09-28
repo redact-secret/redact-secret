@@ -79,7 +79,10 @@ evidence is linked from each published version.
   `CONVEX_SELF_HOSTED_ADMIN_KEY` as exact credential names, and fal's
   `Authorization: Key <id>:<secret>` scheme, reporting the whole value
   (#919). These produced no finding before, even for a random value. A bare
-  `*_KEY` suffix (`PRIMARY_KEY`, `SORT_KEY`) is still not a credential name.
+  `*_KEY` suffix (`PRIMARY_KEY`, `SORT_KEY`) is still not a credential name. A
+  composite `<lead>|<body>` or `<id>:<secret>` value whose secret part is
+  a reference or placeholder (`prod:<name>|${CONVEX_BODY}`,
+  `your-fal-key-id:your-fal-key-secret`) stays silent.
 - `generic-token` no longer redacts secret-reference names and identifiers
   as secrets (#911): a Helm `existingSecret` object name, an unquoted
   `UPPER_SNAKE` credential variable name (`secretKey: DB_PASSWORD`,

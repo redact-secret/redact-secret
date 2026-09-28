@@ -202,6 +202,56 @@ mod generic_names_and_key_scheme {
     }
 
     #[test]
+    fn placeholder_and_reference_values_under_the_exact_names_are_silent() {
+        // Benchmarks #436: the Convex handoff's benign controls and their fal
+        // counterparts, re-authored.
+        for input in [
+            "CONVEX_DEPLOY_KEY=prod:your-deployment-name|your-admin-key\n",
+            "CONVEX_DEPLOY_KEY=prod:adjective-animal-123|super-secret-key\n",
+            "CONVEX_DEPLOY_KEY=prod:happy-otter-123|${CONVEX_BODY}\n",
+            "export CONVEX_SELF_HOSTED_ADMIN_KEY=\"convex-self-hosted|$ADMIN_KEY\"\n",
+            "CONVEX_SELF_HOSTED_ADMIN_KEY: \"convex-self-hosted|{{ convex_admin_key }}\"\n",
+            "CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}\n",
+            "CONVEX_DEPLOY_KEY=\"{{ lookup('env', 'CONVEX_DEPLOY_KEY') }}\"\n",
+            "FAL_KEY=your-fal-key-id:your-fal-key-secret\n",
+            "FAL_KEY=${FAL_KEY_ID}:${FAL_KEY_SECRET}\n",
+            "FAL_KEY=$FAL_KEY_ID:$FAL_KEY_SECRET\n",
+            "FAL_KEY=<YOUR_FAL_KEY>\n",
+            "Authorization: Key your-fal-key-id:your-fal-key-secret\n",
+        ] {
+            let (_, findings) = whole_input(input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+        // Twins: a real-shaped secret part under the same names stays
+        // high/redact over the whole value.
+        let body = format!("01{}", hex(76, 3));
+        let convex = format!("prod:happy-otter-123|{body}");
+        let fal = format!("your-fal-key-id:{}", hex(32, 4));
+        for (input, value, detector, type_name) in [
+            (
+                format!("CONVEX_DEPLOY_KEY={convex}\n"),
+                convex.clone(),
+                "convex-deployment-key",
+                "convex_deployment_key",
+            ),
+            (
+                format!("FAL_KEY={fal}\n"),
+                fal.clone(),
+                "generic-token",
+                "contextual_secret",
+            ),
+            (
+                format!("Authorization: Key {fal}\n"),
+                fal.clone(),
+                "generic-token",
+                "authorization_credential",
+            ),
+        ] {
+            assert_whole_value(&input, &value, detector, type_name);
+        }
+    }
+
+    #[test]
     fn the_key_scheme_is_redacted_whole() {
         let value = id_secret();
         for input in [
