@@ -4,8 +4,9 @@
 `1127bf9` on all ten `latency/*/processing-ratio` rows (median ratios
 1.13 to 1.42 against beta.8, `regression-budgets-v1`). Seven exact
 optimizations on `beta11/950-perf-recovery` bring every latency row back
-within budget: at `a1702684`, nine rows sit at 0.54 to 0.83 of beta.8 and
-`browser-wasm/scale-logs-small-whole` at 1.23 (its allowance is 1.30). The
+within budget: on the final code (`a1702684`, run twice), nine rows sit at
+0.54 to 0.83 of beta.8 and `browser-wasm/scale-logs-small-whole` at 1.17 to
+1.23 (its allowance is 1.30). The
 growth came from 22 more detectors (70 to 92), wider `connection-string` and
 `generic-token` work, and older hot paths those detectors multiplied:
 per-byte prefix scans, run-length tables built before any prefix was
@@ -160,40 +161,42 @@ With `--liftoff-only`: 17.0 ms against 10.9 ms. With `--no-liftoff`:
 
 Median processing ratio against beta.8, per row:
 
-| Row | `1127bf9` [36463844435](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36463844435) | `3f41875` [36472140044](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36472140044) | `aec7c01`¹ [36473719842](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36473719842) | `a170268` [36475754131](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36475754131) |
-| --- | ---: | ---: | ---: | ---: |
-| rust-core small-whole | 1.186 ✗ | 0.727 | 0.708 | 0.543 |
-| rust-core medium-fixed4096 | 1.209 ✗ | 0.836 | 0.814 | 0.792 |
-| python small-whole | 1.139 ✗ | 0.736 | 0.701 | 0.559 |
-| python medium-fixed4096 | 1.183 ✗ | 0.833 | 0.803 | 0.788 |
-| node small-whole | 1.132 ✗ | 0.739 | 0.722 | 0.546 |
-| node medium-fixed4096 | 1.166 ✗ | 0.849 | 0.840 | 0.786 |
-| browser-wasm small-whole (allowed 1.30) | 1.425 ✗ | 1.181 | 1.382 ✗ | 1.232 |
-| browser-wasm medium-fixed4096 | 1.239 ✗ | 0.801 | 0.833 | 0.792 |
-| cli small-whole | 1.239 ✗ | 0.847 | 0.831 | 0.827 |
-| cli medium-fixed4096 | 1.256 ✗ | 0.836 | 0.810 | 0.806 |
-| Runner CPU | Xeon 8573C | Xeon 6973P-C | EPYC 7763 | EPYC 9V74 |
-| Latency verdict | 10 regressions | 10 within budget | 1 regression² | 10 within budget |
+| Row | `1127bf9` [36463844435](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36463844435) | `3f41875` [36472140044](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36472140044) | `aec7c01`¹ [36473719842](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36473719842) | `a170268` [36475754131](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36475754131) | `1a07e02`³ [36476946734](https://github.com/redact-secret/redact-secret-benchmarks/actions/runs/36476946734) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| rust-core small-whole | 1.186 ✗ | 0.727 | 0.708 | 0.543 | 0.545 |
+| rust-core medium-fixed4096 | 1.209 ✗ | 0.836 | 0.814 | 0.792 | 0.769 |
+| python small-whole | 1.139 ✗ | 0.736 | 0.701 | 0.559 | 0.558 |
+| python medium-fixed4096 | 1.183 ✗ | 0.833 | 0.803 | 0.788 | 0.784 |
+| node small-whole | 1.132 ✗ | 0.739 | 0.722 | 0.546 | 0.552 |
+| node medium-fixed4096 | 1.166 ✗ | 0.849 | 0.840 | 0.786 | 0.771 |
+| browser-wasm small-whole (allowed 1.30) | 1.425 ✗ | 1.181 | 1.382 ✗ | 1.232 | 1.166 |
+| browser-wasm medium-fixed4096 | 1.239 ✗ | 0.801 | 0.833 | 0.792 | 0.781 |
+| cli small-whole | 1.239 ✗ | 0.847 | 0.831 | 0.827 | 0.789 |
+| cli medium-fixed4096 | 1.256 ✗ | 0.836 | 0.810 | 0.806 | 0.778 |
+| Runner CPU | Xeon 8573C | Xeon 6973P-C | EPYC 7763 | EPYC 9V74 | EPYC 7763 |
+| Latency verdict | 10 regressions | 10 within budget | 1 regression² | 10 within budget | 10 within budget |
 
 ¹ `aec7c01` is `60056bf` before a `cargo fmt` fixup. The trees differ only in
 formatting.
 ² The `aec7c01` run also flagged `initialization/browser-wasm/scale-logs-small-whole`
-(1.33, +2 ms). `a170268` passes every initialization row. RC acceptance
-passed on all three branch runs.
+(1.33, +2 ms). Both runs of the final code pass every initialization row. RC acceptance
+passed on all four branch runs.
+³ `1a07e02` adds only this record to `a170268`, and was run with 12 rounds
+(24 samples per side) instead of 6.
 
 ## What remains
 
 - **`browser-wasm/scale-logs-small-whole`** is the one row still above 1.0
-  in CI (1.18, 1.38, 1.23 across three runners), while the same comparison
+  in CI (1.18, 1.38, 1.23, 1.17 across four runs), while the same comparison
   measured locally in Chromium is 0.69. Its 12 samples per side spread over
   21-39 ms on the 4-vCPU runners, about 2.5x the local time. Each sample is
   the second call on a fresh page, so wasm compilation and tier-up of a
   module that is 29% larger compressed (the accepted size tradeoff) share
   the runner's 4 vCPUs with the measured call. The row's A/A median
   deviation reaches 0.147, which is where its 0.30 allowance comes from. The
-  final commit passes. The earlier failure did not recur with more
-  optimization and looks like tail noise on that runner class, but the row
-  is the one to watch.
+  final code passes twice, including a 24-sample run on the same EPYC 7763
+  runner class that produced the one failure (1.38), so that failure looks
+  like runner noise. The row is still the one to watch.
 - **#883 batching** (one `detect()` per detector for all lines closed within
   one `append()`) was not needed and is not implemented. After these
   changes, the incremental path costs 7.48 ms per 64 KiB against 4.17 ms for
