@@ -250,6 +250,29 @@
           "end": 15
         }
       ]
+    },
+    {
+      "id": "logfmt-record-email-then-address",
+      "issue": 926,
+      "input": "level=info email=fixture876-q7m9@x4z8v2n6.synthetic client_ip=10.0.0.8",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 17,
+          "end": 51
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_network_address",
+          "confidence": "high",
+          "action": "redact",
+          "start": 62,
+          "end": 70
+        }
+      ]
     }
   ]
 }

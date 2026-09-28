@@ -165,7 +165,11 @@ type is `pii_global_email`, family-contract version is `1`, and
 `contextRequirement` is `required-for-sensitive-classification`. The supported
 RFC 5322 / RFC 6531 subset, Unicode and byte bounds, whole-domain RFC 2606/6761
 negative grammars, safe-fixture split, and false-positive/false-negative costs
-are frozen in the [email family contract](../contracts/pii/email-v1.md). This
+are frozen in the [email family contract](../contracts/pii/email-v1.md). A
+reviewed email field label glued to the address by `=` (`email=`,
+`customer_email=`, `이메일=`) is split off as a label rather than read as
+local part, so a logfmt or `.env` record is labelled
+([#926](https://github.com/redact-secret/redact-secret/issues/926)). This
 row applies the accepted cross-family PII policy to one family and therefore
 does not create a new ADR. Its support state remains `pending` until the exact
 merged artifact's benchmark evidence is reviewed.

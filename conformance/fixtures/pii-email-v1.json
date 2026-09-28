@@ -45,6 +45,13 @@
     {"id":"email-latin-unicode-domain-suffix-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.syntheticé","expected":[]},
     {"id":"email-ccc-zero-combining-mark-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.synthetic⃝","expected":[]},
     {"id":"email-variation-selector-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.synthetic︀","expected":[]},
-    {"id":"email-whole-domain-resemblance-does-not-suppress","input":"email: fixture876-q7m9@notexample.com","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":7,"end":37}]}
+    {"id":"email-whole-domain-resemblance-does-not-suppress","input":"email: fixture876-q7m9@notexample.com","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":7,"end":37}]},
+    {"id":"email-logfmt-label-key-splits-from-local-part","input":"email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":6,"end":40}]},
+    {"id":"email-logfmt-prefixed-label-key","input":"customer_email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":15,"end":49}]},
+    {"id":"email-logfmt-korean-label-key","input":"이메일=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":10,"end":44}]},
+    {"id":"email-logfmt-record-with-earlier-pair","input":"level=info email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":17,"end":51}]},
+    {"id":"email-logfmt-unreviewed-key-stays-joined","input":"user=fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-logfmt-label-prefix-is-not-a-whole-token","input":"emailx=fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-logfmt-reserved-domain-control","input":"email=identity@example.com","expected":[]}
   ]
 }

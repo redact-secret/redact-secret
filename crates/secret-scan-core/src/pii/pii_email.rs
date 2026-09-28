@@ -3,7 +3,8 @@
 use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
 
 use super::{
-    Alternative, ContextRequirement, IdentityDomain, IdentityState, PiiFamily, SensitivityState,
+    Alternative, ContextClass, ContextKind, ContextRequirement, ContextStrength, IdentityDomain,
+    IdentityState, PiiFamily, SensitivityState, normalize_context, pii_context_table,
 };
 use crate::types::{ByteRange, Confidence, Obfuscation, Specificity};
 
@@ -66,6 +67,11 @@ fn detect_email_candidates(input: &str) -> Vec<Alternative> {
         if !valid_local(local) || !valid_domain(domain) || !is_nfc(candidate) {
             continue;
         }
+        let start = match email_label_key_length(local) {
+            Some(label) if valid_local(&local[label..]) => start + label,
+            Some(_) => continue,
+            None => start,
+        };
         let sensitivity = if reserved_documentation_domain(domain) {
             SensitivityState::NonSensitive
         } else {
@@ -89,6 +95,40 @@ fn detect_email_candidates(input: &str) -> Vec<Alternative> {
         });
     }
     output
+}
+
+/// Issue #926: RFC 5322 `atext` includes `=`, so in `email=local@domain` the
+/// local-part scan runs back to the key. When the run before the first `=` is
+/// a reviewed high-signal email field label of the context vocabulary (the
+/// whole key or its last separator-delimited tokens, after the context-only
+/// normalization: `email`, `customer_email`, `이메일`), that run and the `=`
+/// are a label, not local part. Returns their byte length. Any other `=`
+/// stays local-part syntax.
+fn email_label_key_length(local: &str) -> Option<usize> {
+    let separator = local.find('=')?;
+    let key = &local[..separator];
+    if key.is_empty() {
+        return None;
+    }
+    pii_context_table::CONTEXT_ENTRIES
+        .iter()
+        .filter(|entry| {
+            entry.kind == ContextKind::FieldLabel
+                && entry.class == ContextClass::Positive
+                && entry.strength == ContextStrength::HighSignal
+                && entry.domains.contains(&IdentityDomain::Email)
+        })
+        .any(|entry| {
+            let view = normalize_context(key, entry.language);
+            entry.forms.iter().any(|form| {
+                let form = normalize_context(form, entry.language);
+                view == form
+                    || view
+                        .strip_suffix(form.as_str())
+                        .is_some_and(|head| head.ends_with(' '))
+            })
+        })
+        .then_some(separator + 1)
 }
 
 fn scan_local_start(input: &str, at: usize) -> Option<usize> {
@@ -364,6 +404,42 @@ mod tests {
         ] {
             assert!(candidates(input).is_empty(), "{input:?}");
         }
+    }
+
+    #[test]
+    fn a_reviewed_email_label_key_before_equals_is_not_local_part() {
+        let ranges = |input: &str| {
+            candidates(input)
+                .iter()
+                .map(|candidate| (candidate.range.start(), candidate.range.end()))
+                .collect::<Vec<_>>()
+        };
+        let address = "fixture876-q7m9@x4z8v2n6.synthetic";
+        for key in [
+            "email",
+            "EMAIL",
+            "e-mail",
+            "customer_email",
+            "이메일",
+            "고객_이메일",
+        ] {
+            let input = format!("{key}={address}");
+            assert_eq!(ranges(&input), [(key.len() + 1, input.len())], "{input:?}");
+        }
+        // A later `=` inside the address stays local-part syntax.
+        let input = format!("email=a=b{address}");
+        assert_eq!(ranges(&input), [(6, input.len())]);
+        // Keys that are not a whole reviewed label keep the joined candidate.
+        for key in ["user", "emailx", "myemail", "user.email", "contact"] {
+            let input = format!("{key}={address}");
+            assert_eq!(ranges(&input), [(0, input.len())], "{input:?}");
+        }
+        // A label followed by an invalid remainder yields no candidate.
+        assert!(candidates("email=.a@x4z8v2n6.synthetic").is_empty());
+        assert_eq!(
+            candidates("email=identity@example.com")[0].sensitivity,
+            SensitivityState::NonSensitive
+        );
     }
 
     #[test]

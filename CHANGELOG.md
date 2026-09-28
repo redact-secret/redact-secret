@@ -28,6 +28,11 @@ evidence is linked from each published version.
   (`client_ip=10.0.0.8.`) is now reported, as it already was before a `:port`
   suffix (#925). The period stays outside the range, and a period followed by
   a digit, a letter, or another period still leaves the dotted run unmatched.
+- A logfmt or `.env` style `email=address` is now reported as an email
+  finding (#926). A reviewed email field label glued to the address by `=`
+  (`email=`, `customer_email=`, `이메일=`) is read as a label, not as local
+  part, so the finding starts after the `=`. Other keys (`user=`, `emailx=`)
+  are unchanged.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

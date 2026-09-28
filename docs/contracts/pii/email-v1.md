@@ -44,7 +44,17 @@ limits:
   at most 254 UTF-8 bytes. These are byte bounds, including for SMTPUTF8.
 - A candidate must be bounded on the left by something other than local-part
   atom syntax, `.`, or `@`, and on the right by something other than a
-  domain-label character, `.`, or `@`. A combining mark or governed invisible
+  domain-label character, `.`, or `@`. One exception
+  ([#926](https://github.com/redact-secret/redact-secret/issues/926)): RFC
+  5322 `atext` includes `=`, so in `key=local@domain` the local-part run
+  starts at the key. When the run before its first `=` is a reviewed
+  `pii-context` high-signal email field label after the context-only
+  normalization (the whole key, or its last separator-delimited tokens:
+  `email`, `e-mail`, `customer_email`, `이메일`, `고객_이메일`), that run and the
+  `=` are a label, and the candidate starts after the `=`. The remainder must
+  still be a valid local part, or there is no candidate. Any other key
+  (`user=`, `emailx=`, `user.email=`) and any later `=` stay local-part
+  syntax. A combining mark or governed invisible
   scalar is not accepted as either boundary, and a Unicode alphabetic or
   numeric scalar is not accepted on the domain side; the detector rejects the
   whole occurrence rather than matching a suffix or prefix. A URL
@@ -115,6 +125,11 @@ real person's data or exposes matched plaintext.
 False positives are limited by whole-candidate parsing, required high-signal
 context, and named negative evidence. A syntactically valid generated address
 under an email-labelled field can still be a non-sensitive identifier.
+
+The logfmt label split (`email=local@domain`) removes the false negative of
+a labelled `key=value` record. Its cost is a real local part that literally
+begins with a reviewed email label and `=`: it is read as that label plus a
+shorter address, which is still redacted, so the range loses only the key.
 
 False negatives include every unsupported RFC form above, single-label/local
 delivery domains, combining-mark SMTPUTF8 spellings, an address without
