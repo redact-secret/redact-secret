@@ -34,14 +34,18 @@ inspectable evidence; it need not wait for a delivery platform.
 
 - **C1: Reconcile evolving feature content.** Review streaming and integration
   guides against [#179](https://github.com/redact-secret/redact-secret/issues/179)
-  and [#180](https://github.com/redact-secret/redact-secret/issues/180). Exit:
-  examples, runtime support, and limits describe the implemented behavior.
+  (closed) and [#180](https://github.com/redact-secret/redact-secret/issues/180)
+  (closed). Both source issues are closed; this exit still needs a recorded
+  reconciliation pass against the current candidate revision. Exit: examples,
+  runtime support, and limits describe the implemented behavior.
 - **C2: Review the final content inventory.** Reconcile all seven topics with
-  the outputs of [#199](https://github.com/redact-secret/redact-secret/issues/199),
-  [#200](https://github.com/redact-secret/redact-secret/issues/200),
-  [#201](https://github.com/redact-secret/redact-secret/issues/201), and
-  [#202](https://github.com/redact-secret/redact-secret/issues/202). Exit: a
-  candidate-revision review records coverage and disposition of each gap.
+  the outputs of [#199](https://github.com/redact-secret/redact-secret/issues/199)
+  (closed), [#200](https://github.com/redact-secret/redact-secret/issues/200)
+  (closed), [#201](https://github.com/redact-secret/redact-secret/issues/201)
+  (closed), and [#202](https://github.com/redact-secret/redact-secret/issues/202)
+  (closed). All four source issues are closed; this exit still needs a
+  recorded candidate-revision review. Exit: a candidate-revision review
+  records coverage and disposition of each gap.
 - **C3: Record executable-example evidence.** Use the smallest synthetic input
   for each documented behavior. Run `npm run ci` (including integration-example
   tests and JavaScript checks), Rust doctests, and the relevant installed-artifact
