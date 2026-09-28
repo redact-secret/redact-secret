@@ -4849,6 +4849,7 @@
             "connection-positive-postgresql",
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
+            "connection-positive-sqlalchemy-driver-ipv6-host",
             "connection-positive-unclosed-command-substitution-still-detected",
             "connection-regression-http-proxy-userinfo-password",
             "connection-regression-https-userinfo-percent-encoded-password",
@@ -5093,6 +5094,7 @@
             "connection-positive-postgresql",
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
+            "connection-positive-sqlalchemy-driver-ipv6-host",
             "connection-positive-unclosed-command-substitution-still-detected",
             "connection-regression-http-proxy-userinfo-password",
             "connection-regression-https-userinfo-percent-encoded-password",
@@ -9572,7 +9574,8 @@
             "heroku-api-key-legacy-negative-bare-no-context",
             "heroku-api-key-legacy-negative-different-line",
             "heroku-api-key-legacy-negative-heroku-app-id",
-            "heroku-api-key-legacy-negative-uuid-without-heroku-context"
+            "heroku-api-key-legacy-negative-uuid-without-heroku-context",
+            "heroku-api-key-legacy-negative-zero-uuid-placeholder"
           ],
           "state": "supported"
         },
@@ -9807,6 +9810,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "cohere-api-key-positive-dotenv-named",
+            "cohere-api-key-positive-java-builder-token",
             "cohere-api-key-positive-json-named",
             "cohere-api-key-positive-keyword-adjacent-prose",
             "cohere-api-key-positive-log-named",
@@ -9993,6 +9997,8 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "deepgram-api-key-positive-dotenv-named",
+            "deepgram-api-key-positive-go-last-positional-argument",
+            "deepgram-api-key-positive-httpie-token-header",
             "deepgram-api-key-positive-json-named",
             "deepgram-api-key-positive-keyword-adjacent-prose",
             "deepgram-api-key-positive-log-named",

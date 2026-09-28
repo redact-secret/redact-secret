@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2983,
+  "fixtureCount": 2988,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -14505,6 +14505,28 @@
       "note": "A standard mongodb+srv DNS-seedlist host (three or more labels, no port) is recognized."
     },
     {
+      "id": "connection-positive-sqlalchemy-driver-ipv6-host",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "engine = create_engine(\"postgresql+psycopg://orders_app:Synth3ticRevokedDbPass@[2001:db8::5]:5432/orders\")\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 56,
+          "end": 78
+        }
+      ],
+      "note": "Issue #935: a SQLAlchemy dialect+driver:// URL (postgresql+psycopg) with an IPv6 host reports the password; the driver is 1-32 [A-Za-z0-9_] bytes."
+    },
+    {
       "id": "connection-negative-mongodb-srv-host-only",
       "detector": "connection-string",
       "kind": "negative",
@@ -20216,7 +20238,7 @@
       "contexts": [
         "terminal"
       ],
-      "input": "$ twilio profiles:list --properties authToken\nID     Auth Token\nprod   b2907e5c3a18f6d4b2907e5c3a18f6d4\n",
+      "input": "$ twilio profiles:list --properties authToken\nID     Auth Token\nprod   b2907e5c3a\u00318f6d4b2907e5c3a18f6d4\n",
       "expected": [
         {
           "detector": "twilio-auth-token",
@@ -42009,6 +42031,19 @@
       "note": "Issues #933 and #936: the Token: row of heroku authorizations:info output, with heroku only on the command line above, is the token; the layout names the credential slot and binds it to Heroku, so it is high and the default policy redacts it."
     },
     {
+      "id": "heroku-api-key-legacy-negative-zero-uuid-placeholder",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=00000000-0000-0000-0000-000000000000\n",
+      "expected": [],
+      "note": "Issue #934: an all-one-digit UUID under Heroku context is a settings-template placeholder, not a token, and is not reported by any detector."
+    },
+    {
       "id": "heroku-api-key-legacy-negative-bare-no-context",
       "detector": "heroku-api-key-legacy",
       "kind": "negative",
@@ -56444,6 +56479,28 @@
       "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named dotenv key names the credential, so confidence is high."
     },
     {
+      "id": "cohere-api-key-positive-java-builder-token",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Cohere cohere = Cohere.builder().token(\"LTahry7EMU\u0062jsz8FNVckt29GPWdmu3AHQXenv4BJ\").clientName(\"search-api\").build();\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 40,
+          "end": 80
+        }
+      ],
+      "note": "Issue #932: the sole quoted argument of a credential-named builder method on a Cohere builder chain is a high constructor form."
+    },
+    {
       "id": "cohere-api-key-positive-json-named",
       "detector": "cohere-api-key",
       "kind": "positive",
@@ -58891,6 +58948,50 @@
         }
       ],
       "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An Authorization: Token header on a line naming deepgram is medium confidence; since issue #936 it is high when the line names a host under the Deepgram API domain (here api.deepgram.com), so the default policy redacts it."
+    },
+    {
+      "id": "deepgram-api-key-positive-go-last-positional-argument",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "var client = deepgram.NewRESTWithDefaults(context.Background(), \"gnu18fmt07\u0065lsz6dkry5cjqx4bipw3ahov29gnu1\")\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 105
+        }
+      ],
+      "note": "Issue #932: a quoted literal that is the last positional argument of a deepgram-named call, past a closed argument group, is a high constructor form."
+    },
+    {
+      "id": "deepgram-api-key-positive-httpie-token-header",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "http --verbose POST https://api.deepgram.com/v1/listen model==nova-3 'Authorization:Token gnu18fmt07\u0065lsz6dkry5cjqx4bipw3ahov29gnu1' < call.wav\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 90,
+          "end": 130
+        }
+      ],
+      "note": "Issues #932 and #936: HTTPie's Header:value form with no space after the colon is read as an Authorization: Token header; the line names the Deepgram API host, so it is high and redacted."
     },
     {
       "id": "deepgram-api-key-positive-token-header-keyword-only",
