@@ -16142,7 +16142,7 @@
         {
           "detector": "generic-token",
           "type": "contextual_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "contextual",
           "start": 394,
           "end": 425
@@ -16172,7 +16172,7 @@
           "end": 556
         }
       ],
-      "note": "Every remaining declared high-signal and ambiguous credential name (apikey, secret, refresh_token, session_token, passwd, private_key, client_secret, webhook_secret, auth, auth_token, credential, credentials, signing_key) carries its own positive evidence, completing representative coverage of the accepted credential-name set."
+      "note": "Every remaining declared high-signal and ambiguous credential name (apikey, secret, refresh_token, session_token, passwd, private_key, client_secret, webhook_secret, auth_token (high-signal since #941), auth, credential, credentials, signing_key) carries its own positive evidence, completing representative coverage of the accepted credential-name set."
     },
     {
       "id": "contextual-negative-generic-name-high-entropy",

@@ -394,7 +394,7 @@ fn load_ruleset_registers_after_built_ins_and_preserves_profile_identity() {
 #[test]
 fn a_ruleset_detector_cannot_overturn_a_built_ins_resolved_finding_at_a_contextual_medium_tie() {
     // `generic-token`'s own ambiguous-name contextual candidate for
-    // `AUTH_TOKEN=<value>` spans exactly `<value>` (never the key or `=`).
+    // `SIGNING_KEY=<value>` spans exactly `<value>` (never the key or `=`).
     // The ruleset detector below declares its literal prefix as the value's
     // own first four bytes, so its candidate range is byte-identical to
     // `generic-token`'s: same start, same end, same
@@ -411,7 +411,9 @@ fn a_ruleset_detector_cannot_overturn_a_built_ins_resolved_finding_at_a_contextu
         shannon_entropy(value) >= 3.5,
         "fixture value must clear generic-token's ambiguous-name entropy threshold"
     );
-    let input = format!("AUTH_TOKEN={value}\n");
+    // `auth_token` is high-signal since #941, so the fixture uses a name
+    // that is still ambiguous.
+    let input = format!("SIGNING_KEY={value}\n");
 
     let ruleset = b"ruleset-revision: 1\n\
 detector: acme-tok-companion\n\

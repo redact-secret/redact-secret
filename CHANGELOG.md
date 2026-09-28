@@ -132,6 +132,11 @@ evidence is linked from each published version.
   `postgres+asyncpg://`, `mysql+pymysql://` and `mariadb+<driver>://` were
   missed because the scheme did not match. The driver is 1–32
   `[A-Za-z0-9_]` bytes; other schemes with a `+` suffix stay unsupported.
+- `generic-token` treats `auth_token` as a high-signal credential name
+  (#941). A secret-shaped value under `auth_token` is reported at high
+  confidence and redacted instead of warned, and `twilio auth_token=<value>`
+  is a high `twilio_auth_token`. Placeholder, reference and identifier
+  values stay silent; `auth` stays ambiguous.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

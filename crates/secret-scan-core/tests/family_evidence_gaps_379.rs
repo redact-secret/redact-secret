@@ -132,3 +132,44 @@ fn issue_935_a_driver_qualified_sql_url_password_is_redacted() {
         assert!(findings.is_empty(), "{input:?}: {findings:?}");
     }
 }
+
+// ---------------------------------------------------------------- #941
+
+#[test]
+fn issue_941_an_auth_token_assignment_is_redacted() {
+    let token = synthetic(LOWER_HEX, 32, 11);
+    let literal = synthetic(
+        b"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789",
+        28,
+        4,
+    );
+    for (input, value, type_name) in [
+        (
+            format!("[validator] twilio auth_token={token} status=ok\n"),
+            token.clone(),
+            "twilio_auth_token",
+        ),
+        (
+            format!("config:\n  auth_token: \"{literal}\"\n"),
+            literal.clone(),
+            "contextual_secret",
+        ),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+        assert_eq!(span(&input, &findings[0]), value);
+        assert_eq!(findings[0].type_name(), type_name);
+        assert_eq!(findings[0].action(), Action::Redact, "{input:?}");
+    }
+    // Placeholder, reference and #911 identifier shapes stay silent, and the
+    // twin with the gate renamed to a non-credential key stays silent too.
+    for input in [
+        "export TWILIO_AUTH_TOKEN=your_auth_token\n".to_owned(),
+        "auth_token: ${AUTH_TOKEN}\n".to_owned(),
+        "auth_token=TWILIO_AUTH_TOKEN\n".to_owned(),
+        format!("[validator] cache etag={token} status=ok\n"),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert!(findings.is_empty(), "{input:?}: {findings:?}");
+    }
+}
