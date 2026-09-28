@@ -15,6 +15,11 @@ evidence is linked from each published version.
   labelled value is now reported, not only the first. A natural-language label
   between two values (`… contact details …`) still associates with neither.
   The released `pii-context/v1` file is kept unchanged as the beta.10 record.
+- `pii-context/v2` also folds ASCII case in Korean context, so `IP 주소:` and
+  `클라이언트_IP=` label an address like `ip 주소:` does, and adds the field
+  labels `email address`, `e-mail address`, `이메일 주소`, `카드번호`,
+  `신용카드번호`, and `직불카드번호` (#927). A bare `address` or `주소` is
+  still not a label.
 
 ### Fixed
 

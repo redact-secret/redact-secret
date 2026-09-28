@@ -682,6 +682,10 @@ enum ContextStrength {
 
 struct ContextEntry {
     id: &'static str,
+    #[allow(
+        dead_code,
+        reason = "reviewed contract metadata; pii-context/v2 matching no longer depends on the language"
+    )]
     language: ContextLanguage,
     kind: ContextKind,
     class: ContextClass,
@@ -715,7 +719,12 @@ impl ContextEntry {
 #[path = "pii_context_table.rs"]
 mod pii_context_table;
 
-fn normalize_context(value: &str, language: ContextLanguage) -> String {
+/// The context-only comparison view: governed invisible code points removed,
+/// NFC, ASCII case folded, and every separator run collapsed to one space.
+/// `pii-context/v2` folds ASCII case in every language, so the ASCII part of
+/// a Korean form (`ip 주소`, `클라이언트 ip`) matches in any case (issue #927);
+/// Hangul has no case and is unchanged.
+fn normalize_context(value: &str) -> String {
     let visible = value.chars().filter(|character| {
         let code_point = *character as u32;
         !crate::invisible_table::INVISIBLE_RANGES
@@ -724,13 +733,10 @@ fn normalize_context(value: &str, language: ContextLanguage) -> String {
     });
     let mut tokenized = String::new();
     let mut in_separator = false;
-    for character in visible.nfc().map(|character| {
-        if language == ContextLanguage::English && character.is_ascii_uppercase() {
-            character.to_ascii_lowercase()
-        } else {
-            character
-        }
-    }) {
+    for character in visible
+        .nfc()
+        .map(|character| character.to_ascii_lowercase())
+    {
         let separator = character.is_whitespace() || matches!(character, '_' | '-' | ':' | '=');
         if separator {
             if !in_separator {
@@ -843,25 +849,24 @@ fn context_matches(
             .min()
             .unwrap_or(line_end);
         let mut found = Vec::new();
+        let before = normalize_context(&input[before_barrier..range.start()]);
+        let after = normalize_context(&input[range.end()..after_barrier]);
+        let before_offset = normalize_context(&input[line_start..before_barrier])
+            .chars()
+            .count();
+        let after_offset = normalize_context(&input[line_start..range.end()])
+            .chars()
+            .count();
         for entry in pii_context_table::CONTEXT_ENTRIES
             .iter()
             .filter(|entry| entry.domains.contains(&domain))
         {
-            let before = normalize_context(&input[before_barrier..range.start()], entry.language);
-            let after = normalize_context(&input[range.end()..after_barrier], entry.language);
-            let before_offset =
-                normalize_context(&input[line_start..before_barrier], entry.language)
-                    .chars()
-                    .count();
-            let after_offset = normalize_context(&input[line_start..range.end()], entry.language)
-                .chars()
-                .count();
             for form in entry.forms {
                 for (side, view) in [(0usize, before.as_str()), (1usize, after.as_str())] {
                     if entry.kind == ContextKind::FieldLabel && side == 1 {
                         continue;
                     }
-                    let normalized_form = normalize_context(form, entry.language);
+                    let normalized_form = normalize_context(form);
                     for (position, _) in view.match_indices(&normalized_form) {
                         let byte_end = position + normalized_form.len();
                         let boundary_ok = view[..position]
@@ -903,7 +908,6 @@ fn context_matches(
                         let occurrence_end = occurrence_start + scalar_span;
                         if equidistant_from_candidates(
                             input,
-                            entry.language,
                             entry.kind,
                             line_start,
                             line_end,
@@ -1000,13 +1004,8 @@ fn logical_line_bounds(input: &str, range: ByteRange) -> (usize, usize) {
 /// after it, so a candidate that ends before the label never makes it
 /// equidistant (`pii-context/v2`, issue #924); a natural-language label may
 /// associate either way and keeps the two-sided rule.
-#[allow(
-    clippy::too_many_arguments,
-    reason = "one bounded association question over the same line view"
-)]
 fn equidistant_from_candidates(
     input: &str,
-    language: ContextLanguage,
     kind: ContextKind,
     line_start: usize,
     line_end: usize,
@@ -1023,11 +1022,11 @@ fn equidistant_from_candidates(
         if range.start() < line_start || range.end() > line_end {
             continue;
         }
-        let candidate_start = normalize_context(&input[line_start..range.start()], language)
+        let candidate_start = normalize_context(&input[line_start..range.start()])
             .chars()
             .count();
         let candidate_end = candidate_start
-            + normalize_context(&input[range.start()..range.end()], language)
+            + normalize_context(&input[range.start()..range.end()])
                 .chars()
                 .count();
         if kind == ContextKind::FieldLabel && candidate_end <= occurrence_start {
@@ -1459,11 +1458,10 @@ mod tests {
             ],
         );
         assert!(barriers.iter().all(Vec::is_empty));
-        assert_eq!(
-            normalize_context("e\u{301}", ContextLanguage::English),
-            normalize_context("é", ContextLanguage::English)
-        );
-        assert_eq!(normalize_context("ASCII", ContextLanguage::Korean), "ASCII");
+        assert_eq!(normalize_context("e\u{301}"), normalize_context("é"));
+        // pii-context/v2 folds ASCII case in every language (issue #927).
+        assert_eq!(normalize_context("IP 주소"), "ip 주소");
+        assert_eq!(normalize_context("클라이언트_IP"), "클라이언트 ip");
 
         let quoted_natural = context_matches(
             "\"contact details\" TEST",

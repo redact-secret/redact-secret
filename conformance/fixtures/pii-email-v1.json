@@ -52,6 +52,10 @@
     {"id":"email-logfmt-record-with-earlier-pair","input":"level=info email=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":17,"end":51}]},
     {"id":"email-logfmt-unreviewed-key-stays-joined","input":"user=fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
     {"id":"email-logfmt-label-prefix-is-not-a-whole-token","input":"emailx=fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
-    {"id":"email-logfmt-reserved-domain-control","input":"email=identity@example.com","expected":[]}
+    {"id":"email-logfmt-reserved-domain-control","input":"email=identity@example.com","expected":[]},
+    {"id":"email-english-email-address-label","input":"email address: fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":15,"end":49}]},
+    {"id":"email-korean-email-address-label","input":"이메일 주소: fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":18,"end":52}]},
+    {"id":"email-logfmt-email-address-label-key","input":"email_address=fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":14,"end":48}]},
+    {"id":"email-bare-address-label-control","input":"address: fixture876-q7m9@x4z8v2n6.synthetic","expected":[]}
   ]
 }

@@ -83,7 +83,9 @@ Normative identity sources are:
 
 Structure establishes email identity only. A public finding is emitted only
 when the shared context matcher associates a reviewed high-signal email
-context (`email`, `e-mail`, `이메일`, or `고객 이메일`) with the candidate.
+context (`email`, `e-mail`, `이메일`, or `고객 이메일`, and, since
+`pii-context/v2` ([#927](https://github.com/redact-secret/redact-secret/issues/927)),
+`email address`, `e-mail address`, or `이메일 주소`) with the candidate.
 Ambiguous `contact` / `연락처` vocabulary does not establish sensitivity.
 
 After positive context, either of these named negative-evidence grammars makes

@@ -29,7 +29,7 @@
         "unicode": { "const": "NFC" },
         "removeGovernedInvisible": { "const": true },
         "englishCase": { "const": "ascii-lower" },
-        "koreanCase": { "const": "none" },
+        "koreanCase": { "const": "ascii-lower" },
         "tokenSeparators": {
           "type": "array",
           "minItems": 5,

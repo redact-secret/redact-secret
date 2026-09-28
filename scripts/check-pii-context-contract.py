@@ -53,8 +53,9 @@ def normalize(value: str, language: str, ranges: list[tuple[int, int]] | None = 
     ranges = governed_invisible_ranges() if ranges is None else ranges
     visible = "".join(character for character in value if not in_ranges(ord(character), ranges))
     value = unicodedata.normalize("NFC", visible)
-    if language == "en":
-        value = "".join(character.lower() if "A" <= character <= "Z" else character for character in value)
+    # pii-context/v2 folds ASCII case in every language (issue #927); the
+    # language argument stays for the fixture and entry metadata.
+    value = "".join(character.lower() if "A" <= character <= "Z" else character for character in value)
     return SEPARATORS.sub(" ", value).strip()
 
 

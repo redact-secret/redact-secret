@@ -119,9 +119,9 @@ fn email_label_key_length(local: &str) -> Option<usize> {
                 && entry.domains.contains(&IdentityDomain::Email)
         })
         .any(|entry| {
-            let view = normalize_context(key, entry.language);
+            let view = normalize_context(key);
             entry.forms.iter().any(|form| {
-                let form = normalize_context(form, entry.language);
+                let form = normalize_context(form);
                 view == form
                     || view
                         .strip_suffix(form.as_str())
