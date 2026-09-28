@@ -57,6 +57,7 @@ mod pinecone;
 mod posthog;
 mod postman;
 mod private_key;
+mod resend;
 mod ruleset_adapter;
 mod sendgrid;
 mod sentry;
@@ -173,6 +174,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(convex::ConvexDeploymentKeyDetector),
         Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
         Box::new(inngest::INNGEST_SIGNING_KEY),
+        Box::new(resend::RESEND_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -307,6 +309,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("convex-deployment-key", Pack::Provider),
     ("onepassword-service-account-token", Pack::Provider),
     ("inngest-signing-key", Pack::Provider),
+    ("resend-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -430,6 +433,7 @@ mod tests {
                 "convex-deployment-key",
                 "onepassword-service-account-token",
                 "inngest-signing-key",
+                "resend-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -790,6 +794,7 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
             format!("ops_eyJ{}", "SyntheticRevokedOnePasswordFixture".repeat(8));
@@ -873,6 +878,7 @@ mod tests {
                 onepassword_service_account_token_input.as_str(),
             ),
             ("inngest-signing-key", inngest_signing_key_input.as_str()),
+            ("resend-api-key", resend_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

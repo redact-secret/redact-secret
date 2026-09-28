@@ -81,6 +81,7 @@ export const CANONICAL_IDS = [
   "convex-deployment-key",
   "onepassword-service-account-token",
   "inngest-signing-key",
+  "resend-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -120,6 +121,7 @@ export const GROUPS = {
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
     "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token", "posthog-token",
+    "resend-api-key",
   ],
 };
 

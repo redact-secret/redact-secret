@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 113 |
+| supported | 114 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 124.
+Coverage declarations: 125.
 
 ## Coverage by detector
 
@@ -95,6 +95,7 @@ Coverage declarations: 124.
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -208,6 +209,7 @@ Coverage declarations: 124.
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
+| resend_api_key | resend-api-key | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
 | sentry_user_auth_token | sentry-user-auth-token | provider | supported | not-applicable | none |
@@ -257,15 +259,15 @@ Coverage declarations: 124.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 124 | 0 | 0 |
-| boundary | 113 | 0 | 0 |
-| host-context | 113 | 0 | 0 |
+| adversarial | 125 | 0 | 0 |
+| boundary | 114 | 0 | 0 |
+| host-context | 114 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 124 | 0 | 0 |
-| near-miss-negative | 113 | 0 | 0 |
-| overlap | 113 | 0 | 0 |
-| positive | 113 | 0 | 0 |
-| range | 124 | 0 | 0 |
+| malformed | 125 | 0 | 0 |
+| near-miss-negative | 114 | 0 | 0 |
+| overlap | 114 | 0 | 0 |
+| positive | 114 | 0 | 0 |
+| range | 125 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

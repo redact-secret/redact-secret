@@ -12294,6 +12294,126 @@
       "type": "inngest_signing_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "resend-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "resend-api-key-positive-bare",
+            "resend-api-key-positive-chat-sentence",
+            "resend-api-key-positive-crlf-unicode-prefix",
+            "resend-api-key-positive-curl-bearer",
+            "resend-api-key-positive-dotenv",
+            "resend-api-key-positive-json-config",
+            "resend-api-key-positive-json-token-key",
+            "resend-api-key-positive-log",
+            "resend-api-key-positive-punctuation-adjacent",
+            "resend-api-key-positive-python-module-attribute",
+            "resend-api-key-positive-python-sdk-call",
+            "resend-api-key-positive-repeated-value",
+            "resend-api-key-positive-sdk-constructor",
+            "resend-api-key-positive-second-sample",
+            "resend-api-key-positive-second-sample-dotenv",
+            "resend-api-key-positive-shell-export",
+            "resend-api-key-positive-tool-call-arguments",
+            "resend-api-key-positive-x-api-key-header",
+            "resend-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "resend-api-key-overlap-bearer-header",
+            "resend-api-key-overlap-context",
+            "resend-api-key-overlap-second-sample-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "resend-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "resend-api-key-boundary-all-lowercase",
+            "resend-api-key-boundary-dash-separator",
+            "resend-api-key-boundary-glued-suffix",
+            "resend-api-key-boundary-identifier-glue",
+            "resend-api-key-boundary-long-first-segment",
+            "resend-api-key-boundary-long-second-segment",
+            "resend-api-key-boundary-second-underscore",
+            "resend-api-key-boundary-short-first-segment",
+            "resend-api-key-boundary-short-second-segment",
+            "resend-api-key-boundary-underscore-glue",
+            "resend-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "resend-api-key-negative-placeholders",
+            "resend-api-key-negative-python-re-names",
+            "resend-api-key-negative-shell-reference",
+            "resend-api-key-negative-snake-identifier",
+            "resend-api-key-negative-webhook-secret-mention"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "resend-api-key-boundary-all-lowercase",
+            "resend-api-key-boundary-dash-separator",
+            "resend-api-key-boundary-glued-suffix",
+            "resend-api-key-boundary-identifier-glue",
+            "resend-api-key-boundary-long-first-segment",
+            "resend-api-key-boundary-long-second-segment",
+            "resend-api-key-boundary-second-underscore",
+            "resend-api-key-boundary-short-first-segment",
+            "resend-api-key-boundary-short-second-segment",
+            "resend-api-key-boundary-underscore-glue",
+            "resend-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for resend_api_key (resend-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "resend_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12518,6 +12638,7 @@
             "pulumi-access-token-adversarial-long-suffix",
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
+            "resend-api-key-adversarial-long-run",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
             "sentry-user-auth-token-adversarial-long-run",
@@ -12966,6 +13087,7 @@
             "pulumi-access-token-adversarial-long-suffix",
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
+            "resend-api-key-adversarial-long-run",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
             "sentry-user-auth-token-adversarial-long-run",

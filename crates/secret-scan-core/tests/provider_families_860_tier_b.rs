@@ -353,3 +353,82 @@ mod inngest {
         assert_partition_parity(&key("branch", 64, 7));
     }
 }
+
+mod resend {
+    use super::*;
+
+    const DETECTOR: &str = "resend-api-key";
+    const TYPE: &str = "resend_api_key";
+
+    fn key(first: usize, second: usize, seed: usize) -> String {
+        format!(
+            "re_{}_{}",
+            filler(ALNUM, first, seed),
+            filler(ALNUM, second, seed + 1)
+        )
+    }
+
+    #[test]
+    fn the_documented_layout_wins_every_context_as_the_sole_finding() {
+        for seed in [1, 5, 9] {
+            let key = key(8, 24, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("RESEND_API_KEY={key}\n"),
+                format!("const resend = new Resend(\"{key}\");\n"),
+                format!("resend.api_key = \"{key}\"\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"resend\":{{\"env\":{{\"RESEND_API_KEY\":\"{key}\"}}}}}}}}"
+                ),
+                format!("curl -H 'Authorization: Bearer {key}' https://example.invalid/emails\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let first = filler(ALNUM, 8, 2);
+        let second = filler(ALNUM, 24, 3);
+        let base = format!("re_{first}_{second}");
+        let mut underscored = second.clone();
+        underscored.replace_range(10..11, "_");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key(7, 24, 2),
+                key(9, 24, 2),
+                key(8, 23, 2),
+                key(8, 25, 2),
+                format!("re_{first}-{second}"),
+                format!("re_{first}_{underscored}"),
+                format!("re_{}_{}", first.to_lowercase(), second.to_lowercase()),
+                format!("RE_{first}_{second}"),
+                format!("a{base}"),
+                format!("_{base}"),
+                format!("{base}x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "RESEND_API_KEY=re_123456789\n",
+            "RESEND_API_KEY=re_xxxxxxxxx\n",
+            "RESEND_API_KEY=re_...\n",
+            "pattern = re_compile(r'\\d+')\n",
+            "re_pattern_cache = {}\n",
+            "def pre_process_all_inputs_now(): pass\n",
+            "RESEND_API_KEY=${RESEND_API_KEY}\n",
+        ] {
+            assert_unclaimed(DETECTOR, input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(8, 24, 4));
+    }
+}

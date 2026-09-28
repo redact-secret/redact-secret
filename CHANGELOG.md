@@ -60,6 +60,8 @@ evidence is linked from each published version.
   - `inngest-signing-key` (#914): Inngest `signkey-<prod|test|branch>-`
     + 64-hex signing keys (`inngest_signing_key`), which replaces the
     medium, warned `contextual_secret` under `INNGEST_SIGNING_KEY=`.
+  - `resend-api-key` (#915): Resend `re_` + 8 + `_` + 24 API keys
+    (`resend_api_key`), with a mixed-case guard against `re_` identifiers.
 
 ### Fixed
 

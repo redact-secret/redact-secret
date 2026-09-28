@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2844,
+  "fixtureCount": 2883,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -69271,6 +69271,724 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5\u0073ignkey-prod-5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ffbadcafe0b0e5eed5",
+      "expected": [],
+      "note": "A long run of glued keys is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "resend-api-key-positive-bare",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "resend-api-key-positive-dotenv",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RESEND_API_KEY=\u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 51
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-shell-export",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export RESEND_API_KEY=\"\u0072e_Synth3ic_RevokedResendFixtureKey0\"\n",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 59
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-yaml",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  RESEND_API_KEY: \u0072e_Synth3ic_RevokedResendFixtureKey0\n",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 59
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-json-config",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"RESEND_API_KEY\": \"\u0072e_Synth3ic_RevokedResendFixtureKey0\"}",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-json-token-key",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0072e_Synth3ic_RevokedResendFixtureKey0\"}",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 47
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-python-sdk-call",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0072e_Synth3ic_RevokedResendFixtureKey0\")",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 61
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-overlap-bearer-header",
+      "detector": "resend-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0072e_Synth3ic_RevokedResendFixtureKey0\n",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 58
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "resend-api-key-positive-x-api-key-header",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 47
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-curl-bearer",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0072e_Synth3ic_RevokedResendFixtureKey0\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 67
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-tool-call-arguments",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0072e_Synth3ic_RevokedResendFixtureKey0\"}}",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 74
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-chat-sentence",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0072e_Synth3ic_RevokedResendFixtureKey0 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 51
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-log",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0072e_Synth3ic_RevokedResendFixtureKey0 for request 7",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 91
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-positive-punctuation-adjacent",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0072e_Synth3ic_RevokedResendFixtureKey0).",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 37
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "resend-api-key-positive-crlf-unicode-prefix",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0072e_Synth3ic_RevokedResendFixtureKey0\n\r\n",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 60
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "resend-api-key-overlap-context",
+      "detector": "resend-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 49
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "resend-api-key-positive-repeated-value",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic_RevokedResendFixtureKey0 \u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 73
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "resend-api-key-positive-second-sample",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Rev0kedX_SyntheticResendSample2Zq",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "The second-sample shape is reported on its own."
+    },
+    {
+      "id": "resend-api-key-positive-second-sample-dotenv",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RESEND_API_KEY=\u0072e_Rev0kedX_SyntheticResendSample2Zq",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 51
+        }
+      ],
+      "note": "The second-sample shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "resend-api-key-overlap-second-sample-bearer",
+      "detector": "resend-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0072e_Rev0kedX_SyntheticResendSample2Zq\n",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 58
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "resend-api-key-boundary-short-first-segment",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "re_Synth3i_RevokedResendFixtureKey0",
+      "expected": [],
+      "note": "A 7-byte first segment breaks the documented 8/_/24 layout."
+    },
+    {
+      "id": "resend-api-key-boundary-long-first-segment",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3icx_RevokedResendFixtureKey0",
+      "expected": [],
+      "note": "A 9-byte first segment breaks the documented 8/_/24 layout."
+    },
+    {
+      "id": "resend-api-key-boundary-short-second-segment",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic_RevokedResendFixtureKey",
+      "expected": [],
+      "note": "A 23-byte second segment breaks the documented layout."
+    },
+    {
+      "id": "resend-api-key-boundary-long-second-segment",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic_RevokedResendFixtureKey0Z",
+      "expected": [],
+      "note": "A 25-byte second segment breaks the documented layout; it is rejected whole."
+    },
+    {
+      "id": "resend-api-key-boundary-dash-separator",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic-RevokedResendFixtureKey0",
+      "expected": [],
+      "note": "The segments are joined by an underscore."
+    },
+    {
+      "id": "resend-api-key-boundary-second-underscore",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic_RevokedRes_ndFixtureKey0",
+      "expected": [],
+      "note": "Only one underscore separates the segments."
+    },
+    {
+      "id": "resend-api-key-boundary-all-lowercase",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "re_synth3ic_revokedresendfixturekey0",
+      "expected": [],
+      "note": "The mixed-case guard rejects an all-lowercase identifier of the same layout."
+    },
+    {
+      "id": "resend-api-key-boundary-uppercase-prefix",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "RE_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [],
+      "note": "The CLI-enforced prefix is lowercase re_."
+    },
+    {
+      "id": "resend-api-key-boundary-identifier-glue",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "a\u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [],
+      "note": "The re_ inside a wider identifier (are_) is not a prefix."
+    },
+    {
+      "id": "resend-api-key-boundary-underscore-glue",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "expected": [],
+      "note": "A glued underscore before the prefix makes it part of a wider identifier."
+    },
+    {
+      "id": "resend-api-key-boundary-glued-suffix",
+      "detector": "resend-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0072e_Synth3ic_RevokedResendFixtureKey0x",
+      "expected": [],
+      "note": "A byte glued after the key makes it part of a wider identifier."
+    },
+    {
+      "id": "resend-api-key-negative-placeholders",
+      "detector": "resend-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like re_123456789, re_xxxxxxxxx, re_... or re_********* in the docs.",
+      "expected": [],
+      "note": "Placeholders and masks fail the 8/_/24 layout."
+    },
+    {
+      "id": "resend-api-key-negative-python-re-names",
+      "detector": "resend-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "import re\npattern = re_compile(r\"\\d+\")\nre_pattern_cache = {}\n",
+      "expected": [],
+      "note": "Python re_ names fail the layout."
+    },
+    {
+      "id": "resend-api-key-negative-snake-identifier",
+      "detector": "resend-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "def pre_process_all_inputs_now(batch):\n    return batch\n",
+      "expected": [],
+      "note": "A glued re_ inside a snake_case identifier is not a prefix."
+    },
+    {
+      "id": "resend-api-key-negative-shell-reference",
+      "detector": "resend-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RESEND_API_KEY=${RESEND_API_KEY}\n",
+      "expected": [],
+      "note": "A shell reference is not a key."
+    },
+    {
+      "id": "resend-api-key-negative-webhook-secret-mention",
+      "detector": "resend-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Resend webhook signing secrets start with whsec_ instead.",
+      "expected": [],
+      "note": "A webhook-secret mention is a separate family."
+    },
+    {
+      "id": "resend-api-key-positive-sdk-constructor",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const resend = new Resend(\"\u0072e_Synth3ic_RevokedResendFixtureKey0\");",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 63
+        }
+      ],
+      "note": "The SDK constructor argument is reported at exactly the key."
+    },
+    {
+      "id": "resend-api-key-positive-python-module-attribute",
+      "detector": "resend-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "resend.api_key = \"\u0072e_Synth3ic_RevokedResendFixtureKey0\"\n",
+      "expected": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 54
+        }
+      ],
+      "note": "The Python module attribute is reported at exactly the key."
+    },
+    {
+      "id": "resend-api-key-adversarial-long-run",
+      "detector": "resend-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0",
       "expected": [],
       "note": "A long run of glued keys is one wider identifier: no carved-out match, and the scan stays linear and bounded."
     }

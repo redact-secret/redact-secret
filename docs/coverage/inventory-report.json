@@ -5025,12 +5025,65 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "inngest_signing_key"
+    },
+    {
+      "detector": "resend-api-key",
+      "evidence": {
+        "fixtureCount": 39,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "resend-api-key-positive-bare",
+        "resend-api-key-positive-chat-sentence",
+        "resend-api-key-positive-crlf-unicode-prefix",
+        "resend-api-key-positive-curl-bearer",
+        "resend-api-key-positive-dotenv",
+        "resend-api-key-positive-json-config",
+        "resend-api-key-positive-json-token-key",
+        "resend-api-key-positive-log",
+        "resend-api-key-positive-punctuation-adjacent",
+        "resend-api-key-positive-python-module-attribute",
+        "resend-api-key-positive-python-sdk-call",
+        "resend-api-key-positive-repeated-value",
+        "resend-api-key-positive-sdk-constructor",
+        "resend-api-key-positive-second-sample",
+        "resend-api-key-positive-second-sample-dotenv",
+        "resend-api-key-positive-shell-export",
+        "resend-api-key-positive-tool-call-arguments",
+        "resend-api-key-positive-x-api-key-header",
+        "resend-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "resend_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 113,
+    "supported": 114,
     "unresolved": 0
   }
 }
