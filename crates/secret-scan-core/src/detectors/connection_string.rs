@@ -5,7 +5,8 @@
 //! authority avoids classifying host-only and malformed URLs. Standard
 //! MongoDB seed lists and Redis password-only authorities are handled
 //! explicitly; unsupported schemes and placeholder passwords are false
-//! negatives by design. This mirrors `src/detectors/connection-string.ts`
+//! negatives by design. A SQL dialect scheme may carry a `SQLAlchemy` driver
+//! suffix (`postgresql+psycopg://`, issue #935). This mirrors `src/detectors/connection-string.ts`
 //! (`decision-govern-cross-language-conformance`).
 //!
 //! Also recognizes Azure Storage connection strings
@@ -59,10 +60,39 @@ const SCHEMES: [&str; 14] = [
 const MAX_PASSWORD_LENGTH: usize = 4_096;
 const MAX_AUTHORITY_LENGTH: usize = 8_192;
 
+/// SQL dialects that may carry a SQLAlchemy-style driver suffix,
+/// `dialect+driver://` (issue #935): `postgresql+psycopg://`,
+/// `mysql+pymysql://`, `mariadb+mariadbconnector://`. RFC 3986 allows `+` in
+/// a scheme, and the authority grammar after `://` is the dialect's own.
+const DRIVER_SUFFIX_DIALECTS: [&str; 4] = ["postgresql", "postgres", "mysql", "mariadb"];
+
+/// Longest driver name accepted after `+`; `SQLAlchemy`'s driver names are
+/// short lowercase identifiers (`psycopg2`, `asyncpg`, `mysqlconnector`).
+const MAX_DRIVER_LENGTH: usize = 32;
+
 struct SchemeMatch {
     start: usize,
     end: usize,
     scheme: &'static str,
+    driver_suffix: bool,
+}
+
+/// The end of a `+<driver>` suffix starting at `at` (the byte after a
+/// [`DRIVER_SUFFIX_DIALECTS`] name): `+`, then 1 to [`MAX_DRIVER_LENGTH`]
+/// bytes of `[A-Za-z0-9_]`. `None` when there is no such suffix.
+fn driver_suffix_end(bytes: &[u8], at: usize) -> Option<usize> {
+    if bytes.get(at) != Some(&b'+') {
+        return None;
+    }
+    let driver_start = at + 1;
+    let driver_len = bytes[driver_start..]
+        .iter()
+        .take(MAX_DRIVER_LENGTH + 1)
+        .take_while(|&&byte| byte.is_ascii_alphanumeric() || byte == b'_')
+        .count();
+    (1..=MAX_DRIVER_LENGTH)
+        .contains(&driver_len)
+        .then_some(driver_start + driver_len)
 }
 
 /// Finds the next `<scheme>://` occurrence at or after `from`, matching the
@@ -72,15 +102,23 @@ fn find_next_scheme(input: &str, from: usize) -> Option<SchemeMatch> {
     let mut position = from;
     while position <= bytes.len() {
         for scheme in SCHEMES {
-            let end = position + scheme.len() + 3;
-            if end <= bytes.len()
-                && bytes[position..position + scheme.len()].eq_ignore_ascii_case(scheme.as_bytes())
-                && bytes[position + scheme.len()..end] == *b"://"
+            let name_end = position + scheme.len();
+            if name_end > bytes.len()
+                || !bytes[position..name_end].eq_ignore_ascii_case(scheme.as_bytes())
             {
+                continue;
+            }
+            let (separator, driver_suffix) = match driver_suffix_end(bytes, name_end) {
+                Some(driver_end) if DRIVER_SUFFIX_DIALECTS.contains(&scheme) => (driver_end, true),
+                _ => (name_end, false),
+            };
+            let end = separator + 3;
+            if end <= bytes.len() && bytes[separator..end] == *b"://" {
                 return Some(SchemeMatch {
                     start: position,
                     end,
                     scheme,
+                    driver_suffix,
                 });
             }
         }
@@ -653,6 +691,9 @@ impl Detector for ConnectionStringDetector {
             if scheme == "mongodb" && authority.contains(',') {
                 signals.push("mongodb-seed-list");
             }
+            if scheme_match.driver_suffix {
+                signals.push("driver-qualified-scheme");
+            }
 
             if let Some(range) = ByteRange::new(start, end) {
                 candidates.push(
@@ -1102,6 +1143,47 @@ mod tests {
     fn overlong_malformed_authority_is_abandoned_after_a_fixed_bound() {
         let input = format!("postgres://fixture:{}@localhost/db", "%2".repeat(50_000));
         assert_eq!(detect(&input), Vec::new());
+    }
+
+    #[test]
+    fn a_sql_dialect_with_a_driver_suffix_is_detected() {
+        // Issue #935: SQLAlchemy `dialect+driver://` URLs.
+        for input in [
+            "postgresql+psycopg://report:SYNTHETICq8vN3xR7tLm2@db.example.test:5432/reports",
+            "postgresql+psycopg://report:SYNTHETICq8vN3xR7tLm2@[2001:db8::10]:5432/reports",
+            "postgres+asyncpg://report:SYNTHETICq8vN3xR7tLm2@db.example.test/reports",
+            "MYSQL+PyMySQL://report:SYNTHETICq8vN3xR7tLm2@db.example.test/reports",
+            "mariadb+mariadbconnector://report:SYNTHETICq8vN3xR7tLm2@db.example.test/reports",
+            "create_engine(\"mysql+mysql_connector://report:SYNTHETICq8vN3xR7tLm2@db.example.test/r\")",
+        ] {
+            let candidates = detect(input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            let range = candidates[0].range();
+            assert_eq!(&input[range.start()..range.end()], "SYNTHETICq8vN3xR7tLm2");
+            assert!(
+                candidates[0]
+                    .signals()
+                    .iter()
+                    .any(|signal| signal == "driver-qualified-scheme"),
+                "{input}"
+            );
+        }
+        for input in [
+            // A driver on a non-SQL scheme, an empty or over-long driver, a
+            // driver byte outside `[A-Za-z0-9_]`, and a placeholder password.
+            "redis+sentinel://report:SYNTHETICq8vN3xR7tLm2@cache.example.test/0",
+            "https+unix://report:SYNTHETICq8vN3xR7tLm2@www.example.test/",
+            "postgresql+://report:SYNTHETICq8vN3xR7tLm2@db.example.test/reports",
+            &format!(
+                "postgresql+{}://report:SYNTHETICq8vN3xR7tLm2@db.example.test/r",
+                "d".repeat(MAX_DRIVER_LENGTH + 1)
+            ),
+            "postgresql+psy-copg://report:SYNTHETICq8vN3xR7tLm2@db.example.test/reports",
+            "postgresql+psycopg://report:<password>@db.example.test/reports",
+            "postgresql+psycopg://report@db.example.test/reports",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     #[test]

@@ -98,3 +98,37 @@ fn issue_934_real_shaped_twins_stay_redacted() {
         assert_eq!(findings[0].action(), Action::Redact, "{input:?}");
     }
 }
+
+// ---------------------------------------------------------------- #935
+
+#[test]
+fn issue_935_a_driver_qualified_sql_url_password_is_redacted() {
+    let password = synthetic(
+        b"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789",
+        22,
+        9,
+    );
+    for scheme in ["postgresql+psycopg", "postgres+asyncpg", "mysql+pymysql"] {
+        for host in ["db.example.test:5432", "[2001:db8::5]:5432"] {
+            let input = format!(
+                "engine = create_engine(\"{scheme}://report:{password}@{host}/reports\")\n"
+            );
+            let findings = findings_with_parity(&input);
+            assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+            assert_eq!(span(&input, &findings[0]), password);
+            assert_eq!(findings[0].type_name(), "connection_string_password");
+            assert_eq!(findings[0].action(), Action::Redact);
+        }
+    }
+    // Benign twins: no password, a reference password, a driver on an
+    // unsupported scheme.
+    for input in [
+        "engine = create_engine(\"postgresql+psycopg://report@db.example.test/reports\")\n".to_owned(),
+        "engine = create_engine(\"postgresql+psycopg://report:${DB_PASSWORD}@db.example.test/r\")\n"
+            .to_owned(),
+        format!("broker = \"redis+sentinel://report:{password}@cache.example.test/0\"\n"),
+    ] {
+        let findings = findings_with_parity(&input);
+        assert!(findings.is_empty(), "{input:?}: {findings:?}");
+    }
+}

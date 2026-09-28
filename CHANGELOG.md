@@ -127,6 +127,11 @@ evidence is linked from each published version.
   Stripe key or `whsec_` secret whose body is one repeated character
   (`sk_test_` plus a run of `x`). A body one character off the filler is
   still reported.
+- `connection-string` reports the password in a SQLAlchemy
+  `dialect+driver://` URL (#935): `postgresql+psycopg://`,
+  `postgres+asyncpg://`, `mysql+pymysql://` and `mariadb+<driver>://` were
+  missed because the scheme did not match. The driver is 1–32
+  `[A-Za-z0-9_]` bytes; other schemes with a `+` suffix stay unsupported.
 
 ## 0.1.0-beta.10 — 2026-09-28
 
