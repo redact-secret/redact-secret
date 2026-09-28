@@ -31,7 +31,7 @@ Sources (all re-checked 2026-09-28; the full table is in the
 - **Prefix.** NVIDIA docs ("typically start with nvapi-") and the ngcsdk
   CLI constant `SCOPED_KEY_PREFIX = "nvapi-"` with an executing
   `startswith` (R1, R6).
-- **Alphabet and floor, R2.** A provider-authored secret-scan rule in
+- **Alphabet and floor, R2.** A provider-authored secret-scanning rule in
   [NVIDIA-NeMo/nemo-helix `pii_scan.py`](https://github.com/NVIDIA-NeMo/nemo-helix/blob/689f7852611b0151cee2748ca2b68e8e163e3b65/plugins/nemo-agents/src/nemo_agents_plugin/skills/agents-secure/resources/pii_scan.py#L229-L232)
   (added 2026-05-21): `\bnvapi-[A-Za-z0-9_\-]{60,}\b`. A second NVIDIA rule,
   a custom gitleaks block in
