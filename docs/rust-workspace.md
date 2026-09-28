@@ -205,7 +205,16 @@ side-effect free, on top of the dependency boundary above:
   `npm run wasm:build:common` builds `--no-default-features`, linking only
   the `common` ones instead. Each built artifact reports which one it linked
   through a `profile()` export. See
-  [detector profiles](../ARCHITECTURE.md#detector-profiles).
+  [detector profiles](../ARCHITECTURE.md#detector-profiles). A core
+  constructor a `common` build calls must name the `common` registry
+  constructor directly, never dispatch on a runtime `Profile`, or the `full`
+  constructor and every `provider` detector become reachable. The CI
+  `rust-wasm` job builds both release artifacts and runs
+  `node scripts/measure-wasm-profiles.mjs --guard-only`, which fails when
+  `common` is not smaller than `full`, links a `provider` detector
+  implementation, misses a `common` one, or exports a different surface. It
+  reads each detector module's pack from `detectors/mod.rs`, so a new
+  provider module needs no script change (#929).
 
 ### Package contents
 

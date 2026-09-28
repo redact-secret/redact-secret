@@ -22,11 +22,31 @@
  *
  * It exits non-zero, after writing what it measured, when a guard fails:
  * the `common` binary is not smaller than `full`, links a `provider`
- * detector module, or exports a different surface. Usage:
+ * detector implementation, does not link every `common` one, or exports a
+ * different surface. Usage:
  *
  *     npm run js:build   # once; the facade is not profile-sensitive
  *     node scripts/measure-wasm-profiles.mjs --out-dir docs/audits/evidence/381 \
  *       [--scratch-dir <dir>] [--runs 10] [--engine chromium ...]
+ *     node scripts/measure-wasm-profiles.mjs --guard-only [--scratch-dir <dir>]
+ *
+ * `--guard-only` builds both artifacts and checks the guards, and measures
+ * no performance and writes no evidence file; CI runs it (#929).
+ *
+ * Which detector module belongs to which pack is read from the core's
+ * `detectors/mod.rs` (`BUILT_IN_PACKS` and `built_in_detectors()`), so a new
+ * provider module is classified without editing this script. A declared
+ * module that registers no built-in detector (`pattern`, `text`,
+ * `ruleset_adapter`, ...) is shared engine code.
+ *
+ * A module counts as linked when the binary's `name` section carries one of
+ * its `Detector` implementations. Other symbols of a provider module can
+ * appear without its detector: LLVM merges identical functions and keeps
+ * one name for the merged body (a two-line byte predicate in a provider
+ * module can carry the name of the same predicate a `common` detector
+ * calls), and the incremental session's retention rules call a few
+ * provider-specific context helpers in every profile. Those are reported as
+ * `providerHelperModules` and are not a failure.
  *
  * The two builds land in `--scratch-dir` (default `target/wasm-profiles`).
  *
@@ -52,25 +72,57 @@ export const PROFILES = ["full", "common"];
 export const ENGINES = ["chromium", "firefox", "webkit"];
 export const WORKLOADS = ["scale-logs-small-whole", "scale-logs-medium-fixed4096"];
 
-/**
- * The detector modules that implement the `common` pack, by detector id.
- * `scripts/tests/measure-wasm-profiles.test.mjs` pins the ids to the
- * `Pack::Common` rows of `BUILT_IN_PACKS`.
- */
-export const COMMON_PACK_MODULES = {
-  "private-key": "private_key",
-  jwt: "jwt",
-  "bearer-token": "bearer_token",
-  "connection-string": "connection_string",
-  "otpauth-uri": "otpauth",
-  "generic-token": "generic_token",
-};
+const DETECTORS_MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs");
 
 /**
- * Shared lexical helpers under `detectors::` that are engine code, not pack
- * code (the contract's admission rule 4).
+ * The pack of every detector module, read from the core's `detectors/mod.rs`
+ * source text: the modules it declares, the module of each entry of
+ * `built_in_detectors()`, and the pack of the same position in
+ * `BUILT_IN_PACKS` (the core's tests pin both lists to the canonical order).
+ * Returns `{ common, provider, sharedEngine }` as sorted module-name arrays.
+ * Throws when the two lists disagree in length or a module holds detectors
+ * of both packs.
  */
-export const SHARED_ENGINE_MODULES = ["text"];
+export function modulePacks(source) {
+  const declared = [...source.matchAll(/^mod ([a-z0-9_]+);$/gm)].map((match) => match[1]);
+  const imported = Object.fromEntries(
+    [...source.matchAll(/^use ([a-z0-9_]+)::([A-Za-z0-9_]+);$/gm)].map((match) => [match[2], match[1]]),
+  );
+  const list = source.match(/fn built_in_detectors\(\) -> Vec<Box<dyn Detector>> \{\s*vec!\[([\s\S]*?)\n\s*\]\n\}/);
+  const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
+  if (list === null || table === null) throw new Error("detectors/mod.rs: built_in_detectors() or BUILT_IN_PACKS not found");
+  const entries = list[1].split("\n").map((line) => line.trim()).filter((line) => line && !line.startsWith("//"));
+  const modules = entries.map((entry) => {
+    const path = entry.match(/\b([a-z_][a-z0-9_]*)::/);
+    if (path !== null) return path[1];
+    const bare = entry.match(/Box::new\(([A-Za-z0-9_]+)\)/);
+    if (bare !== null && imported[bare[1]] !== undefined) return imported[bare[1]];
+    throw new Error(`detectors/mod.rs: cannot tell the module of built-in entry ${entry}`);
+  });
+  const packs = [...table[1].matchAll(/\("[a-z0-9-]+", Pack::(Common|Provider)\)/g)].map((match) => match[1]);
+  if (modules.length !== packs.length) {
+    throw new Error(`detectors/mod.rs: ${modules.length} built-in detectors but ${packs.length} BUILT_IN_PACKS rows`);
+  }
+  const byModule = new Map();
+  modules.forEach((module, index) => {
+    if (!declared.includes(module)) throw new Error(`detectors/mod.rs: ${module} is not a declared module`);
+    byModule.set(module, new Set([...(byModule.get(module) ?? []), packs[index]]));
+  });
+  for (const [module, set] of byModule) {
+    if (set.size > 1) throw new Error(`detectors/mod.rs: ${module} holds both common and provider detectors`);
+  }
+  const of = (pack) => [...byModule].filter(([, set]) => set.has(pack)).map(([module]) => module).sort();
+  return {
+    common: of("Common"),
+    provider: of("Provider"),
+    sharedEngine: declared.filter((module) => !byModule.has(module)).sort(),
+  };
+}
+
+/** {@link modulePacks} of this checkout's core. */
+export function loadModulePacks() {
+  return modulePacks(readFileSync(DETECTORS_MOD_RS, "utf8"));
+}
 
 function fail(message) {
   console.error(message);
@@ -99,14 +151,28 @@ export function detectorModules(nameSection) {
   return [...modules].sort();
 }
 
-/** Splits linked detector modules into `common`, shared engine, and `provider` code. */
-export function classifyModules(modules) {
-  const common = new Set(Object.values(COMMON_PACK_MODULES));
-  const shared = new Set(SHARED_ENGINE_MODULES);
+/**
+ * Every module with a `<redact_secret::detectors::<module>::<type> as
+ * redact_secret::types::Detector>` method the `name` section mentions: the
+ * modules whose detectors are linked, sorted and unique.
+ */
+export function detectorImplementations(nameSection) {
+  const modules = new Set();
+  const pattern = /<redact_secret\[[0-9a-f]+\]::detectors::([a-z0-9_]+)::[A-Za-z0-9_]+(?:<[^>]*>)? as redact_secret\[[0-9a-f]+\]::types::Detector>::/g;
+  for (const match of nameSection.matchAll(pattern)) modules.add(match[1]);
+  return [...modules].sort();
+}
+
+/** Splits linked detector modules into `common`, shared engine, `provider` and undeclared code. */
+export function classifyModules(modules, packs) {
+  const common = new Set(packs.common);
+  const shared = new Set(packs.sharedEngine);
+  const provider = new Set(packs.provider);
   return {
     common: modules.filter((module) => common.has(module)),
     sharedEngine: modules.filter((module) => shared.has(module)),
-    provider: modules.filter((module) => !common.has(module) && !shared.has(module)),
+    provider: modules.filter((module) => provider.has(module)),
+    undeclared: modules.filter((module) => !common.has(module) && !shared.has(module) && !provider.has(module)),
   };
 }
 
@@ -120,7 +186,7 @@ function sha256(buffer) {
 }
 
 /** Reads one built artifact: sizes, digests, exports, and linked detector modules. */
-function inspectArtifact(profile, directory) {
+function inspectArtifact(profile, directory, packs) {
   const { outName } = DETECTOR_PROFILES[profile];
   const wasm = readFileSync(join(directory, `${outName}_bg.wasm`));
   const glue = readFileSync(join(directory, `${outName}.js`));
@@ -129,7 +195,9 @@ function inspectArtifact(profile, directory) {
   if (nameSections.length !== 1) {
     throw new Error(`${profile}: expected one name section, found ${nameSections.length}`);
   }
-  const modules = detectorModules(Buffer.from(nameSections[0]).toString("latin1"));
+  const nameSection = Buffer.from(nameSections[0]).toString("latin1");
+  const modules = detectorModules(nameSection);
+  const implementations = detectorImplementations(nameSection);
   return {
     sizes: {
       wasmRawBytes: wasm.length,
@@ -144,12 +212,14 @@ function inspectArtifact(profile, directory) {
       .map((entry) => entry.name)
       .sort(),
     detectorModules: modules,
-    classification: classifyModules(modules),
+    classification: classifyModules(modules, packs),
+    detectorImplementations: implementations,
+    implementationClassification: classifyModules(implementations, packs),
   };
 }
 
 /** Every failed guard, as a message. An empty list means every guard held. */
-export function guardFailures(full, common) {
+export function guardFailures(full, common, packs) {
   const failures = [];
   if (common.sizes.wasmRawBytes >= full.sizes.wasmRawBytes) {
     failures.push(
@@ -157,14 +227,19 @@ export function guardFailures(full, common) {
         `(${full.sizes.wasmRawBytes} B): provider code is reachable from the common constructor`,
     );
   }
-  if (common.classification.provider.length > 0) {
-    failures.push(`common links provider detector modules: ${common.classification.provider.join(", ")}`);
+  const linked = common.implementationClassification;
+  if (linked.provider.length > 0) {
+    failures.push(`common links provider detector implementations: ${linked.provider.join(", ")}`);
   }
-  if (full.classification.provider.length === 0) {
-    failures.push("full links no provider detector module: the name-section inventory is not working");
+  for (const [profile, artifact] of [["full", full], ["common", common]]) {
+    const { undeclared } = artifact.implementationClassification;
+    if (undeclared.length > 0) failures.push(`${profile} links detectors of undeclared modules: ${undeclared.join(", ")}`);
   }
-  const expectedCommon = Object.values(COMMON_PACK_MODULES).sort();
-  const linkedCommon = [...common.classification.common].sort();
+  if (full.implementationClassification.provider.length === 0) {
+    failures.push("full links no provider detector implementation: the name-section inventory is not working");
+  }
+  const expectedCommon = [...packs.common].sort();
+  const linkedCommon = [...linked.common].sort();
   if (JSON.stringify(linkedCommon) !== JSON.stringify(expectedCommon)) {
     failures.push(`common links ${linkedCommon.join(", ")}, expected ${expectedCommon.join(", ")}`);
   }
@@ -215,10 +290,14 @@ function toolchain() {
 }
 
 function parseArguments(argv) {
-  const options = { outDir: undefined, scratchDir: undefined, runs: 10, engines: [] };
+  const options = { outDir: undefined, scratchDir: undefined, runs: 10, engines: [], guardOnly: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     const value = argv[index + 1];
+    if (argument === "--guard-only") {
+      options.guardOnly = true;
+      continue;
+    }
     if (argument === "--out-dir") options.outDir = value;
     else if (argument === "--scratch-dir") options.scratchDir = value;
     else if (argument === "--runs") options.runs = Number(value);
@@ -228,7 +307,7 @@ function parseArguments(argv) {
     } else fail(`unknown argument: ${argument}`);
     index += 1;
   }
-  if (options.outDir === undefined) fail("--out-dir is required");
+  if (options.outDir === undefined && !options.guardOnly) fail("--out-dir is required");
   if (!Number.isSafeInteger(options.runs) || options.runs < 2) fail("--runs must be an integer of at least 2");
   if (options.engines.length === 0) options.engines = ["chromium"];
   return options;
@@ -240,10 +319,8 @@ function writeJson(path, value) {
 
 function main() {
   const options = parseArguments(process.argv.slice(2));
-  const outDir = resolve(REPO_ROOT, options.outDir);
-  const rawDir = join(outDir, "raw");
   const scratch = resolve(REPO_ROOT, options.scratchDir ?? DEFAULT_SCRATCH_DIR);
-  mkdirSync(rawDir, { recursive: true });
+  const packs = loadModulePacks();
 
   const source = {
     commit: capture("git", ["rev-parse", "HEAD"]),
@@ -259,9 +336,23 @@ function main() {
       "--detector-profile", profile,
       "--out-dir", directories[profile],
     ]);
-    artifacts[profile] = inspectArtifact(profile, directories[profile]);
+    artifacts[profile] = inspectArtifact(profile, directories[profile], packs);
   }
   const { full, common } = artifacts;
+  const failures = guardFailures(full, common, packs);
+  const summary =
+    `[measure-wasm-profiles] full ${full.sizes.wasmRawBytes} B raw / ${full.sizes.wasmBrotliBytes} B brotli; ` +
+    `common ${common.sizes.wasmRawBytes} B raw / ${common.sizes.wasmBrotliBytes} B brotli; ` +
+    `common detectors: ${common.implementationClassification.common.join(", ")}; ` +
+    `provider helper modules in common: ${common.classification.provider.join(", ") || "none"}`;
+  if (options.guardOnly) {
+    console.log(summary);
+    if (failures.length > 0) fail(`[measure-wasm-profiles] guard failed:\n  ${failures.join("\n  ")}`);
+    return;
+  }
+  const outDir = resolve(REPO_ROOT, options.outDir);
+  const rawDir = join(outDir, "raw");
+  mkdirSync(rawDir, { recursive: true });
 
   const saved = (key) => ({
     bytes: full.sizes[key] - common.sizes[key],
@@ -297,16 +388,18 @@ function main() {
     deltaVersus378Estimate: versus378,
   });
 
-  const failures = guardFailures(full, common);
   writeJson(join(outDir, "build-evidence.json"), {
     source,
     guards: { passed: failures.length === 0, failures },
+    modulePacks: packs,
     profiles: Object.fromEntries(
       PROFILES.map((profile) => [
         profile,
         {
           detectorModules: artifacts[profile].detectorModules,
           classification: artifacts[profile].classification,
+          detectorImplementations: artifacts[profile].detectorImplementations,
+          implementationClassification: artifacts[profile].implementationClassification,
           exports: artifacts[profile].exports,
         },
       ]),
@@ -332,10 +425,7 @@ function main() {
     engines: performance,
   });
 
-  console.log(
-    `[measure-wasm-profiles] full ${full.sizes.wasmRawBytes} B raw / ${full.sizes.wasmBrotliBytes} B brotli; ` +
-      `common ${common.sizes.wasmRawBytes} B raw / ${common.sizes.wasmBrotliBytes} B brotli`,
-  );
+  console.log(summary);
   if (failures.length > 0) fail(`[measure-wasm-profiles] guard failed:\n  ${failures.join("\n  ")}`);
 }
 
