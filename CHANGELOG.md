@@ -53,6 +53,11 @@ evidence is linked from each published version.
   `<name>|<secret>` value whole (#918). The span used to stop at the first
   `:` or `|`, redacting the non-secret left half and leaving the secret right
   half readable in sanitized output.
+- `generic-token` recognizes `FAL_KEY`, `CONVEX_DEPLOY_KEY` and
+  `CONVEX_SELF_HOSTED_ADMIN_KEY` as exact credential names, and fal's
+  `Authorization: Key <id>:<secret>` scheme, reporting the whole value
+  (#919). These produced no finding before, even for a random value. A bare
+  `*_KEY` suffix (`PRIMARY_KEY`, `SORT_KEY`) is still not a credential name.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

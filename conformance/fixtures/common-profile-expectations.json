@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2679,
+  "fixtureCount": 2691,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2683,6 +2683,18 @@
     {"expected":[],"id":"bearer-token-negative-prose-url"},
     {"expected":[],"id":"bearer-token-negative-joined-placeholders"},
     {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":68,"start":22,"type":"bearer_token"}],"id":"bearer-token-positive-placeholder-lead-real-tail"},
-    {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":9006,"start":7,"type":"bearer_token"}],"id":"bearer-token-adversarial-long-join-chain"}
+    {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":9006,"start":7,"type":"bearer_token"}],"id":"bearer-token-adversarial-long-join-chain"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":77,"start":8,"type":"contextual_secret"}],"id":"generic-token-positive-fal-key-dotenv"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":52,"start":16,"type":"contextual_secret"}],"id":"generic-token-positive-fal-key-shell-export"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":76,"start":18,"type":"contextual_secret"}],"id":"generic-token-positive-convex-deploy-key-dotenv"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":111,"start":75,"type":"contextual_secret"}],"id":"generic-token-positive-convex-self-hosted-admin-key-compose"},
+    {"expected":[],"id":"generic-token-negative-primary-key-suffix"},
+    {"expected":[],"id":"generic-token-negative-sort-key-suffix"},
+    {"expected":[],"id":"generic-token-negative-prefixed-fal-key"},
+    {"expected":[],"id":"generic-token-negative-convex-deployment-selector"},
+    {"expected":[],"id":"generic-token-negative-fal-key-placeholder"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":88,"start":19,"type":"authorization_credential"}],"id":"generic-token-positive-authorization-key-scheme"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":105,"start":36,"type":"authorization_credential"}],"id":"generic-token-positive-authorization-key-scheme-curl"},
+    {"expected":[],"id":"generic-token-negative-key-scheme-prose"}
   ]
 }

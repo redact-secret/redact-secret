@@ -2054,10 +2054,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 221,
+        "fixtureCount": 233,
         "hostContextsExercised": [
           "chat",
           "curl",
+          "docker-compose",
           "dotenv",
           "github-actions",
           "http",
@@ -2126,6 +2127,10 @@
         "contextual-positive-template-embedded-still-detected",
         "contextual-positive-template-prefix-only-still-detected",
         "contextual-positive-vals-scheme-prefix-still-detected",
+        "generic-token-positive-convex-deploy-key-dotenv",
+        "generic-token-positive-convex-self-hosted-admin-key-compose",
+        "generic-token-positive-fal-key-dotenv",
+        "generic-token-positive-fal-key-shell-export",
         "generic-token-positive-unquoted-markdown-inline-code",
         "generic-token-regression-arn-prefixed-literal",
         "generic-token-regression-db-pass-name",
@@ -2174,10 +2179,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 221,
+        "fixtureCount": 233,
         "hostContextsExercised": [
           "chat",
           "curl",
+          "docker-compose",
           "dotenv",
           "github-actions",
           "http",
@@ -2214,6 +2220,8 @@
         "authorization-host-shell",
         "authorization-positive-basic",
         "authorization-positive-token-minimum",
+        "generic-token-positive-authorization-key-scheme",
+        "generic-token-positive-authorization-key-scheme-curl",
         "generic-token-regression-mid-line-quoted-basic-header",
         "generic-token-regression-proxy-authorization-basic"
       ],
@@ -2222,6 +2230,7 @@
         {
           "evidenceFixtureIds": [
             "authorization-positive-basic",
+            "generic-token-positive-authorization-key-scheme-curl",
             "generic-token-regression-mid-line-quoted-basic-header",
             "generic-token-regression-proxy-authorization-basic"
           ],
@@ -2231,6 +2240,8 @@
         {
           "evidenceFixtureIds": [
             "authorization-positive-token-minimum",
+            "generic-token-positive-authorization-key-scheme",
+            "generic-token-positive-authorization-key-scheme-curl",
             "generic-token-regression-mid-line-quoted-basic-header",
             "generic-token-regression-proxy-authorization-basic"
           ],
@@ -2244,10 +2255,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 221,
+        "fixtureCount": 233,
         "hostContextsExercised": [
           "chat",
           "curl",
+          "docker-compose",
           "dotenv",
           "github-actions",
           "http",

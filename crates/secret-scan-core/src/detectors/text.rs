@@ -201,15 +201,19 @@ const PLACEHOLDER_CREDENTIAL_WORDS: &[&str] = &[
 /// `replace-with-your-mistral-key`). A closed list of the AI-inference and
 /// developer-credential providers the built-in detectors name, not a
 /// vocabulary: a provider outside it (`YOUR_MAILCHIMP_API_KEY`) is one word
-/// off the lists and stays detected. Issue #774.
+/// off the lists and stays detected. Issue #774; `convex` and `fal` were
+/// added with their exact credential names in issue #919
+/// (`FAL_KEY=your_fal_key`).
 const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
     "ai",
     "ai21",
     "anthropic",
     "cohere",
+    "convex",
     "deepgram",
     "deepseek",
     "elevenlabs",
+    "fal",
     "fireworks",
     "gemini",
     "groq",

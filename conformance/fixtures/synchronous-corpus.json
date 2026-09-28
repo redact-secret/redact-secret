@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2679,
+  "fixtureCount": 2691,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -66126,6 +66126,216 @@
         }
       ],
       "note": "Issue #918: a long chain of joins is read once, left to right, and stays linear."
+    },
+    {
+      "id": "generic-token-positive-fal-key-dotenv",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FAL_KEY=5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 77
+        }
+      ],
+      "note": "Issue #919: FAL_KEY is an exact high-signal name; the colon-joined value is reported whole."
+    },
+    {
+      "id": "generic-token-positive-fal-key-shell-export",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export FAL_KEY=\"SYNTHETICrevokedNEUTRALvalue0042xyzw\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 52
+        }
+      ],
+      "note": "Issue #919: the name alone is enough; a neutral random value under FAL_KEY is reported."
+    },
+    {
+      "id": "generic-token-positive-convex-deploy-key-dotenv",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:happy-otter-123|01SYNTHETICrevokedCONVEXdeployKEY0042\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 18,
+          "end": 76
+        }
+      ],
+      "note": "Issue #919: CONVEX_DEPLOY_KEY is an exact high-signal name."
+    },
+    {
+      "id": "generic-token-positive-convex-self-hosted-admin-key-compose",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "docker-compose"
+      ],
+      "input": "services:\n  backend:\n    environment:\n      CONVEX_SELF_HOSTED_ADMIN_KEY: \"SYNTHETICrevokedNEUTRALvalue0042xyzw\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 75,
+          "end": 111
+        }
+      ],
+      "note": "Issue #919: CONVEX_SELF_HOSTED_ADMIN_KEY is an exact high-signal name in a Compose environment block."
+    },
+    {
+      "id": "generic-token-negative-primary-key-suffix",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PRIMARY_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw\n",
+      "expected": [],
+      "note": "Issue #919 control: a bare *_KEY suffix is not a name token; only the exact provider names were added."
+    },
+    {
+      "id": "generic-token-negative-sort-key-suffix",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SORT_KEY=name\nCACHE_KEY=user:42:profile\n",
+      "expected": [],
+      "note": "Issue #919 control: sort and cache keys hold non-secrets."
+    },
+    {
+      "id": "generic-token-negative-prefixed-fal-key",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "APP_FAL_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw\n",
+      "expected": [],
+      "note": "Issue #919 control: the provider names match only as the whole name, never behind a prefix."
+    },
+    {
+      "id": "generic-token-negative-convex-deployment-selector",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOYMENT=dev:happy-otter-123\n",
+      "expected": [],
+      "note": "Issue #919 control: the public deployment selector is not a credential name."
+    },
+    {
+      "id": "generic-token-negative-fal-key-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FAL_KEY=your_fal_key\n",
+      "expected": [],
+      "note": "Issue #919 control: an instructional placeholder naming fal is excluded."
+    },
+    {
+      "id": "generic-token-positive-authorization-key-scheme",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Key 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 19,
+          "end": 88
+        }
+      ],
+      "note": "Issue #919: fal's Authorization: Key scheme is an authorization credential; the colon-joined value is reported whole."
+    },
+    {
+      "id": "generic-token-positive-authorization-key-scheme-curl",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -X POST -H \"Authorization: Key 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42\" https://example.invalid/run",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 36,
+          "end": 105
+        }
+      ],
+      "note": "Issue #919: a mid-line Key header in a quoted curl argument is taken like a mid-line Basic header."
+    },
+    {
+      "id": "generic-token-negative-key-scheme-prose",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The Key to authorization is rotation.\nAuthorization: Key rotation\n",
+      "expected": [],
+      "note": "Issue #919 control: Key as prose, or a short scheme value, is not a credential."
     }
   ]
 }

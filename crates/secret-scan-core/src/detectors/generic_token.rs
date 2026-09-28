@@ -1,4 +1,4 @@
-//! Contextual assignment, structural `Basic`/`Token` authorization, and a
+//! Contextual assignment, structural `Basic`/`Token`/`Key` authorization, and a
 //! bare vendor-prefixed high-entropy policy layer.
 //!
 //! Combines explicit credential names or authorization syntax with bounded
@@ -43,7 +43,20 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// (`render_pass`, `first_pass`, `second_pass`), but `db_pass` is the
 /// conventional database password variable (`DB_PASS`, `dbPass`). A
 /// further-prefixed `app_db_pass` is not matched (issue #823).
-const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["db_pass"];
+///
+/// Issue #919 adds three provider credential variables whose only
+/// distinguishing segment is a bare `_key` suffix, which is deliberately not
+/// a name token (`sort_key`, `cache_key`, `primary_key`, `partition_key` and
+/// `idempotency_key` hold non-secrets): `fal_key` (fal's documented and only
+/// credential variable, `FAL_KEY`), and Convex's `convex_deploy_key` and
+/// `convex_self_hosted_admin_key`. Only these whole names match; `fal_key_id`
+/// (the public id half), `convex_key` and `my_fal_key` do not.
+const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "db_pass",
+    "fal_key",
+    "convex_deploy_key",
+    "convex_self_hosted_admin_key",
+];
 
 const AMBIGUOUS_NAMES: &[&str] = &[
     "auth",
@@ -2117,7 +2130,7 @@ fn call_argument_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-// --- `AUTHORIZATION_PATTERN`: (?:^|[\r\n])[ \t]*authorization[ \t]*:[ \t]*(basic|token)[ \t]+([A-Za-z0-9+/=_-]{12,}) ---
+// --- `AUTHORIZATION_PATTERN`: (?:^|[\r\n])[ \t]*authorization[ \t]*:[ \t]*(basic|token|key)[ \t]+([A-Za-z0-9+/=_-]{12,}) ---
 
 fn is_space_or_tab_byte(byte: u8) -> bool {
     byte == b' ' || byte == b'\t'
@@ -2125,6 +2138,14 @@ fn is_space_or_tab_byte(byte: u8) -> bool {
 
 fn is_authorization_value_byte(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || matches!(byte, b'+' | b'/' | b'=' | b'_' | b'-')
+}
+
+/// A `Key` scheme value byte: the authorization alphabet plus `:`, because
+/// fal's documented `Authorization: Key <key_id>:<key_secret>` joins its two
+/// halves with a colon (issue #919). Ending the value at the colon would
+/// redact the public id half and leave the secret half readable.
+fn is_key_scheme_value_byte(byte: u8) -> bool {
+    is_authorization_value_byte(byte) || byte == b':'
 }
 
 struct AuthorizationMatch {
@@ -2165,6 +2186,10 @@ fn parse_authorization_from(input: &str, start: usize) -> Option<AuthorizationMa
     } else if starts_with_ci(input, cursor, "token") {
         cursor += "token".len();
         "token"
+    } else if starts_with_ci(input, cursor, "key") {
+        // fal's scheme (issue #919): `Authorization: Key <id>:<secret>`.
+        cursor += "key".len();
+        "key"
     } else {
         return None;
     };
@@ -2174,7 +2199,15 @@ fn parse_authorization_from(input: &str, start: usize) -> Option<AuthorizationMa
         return None;
     }
     let value_start = cursor + ws_len;
-    let value_len = ascii_run_len(bytes, value_start, is_authorization_value_byte);
+    let mut value_len = if scheme == "key" {
+        ascii_run_len(bytes, value_start, is_key_scheme_value_byte)
+    } else {
+        ascii_run_len(bytes, value_start, is_authorization_value_byte)
+    };
+    // A trailing colon joins nothing (`Key <value>: prose`).
+    while value_len > 0 && bytes[value_start + value_len - 1] == b':' {
+        value_len -= 1;
+    }
     if value_len < MIN_AUTHORIZATION_VALUE_LENGTH {
         return None;
     }
@@ -2201,6 +2234,8 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
         // mid-line `Authorization: token ...` is the header provider
         // detectors (`travisci-api-token`, `github-token`) key on, and an
         // always-redact generic candidate would take the span from them.
+        // `Key` is taken mid-line too (issue #919): fal documents it in a
+        // curl `-H` argument, and no provider detector keys on it.
         Some(ch)
             if matches!(ch, 'a' | 'A' | 'p' | 'P')
                 && prev_char(input, pos).is_some_and(|previous| {
@@ -2208,7 +2243,7 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
                         && !matches!(previous, '_' | '-' | '\r' | '\n')
                 }) =>
         {
-            parse_authorization_from(input, pos).filter(|m| m.scheme == "basic")
+            parse_authorization_from(input, pos).filter(|m| matches!(m.scheme, "basic" | "key"))
         }
         _ => None,
     }
@@ -2329,7 +2364,7 @@ impl Detector for GenericTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = assignment_candidates(input, &self.names);
-        // Authorization-scheme matching (`Basic`/`Token`) and the bare
+        // Authorization-scheme matching (`Basic`/`Token`/`Key`) and the bare
         // vendor-prefixed policy layer have nothing to do with names, so
         // only the built-in instance runs them — the ruleset names
         // extension would otherwise duplicate the built-in's own candidates
@@ -3060,6 +3095,104 @@ mod tests {
             detect("db_password=SYNTHETIC_REVOKED_DB_PASS_VALUE").len(),
             1
         );
+    }
+
+    #[test]
+    fn fal_and_convex_credential_variables_are_exact_high_signal_names() {
+        // Issue #919: a bare `_key` suffix is not a name token, so these
+        // provider variables produced no finding at all.
+        const FAL: &str = "5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42";
+        const CONVEX: &str = "prod:happy-otter-123|01SYNTHETICrevokedCONVEXdeployKEY0042";
+        for (input, value) in [
+            (format!("FAL_KEY={FAL}"), FAL),
+            (format!("export FAL_KEY=\"{FAL}\""), FAL),
+            (format!("falKey: '{FAL}'"), FAL),
+            (format!("{{\"FAL_KEY\": \"{FAL}\"}}"), FAL),
+            (format!("CONVEX_DEPLOY_KEY={CONVEX}"), CONVEX),
+            (format!("CONVEX_SELF_HOSTED_ADMIN_KEY={CONVEX}"), CONVEX),
+            (
+                format!("  CONVEX_SELF_HOSTED_ADMIN_KEY: \"{CONVEX}\""),
+                CONVEX,
+            ),
+            (
+                "FAL_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw".to_owned(),
+                "SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            ),
+        ] {
+            let candidates = detect(&input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+            assert_eq!(candidates[0].type_name(), "contextual_secret");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+        }
+    }
+
+    #[test]
+    fn a_bare_key_suffix_stays_outside_the_vocabulary() {
+        // Issue #919 benign twins: only the three whole names were added.
+        for input in [
+            "PRIMARY_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "SORT_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "CACHE_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "PARTITION_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "IDEMPOTENCY_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "CONVEX_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "MY_FAL_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "FAL_KEY_ID=5e7c0ded-feed-4bad-9ace-0ddba11c0de5",
+            "CONVEX_DEPLOYMENT=dev:happy-otter-123",
+            "FAL_KEY=${FAL_KEY}",
+            "FAL_KEY=your_fal_key",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn the_key_authorization_scheme_is_detected_whole() {
+        // Issue #919: fal's `Authorization: Key <id>:<secret>`.
+        const FAL: &str = "5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42";
+        for input in [
+            format!("Authorization: Key {FAL}"),
+            format!("authorization: key {FAL}\r\n"),
+            format!("curl -H \"Authorization: Key {FAL}\" https://example.invalid/run"),
+            format!("{{\"headers\":{{\"Authorization\":\"Key {FAL}\"}}}}"),
+            format!("Proxy-Authorization: Key {FAL}"),
+            format!("Authorization: Key {FAL}: sent"),
+        ] {
+            let candidates: Vec<Candidate> = detect(&input)
+                .into_iter()
+                .filter(|candidate| candidate.type_name() == "authorization_credential")
+                .collect();
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], FAL, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+            assert!(
+                candidates[0]
+                    .signals()
+                    .iter()
+                    .any(|signal| signal == "authorization-key-scheme")
+            );
+        }
+    }
+
+    #[test]
+    fn key_as_prose_or_a_short_value_is_not_an_authorization_scheme() {
+        for input in [
+            "The Key to authorization is a signed request.",
+            "Authorization: Key rotation",
+            "authorization: keyring SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "Authorization: Key $FAL_KEY",
+            "Authorization: Key ${FAL_KEY}",
+            "X-Authorization: Key 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff",
+            "notAuthorization: Key 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff",
+        ] {
+            assert!(
+                detect(input)
+                    .iter()
+                    .all(|candidate| candidate.type_name() != "authorization_credential"),
+                "{input}"
+            );
+        }
     }
 
     #[test]

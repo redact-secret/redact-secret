@@ -123,3 +123,75 @@ mod bearer_joined_value {
         assert_partition_parity(&format!("Authorization: Bearer {}\n", name_secret()));
     }
 }
+
+mod generic_names_and_key_scheme {
+    use super::*;
+
+    const NEUTRAL: &str = "SYNTHETICrevokedNEUTRALvalue0042xyzw";
+
+    #[test]
+    fn exact_provider_names_yield_a_high_contextual_finding_at_the_whole_value() {
+        let convex = "prod:happy-otter-123|01SYNTHETICrevokedCONVEXdeployKEY0042";
+        for (name, value) in [
+            ("FAL_KEY", id_secret()),
+            ("FAL_KEY", NEUTRAL.to_owned()),
+            ("CONVEX_DEPLOY_KEY", convex.to_owned()),
+            ("CONVEX_SELF_HOSTED_ADMIN_KEY", convex.to_owned()),
+        ] {
+            for input in [
+                format!("{name}={value}\n"),
+                format!("export {name}=\"{value}\"\n"),
+                format!("env:\n  {name}: {value}\n"),
+            ] {
+                assert_whole_value(&input, &value, "generic-token", "contextual_secret");
+            }
+        }
+    }
+
+    #[test]
+    fn a_bare_key_suffix_is_not_broadened() {
+        for name in [
+            "PRIMARY_KEY",
+            "SORT_KEY",
+            "CACHE_KEY",
+            "PARTITION_KEY",
+            "IDEMPOTENCY_KEY",
+            "CONVEX_KEY",
+            "APP_FAL_KEY",
+        ] {
+            let input = format!("{name}={NEUTRAL}\n");
+            let (_, findings) = whole_input(&input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+        for input in [
+            "PRIMARY_KEY=id\n",
+            "SORT_KEY=name\n",
+            "CONVEX_DEPLOYMENT=dev:happy-otter-123\n",
+            "FAL_KEY=your_fal_key\n",
+            "FAL_KEY=${FAL_KEY}\n",
+            "The Key to good authorization is rotation.\n",
+            "Authorization: Key rotation\n",
+        ] {
+            let (_, findings) = whole_input(input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+    }
+
+    #[test]
+    fn the_key_scheme_is_redacted_whole() {
+        let value = id_secret();
+        for input in [
+            format!("Authorization: Key {value}\n"),
+            format!("curl -H \"Authorization: Key {value}\" https://example.invalid/run\n"),
+            format!("{{\"headers\": {{\"Authorization\": \"Key {value}\"}}}}"),
+        ] {
+            assert_whole_value(&input, &value, "generic-token", "authorization_credential");
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("FAL_KEY={}\n", id_secret()));
+        assert_partition_parity(&format!("Authorization: Key {}\n", id_secret()));
+    }
+}
