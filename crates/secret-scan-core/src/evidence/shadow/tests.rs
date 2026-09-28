@@ -353,7 +353,7 @@ fn a_statistical_comparison_renders_to_one_fixed_line() {
     assert_eq!(
         shadow_evaluation_jsonl("case-1", &input, &registry()),
         format!(
-            "{{\"record\":\"shadow-comparison\",\"input\":\"case-1\",\"finding\":\"finding-1\",\"start\":8,\"end\":40,\"byteLength\":32,\"detector\":\"generic-token\",\"type\":\"contextual_secret\",\"specificity\":\"contextual\",\"legacyConfidence\":\"{confidence}\",\"legacyAction\":\"{action}\",\"authority\":\"statistical\",\"model\":\"evidence-aggregation/v2\",\"featureSchema\":\"evidence-features/v1\",\"contextClass\":\"credential-name\",\"exclusion\":null,\"groups\":{{\"randomness\":30,\"lexical\":0,\"contextual\":50,\"validation\":0,\"negative\":0}},\"signals\":[{{\"group\":\"randomness\",\"signal\":\"shannon_entropy_q16\",\"points\":30}},{{\"group\":\"contextual\",\"signal\":\"credential-context\",\"points\":50}},{{\"group\":\"negative\",\"signal\":\"strict-exclusion\",\"points\":0}}],\"positive\":80,\"negative\":0,\"score\":80,\"band\":\"high\",\"promotion\":\"{promotion}\",\"reasons\":[\"credential-context\",\"randomness-capped\"]}}\n"
+            "{{\"record\":\"shadow-comparison\",\"input\":\"case-1\",\"finding\":\"finding-1\",\"start\":8,\"end\":40,\"byteLength\":32,\"detector\":\"generic-token\",\"type\":\"contextual_secret\",\"specificity\":\"contextual\",\"legacyConfidence\":\"{confidence}\",\"legacyAction\":\"{action}\",\"authority\":\"statistical\",\"model\":\"evidence-aggregation/v3\",\"featureSchema\":\"evidence-features/v2\",\"contextClass\":\"credential-name\",\"exclusion\":null,\"groups\":{{\"randomness\":30,\"lexical\":0,\"contextual\":50,\"validation\":0,\"negative\":0}},\"signals\":[{{\"group\":\"randomness\",\"signal\":\"residual_entropy_q16\",\"points\":30}},{{\"group\":\"contextual\",\"signal\":\"credential-context\",\"points\":50}},{{\"group\":\"negative\",\"signal\":\"strict-exclusion\",\"points\":0}}],\"positive\":80,\"negative\":0,\"score\":80,\"band\":\"high\",\"promotion\":\"{promotion}\",\"reasons\":[\"credential-context\",\"randomness-capped\"]}}\n"
         )
     );
 }
@@ -363,7 +363,7 @@ fn a_deterministic_comparison_renders_without_scorer_fields() {
     let input = format!("token={GITHUB_TOKEN}");
     assert_eq!(
         shadow_evaluation_jsonl("case-2", &input, &registry()),
-        "{\"record\":\"shadow-comparison\",\"input\":\"case-2\",\"finding\":\"finding-1\",\"start\":6,\"end\":46,\"byteLength\":40,\"detector\":\"github-token\",\"type\":\"github_token\",\"specificity\":\"provider\",\"legacyConfidence\":\"high\",\"legacyAction\":\"redact\",\"authority\":\"deterministic\",\"model\":\"evidence-aggregation/v2\",\"featureSchema\":\"evidence-features/v1\",\"contextClass\":null,\"exclusion\":null,\"groups\":null,\"signals\":[],\"score\":null,\"band\":\"high\",\"promotion\":\"preserve\",\"reasons\":[\"deterministic-authority\"]}\n"
+        "{\"record\":\"shadow-comparison\",\"input\":\"case-2\",\"finding\":\"finding-1\",\"start\":6,\"end\":46,\"byteLength\":40,\"detector\":\"github-token\",\"type\":\"github_token\",\"specificity\":\"provider\",\"legacyConfidence\":\"high\",\"legacyAction\":\"redact\",\"authority\":\"deterministic\",\"model\":\"evidence-aggregation/v3\",\"featureSchema\":\"evidence-features/v2\",\"contextClass\":null,\"exclusion\":null,\"groups\":null,\"signals\":[],\"score\":null,\"band\":\"high\",\"promotion\":\"preserve\",\"reasons\":[\"deterministic-authority\"]}\n"
     );
 }
 

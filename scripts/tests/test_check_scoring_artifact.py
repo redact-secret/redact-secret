@@ -59,28 +59,28 @@ class RepositoryArtifact(unittest.TestCase):
 
     def test_the_manifest_binds_the_current_identities(self) -> None:
         model = ARTIFACT["model"]
-        self.assertEqual(model["aggregation"]["id"], "evidence-aggregation/v2")
-        self.assertEqual(model["featureSchema"]["id"], "evidence-features/v1")
-        self.assertEqual(ARTIFACT["artifact"]["revision"], 4)
+        self.assertEqual(model["aggregation"]["id"], "evidence-aggregation/v3")
+        self.assertEqual(model["featureSchema"]["id"], "evidence-features/v2")
+        self.assertEqual(ARTIFACT["artifact"]["revision"], 5)
         self.assertEqual(
             ARTIFACT["modelFingerprint"],
-            "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
+            "db9fe32e29e52fc9f85713cfb986b6675b57afca6acf062734ada5c69e0162c4",
         )
         self.assertEqual(
             ARTIFACT["calibration"]["featureDataset"]["datasetHash"],
-            "4ea0a82f61b719b4611f8e7e2caafd01edda5b5dfa7c2691bffd6ac17d0e199c",
+            "2241d655096403d7f6a2b16201c2d4614bb39d2520a75734ec9958941cde172d",
         )
         self.assertEqual(
             ARTIFACT["calibration"]["selection"]["sourceHash"],
-            "23683daf5738b9cf3de583ade589f06677cfb2bcf581bff38e889b1eddae9509",
+            "b906f0c17a18e7533cd477e1815d169ae0d2fdc81f112a61020449cfb7c9c056",
         )
         self.assertEqual(
             ARTIFACT["calibration"]["scoring"]["identity"],
-            "838aa57db8e2331c8540a42da823ffda8802d681952f4dc7af20e6001c5693a2",
+            "8ac80470de3b218cb44459dfefea3594bedf191ecec399797a4ce26e8e223962",
         )
         self.assertEqual(
             ARTIFACT["calibration"]["commit"],
-            "e18efa2d0802c030925b9306a5dca33057185936",
+            "5823751c16df4776035f5a0bd6f9640f8013a6a7",
         )
         self.assertEqual(ARTIFACT["tuningManifest"]["status"], "pending")
         self.assertIsNone(ARTIFACT["tuningManifest"]["hash"])
@@ -89,6 +89,7 @@ class RepositoryArtifact(unittest.TestCase):
         ids = {item["id"] for item in ARTIFACT["knownLimitations"]}
         self.assertIn("validation-cap-placeholder", ids)
         self.assertIn("poor-generalization", ids)
+        self.assertIn("q4-structural-at-this-operating-point", ids)
 
 
 class Schema(unittest.TestCase):
@@ -187,14 +188,14 @@ class BaseComparison(unittest.TestCase):
         self.assertTrue(any("append-only" in error for error in errors), errors)
 
     def test_a_changed_constant_with_a_new_model_identity_passes(self) -> None:
-        head = mutated_model(ARTIFACT, new_id="evidence-aggregation/v3")
+        head = mutated_model(ARTIFACT, new_id="evidence-aggregation/v4")
         self.assertEqual(check.check_ledger(head), [])
         self.assertEqual(check.compare_with_base(ARTIFACT, head), [])
 
     def test_changed_feature_semantics_need_a_new_feature_schema_identity(self) -> None:
         head = copy.deepcopy(ARTIFACT)
         head["model"]["featureSchema"]["maxAnalysedChars"] = 512
-        head["model"]["aggregation"]["id"] = "evidence-aggregation/v2"
+        head["model"]["aggregation"]["id"] = "evidence-aggregation/v4"
         head["artifact"]["revision"] += 1
         errors = check.compare_with_base(ARTIFACT, head)
         self.assertTrue(any("feature schema identity" in error for error in errors), errors)

@@ -64,16 +64,20 @@ fn golden_values_match_the_independent_reference() {
 }
 
 #[test]
-fn names_follow_the_v1_vector_in_order() {
+fn the_v2_vector_appends_the_residual_features_after_v1() {
     assert_eq!(
         extract_residual_features("abc")
             .to_vector()
             .map(|(name, _)| name),
         RESIDUAL_FEATURE_NAMES
     );
-    let v1 = extract_features("abc").to_vector();
-    for name in RESIDUAL_FEATURE_NAMES {
-        assert!(v1.iter().all(|(existing, _)| *existing != name), "{name}");
+    for (input, _) in GOLDEN {
+        let vector = extract_features(input).to_vector();
+        assert_eq!(
+            vector[27..],
+            extract_residual_features(input).to_vector(),
+            "input {input:?}"
+        );
     }
 }
 

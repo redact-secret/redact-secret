@@ -91,8 +91,8 @@ fn candidates(input: &str) -> Vec<(Candidate, &str)> {
         .collect()
 }
 
-/// 20 distinct symbols, each once: Shannon entropy `log2(20)`, between the
-/// randomness ramp's ends.
+/// 20 distinct symbols, each once, no step or copy: residual entropy
+/// `log2(20)`, which earns randomness points but alone stays below `low`.
 const AMBIGUOUS_VALUE: &str = "k3Z9pQ7vW2mX8nR4tL6y";
 /// 32 distinct symbols: Shannon entropy 5 bits, above the ramp's top.
 const RANDOM_VALUE: &str = "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa";
@@ -118,6 +118,10 @@ fn the_product_model_satisfies_the_contract_invariants() {
         FEATURE_NAMES[SHANNON_ENTROPY_FEATURE],
         "shannon_entropy_q16"
     );
+    assert_eq!(
+        FEATURE_NAMES[RESIDUAL_ENTROPY_FEATURE],
+        "residual_entropy_q16"
+    );
     assert_eq!(FEATURE_NAMES[MIN_ENTROPY_FEATURE], "min_entropy_q16");
     assert_eq!(
         FEATURE_NAMES[ALPHABET_EFFICIENCY_FEATURE],
@@ -131,11 +135,11 @@ fn the_product_model_satisfies_the_contract_invariants() {
 
 #[test]
 fn the_product_model_is_the_calibrated_selection() {
-    // redact-secret-benchmarks#300 (PR #330,
-    // e18efa2d0802c030925b9306a5dca33057185936). Changing any value
+    // #829, redact-secret-benchmarks PR #437
+    // (5823751c16df4776035f5a0bd6f9640f8013a6a7). Changing any value
     // here is a new model identity (ADR section 10).
     let model = SHADOW_MODEL;
-    assert_eq!(model.id, "evidence-aggregation/v2");
+    assert_eq!(model.id, "evidence-aggregation/v3");
     let caps = model
         .groups
         .map(|config| (config.group.as_str(), config.cap));
@@ -152,9 +156,9 @@ fn the_product_model_is_the_calibrated_selection() {
     assert_eq!(
         model.groups[0].signals,
         [SignalRule::FeatureRamp {
-            feature: SHANNON_ENTROPY_FEATURE,
-            lo: 226_998,
-            hi: 265_935,
+            feature: RESIDUAL_ENTROPY_FEATURE,
+            lo: 234_123,
+            hi: 263_562,
             max: 30,
         }]
     );
@@ -408,6 +412,60 @@ fn context_plus_randomness_strengthens_an_ambiguous_candidate() {
     );
 }
 
+/// The Shannon-entropy ramp `evidence-aggregation/v2` used, for contrast.
+const V2_RANDOMNESS: [SignalRule; 1] = [SignalRule::FeatureRamp {
+    feature: SHANNON_ENTROPY_FEATURE,
+    lo: 226_998,
+    hi: 265_935,
+    max: 30,
+}];
+
+#[test]
+fn benign_periodic_and_sequence_values_no_longer_reach_high_in_context() {
+    // #829: under the v2 Shannon ramp these values in a credential-bearing
+    // context reached `high`; the residual entropy leaves them at the
+    // `medium` that context alone proposes.
+    let v2 = with_randomness(&V2_RANDOMNESS, 30);
+    for benign in [
+        "abcdefghijklmnopqrstuvwxyz",
+        "0123456789abcdef0123456789abcdef",
+        "ZYXWVUTSRQPONMLKJIHGFEDCBA",
+        "aAbBcCdDeEfFgGhHiIjJkKlL",
+    ] {
+        let context = ContextClass::CredentialName;
+        assert_eq!(
+            aggregate(&v2, &inputs(benign, context)).band,
+            ShadowBand::High,
+            "{benign}"
+        );
+        let v3 = statistical(benign, context);
+        assert_eq!(v3.band, ShadowBand::Medium, "{benign}");
+        assert_eq!(
+            v3.groups[EvidenceGroup::Randomness as usize].contribution,
+            0
+        );
+    }
+}
+
+#[test]
+fn inserted_repetition_does_not_lower_random_material_in_context() {
+    // #829: runs of one symbol inserted into random material in a
+    // credential-bearing context keep it at `high`.
+    for seed in 1_u64..=40 {
+        let body = synthetic(seed, 32);
+        let symbols: Vec<char> = body.chars().collect();
+        let mut reshaped = String::new();
+        for chunk in symbols.chunks(4) {
+            reshaped.extend(chunk);
+            reshaped.push_str("zzzz");
+        }
+        let original = statistical(&body, ContextClass::CredentialName);
+        let after = statistical(&reshaped, ContextClass::CredentialName);
+        assert_eq!(original.band, ShadowBand::High, "{seed}");
+        assert_eq!(after.band, ShadowBand::High, "{seed}");
+    }
+}
+
 #[test]
 fn a_real_contextual_candidate_is_strengthened_through_its_detector_signals() {
     let input = format!("API_KEY={AMBIGUOUS_VALUE}");
@@ -572,7 +630,7 @@ fn raising_a_positive_signal_never_lowers_the_score() {
     let mut previous = 0;
     for entropy in (0..=400_000).step_by(997) {
         let mut raised = base;
-        raised.features.shannon_entropy_q16 = entropy;
+        raised.features.residual.entropy_q16 = entropy;
         let score = aggregate(&SHADOW_MODEL, &raised).score;
         assert!(score >= previous, "{entropy}");
         previous = score;
@@ -666,7 +724,7 @@ fn explanations_carry_no_part_of_the_value() {
     assert_eq!(
         signals,
         [
-            "shannon_entropy_q16",
+            "residual_entropy_q16",
             "credential-context",
             "strict-exclusion"
         ]

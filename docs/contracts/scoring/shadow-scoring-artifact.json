@@ -3,7 +3,7 @@
   "format": "redact-secret/shadow-scoring-artifact/1",
   "artifact": {
     "id": "redact-secret/shadow-scoring-artifact",
-    "revision": 4
+    "revision": 5
   },
   "status": "reviewed",
   "contract": {
@@ -24,25 +24,25 @@
   },
   "model": {
     "featureSchema": {
-      "id": "evidence-features/v1",
+      "id": "evidence-features/v2",
       "maxAnalysedChars": 256,
       "maxAutocorrelationLag": 32,
       "fixedPointFractionBits": 16,
-      "features": ["byte_len", "analysed_chars", "truncated", "distinct_symbols", "max_symbol_count", "shannon_entropy_q16", "min_entropy_q16", "information_bits_q16", "class_lower", "class_upper", "class_digit", "class_symbol", "class_space_control", "class_non_ascii", "class_count", "class_transitions", "class_alphabet_size", "entropy_efficiency_permille", "alphabet_efficiency_permille", "distinct_ratio_permille", "length_permille", "longest_run", "adjacent_repeat_permille", "repeated_bigram_permille", "smallest_period", "max_autocorrelation_permille", "max_autocorrelation_lag"],
+      "features": ["byte_len", "analysed_chars", "truncated", "distinct_symbols", "max_symbol_count", "shannon_entropy_q16", "min_entropy_q16", "information_bits_q16", "class_lower", "class_upper", "class_digit", "class_symbol", "class_space_control", "class_non_ascii", "class_count", "class_transitions", "class_alphabet_size", "entropy_efficiency_permille", "alphabet_efficiency_permille", "distinct_ratio_permille", "length_permille", "longest_run", "adjacent_repeat_permille", "repeated_bigram_permille", "smallest_period", "max_autocorrelation_permille", "max_autocorrelation_lag", "residual_symbols", "residual_entropy_q16", "residual_min_entropy_q16"],
       "goldenVectors": [
-        {"input": "", "vector": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-        {"input": "aaaaaaaaaaaaaaaa", "vector": [16, 16, 0, 1, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 62, 62, 16, 1000, 933, 1, 1000, 2]},
-        {"input": "abcabcabcabcabcabc", "vector": [18, 18, 0, 3, 6, 103872, 103872, 1869696, 18, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 337, 166, 70, 1, 0, 823, 3, 1000, 3]},
-        {"input": "XXXX-XXXX-XXXX-XXXX", "vector": [19, 19, 0, 2, 16, 41239, 16248, 783541, 0, 16, 0, 3, 0, 0, 2, 6, 58, 629, 107, 105, 74, 4, 666, 833, 5, 1000, 5]},
-        {"input": "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa", "vector": [32, 32, 0, 32, 1, 327680, 327680, 10485760, 12, 12, 8, 0, 0, 0, 3, 31, 62, 1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0]},
-        {"input": "\ud83d\ude00a\ud83d\ude03b\ud83d\ude00a\ud83d\ude03b", "vector": [20, 8, 0, 4, 2, 131072, 131072, 1048576, 4, 0, 0, 0, 0, 4, 2, 7, 28, 1000, 416, 500, 31, 1, 0, 428, 4, 1000, 4]},
-        {"input": "ab", "vector": [2, 2, 0, 2, 1, 65536, 65536, 131072, 2, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 212, 1000, 7, 1, 0, 0, 0, 0, 0]},
-        {"input": "aabc", "vector": [4, 4, 0, 3, 2, 98304, 65536, 393216, 4, 0, 0, 0, 0, 0, 1, 0, 26, 946, 319, 750, 15, 2, 333, 0, 0, 0, 0]}
+        {"input": "", "vector": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+        {"input": "aaaaaaaaaaaaaaaa", "vector": [16, 16, 0, 1, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 62, 62, 16, 1000, 933, 1, 1000, 2, 1, 0, 0]},
+        {"input": "abcabcabcabcabcabc", "vector": [18, 18, 0, 3, 6, 103872, 103872, 1869696, 18, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 337, 166, 70, 1, 0, 823, 3, 1000, 3, 4, 65536, 65536]},
+        {"input": "XXXX-XXXX-XXXX-XXXX", "vector": [19, 19, 0, 2, 16, 41239, 16248, 783541, 0, 16, 0, 3, 0, 0, 2, 6, 58, 629, 107, 105, 74, 4, 666, 833, 5, 1000, 5, 2, 65536, 65536]},
+        {"input": "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa", "vector": [32, 32, 0, 32, 1, 327680, 327680, 10485760, 12, 12, 8, 0, 0, 0, 3, 31, 62, 1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0, 32, 327680, 327680]},
+        {"input": "\ud83d\ude00a\ud83d\ude03b\ud83d\ude00a\ud83d\ude03b", "vector": [20, 8, 0, 4, 2, 131072, 131072, 1048576, 4, 0, 0, 0, 0, 4, 2, 7, 28, 1000, 416, 500, 31, 1, 0, 428, 4, 1000, 4, 6, 125718, 103872]},
+        {"input": "ab", "vector": [2, 2, 0, 2, 1, 65536, 65536, 131072, 2, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 212, 1000, 7, 1, 0, 0, 0, 0, 0, 2, 65536, 65536]},
+        {"input": "aabc", "vector": [4, 4, 0, 3, 2, 98304, 65536, 393216, 4, 0, 0, 0, 0, 0, 1, 0, 26, 946, 319, 750, 15, 2, 333, 0, 0, 0, 0, 2, 65536, 65536]}
       ]
     },
     "aggregation": {
-      "id": "evidence-aggregation/v2",
-      "featureSchema": "evidence-features/v1",
+      "id": "evidence-aggregation/v3",
+      "featureSchema": "evidence-features/v2",
       "maxGroupSignals": 4,
       "groups": [
         {
@@ -51,7 +51,7 @@
           "rule": "halving-diminishing-returns",
           "cap": 30,
           "signals": [
-            {"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 226998, "hi": 265935, "max": 30}
+            {"kind": "feature-ramp", "signal": "residual_entropy_q16", "feature": 28, "lo": 234123, "hi": 263562, "max": 30}
           ]
         },
         {
@@ -101,7 +101,7 @@
       "minMaskLength": 3
     }
   },
-  "modelFingerprint": "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
+  "modelFingerprint": "db9fe32e29e52fc9f85713cfb986b6675b57afca6acf062734ada5c69e0162c4",
   "identityLedger": [
     {
       "model": "evidence-aggregation/v1",
@@ -114,6 +114,12 @@
       "featureSchema": "evidence-features/v1",
       "modelFingerprint": "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
       "introducedInRevision": 3
+    },
+    {
+      "model": "evidence-aggregation/v3",
+      "featureSchema": "evidence-features/v2",
+      "modelFingerprint": "db9fe32e29e52fc9f85713cfb986b6675b57afca6acf062734ada5c69e0162c4",
+      "introducedInRevision": 5
     }
   ],
   "sources": {
@@ -121,23 +127,32 @@
       {
         "path": "docs/specs/engine.md",
         "section": "Shadow evidence feature schema",
-        "sha256": "7c0d2413531e9d5b29c92feaad49515af920ff39ece1e1a156c611ba692515b9"
+        "sha256": "5973c396b1bf561f1e8987abf52ca7a1095ff120c86cbbf13ed364f52200c019"
+      },
+      {
+        "path": "docs/specs/engine.md",
+        "section": "Shadow evidence residual features",
+        "sha256": "f62966e4f55b59b2fcc227b3b7709d3d46298135ffb507ca33083cae05738a63"
       },
       {
         "path": "docs/specs/engine.md",
         "section": "Shadow evidence aggregation",
-        "sha256": "7a3887b23c4b05c8ac01dee3623a7864169745cb8d7ab13630324477c09f3bcc"
+        "sha256": "1211277d9d48885e918710e2e985838afee38ec3c772d9bfea30b6a11f2a10f6"
       },
       {
         "path": "docs/specs/engine.md",
         "section": "Maintainer-local shadow evaluation",
-        "sha256": "b159017b0a0e662310507105e9c256a46982a1aaeb0604d6509793ab48037d0d"
+        "sha256": "19dc1157355aeacb0fd402a00a351b24509560bb6ddcfc0166530f96d78f9365"
       }
     ],
     "code": [
       {
         "path": "crates/secret-scan-core/src/evidence/features.rs",
-        "sha256": "1a9abfd0ff8c8fbddb23f5ecc81be533742a96dd7af999011e49f4bd247b5c02"
+        "sha256": "8d4d1269e94e90d972fe4d1a1578851f39ed68a965f938cfc8d9bcc6b0df9882"
+      },
+      {
+        "path": "crates/secret-scan-core/src/evidence/residual.rs",
+        "sha256": "0c50668ab327406a6068abbb5448bfaf9acfa5af196751a0e9b85613ec592248"
       },
       {
         "path": "crates/secret-scan-core/src/evidence/fixed_point.rs",
@@ -153,7 +168,7 @@
       },
       {
         "path": "crates/secret-scan-core/src/evidence/aggregate.rs",
-        "sha256": "1560a14a2fa3d71db7766fe26e434bbee8c22d6d83f628ce26b0d10c8ed82657"
+        "sha256": "ca6288d52dbaeeefd414e56d3fa30c7b2ae5aa6b6c5aa079db21b195f100ff22"
       },
       {
         "path": "crates/secret-scan-core/src/evidence/shadow.rs",
@@ -163,97 +178,83 @@
   },
   "calibration": {
     "repository": "redact-secret/redact-secret-benchmarks",
-    "issue": 300,
-    "pullRequest": 330,
+    "issue": 829,
+    "pullRequest": 437,
     "branch": "develop",
-    "commit": "e18efa2d0802c030925b9306a5dca33057185936",
-    "method": "https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/docs/specs/calibration-experiments.md",
-    "experimentVersion": "calibration-experiments/1",
-    "selectedConfiguration": "halving-r1-l0-r30-l0-c50",
+    "commit": "5823751c16df4776035f5a0bd6f9640f8013a6a7",
+    "method": "https://github.com/redact-secret/redact-secret-benchmarks/blob/5823751c16df4776035f5a0bd6f9640f8013a6a7/docs/specs/calibration-experiments.md",
+    "experimentVersion": "calibration-experiments/2",
+    "selectedConfiguration": "halving-q1-l0-r30-l0-c50",
     "selection": {
-      "method": "calibration-experiments/1:dev-balanced-error-within-tolerance,fewest-parameters,loco-stability",
-      "sourceHash": "23683daf5738b9cf3de583ade589f06677cfb2bcf581bff38e889b1eddae9509",
+      "method": "calibration-experiments/2:dev-balanced-error-within-tolerance,fewest-parameters,loco-stability",
+      "sourceHash": "b906f0c17a18e7533cd477e1815d169ae0d2fdc81f112a61020449cfb7c9c056",
       "seed": "none"
     },
     "featureDataset": {
       "schemaVersion": 1,
-      "extractorVersion": "candidate-features/2",
-      "extractorSourceHash": "d943c854b79eefdfb5573e30ace6d8fd67f5be9e1ebefc2b9ee9e9d73d05833f",
-      "datasetHash": "4ea0a82f61b719b4611f8e7e2caafd01edda5b5dfa7c2691bffd6ac17d0e199c",
-      "featureSchema": "evidence-features/v1",
+      "extractorVersion": "candidate-features/3",
+      "extractorSourceHash": "cba5a01cbdc95d2cb5b3ae70235724eae95bedb6f74a712bbcc236c281343644",
+      "datasetHash": "2241d655096403d7f6a2b16201c2d4614bb39d2520a75734ec9958941cde172d",
+      "featureSchema": "evidence-features/v2",
       "productFeatureSource": {
         "repository": "redact-secret/redact-secret",
-        "commit": "d7733632bb05082710f71b6684ccf60c7a69377e",
-        "pinnedBy": "https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/benchmarks/lib/evidence-features.ts"
+        "commit": "21509e903e540ece5966e4ed4d6d1a77a0a14ce8",
+        "pinnedBy": "https://github.com/redact-secret/redact-secret-benchmarks/blob/5823751c16df4776035f5a0bd6f9640f8013a6a7/benchmarks/lib/evidence-features.ts"
       }
     },
     "scoring": {
       "contractDecision": "decision-freeze-the-shadow-evidence-score-and-confidence-contract",
-      "featureSchemaVersion": "evidence-features/v1",
-      "featureSetHash": "55b1da0ebce3180e73e6ad075e8dd322cc075e886a3029db0cc26cc7b572cb68",
+      "featureSchemaVersion": "evidence-features/v2",
+      "featureSetHash": "cc2af23f50a7e12fcbb15400503e76d6fc74fd353b7699410ba47a56f5bd3d69",
       "aggregationContractVersion": "grouped-halving/1",
-      "weightSetHash": "6f37787cd0c770f45b763cc50539c3c19044182c828451022a3b6c3d5cb43b5a",
+      "weightSetHash": "1cddccb2b4e4aef8d6cfe169c8577e21544dfbbbae797bb22b96829981020f41",
       "thresholdSetHash": "abd9803cccb4bc48233e50d592a92cb48c7c8cd99b449a17d78ab616e8b7587f",
-      "identity": "838aa57db8e2331c8540a42da823ffda8802d681952f4dc7af20e6001c5693a2"
+      "identity": "8ac80470de3b218cb44459dfefea3594bedf191ecec399797a4ce26e8e223962"
     },
     "holdoutAccess": "none",
-    "reproduction": "At benchmark commit e18efa2d0802c030925b9306a5dca33057185936, from a clean tree: npm ci, npm run features:extract, npm run calibration:run. The run writes results-output/calibration/, which is ignored by version control and maintainer-local. It reproduces the dataset hash, the selection source hash and the scoring identity above. The fitted per-configuration detail stays there and is never copied into either repository.",
-    "correspondence": "The benchmark's scoring identity names the selected configuration by component hashes only. For redact-secret-benchmarks#300 a maintainer reran the calibration at the merged benchmark commit and confirmed that the selected configuration's randomness ramp, caps, context signal, strict negative gate and band thresholds equal model.aggregation here, which is the compiled SHADOW_MODEL. grouped-halving/1 is the benchmark's name for the halving rule that the product implements as evidence-aggregation/v2."
+    "reproduction": "At benchmark commit 5823751c16df4776035f5a0bd6f9640f8013a6a7, from a clean tree: npm ci, npm run features:extract, npm run calibration:run. The run writes results-output/calibration/, which is ignored by version control and maintainer-local. It reproduces the dataset hash, the selection source hash and the scoring identity above; for redact-secret#829 the run was made twice at this commit and gave identical output. The fitted per-configuration detail stays there and is never copied into either repository.",
+    "correspondence": "The benchmark's scoring identity names the selected configuration by component hashes only. For redact-secret#829 the calibration was rerun at the merged benchmark commit and the selected configuration's randomness ramp (over residual_entropy_q16), caps, context signal, strict negative gate and band thresholds equal model.aggregation here, which is the compiled SHADOW_MODEL. grouped-halving/1 is the benchmark's name for the halving rule that the product implements as evidence-aggregation/v3. The calibration-experiments/2 grid admits only the residual entropy as a randomness signal, because #829 replaces Shannon entropy rather than adding to it."
   },
   "corpora": {
     "pinManifest": {
       "path": "benchmarks/pin-manifest.json",
-      "sha256": "4ce4e3be36e78e4dd7111fda50cc006d3331f3ab9fc8f3fda4efc338eaab1a99"
+      "sha256": "34b9516b4fa248fafe3993b1a58d69c6d1914a2cc1a9b3abebd244eff065a720"
     },
     "tuning": [
-      {
-        "category": "accuracy",
-        "corpusHash": "33c2a504fe7c3c200f7458b903104844d695fea8296dc6977038273358f72e33"
-      },
-      {
-        "category": "real-world-shapes",
-        "corpusHash": "8c0e2f60d87286f8acaa81664308ff291b36dc53474b30e344e43625697ffd0f"
-      },
-      {
-        "category": "shadow-scoring-authored",
-        "corpusHash": "088a65d2a513a852d448d19265c2b6105399fe5029508fff530d74e76a51e046"
-      },
-      {
-        "category": "token-contexts",
-        "corpusHash": "1a38c702ee7fbf6febdfb4f856fccef65966812e23bfa751322c84242ec441ac"
-      }
+      {"category":  "accuracy", "corpusHash":  "33c2a504fe7c3c200f7458b903104844d695fea8296dc6977038273358f72e33"},
+      {"category":  "real-world-shapes", "corpusHash":  "8c0e2f60d87286f8acaa81664308ff291b36dc53474b30e344e43625697ffd0f"},
+      {"category":  "shadow-scoring-authored", "corpusHash":  "795066d54144741fc23eb23e6ad8e96386c21d03ea1b8330f876e7fd59bbdd6d"},
+      {"category":  "token-contexts", "corpusHash":  "1a38c702ee7fbf6febdfb4f856fccef65966812e23bfa751322c84242ec441ac"}
     ],
     "evaluation": [
-      {"source": "beta8-207", "role": "development-evaluation", "corpusHash": "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"},
-      {"source": "beta8-208", "role": "development-evaluation", "corpusHash": "34da38437df4f13693c89236967fcac5ca7f45efe417511963de4097046a494b"},
-      {"source": "beta8-209", "role": "development-evaluation", "corpusHash": "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"},
-      {"source": "beta8-210", "role": "development-evaluation", "corpusHash": "605e70510d2c2c7327dea6f76aa163dce60a693aedb0046081153d3d7a6da7ef"},
-      {"source": "beta8-211", "role": "development-evaluation", "corpusHash": "44fa2fce8383c01ac784b9d61edaaf51bc59eb36369f71a0935cf744150607d9"},
-      {"source": "beta8-212", "role": "development-evaluation", "corpusHash": "bbdcd601e1bd31a007db0a820f49bba376869e34ac7c9f606a2b60fcd4e3b399"},
-      {"source": "beta8-213a", "role": "development-evaluation", "corpusHash": "e93816b20a54ab8f2757962d95f49f271af53222716049a4a0452869aa8171ca"},
-      {"source": "beta8-213b", "role": "development-evaluation", "corpusHash": "e976fb045d30e6f3c34849e29f264f4d0cb3267eb2b97171dd41d2961d30e681"},
-      {"source": "beta8-213c", "role": "development-evaluation", "corpusHash": "d39630d42d62950f5c3ae2fb64d8ed767c6e737272f87536034cb0a234f0e638"},
-      {"source": "beta8-213d", "role": "development-evaluation", "corpusHash": "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc"},
-      {"source": "beta8-213e", "role": "development-evaluation", "corpusHash": "435c2c68cf12647acd62dcae3dca0d91c79c2b4813bc99d2c532e024daaaae40"},
-      {"source": "beta8-213f", "role": "development-evaluation", "corpusHash": "abe90d21dfa8e74ee5b2fa21ba27a4884dc6c1d1c89df91b980c8d92b5a7037f"},
-      {"source": "beta8-259", "role": "development-evaluation", "corpusHash": "0da5d62f8f385dafbe46a568105227458479b4e96391c02867a4dc9adfde9220"},
-      {"source": "beta8-263", "role": "development-evaluation", "corpusHash": "118ed8e978bc5857b2a15782efb7e83d711b0afa0f5adab75f30de1051f20843"},
-      {"source": "common-formats", "role": "development-evaluation", "corpusHash": "0094f4fc2576ae072f72b5f2f5f14541911e8ccbaa42f92b360de2925d5f7f2f"},
-      {"source": "context-edges", "role": "development-evaluation", "corpusHash": "091c79bc72557faa0657cafb79895e19e848a5b6dbd4f3c40d96d031f5f0e6ae"},
-      {"source": "credential-formats", "role": "development-evaluation", "corpusHash": "8a314552eea2e9db66ed49750294ad59a8b10bc4c33fcf471f2eaee059b8af4f"},
-      {"source": "detector-coverage", "role": "development-evaluation", "corpusHash": "249101e718a962ae37d8732b42f57febc85d7cb4d27de470b62621b8d888b71f"},
-      {
-        "source": "milestone-6-closed",
-        "role": "regression",
-        "corpusHash": "388b26e3703fc5a80b1ca0cd65232873e765a0a0b59148ba0e6998fd6c8ff766"
-      },
-      {"source": "negative-controls", "role": "development-evaluation", "corpusHash": "90cb2e615a5afa71f8d52ba70454d5d65cb9b206af78ac292f02cb0f9ee57a7b"},
-      {"source": "reference-syntax", "role": "development-evaluation", "corpusHash": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"},
-      {
-        "source": "sendgrid-regressions",
-        "role": "regression",
-        "corpusHash": "bb556d9d91dda1a394c83be1cd3763e75ebf9230d5fbdb6ad5abd91368ab459d"
-      }
+      {"source":  "beta8-207", "role":  "development-evaluation", "corpusHash":  "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"},
+      {"source":  "beta8-208", "role":  "development-evaluation", "corpusHash":  "34da38437df4f13693c89236967fcac5ca7f45efe417511963de4097046a494b"},
+      {"source":  "beta8-209", "role":  "development-evaluation", "corpusHash":  "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"},
+      {"source":  "beta8-210", "role":  "development-evaluation", "corpusHash":  "605e70510d2c2c7327dea6f76aa163dce60a693aedb0046081153d3d7a6da7ef"},
+      {"source":  "beta8-211", "role":  "development-evaluation", "corpusHash":  "33ab0872de731e074c6b039102d4ae418b2889597ba44070720636ee6e481274"},
+      {"source":  "beta8-212", "role":  "development-evaluation", "corpusHash":  "3ccd0a1980bf279fd3a2aa033c44734dd8a0e73a043498057c22084300cedfb4"},
+      {"source":  "beta8-213a", "role":  "development-evaluation", "corpusHash":  "e93816b20a54ab8f2757962d95f49f271af53222716049a4a0452869aa8171ca"},
+      {"source":  "beta8-213b", "role":  "development-evaluation", "corpusHash":  "e976fb045d30e6f3c34849e29f264f4d0cb3267eb2b97171dd41d2961d30e681"},
+      {"source":  "beta8-213c", "role":  "development-evaluation", "corpusHash":  "d39630d42d62950f5c3ae2fb64d8ed767c6e737272f87536034cb0a234f0e638"},
+      {"source":  "beta8-213d", "role":  "development-evaluation", "corpusHash":  "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc"},
+      {"source":  "beta8-213e", "role":  "development-evaluation", "corpusHash":  "435c2c68cf12647acd62dcae3dca0d91c79c2b4813bc99d2c532e024daaaae40"},
+      {"source":  "beta8-213f", "role":  "development-evaluation", "corpusHash":  "abe90d21dfa8e74ee5b2fa21ba27a4884dc6c1d1c89df91b980c8d92b5a7037f"},
+      {"source":  "beta8-259", "role":  "development-evaluation", "corpusHash":  "0da5d62f8f385dafbe46a568105227458479b4e96391c02867a4dc9adfde9220"},
+      {"source":  "beta8-263", "role":  "development-evaluation", "corpusHash":  "118ed8e978bc5857b2a15782efb7e83d711b0afa0f5adab75f30de1051f20843"},
+      {"source":  "beta8-384a", "role":  "development-evaluation", "corpusHash":  "900fdce11ecc6ff3ec01093865dbccb87d7c970360ed6f1e235e9b993574670e"},
+      {"source":  "beta8-384b", "role":  "development-evaluation", "corpusHash":  "9fd0bc1f5c8dd3d1387db266f31d290ac44f71ac1d388deb2504bc46da472cdf"},
+      {"source":  "beta8-384c", "role":  "development-evaluation", "corpusHash":  "2a3a5be696449d4002c5396f74ba2938609c0bda16f534942734d5d32524b273"},
+      {"source":  "beta8-384d", "role":  "development-evaluation", "corpusHash":  "8ee68c5897accba5af1b80d08c791aee7b957c3587501d2d23eed95787300e4f"},
+      {"source":  "beta8-384e", "role":  "development-evaluation", "corpusHash":  "589d22a854c77c9bc1249d943812994c2933a5edbe26fe6c82cd25a003d3858d"},
+      {"source":  "common-formats", "role":  "development-evaluation", "corpusHash":  "225b06c87c3c974ff650f943746baad9a488febd5a33871b4894516a7244115c"},
+      {"source":  "context-edges", "role":  "development-evaluation", "corpusHash":  "091c79bc72557faa0657cafb79895e19e848a5b6dbd4f3c40d96d031f5f0e6ae"},
+      {"source":  "credential-formats", "role":  "development-evaluation", "corpusHash":  "8a314552eea2e9db66ed49750294ad59a8b10bc4c33fcf471f2eaee059b8af4f"},
+      {"source":  "detector-coverage", "role":  "development-evaluation", "corpusHash":  "bea811f25191485109788793a1aacfc8b751ac5e74b23b529d873b1e752c2741"},
+      {"source":  "milestone-6-closed", "role":  "regression", "corpusHash":  "388b26e3703fc5a80b1ca0cd65232873e765a0a0b59148ba0e6998fd6c8ff766"},
+      {"source":  "negative-controls", "role":  "development-evaluation", "corpusHash":  "90cb2e615a5afa71f8d52ba70454d5d65cb9b206af78ac292f02cb0f9ee57a7b"},
+      {"source":  "policy-qualified-credentials", "role":  "development-evaluation", "corpusHash":  "975cf4ff26dc6b93b9a1040fbd2a6749a7cf97b6b244bd46ebbe9b55a9e7e157"},
+      {"source":  "reference-syntax", "role":  "development-evaluation", "corpusHash":  "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"},
+      {"source":  "sendgrid-regressions", "role":  "regression", "corpusHash":  "bb556d9d91dda1a394c83be1cd3763e75ebf9230d5fbdb6ad5abd91368ab459d"}
     ]
   },
   "tuningManifest": {
@@ -264,10 +265,10 @@
       "id": "shadow-evidence-generic-token-v1",
       "status": "draft",
       "product": null,
-      "generatedAt": "e18efa2d0802c030925b9306a5dca33057185936",
-      "fileSha256": "eaee83a15151f10f0b1c6b8ff44bf445dfe7234c5159c22e9286095943ed8fe7",
-      "canonicalHash": "6d815d17226e34c5c95b0959770b51630456fb6dd0f554078683f6207f330ec6",
-      "deterministic": "results-output/calibration/tuning-manifest-draft.json written by npm run calibration:run at generatedAt. Its createdAt is that commit's date and the dataset is byte-identical across runs, so two runs wrote the same bytes (fileSha256). canonicalHash is tuningManifestHash() in benchmarks/lib/tuning-manifest.ts, the SHA-256 of the canonical JSON that #256 evidence records. It changes once product is filled."
+      "generatedAt": "5823751c16df4776035f5a0bd6f9640f8013a6a7",
+      "fileSha256": "afb40036bbb35f995eb369132958436c0389db77fde6aa37836cf508cc7bd566",
+      "canonicalHash": "8eaed2f195e04768c9b29d90608f1a09b23bf751d4613cbd7c29e9ddb3cc21b7",
+      "deterministic": "results-output/calibration/tuning-manifest-draft.json written by npm run calibration:run at generatedAt. Its createdAt is that commit's date and the dataset is byte-identical across runs, so two runs wrote the same bytes (fileSha256). canonicalHash is tuningManifestHash() in benchmarks/lib/tuning-manifest.ts over the draft without draftNotes, the SHA-256 of the canonical JSON that #256 evidence records. It changes once product is filled."
     }
   },
   "productRevision": {
@@ -289,18 +290,22 @@
       "statement": "The #256 tuning manifest is not bound yet (tuningManifest.status is pending), so this artifact records the draft's identity rather than a final tuning manifest hash."
     },
     {
-      "id": "adversarial-evidence-final",
-      "statement": "Final adversarial evidence is linked from docs/specs/engine.md, 'Maintainer-local shadow evaluation', to the immutable beta.9 qualification record for product source 09e1d7f85cd2ada9f387cc5c9beef3b29023d17d. All four attacker-known invariants held, while future-promotion Q4 failed."
+      "id": "adversarial-evidence-pending",
+      "statement": "The attacker-known evaluation (redact-secret-benchmarks#289) and the #257 promotion-gate reading for evidence-aggregation/v3 are regenerated against the product commit that carries this artifact revision and are pending. The beta.9 record linked from docs/specs/engine.md, 'Maintainer-local shadow evaluation', covers evidence-aggregation/v2 only."
     },
     {
       "id": "poor-generalization",
-      "statement": "The #300 selection has development medium-band balanced error 0.055228960396039604 but evaluation balanced error 0.6228352283569377, a generalization gap of 0.5676062679608981; its worst leave-one-category-out balanced error is 0.6666666666666666. This scorer remains shadow-only, non-enforcing and outside the public API. These results are not promotion evidence."
+      "statement": "The #829 selection has development medium-band balanced error 0.049172226340499135 but evaluation balanced error 0.6244338423530675, a generalization gap of 0.5752616160125684; its worst leave-one-category-out balanced error is 0.6666666666666666. This scorer remains shadow-only, non-enforcing and outside the public API. These results are not promotion evidence."
+    },
+    {
+      "id": "q4-structural-at-this-operating-point",
+      "statement": "Randomness alone stays below low and context alone reaches medium, so no randomness signal changes an outcome read at medium. The future-promotion Q4 projection reads medium and a statistical candidate without credential-bearing context never reaches it, so Q4 cannot pass at this operating point whichever randomness measure the model uses (#829). Changing the operating point is a calibration decision and a new model identity."
     }
   ],
   "review": {
     "generation": "model is rendered from the compiled core by crates/secret-scan-core/src/evidence/aggregate/artifact_drift.rs; its failing assertion prints the rendering. sources are SHA-256 hashes of the listed files and spec sections, including the maintainer-local evaluation path (evidence/shadow.rs and its spec section), so a change to its record format is a new revision. calibration, corpora and tuningManifest are copied from the benchmark run's identities and hashes, never from its fitted detail.",
     "method": "Reviewed in the pull request that changes this file. The reviewer confirms that a changed model carries a new model identity (and a changed featureSchema a new feature schema identity), that every change raises artifact.revision, and that no probability, score, weight or threshold reaches a public surface.",
-    "reviewedIn": "https://github.com/redact-secret/redact-secret/issues/771",
+    "reviewedIn": "https://github.com/redact-secret/redact-secret/issues/829",
     "check": "npm run scoring-artifact:check (offline, part of npm run ci); the cargo test the_compiled_scorer_matches_the_reviewed_scoring_artifact; and the pull-request CI job that runs the same check against the base branch's artifact."
   }
 }
