@@ -46,7 +46,9 @@ core remains the only authoritative implementation
   no package ships it; the governing rules are in
   [`docs/specs/contextual-detection.md`](../specs/contextual-detection.md).
   v2 ([#924](https://github.com/redact-secret/redact-secret/issues/924))
-  changed how equidistance is judged for field labels.
+  changed how equidistance is judged for field labels; before any release
+  carried it, it was amended in place so a `|` delimiter bounds a positive
+  field label ([#940](https://github.com/redact-secret/redact-secret/issues/940)).
 - [`pii/pii-context-v1.json`](pii/pii-context-v1.json) and its schema
   [`pii/pii-context-v1.schema.json`](pii/pii-context-v1.schema.json) — the
   `pii-context/v1` vocabulary defined for issue

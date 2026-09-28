@@ -26,7 +26,8 @@
       "direction": "before",
       "maxDistance": 16,
       "gap": "separators-and-quotes-only",
-      "equidistanceAmong": "following-candidates"
+      "equidistanceAmong": "following-candidates",
+      "pipeDelimiter": "positive-field-labels"
     },
     "naturalLanguageLabel": {
       "direction": "either",
@@ -536,6 +537,48 @@
         {"candidate": "a", "matches": ["en-network-address-field"], "effect": "positive-evidence"},
         {"candidate": "b", "matches": [], "effect": "no-evidence"}
       ]
+    },
+    {
+      "id": "field-label-after-pipe-delimited-fields-associates",
+      "language": "en",
+      "template": "a|b|email={{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "field-label-in-pipe-table-cell-associates",
+      "language": "en",
+      "template": "| ssn | {{candidate:a}} |",
+      "candidates": [{"id": "a", "domain": "national-id", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-us-ssn-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-field-label-after-pipe-associates",
+      "language": "ko",
+      "template": "x|전화번호: {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "phone", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-phone-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "pipe-does-not-join-cells-into-one-form",
+      "language": "en",
+      "template": "| card | number | {{candidate:a}} |",
+      "candidates": [{"id": "a", "domain": "payment-card", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": [], "effect": "no-evidence"}]
+    },
+    {
+      "id": "pipe-label-with-another-cell-in-gap-is-no-evidence",
+      "language": "en",
+      "template": "| email | name | {{candidate:a}} |",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": [], "effect": "no-evidence"}]
+    },
+    {
+      "id": "pipe-adds-no-negative-association",
+      "language": "en",
+      "template": "x|example email: {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-email-field"], "effect": "positive-evidence"}]
     },
     {
       "id": "equidistant-context-is-unassociated",
