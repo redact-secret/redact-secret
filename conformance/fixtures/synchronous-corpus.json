@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2691,
+  "fixtureCount": 2702,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -66336,6 +66336,194 @@
       "input": "The Key to authorization is rotation.\nAuthorization: Key rotation\n",
       "expected": [],
       "note": "Issue #919 control: Key as prose, or a short scheme value, is not a credential."
+    },
+    {
+      "id": "generic-token-negative-helm-existing-secret",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "postgresql:\n  auth:\n    existingSecret: orders-db-credentials\n",
+      "expected": [],
+      "note": "Issue #911: a Helm existingSecret value names a Kubernetes Secret object, not a secret."
+    },
+    {
+      "id": "generic-token-negative-external-secret-key-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "spec:\n  data:\n    - secretKey: ORDERS_DB_PASSWORD\n      remoteRef:\n        key: prod/orders/db\n",
+      "expected": [],
+      "note": "Issue #911: an unquoted UPPER_SNAKE credential variable name names the key inside a Secret, not its value."
+    },
+    {
+      "id": "generic-token-negative-reverse-dns-keychain-item",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "case sessionToken = \"com.example.orders.sessionToken\"\n",
+      "expected": [],
+      "note": "Issue #911: a reverse-DNS keychain item identifier names where a secret is stored."
+    },
+    {
+      "id": "generic-token-negative-templated-vault-lookup-path",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "orders_api_token: \"{{ lookup('community.hashi_vault.hashi_vault', 'secret=kv/data/orders:api_token') }}\"\n",
+      "expected": [],
+      "note": "Issue #911: a secret-path term inside an open template lookup is a reference the template renders later."
+    },
+    {
+      "id": "generic-token-negative-lua-method-call",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "local secret = secrets:get(partner_id)\n",
+      "expected": [],
+      "note": "Issue #911: a Lua method call names where the secret comes from."
+    },
+    {
+      "id": "generic-token-negative-constant-keyword-argument",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "    assert verify(body, signing_secret=TEST_SIGNING_SECRET)\n",
+      "expected": [],
+      "note": "Issue #911: a keyword argument passing an UPPER_SNAKE constant is a reference, not a literal."
+    },
+    {
+      "id": "generic-token-positive-literal-under-webhook-secret",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "postgresql:\n  auth:\n    webhookSecret: aZ3kQ9xL2mV7pR4tW8nB5cD1fG6hJ0sYx\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 39,
+          "end": 72
+        }
+      ],
+      "note": "Issue #911: twin: a literal under a <prefix>Secret name stays redacted; only existingSecret changed."
+    },
+    {
+      "id": "generic-token-positive-literal-under-secret-key",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "spec:\n  data:\n    - secretKey: aZ3kQ9xL2mV7pR4tW8nB5cD1fG6hJ0sYx\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 31,
+          "end": 64
+        }
+      ],
+      "note": "Issue #911: twin: a random literal where the variable name was stays redacted."
+    },
+    {
+      "id": "generic-token-positive-literal-keychain-case",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "case sessionToken = \"aZ3kQ9xL2mV7pR4tW8nB5cD1fG6hJ0sYx\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 21,
+          "end": 54
+        }
+      ],
+      "note": "Issue #911: twin: a literal where the reverse-DNS identifier was stays redacted."
+    },
+    {
+      "id": "generic-token-positive-literal-lookup-term",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "orders_api_token: \"{{ lookup('community.hashi_vault.hashi_vault', 'secret=aZ3kQ9xL2mV7pR4tW8nB5cD1fG6hJ0sYx') }}\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 74,
+          "end": 107
+        }
+      ],
+      "note": "Issue #911: twin: a literal lookup term with no path stays redacted."
+    },
+    {
+      "id": "generic-token-positive-literal-keyword-argument",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "    assert verify(body, signing_secret=\"aZ3kQ9xL2mV7pR4tW8nB5cD1fG6hJ0sYx\")\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 40,
+          "end": 73
+        }
+      ],
+      "note": "Issue #911: twin: a quoted literal keyword argument stays redacted."
     }
   ]
 }

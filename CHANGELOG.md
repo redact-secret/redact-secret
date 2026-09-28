@@ -58,6 +58,13 @@ evidence is linked from each published version.
   `Authorization: Key <id>:<secret>` scheme, reporting the whole value
   (#919). These produced no finding before, even for a random value. A bare
   `*_KEY` suffix (`PRIMARY_KEY`, `SORT_KEY`) is still not a credential name.
+- `generic-token` no longer redacts secret-reference names and identifiers
+  as secrets (#911): a Helm `existingSecret` object name, an unquoted
+  `UPPER_SNAKE` credential variable name (`secretKey: DB_PASSWORD`,
+  `signing_secret=FAKE_SIGNING_SECRET`), a reverse-DNS keychain item
+  identifier, a Lua or `::` method-call chain, and a secret-path term inside
+  an open `{{ ... }}` template lookup. A literal in the same position is
+  still redacted.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

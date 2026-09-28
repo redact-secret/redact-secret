@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2691,
+  "fixtureCount": 2702,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2695,6 +2695,17 @@
     {"expected":[],"id":"generic-token-negative-fal-key-placeholder"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":88,"start":19,"type":"authorization_credential"}],"id":"generic-token-positive-authorization-key-scheme"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":105,"start":36,"type":"authorization_credential"}],"id":"generic-token-positive-authorization-key-scheme-curl"},
-    {"expected":[],"id":"generic-token-negative-key-scheme-prose"}
+    {"expected":[],"id":"generic-token-negative-key-scheme-prose"},
+    {"expected":[],"id":"generic-token-negative-helm-existing-secret"},
+    {"expected":[],"id":"generic-token-negative-external-secret-key-name"},
+    {"expected":[],"id":"generic-token-negative-reverse-dns-keychain-item"},
+    {"expected":[],"id":"generic-token-negative-templated-vault-lookup-path"},
+    {"expected":[],"id":"generic-token-negative-lua-method-call"},
+    {"expected":[],"id":"generic-token-negative-constant-keyword-argument"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":72,"start":39,"type":"contextual_secret"}],"id":"generic-token-positive-literal-under-webhook-secret"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":64,"start":31,"type":"contextual_secret"}],"id":"generic-token-positive-literal-under-secret-key"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":54,"start":21,"type":"contextual_secret"}],"id":"generic-token-positive-literal-keychain-case"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":107,"start":74,"type":"contextual_secret"}],"id":"generic-token-positive-literal-lookup-term"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":73,"start":40,"type":"contextual_secret"}],"id":"generic-token-positive-literal-keyword-argument"}
   ]
 }
