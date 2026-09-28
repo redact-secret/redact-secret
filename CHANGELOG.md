@@ -46,6 +46,14 @@ evidence is linked from each published version.
     `composio_project_api_key`, `composio_org_api_key` and
     `composio_user_api_key`. `ck_`, `cak_` and `uak_` at other widths stay
     unclaimed.
+- New provider detectors from the #860 Tier B handoffs, each always redacted
+  at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences generic
+  detection missed:
+  - `convex-deployment-key` (#912): Convex `<name>|01<hex>` deployment
+    and admin keys (`convex_deployment_key`), typed lead and name inside the
+    span; the issuance-gated `eyJ2` cloud body stays unclaimed.
 
 ### Fixed
 

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2702,
+  "fixtureCount": 2757,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -66524,6 +66524,1058 @@
         }
       ],
       "note": "Issue #911: twin: a quoted literal keyword argument stays redacted."
+    },
+    {
+      "id": "convex-deployment-key-positive-bare",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 97
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "convex-deployment-key-positive-dotenv",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 115
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-shell-export",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CONVEX_DEPLOY_KEY=\"prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\"\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 123
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-yaml",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  CONVEX_DEPLOY_KEY: prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 123
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-json-config",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"CONVEX_DEPLOY_KEY\": \"prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\"}",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 120
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-json-token-key",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\"}",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 108
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-python-sdk-call",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\")",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 122
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-overlap-bearer-header",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 119
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "convex-deployment-key-positive-x-api-key-header",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 108
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-curl-bearer",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 128
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-tool-call-arguments",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\"}}",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 135
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-chat-sentence",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 112
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-log",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d for request 7",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 152
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-positive-punctuation-adjacent",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d).",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 98
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "convex-deployment-key-positive-crlf-unicode-prefix",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\nprod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d\n\r\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 121
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "convex-deployment-key-overlap-context",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 110
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "convex-deployment-key-positive-repeated-value",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 97
+        },
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 98,
+          "end": 195
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "convex-deployment-key-positive-self-hosted-untyped",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 93
+        }
+      ],
+      "note": "The self-hosted-untyped shape is reported on its own."
+    },
+    {
+      "id": "convex-deployment-key-positive-self-hosted-untyped-dotenv",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 111
+        }
+      ],
+      "note": "The self-hosted-untyped shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-overlap-self-hosted-untyped-bearer",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 115
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "convex-deployment-key-positive-dev-typed",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dev:brave-lynx-7|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba1",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 97
+        }
+      ],
+      "note": "The dev-typed shape is reported on its own."
+    },
+    {
+      "id": "convex-deployment-key-positive-dev-typed-dotenv",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=dev:brave-lynx-7|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba1",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 115
+        }
+      ],
+      "note": "The dev-typed shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-overlap-dev-typed-bearer",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer dev:brave-lynx-7|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba1\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 119
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "convex-deployment-key-positive-preview-typed",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "preview:acme-team:web-app|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 100
+        }
+      ],
+      "note": "The preview-typed shape is reported on its own."
+    },
+    {
+      "id": "convex-deployment-key-positive-preview-typed-dotenv",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=preview:acme-team:web-app|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 118
+        }
+      ],
+      "note": "The preview-typed shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-overlap-preview-typed-bearer",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer preview:acme-team:web-app|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 122
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "convex-deployment-key-positive-project-typed",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "project:acme:api|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 107
+        }
+      ],
+      "note": "The project-typed shape is reported on its own."
+    },
+    {
+      "id": "convex-deployment-key-positive-project-typed-dotenv",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=project:acme:api|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 125
+        }
+      ],
+      "note": "The project-typed shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-overlap-project-typed-bearer",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer project:acme:api|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 129
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "convex-deployment-key-positive-body-96",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 117
+        }
+      ],
+      "note": "The body-96 shape is reported on its own."
+    },
+    {
+      "id": "convex-deployment-key-positive-body-96-dotenv",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOY_KEY=prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 135
+        }
+      ],
+      "note": "The body-96 shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "convex-deployment-key-overlap-body-96-bearer",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 139
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "convex-deployment-key-boundary-short-body",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0",
+      "expected": [],
+      "note": "A 72-hex body is under the 74-96 generator range."
+    },
+    {
+      "id": "convex-deployment-key-boundary-long-body",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff",
+      "expected": [],
+      "note": "A 98-hex body is over the 74-96 generator range; it is rejected whole, never truncated."
+    },
+    {
+      "id": "convex-deployment-key-boundary-odd-body",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0",
+      "expected": [],
+      "note": "Hex encoding is always even-length."
+    },
+    {
+      "id": "convex-deployment-key-boundary-wrong-version",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|025e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "Only version byte 01 is the reviewed generator output."
+    },
+    {
+      "id": "convex-deployment-key-boundary-uppercase-hex",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacaAe5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "The generator writes lowercase hex; an uppercase byte ends the body short of the range."
+    },
+    {
+      "id": "convex-deployment-key-boundary-non-hex-byte",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacage5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "A non-hex byte ends the body short of the range."
+    },
+    {
+      "id": "convex-deployment-key-boundary-double-separator",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted||015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "Exactly one pipe separates the name and the body."
+    },
+    {
+      "id": "convex-deployment-key-boundary-underscore-name",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bold_hyena_681|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "An underscore is outside the name class, so no valid start is reached."
+    },
+    {
+      "id": "convex-deployment-key-boundary-glued-type-lead",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xprod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "A glued type lead is not a type lead, and the name after a colon is not untyped."
+    },
+    {
+      "id": "convex-deployment-key-boundary-glued-suffix",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dx",
+      "expected": [],
+      "note": "A byte glued after the body makes it part of a wider identifier."
+    },
+    {
+      "id": "convex-deployment-key-boundary-prod-lead-non-cloud-name",
+      "detector": "convex-deployment-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod:convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "A prod or dev lead requires a cloud deployment name."
+    },
+    {
+      "id": "convex-deployment-key-negative-deployment-selector",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_DEPLOYMENT=dev:happy-otter-123\nCONVEX_DEPLOYMENT=prod:happy-otter-123\n",
+      "expected": [],
+      "note": "The public deployment selector has no pipe and no body."
+    },
+    {
+      "id": "convex-deployment-key-negative-deployment-url",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONVEX_URL=https://happy-otter-123.convex.cloud\n",
+      "expected": [],
+      "note": "A deployment URL is public."
+    },
+    {
+      "id": "convex-deployment-key-negative-docs-placeholders",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like prod:your-deployment-name|your-admin-key or prod:adjective-animal-123|super-secret-key in the docs.",
+      "expected": [],
+      "note": "Documentation placeholders fail the 01 + hex body grammar."
+    },
+    {
+      "id": "convex-deployment-key-negative-shell-reference-body",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod:happy-otter-123|${CONVEX_BODY}",
+      "expected": [],
+      "note": "A shell reference in place of the body is not a key."
+    },
+    {
+      "id": "convex-deployment-key-negative-markdown-cell",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "| name | 015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d |",
+      "expected": [],
+      "note": "A Markdown table separator followed by a space is not the key separator."
+    },
+    {
+      "id": "convex-deployment-key-negative-digest-without-version",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sha|ab5e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de",
+      "expected": [],
+      "note": "A 74-hex digest after a pipe without the 01 lead is not a key."
+    },
+    {
+      "id": "convex-deployment-key-negative-gated-cloud-body",
+      "detector": "convex-deployment-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod:happy-otter-123|eyJ2SyntheticGatedCloudBodyNotClaimedYet0",
+      "expected": [],
+      "note": "The eyJ2 cloud body is issuance-gated (R4) and stays unclaimed until the gate clears; recorded as gated, not as a benign rule."
+    },
+    {
+      "id": "convex-deployment-key-positive-authorization-convex-scheme",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Convex prod:happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d' https://happy-otter-123.convex.cloud/api/query",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 128
+        }
+      ],
+      "note": "The provider's own Authorization: Convex scheme is reported at exactly the key."
+    },
+    {
+      "id": "convex-deployment-key-positive-compose-self-hosted",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "docker-compose"
+      ],
+      "input": "services:\n  backend:\n    environment:\n      CONVEX_SELF_HOSTED_ADMIN_KEY: convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 74,
+          "end": 167
+        }
+      ],
+      "note": "A self-hosted admin key in a Compose environment block is reported whole, name included."
+    },
+    {
+      "id": "convex-deployment-key-overlap-bearer-self-hosted",
+      "detector": "convex-deployment-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de\n",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 115
+        }
+      ],
+      "note": "The provider finding supersedes the whole-value Bearer candidate (#918): one finding over the whole key."
+    },
+    {
+      "id": "convex-deployment-key-positive-non-type-separator",
+      "detector": "convex-deployment-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "prod;happy-otter-123|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5,
+          "end": 97
+        }
+      ],
+      "note": "A separator that is not a type lead leaves an untyped key, claimed from the name on."
+    },
+    {
+      "id": "convex-deployment-key-adversarial-long-run",
+      "detector": "convex-deployment-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "convex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0dconvex-self-hosted|015e7c0dedfeedbeefdeadc0de0ddba11acefacade5a1ed0ff5e7c0dedfeedbeefdeadc0de0d",
+      "expected": [],
+      "note": "A long run of glued keys is one wider identifier: no carved-out match, and the scan stays linear and bounded."
     }
   ]
 }

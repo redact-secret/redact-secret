@@ -38,6 +38,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `confluent_cloud_api_secret_legacy` | `confluent-cloud-api-secret-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `connection_string_password` | `connection-string` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
 | `contextual_secret` | `generic-token` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
+| `convex_deployment_key` | `convex-deployment-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider code: backend key format and generator; hex length derived from the generator), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `databricks_personal_access_token` | `databricks-personal-access-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `datadog_api_key` | `datadog-api-key` | `confidence-gated` | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `datadog_application_key` | `datadog-application-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; current `ddapp_`-prefixed shape added by issue #671, applying the existing `confluent_cloud_api_secret` / `heroku_api_key` current/legacy split policy to this family |
@@ -557,6 +558,48 @@ redact), `ck_` and `cak_` keys (no known shape), and single-case `ak_` bodies.
 False positives: `ak_` + a 20-byte mixed-case identifier with a boundary on
 both sides, and `oak_` + any 20-byte alphabet run.
 
+## Tier B provider families (#860)
+
+The Tier B families of issue
+[#860](https://github.com/redact-secret/redact-secret/issues/860)
+([re-rank](../audits/evidence/860/tier-b-rerank.md)) are each a new detector
+with its own finding type, `Provider` specificity, high confidence and always
+redacted, so overlap resolution reports one provider finding per span over
+`contextual_secret`, `bearer_token` and `authorization_credential`. The frozen
+contract for each family, with its sources, tier rationale, excluded shapes
+and issuance checklist, is its step-3 handoff next to the re-rank; this
+section records only the implemented grammar and its trade-offs.
+
+Shared rules: a value is rejected when the byte before it or after it
+continues an identifier (`[A-Za-z0-9_-]`, adjusted per family where noted),
+so an embedded, over-long or glued value is an intentional false negative,
+never a truncated match. None of these providers is added to
+`generic-token`'s dedicated-provider deferral list: each has shapes these
+contracts exclude, and deferral would turn a provider-named assignment of one
+into a silent miss. No row is a support-status claim; promotion stays gated on
+core conformance and the benchmarks arrival and profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `convex:deployment-key` | `convex-deployment-key` | optional `prod:`/`dev:` + cloud name `[a-z]+-[a-z]+-[0-9]+`, or `preview:`/`project:` + `<slug>:<slug>`; or an untyped `[a-z0-9][a-z0-9-]{0,62}` name; then one `\|`, then `01` + lowercase hex, even length 74–96. The whole key, lead and name included, is the span. The key must start at the input start or after a byte outside `[A-Za-z0-9_:-]` | `convex_deployment_key` | T1 (backend `format_admin_key` and key broker; the 74–96 range is derived from the generator) |
+
+Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
+[handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
+plus the `01` hex envelope, not a leading literal, so this is a bespoke scan
+(one pass over `|`, bounded left and right walks). The public name is inside
+the span so a partial redaction cannot be reassembled. The cloud deploy-key
+body (`eyJ2…`) is issuance-gated (ruling R4) and stays unclaimed; `convex` is
+not in `generic-token`'s deferral list, so the exact names
+`CONVEX_DEPLOY_KEY` and `CONVEX_SELF_HOSTED_ADMIN_KEY` (#919) keep a
+contextual finding for it. False negatives: every `eyJ2` cloud key until the
+gate clears, pre-0.16.0 bare keys, a name or slug outside the bounded class,
+a `prod:`/`dev:` lead before a non-cloud name, uppercase hex, and any future
+key version. A separator that is not a type lead (`prod;<name>|01…`) leaves an
+untyped key claimed from the name on. False positives: a non-Convex
+`<name>|01<74–96 even lowercase hex>` with clean boundaries; none is known.
+Cost: one scan for `|`, then at most 97 bytes right and 137 bytes left per
+candidate.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -573,6 +616,7 @@ both sides, and `oak_` + any 20-byte alphabet run.
 | Helicone `sk-`/`pk-` + `helicone` + optional `-eu`/`-rl` + four 7-byte `[a-z0-9]` groups, and the `sk-helicone-proxy-` key with a trailing UUID, are reported as `helicone_api_key` (`sk-`) and `helicone_write_api_key` (`pk-`, redacted by default) at provider specificity, bare or in any context; legacy bare `sk-`, `-cp-` and `-gov` forms stay unclaimed ([#907](https://github.com/redact-secret/redact-secret/issues/907), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family, with the group alphabet fixed by ruling R8 |
 | Firecrawl `fc-` + a dashless lowercase UUIDv4 (32 hex, version and variant nibbles enforced) is reported as `firecrawl_api_key` at provider specificity, bare or in any context; legacy dashed UUIDs, `fco_` and `fcmcp_` stay unclaimed ([#908](https://github.com/redact-secret/redact-secret/issues/908), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | Composio `ak_` + 20 (mixed-case guard), `oak_` + 20 and `uak_` + 43 `[A-Za-z0-9_-]` keys are reported as three finding types at provider specificity, bare or in any context; `ck_`, `cak_` and `uak_` at other widths stay unclaimed ([#909](https://github.com/redact-secret/redact-secret/issues/909), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family, with the `uak_` width fixed by ruling R6 |
+| Convex `<name>\|01<hex>` deployment and admin keys (typed `prod`/`dev`/`preview`/`project` lead or untyped self-hosted name; even 74–96 lowercase hex body led by `01`) are reported as `convex_deployment_key` at provider specificity over the whole key; the `eyJ2` cloud body stays unclaimed until its issuance check ([#912](https://github.com/redact-secret/redact-secret/issues/912), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

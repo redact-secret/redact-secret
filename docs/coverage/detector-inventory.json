@@ -799,6 +799,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0075ak_Synthetic_Revoked-ComposioUserKeyFixture-01",
       "schemes": null
+    },
+    {
+      "type": "convex_deployment_key",
+      "detector": "convex-deployment-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063onvex-self-hosted|01deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+      "schemes": null
     }
   ],
   "consumers": [

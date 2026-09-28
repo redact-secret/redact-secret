@@ -78,6 +78,7 @@ export const CANONICAL_IDS = [
   "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
   "doppler-token", "trigger-dev-token", "e2b-api-key", "posthog-token", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
+  "convex-deployment-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -104,6 +105,7 @@ export const GROUPS = {
     "pulumi-access-token", "pinecone-api-key", "databricks-personal-access-token",
     "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "postman-api-key", "postman-collection-access-key",
     "heroku-api-key", "heroku-api-key-legacy", "doppler-token",
+    "convex-deployment-key",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",

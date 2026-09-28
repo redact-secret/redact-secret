@@ -11914,6 +11914,142 @@
       "type": "composio_user_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "convex-deployment-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "convex-deployment-key-positive-authorization-convex-scheme",
+            "convex-deployment-key-positive-bare",
+            "convex-deployment-key-positive-body-96",
+            "convex-deployment-key-positive-body-96-dotenv",
+            "convex-deployment-key-positive-chat-sentence",
+            "convex-deployment-key-positive-compose-self-hosted",
+            "convex-deployment-key-positive-crlf-unicode-prefix",
+            "convex-deployment-key-positive-curl-bearer",
+            "convex-deployment-key-positive-dev-typed",
+            "convex-deployment-key-positive-dev-typed-dotenv",
+            "convex-deployment-key-positive-dotenv",
+            "convex-deployment-key-positive-json-config",
+            "convex-deployment-key-positive-json-token-key",
+            "convex-deployment-key-positive-log",
+            "convex-deployment-key-positive-non-type-separator",
+            "convex-deployment-key-positive-preview-typed",
+            "convex-deployment-key-positive-preview-typed-dotenv",
+            "convex-deployment-key-positive-project-typed",
+            "convex-deployment-key-positive-project-typed-dotenv",
+            "convex-deployment-key-positive-punctuation-adjacent",
+            "convex-deployment-key-positive-python-sdk-call",
+            "convex-deployment-key-positive-repeated-value",
+            "convex-deployment-key-positive-self-hosted-untyped",
+            "convex-deployment-key-positive-self-hosted-untyped-dotenv",
+            "convex-deployment-key-positive-shell-export",
+            "convex-deployment-key-positive-tool-call-arguments",
+            "convex-deployment-key-positive-x-api-key-header",
+            "convex-deployment-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "convex-deployment-key-overlap-bearer-header",
+            "convex-deployment-key-overlap-bearer-self-hosted",
+            "convex-deployment-key-overlap-body-96-bearer",
+            "convex-deployment-key-overlap-context",
+            "convex-deployment-key-overlap-dev-typed-bearer",
+            "convex-deployment-key-overlap-preview-typed-bearer",
+            "convex-deployment-key-overlap-project-typed-bearer",
+            "convex-deployment-key-overlap-self-hosted-untyped-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "convex-deployment-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "convex-deployment-key-boundary-double-separator",
+            "convex-deployment-key-boundary-glued-suffix",
+            "convex-deployment-key-boundary-glued-type-lead",
+            "convex-deployment-key-boundary-long-body",
+            "convex-deployment-key-boundary-non-hex-byte",
+            "convex-deployment-key-boundary-odd-body",
+            "convex-deployment-key-boundary-prod-lead-non-cloud-name",
+            "convex-deployment-key-boundary-short-body",
+            "convex-deployment-key-boundary-underscore-name",
+            "convex-deployment-key-boundary-uppercase-hex",
+            "convex-deployment-key-boundary-wrong-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "convex-deployment-key-negative-deployment-selector",
+            "convex-deployment-key-negative-deployment-url",
+            "convex-deployment-key-negative-digest-without-version",
+            "convex-deployment-key-negative-docs-placeholders",
+            "convex-deployment-key-negative-gated-cloud-body",
+            "convex-deployment-key-negative-markdown-cell",
+            "convex-deployment-key-negative-shell-reference-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "convex-deployment-key-boundary-double-separator",
+            "convex-deployment-key-boundary-glued-suffix",
+            "convex-deployment-key-boundary-glued-type-lead",
+            "convex-deployment-key-boundary-long-body",
+            "convex-deployment-key-boundary-non-hex-byte",
+            "convex-deployment-key-boundary-odd-body",
+            "convex-deployment-key-boundary-prod-lead-non-cloud-name",
+            "convex-deployment-key-boundary-short-body",
+            "convex-deployment-key-boundary-underscore-name",
+            "convex-deployment-key-boundary-uppercase-hex",
+            "convex-deployment-key-boundary-wrong-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for convex_deployment_key (convex-deployment-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "convex_deployment_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12066,6 +12202,7 @@
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
+            "convex-deployment-key-adversarial-long-run",
             "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
@@ -12511,6 +12648,7 @@
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
+            "convex-deployment-key-adversarial-long-run",
             "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",

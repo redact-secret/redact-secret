@@ -37,7 +37,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 93] = [
+const ALWAYS_REDACT_TYPES: [&str; 94] = [
     "anthropic_admin_api_key",
     "anthropic_api_key",
     "anthropic_enterprise_api_key",
@@ -54,6 +54,7 @@ const ALWAYS_REDACT_TYPES: [&str; 93] = [
     "composio_user_api_key",
     "confluent_cloud_api_secret",
     "connection_string_password",
+    "convex_deployment_key",
     "databricks_personal_access_token",
     "datadog_application_key",
     "digitalocean_token",

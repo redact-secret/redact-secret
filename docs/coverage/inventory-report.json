@@ -4847,12 +4847,74 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "composio_user_api_key"
+    },
+    {
+      "detector": "convex-deployment-key",
+      "evidence": {
+        "fixtureCount": 55,
+        "hostContextsExercised": [
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "convex-deployment-key-positive-authorization-convex-scheme",
+        "convex-deployment-key-positive-bare",
+        "convex-deployment-key-positive-body-96",
+        "convex-deployment-key-positive-body-96-dotenv",
+        "convex-deployment-key-positive-chat-sentence",
+        "convex-deployment-key-positive-compose-self-hosted",
+        "convex-deployment-key-positive-crlf-unicode-prefix",
+        "convex-deployment-key-positive-curl-bearer",
+        "convex-deployment-key-positive-dev-typed",
+        "convex-deployment-key-positive-dev-typed-dotenv",
+        "convex-deployment-key-positive-dotenv",
+        "convex-deployment-key-positive-json-config",
+        "convex-deployment-key-positive-json-token-key",
+        "convex-deployment-key-positive-log",
+        "convex-deployment-key-positive-non-type-separator",
+        "convex-deployment-key-positive-preview-typed",
+        "convex-deployment-key-positive-preview-typed-dotenv",
+        "convex-deployment-key-positive-project-typed",
+        "convex-deployment-key-positive-project-typed-dotenv",
+        "convex-deployment-key-positive-punctuation-adjacent",
+        "convex-deployment-key-positive-python-sdk-call",
+        "convex-deployment-key-positive-repeated-value",
+        "convex-deployment-key-positive-self-hosted-untyped",
+        "convex-deployment-key-positive-self-hosted-untyped-dotenv",
+        "convex-deployment-key-positive-shell-export",
+        "convex-deployment-key-positive-tool-call-arguments",
+        "convex-deployment-key-positive-x-api-key-header",
+        "convex-deployment-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "convex_deployment_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 110,
+    "supported": 111,
     "unresolved": 0
   }
 }

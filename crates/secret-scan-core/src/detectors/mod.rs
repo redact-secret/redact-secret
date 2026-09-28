@@ -20,6 +20,7 @@ mod cloudflare;
 mod composio;
 mod confluent;
 mod connection_string;
+mod convex;
 mod databricks;
 mod datadog;
 mod discord;
@@ -167,6 +168,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(helicone::HELICONE),
         Box::new(firecrawl::FIRECRAWL),
         Box::new(composio::COMPOSIO),
+        Box::new(convex::ConvexDeploymentKeyDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -298,6 +300,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("helicone-api-key", Pack::Provider),
     ("firecrawl-api-key", Pack::Provider),
     ("composio-api-key", Pack::Provider),
+    ("convex-deployment-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -418,6 +421,7 @@ mod tests {
                 "helicone-api-key",
                 "firecrawl-api-key",
                 "composio-api-key",
+                "convex-deployment-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -778,6 +782,7 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let convex_deployment_key_input = format!("convex-self-hosted|01{}", "deadbeef".repeat(9));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -848,6 +853,10 @@ mod tests {
             ("helicone-api-key", helicone_api_key_input.as_str()),
             ("firecrawl-api-key", firecrawl_api_key_input.as_str()),
             ("composio-api-key", composio_api_key_input.as_str()),
+            (
+                "convex-deployment-key",
+                convex_deployment_key_input.as_str(),
+            ),
         ];
         assert_provider_candidates(&cases);
     }
