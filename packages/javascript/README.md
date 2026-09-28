@@ -11,7 +11,8 @@ the server must scan again as the authoritative enforcement boundary (see
 [safe integration](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/safe-integration.md)).
 
 Redact Secret is not a DLP platform and does not detect every secret: it
-finds supported credential formats only, and an empty finding list does not
+finds supported credential formats and, only when you opt in, six bounded
+structured PII families (qualification pending), and an empty finding list does not
 prove text is secret-free. It complements repository and history scanners
 rather than replacing them. Per-family support is published in the generated
 [support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
@@ -270,17 +271,27 @@ mapped to the same fixed error vocabulary.
 ## Public API
 
 Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
-`createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
+`piiActivation`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`, `VERSION`,
 `PROFILE`.
 
-Types: `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
+Types: `InitializeOptions`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 `SecretConfidence`, `SecretObfuscation`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
 `PlaceholderContext`, `ScanOptions`, `RedactOptions`, `ScanAndRedactOptions`,
 `ScanResult`, `WholeInputLimits`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,
 `IncrementalSanitizerResult`, `IncrementalSanitizerState`,
 `IncrementalLimits`, `IncrementalSecretPolicy`, `IncrementalPolicyContext`,
 `RangeUnit`, `SecretScanErrorCode`.
+
+PII activation is opt-in and off by default. Pass `pii` selectors to
+`initialize`, for example `await initialize({ pii: ["pii"] })`, then read the
+canonical identity with `piiActivation()`. It covers six bounded structured
+families (email, IBAN, network address, payment card, phone, US SSN) whose
+qualification is pending; availability is not a support claim. The `pii`
+selection is an `initialize` option, not a separate subpath import. A browser
+or Worker fetches the PII WebAssembly build only when the first `initialize`
+call selects PII. See the
+[JavaScript guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/javascript.md).
 
 Stream subpaths: `@redact-secret/core/node-stream` exports
 `createNodeStreamSanitizer`, `NodeStreamSanitizer`, and `SecretScanError`;

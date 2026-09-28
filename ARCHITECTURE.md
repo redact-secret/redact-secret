@@ -3,7 +3,7 @@
 ## Overview
 
 Redact Secret is a deterministic, cross-language text-inspection product for
-detecting and redacting credentials before untrusted content crosses a trust
+detecting and redacting credentials (plus opt-in structured PII, qualification pending) before untrusted content crosses a trust
 boundary. One Rust core is the canonical implementation of built-in detection,
 candidate normalization and overlap resolution, policy evaluation, redaction,
 and bounded incremental sanitization.
@@ -718,9 +718,9 @@ context) is not excluded. All six families are implemented on the shared
 evidence foundation under the accepted
 [`pii-v1` domain, scope, arbitration, and activation contract](./docs/decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
 ([#578](https://github.com/redact-secret/redact-secret/issues/578),
-[#579](https://github.com/redact-secret/redact-secret/issues/579)), merged
-into the unreleased beta.10 candidate pending #579's remaining
-runtime/profile/artifact-size and cross-domain qualification evidence. That
+[#579](https://github.com/redact-secret/redact-secret/issues/579)), shipped
+opt-in in beta.10, all with `pending` qualification until #579's remaining
+runtime/profile/artifact-size and cross-domain qualification evidence lands. That
 model keeps type evidence separate from sensitivity, uses explicit global or
 jurisdictional scope, and makes PII activation orthogonal to the existing
 `full`/`common` credential profiles. Its English/Korean context input is the
