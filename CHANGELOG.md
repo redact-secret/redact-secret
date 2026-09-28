@@ -47,6 +47,12 @@ evidence is linked from each published version.
   later row. Negative and natural-language context keeps the whitespace-only
   boundary, so a pipe never suppresses a finding. This amends the unreleased
   `pii-context/v2` in place; the activation identity is unchanged.
+- An email address joined to a reviewed email label by a bare `|`
+  (`email|…`, `|email|…|`, `id=7|email|…`) is now reported (#943). RFC 5322
+  allows `|` in a local part, so the label and address were read as one local
+  part; a `|` right after a reviewed email label is now a field boundary.
+  After any other text (`|emailx|…`, `|user|a|…`) the `|` stays part of the
+  local part.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

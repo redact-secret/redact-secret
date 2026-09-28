@@ -59,9 +59,16 @@ limits:
   ([#940](https://github.com/redact-secret/redact-secret/issues/940)): each
   `|` starts a new field, the run from it to that field's first `=` is judged
   by the same label rule, and the first field from the left whose key is a
-  label ends the label. A `|` inside a key that is not a label (`user|emailx=`,
-  `user|user.email=`) changes nothing. A label glued to the address by `|`
-  alone (`email|local@domain`) is not split. A combining mark or governed invisible
+  label ends the label. A field key may also end at a bare `|`
+  ([#943](https://github.com/redact-secret/redact-secret/issues/943)): when
+  the text of a field before a `|` is a reviewed email label by the same rule
+  (`email|local@domain`, `|email|local@domain|`, `id=7|email|local@domain`,
+  `|customer_email|…`, `|이메일|…`), that `|` is a field boundary and the
+  candidate starts after it. A `|` after any other text (`|emailx|`,
+  `|user|a|`, `user|user.email=`) stays local-part syntax. The first label
+  field from the left wins, whichever delimiter ends it. A local part that
+  starts with `|` after whitespace (`|email |local@domain|`) is not trimmed:
+  the finding includes that `|`. A combining mark or governed invisible
   scalar is not accepted as either boundary, and a Unicode alphabetic or
   numeric scalar is not accepted on the domain side; the detector rejects the
   whole occurrence rather than matching a suffix or prefix. A URL
@@ -139,8 +146,10 @@ The logfmt label split (`email=local@domain`) removes the false negative of
 a labelled `key=value` record. Its cost is a real local part that literally
 begins with a reviewed email label and `=`: it is read as that label plus a
 shorter address, which is still redacted, so the range loses only the key.
-The pipe-field split (#940) has the same cost for a local part that contains
-`|label=`.
+The pipe-field splits (#940, #943) have the same cost for a local part that
+contains `|label=`, `label|`, or `|label|`: the address is still redacted and
+the range loses only the label. They are security-first: a label joined by a
+bare `|` would otherwise leave the whole labelled address in plain text.
 
 False negatives include every unsupported RFC form above, single-label/local
 delivery domains, combining-mark SMTPUTF8 spellings, an address without

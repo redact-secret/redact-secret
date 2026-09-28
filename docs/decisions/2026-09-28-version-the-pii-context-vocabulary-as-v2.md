@@ -115,9 +115,17 @@ fifth token separator:
 The email family applies the same reading to its `=` label split: RFC 5322
 `atext` includes `|`, so a pipe record's local-part scan runs back over
 earlier fields, and each `|` starts a field whose key is judged by the #926
-label rule ([`email-v1`](../contracts/pii/email-v1.md)). A label glued to the
-address by `|` alone (`email|local@domain`) is not split and stays a false
-negative.
+label rule ([`email-v1`](../contracts/pii/email-v1.md)). A field key also
+ends at a bare `|`
+([#943](https://github.com/redact-secret/redact-secret/issues/943)): when the
+text before that `|` is exactly a reviewed positive email field label by the
+#926 rule (`email|local@domain`, `|email|local@domain|`), the `|` is a field
+boundary, the label is split off, and it associates through the pipe rule
+above. After any other text (`|emailx|`, `|user|a|`) the `|` keeps its RFC
+local-part reading. This is the security-first reading: the alternative
+leaves a labelled address unreported, while the split only costs the range
+of a real local part that literally contains `label|`, and that address is
+still redacted.
 
 **Why this amends v2 in place instead of versioning v3.** The vocabulary
 contract says a matching change requires a new version. That rule exists so a

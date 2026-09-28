@@ -636,6 +636,130 @@
           "end": 51
         }
       ]
+    },
+    {
+      "id": "bare-pipe-email-label-table-cell",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|email|fixture876-q7m9@x4z8v2n6.synthetic|",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 41
+        }
+      ]
+    },
+    {
+      "id": "bare-pipe-email-label-after-earlier-pair",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "id=7|email|fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 11,
+          "end": 45
+        }
+      ]
+    },
+    {
+      "id": "bare-pipe-email-label-with-space-twin",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|email |fixture876-q7m9@x4z8v2n6.synthetic|",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 42
+        }
+      ]
+    },
+    {
+      "id": "bare-pipe-email-label-then-phone-field",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|email|fixture876-q7m9@x4z8v2n6.synthetic|phone|555-234-5678|",
+      "expected": [
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_email",
+          "confidence": "high",
+          "action": "redact",
+          "start": 7,
+          "end": 41
+        },
+        {
+          "detector": "pii-domain",
+          "type": "pii_global_phone",
+          "confidence": "high",
+          "action": "redact",
+          "start": 48,
+          "end": 60
+        }
+      ]
+    },
+    {
+      "id": "bare-pipe-email-label-prefix-twin",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|emailx|fixture876-q7m9@x4z8v2n6.synthetic|",
+      "expected": []
+    },
+    {
+      "id": "bare-pipe-unreviewed-fields-twin",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|user|a|fixture876-q7m9@x4z8v2n6.synthetic|",
+      "expected": []
+    },
+    {
+      "id": "bare-pipe-email-label-reserved-domain-control",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|email|person@example.com|",
+      "expected": []
+    },
+    {
+      "id": "bare-pipe-unreviewed-fields-reserved-domain-control",
+      "issue": 943,
+      "selectors": [
+        "pii:us",
+        "pii:global"
+      ],
+      "input": "|user|a|b@example.com|",
+      "expected": []
     }
   ]
 }
