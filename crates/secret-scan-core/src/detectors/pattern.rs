@@ -245,6 +245,30 @@ pub(super) fn run_ends(bytes: &[u8], alphabet: Alphabet) -> Vec<usize> {
     ends
 }
 
+/// The offset of the first occurrence of `needle` in `bytes` that starts at
+/// or after `from`, or `None` when there is none (or `needle` is empty).
+///
+/// A left-to-right scan that tests `bytes[start..].starts_with(needle)` at
+/// every offset and advances by one byte on a miss visits exactly the
+/// offsets this returns, in the same order, so replacing that inner miss
+/// loop with this search leaves the scan's result unchanged; it only skips
+/// the offsets whose first byte already rules them out (issue #950).
+pub(super) fn find_literal(bytes: &[u8], needle: &[u8], from: usize) -> Option<usize> {
+    let (&first, rest) = needle.split_first()?;
+    let last_start = bytes.len().checked_sub(needle.len())?;
+    let mut at = from;
+    while at <= last_start {
+        at += bytes[at..=last_start]
+            .iter()
+            .position(|&byte| byte == first)?;
+        if bytes[at + 1..at + needle.len()] == *rest {
+            return Some(at);
+        }
+        at += 1;
+    }
+    None
+}
+
 /// `true` when neither the byte immediately before `start` nor the byte
 /// immediately at `end` belongs to `boundary`, i.e. the span is not a
 /// truncated slice of a longer run of the same or a wider alphabet.
@@ -439,6 +463,33 @@ pub(super) fn scan_prefixed_shapes(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn find_literal_returns_the_first_occurrence_at_or_after_the_offset() {
+        let haystacks: [&[u8]; 6] = [
+            b"",
+            b"x",
+            b"xoxb-xoxb",
+            b"aaaa",
+            b"xoxxoxbxoxb-",
+            b"://:/://",
+        ];
+        let needles: [&[u8]; 5] = [b"x", b"xoxb-", b"aa", b"://", b"aaaaa"];
+        for haystack in haystacks {
+            for needle in needles {
+                for from in 0..=haystack.len() + 1 {
+                    let expected =
+                        (from..haystack.len()).find(|&at| haystack[at..].starts_with(needle));
+                    assert_eq!(
+                        find_literal(haystack, needle, from),
+                        expected,
+                        "{haystack:?} {needle:?} {from}"
+                    );
+                }
+            }
+        }
+        assert_eq!(find_literal(b"abc", b"", 0), None);
+    }
 
     #[test]
     fn alphabets_match_documented_classes() {
