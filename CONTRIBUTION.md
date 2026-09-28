@@ -54,6 +54,35 @@ require artifact inspection and clean-install smoke tests.
 Pull requests should explain the observable change, its verification, and any
 compatibility impact.
 
+### Requirements for acceptable contributions
+
+A contribution is accepted when it meets all of the following. The automated
+items are enforced by CI on every pull request; the rest are checked in review.
+
+- **Coding standard.** Follow [CONVENTIONS.md](CONVENTIONS.md). Rust code is
+  formatted with `rustfmt` (`rustfmt.toml`) and must pass `cargo clippy` with
+  warnings denied (`clippy.toml`, `RUSTFLAGS=-D warnings`); TypeScript must
+  type-check. Do not silence a warning to make CI pass; fix its cause.
+- **Tests.** Every behavior change to a detector, redaction, overlap
+  resolution, or policy comes with deterministic automated tests in the same
+  pull request, in the shared [conformance corpus](conformance/README.md) or
+  the package's own test suite. A pull request that changes behavior without a
+  test is not ready to merge.
+- **Synthetic data only.** Fixtures, logs, snapshots, and documentation use
+  unmistakably synthetic or revoked examples. Never commit a real credential.
+- **Boundaries.** Keep the core side-effect free (no runtime network access,
+  telemetry, secret storage, or environment-dependent behavior), keep
+  detection separate from policy enforcement, and state the false-positive and
+  false-negative tradeoffs of a detector change. A material boundary change
+  needs an ADR.
+- **Supply chain and static analysis.** Dependency changes must pass
+  `cargo deny`, and the pinned OpenGrep SAST gate (`.github/workflows/sast.yml`)
+  must pass. A new finding is fixed, or dispositioned in
+  `sast/baseline.json` with a reason a reviewer can check.
+- **Changelog.** Follow [Changelog coverage](#changelog-coverage) below.
+- **License.** Contributions are licensed under the repository's
+  [MIT License](LICENSE).
+
 ### Changelog coverage
 
 A pull request that changes the detector registry, the policy that classifies
