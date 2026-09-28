@@ -129,6 +129,11 @@ FULL_ARTIFACT_GLUE = "redact_secret_wasm.js"
 FULL_PROFILE_ASSERTION = '!== "full"'
 COMMON_ARTIFACT_GLUE = "redact_secret_wasm_common.js"
 COMMON_PROFILE_ASSERTION = '!== "common"'
+# Issue #937: the same step must also refuse a default artifact that links
+# the PII runtime (it must answer a PII selection with
+# PII_SELECTOR_UNAVAILABLE) and check both `pii` artifacts.
+PII_UNAVAILABLE_ASSERTION = '!== "PII_SELECTOR_UNAVAILABLE"'
+PII_ARTIFACT_GLUES = ("redact_secret_wasm_pii.js", "redact_secret_wasm_common_pii.js")
 
 # Issue #527: `publish-pypi` must verify, at publish time, that the wheels
 # and source distribution it is about to hand to PyPI are byte-identical to
@@ -371,6 +376,17 @@ def validate(root: Path) -> list[str]:
                     f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
                     'assert the common artifact reports "common"'
                 )
+            if PII_UNAVAILABLE_ASSERTION not in body:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
+                    "assert the default artifacts refuse PII as unavailable"
+                )
+            for glue in PII_ARTIFACT_GLUES:
+                if glue not in body:
+                    errors.append(
+                        f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
+                        f"check the pii artifact {glue}"
+                    )
 
     wrapper_job = jobs.get(WRAPPER_JOB)
     if wrapper_job is not None:

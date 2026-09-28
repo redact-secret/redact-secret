@@ -25,6 +25,21 @@ declare module "@redact-secret/wasm/common" {
 }
 
 /**
+ * As above, for each profile's `pii` build (issue #937), which only
+ * `initialize()` with a PII selection loads. The shape is the same; only the
+ * linked runtime differs.
+ */
+declare module "@redact-secret/wasm/pii" {
+  const generated: unknown;
+  export default generated;
+}
+
+declare module "@redact-secret/wasm/common/pii" {
+  const generated: unknown;
+  export default generated;
+}
+
+/**
  * As above, for the raw `.wasm` binaries `runtime/workerd.ts`/
  * `workerd-common.ts` import directly by their own literal specifier
  * (`decision-verify-edge-runtimes`): a bundler that resolves a `workerd`
@@ -40,6 +55,16 @@ declare module "@redact-secret/wasm/redact_secret_wasm_bg.wasm" {
 }
 
 declare module "@redact-secret/wasm/redact_secret_wasm_common_bg.wasm" {
+  const module: WebAssembly.Module;
+  export default module;
+}
+
+declare module "@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm" {
+  const module: WebAssembly.Module;
+  export default module;
+}
+
+declare module "@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm" {
   const module: WebAssembly.Module;
   export default module;
 }

@@ -100,6 +100,14 @@ jobs:
       - name: Run Clippy on the common-profile browser binding
         run: cargo clippy -p redact-secret-wasm --all-targets --no-default-features --locked -- -D warnings
 
+      # Issue #937: each profile's `pii` build is the same crate with its
+      # off-by-default `pii` feature, which selects other registry
+      # constructors.
+      - name: Run Clippy on the pii browser bindings
+        run: |
+          cargo clippy -p redact-secret-wasm --all-targets --features pii --locked -- -D warnings
+          cargo clippy -p redact-secret-wasm --all-targets --no-default-features --features pii --locked -- -D warnings
+
       - name: Check API surface, boundaries, versions, MSRV, and package contents
         run: npm run rust:check
 
@@ -260,12 +268,28 @@ jobs:
           WASM_BINDGEN_TEST_ONLY_NODE: "1"
         run: cargo test -p redact-secret-wasm --no-default-features --target wasm32-unknown-unknown --locked
 
+      # Issue #937: the `pii` builds of both profiles (the off-by-default
+      # `pii` feature), natively and, for `full`, on wasm32.
+      - name: Test the pii browser bindings natively
+        run: |
+          cargo test -p redact-secret-wasm --features pii --locked
+          cargo test -p redact-secret-wasm --no-default-features --features pii --locked
+
+      - name: Test the full pii browser binding for wasm32 (via Node)
+        env:
+          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER: wasm-bindgen-test-runner
+          WASM_BINDGEN_TEST_ONLY_NODE: "1"
+        run: cargo test -p redact-secret-wasm --features pii --target wasm32-unknown-unknown --locked
+
       # Issue #929. Build the real `full` and `common` release artifacts and
       # check the profile guards of scripts/measure-wasm-profiles.mjs:
       # `common` is smaller, links every `common` detector and no `provider`
       # detector, and exports the same surface. Before this ran in CI, #884
       # made every provider detector reachable from `common` unnoticed.
-      - name: Guard the common WASM profile against provider code
+      # Issue #937 adds each profile's `pii` build: the default `full` and
+      # `common` builds must link no part of the PII runtime, each `pii` build
+      # must link it, and all four export one surface.
+      - name: Guard the WASM profiles against provider and PII code
         run: node scripts/measure-wasm-profiles.mjs --guard-only
 
       # Issue #772. The shadow scorer is crate-internal, so the shipped

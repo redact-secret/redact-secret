@@ -17,7 +17,7 @@
  * separate `common` entry (see `./wasm-binding.js`'s module comment).
  */
 
-import type { NativeBinding } from "../native.js";
+import type { NativeBindingLoader } from "../native.js";
 import {
   assertWasmModuleShape,
   createBindingFromWasmModule,
@@ -26,22 +26,27 @@ import {
 
 /**
  * Loads the `common`-profile WebAssembly artifact published in lockstep with
- * this package, under `@redact-secret/wasm`'s `common` subpath export.
+ * this package, under `@redact-secret/wasm`'s `common` subpath export, or,
+ * only when the first `initialize()` carries a PII selection, its `pii`
+ * build under the `common/pii` subpath (issue #937).
  *
- * The specifier is a literal so a bundler can resolve and include the glue and
- * the `.wasm` binary it references, and the import is dynamic so nothing is
- * fetched until a caller awaits `initialize()`.
+ * Each specifier is a literal so a bundler can resolve and include the glue
+ * and the `.wasm` binary it references, and each import is dynamic so
+ * nothing is fetched until a caller awaits `initialize()`, and the `pii`
+ * build is never fetched unless PII is selected.
  */
-async function loadWasmModule(): Promise<WasmModule> {
-  const module = (await import(
-    "@redact-secret/wasm/common"
-  )) as unknown as Partial<WasmModule>;
+async function loadWasmModule(pii: boolean): Promise<WasmModule> {
+  const module = (
+    pii
+      ? await import("@redact-secret/wasm/common/pii")
+      : await import("@redact-secret/wasm/common")
+  ) as unknown as Partial<WasmModule>;
   assertWasmModuleShape(module);
   return module;
 }
 
-export const loadNativeBinding = async (): Promise<NativeBinding> => {
-  const wasm = await loadWasmModule();
+export const loadNativeBinding: NativeBindingLoader = async ({ pii }) => {
+  const wasm = await loadWasmModule(pii);
   await wasm.default();
   return createBindingFromWasmModule(wasm);
 };

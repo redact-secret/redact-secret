@@ -357,6 +357,54 @@ jobs:
             );
           }
           console.log('bindings/wasm/npm/redact_secret_wasm_common.js reports profile "common" as expected.');
+
+          // Issue #937: each profile ships a default build without the PII
+          // runtime and a `pii` build with it. A default build must refuse a
+          // PII selection as unavailable; a `pii` build must report its
+          // profile and accept one. Each glue module owns its own instance.
+          const piiCode = (initializeFn) => {
+            try {
+              initializeFn(["pii"]);
+              return "accepted";
+            } catch (error) {
+              return error?.code;
+            }
+          };
+          const { initialize: initializeFull } = await import("./bindings/wasm/npm/redact_secret_wasm.js");
+          const { initialize: initializeCommon } = await import("./bindings/wasm/npm/redact_secret_wasm_common.js");
+          for (const [glue, initializeFn] of [
+            ["redact_secret_wasm.js", initializeFull],
+            ["redact_secret_wasm_common.js", initializeCommon],
+          ]) {
+            const code = piiCode(initializeFn);
+            if (code !== "PII_SELECTOR_UNAVAILABLE") {
+              throw new Error(
+                `bindings/wasm/npm/${glue} answered a PII selection with "${code}", not "PII_SELECTOR_UNAVAILABLE" -- refusing to publish a default artifact that links the PII runtime`,
+              );
+            }
+          }
+          const pii = await import("./bindings/wasm/npm/redact_secret_wasm_pii.js");
+          const commonPii = await import("./bindings/wasm/npm/redact_secret_wasm_common_pii.js");
+          await pii.default(readFileSync("./bindings/wasm/npm/redact_secret_wasm_pii_bg.wasm"));
+          await commonPii.default(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_pii_bg.wasm"));
+          for (const [glue, module, expected] of [
+            ["redact_secret_wasm_pii.js", pii, "full"],
+            ["redact_secret_wasm_common_pii.js", commonPii, "common"],
+          ]) {
+            const reportedPii = module.profile();
+            if (reportedPii !== expected) {
+              throw new Error(
+                `bindings/wasm/npm/${glue} reports profile "${reportedPii}", not "${expected}" -- refusing to publish a pii artifact under a mismatched profile`,
+              );
+            }
+            const code = piiCode(module.initialize);
+            if (code !== "accepted") {
+              throw new Error(
+                `bindings/wasm/npm/${glue} refused a PII selection with "${code}" -- refusing to publish a pii artifact without the PII runtime`,
+              );
+            }
+          }
+          console.log("each default artifact refuses PII as unavailable; each pii artifact reports its profile and accepts PII.");
           NODE_VERIFY
 
       # Issue #528's generalization of issue #527's Python check: both
@@ -380,7 +428,15 @@ jobs:
             bindings/wasm/npm/redact_secret_wasm_common.js \
             bindings/wasm/npm/redact_secret_wasm_common.d.ts \
             bindings/wasm/npm/redact_secret_wasm_common_bg.wasm \
-            bindings/wasm/npm/redact_secret_wasm_common_bg.wasm.d.ts
+            bindings/wasm/npm/redact_secret_wasm_common_bg.wasm.d.ts \
+            bindings/wasm/npm/redact_secret_wasm_pii.js \
+            bindings/wasm/npm/redact_secret_wasm_pii.d.ts \
+            bindings/wasm/npm/redact_secret_wasm_pii_bg.wasm \
+            bindings/wasm/npm/redact_secret_wasm_pii_bg.wasm.d.ts \
+            bindings/wasm/npm/redact_secret_wasm_common_pii.js \
+            bindings/wasm/npm/redact_secret_wasm_common_pii.d.ts \
+            bindings/wasm/npm/redact_secret_wasm_common_pii_bg.wasm \
+            bindings/wasm/npm/redact_secret_wasm_common_pii_bg.wasm.d.ts
 
       - name: Pack, content-check, publish, and verify
         run: node scripts/publish-dependency-package.mjs --package-dir bindings/wasm/npm --tag "${{ steps.tag.outputs.tag }}"

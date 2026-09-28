@@ -185,13 +185,20 @@ which exports, expectations, and fixture each pass uses.
 `wasm32-unknown-unknown` cdylib and generates the `web`-target glue with a
 `wasm-bindgen` CLI whose version must match the crate's exactly. The qualifier
 serves that directory over HTTP — with `application/wasm` on the binary, which
-streaming instantiation requires — and loads nine fresh pages in each engine
-against that one artifact. Two default pages qualify the raw artifact and
-published package; two activate the exact payment-card selector and its global
+streaming instantiation requires — and loads eleven fresh pages in each engine.
+The directory holds two builds of the profile (#937): the default one, which
+links no PII runtime, and the `pii` one. Two default pages qualify the raw
+default build and the published package on it; one proves the default build
+answers a valid PII selection with `PII_SELECTOR_UNAVAILABLE`, reports selector
+and conflict errors unchanged, and finds no PII; one drives the package's
+`initialize({ pii })` entry point, which must load the `pii` build. On the
+`pii` build, two pages activate the exact payment-card selector and its global
 closure; two activate the exact phone selector and its global closure; two
 activate the exact US SSN selector and its `pii:us` jurisdiction closure; one
-proves the SSN input stays clean with PII off. Every activation
-runs in an isolated module instance.
+proves the SSN input stays clean with PII off. The runner records the `.wasm`
+files each page fetches and fails a page that fetches any build other than its
+own, so a PII-off page that downloads the PII runtime fails in every engine.
+Every activation runs in an isolated module instance.
 
 The first, `scripts/browser-harness.mjs`, drives the artifact through its own
 exports:

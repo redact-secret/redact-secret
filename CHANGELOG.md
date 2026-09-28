@@ -69,6 +69,35 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The default browser WebAssembly artifacts no longer carry the PII domain
+  runtime (#937). Since 0.1.0-beta.10 every WASM build linked the
+  `pii-domain` adapter, its families, and their Unicode normalization
+  tables, so a browser that never enabled PII downloaded about twice the
+  bytes. Each profile now ships two builds in `@redact-secret/wasm`: the
+  default one (`redact_secret_wasm*`, `redact_secret_wasm_common*`), which
+  links no PII runtime, and a `pii` one (`redact_secret_wasm_pii*`,
+  `redact_secret_wasm_common_pii*`, subpaths `./pii` and `./common/pii`),
+  built with the `redact-secret-wasm` crate's new off-by-default `pii` Cargo
+  feature. `@redact-secret/core` loads the `pii` build only when the
+  `initialize()` call that loads the binding carries a non-empty `pii`
+  selection; the Node addon, Python, Rust and CLI are unchanged. Release
+  `.wasm` sizes (raw / gzip level 9) move from 741,780 / 275,500 B to
+  468,090 / 159,706 B for `full` and from 590,801 / 229,049 B to
+  317,150 / 113,968 B for `common`; the `pii` builds are 741,825 / 275,512 B
+  and 590,846 / 229,048 B. Both default builds remain above the
+  0.1.0-beta.8 size budgets (137,639 and 100,058 B gzip, +5%): the rest of
+  the growth predates the PII runtime. The `measure-wasm-profiles.mjs --guard-only` CI
+  guard now fails when a default build links any part of the PII runtime.
+- Migration: the public PII API is unchanged. `initialize({ pii: [...] })`,
+  `piiActivation()`, the selector grammar, error codes, and the one-shot
+  `PII_ACTIVATION_CONFLICT` behave as before on every entry point. Two
+  things are new. A bundler now emits each profile's `pii` build as a second,
+  lazily loaded `.wasm` asset next to the default one; only the build the
+  page selects is fetched. Code that imports `@redact-secret/wasm` directly
+  (the package is documented as not intended for direct use) must import
+  `@redact-secret/wasm/pii` or `@redact-secret/wasm/common/pii` to select
+  PII: the default builds now answer a valid PII selection with
+  `PII_SELECTOR_UNAVAILABLE`.
 - The PII context vocabulary is now `pii-context/v2`, and every PII
   activation identity names it (`vocabulary=pii-context/v2`). A field label
   associates only with the value after it, so an earlier value on the same

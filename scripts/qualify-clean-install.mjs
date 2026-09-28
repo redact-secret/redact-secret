@@ -257,13 +257,16 @@ async function browserLane(context) {
   await writeScenarioFiles(project, scenario.files);
   await runStep("build", scenario.run, project, env);
 
-  // The bundle must carry the full-profile WebAssembly binary the package
-  // installed, byte for byte, and not the common one.
+  // The bundle must carry the full-profile WebAssembly binaries the package
+  // installed, byte for byte, and not the common ones: the default build and
+  // the `pii` build `initialize({ pii })` loads lazily (issue #937).
   const installedWasm = await fileDigests(join(project, "node_modules", "@redact-secret", "wasm"));
   const bundled = [...(await fileDigests(join(project, "dist")))].filter(([file]) => file.endsWith(".wasm"));
+  const defaultWasm = installedWasm.get("redact_secret_wasm_bg.wasm");
+  const expectedBundle = [defaultWasm, installedWasm.get("redact_secret_wasm_pii_bg.wasm")].sort();
   assert(
-    bundled.length === 1 && bundled[0][1] === installedWasm.get("redact_secret_wasm_bg.wasm"),
-    "the bundle does not carry exactly the installed full-profile .wasm asset",
+    JSON.stringify(bundled.map(([, digest]) => digest).sort()) === JSON.stringify(expectedBundle),
+    "the bundle does not carry exactly the installed full-profile default and pii .wasm assets",
   );
 
   const port = /--port\s+(\d+)/.exec(scenario.serve)?.[1];
@@ -280,7 +283,12 @@ async function browserLane(context) {
     const wasmResponses = [];
     page.on("response", (response) => {
       if (new URL(response.url()).pathname.endsWith(".wasm")) {
-        wasmResponses.push({ status: response.status(), type: response.headers()["content-type"] });
+        wasmResponses.push(
+          response.body().then(
+            (body) => ({ status: response.status(), type: response.headers()["content-type"], sha256: sha256(body) }),
+            () => ({ status: response.status(), type: response.headers()["content-type"], sha256: null }),
+          ),
+        );
       }
     });
     const readOutput = async () => {
@@ -291,10 +299,13 @@ async function browserLane(context) {
     const output = await readOutput();
     assert(output === scenario.expect, "page text differs from the documented output");
     const elapsedSeconds = timer();
+    const loaded = await Promise.all(wasmResponses);
     assert(
-      wasmResponses.length === 1 && wasmResponses[0].status === 200 && wasmResponses[0].type?.startsWith("application/wasm"),
+      loaded.length === 1 && loaded[0].status === 200 && loaded[0].type?.startsWith("application/wasm"),
       "the page did not load exactly one .wasm asset served as application/wasm",
     );
+    // The quickstart enables no PII, so only the default build is fetched.
+    assert(loaded[0].sha256 === defaultWasm, "the page loaded a .wasm other than the default full-profile build");
 
     const install = await verifyNpmInstall(project, context.version, context.candidate, context.registryUrl);
     const fixed = await fixedJsMessage(project, env, "INITIALIZATION_FAILED");

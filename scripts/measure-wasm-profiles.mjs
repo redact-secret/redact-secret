@@ -23,15 +23,24 @@
  * It exits non-zero, after writing what it measured, when a guard fails:
  * the `common` binary is not smaller than `full`, links a `provider`
  * detector implementation, does not link every `common` one, or exports a
- * different surface. Usage:
+ * different surface.
+ *
+ * Each profile directory also holds the profile's `pii` variant (issue
+ * #937). The PII guards fail when a default artifact links any part of the
+ * PII runtime (the `pii-domain` adapter's `Detector` implementation, a
+ * `PiiFamily` implementation, or `unicode_normalization`), when a `pii`
+ * variant does not link it (the inventory would then prove nothing), when
+ * `common-pii` breaks a `common` guard, or when any of the four artifacts
+ * exports a different surface. Usage:
  *
  *     npm run js:build   # once; the facade is not profile-sensitive
  *     node scripts/measure-wasm-profiles.mjs --out-dir docs/audits/evidence/381 \
  *       [--scratch-dir <dir>] [--runs 10] [--engine chromium ...]
  *     node scripts/measure-wasm-profiles.mjs --guard-only [--scratch-dir <dir>]
  *
- * `--guard-only` builds both artifacts and checks the guards, and measures
- * no performance and writes no evidence file; CI runs it (#929).
+ * `--guard-only` builds every artifact and checks the guards, and measures
+ * no performance and writes no evidence file; CI runs it (#929, #937).
+ * Performance is measured for the default `full` and `common` builds only.
  *
  * Which detector module belongs to which pack is read from the core's
  * `detectors/mod.rs` (`BUILT_IN_PACKS` and `built_in_detectors()`), so a new
@@ -60,7 +69,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { DETECTOR_PROFILES } from "./build-browser-artifact.mjs";
+import { DETECTOR_PROFILES, profileBuilds } from "./build-browser-artifact.mjs";
 import { brotliSize, gzipSize } from "./measure-detector-cost.mjs";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -69,6 +78,8 @@ const DEFAULT_SCRATCH_DIR = join("target", "wasm-profiles");
 const BASELINE_378 = join(REPO_ROOT, "docs", "audits", "evidence", "378", "artifact-sizes.json");
 
 export const PROFILES = ["full", "common"];
+/** Every artifact the guard inspects: each profile's default build and its `pii` variant (#937). */
+export const ARTIFACTS = ["full", "common", "full-pii", "common-pii"];
 export const ENGINES = ["chromium", "firefox", "webkit"];
 export const WORKLOADS = ["scale-logs-small-whole", "scale-logs-medium-fixed4096"];
 
@@ -163,6 +174,24 @@ export function detectorImplementations(nameSection) {
   return [...modules].sort();
 }
 
+/**
+ * The parts of the PII domain runtime a `name` section links, sorted and
+ * unique: `PiiDomain` for the `pii-domain` adapter's `Detector`
+ * implementation, the type name of every `PiiFamily` implementation, and
+ * `unicode_normalization`, which only the PII families use. `PiiSelection`
+ * parsing and the activation identity are not the runtime: every artifact
+ * keeps them, so a selector is rejected with the same code everywhere.
+ */
+export function piiRuntime(nameSection) {
+  const parts = new Set();
+  const adapter = /<redact_secret\[[0-9a-f]+\]::pii::PiiDomain as redact_secret\[[0-9a-f]+\]::types::Detector>::/;
+  if (adapter.test(nameSection)) parts.add("PiiDomain");
+  const family = /<redact_secret\[[0-9a-f]+\]::pii::(?:[a-z0-9_]+::)*([A-Za-z0-9_]+) as redact_secret\[[0-9a-f]+\]::pii::PiiFamily>::/g;
+  for (const match of nameSection.matchAll(family)) parts.add(match[1]);
+  if (/unicode_normalization\[[0-9a-f]+\]::/.test(nameSection)) parts.add("unicode_normalization");
+  return [...parts].sort();
+}
+
 /** Splits linked detector modules into `common`, shared engine, `provider` and undeclared code. */
 export function classifyModules(modules, packs) {
   const common = new Set(packs.common);
@@ -185,15 +214,25 @@ function sha256(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
 }
 
+/** The build constants of one of {@link ARTIFACTS}. */
+export function artifactBuild(artifact) {
+  const [profile, variant] = artifact.split("-");
+  const entry = DETECTOR_PROFILES[profile];
+  if (entry === undefined || (variant !== undefined && variant !== "pii")) {
+    throw new Error(`unknown artifact ${artifact}`);
+  }
+  return variant === "pii" ? entry.pii : entry;
+}
+
 /** Reads one built artifact: sizes, digests, exports, and linked detector modules. */
-function inspectArtifact(profile, directory, packs) {
-  const { outName } = DETECTOR_PROFILES[profile];
+function inspectArtifact(artifact, directory, packs) {
+  const { outName } = artifactBuild(artifact);
   const wasm = readFileSync(join(directory, `${outName}_bg.wasm`));
   const glue = readFileSync(join(directory, `${outName}.js`));
   const module = new WebAssembly.Module(wasm);
   const nameSections = WebAssembly.Module.customSections(module, "name");
   if (nameSections.length !== 1) {
-    throw new Error(`${profile}: expected one name section, found ${nameSections.length}`);
+    throw new Error(`${artifact}: expected one name section, found ${nameSections.length}`);
   }
   const nameSection = Buffer.from(nameSections[0]).toString("latin1");
   const modules = detectorModules(nameSection);
@@ -215,36 +254,75 @@ function inspectArtifact(profile, directory, packs) {
     classification: classifyModules(modules, packs),
     detectorImplementations: implementations,
     implementationClassification: classifyModules(implementations, packs),
+    piiRuntime: piiRuntime(nameSection),
   };
 }
 
-/** Every failed guard, as a message. An empty list means every guard held. */
-export function guardFailures(full, common, packs) {
+/**
+ * Every failed guard, as a message. An empty list means every guard held.
+ * `names` labels the two artifacts in messages; {@link piiGuardFailures}
+ * reuses the same checks for the `full-pii`/`common-pii` pair.
+ */
+export function guardFailures(full, common, packs, names = { full: "full", common: "common" }) {
   const failures = [];
   if (common.sizes.wasmRawBytes >= full.sizes.wasmRawBytes) {
     failures.push(
-      `common .wasm (${common.sizes.wasmRawBytes} B) is not smaller than full ` +
+      `${names.common} .wasm (${common.sizes.wasmRawBytes} B) is not smaller than ${names.full} ` +
         `(${full.sizes.wasmRawBytes} B): provider code is reachable from the common constructor`,
     );
   }
   const linked = common.implementationClassification;
   if (linked.provider.length > 0) {
-    failures.push(`common links provider detector implementations: ${linked.provider.join(", ")}`);
+    failures.push(`${names.common} links provider detector implementations: ${linked.provider.join(", ")}`);
   }
-  for (const [profile, artifact] of [["full", full], ["common", common]]) {
+  for (const [profile, artifact] of [[names.full, full], [names.common, common]]) {
     const { undeclared } = artifact.implementationClassification;
     if (undeclared.length > 0) failures.push(`${profile} links detectors of undeclared modules: ${undeclared.join(", ")}`);
   }
   if (full.implementationClassification.provider.length === 0) {
-    failures.push("full links no provider detector implementation: the name-section inventory is not working");
+    failures.push(`${names.full} links no provider detector implementation: the name-section inventory is not working`);
   }
   const expectedCommon = [...packs.common].sort();
   const linkedCommon = [...linked.common].sort();
   if (JSON.stringify(linkedCommon) !== JSON.stringify(expectedCommon)) {
-    failures.push(`common links ${linkedCommon.join(", ")}, expected ${expectedCommon.join(", ")}`);
+    failures.push(`${names.common} links ${linkedCommon.join(", ")}, expected ${expectedCommon.join(", ")}`);
   }
   if (JSON.stringify(full.exports) !== JSON.stringify(common.exports)) {
-    failures.push("full and common export different surfaces");
+    failures.push(`${names.full} and ${names.common} export different surfaces`);
+  }
+  return failures;
+}
+
+/**
+ * Every failed PII-split guard (#937), given all four artifacts: the default
+ * `full` and `common` builds link no part of the PII runtime; each `pii`
+ * variant links it; `common-pii` obeys every {@link guardFailures} check
+ * against `full-pii`; each default build is smaller than its `pii` variant;
+ * and all four export one surface.
+ */
+export function piiGuardFailures({ full, common, "full-pii": fullPii, "common-pii": commonPii }, packs) {
+  const failures = [];
+  for (const [name, artifact] of [["full", full], ["common", common]]) {
+    const linkedPii = artifact.piiRuntime ?? [];
+    if (linkedPii.length > 0) failures.push(`${name} links the PII runtime: ${linkedPii.join(", ")}`);
+  }
+  for (const [name, artifact] of [["full-pii", fullPii], ["common-pii", commonPii]]) {
+    const parts = artifact.piiRuntime ?? [];
+    const families = parts.filter((part) => part !== "PiiDomain" && part !== "unicode_normalization");
+    if (!parts.includes("PiiDomain") || !parts.includes("unicode_normalization") || families.length === 0) {
+      failures.push(`${name} does not link the PII runtime: the name-section inventory is not working`);
+    }
+  }
+  failures.push(...guardFailures(fullPii, commonPii, packs, { full: "full-pii", common: "common-pii" }));
+  for (const [name, base, variant] of [["full", full, fullPii], ["common", common, commonPii]]) {
+    if (base.sizes.wasmRawBytes >= variant.sizes.wasmRawBytes) {
+      failures.push(`${name} .wasm (${base.sizes.wasmRawBytes} B) is not smaller than ${name}-pii (${variant.sizes.wasmRawBytes} B)`);
+    }
+  }
+  for (const [name, artifact] of [["full-pii", fullPii], ["common-pii", commonPii]]) {
+    if (JSON.stringify(artifact.exports) !== JSON.stringify(full.exports)) {
+      failures.push(`${name} exports a different surface than full`);
+    }
   }
   return failures;
 }
@@ -331,20 +409,27 @@ function main() {
   const directories = {};
   for (const profile of PROFILES) {
     directories[profile] = join(scratch, profile);
+    directories[`${profile}-pii`] = directories[profile];
     run(process.execPath, [
       join(REPO_ROOT, "scripts", "build-browser-artifact.mjs"),
       "--detector-profile", profile,
       "--out-dir", directories[profile],
     ]);
-    artifacts[profile] = inspectArtifact(profile, directories[profile], packs);
+    for (const [variant] of profileBuilds(profile)) {
+      const artifact = variant === "pii" ? `${profile}-pii` : profile;
+      artifacts[artifact] = inspectArtifact(artifact, directories[profile], packs);
+    }
   }
   const { full, common } = artifacts;
-  const failures = guardFailures(full, common, packs);
+  const failures = [...guardFailures(full, common, packs), ...piiGuardFailures(artifacts, packs)];
   const summary =
-    `[measure-wasm-profiles] full ${full.sizes.wasmRawBytes} B raw / ${full.sizes.wasmBrotliBytes} B brotli; ` +
-    `common ${common.sizes.wasmRawBytes} B raw / ${common.sizes.wasmBrotliBytes} B brotli; ` +
-    `common detectors: ${common.implementationClassification.common.join(", ")}; ` +
-    `provider helper modules in common: ${common.classification.provider.join(", ") || "none"}`;
+    "[measure-wasm-profiles] " +
+    ARTIFACTS.map(
+      (name) => `${name} ${artifacts[name].sizes.wasmRawBytes} B raw / ${artifacts[name].sizes.wasmGzipBytes} B gzip / ${artifacts[name].sizes.wasmBrotliBytes} B brotli`,
+    ).join("; ") +
+    `; common detectors: ${common.implementationClassification.common.join(", ")}; ` +
+    `provider helper modules in common: ${common.classification.provider.join(", ") || "none"}; ` +
+    `PII runtime in full-pii: ${artifacts["full-pii"].piiRuntime.join(", ")}`;
   if (options.guardOnly) {
     console.log(summary);
     if (failures.length > 0) fail(`[measure-wasm-profiles] guard failed:\n  ${failures.join("\n  ")}`);
@@ -378,7 +463,7 @@ function main() {
     source,
     toolchain: toolchain(),
     profiles: Object.fromEntries(
-      PROFILES.map((profile) => [profile, { sizes: artifacts[profile].sizes, sha256: artifacts[profile].sha256 }]),
+      ARTIFACTS.map((name) => [name, { sizes: artifacts[name].sizes, sha256: artifacts[name].sha256 }]),
     ),
     commonSavedVersusFull: {
       wasmRaw: saved("wasmRawBytes"),
@@ -393,14 +478,15 @@ function main() {
     guards: { passed: failures.length === 0, failures },
     modulePacks: packs,
     profiles: Object.fromEntries(
-      PROFILES.map((profile) => [
-        profile,
+      ARTIFACTS.map((name) => [
+        name,
         {
-          detectorModules: artifacts[profile].detectorModules,
-          classification: artifacts[profile].classification,
-          detectorImplementations: artifacts[profile].detectorImplementations,
-          implementationClassification: artifacts[profile].implementationClassification,
-          exports: artifacts[profile].exports,
+          detectorModules: artifacts[name].detectorModules,
+          classification: artifacts[name].classification,
+          detectorImplementations: artifacts[name].detectorImplementations,
+          implementationClassification: artifacts[name].implementationClassification,
+          piiRuntime: artifacts[name].piiRuntime,
+          exports: artifacts[name].exports,
         },
       ]),
     ),

@@ -38,6 +38,16 @@
  * (`scripts/browser-package-harness-common.mjs`) on the same artifact,
  * instead of the default entry the `full` package page drives.
  *
+ * Each profile directory holds two builds (issue #937): the default one,
+ * which links no PII runtime, and the `pii` one
+ * (`<outName>_pii{.js,_bg.wasm}`). Both are staged. The artifact page, the
+ * package page, and a `pii-unavailable` page run on the default build; the
+ * PII activation pages run on the `pii` build; a `package-pii` page drives
+ * the package's `initialize({ pii })` entry point, which must load the `pii`
+ * build. Every page's fetched `.wasm` files are recorded, and a page that
+ * fetches any build other than the one it expects fails, so a default page
+ * that downloads the PII runtime is caught in every engine.
+ *
  * Every corpus input is synthetic or explicitly revoked, and no diagnostic
  * this script prints carries an input, a matched value, or a placeholder.
  */
@@ -73,6 +83,8 @@ const DETECTOR_PROFILES = Object.fromEntries(
     {
       glue: wasmProfile.glue,
       binary: wasmProfile.binary,
+      piiGlue: wasmProfile.pii.glue,
+      piiBinary: wasmProfile.pii.binary,
       defaultArtifactDir: join(REPO_ROOT, wasmProfile.relativeDir),
       buildCommand: wasmProfile.buildCommand,
     },
@@ -104,19 +116,30 @@ const CONTENT_TYPES = {
 
 /**
  * Each page drives a fresh module instance through the one-time initialization
- * gate: the artifact and package defaults, then payment-card and phone
- * global/exact plus US SSN jurisdiction/exact activation through the
- * artifact's own exports.
+ * gate: the artifact and package defaults, the default build's PII
+ * rejection, the package's PII entry point, then payment-card and phone
+ * global/exact plus US SSN jurisdiction/exact activation through the `pii`
+ * build's own exports. `wasm` names the one build (`default` or `pii`) the
+ * page may fetch.
  */
 const PAGES = [
-  { name: "artifact", file: "artifact.html", module: "./browser-harness.mjs" },
-  { name: "package", file: "package.html", module: "./package-harness.js" },
+  { name: "artifact", file: "artifact.html", module: "./browser-harness.mjs", wasm: "default" },
+  { name: "package", file: "package.html", module: "./package-harness.js", wasm: "default" },
+  {
+    name: "pii-unavailable",
+    file: "pii-unavailable.html",
+    module: "./browser-pii-harness.mjs",
+    exportName: "qualifyUnavailable",
+    wasm: "default",
+  },
+  { name: "package-pii", file: "package-pii.html", module: "./package-pii-harness.js", wasm: "pii" },
   {
     name: "payment-card-exact",
     file: "payment-card-exact.html",
     module: "./browser-pii-harness.mjs",
     selector: "pii:family:global:payment-card",
     fixtureKey: "paymentCard",
+    wasm: "pii",
   },
   {
     name: "payment-card-global",
@@ -124,6 +147,7 @@ const PAGES = [
     module: "./browser-pii-harness.mjs",
     selector: "pii:global",
     fixtureKey: "paymentCard",
+    wasm: "pii",
   },
   {
     name: "phone-exact",
@@ -131,6 +155,7 @@ const PAGES = [
     module: "./browser-pii-harness.mjs",
     selector: "pii:family:global:phone",
     fixtureKey: "phone",
+    wasm: "pii",
   },
   {
     name: "phone-global",
@@ -138,6 +163,7 @@ const PAGES = [
     module: "./browser-pii-harness.mjs",
     selector: "pii:global",
     fixtureKey: "phone",
+    wasm: "pii",
   },
   {
     name: "us-ssn-exact",
@@ -145,6 +171,7 @@ const PAGES = [
     module: "./browser-pii-harness.mjs",
     selector: "pii:family:us:ssn",
     fixtureKey: "usSsn",
+    wasm: "pii",
   },
   {
     name: "us-ssn-jurisdiction",
@@ -152,6 +179,7 @@ const PAGES = [
     module: "./browser-pii-harness.mjs",
     selector: "pii:us",
     fixtureKey: "usSsn",
+    wasm: "pii",
   },
   {
     name: "us-ssn-pii-off",
@@ -159,15 +187,16 @@ const PAGES = [
     module: "./browser-pii-harness.mjs",
     selector: null,
     fixtureKey: "usSsn",
+    wasm: "pii",
   },
 ];
 
-function renderPage(module, selector, fixtureKey) {
+function renderPage(module, selector, fixtureKey, exportName = "qualify") {
   return `<!doctype html>
 <meta charset="utf-8">
 <title>redact-secret browser qualification</title>
 <script type="module">
-  import { qualify } from "${module}";
+  import { ${exportName} as qualify } from "${module}";
   const fixtures = await (await fetch("./fixtures.json")).json();
   try {
     globalThis.__qualification = await qualify(fixtures, ${JSON.stringify(selector)}, ${JSON.stringify(fixtureKey)});
@@ -286,6 +315,11 @@ function buildFixtures(detectorProfile) {
   }
 
   return {
+    packagePii: {
+      selector: "pii:family:global:phone",
+      family: phone.family,
+      positive: phonePositive,
+    },
     version: JSON.parse(
       readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8"),
     ).version,
@@ -324,26 +358,34 @@ function buildFixtures(detectorProfile) {
  * instead of the root ones, so the bundle never pulls in the `full` package
  * entry or the `full` `.wasm`.
  */
-async function bundlePackageHarness(artifactDir, outFile, detectorProfile) {
+async function bundlePackageHarness(artifactDir, outFile, detectorProfile, pii = false) {
   const { build } = await import("esbuild");
-  const glue = DETECTOR_PROFILES[detectorProfile].glue;
-  const entry =
-    detectorProfile === "common"
+  const { glue, piiGlue } = DETECTOR_PROFILES[detectorProfile];
+  const entry = pii
+    ? join(SCRIPTS_DIR, "browser-package-pii-harness.mjs")
+    : detectorProfile === "common"
       ? join(SCRIPTS_DIR, "browser-package-harness-common.mjs")
       : join(SCRIPTS_DIR, "browser-package-harness.mjs");
+  // Both builds are aliased: the package's loader names each with its own
+  // literal dynamic import (issue #937), and the runner checks which one a
+  // page actually fetched.
   const alias =
     detectorProfile === "common"
       ? {
           // No `@redact-secret/core/web-stream` alias: the common harness
           // does not import it (see its own module comment — that adapter
-          // is not profile-aware yet).
+          // is not profile-aware yet). The PII harness imports the root
+          // specifier, which for `common` is the `/common` entry.
+          ...(pii ? { "@redact-secret/core": PACKAGE_COMMON_ENTRY } : {}),
           "@redact-secret/core/common": PACKAGE_COMMON_ENTRY,
           "@redact-secret/wasm/common": join(artifactDir, glue),
+          "@redact-secret/wasm/common/pii": join(artifactDir, piiGlue),
         }
       : {
           "@redact-secret/core": PACKAGE_ENTRY,
           "@redact-secret/core/web-stream": PACKAGE_WEB_STREAM_ENTRY,
           "@redact-secret/wasm": join(artifactDir, glue),
+          "@redact-secret/wasm/pii": join(artifactDir, piiGlue),
         };
   const result = await build({
     entryPoints: [entry],
@@ -372,7 +414,7 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
     }
   }
   const directory = mkdtempSync(join(tmpdir(), "redact-secret-browser-"));
-  for (const name of [profile.glue, profile.binary]) {
+  for (const name of [profile.glue, profile.binary, profile.piiGlue, profile.piiBinary]) {
     try {
       copyFileSync(join(artifactDir, name), join(directory, name));
     } catch {
@@ -383,10 +425,12 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
       );
     }
   }
-  writeFileSync(
-    join(directory, "artifact.js"),
-    `export * from "./${profile.glue}";\nexport { default } from "./${profile.glue}";\n`,
-  );
+  for (const [shim, glue] of [["artifact.js", profile.glue], ["artifact-pii.js", profile.piiGlue]]) {
+    writeFileSync(
+      join(directory, shim),
+      `export * from "./${glue}";\nexport { default } from "./${glue}";\n`,
+    );
+  }
   copyFileSync(
     join(SCRIPTS_DIR, "browser-harness.mjs"),
     join(directory, "browser-harness.mjs"),
@@ -400,8 +444,14 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
     join(directory, "package-harness.js"),
     detectorProfile,
   );
-  for (const { file, module, selector, fixtureKey } of pages) {
-    writeFileSync(join(directory, file), renderPage(module, selector, fixtureKey));
+  await bundlePackageHarness(
+    artifactDir,
+    join(directory, "package-pii-harness.js"),
+    detectorProfile,
+    true,
+  );
+  for (const { file, module, selector, fixtureKey, exportName } of pages) {
+    writeFileSync(join(directory, file), renderPage(module, selector, fixtureKey, exportName));
   }
   writeFileSync(
     join(directory, "fixtures.json"),
@@ -445,16 +495,37 @@ async function serve(directory) {
  * each drives a fresh module instance through the one-time initialization
  * gate its first check asserts.
  */
+/**
+ * The `.wasm` files a page fetched must be exactly the build it expects
+ * (issue #937): the default build for every PII-off page, the `pii` build
+ * for every PII page. Returns a failed check, or `undefined`.
+ */
+export function wasmFetchCheck(profile, expected, fetched) {
+  const binary = expected === "pii" ? profile.piiBinary : profile.binary;
+  const unique = [...new Set(fetched)].sort();
+  if (unique.length === 1 && unique[0] === binary) return undefined;
+  return {
+    name: `fetched only the ${expected} build (${binary})`,
+    ok: false,
+    detail: `fetched ${unique.join(", ") || "no .wasm"}`,
+  };
+}
+
 async function runEngine(playwright, engine, origin, pages) {
   const browser = await playwright[engine].launch();
   const runs = [];
   try {
-    for (const { name, file } of pages) {
+    for (const { name, file, wasm } of pages) {
       const diagnostics = [];
+      const fetched = [];
       const tab = await browser.newPage();
       tab.on("pageerror", (error) => diagnostics.push(`pageerror: ${error.message}`));
       tab.on("console", (message) => {
         if (message.type() === "error") diagnostics.push(`console: ${message.text()}`);
+      });
+      tab.on("request", (request) => {
+        const path = new URL(request.url()).pathname;
+        if (path.endsWith(".wasm")) fetched.push(path.slice(1));
       });
       await tab.goto(`${origin}/${file}`, { waitUntil: "load" });
       await tab.waitForFunction(
@@ -466,6 +537,8 @@ async function runEngine(playwright, engine, origin, pages) {
         page: name,
         report: await tab.evaluate(() => globalThis.__qualification),
         diagnostics,
+        wasm,
+        fetched,
       });
       await tab.close();
     }
@@ -509,7 +582,16 @@ async function main() {
       }
       let passed = 0;
       let engineFailed = false;
-      for (const { page: name, report, diagnostics } of runs) {
+      for (const { page: name, report: pageReport, diagnostics, wasm, fetched } of runs) {
+        const fetchFailure = wasmFetchCheck(DETECTOR_PROFILES[options.detectorProfile], wasm, fetched);
+        const report = fetchFailure === undefined
+          ? pageReport
+          : {
+              ...pageReport,
+              ok: false,
+              failures: pageReport.failures + 1,
+              checks: [...pageReport.checks, fetchFailure],
+            };
         for (const entry of report.checks) {
           console.log(
             `${entry.ok ? "ok" : "not ok"} - ${engine} · ${name} · ${entry.name}`,

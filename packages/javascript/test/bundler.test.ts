@@ -37,8 +37,12 @@ async function bundle(
     external: [
       "@redact-secret/wasm",
       "@redact-secret/wasm/common",
+      "@redact-secret/wasm/pii",
+      "@redact-secret/wasm/common/pii",
       "@redact-secret/wasm/redact_secret_wasm_bg.wasm",
       "@redact-secret/wasm/redact_secret_wasm_common_bg.wasm",
+      "@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm",
+      "@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm",
     ],
     stdin: {
       contents,
@@ -97,6 +101,8 @@ describe("bundler conditions", () => {
     // glue and `.wasm` binary here.
     expect(output).not.toContain('import("@redact-secret/wasm")');
     expect(output).not.toContain('import("@redact-secret/wasm/common")');
+    expect(output).not.toContain('import("@redact-secret/wasm/pii")');
+    expect(output).not.toContain('import("@redact-secret/wasm/common/pii")');
   });
 
   it("routes the Web adapter through the WebAssembly adapter only", async () => {
@@ -154,7 +160,9 @@ describe("bundler conditions", () => {
     );
     expect(inputs.some((path) => path.startsWith("node:"))).toBe(false);
     expect(output).not.toContain('import("@redact-secret/wasm")');
+    expect(output).not.toContain('import("@redact-secret/wasm/pii")');
     expect(output).toContain('import("@redact-secret/wasm/common")');
+    expect(output).toContain('import("@redact-secret/wasm/common/pii")');
   });
 
   it("bundles the /common Node adapter for Node, through node-stream-common only", async () => {
@@ -186,6 +194,16 @@ describe("bundler conditions", () => {
     expect(output).toContain('import("@redact-secret/wasm")');
   });
 
+  it("reaches each profile's pii artifact only through its own dynamic import (#937)", async () => {
+    const { output } = await bundle("browser");
+
+    // The PII-capable build is a separate literal dynamic import, loaded
+    // only when initialize() carries a PII selection; the root entry never
+    // names a common artifact.
+    expect(output).toContain('import("@redact-secret/wasm/pii")');
+    expect(output).not.toContain('import("@redact-secret/wasm/common');
+  });
+
   it("routes a Cloudflare Workers build through the workerd adapter, not browser or node (decision-verify-edge-runtimes)", async () => {
     const { inputs, output } = await bundle(
       "browser",
@@ -206,6 +224,8 @@ describe("bundler conditions", () => {
     // way the browser adapter's `@redact-secret/wasm` specifier stays
     // discoverable to a bundler.
     expect(output).toContain('"@redact-secret/wasm/redact_secret_wasm_bg.wasm"');
+    expect(output).toContain('"@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm"');
+    expect(output).not.toContain("redact_secret_wasm_common");
   });
 
   it("routes a /common Cloudflare Workers build through the workerd-common adapter only", async () => {
@@ -227,5 +247,10 @@ describe("bundler conditions", () => {
     expect(output).toContain(
       '"@redact-secret/wasm/redact_secret_wasm_common_bg.wasm"',
     );
+    expect(output).toContain(
+      '"@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm"',
+    );
+    expect(output).not.toContain('"@redact-secret/wasm/redact_secret_wasm_bg.wasm"');
+    expect(output).not.toContain('"@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm"');
   });
 });

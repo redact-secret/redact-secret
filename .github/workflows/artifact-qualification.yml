@@ -882,10 +882,16 @@ jobs:
           name: wasm-web-common
           path: dist/wasm-web-common
 
+      # Issue #937: a PII selection makes the fallback load the profile's
+      # `pii` build instead of the default one, so the phone matrix runs that
+      # path (exact, global) next to the PII-off default.
       - name: Qualify the Node WebAssembly fallback
         run: |
           node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web
           node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web-common --detector-profile common
+          node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web --phone-selector exact
+          node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web --phone-selector global
+          node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web --phone-selector off
 
       # One step per profile: each starts its own `wrangler dev`, so a hang
       # names the profile that caused it instead of the pair.
@@ -894,6 +900,14 @@ jobs:
 
       - name: Qualify the Cloudflare Workers runtime path (common profile)
         run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common
+
+      # Issue #937: `initialize({ pii })` instantiates the profile's `pii`
+      # build, bundled next to the default one.
+      - name: Qualify the Cloudflare Workers runtime path (PII)
+        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web --pii
+
+      - name: Qualify the Cloudflare Workers runtime path (common profile, PII)
+        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common --pii
 
   # Issue #586: the five-minute quickstart (`docs/quickstart.md`), run from an
   # empty directory outside the checkout with the page's own commands and

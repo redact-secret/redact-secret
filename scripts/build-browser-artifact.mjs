@@ -8,7 +8,7 @@
  * the generated `default()` init resolves `redact_secret_wasm_bg.wasm` relative
  * to its own `import.meta.url`.
  *
- * Only the four generated files are emitted. The published manifest for
+ * Only the generated files are emitted (four per build). The published manifest for
  * `@redact-secret/wasm` lives at `bindings/wasm/npm/package.json`
  * (issue #79), and `scripts/qualify-package-consumer.mjs` copies this
  * directory over it, so a manifest emitted here would overwrite it.
@@ -21,6 +21,14 @@
  * into `bindings/wasm/pkg-common` by default. Its own file names let both
  * artifacts sit side by side in one directory without either overwriting
  * the other.
+ *
+ * Every profile directory also receives that profile's `pii` variant
+ * (issue #937): the same crate built with its `pii` Cargo feature, emitted
+ * as `<outName>_pii{.js,.d.ts,_bg.wasm,_bg.wasm.d.ts}` next to the default
+ * build. The default build links no PII runtime; `@redact-secret/core`
+ * loads the `pii` variant only when `initialize()` is given a PII
+ * selection. Keeping both in one directory keeps one upload artifact per
+ * profile (`wasm-web`, `wasm-web-common`).
  *
  * The `wasm-bindgen` CLI must be the exact version the crate is compiled
  * against; a mismatch produces glue that cannot instantiate the module, so it
@@ -35,9 +43,9 @@ import { mkdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { DETECTOR_PROFILES } from "./lib/detector-profiles.mjs";
+import { DETECTOR_PROFILES, profileBuilds } from "./lib/detector-profiles.mjs";
 
-export { DETECTOR_PROFILES };
+export { DETECTOR_PROFILES, profileBuilds };
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -133,33 +141,35 @@ function main() {
   const workspace = readWorkspace();
   requireMatchingBindgenCli(workspace.bindgenVersion);
 
-  const detectorProfile = DETECTOR_PROFILES[options.detectorProfile];
-  const build = [
-    "build",
-    "-p",
-    CRATE,
-    "--target",
-    "wasm32-unknown-unknown",
-    "--locked",
-    ...detectorProfile.cargoArgs,
-  ];
-  if (options.profile === "release") build.push("--release");
-  run("cargo", build, { stdio: "inherit" });
-
+  const outDir = resolve(REPO_ROOT, options.outDir);
+  rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(outDir, { recursive: true });
   const wasm = join(
     workspace.targetDirectory,
     "wasm32-unknown-unknown",
     options.profile,
     `${CARGO_OUT_NAME}.wasm`,
   );
-  const outDir = resolve(REPO_ROOT, options.outDir);
-  rmSync(outDir, { recursive: true, force: true });
-  mkdirSync(outDir, { recursive: true });
-  run(
-    "wasm-bindgen",
-    ["--target", "web", "--out-dir", outDir, "--out-name", detectorProfile.outName, wasm],
-    { stdio: "inherit" },
-  );
+  // One cargo output path serves every feature set, so each build is
+  // bound with `wasm-bindgen` before the next one overwrites it.
+  for (const [, variant] of profileBuilds(options.detectorProfile)) {
+    const build = [
+      "build",
+      "-p",
+      CRATE,
+      "--target",
+      "wasm32-unknown-unknown",
+      "--locked",
+      ...variant.cargoArgs,
+    ];
+    if (options.profile === "release") build.push("--release");
+    run("cargo", build, { stdio: "inherit" });
+    run(
+      "wasm-bindgen",
+      ["--target", "web", "--out-dir", outDir, "--out-name", variant.outName, wasm],
+      { stdio: "inherit" },
+    );
+  }
 
   console.log(
     `built the ${options.detectorProfile} browser artifact ${workspace.version} ` +

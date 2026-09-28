@@ -20,6 +20,7 @@ import { dirname, join } from "node:path";
 import { SecretScanError } from "../errors.js";
 import type {
   NativeBinding,
+  NativeBindingLoader,
   NativeFinding,
   NativeFormatterCallback,
   NativeIncrementalOptions,
@@ -400,13 +401,29 @@ export function createBindingFromCommonAddon(
  * `bindings/wasm/npm/package.json`'s own `files` list.
  */
 const WASM_PACKAGE = "@redact-secret/wasm";
+type WasmFallbackArtifact = Readonly<{ specifier: string; binaryName: string }>;
 const WASM_FALLBACK: Readonly<
-  Record<"full" | "common", Readonly<{ specifier: string; binaryName: string }>>
+  Record<
+    "full" | "common",
+    Readonly<{ default: WasmFallbackArtifact; pii: WasmFallbackArtifact }>
+  >
 > = {
-  full: { specifier: WASM_PACKAGE, binaryName: "redact_secret_wasm_bg.wasm" },
+  full: {
+    default: { specifier: WASM_PACKAGE, binaryName: "redact_secret_wasm_bg.wasm" },
+    pii: {
+      specifier: `${WASM_PACKAGE}/pii`,
+      binaryName: "redact_secret_wasm_pii_bg.wasm",
+    },
+  },
   common: {
-    specifier: `${WASM_PACKAGE}/common`,
-    binaryName: "redact_secret_wasm_common_bg.wasm",
+    default: {
+      specifier: `${WASM_PACKAGE}/common`,
+      binaryName: "redact_secret_wasm_common_bg.wasm",
+    },
+    pii: {
+      specifier: `${WASM_PACKAGE}/common/pii`,
+      binaryName: "redact_secret_wasm_common_pii_bg.wasm",
+    },
   },
 };
 
@@ -428,6 +445,9 @@ function readWasmBytes(binaryName: string): Uint8Array {
 /**
  * Loads and initializes the WebAssembly fallback for `profile`, normalized
  * through the same `createBindingFromWasmModule` `runtime/browser.ts` uses.
+ * `pii` selects the profile's `pii` build, the only one that links the PII
+ * runtime (issue #937); the addon links it in every build, so only this
+ * fallback needs the choice.
  *
  * The `import()` specifier is looked up in {@link WASM_FALLBACK} rather than
  * written as a string literal at the call site, so a bundler that only
@@ -451,8 +471,9 @@ function readWasmBytes(binaryName: string): Uint8Array {
  */
 export async function loadWasmFallback(
   profile: "full" | "common",
+  pii = false,
 ): Promise<NativeBinding> {
-  const { specifier, binaryName } = WASM_FALLBACK[profile];
+  const { specifier, binaryName } = WASM_FALLBACK[profile][pii ? "pii" : "default"];
   let wasmModule: Partial<WasmModule>;
   try {
     wasmModule = (await import(specifier)) as unknown as Partial<WasmModule>;
@@ -477,10 +498,10 @@ export async function loadWasmFallback(
  * optional dependency, or a corrupt addon — since none of those is
  * distinguishable from the others once caught.
  */
-export const loadNativeBinding = async (): Promise<NativeBinding> => {
+export const loadNativeBinding: NativeBindingLoader = async ({ pii }) => {
   try {
     return createBindingFromAddon(loadAddon());
   } catch {
-    return loadWasmFallback("full");
+    return loadWasmFallback("full", pii);
   }
 };

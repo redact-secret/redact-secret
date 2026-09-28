@@ -294,10 +294,13 @@ async function main() {
     await rm(tarballs.wasm, { force: true });
     await mkdir(nodePlatformDir, { recursive: true });
     await rm(join(nodePlatformDir, JSON.parse(await readFile(join(nodePlatformDir, "package.json"), "utf8")).main), { force: true });
-    await rm(join(wasmPackageDir, "redact_secret_wasm.js"), { force: true });
-    await rm(join(wasmPackageDir, "redact_secret_wasm.d.ts"), { force: true });
-    await rm(join(wasmPackageDir, "redact_secret_wasm_bg.wasm"), { force: true });
-    await rm(join(wasmPackageDir, "redact_secret_wasm_bg.wasm.d.ts"), { force: true });
+    // The default build and its `pii` build (issue #937), both copied in by
+    // `assembleWasmPackage`.
+    for (const outName of ["redact_secret_wasm", "redact_secret_wasm_pii"]) {
+      for (const suffix of [".js", ".d.ts", "_bg.wasm", "_bg.wasm.d.ts"]) {
+        await rm(join(wasmPackageDir, `${outName}${suffix}`), { force: true });
+      }
+    }
     if (consumerRoot) await rm(consumerRoot, { recursive: true, force: true });
   }
 
