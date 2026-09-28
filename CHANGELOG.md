@@ -66,6 +66,14 @@ evidence is linked from each published version.
     API tokens (`apify_api_token`), the provider's own open-ended rule.
   - `wandb-api-key` (#917): W&B `wandb_v1_` API keys (`wandb_api_key`),
     with a tolerant 64–96 body band around the documented width.
+- A generated public site feed (#945):
+  `docs/contracts/site-feed/v1/feed.json` with its JSON Schema, schema
+  version `redact-secret.site-feed/v1`. It carries the latest release's
+  identity and per-registry package versions and the support matrix's
+  status per family, generated from the release record and the pinned
+  matrix by `npm run site-feed:generate` and checked by `npm run
+  site-feed:check`. Consumers read it at an exact commit; a breaking change
+  moves to a `v2` path.
 
 ### Changed
 

@@ -49,6 +49,20 @@ core remains the only authoritative implementation
   changed how equidistance is judged for field labels; before any release
   carried it, it was amended in place so a `|` delimiter bounds a positive
   field label ([#940](https://github.com/redact-secret/redact-secret/issues/940)).
+- [`site-feed/v1/feed.json`](site-feed/v1/feed.json) and its schema
+  [`site-feed/v1/feed.schema.json`](site-feed/v1/feed.schema.json) — the
+  public site feed (`redact-secret.site-feed/v1`, issue
+  [#945](https://github.com/redact-secret/redact-secret/issues/945)): release
+  identity and support status a public site may claim, generated from the
+  latest `docs/releases/<version>/manifest.json` and
+  `benchmarks/support-matrix.json` by `scripts/generate-site-feed.py` (`npm
+  run site-feed:generate`). `npm run site-feed:check`, part of `npm run ci`,
+  fails when it is stale or schema-invalid. `redact-secret-www` reads it at
+  an exact commit from
+  `https://raw.githubusercontent.com/redact-secret/redact-secret/<40-hex commit>/docs/contracts/site-feed/v1/feed.json`.
+  No package ships it. The contract and its compatibility policy are in
+  [`docs/specs/distribution.md`](../specs/distribution.md) and
+  [`decision-publish-a-commit-bound-public-site-feed`](../decisions/2026-09-28-publish-a-commit-bound-public-site-feed.md).
 - [`pii/pii-context-v1.json`](pii/pii-context-v1.json) and its schema
   [`pii/pii-context-v1.schema.json`](pii/pii-context-v1.schema.json) — the
   `pii-context/v1` vocabulary defined for issue

@@ -369,6 +369,13 @@ says it is not comparable and states no delta. Commit the fragment as
 changelog entry as its `### Support status` section. `npm run
 support-matrix:check` (in `npm run ci`) fails when the two differ (#724).
 
+The same closeout PR regenerates the public site feed from the new record
+(and from `benchmarks/support-matrix.json`, if it was re-pinned) with `npm
+run site-feed:generate` and commits
+`docs/contracts/site-feed/v1/feed.json`; `npm run site-feed:check` (in `npm
+run ci`) fails until it does. The feed contract is in
+[the distribution spec](specs/distribution.md).
+
 Run the deterministic, offline durable-record check before opening the
 closeout PR:
 

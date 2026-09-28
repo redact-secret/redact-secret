@@ -60,6 +60,7 @@ Current rules: `docs/specs/distribution.md`.
 - [Define the supported MCP redaction boundary](2026-09-25-define-the-supported-mcp-redaction-boundary.md)
 - [Define the supported MCP `resources/read` boundary](2026-09-25-define-the-supported-mcp-resources-read-boundary.md)
 - [Redact key-identified leaves in place, make `resources/read` the next MCP boundary, and defer Python MCP](2026-09-25-rule-on-the-mcp-boundary-open-questions.md)
+- [Publish release identity and support status to the public site as a generated, commit-bound feed](2026-09-28-publish-a-commit-bound-public-site-feed.md)
 
 ## Evidence and gates
 
