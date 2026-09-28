@@ -17,6 +17,7 @@ use crate::evidence::aggregate::ShadowAuthority;
 use crate::evidence::features::{
     EvidenceFeatures, FEATURE_COUNT, MAX_ANALYSED_CHARS, extract_features,
 };
+use crate::evidence::residual::extract_residual_features;
 use crate::evidence::shadow::ShadowComparison;
 use crate::incremental::{IncrementalLimits, IncrementalSanitizer};
 use crate::registry::DetectorRegistry;
@@ -230,6 +231,36 @@ fn hostile_values_have_pinned_feature_vectors() {
     {
         assert_eq!(name, pinned_name);
         assert_eq!(vector(extract_features(&value)), pinned, "{name}");
+    }
+}
+
+/// The residual features (#829) of the same hostile values, pinned, and
+/// read from the first 256 symbols only. `max-length` (random material,
+/// almost nothing predicted) drives the context-copy rule's quadratic scan
+/// to its longest path.
+const HOSTILE_RESIDUALS: [(&str, [u32; 3]); 7] = [
+    ("period-32", [34, 325_701, 267_875]),
+    ("period-33", [35, 328_663, 270_616]),
+    ("late-period-break", [2, 65_536, 65_536]),
+    ("distinct-bigrams", [15, 182_838, 152_169]),
+    ("single-symbol", [1, 0, 0]),
+    ("astral-distinct", [2, 65_536, 65_536]),
+    ("max-length", [251, 378_355, 304_718]),
+];
+
+#[test]
+fn hostile_values_have_pinned_residual_features() {
+    for ((name, value), (pinned_name, pinned)) in
+        hostile_values().into_iter().zip(HOSTILE_RESIDUALS)
+    {
+        assert_eq!(name, pinned_name);
+        let whole = extract_residual_features(&value);
+        assert_eq!(whole.to_vector().map(|(_, v)| v), pinned, "{name}");
+        assert_eq!(
+            whole,
+            extract_residual_features(analysed_prefix(&value)),
+            "{name}"
+        );
     }
 }
 
