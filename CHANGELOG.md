@@ -121,6 +121,12 @@ evidence is linked from each published version.
   (`email=`, `customer_email=`, `이메일=`) is read as a label, not as local
   part, so the finding starts after the `=`. Other keys (`user=`, `emailx=`)
   are unchanged.
+- `heroku-api-key-legacy` and `stripe-token` no longer redact repeated-filler
+  documentation placeholders (#934): an all-one-digit UUID under Heroku
+  context (`HEROKU_API_KEY=00000000-0000-0000-0000-000000000000`), and a
+  Stripe key or `whsec_` secret whose body is one repeated character
+  (`sk_test_` plus a run of `x`). A body one character off the filler is
+  still reported.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

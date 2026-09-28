@@ -628,11 +628,10 @@
       "detector": "stripe-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 16,
+        "count": 15,
         "fixtureIds": [
           "stripe-positive-all-prefixes",
           "stripe-positive-crlf-unicode-prefix",
-          "stripe-positive-doc-style-placeholder",
           "stripe-positive-dotenv",
           "stripe-positive-json",
           "stripe-positive-log",
@@ -650,7 +649,7 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 15,
+        "count": 16,
         "fixtureIds": [
           "stripe-negative-interpolated-secret-prefix",
           "stripe-negative-lookalike",
@@ -661,6 +660,7 @@
           "stripe-negative-public-prefix-punctuation",
           "stripe-negative-public-prefix-sandbox-mode",
           "stripe-negative-public-prefix-unicode-crlf",
+          "stripe-negative-repeated-filler-placeholder",
           "stripe-negative-sk-org-missing-separator",
           "stripe-negative-webhook-public-identifiers",
           "stripe-negative-webhook-secret-embedded-in-wider-identifier",

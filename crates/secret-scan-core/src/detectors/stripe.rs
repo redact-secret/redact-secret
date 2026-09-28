@@ -24,6 +24,7 @@
 
 use crate::detectors::additional_providers::STRIPE;
 use crate::detectors::pattern;
+use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -55,7 +56,14 @@ impl Detector for StripeTokenDetector {
         context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = STRIPE.detect(input, context)?;
+        candidates.retain(|candidate| {
+            let range = candidate.range();
+            !has_filler_body(&input[range.start()..range.end()])
+        });
         for (start, end) in scan_webhook(input) {
+            if has_filler_body(&input[start..end]) {
+                continue;
+            }
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
@@ -68,6 +76,19 @@ impl Detector for StripeTokenDetector {
         candidates.sort_by_key(|candidate| candidate.range().start());
         Ok(candidates)
     }
+}
+
+/// `true` when the body after the value's last `_` (every Stripe prefix ends
+/// in `_` and no body contains one) is one repeated character, trailing `=`
+/// padding aside: `sk_test_` plus a run of `x`, `whsec_` plus a run of `0`
+/// (issue #934). Stripe's documentation placeholders take this form, and a
+/// random key body never does, so the same filler exclusion `generic-token`
+/// applies (`decision-redact-provider-named-credential-assignments` §3)
+/// holds here whatever the body length.
+fn has_filler_body(value: &str) -> bool {
+    value
+        .rsplit_once('_')
+        .is_some_and(|(_, body)| text::is_repeated_character_filler(body.trim_end_matches('=')))
 }
 
 /// Every boundary-delimited `whsec_` value, left to right. A failed attempt
@@ -220,5 +241,20 @@ mod tests {
             ranges(&input),
             vec![(0, 6 + BODY.len()), (second, second + 6 + BODY.len())]
         );
+    }
+
+    #[test]
+    fn rejects_a_repeated_filler_body_behind_any_prefix() {
+        for input in [
+            format!("sk_test_{}", "x".repeat(24)),
+            format!("sk_live_{}", "X".repeat(32)),
+            format!("rk_test_{}", "0".repeat(20)),
+            format!("whsec_{}", "x".repeat(32)),
+            format!("whsec_{}==", "A".repeat(32)),
+        ] {
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+        let real = format!("sk_test_{BODY}");
+        assert_eq!(ranges(&real), vec![(0, real.len())]);
     }
 }

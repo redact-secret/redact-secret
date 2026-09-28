@@ -71,7 +71,7 @@
     {"expected":[],"id":"stripe-negative-public-prefix-unicode-crlf"},
     {"expected":[],"id":"stripe-negative-masked-secret-prefix"},
     {"expected":[],"id":"stripe-negative-interpolated-secret-prefix"},
-    {"expected":[],"id":"stripe-positive-doc-style-placeholder"},
+    {"expected":[],"id":"stripe-negative-repeated-filler-placeholder"},
     {"expected":[],"id":"stripe-positive-mixed-public-and-secret"},
     {"expected":[],"id":"stripe-positive-dotenv"},
     {"expected":[],"id":"stripe-positive-json"},

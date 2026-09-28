@@ -899,7 +899,6 @@
       "evidenceFixtureIds": [
         "stripe-positive-all-prefixes",
         "stripe-positive-crlf-unicode-prefix",
-        "stripe-positive-doc-style-placeholder",
         "stripe-positive-dotenv",
         "stripe-positive-json",
         "stripe-positive-log",

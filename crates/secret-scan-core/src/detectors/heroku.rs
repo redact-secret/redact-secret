@@ -81,6 +81,10 @@
 //!   never reported. The tradeoff is a false negative for a legacy token
 //!   stored under such a key name, which no Heroku tooling documents.
 //!
+//!   A UUID whose hex digits are all one character (the all-zero UUID a
+//!   settings template ships, issue #934) is a documentation placeholder,
+//!   not a token, and is never reported either.
+//!
 //!   For the same reason, a UUID that is a URL path segment (the byte
 //!   before it is `/`, as in `https://api.heroku.com/apps/<uuid>/dynos`) is
 //!   a Platform API resource id and is never reported (issue #743). The
@@ -321,6 +325,17 @@ fn is_identifier_key(key: &[u8]) -> bool {
     })
 }
 
+/// `true` when every hex digit of a UUID-shaped value is the same character:
+/// the all-zero UUID `00000000-0000-0000-0000-000000000000` and its
+/// `ffffffff-...` sibling (issue #934). Heroku's documentation placeholders
+/// take this form, a random token never does, and `generic-token` already
+/// excludes it under the same name
+/// (`decision-redact-provider-named-credential-assignments` §3).
+fn is_filler_uuid(value: &str) -> bool {
+    let digits: String = value.chars().filter(|&ch| ch != '-').collect();
+    text::is_repeated_character_filler(&digits)
+}
+
 /// `true` when the value starting at `value_start` is a URL path segment:
 /// the byte right before it is `/` (issue #743).
 fn is_url_path_segment(bytes: &[u8], value_start: usize) -> bool {
@@ -470,6 +485,7 @@ impl Detector for HerokuApiKeyLegacyDetector {
                             .is_some_and(|line| is_heroku_auth_token_command(line)));
                 if !in_context
                     || !is_uuid_shape(bytes, relative_start, relative_end, pattern::is_hex)
+                    || is_filler_uuid(&line[relative_start..relative_end])
                     || is_identifier_key(assigned_key(bytes, relative_start))
                     || is_url_path_segment(bytes, relative_start)
                 {
@@ -1004,5 +1020,18 @@ mod tests {
     fn stays_bounded_over_a_long_context_free_line_packed_with_candidates() {
         let input = format!("{LEGACY_UUID} ").repeat(10_000);
         assert_eq!(detect_legacy(&input).len(), 0);
+    }
+
+    #[test]
+    fn rejects_an_all_one_digit_uuid_placeholder_under_heroku_context() {
+        for filler in [
+            "00000000-0000-0000-0000-000000000000",
+            "ffffffff-ffff-ffff-ffff-ffffffffffff",
+        ] {
+            assert!(detect_legacy(&format!("HEROKU_API_KEY={filler}")).is_empty());
+        }
+        // One digit off the filler is a UUID again.
+        let near = "00000000-0000-0000-0000-000000000001";
+        assert_eq!(detect_legacy(&format!("HEROKU_API_KEY={near}")).len(), 1);
     }
 }

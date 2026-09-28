@@ -3276,26 +3276,17 @@
       "note": "A shell/template interpolation reference immediately after the secret prefix breaks the alphabet run before the minimum length, so a variable reference is not misread as a literal secret."
     },
     {
-      "id": "stripe-positive-doc-style-placeholder",
+      "id": "stripe-negative-repeated-filler-placeholder",
       "detector": "stripe-token",
-      "kind": "positive",
+      "kind": "negative",
       "support": "supported",
-      "tier": "canonical",
+      "tier": "negative",
       "contexts": [
         "plain-text"
       ],
       "input": "sk_live_xxxxxxxxxxxxxxxxxxxxxxxx",
-      "expected": [
-        {
-          "detector": "stripe-token",
-          "type": "stripe_credential",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 32
-        }
-      ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+      "expected": [],
+      "note": "A documentation placeholder whose body is one repeated character is not classified (issue #934): a random key body is never one repeated character, so the filler exclusion generic-token applies holds here too. Until #934 this was a positive fixture recording the opposite tradeoff."
     },
     {
       "id": "stripe-positive-mixed-public-and-secret",
