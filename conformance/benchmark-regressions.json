@@ -1429,6 +1429,63 @@
       "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #837. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/821, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
+      "id": "benchmark-gap-911",
+      "benchmarkRecordId": "product-911",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/911",
+      "benchmarkFixtureIds": [
+        "real-world-shapes--helm-values-search-api",
+        "real-world-shapes--k8s-billing-externalsecret",
+        "real-world-shapes--ansible-group-vars-gameservers",
+        "real-world-shapes--swift-keychain-wrapper",
+        "real-world-shapes--pytest-fake-fixtures",
+        "real-world-shapes--lua-openresty-hmac",
+        "real-world-shapes--agent-summary-korean-rotation"
+      ],
+      "corpusHashes": [
+        "7adc76864a1a1f017f1ac3a88de933301819ffe28af154ab9b9ff7e155355de3"
+      ],
+      "fixingCommit": "12a984ebf62dd1f8640058b8290421f6cc72baf7",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-negative-helm-existing-secret",
+          "generic-token-negative-external-secret-key-name",
+          "generic-token-negative-reverse-dns-keychain-item",
+          "generic-token-negative-templated-vault-lookup-path",
+          "generic-token-negative-lua-method-call",
+          "generic-token-negative-constant-keyword-argument",
+          "generic-token-positive-literal-under-webhook-secret",
+          "generic-token-positive-literal-under-secret-key",
+          "generic-token-positive-literal-keychain-case",
+          "generic-token-positive-literal-lookup-term",
+          "generic-token-positive-literal-keyword-argument"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030868",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030771",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030741",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030023",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124029999",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030119",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030073",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124030324",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36480272622/job/109124187479"
+          ]
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "Found by the untargeted benign corpus (redact-secret-benchmarks#378, real-world-shapes, corpus 7adc7686...5de3) on published 0.1.0-beta.9 and candidate 9ab0fa0. False positive: generic-token redacted secret-reference names and identifiers in seven ordinary config/source files (a Helm existingSecret name, an ExternalSecret secretKey, a templated Vault lookup path, reverse-DNS keychain identifiers, a Lua method call, a placeholder constant keyword argument, and the Korean agent summary). The fixing commit (PR #938, merged at main ea5c7bd) makes each structurally non-literal shape produce no finding while a literal in the same position stays high/redact; the canonical fixtures are six benign shapes and five literal twins, freshly built synthetic values. The pytest file keeps one medium warn on a short quoted literal under a high-signal name (FAKE_TOKEN), which is outside this issue: decision-warn-unconditionally-on-high-signal-contextual-names warns on it by design. productConformance passed: the canonical fixtures pass in Artifact qualification run 36480272622 at main 1db8ff3, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, and the Python wheel). benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the fixed-candidate rerun is recorded on develop until develop is promoted."
+    },
+    {
       "id": "benchmark-gap-931",
       "benchmarkRecordId": "product-931",
       "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
