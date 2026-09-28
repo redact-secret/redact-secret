@@ -124,6 +124,10 @@ class BuildReportTests(unittest.TestCase):
         markdown = GEN.render_markdown(GEN.build_report(self.inventory_report, self.declarations_doc))
         self.assertNotIn("evidenceFixtureIds", markdown)
 
+    def test_supported_ratio_is_generated_from_the_row_counts(self) -> None:
+        markdown = GEN.render_markdown(GEN.build_report(self.inventory_report, self.declarations_doc))
+        self.assertIn("1/2 supported does not mean", markdown)
+
 
 class ReconciliationTests(unittest.TestCase):
     def test_no_errors_when_types_and_detectors_agree(self) -> None:

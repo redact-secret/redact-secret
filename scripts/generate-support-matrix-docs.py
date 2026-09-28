@@ -57,6 +57,7 @@ MATRIX_PATH = ROOT / "benchmarks" / "support-matrix.json"
 SCHEMA_PATH = ROOT / "benchmarks" / "support-matrix-schema.json"
 DOC_PATH = ROOT / "docs" / "support-matrix.md"
 README_PATH = ROOT / "README.md"
+DETECTORS_PATH = ROOT / "crates" / "secret-scan-core" / "src" / "detectors" / "mod.rs"
 CHANGELOG_PATH = ROOT / "CHANGELOG.md"
 RELEASES_DIR = ROOT / "docs" / "releases"
 FRAGMENT_NAME = "support-status.md"
@@ -250,6 +251,39 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+BUILT_IN_PACKS_TABLE = re.compile(r"BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];")
+
+
+def built_in_detector_ids(source: str) -> list[str]:
+    """Every detector id in the core's `BUILT_IN_PACKS`, in table order."""
+    table = BUILT_IN_PACKS_TABLE.search(source)
+    if table is None:
+        raise ValueError("detectors/mod.rs: BUILT_IN_PACKS not found")
+    return re.findall(r'\("([a-z0-9-]+)", Pack::', table.group(1))
+
+
+def unmeasured_detectors(matrix: dict, detector_ids: list[str]) -> list[str]:
+    """Built-in detectors that no matrix family lists: shipped, but with no
+    measured support status yet (issue #951). They are shown as `not yet
+    measured` rather than assigned a status or left silently absent."""
+    measured = {detector for family in matrix["families"] for detector in family["detectors"]}
+    return sorted(detector for detector in detector_ids if detector not in measured)
+
+
+def repo_unmeasured(matrix: dict, detectors_path: Path = DETECTORS_PATH) -> list[str]:
+    return unmeasured_detectors(matrix, built_in_detector_ids(detectors_path.read_text(encoding="utf-8")))
+
+
+def missing_from_doc(doc_text: str, detector_ids: list[str]) -> list[str]:
+    """Built-in detectors the rendered matrix document never names, as a
+    whole-token id, in either a family row or the not-yet-measured section."""
+    return [
+        detector
+        for detector in detector_ids
+        if re.search(rf"(?<![a-z0-9-]){re.escape(detector)}(?![a-z0-9-])", doc_text) is None
+    ]
+
+
 def validate_matrix(matrix: dict, schema: dict) -> list[str]:
     """Structural checks independent of `generate-support-matrix.ts`'s own
     guarantees: this is the second line of defense against a pinned copy that
@@ -370,7 +404,7 @@ def _support_label(family: dict) -> str:
     return status.capitalize()
 
 
-def render_matrix_markdown(matrix: dict) -> str:
+def render_matrix_markdown(matrix: dict, unmeasured: list[str] | tuple[str, ...] = ()) -> str:
     families = matrix["families"]
     revision = matrix["sourceReport"]["revision"]
     lines = [
@@ -484,6 +518,21 @@ def render_matrix_markdown(matrix: dict) -> str:
         )
         lines.append("")
 
+    if unmeasured:
+        lines.extend(
+            [
+                "### Not yet measured",
+                "",
+                f"{len(unmeasured)} built-in detectors ship in the core but are not covered by the pinned "
+                "measurement above, so they have no support status yet. Their absence from the tables above "
+                "means \"not yet measured\", not \"unsupported\": do not read a status into them. The next "
+                "pinned matrix that measures them moves each into a status section.",
+                "",
+                _markdown_table(["Detector", "Measured support status"], [[f"`{d}`", "not yet measured"] for d in unmeasured]),
+                "",
+            ]
+        )
+
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
@@ -510,7 +559,7 @@ def _last_column(family: dict, status: str) -> str:
     return "not recorded in the pinned evidence"
 
 
-def render_readme_fragment(matrix: dict) -> str:
+def render_readme_fragment(matrix: dict, unmeasured: list[str] | tuple[str, ...] = ()) -> str:
     distribution = matrix["distribution"]
     stable_distribution = matrix["stableDistribution"]
     tier_counts = _tier_counts(matrix)
@@ -519,6 +568,13 @@ def render_readme_fragment(matrix: dict) -> str:
         f"{profile}: {stable_distribution[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
     )
     evidence_counts = ", ".join(f"{tier}: {tier_counts[tier]}" for tier in EVIDENCE_TIER_ORDER)
+    not_measured = (
+        f" {len(unmeasured)} shipped detectors are not yet measured and carry no status: "
+        + ", ".join(f"`{d}`" for d in unmeasured)
+        + "."
+        if unmeasured
+        else ""
+    )
     lines = [
         README_START,
         f"**Support status** ({matrix['providerCount']} providers, {matrix['familyCount']} credential "
@@ -527,7 +583,7 @@ def render_readme_fragment(matrix: dict) -> str:
         "`Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. "
         "`provisional` means useful but evidence-incomplete, not \"almost stable\"; unsupported "
         "families are listed with their reason. See the full "
-        "[support matrix](docs/support-matrix.md).",
+        "[support matrix](docs/support-matrix.md)." + not_measured,
         README_END,
     ]
     return "\n".join(lines)
@@ -689,6 +745,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--schema", type=Path, default=SCHEMA_PATH)
     parser.add_argument("--doc-out", type=Path, default=DOC_PATH)
     parser.add_argument("--readme", type=Path, default=README_PATH)
+    parser.add_argument("--detectors-source", type=Path, default=DETECTORS_PATH, help="the core's detectors/mod.rs holding BUILT_IN_PACKS")
     parser.add_argument("--changelog", type=Path, default=CHANGELOG_PATH)
     parser.add_argument("--releases-dir", type=Path, default=RELEASES_DIR)
     parser.add_argument("--check", action="store_true", help="fail if docs/support-matrix.md or README.md are out of date; write nothing")
@@ -710,9 +767,11 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(render_release_note(matrix, previous))
         return 0
 
-    doc_text = render_matrix_markdown(matrix)
+    detector_ids = built_in_detector_ids(args.detectors_source.read_text(encoding="utf-8"))
+    unmeasured = unmeasured_detectors(matrix, detector_ids)
+    doc_text = render_matrix_markdown(matrix, unmeasured)
     readme_text = args.readme.read_text(encoding="utf-8")
-    fragment = render_readme_fragment(matrix)
+    fragment = render_readme_fragment(matrix, unmeasured)
     new_readme_text = inject_readme_fragment(readme_text, fragment)
 
     if args.check:
@@ -727,6 +786,13 @@ def main(argv: list[str] | None = None) -> int:
                 f"{args.readme} support-status section is out of date; regenerate with "
                 "`python3 -B scripts/generate-support-matrix-docs.py`"
             )
+        if args.doc_out.exists():
+            absent = missing_from_doc(args.doc_out.read_text(encoding="utf-8"), detector_ids)
+            if absent:
+                problems.append(
+                    f"{args.doc_out} names no support status or `not yet measured` entry for built-in "
+                    "detector(s) " + ", ".join(absent) + " (BUILT_IN_PACKS)"
+                )
         problems.extend(check_changelog_fragments(args.changelog, args.releases_dir))
         for problem in problems:
             print(f"error: {problem}", file=sys.stderr)

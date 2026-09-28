@@ -181,3 +181,32 @@ Evidence tiers across all families:
 | pinecone | Legacy API key (bare UUID) | Unsupported | — | None | — | — | Beta.8 context-gated arrival family pinecone-api-key-legacy (#212, research #228); the UUID shape is corroborated by unpinned tools only. Owned by the product pinecone-api-key detector since product main 2420e80 (redact-secret#766 and its ADR 2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name): the UUID is redacted at high confidence under a Pinecone API-key name (PINECONE_API_KEY, pinecone_api_key, PINECONE_KEY, or api_key/apiKey/Api-Key on a line naming pinecone), and a bare UUID stays unclaimed. The detector reports it with the same pinecone_api_key finding type as pcsk_, so detectors stays empty: mapping the family to pinecone-api-key would merge it into that contract (#253). Provider source: https://docs.pinecone.io/reference/api/authentication. |
 | slack | Workflow webhook token | Unsupported | — | None | — | — | classifyFixture explicitly routes xwfp- values to the "needs a separate format contract" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: "Variant support must not be inferred from a related family name."). |
 | stripe | Organization API key | Unsupported | — | None | — | — | classifyFixture explicitly routes sk_org_ values to "this variant needs a separate format contract; related detector support is not evidence of parity", so it is not claimed by stripe-token's live/test secret-key pattern. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: "Variant support must not be inferred from a related family name."). |
+
+### Not yet measured
+
+22 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
+
+| Detector | Measured support status |
+| --- | --- |
+| `ai21-api-key` | not yet measured |
+| `apify-api-token` | not yet measured |
+| `aws-bedrock-long-term-api-key` | not yet measured |
+| `aws-bedrock-short-term-api-key` | not yet measured |
+| `cohere-api-key` | not yet measured |
+| `composio-api-key` | not yet measured |
+| `convex-deployment-key` | not yet measured |
+| `deepgram-api-key` | not yet measured |
+| `doppler-token` | not yet measured |
+| `e2b-api-key` | not yet measured |
+| `elevenlabs-api-key` | not yet measured |
+| `firecrawl-api-key` | not yet measured |
+| `helicone-api-key` | not yet measured |
+| `inngest-signing-key` | not yet measured |
+| `mistral-api-key` | not yet measured |
+| `onepassword-service-account-token` | not yet measured |
+| `posthog-token` | not yet measured |
+| `resend-api-key` | not yet measured |
+| `tavily-api-key` | not yet measured |
+| `together-ai-api-key` | not yet measured |
+| `trigger-dev-token` | not yet measured |
+| `wandb-api-key` | not yet measured |
