@@ -147,16 +147,19 @@ fn collect_candidates(
     registry: &DetectorRegistry,
 ) -> Result<Vec<Vec<Candidate>>, SecretScanError> {
     let context = DetectorContext::new(scanned.len());
-    registry
-        .detectors()
-        .iter()
-        .map(|registered| {
+    // Sized once up front: collecting through `Result` loses the iterator's
+    // size hint, so the list grew by doubling on every call, and an
+    // incremental session makes one call per closed line (issue #950).
+    let mut per_detector = Vec::with_capacity(registry.len());
+    for registered in registry.detectors() {
+        per_detector.push(
             registered
                 .detector()
                 .detect(scanned, &context)
-                .map_err(|_| SecretScanErrorCode::DetectorFailure.into())
-        })
-        .collect()
+                .map_err(|_| SecretScanError::from(SecretScanErrorCode::DetectorFailure))?,
+        );
+    }
+    Ok(per_detector)
 }
 
 /// This candidate's rank within [`Specificity`], `0` for [`Specificity::Entropy`]
@@ -298,6 +301,11 @@ impl EvidenceWeight {
 /// not by iteration order over an unordered collection — so a rerun, and
 /// every binding built on this same core, reproduce the identical selection.
 fn select_optimal_disjoint_set(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<RankedCandidate<'_>> {
+    // Nothing to select: most closed lines of an incremental session carry
+    // no candidate, and the tables below would each allocate (issue #950).
+    if ranked.is_empty() {
+        return ranked;
+    }
     ranked.sort_unstable_by(|a, b| {
         a.range
             .end()

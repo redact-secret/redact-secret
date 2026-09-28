@@ -1394,34 +1394,34 @@
     {
       "id": "heroku-legacy-netrc-multi-line-partitions",
       "input": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
-      "text": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "text": "machine api.heroku.com\n  login someone@example.invalid\n  password <SECRET_1>\n",
       "expected": [
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 66,
           "end": 102
         }
       ],
-      "note": "Issue #743: the machine api.heroku.com line and the password line can fall in different chunks. The session holds the Heroku .netrc entry open until its password line arrives, so every partition reports the same medium-confidence finding (a warn, so the text is unchanged) as the whole-input scan."
+      "note": "Issue #743: the machine api.heroku.com line and the password line can fall in different chunks. The session holds the Heroku .netrc entry open until its password line arrives, so every partition reports the same finding as the whole-input scan: high confidence since issue #936, so the token is redacted in every partition."
     },
     {
       "id": "heroku-legacy-auth-token-output-partitions",
       "input": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
-      "text": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "text": "$ heroku auth:token\n<SECRET_1>\n",
       "expected": [
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 20,
           "end": 56
         }
       ],
-      "note": "Issue #743: the heroku auth:token command line is held open until the output line arrives, so the token on the next line is reported at every partition."
+      "note": "Issue #743: the heroku auth:token command line is held open until the output line arrives, so the token on the next line is reported, and redacted since issue #936 (high confidence), at every partition."
     },
     {
       "id": "heroku-hrku-uuid-generation-partitions",

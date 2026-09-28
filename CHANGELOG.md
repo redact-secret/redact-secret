@@ -119,6 +119,22 @@ evidence is linked from each published version.
   labels `email address`, `e-mail address`, `이메일 주소`, `카드번호`,
   `신용카드번호`, and `직불카드번호` (#927). A bare `address` or `주소` is
   still not a label.
+- Keyword-gated provider values read through a structure that names their
+  credential slot and binds the provider are now reported at high
+  confidence and redacted instead of warned (#936). A warning leaves the
+  value in the sanitized output. This covers a complete Mailchimp
+  `<32 hex>-us<1–3 digits>` key outside a hostname or URL path, with or
+  without a Mailchimp keyword on its line; the Heroku `.netrc` `password`,
+  `heroku auth:token` output and `heroku authorizations` `Token:` row; the
+  `Auth Token` column of a `twilio` CLI table; the Schema Registry
+  `basic.auth.user.info` secret below a Confluent-named property; and a
+  Deepgram `Authorization: Token` header on a request to a
+  `*.deepgram.com` API host. No new value is matched. A keyword elsewhere
+  on the line with no such structure, a Deepgram header naming `deepgram`
+  only as a word, and a keyword-kept Mailchimp hostname or path match stay
+  medium (warn). Cost: a non-credential value in one of these exact slots
+  (a 32-hex id with a `-us<N>` suffix in prose) is redacted instead of
+  warned.
 
 ### Fixed
 
@@ -169,6 +185,13 @@ evidence is linked from each published version.
   `postgres+asyncpg://`, `mysql+pymysql://` and `mariadb+<driver>://` were
   missed because the scheme did not match. The driver is 1–32
   `[A-Za-z0-9_]` bytes; other schemes with a `+` suffix stay unsupported.
+- `generic-token` no longer warns on vendor-prefixed documentation
+  placeholders from the Inngest and Resend handoffs (#949):
+  `signkey-test-12345`, `re_123456789` and `re_yourkey`. The part after a
+  short lowercase vendor prefix may now be a counting run of at least four
+  digits or a `your…` credential phrase glued into one word. Any other
+  digit sequence, a leftover letter or digit, and an unlisted word stay
+  reported, and the glued form is not read on a bare value.
 - `generic-token` treats `auth_token` as a high-signal credential name
   (#941). A secret-shaped value under `auth_token` is reported at high
   confidence and redacted instead of warned, and `twilio auth_token=<value>`
@@ -195,13 +218,13 @@ evidence is linked from each published version.
   of `twilio profiles:list` output, and `confluent-cloud-api-secret-legacy`
   a Schema Registry `basic.auth.user.info=<key id>:<secret>` property below
   a Confluent-named URL. These were missed because the provider name was
-  only on an earlier line. They report at medium confidence (warn).
+  only on an earlier line. They report at high confidence (redacted) since
+  #936.
 - `mailchimp-api-key` reports a complete Marketing API key
   (`<32 hex>-us<1–3 digits>`) with no Mailchimp keyword on its line (#931),
-  at medium confidence (warn). Keys under a `requests` Basic-auth tuple, an
-  `Authorization: apikey` header or pasted into prose were missed. A
-  same-line keyword and a Mailchimp-named key behave as before (medium and
-  high). A 32-hex value without the `-us<N>` suffix, and a keyword-free
+  at high confidence (redacted) since #936. Keys under a `requests`
+  Basic-auth tuple, an `Authorization: apikey` header or pasted into prose
+  were missed. A 32-hex value without the `-us<N>` suffix, and a keyword-free
   match used as a hostname label or URL path segment, stay unreported.
 - A PII field label directly after a `|` delimiter now labels its value, as
   one after whitespace does (#940): pipe-delimited records (`a|b|email=…`,
@@ -218,6 +241,35 @@ evidence is linked from each published version.
   part; a `|` right after a reviewed email label is now a field boundary.
   After any other text (`|emailx|…`, `|user|a|…`) the `|` stays part of the
   local part.
+
+### Performance
+
+- Recovered the beta.11 processing-time regression against the beta.8
+  budgets (#950). Findings, ranges, actions and output are unchanged, and no
+  dependency was added:
+  - `slack-token` searches for each prefix directly and builds its run
+    tables only once a prefix occurs, instead of building two
+    input-length tables and comparing at every byte on each of its five
+    passes.
+  - `connection-string` skips offsets too far before the next `://` to
+    start a scheme, instead of trying all 14 schemes at every byte.
+  - `generic-token` rejects an ineligible assignment name (`status=200`)
+    before it scores the value.
+  - The shared prefixed scan returns before allocating anything when no
+    byte that can begin a prefix occurs, builds a run table only for a
+    matched prefix, and finds lead bytes eight input bytes at a time. This
+    matters most for the incremental path, which calls every detector once
+    per closed line, and for WebAssembly.
+  - The pipeline sizes its per-detector candidate list once per call and
+    skips overlap selection when nothing was proposed.
+  - The WebAssembly `scan` and `scanAndRedact` convert all finding ranges
+    to UTF-16 in one pass over the input, instead of counting from the
+    start for each finding.
+
+  Measured on the benchmarks performance workflow, all ten
+  `latency/*/processing-ratio` rows are within budget (0.54-0.83 of beta.8;
+  `browser-wasm` `scale-logs-small-whole` 1.23 against its 1.30 allowance).
+  See `docs/audits/evidence/950/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

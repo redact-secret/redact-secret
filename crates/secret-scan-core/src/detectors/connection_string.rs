@@ -20,6 +20,7 @@
 //! string split across log lines, is a false negative by design, same as
 //! this file's other structural false negatives above.
 
+use super::pattern;
 use super::text::{
     is_command_substitution_reference, is_opencode_reference, is_repeated_character_filler,
     is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
@@ -70,6 +71,20 @@ const DRIVER_SUFFIX_DIALECTS: [&str; 4] = ["postgresql", "postgres", "mysql", "m
 /// short lowercase identifiers (`psycopg2`, `asyncpg`, `mysqlconnector`).
 const MAX_DRIVER_LENGTH: usize = 32;
 
+/// The longest distance from a scheme's first byte to its `://`: the longest
+/// scheme name plus a `+<driver>` suffix of [`MAX_DRIVER_LENGTH`] bytes.
+const MAX_SCHEME_SPAN: usize = {
+    let mut longest = 0;
+    let mut index = 0;
+    while index < SCHEMES.len() {
+        if SCHEMES[index].len() > longest {
+            longest = SCHEMES[index].len();
+        }
+        index += 1;
+    }
+    longest + 1 + MAX_DRIVER_LENGTH
+};
+
 struct SchemeMatch {
     start: usize,
     end: usize,
@@ -100,7 +115,21 @@ fn driver_suffix_end(bytes: &[u8], at: usize) -> Option<usize> {
 fn find_next_scheme(input: &str, from: usize) -> Option<SchemeMatch> {
     let bytes = input.as_bytes();
     let mut position = from;
+    // Every match ends in `://`, at most `MAX_SCHEME_SPAN` bytes after the
+    // offset it starts at. Offsets further than that before the next `://`
+    // cannot match any scheme, so the scan jumps over them instead of trying
+    // every scheme at each one; the offsets it still tries, and their order,
+    // are the ones that could match (issue #950).
+    let mut separator = None;
     while position <= bytes.len() {
+        if separator.is_none_or(|at| at < position) {
+            separator = Some(pattern::find_literal(bytes, b"://", position)?);
+        }
+        if let Some(at) = separator
+            && at > position + MAX_SCHEME_SPAN
+        {
+            position = at - MAX_SCHEME_SPAN;
+        }
         for scheme in SCHEMES {
             let name_end = position + scheme.len();
             if name_end > bytes.len()
@@ -488,15 +517,7 @@ fn is_azure_segment_terminator(byte: u8) -> bool {
 }
 
 fn find_next_literal(input: &str, literal: &str, from: usize) -> Option<usize> {
-    let bytes = input.as_bytes();
-    let needle = literal.as_bytes();
-    if from > bytes.len() {
-        return None;
-    }
-    bytes[from..]
-        .windows(needle.len())
-        .position(|window| window == needle)
-        .map(|offset| from + offset)
+    pattern::find_literal(input.as_bytes(), literal.as_bytes(), from)
 }
 
 /// Expands bidirectionally from `anchor` to the full extent of the
@@ -1143,6 +1164,62 @@ mod tests {
     fn overlong_malformed_authority_is_abandoned_after_a_fixed_bound() {
         let input = format!("postgres://fixture:{}@localhost/db", "%2".repeat(50_000));
         assert_eq!(detect(&input), Vec::new());
+    }
+
+    /// The scan `find_next_scheme` replaced (issue #950): every scheme tried
+    /// at every offset, advancing one byte at a time.
+    fn find_next_scheme_every_offset(input: &str, from: usize) -> Option<(usize, usize, bool)> {
+        let bytes = input.as_bytes();
+        (from..=bytes.len()).find_map(|position| {
+            SCHEMES.iter().find_map(|scheme| {
+                let name_end = position + scheme.len();
+                if name_end > bytes.len()
+                    || !bytes[position..name_end].eq_ignore_ascii_case(scheme.as_bytes())
+                {
+                    return None;
+                }
+                let (separator, driver_suffix) = match driver_suffix_end(bytes, name_end) {
+                    Some(driver_end) if DRIVER_SUFFIX_DIALECTS.contains(scheme) => {
+                        (driver_end, true)
+                    }
+                    _ => (name_end, false),
+                };
+                let end = separator + 3;
+                (end <= bytes.len() && bytes[separator..end] == *b"://").then_some((
+                    position,
+                    end,
+                    driver_suffix,
+                ))
+            })
+        })
+    }
+
+    #[test]
+    fn the_separator_skip_finds_the_same_scheme_as_trying_every_offset() {
+        let longest_driver = "d".repeat(MAX_DRIVER_LENGTH);
+        let filler = "x".repeat(3 * MAX_SCHEME_SPAN);
+        let inputs = [
+            String::new(),
+            "://".to_owned(),
+            format!("{filler}://{filler}"),
+            format!("{filler}mongodb+srv://u:p@h {filler}postgresql+{longest_driver}://u:p@h"),
+            format!("{filler}postgresql+{longest_driver}d://u:p@h redis://:p@h"),
+            format!("rediss://:p@h{filler}HTTPS://u:p@h{filler}ftp:/x ftps://"),
+            format!("{filler}mysql+a://{filler}amqp://amqps://"),
+        ];
+        for input in &inputs {
+            for from in 0..=input.len() {
+                assert_eq!(
+                    find_next_scheme(input, from).map(|found| (
+                        found.start,
+                        found.end,
+                        found.driver_suffix
+                    )),
+                    find_next_scheme_every_offset(input, from),
+                    "{input:?} from {from}"
+                );
+            }
+        }
     }
 
     #[test]

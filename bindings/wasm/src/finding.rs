@@ -101,10 +101,25 @@ impl FindingJs {
 
 impl FindingJs {
     /// Wraps `finding`, converting its UTF-8 byte range to UTF-16 code units
-    /// against `input`.
+    /// against `input`. Outside tests, [`FindingJs::all`] converts a whole
+    /// scan's findings in one pass instead.
+    #[cfg(test)]
     pub(crate) fn new(input: &str, finding: redact_secret::Finding) -> Self {
         let (start, end) = range::to_utf16_range(input, finding.range());
         Self::from_range(finding, start, end)
+    }
+
+    /// Wraps each of `findings`, converting all of their UTF-8 byte ranges to
+    /// UTF-16 code units in one pass over `input` (`range::Utf16Ranges`).
+    pub(crate) fn all(input: &str, findings: Vec<redact_secret::Finding>) -> Vec<Self> {
+        let mut ranges = range::Utf16Ranges::new(input);
+        findings
+            .into_iter()
+            .map(|finding| {
+                let (start, end) = ranges.convert(finding.range());
+                Self::from_range(finding, start, end)
+            })
+            .collect()
     }
 
     /// Wraps `finding` with an already-converted UTF-16 code-unit range.

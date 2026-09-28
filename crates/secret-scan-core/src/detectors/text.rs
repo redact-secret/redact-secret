@@ -232,6 +232,56 @@ const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
 /// followed only by qualifiers (`YOUR_PERSONAL_ACCESS`) is not enough.
 const PLACEHOLDER_CREDENTIAL_NOUNS: &[&str] = &["jwt", "key", "secret", "token"];
 
+/// `true` for an instructional placeholder written as one glued word, such
+/// as `yourkey`, `yourapikey` or `YourSigningKeyHere` (issue #949): ASCII
+/// letters only, opening with a [`PLACEHOLDER_LEAD_WORDS`] entry, and the
+/// rest splitting exactly into [`PLACEHOLDER_CREDENTIAL_WORDS`],
+/// [`PLACEHOLDER_PROVIDER_WORDS`], lead words or `signing`, with at least
+/// one [`PLACEHOLDER_CREDENTIAL_NOUNS`] entry, all case-insensitively.
+///
+/// Without separators the word boundaries are ambiguous, so this is only
+/// applied behind a vendor prefix (`re_yourkey`), never to a bare value. A
+/// letter left over (`yourkeyq`) or any digit keeps the value detected.
+pub(super) fn is_glued_instructional_placeholder(value: &str) -> bool {
+    if value.is_empty() || !value.bytes().all(|byte| byte.is_ascii_alphabetic()) {
+        return false;
+    }
+    let lower = value.to_ascii_lowercase();
+    let Some(rest) = PLACEHOLDER_LEAD_WORDS
+        .iter()
+        .find_map(|lead| lower.strip_prefix(lead))
+    else {
+        return false;
+    };
+    let words = || {
+        PLACEHOLDER_CREDENTIAL_WORDS
+            .iter()
+            .chain(PLACEHOLDER_PROVIDER_WORDS)
+            .chain(PLACEHOLDER_LEAD_WORDS)
+            .chain(&["signing"])
+    };
+    // reachable[i]: rest[..i] splits into listed words; with_noun[i]: one
+    // such split names a credential noun. Bounded by the value's length
+    // times the fixed word lists.
+    let len = rest.len();
+    let mut reachable = vec![false; len + 1];
+    let mut with_noun = vec![false; len + 1];
+    reachable[0] = true;
+    for start in 0..len {
+        if !reachable[start] {
+            continue;
+        }
+        for word in words() {
+            if rest[start..].starts_with(word) {
+                let end = start + word.len();
+                reachable[end] = true;
+                with_noun[end] |= with_noun[start] || PLACEHOLDER_CREDENTIAL_NOUNS.contains(word);
+            }
+        }
+    }
+    len > 0 && reachable[len] && with_noun[len]
+}
+
 /// `true` for an instructional placeholder such as `YOUR_ACCESS_TOKEN`,
 /// `INSERT_ACCESS_TOKEN`, `YOUR_API_KEY`, or `your-oauth-token-here`: the
 /// value splits on `_`, `-`, and `.` into two or more words, the first is a

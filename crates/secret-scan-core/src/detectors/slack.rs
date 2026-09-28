@@ -240,19 +240,23 @@ fn scan(input: &str) -> Vec<Match> {
 /// a missing separator is rejected rather than re-read into a wider run.
 fn scan_app_level(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    let digit_ends = pattern::run_ends(bytes, DIGIT_ALPHABET);
-    let alnum_ends = pattern::run_ends(bytes, pattern::is_alnum);
+    // The run tables are built on the first prefix occurrence: most inputs
+    // carry none, and each table is a pass and an allocation (issue #950).
+    let mut tables: Option<(Vec<usize>, Vec<usize>)> = None;
     let mut matches = Vec::new();
     let mut start = 0;
-    while start < bytes.len() {
-        if !bytes[start..].starts_with(APP_LEVEL_PREFIX.as_bytes()) {
-            start += 1;
-            continue;
-        }
+    while let Some(found) = pattern::find_literal(bytes, APP_LEVEL_PREFIX.as_bytes(), start) {
+        start = found;
+        let (digit_ends, alnum_ends) = tables.get_or_insert_with(|| {
+            (
+                pattern::run_ends(bytes, DIGIT_ALPHABET),
+                pattern::run_ends(bytes, pattern::is_alnum),
+            )
+        });
         let Some(end) = app_level_end(
             bytes,
-            &digit_ends,
-            &alnum_ends,
+            digit_ends,
+            alnum_ends,
             start + APP_LEVEL_PREFIX.len(),
         ) else {
             start += 1;
@@ -368,18 +372,23 @@ fn scan_sectioned(
     shape: SectionedShape,
 ) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    let digit_ends = pattern::run_ends(bytes, DIGIT_ALPHABET);
-    let tail_ends = pattern::run_ends(bytes, shape.tail_alphabet);
+    // Built on the first prefix occurrence, as in [`scan_app_level`].
+    let mut tables: Option<(Vec<usize>, Vec<usize>)> = None;
     let mut matches = Vec::new();
     let mut start = 0;
-    while start < bytes.len() {
-        let skip =
-            skip_if_preceded_by.is_some_and(|lead| bytes[..start].ends_with(lead.as_bytes()));
-        if skip || !bytes[start..].starts_with(prefix.as_bytes()) {
+    while let Some(found) = pattern::find_literal(bytes, prefix.as_bytes(), start) {
+        start = found;
+        if skip_if_preceded_by.is_some_and(|lead| bytes[..start].ends_with(lead.as_bytes())) {
             start += 1;
             continue;
         }
-        let Some(end) = sectioned_end(bytes, &digit_ends, &tail_ends, start + prefix.len(), shape)
+        let (digit_ends, tail_ends) = tables.get_or_insert_with(|| {
+            (
+                pattern::run_ends(bytes, DIGIT_ALPHABET),
+                pattern::run_ends(bytes, shape.tail_alphabet),
+            )
+        });
+        let Some(end) = sectioned_end(bytes, digit_ends, tail_ends, start + prefix.len(), shape)
         else {
             start += 1;
             continue;

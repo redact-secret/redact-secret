@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2975,
+  "fixtureCount": 2988,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -14505,6 +14505,28 @@
       "note": "A standard mongodb+srv DNS-seedlist host (three or more labels, no port) is recognized."
     },
     {
+      "id": "connection-positive-sqlalchemy-driver-ipv6-host",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "engine = create_engine(\"postgresql+psycopg://orders_app:Synth3ticRevokedDbPass@[2001:db8::5]:5432/orders\")\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 56,
+          "end": 78
+        }
+      ],
+      "note": "Issue #935: a SQLAlchemy dialect+driver:// URL (postgresql+psycopg) with an IPv6 host reports the password; the driver is 1-32 [A-Za-z0-9_] bytes."
+    },
+    {
       "id": "connection-negative-mongodb-srv-host-only",
       "detector": "connection-string",
       "kind": "negative",
@@ -16212,6 +16234,45 @@
       "input": "client_secret=replaceme",
       "expected": [],
       "note": "The literal placeholder value 'replaceme' remains excluded even though it meets the minimum length, covering a second placeholder-word family distinct from 'redacted' and 'changeme'."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-counting-digits",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RESEND_API_KEY=re_123456789\n",
+      "expected": [],
+      "note": "Issue #949: a short vendor prefix followed by a counting run of digits (at least four, each one more than the last) is a documentation placeholder, as the Resend and Inngest handoffs list; a random numeric body is never a counting run."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-sdk-counting-digits",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const inngest = new Inngest({ id: \"test\", signingKey: \"signkey-test-12345\" });\n",
+      "expected": [],
+      "note": "Issue #949: the Inngest SDK test placeholder signkey-test-12345 is a vendor prefix before a counting digit run and is not a secret."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-glued-your-word",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "resend.api_key = \"re_yourkey\"\n",
+      "expected": [],
+      "note": "Issue #949: an instructional placeholder glued into one word (your + key) behind a vendor prefix is not a secret. Applied only behind a vendor prefix; a leftover letter or digit keeps the value detected."
     },
     {
       "id": "contextual-negative-hash-non-credential-name",
@@ -20167,6 +20228,28 @@
         }
       ],
       "note": "The value has no vendor marker of its own; the twilio-named key (twilio_auth_token) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
+    },
+    {
+      "id": "twilio-auth-token-positive-cli-table-auth-token-column",
+      "detector": "twilio-auth-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ twilio profiles:list --properties authToken\nID     Auth Token\nprod   b2907e5c3a\u00318f6d4b2907e5c3a18f6d4\n",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 71,
+          "end": 103
+        }
+      ],
+      "note": "Issues #933 and #936: the whole cell under the Auth Token column of a table printed by a twilio command is the Auth Token; twilio is only on the command line above. High confidence, so the default policy redacts it."
     },
     {
       "id": "twilio-auth-token-negative-account-sid-on-a-different-line",
@@ -26741,7 +26824,7 @@
           "end": 54
         }
       ],
-      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (since issue #936 the complete shape is high with or without the name; only a keyword-kept hostname or path match stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-json-keyword",
@@ -26763,7 +26846,7 @@
           "end": 57
         }
       ],
-      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimpApiKey) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimpApiKey) names the credential, so since issue #702 it classifies at high confidence (since issue #936 the complete shape is high with or without the name; only a keyword-kept hostname or path match stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-yaml-keyword",
@@ -26785,7 +26868,7 @@
           "end": 56
         }
       ],
-      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimp_api_key) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimp_api_key) names the credential, so since issue #702 it classifies at high confidence (since issue #936 the complete shape is high with or without the name; only a keyword-kept hostname or path match stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-log-keyword",
@@ -26801,13 +26884,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 57
         }
       ],
-      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement."
+      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement; since issue #936 the complete shape outside a hostname or path is high whether or not a keyword is present."
     },
     {
       "id": "mailchimp-api-key-positive-shell-quoted",
@@ -26829,7 +26912,7 @@
           "end": 62
         }
       ],
-      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (since issue #936 the complete shape is high with or without the name; only a keyword-kept hostname or path match stays medium)."
     },
     {
       "id": "mailchimp-api-key-regression-crlf-and-unicode-prefix",
@@ -26845,7 +26928,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 24,
           "end": 60
@@ -26867,13 +26950,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 0,
           "end": 36
         }
       ],
-      "note": "Since issue #931 the complete shape (32 hex, -us, 1-3 digit datacenter) is evidence on its own and is classified at medium confidence with no mailchimp keyword; until #931 this was a negative fixture recording the keyword gate."
+      "note": "Since issue #931 the complete shape (32 hex, -us, 1-3 digit datacenter) is evidence on its own and is classified with no mailchimp keyword (medium under #931, high since issue #936 so the default policy redacts it); until #931 this was a negative fixture recording the keyword gate."
     },
     {
       "id": "mailchimp-api-key-positive-keyword-on-another-line",
@@ -26889,13 +26972,35 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 12,
           "end": 48
         }
       ],
-      "note": "Since issue #931 the complete shape is classified at medium confidence whether or not a mailchimp keyword is on its line; the keyword on another line adds nothing. Until #931 this was a negative fixture."
+      "note": "Since issue #931 the complete shape is classified whether or not a mailchimp keyword is on its line, at high confidence since issue #936; the keyword on another line adds nothing. Until #931 this was a negative fixture."
+    },
+    {
+      "id": "mailchimp-api-key-positive-hostname-label-with-keyword",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp asset https://5c3a18f6d4b2907e5c3a18f6d4b2907e-u\u00736.cdn.example.test/logo.png\n",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 24,
+          "end": 60
+        }
+      ],
+      "note": "Issue #936: the complete shape used as a DNS label is an identifier position; without a keyword it is unreported (#931), and a same-line mailchimp keyword keeps it reported only at medium (warn). Everywhere else the complete shape is high."
     },
     {
       "id": "mailchimp-api-key-negative-environment-variable-reference",
@@ -27002,7 +27107,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 10,
           "end": 48
@@ -27024,7 +27129,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 10,
           "end": 46
@@ -27073,7 +27178,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 10,
           "end": 46
@@ -27081,7 +27186,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 47,
           "end": 83
@@ -27089,7 +27194,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 84,
           "end": 120
@@ -27097,7 +27202,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 121,
           "end": 157
@@ -27105,7 +27210,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 158,
           "end": 194
@@ -27113,7 +27218,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 195,
           "end": 231
@@ -27121,7 +27226,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 232,
           "end": 268
@@ -27129,7 +27234,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 269,
           "end": 305
@@ -27137,7 +27242,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 306,
           "end": 342
@@ -27145,7 +27250,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 343,
           "end": 379
@@ -27153,7 +27258,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 380,
           "end": 416
@@ -27161,7 +27266,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 417,
           "end": 453
@@ -27169,7 +27274,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 454,
           "end": 490
@@ -27177,7 +27282,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 491,
           "end": 527
@@ -27185,7 +27290,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 528,
           "end": 564
@@ -27193,7 +27298,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 565,
           "end": 601
@@ -27201,7 +27306,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 602,
           "end": 638
@@ -27209,7 +27314,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 639,
           "end": 675
@@ -27217,7 +27322,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 676,
           "end": 712
@@ -27225,7 +27330,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 713,
           "end": 749
@@ -27233,7 +27338,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 750,
           "end": 786
@@ -27241,7 +27346,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 787,
           "end": 823
@@ -27249,7 +27354,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 824,
           "end": 860
@@ -27257,7 +27362,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 861,
           "end": 897
@@ -27265,7 +27370,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 898,
           "end": 934
@@ -27273,7 +27378,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 935,
           "end": 971
@@ -27281,7 +27386,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 972,
           "end": 1008
@@ -27289,7 +27394,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1009,
           "end": 1045
@@ -27297,7 +27402,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1046,
           "end": 1082
@@ -27305,7 +27410,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1083,
           "end": 1119
@@ -27313,7 +27418,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1120,
           "end": 1156
@@ -27321,7 +27426,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1157,
           "end": 1193
@@ -27329,7 +27434,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1194,
           "end": 1230
@@ -27337,7 +27442,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1231,
           "end": 1267
@@ -27345,7 +27450,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1268,
           "end": 1304
@@ -27353,7 +27458,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1305,
           "end": 1341
@@ -27361,7 +27466,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1342,
           "end": 1378
@@ -27369,7 +27474,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1379,
           "end": 1415
@@ -27377,7 +27482,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1416,
           "end": 1452
@@ -27385,7 +27490,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1453,
           "end": 1489
@@ -27393,7 +27498,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1490,
           "end": 1526
@@ -27401,7 +27506,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1527,
           "end": 1563
@@ -27409,7 +27514,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1564,
           "end": 1600
@@ -27417,7 +27522,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1601,
           "end": 1637
@@ -27425,7 +27530,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1638,
           "end": 1674
@@ -27433,7 +27538,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1675,
           "end": 1711
@@ -27441,7 +27546,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1712,
           "end": 1748
@@ -27449,7 +27554,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1749,
           "end": 1785
@@ -27457,7 +27562,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1786,
           "end": 1822
@@ -27465,7 +27570,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1823,
           "end": 1859
@@ -27473,7 +27578,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1860,
           "end": 1896
@@ -27481,7 +27586,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1897,
           "end": 1933
@@ -27489,7 +27594,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1934,
           "end": 1970
@@ -27497,7 +27602,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 1971,
           "end": 2007
@@ -27505,7 +27610,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2008,
           "end": 2044
@@ -27513,7 +27618,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2045,
           "end": 2081
@@ -27521,7 +27626,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2082,
           "end": 2118
@@ -27529,7 +27634,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2119,
           "end": 2155
@@ -27537,7 +27642,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2156,
           "end": 2192
@@ -27545,7 +27650,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2193,
           "end": 2229
@@ -27553,7 +27658,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2230,
           "end": 2266
@@ -27561,7 +27666,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2267,
           "end": 2303
@@ -27569,7 +27674,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2304,
           "end": 2340
@@ -27577,7 +27682,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2341,
           "end": 2377
@@ -27585,7 +27690,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2378,
           "end": 2414
@@ -27593,7 +27698,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2415,
           "end": 2451
@@ -27601,7 +27706,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2452,
           "end": 2488
@@ -27609,7 +27714,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2489,
           "end": 2525
@@ -27617,7 +27722,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2526,
           "end": 2562
@@ -27625,7 +27730,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2563,
           "end": 2599
@@ -27633,7 +27738,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2600,
           "end": 2636
@@ -27641,7 +27746,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2637,
           "end": 2673
@@ -27649,7 +27754,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2674,
           "end": 2710
@@ -27657,7 +27762,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2711,
           "end": 2747
@@ -27665,7 +27770,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2748,
           "end": 2784
@@ -27673,7 +27778,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2785,
           "end": 2821
@@ -27681,7 +27786,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2822,
           "end": 2858
@@ -27689,7 +27794,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2859,
           "end": 2895
@@ -27697,7 +27802,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2896,
           "end": 2932
@@ -27705,7 +27810,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2933,
           "end": 2969
@@ -27713,7 +27818,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 2970,
           "end": 3006
@@ -27721,7 +27826,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3007,
           "end": 3043
@@ -27729,7 +27834,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3044,
           "end": 3080
@@ -27737,7 +27842,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3081,
           "end": 3117
@@ -27745,7 +27850,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3118,
           "end": 3154
@@ -27753,7 +27858,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3155,
           "end": 3191
@@ -27761,7 +27866,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3192,
           "end": 3228
@@ -27769,7 +27874,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3229,
           "end": 3265
@@ -27777,7 +27882,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3266,
           "end": 3302
@@ -27785,7 +27890,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3303,
           "end": 3339
@@ -27793,7 +27898,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3340,
           "end": 3376
@@ -27801,7 +27906,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3377,
           "end": 3413
@@ -27809,7 +27914,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3414,
           "end": 3450
@@ -27817,7 +27922,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3451,
           "end": 3487
@@ -27825,7 +27930,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3488,
           "end": 3524
@@ -27833,7 +27938,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3525,
           "end": 3561
@@ -27841,7 +27946,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3562,
           "end": 3598
@@ -27849,7 +27954,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3599,
           "end": 3635
@@ -27857,7 +27962,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3636,
           "end": 3672
@@ -27865,7 +27970,7 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 3673,
           "end": 3709
@@ -27959,7 +28064,7 @@
           "end": 63
         }
       ],
-      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement."
+      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement; since issue #936 the complete shape outside a hostname or path is high whether or not a keyword is present."
     },
     {
       "id": "mailgun-api-key-positive-shell-quoted",
@@ -36272,7 +36377,7 @@
           "end": 71
         }
       ],
-      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement."
+      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement; since issue #936 the complete shape outside a hostname or path is high whether or not a keyword is present."
     },
     {
       "id": "okta-api-token-positive-shell-quoted",
@@ -39462,6 +39567,28 @@
       "note": "A bare confluent keyword sharing the same line as the value is sufficient context, at medium confidence, matching both consulted tools' own keyword-gated behavior."
     },
     {
+      "id": "confluent-cloud-api-secret-legacy-positive-registry-user-info",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "schema.registry.url=https://psrc-7q2x1.us-east-2.aws.confluent.cloud\nbasic.auth.credentials.source=USER_INFO\nbasic.auth.user.info=DLT29GPW5CKSZ8FN\u003aHQXenv4/GPWdmu3+FNVckt29EMUbjsz8DLTahry7CKSZgqx6BJRYfpw5AHQXenv4\n",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 147,
+          "end": 211
+        }
+      ],
+      "note": "Issues #933 and #936: the secret half of a Schema Registry basic.auth.user.info property below a Confluent-named property line; the property names the credential and the block binds it to Confluent, so it is high and redacted. The key id half is public and not reported."
+    },
+    {
       "id": "confluent-cloud-api-secret-legacy-negative-bare-no-context",
       "detector": "confluent-cloud-api-secret-legacy",
       "kind": "negative",
@@ -41851,13 +41978,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 66,
           "end": 102
         }
       ],
-      "note": "Issue #743: the Heroku CLI's multi-line .netrc entry puts machine api.heroku.com two lines above password <uuid>. The UUID is reported as the value of the entry's password token."
+      "note": "Issue #743: the Heroku CLI's multi-line .netrc entry puts machine api.heroku.com two lines above password <uuid>. The UUID is reported as the value of the entry's password token, at high confidence since issue #936 (the layout names the credential slot and binds it to Heroku), so the default policy redacts it."
     },
     {
       "id": "heroku-api-key-legacy-positive-auth-token-output",
@@ -41873,13 +42000,48 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 20,
           "end": 56
         }
       ],
-      "note": "Issue #743: heroku auth:token prints the token alone on the line after the command."
+      "note": "Issue #743: heroku auth:token prints the token alone on the line after the command. High confidence since issue #936: the command's output is the token."
+    },
+    {
+      "id": "heroku-api-key-legacy-positive-authorizations-table",
+      "detector": "heroku-api-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ heroku authorizations:info $AUTH_ID\nClient:      <none>\nDescription: ci deploy\nScope:       global\nToken:       907e5c3a-18f6-d4b2-907e-5c3a18f6d4b2\nUpdated at:  2026-09-02T10:14:31Z\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 114,
+          "end": 150
+        }
+      ],
+      "note": "Issues #933 and #936: the Token: row of heroku authorizations:info output, with heroku only on the command line above, is the token; the layout names the credential slot and binds it to Heroku, so it is high and the default policy redacts it."
+    },
+    {
+      "id": "heroku-api-key-legacy-negative-zero-uuid-placeholder",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=00000000-0000-0000-0000-000000000000\n",
+      "expected": [],
+      "note": "Issue #934: an all-one-digit UUID under Heroku context is a settings-template placeholder, not a token, and is not reported by any detector."
     },
     {
       "id": "heroku-api-key-legacy-negative-bare-no-context",
@@ -56317,6 +56479,28 @@
       "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A provider-named dotenv key names the credential, so confidence is high."
     },
     {
+      "id": "cohere-api-key-positive-java-builder-token",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Cohere cohere = Cohere.builder().token(\"LTahry7EMU\u0062jsz8FNVckt29GPWdmu3AHQXenv4BJ\").clientName(\"search-api\").build();\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 40,
+          "end": 80
+        }
+      ],
+      "note": "Issue #932: the sole quoted argument of a credential-named builder method on a Cohere builder chain is a high constructor form."
+    },
+    {
       "id": "cohere-api-key-positive-json-named",
       "detector": "cohere-api-key",
       "kind": "positive",
@@ -58757,13 +58941,79 @@
         {
           "detector": "deepgram-api-key",
           "type": "deepgram_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 36,
           "end": 76
         }
       ],
-      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An Authorization: Token header on a line naming deepgram is medium confidence."
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). An Authorization: Token header on a line naming deepgram is medium confidence; since issue #936 it is high when the line names a host under the Deepgram API domain (here api.deepgram.com), so the default policy redacts it."
+    },
+    {
+      "id": "deepgram-api-key-positive-go-last-positional-argument",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "var client = deepgram.NewRESTWithDefaults(context.Background(), \"gnu18fmt07\u0065lsz6dkry5cjqx4bipw3ahov29gnu1\")\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 105
+        }
+      ],
+      "note": "Issue #932: a quoted literal that is the last positional argument of a deepgram-named call, past a closed argument group, is a high constructor form."
+    },
+    {
+      "id": "deepgram-api-key-positive-httpie-token-header",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "http --verbose POST https://api.deepgram.com/v1/listen model==nova-3 'Authorization:Token gnu18fmt07\u0065lsz6dkry5cjqx4bipw3ahov29gnu1' < call.wav\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 90,
+          "end": 130
+        }
+      ],
+      "note": "Issues #932 and #936: HTTPie's Header:value form with no space after the colon is read as an Authorization: Token header; the line names the Deepgram API host, so it is high and redacted."
+    },
+    {
+      "id": "deepgram-api-key-positive-token-header-keyword-only",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# deepgram smoke test: Authorization: Token elsz6dkry5cjqx4bipw3ahov29gnu18fmt07elsz\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 44,
+          "end": 84
+        }
+      ],
+      "note": "Issue #936: an Authorization: Token header whose line names deepgram only as a word, not a host under the Deepgram API domain, stays medium (warn); only the API host makes the header high."
     },
     {
       "id": "deepgram-api-key-regression-crlf-and-unicode-prefix",

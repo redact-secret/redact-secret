@@ -9,11 +9,11 @@ use super::pattern::{self, PrefixShape};
 use super::text::{
     OPENCODE_REFERENCE_KINDS, ascii_run_len, char_at, ends_with_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
-    is_horizontal_js_whitespace, is_instructional_token_placeholder, is_js_whitespace,
-    is_line_start, is_opencode_reference, is_repeated_character_filler,
-    is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
-    matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars,
-    starts_with_bare_dollar_reference, starts_with_ci, starts_with_digest_label,
+    is_glued_instructional_placeholder, is_horizontal_js_whitespace,
+    is_instructional_token_placeholder, is_js_whitespace, is_line_start, is_opencode_reference,
+    is_repeated_character_filler, is_ruby_interpolation_reference, is_template_reference,
+    is_windows_env_reference, matches_placeholder_vocabulary, prev_char, rskip_while_chars,
+    skip_while_chars, starts_with_bare_dollar_reference, starts_with_ci, starts_with_digest_label,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -247,8 +247,13 @@ fn is_object_reference_secret_name(normalized: &str) -> bool {
 /// behind a prefix (`GITHUB_CREDENTIALS`), when it is not already
 /// [`is_high_signal_name`].
 fn is_ambiguous_name(normalized: &str) -> bool {
-    !is_high_signal_name(normalized)
-        && (AMBIGUOUS_NAMES.contains(&normalized) || has_prefixed_name(normalized, AMBIGUOUS_NAMES))
+    !is_high_signal_name(normalized) && is_ambiguous_vocabulary_name(normalized)
+}
+
+/// The vocabulary half of [`is_ambiguous_name`], for a caller that already
+/// knows the name is not high-signal.
+fn is_ambiguous_vocabulary_name(normalized: &str) -> bool {
+    AMBIGUOUS_NAMES.contains(&normalized) || has_prefixed_name(normalized, AMBIGUOUS_NAMES)
 }
 
 const MIN_CONTEXT_VALUE_LENGTH: usize = 8;
@@ -1424,7 +1429,9 @@ const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 /// separators, the way vendor prefixes are written (an uppercase lead such
 /// as `KEY_YOUR_API_KEY` stays detected, #756),
 /// and the rest, after one of its `_`/`-` separators, is an instructional
-/// placeholder, an `<...>` reference, repeated filler, or a placeholder word.
+/// placeholder (also glued into one word, `re_yourkey`), an ascending digit
+/// run (`signkey-test-12345`, `re_123456789`; issue #949), an `<...>`
+/// reference, repeated filler, or a placeholder word.
 ///
 /// Issue #702: provider-named assignments (`PERPLEXITY_API_KEY=`) now reach
 /// the generic detector, and their documentation examples keep the vendor
@@ -1445,10 +1452,31 @@ pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
                         || matches!(byte, b'_' | b'-')
                 })
                 && (is_instructional_token_placeholder(rest)
+                    || is_glued_instructional_placeholder(rest)
+                    || is_ascending_digit_run(rest)
                     || starts_with_angle_bracket_reference(rest)
                     || is_repeated_character_filler(rest)
                     || is_generic_placeholder_word(&rest.to_ascii_lowercase()))
         })
+}
+
+/// Shortest digit run [`is_ascending_digit_run`] accepts.
+const MIN_ASCENDING_DIGITS: usize = 4;
+
+/// `true` for a counting run of digits such as `12345`, `123456789` or
+/// `4567890`: at least [`MIN_ASCENDING_DIGITS`] ASCII digits, each one more
+/// than the one before (`9` is followed by `0`). Documentation writes these
+/// behind a vendor prefix (`signkey-test-12345`, `re_123456789`, issue
+/// #949); a random numeric body is an ascending run with probability
+/// 10^-(n-1), so only a placeholder matches. Any other digit sequence, even
+/// all digits, is not excluded here.
+fn is_ascending_digit_run(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    bytes.len() >= MIN_ASCENDING_DIGITS
+        && bytes.iter().all(u8::is_ascii_digit)
+        && bytes
+            .windows(2)
+            .all(|pair| pair[1] == if pair[0] == b'9' { b'0' } else { pair[0] + 1 })
 }
 
 /// `true` when the whole value is a Twilio Account SID (`AC`) or API Key
@@ -1509,6 +1537,25 @@ fn assignment_confidence(
     names: &NameSource,
     query: bool,
 ) -> Option<Confidence> {
+    // Only an eligible name can yield a confidence, so an ineligible one
+    // (`status=200`, `latency_ms=12`) is rejected before the value's
+    // reference checks and entropy are computed. Every check here is pure,
+    // so the order changes the cost, never the result (issue #950).
+    let (high_signal, ambiguous) = match names {
+        NameSource::BuiltIn => {
+            let high_signal = is_high_signal_name(name);
+            let ambiguous = (!high_signal && is_ambiguous_vocabulary_name(name))
+                || (query && QUERY_ONLY_AMBIGUOUS_NAMES.contains(&name));
+            (high_signal, ambiguous)
+        }
+        NameSource::Ruleset(extra_ambiguous_names) => (
+            false,
+            extra_ambiguous_names.iter().any(|extra| extra == name),
+        ),
+    };
+    if !high_signal && !ambiguous {
+        return None;
+    }
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
         || is_non_secret_reference(value, form)
@@ -1518,38 +1565,18 @@ fn assignment_confidence(
 
     let entropy = crate::shannon_entropy(value);
 
-    match names {
-        NameSource::BuiltIn => {
-            if is_high_signal_name(name) {
-                return Some(
-                    if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
-                        Confidence::High
-                    } else {
-                        Confidence::Medium
-                    },
-                );
-            }
-
-            if (is_ambiguous_name(name) || (query && QUERY_ONLY_AMBIGUOUS_NAMES.contains(&name)))
-                && value.len() >= MIN_HIGH_ENTROPY_LENGTH
-                && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
-            {
-                return Some(Confidence::Medium);
-            }
-
-            None
-        }
-        NameSource::Ruleset(extra_ambiguous_names) => {
-            if extra_ambiguous_names.iter().any(|extra| extra == name)
-                && value.len() >= MIN_HIGH_ENTROPY_LENGTH
-                && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
-            {
-                Some(Confidence::Medium)
+    if high_signal {
+        return Some(
+            if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
+                Confidence::High
             } else {
-                None
-            }
-        }
+                Confidence::Medium
+            },
+        );
     }
+
+    (value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD)
+        .then_some(Confidence::Medium)
 }
 
 // --- assignment value spans ------------------------------------------------
@@ -2918,6 +2945,40 @@ mod tests {
         ] {
             assert!(detect(input).is_empty(), "{input}");
         }
+    }
+
+    #[test]
+    fn a_counting_digit_run_or_glued_your_word_behind_a_vendor_prefix_is_a_placeholder() {
+        // Issue #949.
+        for value in [
+            "signkey-test-12345",
+            "re_123456789",
+            "re_1234567890",
+            "re_7890123",
+            "re_yourkey",
+            "re_YourApiKeyHere",
+            "signkey-prod-yoursigningkey",
+        ] {
+            assert!(is_vendor_prefixed_placeholder(value), "{value}");
+        }
+        for value in [
+            "re_123",
+            "re_12346",
+            "re_98765",
+            "re_193847562",
+            "re_yourkeyq",
+            "re_yourkey7",
+            "re_yourdog",
+            "re_your",
+            "RE_yourkey",
+            "longvendorname_12345",
+        ] {
+            assert!(!is_vendor_prefixed_placeholder(value), "{value}");
+        }
+        assert!(!is_ascending_digit_run("123"));
+        assert!(is_ascending_digit_run("8901"));
+        assert!(!is_glued_instructional_placeholder("your"));
+        assert!(!is_glued_instructional_placeholder("your_key"));
     }
 
     #[test]

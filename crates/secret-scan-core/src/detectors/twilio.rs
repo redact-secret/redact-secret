@@ -71,7 +71,8 @@
 //! One multi-line layout is read for the Auth Token only (issue #933): the
 //! table the `twilio` CLI prints for `twilio profiles:list --properties
 //! authToken`. A value that is the whole cell under an `Auth Token` column
-//! header is reported at [`Confidence::Medium`] when the header row directly
+//! header is reported at [`Confidence::High`] (issue #936; #933 reported it
+//! at medium, which only warned) when the header row directly
 //! follows a `twilio <topic:command>` line and at most
 //! [`CLI_TABLE_MAX_DATA_ROWS`] data rows separate the header from it. A
 //! blank line, a new command, or a longer table ends the window, and the
@@ -314,7 +315,8 @@ fn is_cell_at_column(line: &str, start: usize, end: usize, column: usize) -> boo
 ///
 /// `cli_table` enables the multi-line `twilio` CLI table layout (Auth Token
 /// only, issue #933): a value in the Auth Token column of a table printed by
-/// a `twilio` command is reported at medium confidence.
+/// a `twilio` command is reported at high confidence (issue #936; medium,
+/// warn-only, before it).
 #[allow(clippy::too_many_arguments)]
 fn detect_context_gated(
     input: &str,
@@ -368,7 +370,9 @@ fn detect_context_gated(
                 (None, Some(column))
                     if is_cell_at_column(line, relative_start, relative_end, column) =>
                 {
-                    (Confidence::Medium, "twilio-cli-table")
+                    // Issue #936: the column names the credential and the
+                    // command binds it to Twilio, as a Twilio-named key does.
+                    (Confidence::High, "twilio-cli-table")
                 }
                 _ => continue,
             };
@@ -704,7 +708,8 @@ mod tests {
             assert_eq!(found.len(), 1, "{input:?}");
             let range = found[0].range();
             assert_eq!(&input[range.start()..range.end()], AUTH_TOKEN);
-            assert_eq!(found[0].confidence(), Confidence::Medium);
+            // Issue #936: high, so the default policy redacts it.
+            assert_eq!(found[0].confidence(), Confidence::High);
         }
         let crlf = profiles_table("ID     Auth Token", &format!("prod   {AUTH_TOKEN}\n"))
             .replace('\n', "\r\n");

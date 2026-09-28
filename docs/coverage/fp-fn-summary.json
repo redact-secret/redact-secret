@@ -205,7 +205,7 @@
       "detector": "connection-string",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 30,
+        "count": 31,
         "fixtureIds": [
           "connection-host-dotenv",
           "connection-host-javascript",
@@ -233,6 +233,7 @@
           "connection-positive-postgresql",
           "connection-positive-redis-password-only",
           "connection-positive-rediss-fragment",
+          "connection-positive-sqlalchemy-driver-ipv6-host",
           "connection-positive-unclosed-command-substitution-still-detected",
           "connection-regression-http-proxy-userinfo-password",
           "connection-regression-https-userinfo-percent-encoded-password",
@@ -304,6 +305,7 @@
         "log",
         "markdown",
         "plain-text",
+        "python",
         "shell"
       ]
     },

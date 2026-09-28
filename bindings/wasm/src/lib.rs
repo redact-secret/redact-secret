@@ -228,10 +228,7 @@ pub fn scan(
     let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
         .map_err(|error| to_js_error(error.into()))?;
     let findings = scan_after_initialize(input, policy.as_ref(), &limits, ruleset.as_deref())?;
-    Ok(findings
-        .into_iter()
-        .map(|finding| FindingJs::new(input, finding))
-        .collect())
+    Ok(FindingJs::all(input, findings))
 }
 
 /// Redacts `input` using `findings` (as returned by [`scan`] for the same
@@ -290,11 +287,10 @@ pub fn scan_and_redact(
     let findings = scan_after_initialize(input, policy.as_ref(), &limits, ruleset.as_deref())?;
     let text = run_redact(input, &findings, formatter.as_ref(), &limits)
         .map_err(|error| to_js_error(error.into()))?;
-    let findings = findings
-        .into_iter()
-        .map(|finding| FindingJs::new(input, finding))
-        .collect();
-    Ok(ScanAndRedactResultJs::new(text, findings))
+    Ok(ScanAndRedactResultJs::new(
+        text,
+        FindingJs::all(input, findings),
+    ))
 }
 
 /// A synthetic, never-issued secret that the compiled profile detects, shared

@@ -47,10 +47,15 @@
 //! 3. **Keyword-adjacent key** (Medium): a credential-word key
 //!    (`api_key:`) within 32 bytes after the provider keyword with only
 //!    name-like bytes between them (`# Mistral API key: ...`).
-//! 4. **Header** (Medium, Deepgram only): `Authorization: Token <value>` on a
-//!    line that also names `deepgram` (`api.deepgram.com`), with or without
-//!    a space after the colon (`HTTPie`'s `'Authorization:Token <value>'`,
-//!    issue #932). `Bearer` forms are already `bearer-token`'s.
+//! 4. **Header** (Deepgram only): `Authorization: Token <value>` on a line
+//!    that also names `deepgram`, with or without a space after the colon
+//!    (`HTTPie`'s `'Authorization:Token <value>'`, issue #932). High when the
+//!    line names a host under the Deepgram API domain (`api.deepgram.com`,
+//!    `api.eu.deepgram.com`; issue #936): the value is in the key's
+//!    documented slot of a request to the provider, as specific as a
+//!    provider-named key. Medium when `deepgram` is only a word on the line
+//!    (`# deepgram: Authorization: Token <value>`). `Bearer` forms are
+//!    already `bearer-token`'s.
 //!
 //! A value under a `masked_`-led key (`masked_api_key=`, a `LiteLLM` debug
 //! field) is not claimed: the key is not a credential name
@@ -111,6 +116,20 @@ struct Spec {
     adjacent_signal: &'static str,
     /// Accepts an `Authorization: Token <value>` header on a keyword line.
     token_header: bool,
+    /// The provider's API host domain (lowercase). A token header on a line
+    /// that names a host under it is high, not medium (issue #936).
+    api_host_domain: Option<&'static str>,
+}
+
+/// What a value's line offers an `Authorization: Token` header.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum HeaderContext {
+    /// The provider is not named on the line: the header is no context.
+    Absent,
+    /// The provider keyword is somewhere on the line (medium).
+    Keyword,
+    /// The line names a host under the provider's API domain (high).
+    ProviderHost,
 }
 
 const MISTRAL: Spec = Spec {
@@ -123,6 +142,7 @@ const MISTRAL: Spec = Spec {
     constructor_signal: "mistral-sdk-constructor",
     adjacent_signal: "mistral-keyword-adjacent",
     token_header: false,
+    api_host_domain: None,
 };
 
 const COHERE: Spec = Spec {
@@ -135,6 +155,7 @@ const COHERE: Spec = Spec {
     constructor_signal: "cohere-sdk-constructor",
     adjacent_signal: "cohere-keyword-adjacent",
     token_header: false,
+    api_host_domain: None,
 };
 
 const AI21: Spec = Spec {
@@ -147,6 +168,7 @@ const AI21: Spec = Spec {
     constructor_signal: "ai21-sdk-constructor",
     adjacent_signal: "ai21-keyword-adjacent",
     token_header: false,
+    api_host_domain: None,
 };
 
 const DEEPGRAM: Spec = Spec {
@@ -159,6 +181,7 @@ const DEEPGRAM: Spec = Spec {
     constructor_signal: "deepgram-sdk-constructor",
     adjacent_signal: "deepgram-keyword-adjacent",
     token_header: true,
+    api_host_domain: Some("deepgram.com"),
 };
 
 /// `[A-Za-z0-9_-]`: a run is never a slice of a wider identifier.
@@ -338,6 +361,24 @@ fn is_chain_byte(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || byte == b'_'
 }
 
+/// `true` when `line` names a host under `domain` (lowercase): a
+/// case-insensitive `.<domain>` (`api.deepgram.com`, `api.eu.deepgram.com`)
+/// that ends the hostname, so `api.deepgram.com.example.test` and
+/// `api.deepgram.company` do not count.
+fn names_host_under(line: &str, domain: &str) -> bool {
+    let lowered = line.to_ascii_lowercase();
+    let bytes = lowered.as_bytes();
+    lowered.match_indices(domain).any(|(at, _)| {
+        let end = at + domain.len();
+        let after_ends_host = match bytes.get(end) {
+            None => true,
+            Some(b'.') => !bytes.get(end + 1).is_some_and(u8::is_ascii_alphanumeric),
+            Some(&byte) => !(byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_')),
+        };
+        at > 0 && bytes[at - 1] == b'.' && after_ends_host
+    })
+}
+
 fn contains_keyword_ci(window: &str, spec: &Spec) -> Option<usize> {
     let lowered = window.to_ascii_lowercase();
     spec.keywords
@@ -352,7 +393,7 @@ fn context(
     spec: &Spec,
     start: usize,
     end: usize,
-    line_has_keyword: bool,
+    header_context: HeaderContext,
 ) -> Option<(Confidence, &'static str)> {
     let bytes = line.as_bytes();
     if let Some(key) = text::assignment_key(bytes, start) {
@@ -432,8 +473,19 @@ fn context(
                 .strip_suffix(':')
                 .or_else(|| head.strip_suffix('='))
                 .map(|name| name.trim_end_matches([' ', '\t', '"', '\'']));
-            if header.is_some_and(|name| name.ends_with("authorization")) && line_has_keyword {
-                return Some((Confidence::Medium, "deepgram-token-header"));
+            if header.is_some_and(|name| name.ends_with("authorization")) {
+                match header_context {
+                    // Issue #936: the header on a request to the provider's
+                    // own API host is the key's documented slot, as specific
+                    // as a provider-named key, so it is redacted.
+                    HeaderContext::ProviderHost => {
+                        return Some((Confidence::High, "deepgram-host-token-header"));
+                    }
+                    HeaderContext::Keyword => {
+                        return Some((Confidence::Medium, "deepgram-token-header"));
+                    }
+                    HeaderContext::Absent => {}
+                }
             }
         }
     }
@@ -530,15 +582,23 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
         if runs.is_empty() {
             continue;
         }
-        let line_has_keyword = spec.token_header && contains_keyword_ci(line, spec).is_some();
+        let header_context = if !spec.token_header || contains_keyword_ci(line, spec).is_none() {
+            HeaderContext::Absent
+        } else if spec
+            .api_host_domain
+            .is_some_and(|domain| names_host_under(line, domain))
+        {
+            HeaderContext::ProviderHost
+        } else {
+            HeaderContext::Keyword
+        };
         for (start, end) in runs {
             if text::is_repeated_character_filler(&line[start..end])
                 || text::is_labelled_digest(line, start)
             {
                 continue;
             }
-            let Some((confidence, signal)) = context(line, spec, start, end, line_has_keyword)
-            else {
+            let Some((confidence, signal)) = context(line, spec, start, end, header_context) else {
                 continue;
             };
             let Some(range) = ByteRange::new(line_start + start, line_start + end) else {
@@ -715,7 +775,7 @@ mod tests {
                 "http --verbose POST https://api.deepgram.com/v1/listen 'Authorization:Token {d}' < a.wav"
             ),
             &d,
-            Confidence::Medium,
+            Confidence::High,
         );
         // Go: the last positional argument of a call on the provider alias,
         // past a closed `context.Background()` group.
@@ -782,7 +842,7 @@ mod tests {
     }
 
     #[test]
-    fn a_keyword_adjacent_key_and_the_deepgram_token_header_are_medium() {
+    fn a_keyword_adjacent_key_and_a_keyword_only_deepgram_token_header_are_medium() {
         let m = alnum32();
         let d = lower40();
         assert_exact(
@@ -791,19 +851,40 @@ mod tests {
             &m,
             Confidence::Medium,
         );
-        assert_exact(
-            &DEEPGRAM,
-            &format!("curl -H 'Authorization: Token {d}' https://api.deepgram.com/v1/projects"),
-            &d,
-            Confidence::Medium,
-        );
-        assert_exact(
-            &DEEPGRAM,
-            &format!(
+        // `deepgram` only as a word, or a host that is not under the
+        // Deepgram API domain, keeps the header at medium (issue #936).
+        for input in [
+            format!("# deepgram smoke test: Authorization: Token {d}"),
+            format!("curl -H 'Authorization: Token {d}' https://deepgram.example.test/v1"),
+            format!("curl -H 'Authorization: Token {d}' https://api.deepgram.com.example.test/"),
+            format!("curl -H 'Authorization: Token {d}' https://api.deepgram.company/v1 deepgram"),
+        ] {
+            assert_exact(&DEEPGRAM, &input, &d, Confidence::Medium);
+        }
+    }
+
+    #[test]
+    fn a_deepgram_token_header_on_a_request_to_the_deepgram_api_host_is_high() {
+        // Issue #936: the header on a request to the provider's own API host
+        // is the key's documented slot, so the default policy redacts it.
+        let d = lower40();
+        for input in [
+            format!("curl -H 'Authorization: Token {d}' https://api.deepgram.com/v1/projects"),
+            format!("curl -H \"Authorization: Token {d}\" https://API.Deepgram.com/v1/listen"),
+            format!("http POST https://api.eu.deepgram.com/v1/listen 'Authorization:Token {d}'"),
+            format!(
                 "headers = {{\"Authorization\": \"Token {d}\", \"host\": \"api.deepgram.com\"}}"
             ),
-            &d,
-            Confidence::Medium,
+        ] {
+            assert_exact(&DEEPGRAM, &input, &d, Confidence::High);
+        }
+        // The host alone is not context for a value outside the header.
+        assert!(
+            run(
+                &DEEPGRAM,
+                &format!("GET https://api.deepgram.com/v1/x?id={d}")
+            )
+            .is_empty()
         );
     }
 
