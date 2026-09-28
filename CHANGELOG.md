@@ -137,6 +137,12 @@ evidence is linked from each published version.
   confidence and redacted instead of warned, and `twilio auth_token=<value>`
   is a high `twilio_auth_token`. Placeholder, reference and identifier
   values stay silent; `auth` stays ambiguous.
+- `bearer-token` no longer joins the next field of a delimited record onto a
+  Bearer value (#939). `Bearer <tok>|email=<addr>` and `Bearer <tok>|x=1`
+  used to redact `<tok>|email=` and leave the value after it readable; the
+  span is now `<tok>`. `=` counts as padding only where it ends the token.
+  `Authorization: Bearer name@host` is selected whole, host included,
+  instead of redacting only the local part.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

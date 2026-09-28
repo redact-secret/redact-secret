@@ -173,3 +173,37 @@ fn issue_941_an_auth_token_assignment_is_redacted() {
         assert!(findings.is_empty(), "{input:?}: {findings:?}");
     }
 }
+
+// ---------------------------------------------------------------- #939
+
+#[test]
+fn issue_939_a_bearer_join_stops_before_the_next_record_field() {
+    let token = synthetic(
+        b"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789",
+        32,
+        6,
+    );
+    for tail in ["|email=fixture@example.test", "|x=1", "|user: alice"] {
+        let input = format!("Authorization: Bearer {token}{tail}\n");
+        let findings = findings_with_parity(&input);
+        assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+        assert_eq!(span(&input, &findings[0]), token, "{input:?}");
+        let (text, _) = whole_input(&input);
+        assert!(text.ends_with(&format!("{tail}\n")), "{text:?}");
+        assert!(!text.contains(&token), "{text:?}");
+    }
+    // A logfmt record without a credential is untouched.
+    let benign = "level=info msg=\"token refreshed\" user=alice|x=1 status=200\n";
+    assert!(findings_with_parity(benign).is_empty());
+}
+
+#[test]
+fn issue_939_a_bearer_name_at_host_value_is_covered_whole() {
+    let input =
+        "curl -H 'Authorization: Bearer svc-deploy-bot@ci.example.test' https://x.invalid\n";
+    let findings = findings_with_parity(input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(span(input, &findings[0]), "svc-deploy-bot@ci.example.test");
+    // A short local part stays below the floor: no finding, not a partial.
+    assert!(findings_with_parity("Authorization: Bearer ops@example.test\n").is_empty());
+}
