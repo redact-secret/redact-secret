@@ -165,7 +165,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-79 built-in detectors emit 92 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+92 built-in detectors emit 116 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -248,6 +248,19 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `cohere-api-key` | `cohere_api_key` | `confidence-gated` | — |
 | `ai21-api-key` | `ai21_api_key` | `confidence-gated` | — |
 | `deepgram-api-key` | `deepgram_api_key` | `confidence-gated` | — |
+| `doppler-token` | `doppler_service_token`, `doppler_personal_token`, `doppler_cli_token`, `doppler_service_account_token`, `doppler_service_account_identity_token`, `doppler_scim_token`, `doppler_audit_token` | `always-redact` | — |
+| `trigger-dev-token` | `trigger_dev_secret_api_key`, `trigger_dev_personal_access_token` | `always-redact` | — |
+| `e2b-api-key` | `e2b_api_key` | `always-redact` | — |
+| `posthog-token` | `posthog_personal_api_key`, `posthog_project_secret_api_key` | `always-redact` | — |
+| `helicone-api-key` | `helicone_api_key`, `helicone_write_api_key` | `always-redact` | — |
+| `firecrawl-api-key` | `firecrawl_api_key` | `always-redact` | — |
+| `composio-api-key` | `composio_project_api_key`, `composio_org_api_key`, `composio_user_api_key` | `always-redact` | — |
+| `convex-deployment-key` | `convex_deployment_key` | `always-redact` | — |
+| `onepassword-service-account-token` | `onepassword_service_account_token` | `always-redact` | — |
+| `inngest-signing-key` | `inngest_signing_key` | `always-redact` | — |
+| `resend-api-key` | `resend_api_key` | `always-redact` | — |
+| `apify-api-token` | `apify_api_token` | `always-redact` | — |
+| `wandb-api-key` | `wandb_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

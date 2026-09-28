@@ -77,6 +77,13 @@ export const CANONICAL_IDS = [
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
   "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
+  "doppler-token", "trigger-dev-token", "e2b-api-key", "posthog-token", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
+  "convex-deployment-key",
+  "onepassword-service-account-token",
+  "inngest-signing-key",
+  "resend-api-key",
+  "apify-api-token",
+  "wandb-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -93,7 +100,8 @@ export const GROUPS = {
   ai: [
     "openai-token", "anthropic-token", "huggingface-token", "replicate-api-token", "groq-api-key",
     "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "langsmith-api-key",
-    "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
+    "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key", "e2b-api-key", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
+    "wandb-api-key",
   ],
   cloud: [
     "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
@@ -102,17 +110,22 @@ export const GROUPS = {
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "pinecone-api-key", "databricks-personal-access-token",
     "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "postman-api-key", "postman-collection-access-key",
-    "heroku-api-key", "heroku-api-key-legacy",
+    "heroku-api-key", "heroku-api-key-legacy", "doppler-token",
+    "convex-deployment-key",
+    "onepassword-service-account-token",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
-    "atlassian-api-token", "linear-token", "travisci-api-token",
+    "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
+    "inngest-signing-key",
   ],
   "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
-    "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
+    "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token", "posthog-token",
+    "resend-api-key",
+    "apify-api-token",
   ],
 };
 

@@ -130,7 +130,10 @@ reason) — or both — and a `provenance` block recording exactly
 what produced the number: `commit` (full source SHA), `artifactIdentity`
 (the exact built artifact, e.g. a package name and version), `corpusVersion`
 and `corpusHash` (which revision of this corpus ran), `os`, `cpu`, `runtime`,
-and the exact `command` invoked. Schema version 3 adds `pythonHeap` and the
+and the exact `command` invoked. A Node performance result also records
+`resolvedArtifact` (`node-addon` or `wasm`): which artifact `initialize()`
+actually loaded, as reported by `artifact()`, since the loader can fall back
+from the addon to WebAssembly. Schema version 3 adds `pythonHeap` and the
 non-Node `processRss` category; Node-specific, browser, Wasm, Python,
 native-process, and streaming-buffer observations remain separate and must not
 be summed. A result with no reproducible provenance is not evidence.

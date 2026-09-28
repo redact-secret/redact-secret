@@ -1,0 +1,647 @@
+//! Issue #860 Tier A provider families (#903–#909) through the public API
+//! with the full default registry.
+//!
+//! Every key is built at run time from a literal prefix plus a seeded
+//! synthetic filler, so no realistic key literal is committed. The filler
+//! was never derived from an issued credential.
+//!
+//! Each family checks, against the whole built-in registry rather than its
+//! own detector alone:
+//!
+//! - every handoff context (bare, env, `export`, Bearer, `X-API-Key`, JSON
+//!   `token`/`api_key`, SDK keyword argument, chat sentence) yields exactly
+//!   one finding, of the provider type, at exactly the key's span, redacted;
+//!   the provider candidate wins the overlap with `contextual_secret`,
+//!   `bearer_token` and any other built-in, so no duplicate or overlapping
+//!   finding survives;
+//! - one-property twins yield no finding of the provider's detector;
+//! - benign siblings stay unclaimed by the provider's detector;
+//! - every two-chunk partition of a Bearer line matches the whole input.
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
+mod support;
+
+use redact_secret::{Action, Finding};
+use support::{as_chunks, run, utf8_byte_partitions, whole_input};
+
+/// Deterministic synthetic filler over `alphabet`.
+fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
+    (0..len)
+        .map(|i| char::from(alphabet[(i * 7 + seed * 13 + i / 5) % alphabet.len()]))
+        .collect()
+}
+
+const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+/// The nine #860 index contexts plus a few host forms.
+fn contexts(key: &str) -> Vec<String> {
+    vec![
+        key.to_owned(),
+        format!("PROVIDER_TOKEN={key}\n"),
+        format!("export PROVIDER_TOKEN=\"{key}\"\n"),
+        format!("Authorization: Bearer {key}\n"),
+        format!("X-API-Key: {key}\n"),
+        format!("{{\"token\": \"{key}\"}}"),
+        format!("{{\"api_key\": \"{key}\"}}"),
+        format!("client = Client(api_key=\"{key}\")\n"),
+        format!("Here is my key {key} can you debug why it fails?"),
+        format!("config:\n  token: {key}\n"),
+        format!("```\n{key}\n```"),
+        format!("The key is {key}."),
+    ]
+}
+
+fn detector_findings<'a>(findings: &'a [Finding], detector: &str) -> Vec<&'a Finding> {
+    findings
+        .iter()
+        .filter(|f| f.detector() == detector)
+        .collect()
+}
+
+/// Exactly one finding in every context: `detector`/`type_name` at the key's
+/// span, redacted, and the key's body gone from the output.
+fn assert_sole_provider_finding(detector: &str, type_name: &str, key: &str) {
+    for input in contexts(key) {
+        let (text, findings) = whole_input(&input);
+        assert_eq!(findings.len(), 1, "{type_name}: {input}: {findings:?}");
+        let finding = &findings[0];
+        let start = input.find(key).unwrap();
+        assert_eq!(finding.detector(), detector, "{input}");
+        assert_eq!(finding.type_name(), type_name, "{input}");
+        assert_eq!(finding.action(), Action::Redact, "{input}");
+        assert_eq!(
+            (finding.range().start(), finding.range().end()),
+            (start, start + key.len()),
+            "{input}"
+        );
+        assert!(!text.contains(key), "{input}");
+    }
+}
+
+fn assert_unclaimed(detector: &str, input: &str) {
+    let (_, findings) = whole_input(input);
+    assert!(
+        detector_findings(&findings, detector).is_empty(),
+        "{detector} claimed {input}: {findings:?}"
+    );
+}
+
+fn assert_twins_unclaimed(detector: &str, twins: &[String]) {
+    for twin in twins {
+        for input in contexts(twin) {
+            assert_unclaimed(detector, &input);
+        }
+    }
+}
+
+fn assert_partition_parity(key: &str) {
+    let input = format!("Authorization: Bearer {key}\n");
+    let (expected_text, expected) = whole_input(&input);
+    for pieces in utf8_byte_partitions(&input) {
+        let session = run(&as_chunks(&pieces));
+        assert_eq!(session.text(), expected_text, "{pieces:?}");
+        let findings = session.findings();
+        assert_eq!(findings.len(), expected.len(), "{pieces:?}");
+        for (got, want) in findings.iter().zip(&expected) {
+            assert_eq!(got.range(), want.range());
+            assert_eq!(got.detector(), want.detector());
+            assert_eq!(got.type_name(), want.type_name());
+        }
+    }
+}
+
+mod doppler {
+    use super::*;
+
+    const DETECTOR: &str = "doppler-token";
+    const TYPES: [(&str, &str); 7] = [
+        ("st", "doppler_service_token"),
+        ("pt", "doppler_personal_token"),
+        ("ct", "doppler_cli_token"),
+        ("sa", "doppler_service_account_token"),
+        ("said", "doppler_service_account_identity_token"),
+        ("scim", "doppler_scim_token"),
+        ("audit", "doppler_audit_token"),
+    ];
+
+    fn key(literal: &str, segment: Option<&str>, len: usize) -> String {
+        let segment = segment.map(|s| format!("{s}.")).unwrap_or_default();
+        format!(
+            "dp.{literal}.{segment}{}",
+            filler(ALNUM, len, literal.len())
+        )
+    }
+
+    #[test]
+    fn every_type_wins_every_context_as_the_sole_finding() {
+        for (literal, type_name) in TYPES {
+            for len in [40, 43, 44] {
+                assert_sole_provider_finding(DETECTOR, type_name, &key(literal, None, len));
+            }
+        }
+        for segment in ["prd", "dev-us_east", "ci"] {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "doppler_service_token",
+                &key("st", Some(segment), 43),
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let base = key("st", None, 43);
+        let body = &base["dp.st.".len()..];
+        let mut dashed = body.to_owned();
+        dashed.replace_range(10..11, "-");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key("st", None, 39),
+                key("st", None, 45),
+                format!("dp.st.{dashed}"),
+                format!("dp.xx.{body}"),
+                format!("DP.ST.{body}"),
+                format!("dp.st.P.{body}"),
+                format!("dpst.{body}"),
+                format!("x{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "token dp.st\u{2026}Ab12Cd".to_owned(),
+            "DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN }}\n".to_owned(),
+            "DOPPLER_TOKEN=dp.st.xxxx\n".to_owned(),
+            "doppler run --token dp.st.... -- npm start\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key("st", Some("prd"), 43));
+        assert_partition_parity(&key("said", None, 44));
+    }
+}
+
+mod trigger_dev {
+    use super::*;
+
+    const DETECTOR: &str = "trigger-dev-token";
+    const SECRET: &str = "trigger_dev_secret_api_key";
+    const PAT_TYPE: &str = "trigger_dev_personal_access_token";
+    const PAT_ALPHABET: &[u8] = b"123456789abcdefghijkmnopqrstuvwxyz";
+
+    fn additional(env: &str) -> String {
+        format!("tr_{env}_sk_{}", filler(ALNUM, 24, 1))
+    }
+
+    fn root(env: &str, len: usize) -> String {
+        format!("tr_{env}_{}", filler(ALNUM, len, 2))
+    }
+
+    fn pat() -> String {
+        format!("tr_pat_{}", filler(PAT_ALPHABET, 40, 3))
+    }
+
+    #[test]
+    fn every_shape_wins_every_context_as_the_sole_finding() {
+        for env in ["dev", "stg", "prod", "preview"] {
+            assert_sole_provider_finding(DETECTOR, SECRET, &additional(env));
+            assert_sole_provider_finding(DETECTOR, SECRET, &root(env, 24));
+            assert_sole_provider_finding(DETECTOR, SECRET, &root(env, 20));
+        }
+        assert_sole_provider_finding(DETECTOR, PAT_TYPE, &pat());
+    }
+
+    #[test]
+    fn no_stripe_or_elevenlabs_finding_fires_on_a_trigger_dev_key() {
+        for key in [additional("prod"), additional("dev"), root("prod", 24)] {
+            for input in contexts(&key) {
+                let (_, findings) = whole_input(&input);
+                assert!(
+                    findings
+                        .iter()
+                        .all(|f| f.detector() != "stripe-token"
+                            && f.detector() != "elevenlabs-api-key"),
+                    "{input}: {findings:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 24, 2);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("tr_prod_sk_{}", filler(ALNUM, 21, 1)),
+                format!("tr_prod_sk_{}", filler(ALNUM, 25, 1)),
+                root("prod", 22),
+                format!("tr_test_{body}"),
+                format!("TR_PROD_{body}"),
+                format!("str_prod_{body}"),
+                format!("tr_pat_{}", filler(PAT_ALPHABET, 39, 3)),
+                format!("tr_pat_0{}", filler(PAT_ALPHABET, 39, 3)),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let public = filler(ALNUM, 20, 4);
+        for input in [
+            format!("pk_dev_{public}"),
+            format!("TRIGGER_PUBLIC_KEY=pk_prod_{public}\n"),
+            "TRIGGER_SECRET_KEY=tr_dev_sk_xxxxxxxxxx\n".to_owned(),
+            "project ref tr_proj_abcdefghij\n".to_owned(),
+            "if (tr_dev_mode) { start(); }\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&additional("preview"));
+        assert_partition_parity(&pat());
+    }
+}
+
+mod e2b {
+    use super::*;
+
+    const DETECTOR: &str = "e2b-api-key";
+    const HEX: &[u8] = b"0123456789abcdef";
+
+    fn key() -> String {
+        format!("e2b_{}", filler(HEX, 40, 1))
+    }
+
+    #[test]
+    fn the_key_wins_every_context_as_the_sole_finding() {
+        assert_sole_provider_finding(DETECTOR, "e2b_api_key", &key());
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(HEX, 40, 1);
+        let mut upper = body.clone();
+        upper.replace_range(5..6, "A");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("e2b_{}", &body[..39]),
+                format!("e2b_{body}0"),
+                format!("e2b_{upper}"),
+                format!("E2B_{body}"),
+                format!("e2b-{body}"),
+                format!("sk_e2b_{body}"),
+                format!("xe2b_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "from e2b_code_interpreter import Sandbox\n".to_owned(),
+            "E2B_API_KEY=e2b_...\n".to_owned(),
+            "E2B_API_KEY=${E2B_API_KEY}\n".to_owned(),
+            format!("commit {}\n", filler(HEX, 40, 2)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key());
+    }
+}
+
+mod posthog {
+    use super::*;
+
+    const DETECTOR: &str = "posthog-token";
+
+    #[test]
+    fn both_prefixes_win_every_context_as_the_sole_finding() {
+        for len in [42, 43, 47, 48, 49] {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "posthog_personal_api_key",
+                &format!("phx_{}", filler(ALNUM, len, len)),
+            );
+            assert_sole_provider_finding(
+                DETECTOR,
+                "posthog_project_secret_api_key",
+                &format!("phs_{}", filler(ALNUM, len, len)),
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 47, 1);
+        let mut dashed = body.clone();
+        dashed.replace_range(20..21, "-");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("phx_{}", filler(ALNUM, 41, 1)),
+                format!("phx_{}", filler(ALNUM, 50, 1)),
+                format!("phx_{dashed}"),
+                format!("PHX_{body}"),
+                format!("phx-{body}"),
+                format!("xphx_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn the_public_project_token_is_never_claimed() {
+        for len in [43, 44] {
+            let token = format!("phc_{}", filler(ALNUM, len, 3));
+            for input in [
+                token.clone(),
+                format!("posthog.init('{token}', {{ api_host: 'https://us.i.posthog.com' }})"),
+                format!("<script>posthog.init(\"{token}\")</script>"),
+            ] {
+                assert_unclaimed(DETECTOR, &input);
+            }
+        }
+        for input in [
+            "POSTHOG_PERSONAL_API_KEY=phx_...\n",
+            "POSTHOG_API_KEY=${POSTHOG_API_KEY}\n",
+            "POSTHOG_HOST=https://eu.posthog.com\n",
+        ] {
+            assert_unclaimed(DETECTOR, input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("phx_{}", filler(ALNUM, 49, 2)));
+        assert_partition_parity(&format!("phs_{}", filler(ALNUM, 42, 2)));
+    }
+}
+
+mod helicone {
+    use super::*;
+
+    const DETECTOR: &str = "helicone-api-key";
+    const LOWER: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
+
+    fn body() -> String {
+        (0..4)
+            .map(|seed| filler(LOWER, 7, seed))
+            .collect::<Vec<_>>()
+            .join("-")
+    }
+
+    #[test]
+    fn every_prefix_wins_every_context_as_the_sole_finding() {
+        for (role, type_name) in [("sk", "helicone_api_key"), ("pk", "helicone_write_api_key")] {
+            for segment in ["", "eu-", "rl-", "eu-rl-"] {
+                assert_sole_provider_finding(
+                    DETECTOR,
+                    type_name,
+                    &format!("{role}-helicone-{segment}{}", body()),
+                );
+            }
+        }
+        assert_sole_provider_finding(
+            DETECTOR,
+            "helicone_api_key",
+            &format!(
+                "sk-helicone-proxy-{}-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+                body()
+            ),
+        );
+    }
+
+    #[test]
+    fn the_gateway_url_path_and_helicone_auth_header_are_claimed_once() {
+        let key = format!("pk-helicone-{}", body());
+        for input in [
+            format!("https://gateway.helicone.ai/{key}/v1/chat/completions"),
+            format!("Helicone-Auth: Bearer {key}\n"),
+        ] {
+            let (text, findings) = whole_input(&input);
+            assert_eq!(findings.len(), 1, "{input}: {findings:?}");
+            assert_eq!(findings[0].type_name(), "helicone_write_api_key");
+            assert!(!text.contains(&key));
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = body();
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("sk-helicone-{}", &body[..30]),
+                format!("sk-helicone-{body}-abcdefg"),
+                format!("sk-helicone-{}", body.replace('-', "_")),
+                format!("sk-helicone-rl-eu-{body}"),
+                format!("sk-heliconeX-{body}"),
+                format!("SK-HELICONE-{body}"),
+                format!("sk-{body}"),
+                format!("sk-cp-{body}"),
+                format!("xsk-helicone-{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("sk-helicone-eu-rl-{}", body()));
+        assert_partition_parity(&format!("pk-helicone-{}", body()));
+    }
+}
+
+mod firecrawl {
+    use super::*;
+
+    const DETECTOR: &str = "firecrawl-api-key";
+    const HEX: &[u8] = b"0123456789abcdef";
+
+    /// A dashless UUID v4 body from synthetic hex filler.
+    fn body(seed: usize) -> String {
+        let mut body = filler(HEX, 32, seed);
+        body.replace_range(12..13, "4");
+        body.replace_range(16..17, "a");
+        body
+    }
+
+    #[test]
+    fn the_key_wins_every_context_as_the_sole_finding() {
+        for seed in 0..4 {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "firecrawl_api_key",
+                &format!("fc-{}", body(seed)),
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = body(1);
+        let mut version = body.clone();
+        version.replace_range(12..13, "1");
+        let mut variant = body.clone();
+        variant.replace_range(16..17, "c");
+        let dashed = format!(
+            "{}-{}-{}-{}-{}",
+            &body[..8],
+            &body[8..12],
+            &body[12..16],
+            &body[16..20],
+            &body[20..]
+        );
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("fc-{}", &body[..31]),
+                format!("fc-{body}0"),
+                format!("fc-{version}"),
+                format!("fc-{variant}"),
+                format!("fc-{dashed}"),
+                format!("FC-{body}"),
+                format!("fc_{body}"),
+                format!("xfc-{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "FIRECRAWL_API_KEY=fc-YOUR-API-KEY\n",
+            "<div class=\"fc-event fc-daygrid-day\"></div>\n",
+            "api_key=fc-test\n",
+        ] {
+            assert_unclaimed(DETECTOR, input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("fc-{}", body(2)));
+    }
+}
+
+mod composio {
+    use super::*;
+
+    const DETECTOR: &str = "composio-api-key";
+    const NANOID: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+
+    /// A nanoid body that is guaranteed mixed case, so the `ak_` guard holds.
+    fn body(len: usize, seed: usize) -> String {
+        format!("Xq{}", filler(NANOID, len - 2, seed))
+    }
+
+    #[test]
+    fn every_prefix_wins_every_context_as_the_sole_finding() {
+        for seed in 0..3 {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "composio_project_api_key",
+                &format!("ak_{}", body(20, seed)),
+            );
+            assert_sole_provider_finding(
+                DETECTOR,
+                "composio_org_api_key",
+                &format!("oak_{}", body(20, seed)),
+            );
+            assert_sole_provider_finding(
+                DETECTOR,
+                "composio_user_api_key",
+                &format!("uak_{}", body(43, seed)),
+            );
+        }
+    }
+
+    #[test]
+    fn a_body_ending_in_dash_or_underscore_is_exact_in_json_and_prose() {
+        for edge in ["-", "_"] {
+            let key = format!("uak_{}{edge}", body(42, 5));
+            for input in [
+                format!("{{\"token\": \"{key}\"}}"),
+                format!("{key}, then"),
+                format!("{key} next"),
+                key.clone(),
+            ] {
+                let (_, findings) = whole_input(&input);
+                assert_eq!(findings.len(), 1, "{input}: {findings:?}");
+                let start = input.find(&key).unwrap();
+                assert_eq!(findings[0].type_name(), "composio_user_api_key");
+                assert_eq!(
+                    (findings[0].range().start(), findings[0].range().end()),
+                    (start, start + key.len())
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn no_project_key_finding_fires_inside_a_longer_prefix() {
+        let body = body(20, 1);
+        for prefix in ["oak_", "uak_", "cak_", "xak_"] {
+            let input = format!("{prefix}{body}");
+            let (_, findings) = whole_input(&input);
+            assert!(
+                findings
+                    .iter()
+                    .all(|f| f.type_name() != "composio_project_api_key"),
+                "{input}: {findings:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let b20 = body(20, 1);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("ak_{}", &b20[..19]),
+                format!("ak_{b20}A"),
+                format!("ak_{}", b20.to_lowercase()),
+                format!("ak_{}", b20.to_uppercase()),
+                format!("AK_{b20}"),
+                format!("ak-{b20}"),
+                format!("uak_{b20}"),
+                format!("uak_{}", body(42, 1)),
+                format!("uak_{}", body(44, 1)),
+                format!("cak_{b20}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "COMPOSIO_API_KEY=ak_...\n".to_owned(),
+            "ck_test_dummy cak_e2e_agent\n".to_owned(),
+            format!("ak_{}\n", "0123456789abcdef".repeat(4)),
+            "let ak_session_token_value_xy = 1;\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("ak_{}", body(20, 2)));
+        assert_partition_parity(&format!("uak_{}", body(43, 2)));
+    }
+}

@@ -5,6 +5,68 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- New provider detectors from the #860 Tier A handoffs, each always redacted
+  at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences generic
+  detection missed:
+  - `doppler-token` (#903): the seven documented `dp.<type>.` Doppler token
+    types, one finding type each (`doppler_service_token`,
+    `doppler_personal_token`, `doppler_cli_token`,
+    `doppler_service_account_token`,
+    `doppler_service_account_identity_token`, `doppler_scim_token`,
+    `doppler_audit_token`), with the optional service-token environment
+    segment inside the span.
+  - `trigger-dev-token` (#904): Trigger.dev environment secret keys
+    (`tr_<env>_sk_` + 24 and root `tr_<env>_` + 24 or legacy 20, for the
+    four documented env slugs) as `trigger_dev_secret_api_key`, and
+    `tr_pat_` personal access tokens as `trigger_dev_personal_access_token`.
+    Public `pk_<env>_` keys, `tr_oat_` and JWT forms stay unclaimed.
+  - `e2b-api-key` (#905): E2B API keys, `e2b_` + exactly 40 lowercase hex,
+    as `e2b_api_key`. Retired `sk_e2b_` tokens and `e2b_` module names stay
+    unclaimed.
+  - `posthog-token` (#906): PostHog `phx_` personal API keys and `phs_`
+    project secret API keys (42–49 alphanumeric body) as
+    `posthog_personal_api_key` and `posthog_project_secret_api_key`. The
+    public `phc_` project token is never claimed.
+  - `helicone-api-key` (#907): Helicone `sk-helicone-` read-write keys
+    (optional `-eu`/`-rl` segments, and the `sk-helicone-proxy-` key) as
+    `helicone_api_key`, and `pk-helicone-` write-only keys as
+    `helicone_write_api_key`, redacted by default. Legacy bare `sk-`, `-cp-`
+    and `-gov` forms stay unclaimed.
+  - `firecrawl-api-key` (#908): Firecrawl API keys, `fc-` + a dashless
+    lowercase UUIDv4 (version and variant nibbles enforced), as
+    `firecrawl_api_key`. Legacy dashed UUIDs, `fco_` and `fcmcp_` stay
+    unclaimed.
+  - `composio-api-key` (#909): Composio `ak_` project keys (20-byte nanoid
+    body with at least one uppercase and one lowercase letter), `oak_`
+    organization keys (20) and `uak_` user keys (43) as
+    `composio_project_api_key`, `composio_org_api_key` and
+    `composio_user_api_key`. `ck_`, `cak_` and `uak_` at other widths stay
+    unclaimed.
+- New provider detectors from the #860 Tier B handoffs, each always redacted
+  at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences generic
+  detection missed:
+  - `convex-deployment-key` (#912): Convex `<name>|01<hex>` deployment
+    and admin keys (`convex_deployment_key`), typed lead and name inside the
+    span; the issuance-gated `eyJ2` cloud body stays unclaimed.
+  - `onepassword-service-account-token` (#913): 1Password `ops_eyJ`
+    service-account tokens (`onepassword_service_account_token`), Base64url
+    body of at least 250 bytes with its padding inside the span.
+  - `inngest-signing-key` (#914): Inngest `signkey-<prod|test|branch>-`
+    + 64-hex signing keys (`inngest_signing_key`), which replaces the
+    medium, warned `contextual_secret` under `INNGEST_SIGNING_KEY=`.
+  - `resend-api-key` (#915): Resend `re_` + 8 + `_` + 24 API keys
+    (`resend_api_key`), with a mixed-case guard against `re_` identifiers.
+  - `apify-api-token` (#916): Apify `apify_api_` + 20–128 alphanumeric
+    API tokens (`apify_api_token`), the provider's own open-ended rule.
+  - `wandb-api-key` (#917): W&B `wandb_v1_` API keys (`wandb_api_key`),
+    with a tolerant 64–96 body band around the documented width.
+
 ### Changed
 
 - The PII context vocabulary is now `pii-context/v2`, and every PII
@@ -23,6 +85,27 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `bearer-token` selects an `Authorization: Bearer <id>:<secret>` or
+  `<name>|<secret>` value whole (#918). The span used to stop at the first
+  `:` or `|`, redacting the non-secret left half and leaving the secret right
+  half readable in sanitized output. A lead glued to an `<ANGLE>`
+  placeholder or a `$VAR`/`${VAR}` reference is no longer reported as a
+  partial span.
+- `generic-token` recognizes `FAL_KEY`, `CONVEX_DEPLOY_KEY` and
+  `CONVEX_SELF_HOSTED_ADMIN_KEY` as exact credential names, and fal's
+  `Authorization: Key <id>:<secret>` scheme, reporting the whole value
+  (#919). These produced no finding before, even for a random value. A bare
+  `*_KEY` suffix (`PRIMARY_KEY`, `SORT_KEY`) is still not a credential name. A
+  composite `<lead>|<body>` or `<id>:<secret>` value whose secret part is
+  a reference or placeholder (`prod:<name>|${CONVEX_BODY}`,
+  `your-fal-key-id:your-fal-key-secret`) stays silent.
+- `generic-token` no longer redacts secret-reference names and identifiers
+  as secrets (#911): a Helm `existingSecret` object name, an unquoted
+  `UPPER_SNAKE` credential variable name (`secretKey: DB_PASSWORD`,
+  `signing_secret=FAKE_SIGNING_SECRET`), a reverse-DNS keychain item
+  identifier, a Lua or `::` method-call chain, and a secret-path term inside
+  an open `{{ ... }}` template lookup. A literal in the same position is
+  still redacted.
 - PII context association no longer counts a same-range alternative of
   another identity domain as a second candidate (#922). A labelled 10-digit
   card that is also NANP-shaped (`card_number=…`), or a labelled phone number

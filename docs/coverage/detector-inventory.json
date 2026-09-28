@@ -673,6 +673,174 @@
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
       "schemes": null
+    },
+    {
+      "type": "doppler_service_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.st.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_personal_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.pt.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_cli_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.ct.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_service_account_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.sa.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_service_account_identity_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.said.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_scim_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.scim.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "doppler_audit_token",
+      "detector": "doppler-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064p.audit.SyntheticRevokedDopplerServiceToken00000000",
+      "schemes": null
+    },
+    {
+      "type": "trigger_dev_secret_api_key",
+      "detector": "trigger-dev-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0074r_prod_sk_SyntheticRevokedTrigger0",
+      "schemes": null
+    },
+    {
+      "type": "trigger_dev_personal_access_token",
+      "detector": "trigger-dev-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0074r_pat_syntheticrevokedtriggerpatfixture1234567",
+      "schemes": null
+    },
+    {
+      "type": "e2b_api_key",
+      "detector": "e2b-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u00652b_0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
+    },
+    {
+      "type": "posthog_personal_api_key",
+      "detector": "posthog-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070hx_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "schemes": null
+    },
+    {
+      "type": "posthog_project_secret_api_key",
+      "detector": "posthog-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070hs_SyntheticRevokedPosthogPersonalKeyFixture01",
+      "schemes": null
+    },
+    {
+      "type": "helicone_api_key",
+      "detector": "helicone-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073k-helicone-synthet-icrevok-edfixtr-helico1",
+      "schemes": null
+    },
+    {
+      "type": "helicone_write_api_key",
+      "detector": "helicone-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070k-helicone-synthet-icrevok-edfixtr-helico1",
+      "schemes": null
+    },
+    {
+      "type": "firecrawl_api_key",
+      "detector": "firecrawl-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0066c-0123456789ab4def8123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "composio_project_api_key",
+      "detector": "composio-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0061k_Synthetic_Revoked-Ak",
+      "schemes": null
+    },
+    {
+      "type": "composio_org_api_key",
+      "detector": "composio-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006fak_Synthetic_Revoked-Oa",
+      "schemes": null
+    },
+    {
+      "type": "composio_user_api_key",
+      "detector": "composio-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0075ak_Synthetic_Revoked-ComposioUserKeyFixture-01",
+      "schemes": null
+    },
+    {
+      "type": "convex_deployment_key",
+      "detector": "convex-deployment-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063onvex-self-hosted|01deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+      "schemes": null
+    },
+    {
+      "type": "onepassword_service_account_token",
+      "detector": "onepassword-service-account-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006fps_eyJSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixtureSyntheticRevokedOnePasswordFixture",
+      "schemes": null
+    },
+    {
+      "type": "inngest_signing_key",
+      "detector": "inngest-signing-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073ignkey-test-5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "resend_api_key",
+      "detector": "resend-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0072e_Synth3ic_RevokedResendFixtureKey0",
+      "schemes": null
+    },
+    {
+      "type": "apify_api_token",
+      "detector": "apify-api-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "schemes": null
+    },
+    {
+      "type": "wandb_api_key",
+      "detector": "wandb-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
+      "schemes": null
     }
   ],
   "consumers": [

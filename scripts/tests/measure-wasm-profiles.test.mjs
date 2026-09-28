@@ -7,12 +7,13 @@ import { fileURLToPath } from "node:url";
 import { DETECTOR_PROFILES } from "../build-browser-artifact.mjs";
 import {
   classifyModules,
-  COMMON_PACK_MODULES,
+  detectorImplementations,
   detectorModules,
   guardFailures,
+  loadModulePacks,
+  modulePacks,
   percentChange,
   PROFILES,
-  SHARED_ENGINE_MODULES,
 } from "../measure-wasm-profiles.mjs";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -27,17 +28,69 @@ function packTable() {
   );
 }
 
-test("COMMON_PACK_MODULES covers exactly the Pack::Common ids, in canonical order", () => {
-  const commonIds = packTable()
-    .filter(({ pack }) => pack === "Common")
-    .map(({ id }) => id);
-  assert.deepEqual(Object.keys(COMMON_PACK_MODULES), commonIds);
-});
-
-test("every common pack and shared engine module is a real detector source file", () => {
-  for (const module of [...Object.values(COMMON_PACK_MODULES), ...SHARED_ENGINE_MODULES]) {
+test("module packs follow BUILT_IN_PACKS and built_in_detectors() in the core source", () => {
+  const packs = loadModulePacks();
+  assert.deepEqual(packs.common, ["bearer_token", "connection_string", "generic_token", "jwt", "otpauth", "private_key"]);
+  const commonIds = packTable().filter(({ pack }) => pack === "Common").map(({ id }) => id);
+  assert.equal(commonIds.length, 6);
+  for (const module of ["pattern", "ruleset_adapter", "text"]) assert.ok(packs.sharedEngine.includes(module), module);
+  for (const module of ["aws", "heroku", "sentry", "ai_inference"]) assert.ok(packs.provider.includes(module), module);
+  for (const module of [...packs.common, ...packs.provider, ...packs.sharedEngine]) {
     assert.ok(existsSync(join(DETECTORS_DIR, `${module}.rs`)), module);
   }
+  const all = [...packs.common, ...packs.provider, ...packs.sharedEngine];
+  assert.equal(new Set(all).size, all.length, "a module has exactly one role");
+});
+
+const SYNTHETIC_MOD_RS = `mod acme;
+mod jwt;
+mod pattern;
+mod private_key;
+mod zeta;
+
+use crate::types::Detector;
+use private_key::PrivateKeyDetector;
+
+#[must_use]
+pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
+    vec![
+        Box::new(PrivateKeyDetector),
+        Box::new(acme::AcmeTokenDetector),
+        zeta::zeta_detector(),
+        Box::new(acme::ACME_LEGACY),
+        jwt::jwt_detector(),
+    ]
+}
+
+pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
+    ("private-key", Pack::Common),
+    ("acme-token", Pack::Provider),
+    ("zeta-key", Pack::Provider),
+    ("acme-legacy", Pack::Provider),
+    ("jwt", Pack::Common),
+];
+`;
+
+test("modulePacks classifies a new provider module without a script change", () => {
+  assert.deepEqual(modulePacks(SYNTHETIC_MOD_RS), {
+    common: ["jwt", "private_key"],
+    provider: ["acme", "zeta"],
+    sharedEngine: ["pattern"],
+  });
+});
+
+test("modulePacks rejects a list/table mismatch and a mixed-pack module", () => {
+  assert.throws(() => modulePacks(SYNTHETIC_MOD_RS.replace('    ("jwt", Pack::Common),\n', "")), /BUILT_IN_PACKS rows/);
+  assert.throws(() => modulePacks(SYNTHETIC_MOD_RS.replace('("acme-legacy", Pack::Provider)', '("acme-legacy", Pack::Common)')), /both common and provider/);
+});
+
+test("CI runs the real build-and-guard in the rust-wasm job (#929)", () => {
+  const ci = readFileSync(join(REPO_ROOT, ".github", "workflows", "ci.yml"), "utf8");
+  const start = ci.indexOf("\n  rust-wasm:\n");
+  assert.ok(start >= 0, "rust-wasm job not found");
+  const next = ci.slice(start + 1).search(/\n  [a-z0-9-]+:\n/);
+  const job = next < 0 ? ci.slice(start) : ci.slice(start, start + 1 + next);
+  assert.match(job, /node scripts\/measure-wasm-profiles\.mjs --guard-only/);
 });
 
 test("both profiles have a build configuration", () => {
@@ -58,11 +111,23 @@ test("detectorModules reads module names from mangled name-section symbols", () 
   assert.deepEqual(detectorModules(section), ["datadog", "jwt", "text"]);
 });
 
-test("classifyModules separates common, shared engine, and provider code", () => {
-  assert.deepEqual(classifyModules(["datadog", "jwt", "pattern", "text"]), {
+test("detectorImplementations reads Detector impls only", () => {
+  const section = [
+    "<redact_secret[7f632526a786e8f3]::detectors::jwt::JwtDetector as redact_secret[7f632526a786e8f3]::types::Detector>::detect",
+    "<redact_secret[7f632526a786e8f3]::detectors::pattern::PrefixDetector<4> as redact_secret[7f632526a786e8f3]::types::Detector>::id",
+    "Iredact_secret[7f632526a786e8f3]::detectors::sentry::is_lower_hex",
+  ].join(String.fromCharCode(0));
+  assert.deepEqual(detectorImplementations(section), ["jwt", "pattern"]);
+});
+
+const PACKS = { common: ["jwt", "private_key"], provider: ["aws", "datadog", "github"], sharedEngine: ["pattern", "text"] };
+
+test("classifyModules separates common, shared engine, provider and undeclared code", () => {
+  assert.deepEqual(classifyModules(["datadog", "jwt", "mystery", "pattern", "text"], PACKS), {
     common: ["jwt"],
-    sharedEngine: ["text"],
-    provider: ["datadog", "pattern"],
+    sharedEngine: ["pattern", "text"],
+    provider: ["datadog"],
+    undeclared: ["mystery"],
   });
 });
 
@@ -71,29 +136,44 @@ test("percentChange rounds to two places", () => {
   assert.equal(percentChange(224_879, 281_346), -20.07);
 });
 
-const COMMON_MODULES = [...Object.values(COMMON_PACK_MODULES), "text"];
+const COMMON_MODULES = [...PACKS.common, "text"];
 
-function artifact(raw, modules, exports = ["initialize", "profile", "scan"]) {
-  return { sizes: { wasmRawBytes: raw }, exports, classification: classifyModules(modules) };
+function artifact(raw, implementations, helpers = implementations, exports = ["initialize", "profile", "scan"]) {
+  return {
+    sizes: { wasmRawBytes: raw },
+    exports,
+    classification: classifyModules(helpers, PACKS),
+    implementationClassification: classifyModules(implementations, PACKS),
+  };
 }
 
-test("guardFailures accepts a smaller common artifact with only common modules", () => {
+test("guardFailures accepts a smaller common artifact with only common detectors", () => {
   const full = artifact(280_000, [...COMMON_MODULES, "aws", "github", "pattern"]);
   const common = artifact(220_000, COMMON_MODULES);
-  assert.deepEqual(guardFailures(full, common), []);
+  assert.deepEqual(guardFailures(full, common, PACKS), []);
 });
 
-test("guardFailures rejects a common artifact that links provider code or is not smaller", () => {
+test("guardFailures tolerates provider helper symbols without a provider detector", () => {
+  const full = artifact(280_000, [...COMMON_MODULES, "aws", "datadog"]);
+  const common = artifact(220_000, COMMON_MODULES, [...COMMON_MODULES, "datadog"]);
+  assert.deepEqual(guardFailures(full, common, PACKS), []);
+});
+
+test("guardFailures rejects a common artifact that links a provider detector or is not smaller", () => {
   const full = artifact(280_000, [...COMMON_MODULES, "aws"]);
   const regressed = artifact(281_000, [...COMMON_MODULES, "aws"]);
-  const failures = guardFailures(full, regressed);
+  const failures = guardFailures(full, regressed, PACKS);
   assert.equal(failures.length, 2);
   assert.match(failures[0], /not smaller/);
-  assert.match(failures[1], /aws/);
+  assert.match(failures[1], /provider detector implementations: aws/);
 });
 
-test("guardFailures rejects a different export surface", () => {
+test("guardFailures rejects a missing common detector, an undeclared module and a different export surface", () => {
   const full = artifact(280_000, [...COMMON_MODULES, "aws"]);
-  const common = artifact(220_000, COMMON_MODULES, ["initialize", "scan"]);
-  assert.deepEqual(guardFailures(full, common), ["full and common export different surfaces"]);
+  assert.match(guardFailures(full, artifact(220_000, ["jwt"]), PACKS).join(" "), /expected jwt, private_key/);
+  assert.match(guardFailures(full, artifact(220_000, [...COMMON_MODULES, "mystery"]), PACKS).join(" "), /undeclared modules: mystery/);
+  assert.deepEqual(
+    guardFailures(full, artifact(220_000, COMMON_MODULES, COMMON_MODULES, ["initialize", "scan"]), PACKS),
+    ["full and common export different surfaces"],
+  );
 });

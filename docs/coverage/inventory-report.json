@@ -1788,8 +1788,9 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 44,
+        "fixtureCount": 58,
         "hostContextsExercised": [
+          "curl",
           "dotenv",
           "http",
           "json",
@@ -1797,10 +1798,12 @@
           "markdown",
           "plain-text",
           "toml",
+          "xml",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1822,6 +1825,13 @@
         "bearer-positive-scheme",
         "bearer-positive-tab-and-uppercase",
         "bearer-positive-yaml-real-token-still-detected",
+        "bearer-token-positive-colon-joined-id-secret",
+        "bearer-token-positive-curl-colon-joined",
+        "bearer-token-positive-json-header-map-joined",
+        "bearer-token-positive-pipe-joined-name-secret",
+        "bearer-token-positive-placeholder-lead-real-tail",
+        "bearer-token-positive-short-lead-joined",
+        "bearer-token-positive-token-before-html-tag",
         "bearer-token-regression-base64url-value-still-detected",
         "bearer-token-regression-header-anchored-fifteen-byte-value",
         "bearer-token-regression-placeholder-lead-word-with-random-suffix",
@@ -2046,10 +2056,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 221,
+        "fixtureCount": 252,
         "hostContextsExercised": [
           "chat",
           "curl",
+          "docker-compose",
           "dotenv",
           "github-actions",
           "http",
@@ -2118,6 +2129,17 @@
         "contextual-positive-template-embedded-still-detected",
         "contextual-positive-template-prefix-only-still-detected",
         "contextual-positive-vals-scheme-prefix-still-detected",
+        "generic-token-positive-convex-deploy-key-dotenv",
+        "generic-token-positive-convex-lead-literal-body",
+        "generic-token-positive-convex-self-hosted-admin-key-compose",
+        "generic-token-positive-fal-key-dotenv",
+        "generic-token-positive-fal-key-shell-export",
+        "generic-token-positive-fal-placeholder-id-real-secret",
+        "generic-token-positive-literal-keychain-case",
+        "generic-token-positive-literal-keyword-argument",
+        "generic-token-positive-literal-lookup-term",
+        "generic-token-positive-literal-under-secret-key",
+        "generic-token-positive-literal-under-webhook-secret",
         "generic-token-positive-unquoted-markdown-inline-code",
         "generic-token-regression-arn-prefixed-literal",
         "generic-token-regression-db-pass-name",
@@ -2166,10 +2188,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 221,
+        "fixtureCount": 252,
         "hostContextsExercised": [
           "chat",
           "curl",
+          "docker-compose",
           "dotenv",
           "github-actions",
           "http",
@@ -2206,6 +2229,8 @@
         "authorization-host-shell",
         "authorization-positive-basic",
         "authorization-positive-token-minimum",
+        "generic-token-positive-authorization-key-scheme",
+        "generic-token-positive-authorization-key-scheme-curl",
         "generic-token-regression-mid-line-quoted-basic-header",
         "generic-token-regression-proxy-authorization-basic"
       ],
@@ -2214,6 +2239,7 @@
         {
           "evidenceFixtureIds": [
             "authorization-positive-basic",
+            "generic-token-positive-authorization-key-scheme-curl",
             "generic-token-regression-mid-line-quoted-basic-header",
             "generic-token-regression-proxy-authorization-basic"
           ],
@@ -2223,6 +2249,8 @@
         {
           "evidenceFixtureIds": [
             "authorization-positive-token-minimum",
+            "generic-token-positive-authorization-key-scheme",
+            "generic-token-positive-authorization-key-scheme-curl",
             "generic-token-regression-mid-line-quoted-basic-header",
             "generic-token-regression-proxy-authorization-basic"
           ],
@@ -2236,10 +2264,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 221,
+        "fixtureCount": 252,
         "hostContextsExercised": [
           "chat",
           "curl",
+          "docker-compose",
           "dotenv",
           "github-actions",
           "http",
@@ -4062,12 +4091,1116 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "deepgram_api_key"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-bare",
+        "doppler-token-positive-bearer-header",
+        "doppler-token-positive-body-40",
+        "doppler-token-positive-body-40-dotenv",
+        "doppler-token-positive-body-44",
+        "doppler-token-positive-body-44-dotenv",
+        "doppler-token-positive-chat-sentence",
+        "doppler-token-positive-crlf-unicode-prefix",
+        "doppler-token-positive-curl-bearer",
+        "doppler-token-positive-dotenv",
+        "doppler-token-positive-json-config",
+        "doppler-token-positive-json-token-key",
+        "doppler-token-positive-log",
+        "doppler-token-positive-punctuation-adjacent",
+        "doppler-token-positive-python-sdk-call",
+        "doppler-token-positive-repeated-value",
+        "doppler-token-positive-service-token-environment-segment",
+        "doppler-token-positive-service-token-environment-segment-dotenv",
+        "doppler-token-positive-shell-export",
+        "doppler-token-positive-tool-call-arguments",
+        "doppler-token-positive-x-api-key-header",
+        "doppler-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_service_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-pt",
+        "doppler-token-positive-type-pt-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_personal_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-ct",
+        "doppler-token-positive-type-ct-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_cli_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-sa",
+        "doppler-token-positive-type-sa-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_service_account_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-said",
+        "doppler-token-positive-type-said-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_service_account_identity_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-scim",
+        "doppler-token-positive-type-scim-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_scim_token"
+    },
+    {
+      "detector": "doppler-token",
+      "evidence": {
+        "fixtureCount": 58,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "doppler-token-positive-type-audit",
+        "doppler-token-positive-type-audit-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "doppler_audit_token"
+    },
+    {
+      "detector": "trigger-dev-token",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "trigger-dev-token-positive-bare",
+        "trigger-dev-token-positive-bearer-header",
+        "trigger-dev-token-positive-chat-sentence",
+        "trigger-dev-token-positive-crlf-unicode-prefix",
+        "trigger-dev-token-positive-curl-bearer",
+        "trigger-dev-token-positive-dotenv",
+        "trigger-dev-token-positive-json-config",
+        "trigger-dev-token-positive-json-token-key",
+        "trigger-dev-token-positive-legacy-root-key",
+        "trigger-dev-token-positive-legacy-root-key-dotenv",
+        "trigger-dev-token-positive-log",
+        "trigger-dev-token-positive-preview-additional-key",
+        "trigger-dev-token-positive-preview-additional-key-dotenv",
+        "trigger-dev-token-positive-punctuation-adjacent",
+        "trigger-dev-token-positive-python-sdk-call",
+        "trigger-dev-token-positive-repeated-value",
+        "trigger-dev-token-positive-root-key",
+        "trigger-dev-token-positive-root-key-dotenv",
+        "trigger-dev-token-positive-shell-export",
+        "trigger-dev-token-positive-tool-call-arguments",
+        "trigger-dev-token-positive-x-api-key-header",
+        "trigger-dev-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "trigger_dev_secret_api_key"
+    },
+    {
+      "detector": "trigger-dev-token",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "trigger-dev-token-positive-personal-access-token",
+        "trigger-dev-token-positive-personal-access-token-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "trigger_dev_personal_access_token"
+    },
+    {
+      "detector": "e2b-api-key",
+      "evidence": {
+        "fixtureCount": 33,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "e2b-api-key-positive-bare",
+        "e2b-api-key-positive-bearer-header",
+        "e2b-api-key-positive-chat-sentence",
+        "e2b-api-key-positive-crlf-unicode-prefix",
+        "e2b-api-key-positive-curl-bearer",
+        "e2b-api-key-positive-dotenv",
+        "e2b-api-key-positive-json-config",
+        "e2b-api-key-positive-json-token-key",
+        "e2b-api-key-positive-log",
+        "e2b-api-key-positive-punctuation-adjacent",
+        "e2b-api-key-positive-python-sdk-call",
+        "e2b-api-key-positive-repeated-value",
+        "e2b-api-key-positive-second-body",
+        "e2b-api-key-positive-second-body-dotenv",
+        "e2b-api-key-positive-shell-export",
+        "e2b-api-key-positive-tool-call-arguments",
+        "e2b-api-key-positive-x-api-key-header",
+        "e2b-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "e2b_api_key"
+    },
+    {
+      "detector": "posthog-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "posthog-token-positive-bare",
+        "posthog-token-positive-bearer-header",
+        "posthog-token-positive-body-42",
+        "posthog-token-positive-body-42-dotenv",
+        "posthog-token-positive-body-49",
+        "posthog-token-positive-body-49-dotenv",
+        "posthog-token-positive-chat-sentence",
+        "posthog-token-positive-crlf-unicode-prefix",
+        "posthog-token-positive-curl-bearer",
+        "posthog-token-positive-dotenv",
+        "posthog-token-positive-json-config",
+        "posthog-token-positive-json-token-key",
+        "posthog-token-positive-log",
+        "posthog-token-positive-punctuation-adjacent",
+        "posthog-token-positive-python-sdk-call",
+        "posthog-token-positive-repeated-value",
+        "posthog-token-positive-shell-export",
+        "posthog-token-positive-tool-call-arguments",
+        "posthog-token-positive-x-api-key-header",
+        "posthog-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "posthog_personal_api_key"
+    },
+    {
+      "detector": "posthog-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "posthog-token-positive-project-secret-key",
+        "posthog-token-positive-project-secret-key-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "posthog_project_secret_api_key"
+    },
+    {
+      "detector": "helicone-api-key",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "helicone-api-key-positive-bare",
+        "helicone-api-key-positive-bearer-header",
+        "helicone-api-key-positive-chat-sentence",
+        "helicone-api-key-positive-crlf-unicode-prefix",
+        "helicone-api-key-positive-curl-bearer",
+        "helicone-api-key-positive-dotenv",
+        "helicone-api-key-positive-eu-rl-segments",
+        "helicone-api-key-positive-eu-rl-segments-dotenv",
+        "helicone-api-key-positive-json-config",
+        "helicone-api-key-positive-json-token-key",
+        "helicone-api-key-positive-log",
+        "helicone-api-key-positive-proxy-key",
+        "helicone-api-key-positive-proxy-key-dotenv",
+        "helicone-api-key-positive-punctuation-adjacent",
+        "helicone-api-key-positive-python-sdk-call",
+        "helicone-api-key-positive-repeated-value",
+        "helicone-api-key-positive-shell-export",
+        "helicone-api-key-positive-tool-call-arguments",
+        "helicone-api-key-positive-x-api-key-header",
+        "helicone-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "helicone_api_key"
+    },
+    {
+      "detector": "helicone-api-key",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "helicone-api-key-positive-write-key",
+        "helicone-api-key-positive-write-key-dotenv",
+        "helicone-api-key-positive-write-key-eu",
+        "helicone-api-key-positive-write-key-eu-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "helicone_write_api_key"
+    },
+    {
+      "detector": "firecrawl-api-key",
+      "evidence": {
+        "fixtureCount": 34,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "firecrawl-api-key-positive-bare",
+        "firecrawl-api-key-positive-bearer-header",
+        "firecrawl-api-key-positive-chat-sentence",
+        "firecrawl-api-key-positive-crlf-unicode-prefix",
+        "firecrawl-api-key-positive-curl-bearer",
+        "firecrawl-api-key-positive-dotenv",
+        "firecrawl-api-key-positive-json-config",
+        "firecrawl-api-key-positive-json-token-key",
+        "firecrawl-api-key-positive-log",
+        "firecrawl-api-key-positive-punctuation-adjacent",
+        "firecrawl-api-key-positive-python-sdk-call",
+        "firecrawl-api-key-positive-repeated-value",
+        "firecrawl-api-key-positive-shell-export",
+        "firecrawl-api-key-positive-tool-call-arguments",
+        "firecrawl-api-key-positive-variant-b",
+        "firecrawl-api-key-positive-variant-b-dotenv",
+        "firecrawl-api-key-positive-x-api-key-header",
+        "firecrawl-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "firecrawl_api_key"
+    },
+    {
+      "detector": "composio-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "composio-api-key-positive-bare",
+        "composio-api-key-positive-bearer-header",
+        "composio-api-key-positive-body-ending-in-dash",
+        "composio-api-key-positive-body-ending-in-dash-dotenv",
+        "composio-api-key-positive-chat-sentence",
+        "composio-api-key-positive-crlf-unicode-prefix",
+        "composio-api-key-positive-curl-bearer",
+        "composio-api-key-positive-dotenv",
+        "composio-api-key-positive-json-config",
+        "composio-api-key-positive-json-token-key",
+        "composio-api-key-positive-log",
+        "composio-api-key-positive-punctuation-adjacent",
+        "composio-api-key-positive-python-sdk-call",
+        "composio-api-key-positive-repeated-value",
+        "composio-api-key-positive-shell-export",
+        "composio-api-key-positive-tool-call-arguments",
+        "composio-api-key-positive-x-api-key-header",
+        "composio-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "composio_project_api_key"
+    },
+    {
+      "detector": "composio-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "composio-api-key-positive-org-key",
+        "composio-api-key-positive-org-key-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "composio_org_api_key"
+    },
+    {
+      "detector": "composio-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "composio-api-key-positive-user-key",
+        "composio-api-key-positive-user-key-dotenv",
+        "composio-api-key-positive-user-key-ending-in-underscore",
+        "composio-api-key-positive-user-key-ending-in-underscore-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "composio_user_api_key"
+    },
+    {
+      "detector": "convex-deployment-key",
+      "evidence": {
+        "fixtureCount": 55,
+        "hostContextsExercised": [
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "convex-deployment-key-positive-authorization-convex-scheme",
+        "convex-deployment-key-positive-bare",
+        "convex-deployment-key-positive-body-96",
+        "convex-deployment-key-positive-body-96-dotenv",
+        "convex-deployment-key-positive-chat-sentence",
+        "convex-deployment-key-positive-compose-self-hosted",
+        "convex-deployment-key-positive-crlf-unicode-prefix",
+        "convex-deployment-key-positive-curl-bearer",
+        "convex-deployment-key-positive-dev-typed",
+        "convex-deployment-key-positive-dev-typed-dotenv",
+        "convex-deployment-key-positive-dotenv",
+        "convex-deployment-key-positive-json-config",
+        "convex-deployment-key-positive-json-token-key",
+        "convex-deployment-key-positive-log",
+        "convex-deployment-key-positive-non-type-separator",
+        "convex-deployment-key-positive-preview-typed",
+        "convex-deployment-key-positive-preview-typed-dotenv",
+        "convex-deployment-key-positive-project-typed",
+        "convex-deployment-key-positive-project-typed-dotenv",
+        "convex-deployment-key-positive-punctuation-adjacent",
+        "convex-deployment-key-positive-python-sdk-call",
+        "convex-deployment-key-positive-repeated-value",
+        "convex-deployment-key-positive-self-hosted-untyped",
+        "convex-deployment-key-positive-self-hosted-untyped-dotenv",
+        "convex-deployment-key-positive-shell-export",
+        "convex-deployment-key-positive-tool-call-arguments",
+        "convex-deployment-key-positive-x-api-key-header",
+        "convex-deployment-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "convex_deployment_key"
+    },
+    {
+      "detector": "onepassword-service-account-token",
+      "evidence": {
+        "fixtureCount": 47,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "onepassword-service-account-token-positive-b64url-mix",
+        "onepassword-service-account-token-positive-b64url-mix-dotenv",
+        "onepassword-service-account-token-positive-bare",
+        "onepassword-service-account-token-positive-body-866",
+        "onepassword-service-account-token-positive-body-866-dotenv",
+        "onepassword-service-account-token-positive-body-floor",
+        "onepassword-service-account-token-positive-body-floor-dotenv",
+        "onepassword-service-account-token-positive-chat-sentence",
+        "onepassword-service-account-token-positive-crlf-unicode-prefix",
+        "onepassword-service-account-token-positive-curl-bearer",
+        "onepassword-service-account-token-positive-dotenv",
+        "onepassword-service-account-token-positive-double-padding",
+        "onepassword-service-account-token-positive-double-padding-dotenv",
+        "onepassword-service-account-token-positive-github-actions-env",
+        "onepassword-service-account-token-positive-json-config",
+        "onepassword-service-account-token-positive-json-token-key",
+        "onepassword-service-account-token-positive-log",
+        "onepassword-service-account-token-positive-mcp-env-block",
+        "onepassword-service-account-token-positive-punctuation-adjacent",
+        "onepassword-service-account-token-positive-python-sdk-call",
+        "onepassword-service-account-token-positive-repeated-value",
+        "onepassword-service-account-token-positive-shell-export",
+        "onepassword-service-account-token-positive-single-padding",
+        "onepassword-service-account-token-positive-single-padding-dotenv",
+        "onepassword-service-account-token-positive-tool-call-arguments",
+        "onepassword-service-account-token-positive-x-api-key-header",
+        "onepassword-service-account-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "onepassword_service_account_token"
+    },
+    {
+      "detector": "inngest-signing-key",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "inngest-signing-key-positive-bare",
+        "inngest-signing-key-positive-chat-sentence",
+        "inngest-signing-key-positive-crlf-unicode-prefix",
+        "inngest-signing-key-positive-curl-bearer",
+        "inngest-signing-key-positive-dotenv",
+        "inngest-signing-key-positive-fallback-dotenv",
+        "inngest-signing-key-positive-json-config",
+        "inngest-signing-key-positive-json-token-key",
+        "inngest-signing-key-positive-label-branch",
+        "inngest-signing-key-positive-label-branch-dotenv",
+        "inngest-signing-key-positive-label-test",
+        "inngest-signing-key-positive-label-test-dotenv",
+        "inngest-signing-key-positive-log",
+        "inngest-signing-key-positive-punctuation-adjacent",
+        "inngest-signing-key-positive-python-sdk-call",
+        "inngest-signing-key-positive-repeated-value",
+        "inngest-signing-key-positive-sdk-constructor",
+        "inngest-signing-key-positive-shell-export",
+        "inngest-signing-key-positive-tool-call-arguments",
+        "inngest-signing-key-positive-x-api-key-header",
+        "inngest-signing-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "inngest_signing_key"
+    },
+    {
+      "detector": "resend-api-key",
+      "evidence": {
+        "fixtureCount": 39,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "resend-api-key-positive-bare",
+        "resend-api-key-positive-chat-sentence",
+        "resend-api-key-positive-crlf-unicode-prefix",
+        "resend-api-key-positive-curl-bearer",
+        "resend-api-key-positive-dotenv",
+        "resend-api-key-positive-json-config",
+        "resend-api-key-positive-json-token-key",
+        "resend-api-key-positive-log",
+        "resend-api-key-positive-punctuation-adjacent",
+        "resend-api-key-positive-python-module-attribute",
+        "resend-api-key-positive-python-sdk-call",
+        "resend-api-key-positive-repeated-value",
+        "resend-api-key-positive-sdk-constructor",
+        "resend-api-key-positive-second-sample",
+        "resend-api-key-positive-second-sample-dotenv",
+        "resend-api-key-positive-shell-export",
+        "resend-api-key-positive-tool-call-arguments",
+        "resend-api-key-positive-x-api-key-header",
+        "resend-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "resend_api_key"
+    },
+    {
+      "detector": "apify-api-token",
+      "evidence": {
+        "fixtureCount": 37,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "apify-api-token-positive-bare",
+        "apify-api-token-positive-body-cap",
+        "apify-api-token-positive-body-cap-dotenv",
+        "apify-api-token-positive-body-floor",
+        "apify-api-token-positive-body-floor-dotenv",
+        "apify-api-token-positive-chat-sentence",
+        "apify-api-token-positive-crlf-unicode-prefix",
+        "apify-api-token-positive-curl-bearer",
+        "apify-api-token-positive-dotenv",
+        "apify-api-token-positive-js-client-option",
+        "apify-api-token-positive-json-config",
+        "apify-api-token-positive-json-token-key",
+        "apify-api-token-positive-log",
+        "apify-api-token-positive-mcp-env-block",
+        "apify-api-token-positive-punctuation-adjacent",
+        "apify-api-token-positive-python-sdk-call",
+        "apify-api-token-positive-repeated-value",
+        "apify-api-token-positive-shell-export",
+        "apify-api-token-positive-tool-call-arguments",
+        "apify-api-token-positive-x-api-key-header",
+        "apify-api-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "apify_api_token"
+    },
+    {
+      "detector": "wandb-api-key",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "wandb-api-key-positive-bare",
+        "wandb-api-key-positive-body-64",
+        "wandb-api-key-positive-body-64-dotenv",
+        "wandb-api-key-positive-body-96",
+        "wandb-api-key-positive-body-96-dotenv",
+        "wandb-api-key-positive-chat-sentence",
+        "wandb-api-key-positive-crlf-unicode-prefix",
+        "wandb-api-key-positive-curl-bearer",
+        "wandb-api-key-positive-dotenv",
+        "wandb-api-key-positive-host-label",
+        "wandb-api-key-positive-inner-underscore-split",
+        "wandb-api-key-positive-inner-underscore-split-dotenv",
+        "wandb-api-key-positive-json-config",
+        "wandb-api-key-positive-json-token-key",
+        "wandb-api-key-positive-log",
+        "wandb-api-key-positive-login-call",
+        "wandb-api-key-positive-netrc",
+        "wandb-api-key-positive-punctuation-adjacent",
+        "wandb-api-key-positive-python-sdk-call",
+        "wandb-api-key-positive-repeated-value",
+        "wandb-api-key-positive-shell-export",
+        "wandb-api-key-positive-tool-call-arguments",
+        "wandb-api-key-positive-x-api-key-header",
+        "wandb-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "wandb_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 92,
+    "supported": 116,
     "unresolved": 0
   }
 }

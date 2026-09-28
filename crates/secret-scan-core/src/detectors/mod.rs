@@ -11,24 +11,32 @@
 mod additional_providers;
 mod ai_inference;
 mod anthropic;
+mod apify;
 mod atlassian;
 mod aws;
 mod aws_bedrock;
 mod azure_devops;
 mod bearer_token;
 mod cloudflare;
+mod composio;
 mod confluent;
 mod connection_string;
+mod convex;
 mod databricks;
 mod datadog;
 mod discord;
+mod doppler;
+mod e2b;
 mod elevenlabs;
 mod firebase;
+mod firecrawl;
 mod generic_token;
 mod github;
 mod gitlab;
 mod grafana;
+mod helicone;
 mod heroku;
+mod inngest;
 mod jwt;
 mod keyword_gated_keys;
 mod langfuse;
@@ -42,12 +50,15 @@ mod netlify;
 mod new_relic;
 mod notion;
 mod okta;
+mod onepassword;
 mod openai;
 mod otpauth;
 mod pattern;
 mod pinecone;
+mod posthog;
 mod postman;
 mod private_key;
+mod resend;
 mod ruleset_adapter;
 mod sendgrid;
 mod sentry;
@@ -59,8 +70,10 @@ mod terraform;
 mod text;
 mod together_tavily;
 mod travisci;
+mod trigger_dev;
 mod twilio;
 mod vault;
+mod wandb;
 
 use crate::types::Detector;
 use connection_string::ConnectionStringDetector;
@@ -153,6 +166,19 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(keyword_gated_keys::CohereApiKeyDetector),
         Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
         Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
+        Box::new(doppler::DopplerTokenDetector),
+        Box::new(trigger_dev::TRIGGER_DEV),
+        Box::new(e2b::E2B),
+        Box::new(posthog::POSTHOG),
+        Box::new(helicone::HELICONE),
+        Box::new(firecrawl::FIRECRAWL),
+        Box::new(composio::COMPOSIO),
+        Box::new(convex::ConvexDeploymentKeyDetector),
+        Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
+        Box::new(inngest::INNGEST_SIGNING_KEY),
+        Box::new(resend::RESEND_API_KEY),
+        Box::new(apify::APIFY_API_TOKEN),
+        Box::new(wandb::WANDB_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -277,6 +303,19 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("cohere-api-key", Pack::Provider),
     ("ai21-api-key", Pack::Provider),
     ("deepgram-api-key", Pack::Provider),
+    ("doppler-token", Pack::Provider),
+    ("trigger-dev-token", Pack::Provider),
+    ("e2b-api-key", Pack::Provider),
+    ("posthog-token", Pack::Provider),
+    ("helicone-api-key", Pack::Provider),
+    ("firecrawl-api-key", Pack::Provider),
+    ("composio-api-key", Pack::Provider),
+    ("convex-deployment-key", Pack::Provider),
+    ("onepassword-service-account-token", Pack::Provider),
+    ("inngest-signing-key", Pack::Provider),
+    ("resend-api-key", Pack::Provider),
+    ("apify-api-token", Pack::Provider),
+    ("wandb-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -390,6 +429,19 @@ mod tests {
                 "cohere-api-key",
                 "ai21-api-key",
                 "deepgram-api-key",
+                "doppler-token",
+                "trigger-dev-token",
+                "e2b-api-key",
+                "posthog-token",
+                "helicone-api-key",
+                "firecrawl-api-key",
+                "composio-api-key",
+                "convex-deployment-key",
+                "onepassword-service-account-token",
+                "inngest-signing-key",
+                "resend-api-key",
+                "apify-api-token",
+                "wandb-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -742,6 +794,24 @@ mod tests {
             "0123456789abcdef".repeat(4)[..63].to_owned()
         );
         let gitlab_runner_input = "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct";
+        let doppler_token_input =
+            format!("dp.st.{}", "SyntheticRevokedDopplerServiceToken00000000");
+        let trigger_dev_token_input = format!("tr_prod_sk_{}", "SyntheticRevokedTrigger0");
+        let e2b_api_key_input = format!("e2b_{}", "0123456789abcdef0123456789abcdef01234567");
+        let posthog_token_input = format!("phx_{}", "SyntheticRevokedPosthogPersonalKeyFixture01");
+        let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
+        let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
+        let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let wandb_api_key_input = format!(
+            "wandb_v1_{}",
+            &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
+        );
+        let apify_api_token_input = format!("apify_api_{}", "SyntheticRevokedApifyToken0000000000");
+        let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
+        let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
+        let onepassword_service_account_token_input =
+            format!("ops_eyJ{}", "SyntheticRevokedOnePasswordFixture".repeat(8));
+        let convex_deployment_key_input = format!("convex-self-hosted|01{}", "deadbeef".repeat(9));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -805,6 +875,25 @@ mod tests {
             ("cohere-api-key", cohere_api_key_input.as_str()),
             ("ai21-api-key", ai21_api_key_input.as_str()),
             ("deepgram-api-key", deepgram_api_key_input.as_str()),
+            ("doppler-token", doppler_token_input.as_str()),
+            ("trigger-dev-token", trigger_dev_token_input.as_str()),
+            ("e2b-api-key", e2b_api_key_input.as_str()),
+            ("posthog-token", posthog_token_input.as_str()),
+            ("helicone-api-key", helicone_api_key_input.as_str()),
+            ("firecrawl-api-key", firecrawl_api_key_input.as_str()),
+            ("composio-api-key", composio_api_key_input.as_str()),
+            (
+                "convex-deployment-key",
+                convex_deployment_key_input.as_str(),
+            ),
+            (
+                "onepassword-service-account-token",
+                onepassword_service_account_token_input.as_str(),
+            ),
+            ("inngest-signing-key", inngest_signing_key_input.as_str()),
+            ("resend-api-key", resend_api_key_input.as_str()),
+            ("apify-api-token", apify_api_token_input.as_str()),
+            ("wandb-api-key", wandb_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

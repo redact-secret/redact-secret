@@ -1,4 +1,4 @@
-//! Contextual assignment, structural `Basic`/`Token` authorization, and a
+//! Contextual assignment, structural `Basic`/`Token`/`Key` authorization, and a
 //! bare vendor-prefixed high-entropy policy layer.
 //!
 //! Combines explicit credential names or authorization syntax with bounded
@@ -43,7 +43,20 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// (`render_pass`, `first_pass`, `second_pass`), but `db_pass` is the
 /// conventional database password variable (`DB_PASS`, `dbPass`). A
 /// further-prefixed `app_db_pass` is not matched (issue #823).
-const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["db_pass"];
+///
+/// Issue #919 adds three provider credential variables whose only
+/// distinguishing segment is a bare `_key` suffix, which is deliberately not
+/// a name token (`sort_key`, `cache_key`, `primary_key`, `partition_key` and
+/// `idempotency_key` hold non-secrets): `fal_key` (fal's documented and only
+/// credential variable, `FAL_KEY`), and Convex's `convex_deploy_key` and
+/// `convex_self_hosted_admin_key`. Only these whole names match; `fal_key_id`
+/// (the public id half), `convex_key` and `my_fal_key` do not.
+const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "db_pass",
+    "fal_key",
+    "convex_deploy_key",
+    "convex_self_hosted_admin_key",
+];
 
 const AMBIGUOUS_NAMES: &[&str] = &[
     "auth",
@@ -77,6 +90,14 @@ const NON_CREDENTIAL_TOKEN_NAMES: &[&str] = &[
     "device_token",
     "push_token",
 ];
+
+/// Names whose value names a Kubernetes Secret *object* rather than holding
+/// a secret: the Helm-chart `existingSecret` convention (`auth.existingSecret:
+/// postgres-credentials`) and its `existingSecretName` spelling. Matched as
+/// the whole name or behind a prefix (`redis_auth_existing_secret`), so the
+/// `<prefix>_secret` rule no longer reads them as credentials (issue #911).
+/// `secretName` was never a credential name (it ends in `name`).
+const OBJECT_REFERENCE_SECRET_NAMES: &[&str] = &["existing_secret", "existing_secret_name"];
 
 /// Name segments that name a provider with its own built-in detector. A
 /// prefixed name carrying one (`MAILCHIMP_API_KEY`, `GITHUB_TOKEN`,
@@ -203,6 +224,9 @@ fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
 /// high-entropy value of at least eight bytes; placeholder, reference and
 /// masked-value exclusions still apply unchanged.
 pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
+    if is_object_reference_secret_name(normalized) {
+        return false;
+    }
     HIGH_SIGNAL_NAMES.contains(&normalized)
         || EXACT_HIGH_SIGNAL_NAMES.contains(&normalized)
         || has_prefixed_name(normalized, HIGH_SIGNAL_NAMES)
@@ -210,6 +234,16 @@ pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
             && has_prefixed_name(normalized, &["token"])
             && !NON_CREDENTIAL_TOKEN_NAMES.contains(&normalized)
             && !has_prefixed_name(normalized, NON_CREDENTIAL_TOKEN_NAMES))
+}
+
+/// `true` for an [`OBJECT_REFERENCE_SECRET_NAMES`] name, bare or prefixed.
+fn is_object_reference_secret_name(normalized: &str) -> bool {
+    OBJECT_REFERENCE_SECRET_NAMES.iter().any(|name| {
+        normalized == *name
+            || normalized
+                .strip_suffix(name)
+                .is_some_and(|prefix| prefix.ends_with('_'))
+    })
 }
 
 /// `true` for an ambiguous name: one of [`AMBIGUOUS_NAMES`] or the same name
@@ -1026,6 +1060,17 @@ fn scan_identifier_chain(value: &str) -> ChainScan {
         match bytes.get(index) {
             None => return ChainScan::Complete { saw_call },
             Some(b'.') => index += 1,
+            // Lua method calls (`secrets:get(name)`) and Rust/C++ paths
+            // (`vault::read(path)`) join segments with `:` or `::`
+            // (issue #911). A chain still needs a balanced `(...)` call to
+            // count as one, so a colon-joined literal (`user:pass`) is not.
+            Some(b':') => {
+                index += if bytes.get(index + 1) == Some(&b':') {
+                    2
+                } else {
+                    1
+                }
+            }
             Some(_) => return ChainScan::Other,
         }
     }
@@ -1125,6 +1170,160 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_aws_arn(value)
         || (form == ValueForm::Quoted && is_string_concatenation_seam(value))
         || is_quoted_reference(value, form)
+        || (form == ValueForm::Unquoted && is_credential_variable_name_value(value))
+        || is_reverse_dns_identifier(value)
+        || is_composite_with_placeholder_secret_part(value)
+}
+
+/// Final segments that make an `UPPER_SNAKE` identifier the *name* of a
+/// credential variable (`DB_PASSWORD`, `FAKE_SIGNING_SECRET`).
+const CREDENTIAL_NAME_TAIL_WORDS: &[&str] = &[
+    "TOKEN",
+    "SECRET",
+    "PASSWORD",
+    "PASSWD",
+    "PASSPHRASE",
+    "KEY",
+    "CREDENTIAL",
+    "CREDENTIALS",
+];
+
+/// `true` for an unquoted value that is itself a credential variable's
+/// name, an `UPPER_SNAKE` identifier of two or more segments ending in a
+/// credential word: a keyword argument passing a constant
+/// (`signing_secret=FAKE_SIGNING_SECRET)`, the call's `)` included by the
+/// unquoted boundary), or an `ExternalSecret` / Helm `secretKey: DB_PASSWORD`
+/// naming the key inside a Secret object (issue #911).
+///
+/// Quoted values are out of scope, and so is any value carrying a
+/// placeholder lead word (`YOUR_MAILCHIMP_API_KEY`), which the #756
+/// instructional-placeholder rule governs. FN cost: a real secret that is an
+/// unquoted all-caps word chain ending in `_KEY`/`_TOKEN`/`_SECRET`/... .
+fn is_credential_variable_name_value(value: &str) -> bool {
+    let identifier = value.trim_end_matches(')');
+    let mut segments = identifier.split('_');
+    let segment_count = identifier.split('_').count();
+    segment_count >= 2
+        && segments.all(|segment| {
+            segment
+                .bytes()
+                .next()
+                .is_some_and(|first| first.is_ascii_uppercase())
+                && segment
+                    .bytes()
+                    .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit())
+                && !matches!(segment, "YOUR" | "INSERT" | "ENTER" | "PASTE" | "REPLACE")
+        })
+        && identifier
+            .rsplit('_')
+            .next()
+            .is_some_and(|tail| CREDENTIAL_NAME_TAIL_WORDS.contains(&tail))
+}
+
+/// Credential nouns that end a lowercase placeholder phrase.
+const CREDENTIAL_PHRASE_TAIL_WORDS: &[&str] = &[
+    "key",
+    "secret",
+    "token",
+    "password",
+    "passwd",
+    "passphrase",
+    "credential",
+    "credentials",
+];
+
+/// `true` for a lowercase word phrase naming a credential rather than
+/// holding one: two or more `[a-z]+` words joined by `-` or `_`, ending in a
+/// credential noun (`your-admin-key`, `super-secret-key`,
+/// `your-fal-key-secret`). Used only for the secret part of a composite
+/// value ([`is_composite_with_placeholder_secret_part`]).
+fn is_credential_noun_phrase(value: &str) -> bool {
+    let words: Vec<&str> = value.split(['-', '_']).collect();
+    words.len() >= 2
+        && words
+            .iter()
+            .all(|word| !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_lowercase()))
+        && words
+            .last()
+            .is_some_and(|tail| CREDENTIAL_PHRASE_TAIL_WORDS.contains(tail))
+}
+
+/// `true` for a composite value, runs joined by `|` or `:` such as a Convex
+/// `<lead>|<body>` key or a fal `<id>:<secret>` key, whose last run (the
+/// secret part) is a reference or a placeholder: a `$VAR`/`${VAR}`
+/// reference, a `{{ }}` template, an interpolation, an `<angle>`
+/// placeholder, placeholder vocabulary, an instructional placeholder,
+/// filler, or a lowercase credential-noun phrase
+/// (`prod:<name>|${CONVEX_BODY}`, `prod:adjective-animal-123|super-secret-key`,
+/// `your-fal-key-id:your-fal-key-secret`), issue #919 follow-up. The lead
+/// runs are public names, so they never make the value a secret on their
+/// own.
+///
+/// Only a value with no whitespace, `/` or `@` (outside a `{{ }}` secret
+/// part) qualifies, so a URL, a
+/// connection string or a `user:pass@host` credential keeps today's reading,
+/// and a digits-only last run (a port) is never treated as a placeholder. A
+/// real-shaped secret part keeps the whole value high/redact.
+fn is_composite_with_placeholder_secret_part(value: &str) -> bool {
+    let plain = |part: &str| {
+        !part
+            .bytes()
+            .any(|byte| byte.is_ascii_whitespace() || matches!(byte, b'/' | b'@'))
+    };
+    let Some(last) = value.rsplit(['|', ':']).next() else {
+        return false;
+    };
+    if last.len() == value.len() {
+        return false;
+    }
+    let head = &value[..value.len() - last.len() - 1];
+    // Only a `{{ ... }}` template secret part may carry spaces.
+    if head.is_empty()
+        || last.is_empty()
+        || !plain(head)
+        || !(plain(last) || is_template_reference(last))
+    {
+        return false;
+    }
+    let lower = last.to_ascii_lowercase();
+    starts_with_env_reference(last)
+        || is_template_reference(last)
+        || is_interpolation_reference(last)
+        || starts_with_angle_bracket_reference(last)
+        || is_generic_placeholder_word(&lower)
+        || is_instructional_token_placeholder(last)
+        || is_repeated_character_filler(last)
+        || is_credential_noun_phrase(last)
+        // A `${VAR}` reference whose braces were split by the `:` join.
+        || (last.ends_with('}') && head.contains("${"))
+}
+
+/// Leading labels of a reverse-DNS identifier (`com.example.app.apiToken`).
+const REVERSE_DNS_ROOTS: &[&str] = &[
+    "com", "org", "net", "io", "dev", "app", "co", "me", "ai", "edu", "gov", "de", "uk", "fr",
+    "jp", "kr", "us",
+];
+
+/// `true` for a reverse-DNS identifier, the naming scheme of Apple keychain
+/// items, bundle ids and Android packages: a [`REVERSE_DNS_ROOTS`] label,
+/// then two or more further labels of `[A-Za-z][A-Za-z0-9_-]*`, joined by
+/// `.` (`com.example.app.accessToken`, issue #911). It names where a secret
+/// is stored, never the secret. FN cost: a real secret written as three or
+/// more dotted words under one of those roots, which no credential grammar
+/// uses.
+fn is_reverse_dns_identifier(value: &str) -> bool {
+    let mut labels = value.split('.');
+    labels
+        .next()
+        .is_some_and(|root| REVERSE_DNS_ROOTS.contains(&root))
+        && value.split('.').count() >= 3
+        && labels.all(|label| {
+            (1..=63).contains(&label.len())
+                && label.as_bytes()[0].is_ascii_alphabetic()
+                && label
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+        })
 }
 
 /// `true` for an HTML-escaped `<...>` placeholder (`&lt;YOUR_PASSWORD&gt;`):
@@ -2004,6 +2203,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 normalized = String::from("private_key");
             }
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
+                && !is_templated_lookup_path(input, name_start, value)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
                 && let Some(range) = ByteRange::new(value_start, value_end)
@@ -2039,6 +2239,43 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     }
 
     candidates
+}
+
+/// `true` when the assignment starting at `name_start` sits inside a
+/// `{{ ... }}` template expression still open on its line and its value is
+/// a secret-manager path: a lookup-plugin term such as
+/// `'secret=kv/data/app:token'` inside
+/// `{{ lookup('community.hashi_vault.hashi_vault', ...) }}` (issue #911).
+/// The term names where the secret lives; the template renders it later.
+///
+/// A path is two or more `/`-joined segments of `[A-Za-z0-9_.-]`, with an
+/// optional `:field` suffix. A literal term inside a lookup
+/// (`token=<value>` with no `/`) stays detected, and so does any assignment
+/// outside an open template.
+fn is_templated_lookup_path(input: &str, name_start: usize, value: &str) -> bool {
+    let line_start = input[..name_start].rfind(['\n', '\r']).map_or(0, |i| i + 1);
+    let before = &input[line_start..name_start];
+    let inside_template = before
+        .rfind("{{")
+        .is_some_and(|open| !before[open..].contains("}}"));
+    if !inside_template {
+        return false;
+    }
+    let path = value.split_once(':').map_or(value, |(path, _)| path);
+    let field_ok = value.split_once(':').is_none_or(|(_, field)| {
+        !field.is_empty()
+            && field
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-'))
+    });
+    field_ok
+        && path.split('/').count() >= 2
+        && path.split('/').all(|segment| {
+            !segment.is_empty()
+                && segment
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-'))
+        })
 }
 
 // --- single-line call with one positional literal (issue #866) ---------------
@@ -2117,7 +2354,7 @@ fn call_argument_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-// --- `AUTHORIZATION_PATTERN`: (?:^|[\r\n])[ \t]*authorization[ \t]*:[ \t]*(basic|token)[ \t]+([A-Za-z0-9+/=_-]{12,}) ---
+// --- `AUTHORIZATION_PATTERN`: (?:^|[\r\n])[ \t]*authorization[ \t]*:[ \t]*(basic|token|key)[ \t]+([A-Za-z0-9+/=_-]{12,}) ---
 
 fn is_space_or_tab_byte(byte: u8) -> bool {
     byte == b' ' || byte == b'\t'
@@ -2125,6 +2362,14 @@ fn is_space_or_tab_byte(byte: u8) -> bool {
 
 fn is_authorization_value_byte(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || matches!(byte, b'+' | b'/' | b'=' | b'_' | b'-')
+}
+
+/// A `Key` scheme value byte: the authorization alphabet plus `:`, because
+/// fal's documented `Authorization: Key <key_id>:<key_secret>` joins its two
+/// halves with a colon (issue #919). Ending the value at the colon would
+/// redact the public id half and leave the secret half readable.
+fn is_key_scheme_value_byte(byte: u8) -> bool {
+    is_authorization_value_byte(byte) || byte == b':'
 }
 
 struct AuthorizationMatch {
@@ -2165,6 +2410,10 @@ fn parse_authorization_from(input: &str, start: usize) -> Option<AuthorizationMa
     } else if starts_with_ci(input, cursor, "token") {
         cursor += "token".len();
         "token"
+    } else if starts_with_ci(input, cursor, "key") {
+        // fal's scheme (issue #919): `Authorization: Key <id>:<secret>`.
+        cursor += "key".len();
+        "key"
     } else {
         return None;
     };
@@ -2174,7 +2423,15 @@ fn parse_authorization_from(input: &str, start: usize) -> Option<AuthorizationMa
         return None;
     }
     let value_start = cursor + ws_len;
-    let value_len = ascii_run_len(bytes, value_start, is_authorization_value_byte);
+    let mut value_len = if scheme == "key" {
+        ascii_run_len(bytes, value_start, is_key_scheme_value_byte)
+    } else {
+        ascii_run_len(bytes, value_start, is_authorization_value_byte)
+    };
+    // A trailing colon joins nothing (`Key <value>: prose`).
+    while value_len > 0 && bytes[value_start + value_len - 1] == b':' {
+        value_len -= 1;
+    }
     if value_len < MIN_AUTHORIZATION_VALUE_LENGTH {
         return None;
     }
@@ -2201,6 +2458,8 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
         // mid-line `Authorization: token ...` is the header provider
         // detectors (`travisci-api-token`, `github-token`) key on, and an
         // always-redact generic candidate would take the span from them.
+        // `Key` is taken mid-line too (issue #919): fal documents it in a
+        // curl `-H` argument, and no provider detector keys on it.
         Some(ch)
             if matches!(ch, 'a' | 'A' | 'p' | 'P')
                 && prev_char(input, pos).is_some_and(|previous| {
@@ -2208,7 +2467,7 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
                         && !matches!(previous, '_' | '-' | '\r' | '\n')
                 }) =>
         {
-            parse_authorization_from(input, pos).filter(|m| m.scheme == "basic")
+            parse_authorization_from(input, pos).filter(|m| matches!(m.scheme, "basic" | "key"))
         }
         _ => None,
     }
@@ -2329,7 +2588,7 @@ impl Detector for GenericTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = assignment_candidates(input, &self.names);
-        // Authorization-scheme matching (`Basic`/`Token`) and the bare
+        // Authorization-scheme matching (`Basic`/`Token`/`Key`) and the bare
         // vendor-prefixed policy layer have nothing to do with names, so
         // only the built-in instance runs them — the ruleset names
         // extension would otherwise duplicate the built-in's own candidates
@@ -3060,6 +3319,278 @@ mod tests {
             detect("db_password=SYNTHETIC_REVOKED_DB_PASS_VALUE").len(),
             1
         );
+    }
+
+    #[test]
+    fn fal_and_convex_credential_variables_are_exact_high_signal_names() {
+        // Issue #919: a bare `_key` suffix is not a name token, so these
+        // provider variables produced no finding at all.
+        const FAL: &str = "5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42";
+        const CONVEX: &str = "prod:happy-otter-123|01SYNTHETICrevokedCONVEXdeployKEY0042";
+        for (input, value) in [
+            (format!("FAL_KEY={FAL}"), FAL),
+            (format!("export FAL_KEY=\"{FAL}\""), FAL),
+            (format!("falKey: '{FAL}'"), FAL),
+            (format!("{{\"FAL_KEY\": \"{FAL}\"}}"), FAL),
+            (format!("CONVEX_DEPLOY_KEY={CONVEX}"), CONVEX),
+            (format!("CONVEX_SELF_HOSTED_ADMIN_KEY={CONVEX}"), CONVEX),
+            (
+                format!("  CONVEX_SELF_HOSTED_ADMIN_KEY: \"{CONVEX}\""),
+                CONVEX,
+            ),
+            (
+                "FAL_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw".to_owned(),
+                "SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            ),
+        ] {
+            let candidates = detect(&input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+            assert_eq!(candidates[0].type_name(), "contextual_secret");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+        }
+    }
+
+    #[test]
+    fn a_composite_value_with_a_placeholder_or_reference_secret_part_is_excluded() {
+        // Issue #919 follow-up (benchmarks #436): the Convex and fal docs
+        // placeholders and interpolations under the new exact names.
+        for input in [
+            "CONVEX_DEPLOY_KEY=prod:your-deployment-name|your-admin-key",
+            "CONVEX_DEPLOY_KEY=prod:adjective-animal-123|super-secret-key",
+            "CONVEX_DEPLOY_KEY=prod:happy-otter-123|${CONVEX_BODY}",
+            "CONVEX_SELF_HOSTED_ADMIN_KEY=convex-self-hosted|$ADMIN_KEY",
+            "CONVEX_SELF_HOSTED_ADMIN_KEY: \"convex-self-hosted|{{ admin_key }}\"",
+            "CONVEX_DEPLOY_KEY=preview:acme:web|<DEPLOY_KEY_BODY>",
+            "CONVEX_DEPLOY_KEY=prod:happy-otter-123|xxxxxxxxxxxxxxxxxxxx",
+            "FAL_KEY=your-fal-key-id:your-fal-key-secret",
+            "FAL_KEY=${FAL_KEY_ID}:${FAL_KEY_SECRET}",
+            "Authorization: Key your-fal-key-id:your-fal-key-secret",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // Twins: a real-shaped secret part keeps the whole value high.
+        let hex: String = (0..76)
+            .map(|i| char::from(b"0123456789abcdef"[(i * 7 + 3) % 16]))
+            .collect();
+        for (input, value) in [
+            (
+                format!("CONVEX_DEPLOY_KEY=prod:happy-otter-123|01{hex}"),
+                format!("prod:happy-otter-123|01{hex}"),
+            ),
+            (
+                "CONVEX_DEPLOY_KEY=prod:happy-otter-123|eyJ2SyntheticRevokedGatedCloudBody0Aq7Zx9"
+                    .to_owned(),
+                "prod:happy-otter-123|eyJ2SyntheticRevokedGatedCloudBody0Aq7Zx9".to_owned(),
+            ),
+            (
+                "FAL_KEY=your-fal-key-id:5a1ed0ff5e7c0dedfeedbadacef00d42".to_owned(),
+                "your-fal-key-id:5a1ed0ff5e7c0dedfeedbadacef00d42".to_owned(),
+            ),
+            // A lowercase phrase that is not the last run, and a port-like
+            // last run, do not make a value a placeholder.
+            (
+                "FAL_KEY=super-secret-key:Zx81QpVn4Lk7Tr2Wm9Hs6Dc3".to_owned(),
+                "super-secret-key:Zx81QpVn4Lk7Tr2Wm9Hs6Dc3".to_owned(),
+            ),
+            (
+                "password=Zx81QpVn4Lk7Tr2Wm9Hs6Dc3:5432".to_owned(),
+                "Zx81QpVn4Lk7Tr2Wm9Hs6Dc3:5432".to_owned(),
+            ),
+        ] {
+            let candidates = detect(&input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+        }
+    }
+
+    #[test]
+    fn a_bare_key_suffix_stays_outside_the_vocabulary() {
+        // Issue #919 benign twins: only the three whole names were added.
+        for input in [
+            "PRIMARY_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "SORT_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "CACHE_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "PARTITION_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "IDEMPOTENCY_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "CONVEX_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "MY_FAL_KEY=SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "FAL_KEY_ID=5e7c0ded-feed-4bad-9ace-0ddba11c0de5",
+            "CONVEX_DEPLOYMENT=dev:happy-otter-123",
+            "FAL_KEY=${FAL_KEY}",
+            "FAL_KEY=your_fal_key",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn the_key_authorization_scheme_is_detected_whole() {
+        // Issue #919: fal's `Authorization: Key <id>:<secret>`.
+        const FAL: &str = "5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42";
+        for input in [
+            format!("Authorization: Key {FAL}"),
+            format!("authorization: key {FAL}\r\n"),
+            format!("curl -H \"Authorization: Key {FAL}\" https://example.invalid/run"),
+            format!("{{\"headers\":{{\"Authorization\":\"Key {FAL}\"}}}}"),
+            format!("Proxy-Authorization: Key {FAL}"),
+            format!("Authorization: Key {FAL}: sent"),
+        ] {
+            let candidates: Vec<Candidate> = detect(&input)
+                .into_iter()
+                .filter(|candidate| candidate.type_name() == "authorization_credential")
+                .collect();
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], FAL, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+            assert!(
+                candidates[0]
+                    .signals()
+                    .iter()
+                    .any(|signal| signal == "authorization-key-scheme")
+            );
+        }
+    }
+
+    #[test]
+    fn key_as_prose_or_a_short_value_is_not_an_authorization_scheme() {
+        for input in [
+            "The Key to authorization is a signed request.",
+            "Authorization: Key rotation",
+            "authorization: keyring SYNTHETICrevokedNEUTRALvalue0042xyzw",
+            "Authorization: Key $FAL_KEY",
+            "Authorization: Key ${FAL_KEY}",
+            "X-Authorization: Key 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff",
+            "notAuthorization: Key 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff",
+        ] {
+            assert!(
+                detect(input)
+                    .iter()
+                    .all(|candidate| candidate.type_name() != "authorization_credential"),
+                "{input}"
+            );
+        }
+    }
+
+    // --- issue #911: secret-reference names and identifiers -------------
+
+    /// A random literal, built at run time, for the redacted twins.
+    fn random_literal() -> String {
+        (0..32)
+            .map(|i| char::from(b"aZ3kQ9xL2mV7pR4tW8nB5cD1fG6hJ0sY"[(i * 11 + 3) % 32]))
+            .collect()
+    }
+
+    #[test]
+    fn existing_secret_names_an_object_not_a_secret() {
+        for input in [
+            "auth:\n  existingSecret: postgres-credentials\n",
+            "  existingSecret: app-db-credentials-v2\n",
+            "redisAuthExistingSecret: redis-auth-prod\n",
+            "existingSecretName: postgres-credentials\n",
+            "secretName: tls-cert-prod\n",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // `secret` and other `<prefix>_secret` names are unchanged.
+        let literal = random_literal();
+        for input in [
+            format!("webhookSecret: {literal}\n"),
+            format!("clientSecret: {literal}\n"),
+            format!("secret: {literal}\n"),
+        ] {
+            assert_eq!(detect(&input).len(), 1, "{input}");
+        }
+    }
+
+    #[test]
+    fn an_unquoted_credential_variable_name_is_a_reference() {
+        for input in [
+            "    verify(payload, signing_secret=FAKE_SIGNING_SECRET)",
+            "- secretKey: DB_PASSWORD\n",
+            "  secretKey: STRIPE_WEBHOOK_SECRET\n",
+            "client = Client(api_key=OPENAI_API_KEY)",
+            "password=ADMIN_PASSWORD",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // Twins: a literal in the same position, a quoted name, a
+        // placeholder lead word (#756) and a non-credential tail stay
+        // detected.
+        let literal = random_literal();
+        for input in [
+            format!("    verify(payload, signing_secret={literal})"),
+            format!("- secretKey: {literal}\n"),
+            "password=\"ADMIN_PASSWORD_2f9QxL7m\"".to_owned(),
+            "API_KEY=YOUR_MAILCHIMP_API_KEY".to_owned(),
+            "password=SYNTHETIC_REVOKED_DB_PASS_VALUE".to_owned(),
+            "password=Admin_Password".to_owned(),
+        ] {
+            assert!(!detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_reverse_dns_identifier_is_a_reference() {
+        for input in [
+            "case accessToken = \"com.example.app.accessToken\"",
+            "case clientSecret = \"com.example.app.clientSecret\"",
+            "userPassword = \"io.example.keychain.user-password\"",
+            "static let refreshToken = \"dev.example.auth.refresh_token\"",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        let literal = random_literal();
+        for input in [
+            format!("case accessToken = \"{literal}\""),
+            // A JWT and a two-label dotted value are not reverse-DNS.
+            "accessToken = \"eyJhbGciOi.eyJzdWIiOi.SflKxwRJSMeKKF2QT4\"".to_owned(),
+            "accessToken = \"com.Zx81QpVn4Lk7Tr2Wm9\"".to_owned(),
+            "accessToken = \"xq.Zx81QpVn4Lk7.Tr2Wm9Hs6Dc3\"".to_owned(),
+        ] {
+            assert!(!detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_lua_or_path_method_call_is_a_source_code_expression() {
+        for input in [
+            "local secret = secrets:get(partner)",
+            "local token = vault:read(\"app/token\")",
+            "let password = vault::read(path);",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // A colon-joined literal with no call stays detected.
+        let literal = random_literal();
+        for input in [
+            format!("local secret = user:{literal}"),
+            format!("secret = {literal}"),
+        ] {
+            assert!(!detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_secret_path_term_inside_a_template_lookup_is_a_reference() {
+        for input in [
+            "vault_token: \"{{ lookup('community.hashi_vault.hashi_vault', 'secret=kv/data/app:token') }}\"",
+            "db_password: \"{{ lookup('hashi_vault', 'secret=secret/data/db:password url=https://vault.example.invalid') }}\"",
+            "api_key: \"{{ lookup('hashi_vault', 'secret=kv/app') }}\"",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // A literal lookup term, and a path outside a template, stay
+        // detected.
+        let literal = random_literal();
+        for input in [
+            format!("vault: \"{{{{ lookup('hashi_vault', 'secret={literal}') }}}}\""),
+            format!("secret=kv/data/{literal}"),
+            format!("{{{{ x }}}} secret=kv/data/{literal}"),
+        ] {
+            assert!(!detect(&input).is_empty(), "{input}");
+        }
     }
 
     #[test]

@@ -77,6 +77,80 @@ impl Detector for KnownFormatProviderDetector {
     }
 }
 
+/// A [`KnownFormatProviderDetector`] whose shapes each report their own
+/// finding type, for one provider that documents several credential roles
+/// with distinct prefixes (issue #860: Trigger.dev, `PostHog`, Helicone,
+/// Composio). `types[i]` is the finding type of `shapes[i]`.
+///
+/// The scan is the same single left-to-right, longest-prefix-wins pass; a
+/// match's type is that of the shape the scan selected at its start, which is
+/// the longest prefix that matches there, so it is recovered without a second
+/// pass. The same model as `github-token`'s one-detector, many-types table.
+pub(super) struct TypedKnownFormatProviderDetector {
+    id: &'static str,
+    shapes: &'static [PrefixShape<'static>],
+    types: &'static [&'static str],
+    boundary: Alphabet,
+}
+
+impl TypedKnownFormatProviderDetector {
+    /// Constructs a detector from parallel shape and finding-type tables.
+    pub(super) const fn new(
+        id: &'static str,
+        shapes: &'static [PrefixShape<'static>],
+        types: &'static [&'static str],
+        boundary: Alphabet,
+    ) -> Self {
+        assert!(shapes.len() == types.len());
+        Self {
+            id,
+            shapes,
+            types,
+            boundary,
+        }
+    }
+
+    /// The finding type of the shape the scan selected at `start`.
+    fn type_at(&self, bytes: &[u8], start: usize) -> Option<&'static str> {
+        self.shapes
+            .iter()
+            .zip(self.types)
+            .filter(|(shape, _)| bytes[start..].starts_with(shape.prefix.as_bytes()))
+            .max_by_key(|(shape, _)| shape.prefix.len())
+            .map(|(_, type_name)| *type_name)
+    }
+}
+
+impl Detector for TypedKnownFormatProviderDetector {
+    fn id(&self) -> &str {
+        self.id
+    }
+
+    fn detect(
+        &self,
+        input: &str,
+        _context: &DetectorContext,
+    ) -> Result<Vec<Candidate>, DetectorFailure> {
+        let bytes = input.as_bytes();
+        let mut candidates = Vec::new();
+        for (start, end, signals) in
+            pattern::scan_prefixed_shapes(input, self.shapes, self.boundary)
+        {
+            let (Some(range), Some(type_name)) =
+                (ByteRange::new(start, end), self.type_at(bytes, start))
+            else {
+                continue;
+            };
+            candidates.push(
+                Candidate::new(type_name, Confidence::High, range)
+                    .with_specificity(Specificity::Provider)
+                    .with_signals(signals.iter().copied()),
+            );
+        }
+        Ok(candidates)
+    }
+}
+
 /// Stripe secret, restricted, organization, and webhook-signing
 /// credentials. The suffix alphabet is `[A-Za-z0-9]` — narrower than the
 /// `[A-Za-z0-9_-]` boundary — so a trailing `_` or `-` still rejects a
