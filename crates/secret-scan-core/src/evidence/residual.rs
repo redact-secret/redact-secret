@@ -13,10 +13,11 @@
 //!
 //! The formulas are normative in `docs/specs/engine.md`, section "Shadow
 //! evidence residual features". The benchmark-side dataset reproduces them
-//! from that section and this file. Until a scoring model adopts them, no
-//! scorer reads them: [`crate::evidence::features::extract_features`] and
-//! the reviewed `SHADOW_MODEL` are unchanged, so nothing here changes a
-//! finding, `Confidence`, overlap weight, action or shadow band.
+//! from that section and this file.
+//! [`crate::evidence::features::extract_features`] appends them to the `v1`
+//! vector, and the reviewed model `evidence-aggregation/v3` reads
+//! `residual_entropy_q16` as its only randomness signal. Like the rest of the
+//! scorer, they change no finding, `Confidence`, overlap weight or action.
 //!
 //! The numeric contract is the feature schema's: integer arithmetic only
 //! (Q16 through [`log2_q16`], every division a floor), at most
@@ -49,6 +50,13 @@ pub(crate) struct ResidualFeatures {
 
 impl ResidualFeatures {
     /// The features as `(name, value)` in [`RESIDUAL_FEATURE_NAMES`] order.
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "only the tests read the residual features on their own"
+        )
+    )]
     #[must_use]
     pub(crate) fn to_vector(self) -> [(&'static str, u32); 3] {
         let [symbols, entropy, min_entropy] = RESIDUAL_FEATURE_NAMES;
@@ -92,6 +100,13 @@ fn is_predicted(symbols: &[char], i: usize) -> bool {
 ///
 /// Deterministic, allocation-free and bounded: at most
 /// [`MAX_ANALYSED_CHARS`] symbols are read, whatever `value`'s length.
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "extract_features computes the residual from its own analysed symbols"
+    )
+)]
 #[must_use]
 pub(crate) fn extract_residual_features(value: &str) -> ResidualFeatures {
     let mut buffer = ['\0'; MAX_ANALYSED_CHARS];
@@ -100,8 +115,15 @@ pub(crate) fn extract_residual_features(value: &str) -> ResidualFeatures {
         *slot = ch;
         n += 1;
     }
-    let symbols = &buffer[..n];
+    residual_features(&buffer[..n])
+}
 
+/// [`ResidualFeatures`] of the analysed symbols `symbols` (at most
+/// [`MAX_ANALYSED_CHARS`] of them): the shared step of
+/// [`extract_residual_features`] and
+/// [`crate::evidence::features::extract_features`].
+#[must_use]
+pub(crate) fn residual_features(symbols: &[char]) -> ResidualFeatures {
     // Histogram of the residual symbols, by first occurrence.
     let mut seen = ['\0'; MAX_ANALYSED_CHARS];
     let mut counts = [0_u32; MAX_ANALYSED_CHARS];
