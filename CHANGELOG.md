@@ -47,6 +47,13 @@ evidence is linked from each published version.
     `composio_user_api_key`. `ck_`, `cak_` and `uak_` at other widths stay
     unclaimed.
 
+### Fixed
+
+- `bearer-token` selects an `Authorization: Bearer <id>:<secret>` or
+  `<name>|<secret>` value whole (#918). The span used to stop at the first
+  `:` or `|`, redacting the non-secret left half and leaving the secret right
+  half readable in sanitized output.
+
 ## 0.1.0-beta.10 — 2026-09-28
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.10/README.md).

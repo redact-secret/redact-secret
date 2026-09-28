@@ -4705,6 +4705,12 @@
             "bearer-positive-scheme",
             "bearer-positive-tab-and-uppercase",
             "bearer-positive-yaml-real-token-still-detected",
+            "bearer-token-positive-colon-joined-id-secret",
+            "bearer-token-positive-curl-colon-joined",
+            "bearer-token-positive-json-header-map-joined",
+            "bearer-token-positive-pipe-joined-name-secret",
+            "bearer-token-positive-placeholder-lead-real-tail",
+            "bearer-token-positive-short-lead-joined",
             "bearer-token-regression-base64url-value-still-detected",
             "bearer-token-regression-header-anchored-fifteen-byte-value",
             "bearer-token-regression-placeholder-lead-word-with-random-suffix",
@@ -4729,6 +4735,7 @@
           "dimension": "adversarial",
           "evidenceFixtureIds": [
             "bearer-adversarial-punctuation",
+            "bearer-token-adversarial-long-join-chain",
             "invisible-structural-authorization-zwsp"
           ],
           "state": "supported"
@@ -4737,7 +4744,9 @@
           "dimension": "boundary",
           "evidenceFixtureIds": [
             "bearer-boundary-newline-separator",
-            "bearer-boundary-short"
+            "bearer-boundary-short",
+            "bearer-token-boundary-dangling-colon",
+            "bearer-token-boundary-url-after-colon"
           ],
           "state": "supported"
         },
@@ -4756,6 +4765,8 @@
             "bearer-negative-repeated-character-filler-yaml",
             "bearer-token-negative-header-value-below-twelve-bytes",
             "bearer-token-negative-insert-access-token-placeholder",
+            "bearer-token-negative-joined-placeholders",
+            "bearer-token-negative-prose-url",
             "bearer-token-negative-secret-token-placeholder-body",
             "bearer-token-negative-secret-token-scheme-without-body",
             "bearer-token-negative-short-value-without-header",
@@ -12023,6 +12034,7 @@
             "aws-bedrock-short-term-api-key-adversarial-dense-findings",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
+            "bearer-token-adversarial-long-join-chain",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
             "composio-api-key-adversarial-long-suffix",
@@ -12467,6 +12479,7 @@
             "aws-bedrock-short-term-api-key-adversarial-dense-findings",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
+            "bearer-token-adversarial-long-join-chain",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
             "composio-api-key-adversarial-long-suffix",

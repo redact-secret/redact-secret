@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2668,
+  "fixtureCount": 2679,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -65897,6 +65897,235 @@
       "input": "\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak\u0061k_Synthetic_Revoked-Ak",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "bearer-token-positive-colon-joined-id-secret",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 91
+        }
+      ],
+      "note": "Issue #918: an <id>:<secret> Bearer value is selected whole; the secret half after the colon is no longer left in clear."
+    },
+    {
+      "id": "bearer-token-positive-pipe-joined-name-secret",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer svc-deploy|SyntheticRevokedJoinedSecretValue0000\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 70
+        }
+      ],
+      "note": "Issue #918: a <name>|<secret> Bearer value is selected whole, through the run after the pipe."
+    },
+    {
+      "id": "bearer-token-positive-curl-colon-joined",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer 5e7c0ded-feed-4bad-9ace-0ddba11c0de5:5a1ed0ff5e7c0dedfeedbadacef00d42\" https://example.invalid/v1/run",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 31,
+          "end": 100
+        }
+      ],
+      "note": "Issue #918: a quoted curl header argument ends the joined value at the closing quote."
+    },
+    {
+      "id": "bearer-token-positive-json-header-map-joined",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"headers\": {\"Authorization\": \"Bearer svc-deploy|SyntheticRevokedJoinedSecretValue0000\"}}",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 38,
+          "end": 86
+        }
+      ],
+      "note": "Issue #918: a JSON header map value is selected whole, joined runs included."
+    },
+    {
+      "id": "bearer-token-positive-short-lead-joined",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Bearer dev:SyntheticRevokedJoinedTail00",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 7,
+          "end": 39
+        }
+      ],
+      "note": "Issue #918: the length floor is judged on the whole joined value, so a short lead before a long secret is still one credential."
+    },
+    {
+      "id": "bearer-token-boundary-dangling-colon",
+      "detector": "bearer-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer SyntheticRevokedBearerValue00: see the docs\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 51
+        }
+      ],
+      "note": "Issue #918 control: a colon followed by whitespace joins nothing; the span stays the single run."
+    },
+    {
+      "id": "bearer-token-boundary-url-after-colon",
+      "detector": "bearer-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Bearer SyntheticRevokedBearerValue00://example.invalid/path",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 7,
+          "end": 36
+        }
+      ],
+      "note": "Issue #918 control: a scheme separator (://) is a URL, not a joined credential run."
+    },
+    {
+      "id": "bearer-token-negative-prose-url",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Send it as an OAuth bearer https://example.invalid/rfc6750 per the spec.",
+      "expected": [],
+      "note": "Issue #918 control: a URL after a prose bearer is not joined across ://, so it stays below the floor."
+    },
+    {
+      "id": "bearer-token-negative-joined-placeholders",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer YOUR_ACCESS_TOKEN:xxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #918 control: a joined value is excluded only when every run is filler or placeholder vocabulary."
+    },
+    {
+      "id": "bearer-token-positive-placeholder-lead-real-tail",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer YOUR_ACCESS_TOKEN:SyntheticRevokedJoinedTail00\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 68
+        }
+      ],
+      "note": "Issue #918: a placeholder half never hides a real half; the whole joined value is reported."
+    },
+    {
+      "id": "bearer-token-adversarial-long-join-chain",
+      "detector": "bearer-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "Bearer ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 7,
+          "end": 9006
+        }
+      ],
+      "note": "Issue #918: a long chain of joins is read once, left to right, and stays linear."
     }
   ]
 }

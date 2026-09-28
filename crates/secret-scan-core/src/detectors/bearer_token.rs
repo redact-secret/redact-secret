@@ -13,6 +13,12 @@
 //! and `docs/specs/contextual-detection.md`. An instructional placeholder
 //! (`YOUR_ACCESS_TOKEN`, `INSERT_ACCESS_TOKEN`) is excluded as well
 //! ([`is_instructional_token_placeholder`], issue #745).
+//!
+//! A value made of token runs joined by `:` or `|` (`<id>:<secret>`,
+//! `<name>|<secret>`) is selected whole, through the last joined run
+//! (issue #918). Stopping at the first byte outside the RFC 6750 alphabet
+//! used to redact the non-secret left half and leave the secret right half
+//! readable. See [`joined_value_end`].
 
 use super::generic_token::is_vendor_prefixed_placeholder;
 use super::text::{
@@ -80,6 +86,55 @@ fn is_token_char(byte: u8) -> bool {
 /// starting inside a wider identifier.
 fn is_boundary_identifier_char(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-')
+}
+
+/// `:` and `|`: the joins of a composite credential, `<id>:<secret>` (fal,
+/// Basic-style pairs) and `<name>|<secret>` (Convex admin and deploy keys).
+fn is_value_join(byte: u8) -> bool {
+    byte == b':' || byte == b'|'
+}
+
+/// The number of `=` padding bytes (at most [`MAX_TRAILING_EQUALS`]) at
+/// `at`.
+fn trailing_equals_at(bytes: &[u8], at: usize) -> usize {
+    (0..MAX_TRAILING_EQUALS)
+        .take_while(|&offset| bytes.get(at + offset) == Some(&b'='))
+        .count()
+}
+
+/// The end of a Bearer value whose first token run ends at `first_end`
+/// (padding included): each directly following `:` or `|` plus a non-empty
+/// token run (and its own padding) is part of the same value (issue #918).
+///
+/// Returns `(value_end, segment_ends)`: the end of the whole value, and the
+/// padding-excluded end of every run, first included, so the caller can
+/// judge the floor and the placeholder exclusions on the runs. A join with
+/// nothing after it (`<token>:` at a line end, `<token>: prose`) and a
+/// `://` URL separator are not part of the value, so ordinary headers and
+/// prose keep today's span.
+///
+/// The cost is linear: every byte is read at most once, and the scan never
+/// crosses whitespace.
+fn joined_value_end(
+    bytes: &[u8],
+    value_start: usize,
+    first_run_end: usize,
+) -> (usize, Vec<(usize, usize)>) {
+    let mut runs = vec![(value_start, first_run_end)];
+    let mut end = first_run_end + trailing_equals_at(bytes, first_run_end);
+    while bytes.get(end).copied().is_some_and(is_value_join) {
+        let run_start = end + 1;
+        let run_len = ascii_run_len(bytes, run_start, is_token_char);
+        // `scheme://` is a URL, not a joined credential: `Bearer https://…`
+        // in prose keeps today's (floor-rejected) reading.
+        if run_len == 0 || bytes[run_start..].starts_with(b"//") {
+            break;
+        }
+        let run_end = run_start + run_len;
+        runs.push((run_start, run_end));
+        end = run_end + trailing_equals_at(bytes, run_end);
+    }
+    (end, runs)
 }
 
 fn is_space_or_tab(byte: u8) -> bool {
@@ -266,7 +321,16 @@ impl Detector for BearerTokenDetector {
             let value_start = scheme_end + ws_len;
 
             let token_len = ascii_run_len(bytes, value_start, is_token_char);
-            if token_len
+            if token_len == 0 {
+                cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
+                continue;
+            }
+            let (value_end, runs) = joined_value_end(bytes, value_start, value_start + token_len);
+            // The floor is judged on the whole joined value, padding and the
+            // final run's `=` excluded: a short id before a long secret is
+            // still one credential (issue #918).
+            let last_run_end = runs.last().map_or(value_start + token_len, |&(_, end)| end);
+            if last_run_end - value_start
                 < if header {
                     MIN_HEADER_TOKEN_LEN
                 } else {
@@ -276,18 +340,18 @@ impl Detector for BearerTokenDetector {
                 cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
                 continue;
             }
-            let token_end = value_start + token_len;
-            let trailing_equals = (0..MAX_TRAILING_EQUALS)
-                .take_while(|&offset| bytes.get(token_end + offset) == Some(&b'='))
-                .count();
-            let value_end = token_end + trailing_equals;
 
             let boundary_blocked = cursor > 0
                 && is_boundary_identifier_char(bytes[cursor - 1])
                 && !(header && preceded_by_proxy_prefix(bytes, cursor));
-            let value = &input[value_start..token_end];
+            // A joined value is excluded only when every run is filler or
+            // placeholder vocabulary: `YOUR_ID:<real secret>` stays
+            // detected, so a placeholder half never hides a real half.
+            let non_secret = runs
+                .iter()
+                .all(|&(start, end)| is_non_secret_bearer_value(&input[start..end]));
             if !boundary_blocked
-                && !is_non_secret_bearer_value(value)
+                && !non_secret
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 candidates.push(
@@ -538,6 +602,126 @@ mod tests {
         let candidates = detect(&input);
         let (start, end) = only_range(&candidates);
         assert_eq!(&input[start..end], sendgrid_shaped);
+    }
+
+    /// Synthetic `<uuid>:<hex32>` (fal shape) and `<name>|01<hex>` (Convex
+    /// self-hosted shape) values, built at run time; never issued.
+    fn joined_values() -> Vec<(String, usize)> {
+        let hex = |len: usize| -> String {
+            (0..len)
+                .map(|i| char::from(b"0123456789abcdef"[(i * 7 + i / 3) % 16]))
+                .collect()
+        };
+        let uuid = "5f0c2a9e-1b3d-4c7e-9a8f-0d6e4b2c1a7f";
+        vec![
+            (format!("{uuid}:{}", hex(32)), uuid.len()),
+            (
+                format!("convex-self-hosted|01{}", hex(74)),
+                "convex-self-hosted".len(),
+            ),
+            (format!("prod:happy-otter-123|01{}", hex(76)), "prod".len()),
+            (format!("{uuid}:{}==", hex(31)), uuid.len()),
+            (
+                "SYNTHID:SYNTHETIC_REVOKED_SECRET_A|SYNTHETIC_TAIL_B".to_owned(),
+                7,
+            ),
+        ]
+    }
+
+    #[test]
+    fn a_colon_or_pipe_joined_value_is_selected_whole() {
+        // Issue #918: the span used to end at the first `:`/`|`, leaving the
+        // secret half of `<id>:<secret>` / `<name>|<secret>` in clear.
+        for (value, _) in joined_values() {
+            for input in [
+                format!("Authorization: Bearer {value}"),
+                format!("Authorization: Bearer {value}\r\n"),
+                format!("curl -H \"Authorization: Bearer {value}\" https://example.invalid"),
+                format!("curl -H 'authorization: bearer {value}'"),
+                format!("{{\"Authorization\": \"Bearer {value}\"}}"),
+                format!("Bearer {value}"),
+                format!("use Bearer {value}, then retry"),
+            ] {
+                let candidates = detect(&input);
+                let (start, end) = only_range(&candidates);
+                assert_eq!(&input[start..end], value, "{input}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_short_left_half_no_longer_hides_a_long_joined_value() {
+        // The floor is judged on the whole joined value: a 4-byte type lead
+        // before a long secret is one credential.
+        let input = "Bearer dev:SYNTHETIC_REVOKED_TAIL";
+        let candidates = detect(input);
+        assert_eq!(only_range(&candidates), (7, input.len()));
+        // Still below the floor as a whole.
+        assert!(detect("Bearer ab:cd|ef").is_empty());
+        assert!(detect("Authorization: Bearer ab:cdef:gh").is_empty());
+    }
+
+    #[test]
+    fn a_dangling_join_url_or_prose_colon_keeps_the_single_run_span() {
+        for (input, value) in [
+            // A join with nothing (or whitespace) after it is not a value.
+            (
+                "Authorization: Bearer SYNTHETIC_REVOKED_VALUE:",
+                "SYNTHETIC_REVOKED_VALUE",
+            ),
+            (
+                "Authorization: Bearer SYNTHETIC_REVOKED_VALUE: see docs",
+                "SYNTHETIC_REVOKED_VALUE",
+            ),
+            (
+                "| Bearer SYNTHETIC_REVOKED_VALUE | header |",
+                "SYNTHETIC_REVOKED_VALUE",
+            ),
+            (
+                "Authorization: Bearer SYNTHETIC_REVOKED_VALUE|",
+                "SYNTHETIC_REVOKED_VALUE",
+            ),
+            // A `://` URL is not joined onto a preceding token.
+            (
+                "Bearer SYNTHETIC_REVOKED_VALUE://example.invalid/x",
+                "SYNTHETIC_REVOKED_VALUE",
+            ),
+        ] {
+            let candidates = detect(input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+        }
+        // A URL after a prose `bearer` stays below the floor, as before.
+        assert!(detect("an OAuth bearer https://example.invalid/rfc6750").is_empty());
+        assert!(detect("The bearer of: this letter").is_empty());
+        assert!(detect("The bearer 10:30 train").is_empty());
+    }
+
+    #[test]
+    fn a_joined_value_is_excluded_only_when_every_run_is_a_placeholder() {
+        for input in [
+            "Authorization: Bearer YOUR_ACCESS_TOKEN:xxxxxxxxxxxx",
+            "Authorization: Bearer xxxxxxxxxxxxxxxx|0000000000000000",
+            "Authorization: Bearer PASSWORD_SECRET_EXAMPLE:YOUR_ACCESS_TOKEN",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // One real run keeps the whole value detected.
+        for input in [
+            "Authorization: Bearer YOUR_ACCESS_TOKEN:SYNTHETIC_REVOKED_SECRET",
+            "Authorization: Bearer SYNTHETIC_REVOKED_ID|xxxxxxxxxxxxxxxx",
+        ] {
+            let candidates = detect(input);
+            assert_eq!(only_range(&candidates), (22, input.len()), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_long_join_chain_stays_linear() {
+        let input = format!("Bearer {}", "ab:".repeat(50_000));
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(only_range(&candidates), (7, input.len() - 1));
     }
 
     #[test]

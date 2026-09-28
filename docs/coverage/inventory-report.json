@@ -1788,8 +1788,9 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 44,
+        "fixtureCount": 55,
         "hostContextsExercised": [
+          "curl",
           "dotenv",
           "http",
           "json",
@@ -1801,6 +1802,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1822,6 +1824,12 @@
         "bearer-positive-scheme",
         "bearer-positive-tab-and-uppercase",
         "bearer-positive-yaml-real-token-still-detected",
+        "bearer-token-positive-colon-joined-id-secret",
+        "bearer-token-positive-curl-colon-joined",
+        "bearer-token-positive-json-header-map-joined",
+        "bearer-token-positive-pipe-joined-name-secret",
+        "bearer-token-positive-placeholder-lead-real-tail",
+        "bearer-token-positive-short-lead-joined",
         "bearer-token-regression-base64url-value-still-detected",
         "bearer-token-regression-header-anchored-fifteen-byte-value",
         "bearer-token-regression-placeholder-lead-word-with-random-suffix",

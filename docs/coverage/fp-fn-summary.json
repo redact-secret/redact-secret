@@ -79,7 +79,7 @@
       "detector": "bearer-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 18,
+        "count": 24,
         "fixtureIds": [
           "bearer-boundary-prose-long-word-tradeoff",
           "bearer-positive-authorization-extra-whitespace-and-case",
@@ -92,6 +92,12 @@
           "bearer-positive-scheme",
           "bearer-positive-tab-and-uppercase",
           "bearer-positive-yaml-real-token-still-detected",
+          "bearer-token-positive-colon-joined-id-secret",
+          "bearer-token-positive-curl-colon-joined",
+          "bearer-token-positive-json-header-map-joined",
+          "bearer-token-positive-pipe-joined-name-secret",
+          "bearer-token-positive-placeholder-lead-real-tail",
+          "bearer-token-positive-short-lead-joined",
           "bearer-token-regression-base64url-value-still-detected",
           "bearer-token-regression-header-anchored-fifteen-byte-value",
           "bearer-token-regression-placeholder-lead-word-with-random-suffix",
@@ -103,7 +109,7 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 16,
+        "count": 18,
         "fixtureIds": [
           "bearer-negative-identifier",
           "bearer-negative-missing-value",
@@ -117,6 +123,8 @@
           "bearer-negative-repeated-character-filler-yaml",
           "bearer-token-negative-header-value-below-twelve-bytes",
           "bearer-token-negative-insert-access-token-placeholder",
+          "bearer-token-negative-joined-placeholders",
+          "bearer-token-negative-prose-url",
           "bearer-token-negative-secret-token-placeholder-body",
           "bearer-token-negative-secret-token-scheme-without-body",
           "bearer-token-negative-short-value-without-header",
@@ -124,6 +132,7 @@
         ]
       },
       "hostContextsExercised": [
+        "curl",
         "dotenv",
         "http",
         "json",
