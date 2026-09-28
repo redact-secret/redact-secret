@@ -223,8 +223,15 @@ geography, and identity are not inferred. The
 [US SSN family contract](../contracts/pii/us-ssn-v1.md) freezes sources,
 boundaries, field context, safe generation, and tradeoffs. This applies
 existing PII policy and creates no ADR. Its support state remains `pending`
-until counterpart #392 qualifies the exact merged artifact; it does not yet
-complete the `pii-v1` arrival gate.
+until the exact merged artifact's benchmark evidence is reviewed; it does not
+yet complete the `pii-v1` arrival gate.
+
+All six structured PII families are `pending` under `pii-v1`; none is
+`provisional` or `stable`. Selecting a family makes it available and is not a
+support claim. US SSN is the only jurisdictional family; no other jurisdiction
+or national identifier is available. Each family's beta.11 disposition is
+recorded in
+[redact-secret-benchmarks#428](https://github.com/redact-secret/redact-secret-benchmarks/issues/428).
 
 ## Evidence-backed family applications
 
