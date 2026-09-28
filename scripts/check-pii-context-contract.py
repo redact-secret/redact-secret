@@ -84,6 +84,11 @@ def line_views(fixture: dict, ranges: list[tuple[int, int]]) -> tuple[list[tuple
     return views, errors
 
 
+def pipe_bounds(entry: dict) -> bool:
+    """Whether `|` bounds this entry and may sit in its gap: positive field labels only."""
+    return entry["kind"] == "field-label" and entry.get("class") == "positive"
+
+
 def vocabulary_occurrences(contract: dict, language: str, view: str, domains: set[str], ranges: list[tuple[int, int]]) -> list[dict]:
     """Find and resolve overlapping vocabulary forms by declared precedence."""
     occurrences: list[dict] = []
@@ -92,7 +97,14 @@ def vocabulary_occurrences(contract: dict, language: str, view: str, domains: se
             continue
         for form in entry["forms"]:
             normalized = normalize(form, language, ranges)
-            boundary = r"[^\s\"']" if entry["kind"] == "field-label" else r"\S"
+            if pipe_bounds(entry):
+                # A `|` field delimiter bounds a positive field label like
+                # whitespace (pii-context/v2 pipeDelimiter, issue #940).
+                boundary = r"[^\s\"'|]"
+            elif entry["kind"] == "field-label":
+                boundary = r"[^\s\"']"
+            else:
+                boundary = r"\S"
             pattern = re.compile(r"(?<!" + boundary + r")" + re.escape(normalized) + r"(?!" + boundary + r")")
             for match in pattern.finditer(view):
                 occurrences.append({"start": match.start(), "end": match.end(), "entry": entry})
@@ -141,7 +153,8 @@ def associate_occurrence(occurrence: dict, view: str, positions: dict[str, int],
             if position < occurrence["end"]:
                 continue
             gap = view[occurrence["end"] : position]
-            if any(character not in " \"'" for character in gap):
+            allowed = " \"'|" if pipe_bounds(entry) else " \"'"
+            if any(character not in allowed for character in gap):
                 continue
         distance = occurrence_distance(occurrence, position)
         if distance > limit:

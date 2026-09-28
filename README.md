@@ -198,7 +198,10 @@ exact-artifact `pii-v1` benchmark evidence is reviewed; availability alone is
 not a support claim. The jurisdictional `pii:us` selector closes over those
 global families plus `pii:us:ssn`; `pii:family:us:ssn` selects only SSNs. The
 SSN family uses SSA-published structural exclusions and reviewed field labels,
-not issuance or identity lookup. See the [email family contract](docs/contracts/pii/email-v1.md),
+not issuance or identity lookup. No other jurisdiction or national identifier
+is available, and these six bounded families are not general PII coverage; the
+[detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support)
+lists what each one excludes. See the [email family contract](docs/contracts/pii/email-v1.md),
 the [IBAN family contract](docs/contracts/pii/iban-v1.md), the
 [payment-card family contract](docs/contracts/pii/payment-card-v1.md), the
 [phone family contract](docs/contracts/pii/phone-v1.md), and the

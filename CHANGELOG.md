@@ -166,6 +166,21 @@ evidence is linked from each published version.
   same-line keyword and a Mailchimp-named key behave as before (medium and
   high). A 32-hex value without the `-us<N>` suffix, and a keyword-free
   match used as a hostname label or URL path segment, stay unreported.
+- A PII field label directly after a `|` delimiter now labels its value, as
+  one after whitespace does (#940): pipe-delimited records (`a|b|email=…`,
+  `x|phone: …`, `id=7|ssn=…`) and pipe-table cells (`| iban | … |`) are
+  reported for every PII family. A `|` is not a token separator, so two cells
+  never join into one label (`| card | number | … |`), another cell between
+  label and value still blocks it, and a header-row label never reaches a
+  later row. Negative and natural-language context keeps the whitespace-only
+  boundary, so a pipe never suppresses a finding. This amends the unreleased
+  `pii-context/v2` in place; the activation identity is unchanged.
+- An email address joined to a reviewed email label by a bare `|`
+  (`email|…`, `|email|…|`, `id=7|email|…`) is now reported (#943). RFC 5322
+  allows `|` in a local part, so the label and address were read as one local
+  part; a `|` right after a reviewed email label is now a field boundary.
+  After any other text (`|emailx|…`, `|user|a|…`) the `|` stays part of the
+  local part.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

@@ -171,6 +171,21 @@ class SchemaAndSemantics(unittest.TestCase):
         changed["format"] = "redact-secret/pii-context/v1"
         self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
 
+    def test_pipe_delimiter_scope_is_part_of_the_versioned_schema(self) -> None:
+        changed = copy.deepcopy(CONTRACT)
+        changed["association"]["fieldLabel"]["pipeDelimiter"] = "every-entry"
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
+        changed = copy.deepcopy(CONTRACT)
+        del changed["association"]["fieldLabel"]["pipeDelimiter"]
+        self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))
+
+    def test_a_pipe_bounds_only_a_positive_field_label(self) -> None:
+        positive = {"kind": "field-label", "class": "positive"}
+        self.assertTrue(CHECK.pipe_bounds(positive))
+        self.assertFalse(CHECK.pipe_bounds(dict(positive, **{"class": "negative"})))
+        self.assertFalse(CHECK.pipe_bounds(dict(positive, **{"class": "neutral"})))
+        self.assertFalse(CHECK.pipe_bounds(dict(positive, kind="natural-language-label")))
+
     def test_unknown_fields_and_runtime_status_drift_are_rejected(self) -> None:
         changed = copy.deepcopy(CONTRACT)
         changed["runtimeVocabulary"] = True
