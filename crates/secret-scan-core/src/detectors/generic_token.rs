@@ -247,8 +247,13 @@ fn is_object_reference_secret_name(normalized: &str) -> bool {
 /// behind a prefix (`GITHUB_CREDENTIALS`), when it is not already
 /// [`is_high_signal_name`].
 fn is_ambiguous_name(normalized: &str) -> bool {
-    !is_high_signal_name(normalized)
-        && (AMBIGUOUS_NAMES.contains(&normalized) || has_prefixed_name(normalized, AMBIGUOUS_NAMES))
+    !is_high_signal_name(normalized) && is_ambiguous_vocabulary_name(normalized)
+}
+
+/// The vocabulary half of [`is_ambiguous_name`], for a caller that already
+/// knows the name is not high-signal.
+fn is_ambiguous_vocabulary_name(normalized: &str) -> bool {
+    AMBIGUOUS_NAMES.contains(&normalized) || has_prefixed_name(normalized, AMBIGUOUS_NAMES)
 }
 
 const MIN_CONTEXT_VALUE_LENGTH: usize = 8;
@@ -1509,6 +1514,25 @@ fn assignment_confidence(
     names: &NameSource,
     query: bool,
 ) -> Option<Confidence> {
+    // Only an eligible name can yield a confidence, so an ineligible one
+    // (`status=200`, `latency_ms=12`) is rejected before the value's
+    // reference checks and entropy are computed. Every check here is pure,
+    // so the order changes the cost, never the result (issue #950).
+    let (high_signal, ambiguous) = match names {
+        NameSource::BuiltIn => {
+            let high_signal = is_high_signal_name(name);
+            let ambiguous = (!high_signal && is_ambiguous_vocabulary_name(name))
+                || (query && QUERY_ONLY_AMBIGUOUS_NAMES.contains(&name));
+            (high_signal, ambiguous)
+        }
+        NameSource::Ruleset(extra_ambiguous_names) => (
+            false,
+            extra_ambiguous_names.iter().any(|extra| extra == name),
+        ),
+    };
+    if !high_signal && !ambiguous {
+        return None;
+    }
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
         || is_non_secret_reference(value, form)
@@ -1518,38 +1542,18 @@ fn assignment_confidence(
 
     let entropy = crate::shannon_entropy(value);
 
-    match names {
-        NameSource::BuiltIn => {
-            if is_high_signal_name(name) {
-                return Some(
-                    if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
-                        Confidence::High
-                    } else {
-                        Confidence::Medium
-                    },
-                );
-            }
-
-            if (is_ambiguous_name(name) || (query && QUERY_ONLY_AMBIGUOUS_NAMES.contains(&name)))
-                && value.len() >= MIN_HIGH_ENTROPY_LENGTH
-                && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
-            {
-                return Some(Confidence::Medium);
-            }
-
-            None
-        }
-        NameSource::Ruleset(extra_ambiguous_names) => {
-            if extra_ambiguous_names.iter().any(|extra| extra == name)
-                && value.len() >= MIN_HIGH_ENTROPY_LENGTH
-                && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
-            {
-                Some(Confidence::Medium)
+    if high_signal {
+        return Some(
+            if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
+                Confidence::High
             } else {
-                None
-            }
-        }
+                Confidence::Medium
+            },
+        );
     }
+
+    (value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD)
+        .then_some(Confidence::Medium)
 }
 
 // --- assignment value spans ------------------------------------------------
