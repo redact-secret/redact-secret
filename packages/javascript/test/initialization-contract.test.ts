@@ -249,7 +249,7 @@ describe("PII artifact selection", () => {
       await runtime.initialize(options);
       expect(loads).toEqual([{ pii: false }]);
       expect(runtime.piiActivation()).toBe(
-        "credentials=full;selectors=off;families=;vocabulary=pii-context/v1",
+        "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
       );
     }
     for (const profile of ["full", "common"] as const) {
@@ -258,7 +258,7 @@ describe("PII artifact selection", () => {
       await runtime.initialize({ pii: ["pii:family:global:phone"] });
       expect(loads).toEqual([{ pii: true }]);
       expect(runtime.piiActivation()).toBe(
-        `credentials=${profile};selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v1`,
+        `credentials=${profile};selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v2`,
       );
     }
   });

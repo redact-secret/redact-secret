@@ -372,7 +372,7 @@ mod tests {
         assert_eq!(
             pii_activation().unwrap(),
             format!(
-                "credentials={};selectors=off;families=;vocabulary=pii-context/v1",
+                "credentials={};selectors=off;families=;vocabulary=pii-context/v2",
                 PROFILE.as_str()
             )
         );

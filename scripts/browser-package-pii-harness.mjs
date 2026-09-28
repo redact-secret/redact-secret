@@ -49,7 +49,7 @@ export async function qualify(fixtures) {
   });
 
   await check("the PII activation identity is unchanged", () => {
-    const expected = `credentials=${fixtures.profile};selectors=${selector};families=${family};vocabulary=pii-context/v1`;
+    const expected = `credentials=${fixtures.profile};selectors=${selector};families=${family};vocabulary=pii-context/v2`;
     assert(piiActivation() === expected, "activation identity disagreed");
   });
 

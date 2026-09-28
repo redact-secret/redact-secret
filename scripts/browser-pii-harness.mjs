@@ -60,7 +60,7 @@ export async function qualifyUnavailable(fixtures) {
 
   check("a rejected PII selection is not cached; PII-off initialization succeeds", () => {
     initialize([]);
-    const expected = `credentials=${fixtures.profile};selectors=off;families=;vocabulary=pii-context/v1`;
+    const expected = `credentials=${fixtures.profile};selectors=off;families=;vocabulary=pii-context/v2`;
     assert(piiActivation() === expected, "activation identity disagreed");
   });
 

@@ -141,8 +141,8 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
     const INITIALIZE_OPTIONS = ${JSON.stringify(pii === undefined ? {} : { pii: [pii.selector] })};
     const EXPECTED_ACTIVATION = ${JSON.stringify(
       pii === undefined
-        ? `credentials=${detectorProfile};selectors=off;families=;vocabulary=pii-context/v1`
-        : `credentials=${detectorProfile};selectors=${pii.selector};families=${pii.family};vocabulary=pii-context/v1`,
+        ? `credentials=${detectorProfile};selectors=off;families=;vocabulary=pii-context/v2`
+        : `credentials=${detectorProfile};selectors=${pii.selector};families=${pii.family};vocabulary=pii-context/v2`,
     )};
     const GENEROUS_LIMITS = {
       maxInputCodeUnits: 1_000_000,
