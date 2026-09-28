@@ -30,6 +30,7 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | Evidence signals belong to five groups (`randomness`, `lexical`, `contextual`, `validation`, `negative`). A group's signals combine with halving diminishing returns under a cap, no single group and not `randomness` plus `lexical` can reach `high`, and negative evidence applies only when the whole value matches a reviewed exclusion grammar. The scorer is monotone in its signals. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | Scorer arithmetic from features to band is integer fixed-point with no floating point or `libm` calls, so every host produces identical scores and bands. Maintainer diagnostics carry signal and group identifiers and integer values only, never matched bytes or hashes of them. No public item, field or benchmark projection carries a score, probability, threshold, weight or contribution (`scripts/check-rust-workspace.py` check 10), and changing the scoring model's identity invalidates evidence keyed to the old one. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer's `randomness` and `lexical` inputs are the integer statistical features of schema `evidence-features/v1`, defined exactly in the "Shadow evidence feature schema" section below. Extraction is not a detector: it reads at most 256 Unicode scalar values of one candidate value, allocates nothing, stores no part of the value, and changes no finding, `Confidence`, overlap weight or action. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The residual randomness features that feature schema `evidence-features/v2` appends to `v1` (the symbols no repetition, constant step or earlier copy predicts, and their Shannon and min-entropy) are defined in the "Shadow evidence residual features" section below. Extraction has the `v1` bounds and integer arithmetic, and no scoring model reads the features until a new, calibrated model identity adopts them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v2`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer runs next to `generic-token`'s legacy decision without enforcing anything, defined in the "Maintainer-local shadow evaluation" section below. The pipeline evaluates the candidates that overlap resolution selects only when the maintainer-local evaluation path asks for it; every public entry point asks for nothing, so findings, `Confidence`, actions, overlap and every public API are unchanged and the scorer never runs on the public path. The path is an unpublished example that compiles the core's own source and writes JSON Lines holding identifiers and integers only, never matched bytes or hashes of them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
@@ -189,6 +190,117 @@ written from this page reproduces them. Values are synthetic.
 | U+1F600 `a` U+1F603 `b`, twice | `20,8,0,4,2,131072,131072,1048576,4,0,0,0,0,4,2,7,28,1000,416,500,31,1,0,428,4,1000,4` |
 | `ab` | `2,2,0,2,1,65536,65536,131072,2,0,0,0,0,0,1,0,26,1000,212,1000,7,1,0,0,0,0,0` |
 | `aabc` | `4,4,0,3,2,98304,65536,393216,4,0,0,0,0,0,1,0,26,946,319,750,15,2,333,0,0,0,0` |
+
+## Shadow evidence residual features
+
+Issue [#829](https://github.com/redact-secret/redact-secret/issues/829).
+These three features are the only difference between feature schema
+**`evidence-features/v2`** and `v1`: `v2` is the `v1` vector above with
+features 27 to 29 below appended, and features 0 to 26 keep their `v1`
+definitions and positions. The Rust core is authoritative:
+`crates/secret-scan-core/src/evidence/residual.rs`
+(`extract_residual_features`, `RESIDUAL_FEATURE_NAMES`), with the same
+input, symbol, 256-symbol bound and integer arithmetic as the section above.
+Every item is `pub(crate)`; none is public API. The benchmark-side
+candidate-feature dataset reproduces `v2` from this section.
+
+No scoring model reads these features yet. `extract_features` still returns
+the `v1` vector, and the reviewed model below still reads feature 5, so
+they change no finding, `Confidence`, overlap weight, action or shadow band.
+A model that reads them is a new model identity over `evidence-features/v2`,
+calibrated by the benchmark flow and recorded in the scoring artifact.
+
+### Why
+
+The reviewed model's `randomness` group is a ramp over Shannon entropy per
+symbol (feature 5). The attacker-known evaluation
+([redact-secret-benchmarks#289](https://github.com/redact-secret/redact-secret-benchmarks/issues/289))
+and #829 found two faults in that measure:
+
+- it rates a benign periodic or sequence value as high as random material
+  (`abcdefghijklmnopqrstuvwxyz` has about 4.7 bits per symbol, and
+  `0123456789abcdef` twice has 4), so such a value in a credential-bearing
+  context reaches the top band;
+- it falls when repetition, padding or a period is inserted into real
+  material, which is the first reshaping an attacker who has read the
+  scorer would try.
+
+The residual keeps only the symbols that no repetition, constant step or
+earlier copy explains. A benign periodic or sequence value keeps a residual
+of a few symbols, and inserting a run of one symbol adds at most one
+residual symbol, so the residual entropy of reshaped random material stays
+close to that of the original.
+
+### Residual predictor
+
+Position `i` of `s` is **predicted** when any of these holds, comparing code
+points as unsigned integers:
+
+1. repeat: `i ≥ 1` and `s[i] = s[i−1]`;
+2. constant step: `i ≥ 2` and `s[i] + s[i−2] = 2 × s[i−1]` (runs, and
+   ascending or descending sequences such as `abc`, `987`, `ace`);
+3. constant step at lag 2: `i ≥ 4` and `s[i] + s[i−4] = 2 × s[i−2]`
+   (interleaved sequences such as `aAbBcC`, `1a2b3c`);
+4. context copy: `i ≥ 2` and some `j ∈ [2, i)` has
+   `(s[j−2], s[j−1], s[j]) = (s[i−2], s[i−1], s[i])`: the two symbols before
+   `i` were followed by `s[i]` before (tiled, copied and periodic bodies).
+
+The **residual** is the subsequence of symbols at unpredicted positions, in
+order, and `r` its length. Each rule reads only `s[i]` and the symbols
+before it, so the residual of a prefix is a prefix of the residual. Work is
+bounded by `256²` trigram comparisons.
+
+### Features, in `v2` vector order
+
+| # | Name | Definition |
+| --- | --- | --- |
+| 27 | `residual_symbols` | `r` |
+| 28 | `residual_entropy_q16` | Shannon entropy of the residual: feature 5's formula over the residual symbol counts, with `r` in place of `n`; `0` when `r = 0` |
+| 29 | `residual_min_entropy_q16` | `log2_q16(r) ⊖ log2_q16(c'_max)`, `c'_max` the largest residual symbol count; `0` when `r = 0` |
+
+Golden values for the golden inputs of the section above, as features
+27, 28, 29 (reproduced by an independent reimplementation written from this
+page):
+
+| Input | Features 27–29 |
+| --- | --- |
+| empty | `0,0,0` |
+| `aaaaaaaaaaaaaaaa` | `1,0,0` |
+| `abcabcabcabcabcabc` | `4,65536,65536` |
+| `XXXX-XXXX-XXXX-XXXX` | `2,65536,65536` |
+| `Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa` | `32,327680,327680` |
+| U+1F600 `a` U+1F603 `b`, twice | `6,125718,103872` |
+| `ab` | `2,65536,65536` |
+| `aabc` | `2,65536,65536` |
+
+### Measure choice and trade-offs
+
+Feature 28, the residual's Shannon entropy, is the proposed replacement for
+feature 5 in the `randomness` group. Feature 29 is the min-entropy variant
+#829 also named. It is recorded for comparison and not proposed: min-entropy
+is set by the single most frequent symbol, so one inserted separator
+repeated between blocks (not in runs, so every copy is residual) lowers it
+by a bit or more while feature 28 moves by less than half a bit. The unit
+tests pin that contrast, together with benign periodic and sequence values
+whose residual is at most a few symbols and random material whose residual
+entropy stays within half a bit under inserted runs and padding.
+
+What the residual does not remove:
+
+- mapping material into fewer character classes (all lower case, or
+  digits) lowers every per-symbol measure, residual or not, because it
+  removes information;
+- a mirrored body is not a copy, so its second half stays residual (which
+  keeps the measure high, not low);
+- keyboard walks (`qwerty`) and other benign shapes that are not steps or
+  copies stay residual;
+- random material has a few accidental steps or trigram repeats, so its
+  residual is slightly shorter than its length (at least 56 of 64 symbols in
+  the unit tests).
+
+The false-positive and false-negative effect depends on the ramp that reads
+the feature, which the calibration fits; these features alone change no
+shipped or shadow outcome.
 
 ## Shadow evidence aggregation
 

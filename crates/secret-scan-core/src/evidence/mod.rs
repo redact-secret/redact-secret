@@ -9,12 +9,24 @@
 //! [`context`] and [`exclusion`]. [`shadow`] compares that band with the
 //! legacy decision of each candidate the pipeline selects, only when a
 //! maintainer-local caller asks for it, and renders the comparison (#771).
+//! [`residual`] extracts the residual randomness features that
+//! `evidence-features/v2` appends (#829); no model reads them yet.
 
 pub(crate) mod aggregate;
 pub(crate) mod context;
 pub(crate) mod exclusion;
 pub(crate) mod features;
 pub(crate) mod fixed_point;
+// The residual features of `evidence-features/v2` (#829). No scoring model
+// reads them until the successor of the reviewed model adopts them.
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "no scoring model reads the residual features until #829 adopts them"
+    )
+)]
+pub(crate) mod residual;
 // `ShadowComparison::shifted` serves only the incremental session's
 // test-only recording (#772), so a non-test build sees no caller.
 #[cfg_attr(
