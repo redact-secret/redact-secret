@@ -24,6 +24,10 @@ evidence is linked from each published version.
   that happens to pass Luhn (`phone: …`), is now reported under `pii:global`
   and `pii:us` exactly as under its exact-family selector. Equidistance
   between occurrences at different positions is unchanged.
+- A labelled IPv4 or IPv6 address followed by a sentence-final period
+  (`client_ip=10.0.0.8.`) is now reported, as it already was before a `:port`
+  suffix (#925). The period stays outside the range, and a period followed by
+  a digit, a letter, or another period still leaves the dotted run unmatched.
 
 ## 0.1.0-beta.10 — 2026-09-28
 
