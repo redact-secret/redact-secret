@@ -32,6 +32,17 @@ idempotent; a later different selection fails with the fixed,
 input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
 the same contract while retaining `credentials=common` in its identity.
 
+In a browser, a Cloudflare Worker, or the Node WebAssembly fallback, the PII
+runtime lives in a separate WebAssembly build of each profile. The
+`initialize()` call that loads the binding fetches the default build, which
+has no PII runtime, unless its options carry a non-empty `pii` selection;
+then it fetches the profile's `pii` build instead. A page that never selects
+PII therefore never downloads PII code. A bundler emits both builds as
+assets, and only the selected one is fetched. Because activation is
+one-shot, choose the selection in the first `initialize()` call: a later,
+different selection is still `PII_ACTIVATION_CONFLICT`. The Node addon
+carries the PII runtime in its single build.
+
 ```ts
 import { initialize, piiActivation } from "@redact-secret/core";
 

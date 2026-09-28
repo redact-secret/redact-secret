@@ -216,6 +216,19 @@ side-effect free, on top of the dependency boundary above:
   reads each detector module's pack from `detectors/mod.rs`, so a new
   provider module needs no script change (#929).
 
+  A second, off-by-default feature, `pii`, links the PII domain runtime
+  (#937). Each build script run emits both builds of its profile side by
+  side: the default one and `<outName>_pii`. Without `pii`, the crate calls
+  only the PII-off registry and incremental constructors
+  (`with_built_in`, `with_common_built_in`, `with_policy_and_formatter`,
+  `with_common_built_in_policy_and_formatter`), because every `*_and_pii`
+  constructor names the `pii-domain` adapter even for an off selection.
+  It still parses selectors, so a malformed one reports the same code, and
+  answers a valid non-empty selection with `PII_SELECTOR_UNAVAILABLE`. The
+  same guard fails when a default build links the adapter, a `PiiFamily`
+  implementation, or `unicode_normalization`, or when a `pii` build does
+  not.
+
 ### Package contents
 
 `crates/secret-scan-core/Cargo.toml` declares `include`, so the published
