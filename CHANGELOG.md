@@ -63,7 +63,7 @@ evidence is linked from each published version.
 - `anthropic-token` now recognizes the `sk-ant-api01-` and
   `sk-ant-admin01-` prefixes (#862), and the OpenAI admin-key contract is
   reconciled with the shipped `sk-admin-` detection (#863).
-- **Not yet released.** `anthropic-token` and `openai-token` now report a
+- `anthropic-token` and `openai-token` now report a
   distinct finding type per privilege class instead of collapsing them into
   the plain API-key type (#774, research #775/#776/#777): `sk-ant-admin01-`
   (Console Admin API key) reports `anthropic_admin_api_key`; `sk-ant-api01-`
