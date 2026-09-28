@@ -4648,12 +4648,63 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "helicone_write_api_key"
+    },
+    {
+      "detector": "firecrawl-api-key",
+      "evidence": {
+        "fixtureCount": 34,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "firecrawl-api-key-positive-bare",
+        "firecrawl-api-key-positive-bearer-header",
+        "firecrawl-api-key-positive-chat-sentence",
+        "firecrawl-api-key-positive-crlf-unicode-prefix",
+        "firecrawl-api-key-positive-curl-bearer",
+        "firecrawl-api-key-positive-dotenv",
+        "firecrawl-api-key-positive-json-config",
+        "firecrawl-api-key-positive-json-token-key",
+        "firecrawl-api-key-positive-log",
+        "firecrawl-api-key-positive-punctuation-adjacent",
+        "firecrawl-api-key-positive-python-sdk-call",
+        "firecrawl-api-key-positive-repeated-value",
+        "firecrawl-api-key-positive-shell-export",
+        "firecrawl-api-key-positive-tool-call-arguments",
+        "firecrawl-api-key-positive-variant-b",
+        "firecrawl-api-key-positive-variant-b-dotenv",
+        "firecrawl-api-key-positive-x-api-key-header",
+        "firecrawl-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "firecrawl_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 106,
+    "supported": 107,
     "unresolved": 0
   }
 }

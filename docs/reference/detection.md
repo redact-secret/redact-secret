@@ -118,7 +118,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-84 built-in detectors emit 106 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+85 built-in detectors emit 107 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -206,6 +206,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `e2b-api-key` | `e2b_api_key` | `always-redact` | — |
 | `posthog-token` | `posthog_personal_api_key`, `posthog_project_secret_api_key` | `always-redact` | — |
 | `helicone-api-key` | `helicone_api_key`, `helicone_write_api_key` | `always-redact` | — |
+| `firecrawl-api-key` | `firecrawl_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

@@ -26,6 +26,7 @@ mod doppler;
 mod e2b;
 mod elevenlabs;
 mod firebase;
+mod firecrawl;
 mod generic_token;
 mod github;
 mod gitlab;
@@ -163,6 +164,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(e2b::E2B),
         Box::new(posthog::POSTHOG),
         Box::new(helicone::HELICONE),
+        Box::new(firecrawl::FIRECRAWL),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -292,6 +294,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("e2b-api-key", Pack::Provider),
     ("posthog-token", Pack::Provider),
     ("helicone-api-key", Pack::Provider),
+    ("firecrawl-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -410,6 +413,7 @@ mod tests {
                 "e2b-api-key",
                 "posthog-token",
                 "helicone-api-key",
+                "firecrawl-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -768,6 +772,7 @@ mod tests {
         let e2b_api_key_input = format!("e2b_{}", "0123456789abcdef0123456789abcdef01234567");
         let posthog_token_input = format!("phx_{}", "SyntheticRevokedPosthogPersonalKeyFixture01");
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
+        let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -836,6 +841,7 @@ mod tests {
             ("e2b-api-key", e2b_api_key_input.as_str()),
             ("posthog-token", posthog_token_input.as_str()),
             ("helicone-api-key", helicone_api_key_input.as_str()),
+            ("firecrawl-api-key", firecrawl_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

@@ -36,6 +36,10 @@ evidence is linked from each published version.
     `helicone_api_key`, and `pk-helicone-` write-only keys as
     `helicone_write_api_key`, redacted by default. Legacy bare `sk-`, `-cp-`
     and `-gov` forms stay unclaimed.
+  - `firecrawl-api-key` (#908): Firecrawl API keys, `fc-` + a dashless
+    lowercase UUIDv4 (version and variant nibbles enforced), as
+    `firecrawl_api_key`. Legacy dashed UUIDs, `fco_` and `fcmcp_` stay
+    unclaimed.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

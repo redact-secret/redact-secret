@@ -53,6 +53,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `e2b_api_key` | `e2b-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `elevenlabs_api_key` | `elevenlabs-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `firecrawl_api_key` | `firecrawl-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (docs, SDK), UUIDv4 body T1 (provider server code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `fireworks_ai_api_key` | `fireworks-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `github_app_installation_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_refresh_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
@@ -449,6 +450,7 @@ conformance and the benchmarks arrival and profile evidence.
 | `e2b:api-key` | `e2b-api-key` | `e2b_` + exactly 40 lowercase hex | `e2b_api_key` | T1 (provider key generator and seed test under R1; docs corroborate the prefix) |
 | `posthog:personal-api-key` | `posthog-token` | `phx_` or `phs_` + 42–49 `[0-9A-Za-z]` (the union of the prefixed base57 and base62 generator eras); `phc_` never claimed | `posthog_personal_api_key`; `posthog_project_secret_api_key` | T1 (provider generator code and unit tests under R1; the length band is derived from the T1 algorithm) |
 | `helicone:api-key` | `helicone-api-key` | `sk-` or `pk-` + `helicone` + optional `-eu` then optional `-rl` + `-` + four groups of exactly 7 `[a-z0-9]` joined by `-`; `sk-helicone-proxy-` + the four groups + `-` + a lowercase 8-4-4-4-12 UUID | `helicone_api_key` (`sk-`, read-write, and the proxy key); `helicone_write_api_key` (`pk-`, write-only, redacted) | T1 (provider worker validation regexes and generators; proxy key under R1) |
+| `firecrawl:api-key` | `firecrawl-api-key` | `fc-` + exactly 32 lowercase hex forming a dashless UUIDv4 (body byte 12 is `4`, byte 16 is one of `8 9 a b`) | `firecrawl_api_key` | prefix T1 (docs, SDK and MCP code); body T1 (server normalizer, schema default and generator under R1) |
 
 Doppler ([#903](https://github.com/redact-secret/redact-secret/issues/903),
 [handoff](../audits/evidence/860/doppler.md)). One type per documented role
@@ -519,6 +521,20 @@ False positives: an all-`x` placeholder at the exact shape (claimed, the #867
 precedent) and a non-Helicone string with the literal `-helicone-` segment
 and four 7-byte groups; none is known.
 
+Firecrawl ([#908](https://github.com/redact-secret/redact-secret/issues/908),
+[handoff](../audits/evidence/860/firecrawl.md)). Every issued key is a
+Postgres random UUIDv4, so the version and variant nibbles are enforced; that
+rejects 63 of 64 arbitrary 32-hex strings (for example `fc-` + an MD5
+digest) at no cost for issued keys. `fc-` is short, so the leading boundary
+matters: `xfc-`, `_fc-` and CSS or calendar classes (`fc-event`,
+`fc-daygrid-day`) are glued or fail the body. False negatives: legacy bare
+dashed-UUID keys outside named contexts (not attributable to Firecrawl),
+`fc-` + a dashed UUID, another version or variant, uppercase hex, `fco_`
+OAuth and `fcmcp_` MCP credentials, and self-hosted instances with
+authentication off. False positives: an unrelated `fc-` + dashless lowercase
+UUIDv4, such as an `fc-`-prefixed record id minted from a v4 UUID; plausible
+but rare, and the cost is redacting an identifier.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -533,6 +549,7 @@ and four 7-byte groups; none is known.
 | E2B `e2b_` + exactly 40 lowercase hex API keys are reported as `e2b_api_key` at provider specificity, bare or in any context; retired `sk_e2b_` tokens and `e2b_` module names stay unclaimed ([#905](https://github.com/redact-secret/redact-secret/issues/905), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | PostHog `phx_` personal and `phs_` project secret API keys (42–49 alphanumeric) are reported as two finding types at provider specificity, bare or in any context; the public `phc_` project token is never claimed ([#906](https://github.com/redact-secret/redact-secret/issues/906), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent (Stripe `pk_`) to one more family |
 | Helicone `sk-`/`pk-` + `helicone` + optional `-eu`/`-rl` + four 7-byte `[a-z0-9]` groups, and the `sk-helicone-proxy-` key with a trailing UUID, are reported as `helicone_api_key` (`sk-`) and `helicone_write_api_key` (`pk-`, redacted by default) at provider specificity, bare or in any context; legacy bare `sk-`, `-cp-` and `-gov` forms stay unclaimed ([#907](https://github.com/redact-secret/redact-secret/issues/907), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family, with the group alphabet fixed by ruling R8 |
+| Firecrawl `fc-` + a dashless lowercase UUIDv4 (32 hex, version and variant nibbles enforced) is reported as `firecrawl_api_key` at provider specificity, bare or in any context; legacy dashed UUIDs, `fco_` and `fcmcp_` stay unclaimed ([#908](https://github.com/redact-secret/redact-secret/issues/908), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

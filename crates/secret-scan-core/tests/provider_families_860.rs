@@ -465,3 +465,75 @@ mod helicone {
         assert_partition_parity(&format!("pk-helicone-{}", body()));
     }
 }
+
+mod firecrawl {
+    use super::*;
+
+    const DETECTOR: &str = "firecrawl-api-key";
+    const HEX: &[u8] = b"0123456789abcdef";
+
+    /// A dashless UUID v4 body from synthetic hex filler.
+    fn body(seed: usize) -> String {
+        let mut body = filler(HEX, 32, seed);
+        body.replace_range(12..13, "4");
+        body.replace_range(16..17, "a");
+        body
+    }
+
+    #[test]
+    fn the_key_wins_every_context_as_the_sole_finding() {
+        for seed in 0..4 {
+            assert_sole_provider_finding(
+                DETECTOR,
+                "firecrawl_api_key",
+                &format!("fc-{}", body(seed)),
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = body(1);
+        let mut version = body.clone();
+        version.replace_range(12..13, "1");
+        let mut variant = body.clone();
+        variant.replace_range(16..17, "c");
+        let dashed = format!(
+            "{}-{}-{}-{}-{}",
+            &body[..8],
+            &body[8..12],
+            &body[12..16],
+            &body[16..20],
+            &body[20..]
+        );
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("fc-{}", &body[..31]),
+                format!("fc-{body}0"),
+                format!("fc-{version}"),
+                format!("fc-{variant}"),
+                format!("fc-{dashed}"),
+                format!("FC-{body}"),
+                format!("fc_{body}"),
+                format!("xfc-{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "FIRECRAWL_API_KEY=fc-YOUR-API-KEY\n",
+            "<div class=\"fc-event fc-daygrid-day\"></div>\n",
+            "api_key=fc-test\n",
+        ] {
+            assert_unclaimed(DETECTOR, input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("fc-{}", body(2)));
+    }
+}

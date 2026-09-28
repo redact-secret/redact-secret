@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 106 |
+| supported | 107 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 117.
+Coverage declarations: 118.
 
 ## Coverage by detector
 
@@ -50,6 +50,7 @@ Coverage declarations: 117.
 | e2b-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | elevenlabs-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| firecrawl-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | fireworks-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
@@ -149,6 +150,7 @@ Coverage declarations: 117.
 | e2b_api_key | e2b-api-key | provider | supported | not-applicable | none |
 | elevenlabs_api_key | elevenlabs-api-key | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
+| firecrawl_api_key | firecrawl-api-key | provider | supported | not-applicable | none |
 | fireworks_ai_api_key | fireworks-ai-api-key | provider | supported | not-applicable | none |
 | github_app_installation_token | github-token | provider | supported | not-applicable | none |
 | github_app_refresh_token | github-token | provider | supported | not-applicable | none |
@@ -245,15 +247,15 @@ Coverage declarations: 117.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 117 | 0 | 0 |
-| boundary | 106 | 0 | 0 |
-| host-context | 106 | 0 | 0 |
+| adversarial | 118 | 0 | 0 |
+| boundary | 107 | 0 | 0 |
+| host-context | 107 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 117 | 0 | 0 |
-| near-miss-negative | 106 | 0 | 0 |
-| overlap | 106 | 0 | 0 |
-| positive | 106 | 0 | 0 |
-| range | 117 | 0 | 0 |
+| malformed | 118 | 0 | 0 |
+| near-miss-negative | 107 | 0 | 0 |
+| overlap | 107 | 0 | 0 |
+| positive | 107 | 0 | 0 |
+| range | 118 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

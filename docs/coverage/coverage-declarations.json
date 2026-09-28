@@ -11458,6 +11458,118 @@
       "type": "helicone_write_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "firecrawl-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "firecrawl-api-key-positive-bare",
+            "firecrawl-api-key-positive-bearer-header",
+            "firecrawl-api-key-positive-chat-sentence",
+            "firecrawl-api-key-positive-crlf-unicode-prefix",
+            "firecrawl-api-key-positive-curl-bearer",
+            "firecrawl-api-key-positive-dotenv",
+            "firecrawl-api-key-positive-json-config",
+            "firecrawl-api-key-positive-json-token-key",
+            "firecrawl-api-key-positive-log",
+            "firecrawl-api-key-positive-punctuation-adjacent",
+            "firecrawl-api-key-positive-python-sdk-call",
+            "firecrawl-api-key-positive-repeated-value",
+            "firecrawl-api-key-positive-shell-export",
+            "firecrawl-api-key-positive-tool-call-arguments",
+            "firecrawl-api-key-positive-variant-b",
+            "firecrawl-api-key-positive-variant-b-dotenv",
+            "firecrawl-api-key-positive-x-api-key-header",
+            "firecrawl-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "firecrawl-api-key-overlap-context",
+            "firecrawl-api-key-overlap-variant-b-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "firecrawl-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "firecrawl-api-key-boundary-dashed-uuid",
+            "firecrawl-api-key-boundary-glued-suffix",
+            "firecrawl-api-key-boundary-long-body",
+            "firecrawl-api-key-boundary-short-body",
+            "firecrawl-api-key-boundary-uppercase-hex",
+            "firecrawl-api-key-boundary-variant-nibble",
+            "firecrawl-api-key-boundary-version-nibble",
+            "firecrawl-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "firecrawl-api-key-negative-css-classes",
+            "firecrawl-api-key-negative-embedded-in-wider-identifier",
+            "firecrawl-api-key-negative-legacy-dashed-uuid",
+            "firecrawl-api-key-negative-md5-shaped-body",
+            "firecrawl-api-key-negative-placeholders"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "firecrawl-api-key-boundary-dashed-uuid",
+            "firecrawl-api-key-boundary-glued-suffix",
+            "firecrawl-api-key-boundary-long-body",
+            "firecrawl-api-key-boundary-short-body",
+            "firecrawl-api-key-boundary-uppercase-hex",
+            "firecrawl-api-key-boundary-variant-nibble",
+            "firecrawl-api-key-boundary-version-nibble",
+            "firecrawl-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for firecrawl_api_key (firecrawl-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "firecrawl_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -11623,6 +11735,7 @@
             "elevenlabs-api-key-adversarial-long-glued-region",
             "elevenlabs-api-key-adversarial-repeated-prefix",
             "firebase-server-key-adversarial-near-miss-body",
+            "firecrawl-api-key-adversarial-long-suffix",
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
@@ -12065,6 +12178,7 @@
             "elevenlabs-api-key-adversarial-long-glued-region",
             "elevenlabs-api-key-adversarial-repeated-prefix",
             "firebase-server-key-adversarial-near-miss-body",
+            "firecrawl-api-key-adversarial-long-suffix",
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",

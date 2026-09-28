@@ -771,6 +771,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0070k-helicone-synthet-icrevok-edfixtr-helico1",
       "schemes": null
+    },
+    {
+      "type": "firecrawl_api_key",
+      "detector": "firecrawl-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0066c-0123456789ab4def8123456789abcdef",
+      "schemes": null
     }
   ],
   "consumers": [
