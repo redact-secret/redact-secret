@@ -142,7 +142,7 @@ places that must agree:
   the range contract, the `scan_and_redact` ≡ `scan` + `redact` equivalence
   over the canonical corpus, and the sanitized-error shape.
 
-Three things are deliberately outside the surface and must stay there:
+Four things are deliberately outside the surface and must stay there:
 
 - **The beta.9 shadow evidence scorer.** Its score, band, thresholds, weights
   and contributions are crate-internal (`pub(crate)` or narrower).
@@ -155,6 +155,15 @@ Three things are deliberately outside the surface and must stay there:
   the published package and compiles the core's source files as its own
   modules instead of linking a public item
   ([`docs/specs/engine.md`](specs/engine.md#maintainer-local-shadow-evaluation)).
+
+- **PII identity and sensitivity states.** A public PII finding is the only
+  public statement about an occurrence. The per-family identity
+  (`established`/`unmatched`) and sensitivity
+  (`sensitive`/`non-sensitive`/`not-established`) states stay crate-internal.
+  Maintainers and benchmarks reach them only through
+  `crates/secret-scan-core/examples/pii_identity_evaluation.rs`. That example
+  is outside the published package and compiles the core's source the same
+  way ([`docs/specs/engine.md`](specs/engine.md#maintainer-local-pii-identity-evaluation)).
 
 - **The built-in detector registry.** `detectors` is a private module.
   Callers reach the built-in set only through

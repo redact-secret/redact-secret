@@ -36,7 +36,7 @@ const KNOWN_VENDOR_PLACEHOLDER_LITERALS: &[&str] = &[
 ];
 
 /// Whether `matched` is exactly one of [`KNOWN_VENDOR_PLACEHOLDER_LITERALS`].
-fn is_known_vendor_placeholder_literal(matched: &str) -> bool {
+pub(crate) fn is_known_vendor_placeholder_literal(matched: &str) -> bool {
     KNOWN_VENDOR_PLACEHOLDER_LITERALS.contains(&matched)
 }
 
