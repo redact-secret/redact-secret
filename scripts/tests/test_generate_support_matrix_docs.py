@@ -525,6 +525,46 @@ class ChangelogFragmentTests(unittest.TestCase):
         self.assertEqual(GEN.check_changelog_fragments(GEN.CHANGELOG_PATH, GEN.RELEASES_DIR), [])
 
 
+MOD_RS = """
+pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
+    ("widget-token", Pack::Provider),
+    ("gadget-key", Pack::Provider),
+    ("jwt", Pack::Common),
+];
+"""
+
+
+class UnmeasuredDetectorTests(unittest.TestCase):
+    """Issue #951: a shipped detector is never silently absent from the matrix."""
+
+    def test_reads_built_in_pack_ids_in_order(self) -> None:
+        self.assertEqual(GEN.built_in_detector_ids(MOD_RS), ["widget-token", "gadget-key", "jwt"])
+
+    def test_missing_pack_table_is_an_error(self) -> None:
+        with self.assertRaises(ValueError):
+            GEN.built_in_detector_ids("fn nothing() {}")
+
+    def test_detectors_no_family_lists_are_unmeasured(self) -> None:
+        m = matrix([family("widget", "widget:key", "Key", "stable"), family("jwt", "jwt:token", "Token", "stable", detectors=("jwt",))])
+        self.assertEqual(GEN.unmeasured_detectors(m, GEN.built_in_detector_ids(MOD_RS)), ["gadget-key"])
+
+    def test_unmeasured_section_is_rendered_and_readme_names_them(self) -> None:
+        m = matrix([family("widget", "widget:key", "Key", "stable")])
+        text = GEN.render_matrix_markdown(m, ["gadget-key"])
+        self.assertIn("### Not yet measured", text)
+        self.assertIn("| `gadget-key` | not yet measured |", text)
+        self.assertIn("`gadget-key`", GEN.render_readme_fragment(m, ["gadget-key"]))
+        self.assertNotIn("Not yet measured", GEN.render_matrix_markdown(m))
+
+    def test_check_flags_a_pack_missing_from_the_document(self) -> None:
+        m = matrix([family("widget", "widget:key", "Key", "stable")])
+        ids = GEN.built_in_detector_ids(MOD_RS)
+        stale = GEN.render_matrix_markdown(m)
+        self.assertEqual(GEN.missing_from_doc(stale, ids), ["gadget-key", "jwt"])
+        current = GEN.render_matrix_markdown(m, GEN.unmeasured_detectors(m, ids))
+        self.assertEqual(GEN.missing_from_doc(current, ids), [])
+
+
 class RealRepoReconciliationTests(unittest.TestCase):
     """Exercises the generator over the real, pinned `benchmarks/support-matrix.json`
     and its vendored schema, the same way `python3 -B
@@ -537,7 +577,7 @@ class RealRepoReconciliationTests(unittest.TestCase):
 
     def test_committed_support_matrix_doc_is_up_to_date(self) -> None:
         pinned_matrix = GEN.load_json(GEN.MATRIX_PATH)
-        fresh = GEN.render_matrix_markdown(pinned_matrix)
+        fresh = GEN.render_matrix_markdown(pinned_matrix, GEN.repo_unmeasured(pinned_matrix))
         committed = GEN.DOC_PATH.read_text(encoding="utf-8")
         self.assertEqual(
             fresh,
@@ -548,7 +588,7 @@ class RealRepoReconciliationTests(unittest.TestCase):
 
     def test_committed_readme_support_section_is_up_to_date(self) -> None:
         pinned_matrix = GEN.load_json(GEN.MATRIX_PATH)
-        fragment = GEN.render_readme_fragment(pinned_matrix)
+        fragment = GEN.render_readme_fragment(pinned_matrix, GEN.repo_unmeasured(pinned_matrix))
         readme = GEN.README_PATH.read_text(encoding="utf-8")
         start = readme.find(GEN.README_START)
         end = readme.find(GEN.README_END) + len(GEN.README_END)
@@ -559,6 +599,10 @@ class RealRepoReconciliationTests(unittest.TestCase):
             "README.md's support-status section is out of date; regenerate it with "
             "`python3 -B scripts/generate-support-matrix-docs.py`",
         )
+
+    def test_every_built_in_detector_is_named_in_the_committed_matrix(self) -> None:
+        ids = GEN.built_in_detector_ids(GEN.DETECTORS_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(GEN.missing_from_doc(GEN.DOC_PATH.read_text(encoding="utf-8"), ids), [])
 
     def test_docs_never_render_a_status_outside_the_schema_vocabulary(self) -> None:
         """Mirrors redact-secret-benchmarks' `check-support-ui.mjs` UI gate

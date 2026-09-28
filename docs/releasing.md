@@ -111,13 +111,18 @@ The exact matrices belong to
 `Cargo.toml`'s `[workspace.metadata.redact-secret]`; see
 [qualification](qualification.md) and [Python packaging](python-packaging.md).
 
-`@redact-secret/wasm` carries two built artifacts under one package identity:
-the unchanged root (`full`) glue and `.wasm`, and a `common` subpath shipping
-the opt-in `common`-profile build's own glue and `.wasm` beside them. One
-pack/publish step covers both. Before publishing, the workflow instantiates
-the downloaded root artifact and asks it — rather than trusting the download's
-artifact name — that `profile() === "full"`, refusing to publish a `common`
-or otherwise non-`full` build under the `full`/default package identity. See
+`@redact-secret/wasm` carries four built artifacts under one package identity
+(`bindings/wasm/npm/package.json`): the unchanged root (`full`) glue and
+`.wasm`, the `./common` subpath's opt-in `common`-profile build, and, since
+#937, a `pii` build of each profile (`./pii` and `./common/pii`) that links
+the PII runtime. One pack/publish step covers all four. Before publishing,
+the workflow instantiates the downloaded artifacts and asks each — rather
+than trusting the download's artifact name — for its `profile()`, refusing to
+publish a `common` or otherwise non-`full` build under the `full`/default
+package identity (and the reverse for `common`). It also checks the PII split:
+each default build must answer a `pii` selection with
+`PII_SELECTOR_UNAVAILABLE` (a default build that links the PII runtime is
+refused), and each `pii` build must report its profile and accept one. See
 [detector profiles](reference/api-contract.md#detector-profiles).
 
 The workflows create an annotated Git tag after verification. They do not
@@ -282,7 +287,8 @@ Inspect the new run's SHA before approving its protected jobs. The workflow
 repeats qualification at that revision. It publishes native/Wasm npm dependencies
 before the facade; publishes the core crate before the CLI crate; and uploads
 the qualified Python wheel/sdist files. Prerelease npm packages use `beta`,
-stable packages use `latest`.
+stable packages use `latest`. The workflow never sets `latest` on a prerelease; see
+[npm dist-tag policy](#npm-dist-tag-policy).
 
 The post-publication jobs clean-install the exact npm version on all eight
 native Node platforms (the two musl lanes run in `node:22-alpine` containers)
@@ -299,6 +305,31 @@ version, expected artifact identities, observed registry states, and (issue
 #511) the [support-matrix drift](support-matrix-drift.md) record `Artifact
 qualification` computed for this candidate. Its success does not establish
 tag or registry-install success: those jobs are separate.
+
+### npm dist-tag policy
+
+The release workflow publishes every `0.1.0-beta.N` npm package with
+`--tag beta` only. The `latest` tag is therefore not set by any workflow. On
+2026-09-28 `latest` and `beta` both pointed to `0.1.0-beta.10` on all ten npm
+packages, and `latest` had been moved by hand, outside the workflows, several
+times since beta.1 (see [release status](releases/status.md)).
+
+Policy:
+
+- A release does not move `latest`. After the Beta.11 publish, `beta` is
+  `0.1.0-beta.11` but a bare `npm i @redact-secret/core` still resolves
+  `0.1.0-beta.10`, unless `latest` is moved again.
+- Moving `latest` is a separate publication action that needs its own explicit
+  approval under the [release authority](../AGENTS.md#release-authority). It is
+  not part of `Release` or `Reconcile Release`, and approving a release does not
+  approve it.
+- Move all ten packages (`core`, `wasm`, the eight native addons) together, so a
+  bare install never resolves a facade and native addons of different versions.
+  Record the move, its date and the observed `npm view <package> dist-tags`
+  result in [release status](releases/status.md).
+- The separately versioned adapter and vault packages
+  (`redact-secret-adapters`, `redact-secret-vault`) are outside this workflow;
+  their tags are their own repositories' concern.
 
 ## Recover a partial publication
 

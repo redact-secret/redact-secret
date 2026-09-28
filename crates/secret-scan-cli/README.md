@@ -18,12 +18,15 @@ published in the generated
 [support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md).
 
 ```text
-usage: redact-secret [--json] [--pii <selector>]... [--] [<path>...]
-       redact-secret --redact [--pii <selector>]... [--] [<path>]
+usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
+       redact-secret --redact [--ruleset <path>] [--pii <selector>]... [--] [<path>]
        redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h
 ```
+
+`--ruleset <path>` loads a declarative ruleset in either mode and needs an
+explicit path source; standard input accepts none.
 
 PII selectors are opt-in and repeatable. The activation-print form exits
 without opening input. `pii` closes over the context-required

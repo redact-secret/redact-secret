@@ -203,6 +203,8 @@ def _markdown_table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def render_markdown(report: dict) -> str:
+    row_states = report["summary"]["rowStates"]
+    supported_total = f"{row_states['supported']}/{sum(row_states[state] for state in ROW_STATES)}"
     lines = [
         "# Corpus coverage report",
         "",
@@ -220,7 +222,8 @@ def render_markdown(report: dict) -> str:
         "",
         "## Summary",
         "",
-        "These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 26/26 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.",
+        "These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; "
+        f"{supported_total} supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.",
         "",
     ]
     summary_rows = [[state, str(report["summary"]["rowStates"][state])] for state in ROW_STATES]

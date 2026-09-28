@@ -5,8 +5,9 @@ Deterministic secret detection and redaction for runtime data and AI context.
 Your application handles text it does not fully control: user input, pasted
 configuration, error messages, HTTP bodies, and tool results. Before that text
 leaves the request and lands somewhere that keeps or repeats it, pass it
-through Redact Secret. It finds supported credential formats and returns the
-text with those credentials replaced, plus findings that describe what was
+through Redact Secret. It finds supported credential formats (plus opt-in
+structured PII, qualification pending) and returns the
+text with those matches replaced, plus findings that describe what was
 found and where without ever including the secret itself. It runs in your
 process. It makes no network calls and sends no telemetry, and the same input
 always gives the same result.
@@ -53,7 +54,8 @@ See [browser and server boundaries](#browser-and-server-boundaries) and
 
 ## What it does not replace
 
-- **It is not a DLP platform.** It finds credentials, not personal data, and
+- **It is not a DLP platform.** It finds credentials, plus opt-in structured PII (six bounded
+  families, qualification pending), not general personal data, and
   it has no policy console, quarantine, or hosted service.
 - **It does not detect every secret.** Detection is limited to supported
   formats and deliberately favors precision. Truncated, new, or unsupported
@@ -120,18 +122,23 @@ behavior contract that every surface passes lives in
 Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations ship
 from a separate repository,
 [`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
-as `@redact-secret/adapter`, `@redact-secret/adapter-pino`,
-`@redact-secret/adapter-otel` (npm) and `redact-secret-adapters` (PyPI).
-Version 0.1.0 of each was published on 2026-09-22 and requires core
-0.1.0-beta.6 or later. The published versions, their core ranges, and the
-verified install commands are in
+as `@redact-secret/adapter` (0.1.2), `@redact-secret/adapter-pino` (0.1.1),
+`@redact-secret/adapter-otel` (0.1.1) (npm) and `redact-secret-adapters`
+(PyPI, 0.1.0), each requiring core 0.1.0-beta.6 or later. Versions as
+observed on the registries on 2026-09-28; the adapters ship on their own
+release trains ([`train/2026.09.22`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.22),
+[`2026.09.25`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.25),
+[`2026.09.26`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.26)).
+The opt-in [`@redact-secret/vault`](docs/releases/status.md#vault)
+(`0.1.0-alpha.3`) pins core exactly at `0.1.0-beta.10`. The published
+versions, their core ranges, and the install commands are in
 [release status](docs/releases/status.md#host-integration-adapters). See
 [`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
 for why they live apart, including why this repository's own release matrix
 is unaffected.
 Model context (MCP) is covered by the published
 `@redact-secret/adapter-mcp@0.1.0-alpha.1` in the adapters repository
-(npm dist-tag `alpha`), which implements the
+(npm dist-tag `alpha`, observed 2026-09-28), which implements the
 [MCP boundary contract](docs/reference/mcp-boundary.md);
 [`examples/mcp-redact/`](examples/mcp-redact/) composes it into a tested
 agent turn — see its README for its stated support level. LangChain remains
@@ -263,7 +270,7 @@ one whole-input operation, under explicit limits that fail closed. See
 ## Detection coverage
 
 <!-- support-matrix:start -->
-**Support status** (53 providers, 108 credential families; stable: 83, provisional: 7, pending: 1, unsupported: 17; stable qualification: documented: 57, empirical: 26; evidence tiers: T1: 57, T2: 29, T3: 4, T0: 1) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
+**Support status** (53 providers, 108 credential families; stable: 83, provisional: 7, pending: 1, unsupported: 17; stable qualification: documented: 57, empirical: 26; evidence tiers: T1: 57, T2: 29, T3: 4, T0: 1) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md). 22 shipped detectors are not yet measured and carry no status: `ai21-api-key`, `apify-api-token`, `aws-bedrock-long-term-api-key`, `aws-bedrock-short-term-api-key`, `cohere-api-key`, `composio-api-key`, `convex-deployment-key`, `deepgram-api-key`, `doppler-token`, `e2b-api-key`, `elevenlabs-api-key`, `firecrawl-api-key`, `helicone-api-key`, `inngest-signing-key`, `mistral-api-key`, `onepassword-service-account-token`, `posthog-token`, `resend-api-key`, `tavily-api-key`, `together-ai-api-key`, `trigger-dev-token`, `wandb-api-key`.
 <!-- support-matrix:end -->
 
 Built-in detection covers private keys, provider-issued tokens, JWT and
@@ -334,10 +341,16 @@ const langfuse = new Langfuse({ mask: ({ data }) => maskSecrets(data) });
 
 ```python
 from langfuse import Langfuse
-from langfuse_mask import mask_secrets
+
+from langfuse_mask import mask_secrets  # example file, not a package: copy it
 
 langfuse = Langfuse(mask=mask_secrets)
 ```
+
+`langfuse_mask` is the example module
+[`examples/tracing-masking/python/langfuse_mask.py`](examples/tracing-masking/python/langfuse_mask.py),
+which you copy into your application together with its sibling `mask_secrets.py`; the released Python package
+`redact-secret-adapters` does not provide it.
 
 ## Redact secrets in logs
 

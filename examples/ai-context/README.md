@@ -141,5 +141,5 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
 - The contract's conformance fixture, replayed by the adapter on the real
   core, and the core range it is qualified against: the adapters
   repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json)
-  at the `train/2026.09.25` commit that published these adapter versions.
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/be3f2ad5088d108867b7bae13933d706d8f1f861/compatibility.json)
+  at the `train/2026.09.26` commit that published these adapter versions.

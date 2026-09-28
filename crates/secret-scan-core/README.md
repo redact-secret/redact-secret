@@ -11,7 +11,8 @@ network calls, no telemetry, and the same input always gives the same result.
 Findings never include the matched secret.
 
 Redact Secret is not a DLP platform and does not detect every secret: it
-finds supported credential formats only, and an empty finding list does not
+finds supported credential formats and, only when you opt in, six bounded
+structured PII families (qualification pending), and an empty finding list does not
 prove text is secret-free. It complements repository and history scanners
 rather than replacing them. Per-family support is published in the generated
 [support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
@@ -35,8 +36,10 @@ Path: `crates/secret-scan-core`. Registry name: `redact-secret` (library
 - Errors are sanitized: a fixed code and message, never an input fragment, a
   matched value, or a placeholder.
 
-The dependency list is intentionally empty. `npm run rust:check` fails when a
-dependency, source facility, feature, or packaged file steps outside the
+The only runtime dependency is `unicode-normalization` (pinned exactly): pure,
+table-driven Unicode NFC that performs no I/O and keeps context normalization
+identical across native and WebAssembly artifacts. `npm run rust:check` fails
+when a dependency, source facility, feature, or packaged file steps outside the
 boundary declared in the root `Cargo.toml`.
 
 ## Public API
@@ -74,6 +77,8 @@ documentation, inside a function that returns `Result`.)
 | Sanitized error | `SecretScanError`, `SecretScanErrorCode`, `DetectorFailure`, `PolicyFailure`, `FormatterFailure` |
 | Custom detectors | `Detector`, `Candidate`, `DetectorContext`, `DetectorRegistry`, `RegisteredDetector` |
 | Profiles | `Profile` |
+| PII selection | `PiiSelection` |
+| Declarative rulesets | `load_ruleset`, `RulesetError`, `RulesetErrorClass` |
 | Identifiers and units | `is_identifier`, `MAX_IDENTIFIER_LENGTH`, `RANGE_UNIT`, `VERSION` |
 | Detector building blocks | `shannon_entropy` |
 

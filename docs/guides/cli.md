@@ -11,7 +11,15 @@ git diff --cached | redact-secret     # check a staged diff
 redact-secret --json config.txt       # JSON metadata report
 redact-secret --redact input.txt > sanitized.txt
 redact-secret -- --leading-dash.txt   # stop option parsing
+redact-secret --ruleset org.rules config.txt   # add a declarative ruleset
 ```
+
+`--ruleset <path>` works in check and redact mode. It loads a
+[declarative ruleset](rulesets.md) and applies it to every path source in
+addition to the built-in detectors. It requires an explicit path source,
+because standard input's streaming session accepts no custom detector, and a
+malformed ruleset fails the whole run with `INVALID_RULESET` before any source
+is scanned.
 
 PII defaults off. Repeat `--pii <selector>` to request a canonical selector
 set, or use `--print-pii-activation` to print its activation identity and exit

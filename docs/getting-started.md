@@ -21,11 +21,12 @@ musllinux wheel matrix. A built test artifact is not
 necessarily a distributed package; [qualification](qualification.md) explains
 that distinction.
 
-The `/common` entry point (Node and browser only) is the opt-in `common`
+The `/common` entry point (Node and browser) is the opt-in `common`
 detector profile: a smaller, structural/contextual-only detector set for
-size- or latency-sensitive preventive consumers. `full` — everything above
-uses it by default — stays the first and simplest path and the only one
-Python, Rust, and the CLI expose. See
+size- or latency-sensitive preventive consumers. Rust exposes the same profile
+as `DetectorRegistry::with_common_built_in`. `full` — everything above
+uses it by default — stays the first and simplest path, and is the only
+profile Python and the CLI expose. See
 [detector profiles in the JavaScript guide](guides/javascript.md#detector-profiles).
 
 ## Install a published release

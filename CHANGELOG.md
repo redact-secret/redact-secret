@@ -89,9 +89,11 @@ evidence is linked from each published version.
   feature. `@redact-secret/core` loads the `pii` build only when the
   `initialize()` call that loads the binding carries a non-empty `pii`
   selection; the Node addon, Python, Rust and CLI are unchanged. Release
-  `.wasm` sizes (raw / gzip level 9) move from 741,780 / 275,500 B to
-  468,090 / 159,706 B for `full` and from 590,801 / 229,049 B to
-  317,150 / 113,968 B for `common`; the `pii` builds are 741,825 / 275,512 B
+  `.wasm` sizes (raw / gzip level 9) move from what 0.1.0-beta.10 shipped,
+  742,321 / 275,467 B for `full` and 742,433 / 275,477 B for `common`, to
+  468,090 / 159,706 B for `full` and 317,150 / 113,968 B for `common`
+  (the `common` figure also reflects the #929 fix below; alone that fix
+  brought `common` to 590,801 / 229,049 B); the `pii` builds are 741,825 / 275,512 B
   and 590,846 / 229,048 B. Both default builds remain above the
   0.1.0-beta.8 size budgets (137,639 and 100,058 B gzip, +5%): the rest of
   the growth predates the PII runtime. The `measure-wasm-profiles.mjs --guard-only` CI
@@ -138,6 +140,17 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- The `common` WebAssembly profile linked every provider detector (#929).
+  In the published 0.1.0-beta.10, `@redact-secret/wasm/common` (and so
+  `@redact-secret/core/common` in a browser, and its Node fallback to
+  WebAssembly) was no smaller than `full`: its `.wasm` was 742,433 B raw /
+  275,477 B gzip level 9 against 742,321 / 275,467 B for `full`, so a
+  browser that chose `common` for size downloaded nothing less. The registry constructors introduced in #884 routed `common` through a
+  runtime profile check that built the full detector set; the `common`
+  constructors now build the common set directly. The
+  `measure-wasm-profiles.mjs --guard-only` CI step fails when `common` links a
+  provider detector. Upgrade past 0.1.0-beta.10 to get the smaller artifact;
+  no code change is needed.
 - `bearer-token` selects an `Authorization: Bearer <id>:<secret>` or
   `<name>|<secret>` value whole (#918). The span used to stop at the first
   `:` or `|`, redacting the non-secret left half and leaving the secret right
