@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2883,
+  "fixtureCount": 2920,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -69991,6 +69991,725 @@
       "input": "\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0\u0072e_Synth3ic_RevokedResendFixtureKey0",
       "expected": [],
       "note": "A long run of glued keys is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "apify-api-token-positive-bare",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "apify-api-token-positive-dotenv",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "APIFY_TOKEN=\u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 58
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-shell-export",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export APIFY_TOKEN=\"\u0061pify_api_SyntheticRevokedApifyToken0000000000\"\n",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 66
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-yaml",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  APIFY_TOKEN: \u0061pify_api_SyntheticRevokedApifyToken0000000000\n",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 66
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-json-config",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"APIFY_TOKEN\": \"\u0061pify_api_SyntheticRevokedApifyToken0000000000\"}",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 63
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-json-token-key",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0061pify_api_SyntheticRevokedApifyToken0000000000\"}",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 57
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-python-sdk-call",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0061pify_api_SyntheticRevokedApifyToken0000000000\")",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 71
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-overlap-bearer-header",
+      "detector": "apify-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0061pify_api_SyntheticRevokedApifyToken0000000000\n",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 68
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "apify-api-token-positive-x-api-key-header",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 57
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-curl-bearer",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0061pify_api_SyntheticRevokedApifyToken0000000000\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 77
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-tool-call-arguments",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0061pify_api_SyntheticRevokedApifyToken0000000000\"}}",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 84
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-chat-sentence",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0061pify_api_SyntheticRevokedApifyToken0000000000 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 61
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-log",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-28T12:00:00Z INFO  calling API with credential \u0061pify_api_SyntheticRevokedApifyToken0000000000 for request 7",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 101
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-positive-punctuation-adjacent",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0061pify_api_SyntheticRevokedApifyToken0000000000).",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 47
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "apify-api-token-positive-crlf-unicode-prefix",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0061pify_api_SyntheticRevokedApifyToken0000000000\n\r\n",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 70
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "apify-api-token-overlap-context",
+      "detector": "apify-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 59
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "apify-api-token-positive-repeated-value",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApifyToken0000000000 \u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        },
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 47,
+          "end": 93
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "apify-api-token-positive-body-floor",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApif",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 30
+        }
+      ],
+      "note": "The body-floor shape is reported on its own."
+    },
+    {
+      "id": "apify-api-token-positive-body-floor-dotenv",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "APIFY_TOKEN=\u0061pify_api_SyntheticRevokedApif",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 42
+        }
+      ],
+      "note": "The body-floor shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-overlap-body-floor-bearer",
+      "detector": "apify-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0061pify_api_SyntheticRevokedApif\n",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 52
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "apify-api-token-positive-body-cap",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApifyToken0000000000Zq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 138
+        }
+      ],
+      "note": "The body-cap shape is reported on its own."
+    },
+    {
+      "id": "apify-api-token-positive-body-cap-dotenv",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "APIFY_TOKEN=\u0061pify_api_SyntheticRevokedApifyToken0000000000Zq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 150
+        }
+      ],
+      "note": "The body-cap shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "apify-api-token-overlap-body-cap-bearer",
+      "detector": "apify-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0061pify_api_SyntheticRevokedApifyToken0000000000Zq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1\n",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 160
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "apify-api-token-boundary-under-floor",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApi",
+      "expected": [],
+      "note": "19 alphanumerics is under the provider linter's 20-byte floor."
+    },
+    {
+      "id": "apify-api-token-boundary-over-cap",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApifyToken0000000000Zq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaZq7Lm2Xv9Rt4Kp8Wz3Nc6Bh1J",
+      "expected": [],
+      "note": "A body over the 128-byte policy cap is rejected whole, never truncated."
+    },
+    {
+      "id": "apify-api-token-boundary-glued-underscore",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApifyToken0000000000_x",
+      "expected": [],
+      "note": "A glued underscore makes the run part of a wider identifier."
+    },
+    {
+      "id": "apify-api-token-boundary-glued-dash",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0061pify_api_SyntheticRevokedApifyToken0000000000-1",
+      "expected": [],
+      "note": "A glued dash makes the run part of a wider identifier."
+    },
+    {
+      "id": "apify-api-token-boundary-uppercase-prefix",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "APIFY_API_SyntheticRevokedApifyToken0000000000",
+      "expected": [],
+      "note": "The documented prefix is lowercase."
+    },
+    {
+      "id": "apify-api-token-boundary-dash-prefix",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "apify-api-SyntheticRevokedApifyToken0000000000",
+      "expected": [],
+      "note": "The documented prefix uses underscores."
+    },
+    {
+      "id": "apify-api-token-boundary-glued-prefix",
+      "detector": "apify-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "expected": [],
+      "note": "A byte glued before the prefix makes it part of a wider identifier."
+    },
+    {
+      "id": "apify-api-token-negative-placeholders",
+      "detector": "apify-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Tokens look like apify_api_YOUR_TOKEN, apify_api_test_token, apify_api_invalid_token or apify_api_... in the docs.",
+      "expected": [],
+      "note": "Placeholders break the alphanumeric run below 20 or glue an underscore after it."
+    },
+    {
+      "id": "apify-api-token-negative-identifiers",
+      "detector": "apify-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "if err == apify_api_error { retry() }\nAPIFY_API_BASE_URL=https://api.apify.com\n",
+      "expected": [],
+      "note": "Identifiers are too short, and the prefix is case-sensitive."
+    },
+    {
+      "id": "apify-api-token-negative-console-token-mention",
+      "detector": "apify-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Console sessions use apify_ui_test style tokens instead.",
+      "expected": [],
+      "note": "An apify_ui_ Console token has no stated shape and is out of this family."
+    },
+    {
+      "id": "apify-api-token-negative-ci-secret-reference",
+      "detector": "apify-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}\n",
+      "expected": [],
+      "note": "A CI secret reference is not a token."
+    },
+    {
+      "id": "apify-api-token-positive-js-client-option",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const client = new ApifyClient({ token: '\u0061pify_api_SyntheticRevokedApifyToken0000000000' });",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 87
+        }
+      ],
+      "note": "The JS client option is reported at exactly the token."
+    },
+    {
+      "id": "apify-api-token-positive-mcp-env-block",
+      "detector": "apify-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\":{\"apify\":{\"command\":\"npx\",\"args\":[\"-y\",\"@apify/actors-mcp-server\"],\"env\":{\"APIFY_TOKEN\":\"\u0061pify_api_SyntheticRevokedApifyToken0000000000\"}}}}",
+      "expected": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 103,
+          "end": 149
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the token."
+    },
+    {
+      "id": "apify-api-token-adversarial-long-run",
+      "detector": "apify-api-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_apify_api_",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach the floor, and the scan stays linear and bounded."
     }
   ]
 }

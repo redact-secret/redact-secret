@@ -11,6 +11,7 @@
 mod additional_providers;
 mod ai_inference;
 mod anthropic;
+mod apify;
 mod atlassian;
 mod aws;
 mod aws_bedrock;
@@ -175,6 +176,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
         Box::new(inngest::INNGEST_SIGNING_KEY),
         Box::new(resend::RESEND_API_KEY),
+        Box::new(apify::APIFY_API_TOKEN),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -310,6 +312,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("onepassword-service-account-token", Pack::Provider),
     ("inngest-signing-key", Pack::Provider),
     ("resend-api-key", Pack::Provider),
+    ("apify-api-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -434,6 +437,7 @@ mod tests {
                 "onepassword-service-account-token",
                 "inngest-signing-key",
                 "resend-api-key",
+                "apify-api-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -794,6 +798,7 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let apify_api_token_input = format!("apify_api_{}", "SyntheticRevokedApifyToken0000000000");
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
@@ -879,6 +884,7 @@ mod tests {
             ),
             ("inngest-signing-key", inngest_signing_key_input.as_str()),
             ("resend-api-key", resend_api_key_input.as_str()),
+            ("apify-api-token", apify_api_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

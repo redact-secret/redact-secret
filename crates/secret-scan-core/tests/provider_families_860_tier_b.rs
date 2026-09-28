@@ -432,3 +432,73 @@ mod resend {
         assert_partition_parity(&key(8, 24, 4));
     }
 }
+
+mod apify {
+    use super::*;
+
+    const DETECTOR: &str = "apify-api-token";
+    const TYPE: &str = "apify_api_token";
+
+    fn token(len: usize, seed: usize) -> String {
+        format!("apify_api_{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        for (seed, len) in [20, 36, 128].into_iter().enumerate() {
+            let key = token(len, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("APIFY_TOKEN={key}\n"),
+                format!("const client = new ApifyClient({{ token: '{key}' }});\n"),
+                format!("client = ApifyClient(\"{key}\")\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"apify\":{{\"env\":{{\"APIFY_TOKEN\":\"{key}\"}}}}}}}}"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 36, 4);
+        let base = format!("apify_api_{body}");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token(19, 4),
+                token(129, 4),
+                format!("{base}_x"),
+                format!("{base}-1"),
+                format!("APIFY_API_{body}"),
+                format!("apify-api-{body}"),
+                format!("x{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "APIFY_TOKEN=apify_api_YOUR_TOKEN\n",
+            "token: apify_api_test_token\n",
+            "token: apify_api_invalid_token\n",
+            "token: apify_api_dummy_for_smoke\n",
+            "APIFY_TOKEN=apify_api_...\n",
+            "if err == apify_api_error {}\n",
+            "APIFY_API_BASE_URL=https://api.apify.com\n",
+            "APIFY_TOKEN=apify_ui_test\n",
+            "APIFY_TOKEN=${{ secrets.APIFY_TOKEN }}\n",
+            "the prefix is apify_api_\n",
+        ] {
+            assert_unclaimed(DETECTOR, input);
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&token(36, 5));
+    }
+}

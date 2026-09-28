@@ -22,6 +22,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `anthropic_admin_api_key` | `anthropic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #774 splits the `sk-ant-admin01-` prefix (Console Admin API key, full access to every Admin-API endpoint) out of the shared `anthropic_api_key` type, following the precedent [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); research in [#775](https://github.com/redact-secret/redact-secret/issues/775) |
 | `anthropic_api_key` | `anthropic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md); issue #862 extended `anthropic-token`'s prefix set from `sk-ant-api03-` alone to also `sk-ant-api01-` and `sk-ant-admin01-`, all under this one type at the time. Issue #774 then split those two prefixes into their own types (`anthropic_enterprise_api_key`, `anthropic_admin_api_key`); `anthropic_api_key` now covers `sk-ant-api03-` only, unchanged: the same `>= 20` byte `[A-Za-z0-9_-]` run with a left boundary, a deliberate superset of the T2 scanner shape of 93 bytes plus `AA`. False-positive tradeoff: a doc placeholder of 20 or more valid body bytes (for example a long `x` run) matches |
 | `anthropic_enterprise_api_key` | `anthropic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #774 splits the `sk-ant-api01-` prefix out of the shared `anthropic_api_key` type. Named for its general Enterprise organization scope (user management, Compliance, Analytics, Spend Limits — selected at creation), not "compliance": [#776](https://github.com/redact-secret/redact-secret/issues/776) records that `sk-ant-api01-` covers all of those scopes, not the Compliance Access Key alone. Follows the same split precedent as [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
+| `apify_api_token` | `apify-api-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Apify docs placeholder prefix, R4; provider-authored leak linter alphabet and floor, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `atlassian_api_token` | `atlassian-api-token` | `always-redact` | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `authorization_credential` | `generic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `aws_access_key_id` | `aws-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -588,6 +589,7 @@ core conformance and the benchmarks arrival and profile evidence.
 | `onepassword:service-account-token` | `onepassword-service-account-token` | `ops_eyJ` + at least 250 Base64url `[A-Za-z0-9_-]` bytes, no upper bound, plus up to two `=` inside the span; after the padding the next byte must not be `[A-Za-z0-9_-]`, `+`, `/` or `=` | `onepassword_service_account_token` | T1 (provider docs: `ops_` prefix and Base64url-encoded JSON; floor is policy) |
 | `inngest:signing-key` | `inngest-signing-key` | `signkey-prod-`\|`signkey-test-`\|`signkey-branch-` + exactly 64 lowercase hex | `inngest_signing_key` (raw key, rotation fallback and hashed wire form) | T1 (provider code constants; 64 from the docs `openssl rand -hex 32` and SDK fixtures, R5) |
 | `resend:api-key` | `resend-api-key` | `re_` + 8 `[A-Za-z0-9]` + `_` + 24 `[A-Za-z0-9]` (36 in total), with at least one uppercase and one lowercase letter in the 32 segment bytes | `resend_api_key` | prefix T1 (CLI-enforced); layout T1 by example (docs + SDK fixtures, R5); mixed-case guard is policy |
+| `apify:api-token` | `apify-api-token` | `apify_api_` + 20–128 `[A-Za-z0-9]`; a glued `_` or `-` after the run rejects the match; a body over 128 is rejected whole | `apify_api_token` | T1 (prefix R4; alphabet and 20-byte floor from the provider's own leak linter, R2); the 128 cap is policy |
 
 Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
 [handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
@@ -647,6 +649,19 @@ and a key glued to an identifier. False positives: a mixed-case `re_` + 8 +
 `_` + 24 alphanumeric identifier with clean boundaries. Cost: one prefix on
 the shared known-format scan plus a 32-byte post check.
 
+Apify ([#916](https://github.com/redact-secret/redact-secret/issues/916),
+[handoff](../audits/evidence/860/apify.md)). The provider's own rule is
+open-ended (`apify_api_[A-Za-z0-9]{20,}`), so the contract uses it rather
+than a scanner's exact 36 (T2); the 128-byte cap only bounds the run for
+streaming. The body alphabet is narrower than the boundary, so
+`apify_api_token_here`-style placeholders stay unclaimed. `apify_ui_` Console
+tokens and the unprefixed sibling tokens have no stated shape and stay with
+generic context. False negatives: a body containing `-` or `_`, a body over
+128, and `apify_ui_` or sibling tokens outside named contexts. False
+positives: `apify_api_` + 20–128 alphanumerics that is not a token, such as
+alphanumeric placeholder filler (the #867 precedent). Cost: one prefix on the
+shared known-format scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -667,6 +682,7 @@ the shared known-format scan plus a 32-byte post check.
 | 1Password `ops_eyJ` service-account tokens (at least 250 Base64url bytes after the lead, up to two `=` inside the span) are reported as `onepassword_service_account_token` at provider specificity, bare or in any context ([#913](https://github.com/redact-secret/redact-secret/issues/913), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Inngest `signkey-prod-`/`signkey-test-`/`signkey-branch-` + 64 lowercase hex signing keys (raw, fallback and hashed wire form) are reported as `inngest_signing_key` at provider specificity, bare or in any context ([#914](https://github.com/redact-secret/redact-secret/issues/914), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Resend `re_` + 8 + `_` + 24 alphanumeric API keys with both letter cases are reported as `resend_api_key` at provider specificity, bare or in any context ([#915](https://github.com/redact-secret/redact-secret/issues/915), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Apify `apify_api_` + 20–128 alphanumeric API tokens are reported as `apify_api_token` at provider specificity, bare or in any context; `apify_ui_` stays unclaimed ([#916](https://github.com/redact-secret/redact-secret/issues/916), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

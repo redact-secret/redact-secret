@@ -5078,12 +5078,68 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "resend_api_key"
+    },
+    {
+      "detector": "apify-api-token",
+      "evidence": {
+        "fixtureCount": 37,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "apify-api-token-positive-bare",
+        "apify-api-token-positive-body-cap",
+        "apify-api-token-positive-body-cap-dotenv",
+        "apify-api-token-positive-body-floor",
+        "apify-api-token-positive-body-floor-dotenv",
+        "apify-api-token-positive-chat-sentence",
+        "apify-api-token-positive-crlf-unicode-prefix",
+        "apify-api-token-positive-curl-bearer",
+        "apify-api-token-positive-dotenv",
+        "apify-api-token-positive-js-client-option",
+        "apify-api-token-positive-json-config",
+        "apify-api-token-positive-json-token-key",
+        "apify-api-token-positive-log",
+        "apify-api-token-positive-mcp-env-block",
+        "apify-api-token-positive-punctuation-adjacent",
+        "apify-api-token-positive-python-sdk-call",
+        "apify-api-token-positive-repeated-value",
+        "apify-api-token-positive-shell-export",
+        "apify-api-token-positive-tool-call-arguments",
+        "apify-api-token-positive-x-api-key-header",
+        "apify-api-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "apify_api_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 114,
+    "supported": 115,
     "unresolved": 0
   }
 }

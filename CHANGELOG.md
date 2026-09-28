@@ -62,6 +62,8 @@ evidence is linked from each published version.
     medium, warned `contextual_secret` under `INNGEST_SIGNING_KEY=`.
   - `resend-api-key` (#915): Resend `re_` + 8 + `_` + 24 API keys
     (`resend_api_key`), with a mixed-case guard against `re_` identifiers.
+  - `apify-api-token` (#916): Apify `apify_api_` + 20–128 alphanumeric
+    API tokens (`apify_api_token`), the provider's own open-ended rule.
 
 ### Fixed
 

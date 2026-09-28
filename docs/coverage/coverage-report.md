@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 114 |
+| supported | 115 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 125.
+Coverage declarations: 126.
 
 ## Coverage by detector
 
@@ -27,6 +27,7 @@ Coverage declarations: 125.
 | --- | --- | --- |
 | ai21-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | anthropic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
+| apify-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | atlassian-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -124,6 +125,7 @@ Coverage declarations: 125.
 | anthropic_admin_api_key | anthropic-token | provider | supported | not-applicable | none |
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
 | anthropic_enterprise_api_key | anthropic-token | provider | supported | not-applicable | none |
+| apify_api_token | apify-api-token | provider | supported | not-applicable | none |
 | atlassian_api_token | atlassian-api-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
@@ -259,15 +261,15 @@ Coverage declarations: 125.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 125 | 0 | 0 |
-| boundary | 114 | 0 | 0 |
-| host-context | 114 | 0 | 0 |
+| adversarial | 126 | 0 | 0 |
+| boundary | 115 | 0 | 0 |
+| host-context | 115 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 125 | 0 | 0 |
-| near-miss-negative | 114 | 0 | 0 |
-| overlap | 114 | 0 | 0 |
-| positive | 114 | 0 | 0 |
-| range | 125 | 0 | 0 |
+| malformed | 126 | 0 | 0 |
+| near-miss-negative | 115 | 0 | 0 |
+| overlap | 115 | 0 | 0 |
+| positive | 115 | 0 | 0 |
+| range | 126 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

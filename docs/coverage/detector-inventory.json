@@ -827,6 +827,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0072e_Synth3ic_RevokedResendFixtureKey0",
       "schemes": null
+    },
+    {
+      "type": "apify_api_token",
+      "detector": "apify-api-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0061pify_api_SyntheticRevokedApifyToken0000000000",
+      "schemes": null
     }
   ],
   "consumers": [
