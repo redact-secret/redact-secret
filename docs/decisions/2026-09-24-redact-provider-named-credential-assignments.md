@@ -152,3 +152,55 @@ is unchanged. Tests: the detector modules' unit tests and
 `tests/family_evidence_gaps_379.rs`; conformance: the affected
 `synchronous-corpus.json` expectations, plus five new fixtures for the
 layouts and the medium twins.
+
+## Amendment: a provider-named high-signal name falls back to `generic-token` (#948)
+
+Amended 2026-09-29. An off-grammar value under a provider-named credential
+variable got no finding at all
+([#948](https://github.com/redact-secret/redact-secret/issues/948)):
+`MY_API_KEY=<v>` redacted a random 32-byte value while `OPENAI_API_KEY=<v>`
+or `export STRIPE_API_KEY="<v>"` reported nothing, because section 2's
+provider exception disqualified the name and the provider's grammar declined
+the value. Under the security-first default:
+
+- **A provider prefix no longer disqualifies a high-signal name.**
+  `OPENAI_API_KEY`, `GITHUB_TOKEN`, `DD_API_KEY` and `"huggingfaceApiKey"`
+  are high-signal like `MYAPP_API_KEY`, for every
+  prefix of the rule-2 list (`DEDICATED_PROVIDER_SEGMENTS`/`_PHRASES` in
+  `generic_token.rs`). `generic-token` claims the value at the unchanged
+  floors (8 bytes; `high` at 16 bytes and entropy 3.0, else `medium`) with
+  the generic action: `high` redacts, `medium` warns.
+- **The provider detector still decides an on-grammar value**, through
+  overlap resolution alone: provider specificity outranks contextual, and a
+  keyword-gated provider reports its own provider-named assignment `high`
+  (section 1), so the value stays one typed provider finding. A
+  keyword-gated grammar under *another* provider's name is `medium` there
+  and yields to the `high` contextual candidate on resolved action, as it
+  already did under `MYAPP_API_KEY`.
+- **Unchanged.** Non-secret leads (`redacted_`, `masked_`, `publishable_`,
+  ...) still disqualify a name; a provider prefix still disqualifies an
+  ambiguous name (`GITHUB_CREDENTIALS`) and a request-scoped `_token` name
+  stays excluded. Identifier siblings (`_id`, `_url`, `_sid`, ...), #911
+  object-reference names, and the placeholder, reference, template, `$VAR`
+  and filler exclusions apply exactly as for a generic name.
+
+This supersedes section 2's provider exception for high-signal names and the
+`GITHUB_CLIENT_SECRET=<40 hex>` false negative under "What this costs".
+
+- **FN removed:** format drift, a new key generation, a legacy or sibling key
+  type, and a truncated or mis-delimited paste under the provider's own
+  variable name. The `common` profile, which has no provider detectors, now
+  redacts every provider-named assignment.
+- **FP cost:** a non-secret literal of 8+ bytes under a provider-named
+  credential variable, the cost section 2 already accepted for
+  `MYAPP_API_KEY`. The malformed-by-construction controls that motivated the
+  exception are reported again (`GITHUB_TOKEN=ghp_abc123` warns, a
+  full-length near miss redacts), and so is a public id kept under a
+  provider's `_API_KEY` name (a Confluent Cloud API key id, a Datadog key
+  record id).
+
+Evidence (46 canonical fixtures, 244 common-profile expectations, 203
+benchmark construction negatives, all with the same action as under
+`MYAPP_`): [`docs/audits/evidence/948/README.md`](../audits/evidence/948/README.md).
+Tests: `generic_token` unit tests and
+`tests/provider_named_fallback_948.rs`.

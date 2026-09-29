@@ -137,6 +137,20 @@ evidence is linked from each published version.
   medium (warn). Cost: a non-credential value in one of these exact slots
   (a 32-hex id with a `-us<N>` suffix in prose) is redacted instead of
   warned.
+- Provider-named credential variables now redact off-grammar values (#948).
+  A value under `OPENAI_API_KEY=`, `STRIPE_SECRET_KEY=`, `GITHUB_TOKEN=` or
+  `"huggingfaceApiKey":` that the provider's own detector declines (format
+  drift, a legacy or sibling key type, a truncated paste) got no finding at
+  all. It now gets what the same value gets under `MYAPP_API_KEY=`: a
+  `generic-token` `contextual_secret` that redacts at 16+ bytes with
+  entropy 3.0, and warns from 8 bytes. An on-grammar value is still exactly
+  one typed provider finding. Placeholders, references, templates,
+  identifier siblings (`_id`, `_url`, `_sid`) and provider-prefixed
+  ambiguous names (`GITHUB_CREDENTIALS`) stay silent. The `common` profile,
+  which has no provider detectors, now redacts provider-named assignments.
+  Cost: a non-secret literal under a provider-named credential variable,
+  such as a malformed near miss or a public key id (`CONFLUENT_CLOUD_API_KEY`),
+  is reported. See `docs/audits/evidence/948/README.md`.
 
 ### Fixed
 
