@@ -918,6 +918,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0073qa_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
       "schemes": null
+    },
+    {
+      "type": "rubygems_api_key",
+      "detector": "rubygems-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0072ubygems_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
     }
   ],
   "consumers": [

@@ -47,6 +47,8 @@ evidence is linked from each published version.
     (`sonarqube_user_token`) and `sqa_`/`sqp_` global and project analysis
     tokens (`sonarqube_analysis_token`), each + 40 lowercase hex; public
     `sqb_` badge tokens are never claimed.
+  - `rubygems-api-key` (#1023): RubyGems.org `rubygems_` + 48 lowercase hex
+    API keys (`rubygems_api_key`).
 
 ## 0.1.0-beta.11 — 2026-09-29
 

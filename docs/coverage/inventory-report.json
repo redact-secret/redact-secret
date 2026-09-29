@@ -5794,12 +5794,63 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "sonarqube_analysis_token"
+    },
+    {
+      "detector": "rubygems-api-key",
+      "evidence": {
+        "fixtureCount": 34,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "rubygems-api-key-positive-authorization-no-scheme",
+        "rubygems-api-key-positive-bare",
+        "rubygems-api-key-positive-chat-sentence",
+        "rubygems-api-key-positive-crlf-unicode-prefix",
+        "rubygems-api-key-positive-curl-bearer",
+        "rubygems-api-key-positive-dotenv",
+        "rubygems-api-key-positive-gem-credentials-yaml",
+        "rubygems-api-key-positive-github-actions-env",
+        "rubygems-api-key-positive-json-config",
+        "rubygems-api-key-positive-json-token-key",
+        "rubygems-api-key-positive-log",
+        "rubygems-api-key-positive-punctuation-adjacent",
+        "rubygems-api-key-positive-repeated-value",
+        "rubygems-api-key-positive-sdk-call",
+        "rubygems-api-key-positive-shell-export",
+        "rubygems-api-key-positive-tool-call-arguments",
+        "rubygems-api-key-positive-x-api-key-header",
+        "rubygems-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "rubygems_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 127,
+    "supported": 128,
     "unresolved": 0
   }
 }

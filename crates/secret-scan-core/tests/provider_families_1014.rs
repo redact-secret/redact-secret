@@ -420,6 +420,81 @@ mod sonarqube {
     }
 }
 
+mod rubygems {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "rubygems-api-key";
+    const TYPE: &str = "rubygems_api_key";
+
+    pub(super) fn key(seed: usize) -> String {
+        format!("rubygems_{}", filler(LOWER_HEX, 48, seed))
+    }
+
+    #[test]
+    fn the_key_wins_every_context_as_the_sole_finding() {
+        let key = key(1);
+        assert_eq!(key.len(), 57);
+        assert_sole_provider_finding(DETECTOR, TYPE, &key);
+        for input in [
+            format!("GEM_HOST_API_KEY={key}\n"),
+            format!("env:\n  GEM_HOST_API_KEY: {key}\n"),
+            format!("---\n:rubygems_api_key: {key}\n"),
+            format!("gem push pkg/demo-1.0.0.gem --key {key}\n"),
+            format!("Authorization: {key}\n"),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(LOWER_HEX, 48, 2);
+        let base = format!("rubygems_{body}");
+        let mut upper = body.clone();
+        upper.replace_range(5..6, "A");
+        let mut non_hex = body.clone();
+        non_hex.replace_range(5..6, "g");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("rubygems_{}", &body[..47]),
+                format!("{base}0"),
+                format!("rubygems_{upper}"),
+                format!("rubygems_{non_hex}"),
+                format!("RUBYGEMS_{body}"),
+                format!("rubygems-{body}"),
+                format!("x{base}"),
+                format!("{base}_"),
+                format!("{base}-x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "rubygems_version: 3.5.0\nrubygems_mfa_required: true\n".to_owned(),
+            "---\n:rubygems_api_key: YOUR_API_KEY\n".to_owned(),
+            format!("digest {}\n", filler(LOWER_HEX, 48, 3)),
+            "GEM_HOST_API_KEY=${GEM_HOST_API_KEY}\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"rubygems_".repeat(10_000));
+        assert_unclaimed(DETECTOR, &key(4).repeat(200));
+        assert_repetition_line(DETECTOR, &key(4), 200);
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(5));
+    }
+}
+
 /// Each #1014 family keeps its own finding on one line next to the others
 /// and an existing prefixed family, and no family claims another's key.
 mod isolation {
@@ -430,6 +505,7 @@ mod isolation {
             (bitwarden::DETECTOR, bitwarden::token(9)),
             (polar::DETECTOR, polar::oat(9)),
             (sonarqube::DETECTOR, sonarqube::token("squ_", 9)),
+            (rubygems::DETECTOR, rubygems::key(9)),
             ("e2b-api-key", format!("e2b_{}", filler(LOWER_HEX, 40, 9))),
         ]
     }

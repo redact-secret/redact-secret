@@ -13928,6 +13928,118 @@
       "type": "sonarqube_analysis_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "rubygems-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "rubygems-api-key-positive-authorization-no-scheme",
+            "rubygems-api-key-positive-bare",
+            "rubygems-api-key-positive-chat-sentence",
+            "rubygems-api-key-positive-crlf-unicode-prefix",
+            "rubygems-api-key-positive-curl-bearer",
+            "rubygems-api-key-positive-dotenv",
+            "rubygems-api-key-positive-gem-credentials-yaml",
+            "rubygems-api-key-positive-github-actions-env",
+            "rubygems-api-key-positive-json-config",
+            "rubygems-api-key-positive-json-token-key",
+            "rubygems-api-key-positive-log",
+            "rubygems-api-key-positive-punctuation-adjacent",
+            "rubygems-api-key-positive-repeated-value",
+            "rubygems-api-key-positive-sdk-call",
+            "rubygems-api-key-positive-shell-export",
+            "rubygems-api-key-positive-tool-call-arguments",
+            "rubygems-api-key-positive-x-api-key-header",
+            "rubygems-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "rubygems-api-key-overlap-bearer-header",
+            "rubygems-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "rubygems-api-key-adversarial-glued-keys",
+            "rubygems-api-key-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "rubygems-api-key-boundary-body-47",
+            "rubygems-api-key-boundary-body-49",
+            "rubygems-api-key-boundary-dash-separator",
+            "rubygems-api-key-boundary-glued-prefix",
+            "rubygems-api-key-boundary-glued-trailing",
+            "rubygems-api-key-boundary-non-hex",
+            "rubygems-api-key-boundary-uppercase-hex",
+            "rubygems-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "rubygems-api-key-negative-bare-48-hex",
+            "rubygems-api-key-negative-credentials-placeholder",
+            "rubygems-api-key-negative-env-reference",
+            "rubygems-api-key-negative-metadata-keys"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "rubygems-api-key-boundary-body-47",
+            "rubygems-api-key-boundary-body-49",
+            "rubygems-api-key-boundary-dash-separator",
+            "rubygems-api-key-boundary-glued-prefix",
+            "rubygems-api-key-boundary-glued-trailing",
+            "rubygems-api-key-boundary-non-hex",
+            "rubygems-api-key-boundary-uppercase-hex",
+            "rubygems-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for rubygems_api_key (rubygems-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "rubygems_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -14168,6 +14280,8 @@
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
             "resend-api-key-adversarial-long-run",
+            "rubygems-api-key-adversarial-glued-keys",
+            "rubygems-api-key-adversarial-prefix-run",
             "runpod-api-key-adversarial-long-body-run",
             "runpod-api-key-adversarial-long-run",
             "sendgrid-adversarial-incomplete-suffix",
@@ -14637,6 +14751,8 @@
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
             "resend-api-key-adversarial-long-run",
+            "rubygems-api-key-adversarial-glued-keys",
+            "rubygems-api-key-adversarial-prefix-run",
             "runpod-api-key-adversarial-long-body-run",
             "runpod-api-key-adversarial-long-run",
             "sendgrid-adversarial-incomplete-suffix",

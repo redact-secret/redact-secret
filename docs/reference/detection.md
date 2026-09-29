@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-101 built-in detectors emit 127 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+102 built-in detectors emit 128 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -294,6 +294,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `bitwarden-secrets-manager-access-token` | `bitwarden_secrets_manager_access_token` | `always-redact` | — |
 | `polar-token` | `polar_organization_access_token`, `polar_api_credential` | `always-redact` | — |
 | `sonarqube-token` | `sonarqube_user_token`, `sonarqube_analysis_token` | `always-redact` | — |
+| `rubygems-api-key` | `rubygems_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

@@ -93,6 +93,7 @@ export const CANONICAL_IDS = [
   "bitwarden-secrets-manager-access-token",
   "polar-token",
   "sonarqube-token",
+  "rubygems-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -135,7 +136,7 @@ export const GROUPS = {
     "inngest-signing-key",
     "sonarqube-token",
   ],
-  "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
+  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "rubygems-api-key"],
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
