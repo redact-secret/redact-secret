@@ -94,6 +94,45 @@ pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 pub(crate) use twilio::has_open_twilio_cli_table;
 
+/// `true` when appending `appended` to any input leaves both
+/// [`has_open_contextual_assignment`] and [`has_open_bearer_authorization`]
+/// unchanged. Each first skips trailing [`text::is_js_whitespace`] and then
+/// reads only what precedes it, so text made of nothing else is invisible to
+/// them. The incremental session relies on this to re-evaluate the two tail
+/// checks only when a line with other content closes (issue #986).
+pub(crate) fn is_open_tail_neutral(appended: &str) -> bool {
+    appended.chars().all(text::is_js_whitespace)
+}
+
+/// `true` when a detector can read `unit` (the scan copy of one closed
+/// incremental unit) as the continuation of text on an earlier line, so
+/// scanning it after that text can differ from scanning it alone. The
+/// incremental session never batches such a unit with the units before it
+/// (issue #985; the per-detector audit is in `docs/audits/evidence/985/`).
+///
+/// Two built-in grammars skip [`text::is_js_whitespace`], line terminators
+/// included, between their parts:
+///
+/// - `generic-token`'s assignment grammar between a name and its `=`/`:`
+///   operator (`parse_name_and_operator`), so a unit starting with an
+///   operator can bind to a name on an earlier line;
+/// - `bearer-token`'s header grammar around the `:` of `authorization:`
+///   and before `bearer` (`match_scheme_at`), so a unit starting with `:` or
+///   `bearer` can complete a header begun on an earlier line.
+///
+/// Their retention hints hold most of those layouts in one unit, but not
+/// every one the grammars accept (a backticked or glued name, a JWK member,
+/// `X-Authorization:`), and whole-input scanning already reads them
+/// together. Excluding the unit from the batch keeps each batch equal to
+/// per-unit processing without changing either grammar.
+pub(crate) fn continues_previous_line(unit: &str) -> bool {
+    let start = unit.trim_start_matches(text::is_js_whitespace);
+    start.starts_with(['=', ':'])
+        || start
+            .get(..6)
+            .is_some_and(|word| word.eq_ignore_ascii_case("bearer"))
+}
+
 /// Every built-in detector, in canonical registration order.
 #[must_use]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {

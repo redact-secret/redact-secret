@@ -152,6 +152,16 @@ impl<'a> NormalizedInput<'a> {
         )
     }
 
+    /// Translates `original`, an offset in the original input that is not
+    /// inside a removed run, into [`text`](Self::text): every run that ends
+    /// at or before it is subtracted.
+    pub(crate) fn to_scanned_offset(&self, original: usize) -> usize {
+        let runs_before = self
+            .seams
+            .partition_point(|seam| seam.original_after <= original);
+        original - self.removed_before(runs_before)
+    }
+
     /// Whether a removed run lies strictly inside `range` (of
     /// [`text`](Self::text)): the same "interior" definition
     /// [`to_original`](Self::to_original) uses to fold a run into a
