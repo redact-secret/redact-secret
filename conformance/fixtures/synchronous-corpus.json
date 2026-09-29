@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3372,
+  "fixtureCount": 3410,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -79480,6 +79480,729 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z",
+      "expected": [],
+      "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "honeycomb-api-key-positive-bare",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "honeycomb-api-key-positive-dotenv",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HONEYCOMB_API_KEY=\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 82
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-shell-export",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export HONEYCOMB_API_KEY=\"\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\"\n",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 90
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-yaml",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  HONEYCOMB_API_KEY: \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\n",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 90
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-json-config",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"HONEYCOMB_API_KEY\": \"\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\"}",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 87
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-json-token-key",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\"}",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 75
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-python-sdk-call",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\")",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 89
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-x-api-key-header",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 75
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-curl-bearer",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 95
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-tool-call-arguments",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\"}}",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 102
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-chat-sentence",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is my key \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 79
+        }
+      ],
+      "note": "A value pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-log",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO  calling API with credential \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn for request 7",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 119
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-positive-punctuation-adjacent",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn).",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 65
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "honeycomb-api-key-positive-crlf-unicode-prefix",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\n\r\n",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 88
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "honeycomb-api-key-positive-repeated-value",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        },
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 129
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "honeycomb-api-key-positive-second-sample",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068caic_revokedsyntheticclassicingestkey00000000000000000000000000",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        }
+      ],
+      "note": "The second-sample shape is reported on its own."
+    },
+    {
+      "id": "honeycomb-api-key-positive-second-sample-dotenv",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HONEYCOMB_API_KEY=\u0068caic_revokedsyntheticclassicingestkey00000000000000000000000000",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 82
+        }
+      ],
+      "note": "The second-sample shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "honeycomb-api-key-overlap-bearer-header",
+      "detector": "honeycomb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\n",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 86
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "honeycomb-api-key-overlap-context",
+      "detector": "honeycomb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 77
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "honeycomb-api-key-overlap-second-sample-bearer",
+      "detector": "honeycomb-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0068caic_revokedsyntheticclassicingestkey00000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 86
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "honeycomb-api-key-positive-team-header",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-Honeycomb-Team: \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 82
+        }
+      ],
+      "note": "The X-Honeycomb-Team header value is reported at exactly the key."
+    },
+    {
+      "id": "honeycomb-api-key-positive-otel-headers-env",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OTEL_EXPORTER_OTLP_HEADERS=x-honeycomb-team=\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 108
+        }
+      ],
+      "note": "An OpenTelemetry exporter header env value is reported at exactly the key."
+    },
+    {
+      "id": "honeycomb-api-key-positive-otel-collector-yaml",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "exporters:\n  otlp:\n    endpoint: api.honeycomb.io:443\n    headers:\n      x-honeycomb-team: \u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\n",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 91,
+          "end": 155
+        }
+      ],
+      "note": "An OpenTelemetry collector headers map is reported at exactly the key."
+    },
+    {
+      "id": "honeycomb-api-key-positive-libhoney-config",
+      "detector": "honeycomb-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "libhoney.Init(libhoney.Config{APIKey: \"\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\", Dataset: \"ci\"})",
+      "expected": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 39,
+          "end": 103
+        }
+      ],
+      "note": "A libhoney config is reported at exactly the key."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-short-body",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklm",
+      "expected": [],
+      "note": "A 57-byte body is not the SDK's 64-byte total."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-long-body",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmnz",
+      "expected": [],
+      "note": "A 59-byte body is rejected whole."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-uppercase-byte",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycomQingestkey0123456789abcdefghijklmn",
+      "expected": [],
+      "note": "The body is lowercase alphanumeric."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-dash-in-body",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycom-ingestkey0123456789abcdefghijklmn",
+      "expected": [],
+      "note": "The body has no dash."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-missing-type-letter",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmnz",
+      "expected": [],
+      "note": "The prefix carries one type letter."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-uppercase-type-letter",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cAik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [],
+      "note": "The type letter is lowercase."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-management-shape",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxmk_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [],
+      "note": "The management prefix with an ingest body is not an ingest key."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-identifier-glue",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [],
+      "note": "A glued leading byte makes it part of a wider identifier."
+    },
+    {
+      "id": "honeycomb-api-key-boundary-glued-suffix",
+      "detector": "honeycomb-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn_x",
+      "expected": [],
+      "note": "A byte glued after the key makes it part of a wider identifier."
+    },
+    {
+      "id": "honeycomb-api-key-negative-key-id",
+      "detector": "honeycomb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"id\": \"\u0068cxik_syntheticrevokedhoneycombi\"}",
+      "expected": [],
+      "note": "A key id alone is a non-secret identifier."
+    },
+    {
+      "id": "honeycomb-api-key-negative-environment-id",
+      "detector": "honeycomb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "environment \u0068cxen_syntheticrevokedhoneycombi created",
+      "expected": [],
+      "note": "An environment id is not a key."
+    },
+    {
+      "id": "honeycomb-api-key-negative-management-key-gated",
+      "detector": "honeycomb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "rotated management key \u0068cxmk_syntheticrevokedhoneycombi:ngestkey0123456789abcdefghijklmn today",
+      "expected": [],
+      "note": "A bare management key stays unclaimed until its issuance check settles the segment alphabet."
+    },
+    {
+      "id": "honeycomb-api-key-negative-shell-reference",
+      "detector": "honeycomb-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HONEYCOMB_API_KEY=${HONEYCOMB_API_KEY}\n",
+      "expected": [],
+      "note": "A shell reference is not a key."
+    },
+    {
+      "id": "honeycomb-api-key-adversarial-long-run",
+      "detector": "honeycomb-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
       "expected": [],
       "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
     }

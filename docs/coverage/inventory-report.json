@@ -5757,12 +5757,67 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "paddle_api_key"
+    },
+    {
+      "detector": "honeycomb-api-key",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "honeycomb-api-key-positive-bare",
+        "honeycomb-api-key-positive-chat-sentence",
+        "honeycomb-api-key-positive-crlf-unicode-prefix",
+        "honeycomb-api-key-positive-curl-bearer",
+        "honeycomb-api-key-positive-dotenv",
+        "honeycomb-api-key-positive-json-config",
+        "honeycomb-api-key-positive-json-token-key",
+        "honeycomb-api-key-positive-libhoney-config",
+        "honeycomb-api-key-positive-log",
+        "honeycomb-api-key-positive-otel-collector-yaml",
+        "honeycomb-api-key-positive-otel-headers-env",
+        "honeycomb-api-key-positive-punctuation-adjacent",
+        "honeycomb-api-key-positive-python-sdk-call",
+        "honeycomb-api-key-positive-repeated-value",
+        "honeycomb-api-key-positive-second-sample",
+        "honeycomb-api-key-positive-second-sample-dotenv",
+        "honeycomb-api-key-positive-shell-export",
+        "honeycomb-api-key-positive-team-header",
+        "honeycomb-api-key-positive-tool-call-arguments",
+        "honeycomb-api-key-positive-x-api-key-header",
+        "honeycomb-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "honeycomb_ingest_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 126,
+    "supported": 127,
     "unresolved": 0
   }
 }

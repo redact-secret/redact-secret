@@ -145,6 +145,8 @@ fn every_family_value() -> Vec<(&'static str, String)> {
         ("dynatrace-token", dynatrace::token("s16", 24, 64, 2)),
         ("paddle-api-key", paddle::key("live", 26, 22, 3, 1)),
         ("paddle-api-key", paddle::key("sdbx", 26, 22, 3, 2)),
+        ("honeycomb-api-key", honeycomb::key('x', "ik", 58, 1)),
+        ("honeycomb-api-key", honeycomb::key('a', "ic", 58, 2)),
     ]
 }
 
@@ -453,5 +455,98 @@ mod paddle {
     #[test]
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&key("sdbx", 26, 22, 3, 6));
+    }
+}
+
+mod honeycomb {
+    use super::*;
+
+    const DETECTOR: &str = "honeycomb-api-key";
+    const TYPE: &str = "honeycomb_ingest_key";
+
+    pub(super) fn key(letter: char, kind: &str, len: usize, seed: usize) -> String {
+        format!("hc{letter}{kind}_{}", filler(LOWER_ALNUM, len, seed))
+    }
+
+    #[test]
+    fn ingest_keys_win_every_context_as_the_sole_finding() {
+        for (letter, kind, seed) in [
+            ('x', "ik", 1),
+            ('x', "ic", 4),
+            ('b', "ik", 7),
+            ('z', "ic", 9),
+        ] {
+            let key = key(letter, kind, 58, seed);
+            assert_eq!(key.len(), 64);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("HONEYCOMB_API_KEY={key}\n"),
+                format!("X-Honeycomb-Team: {key}\n"),
+                format!("OTEL_EXPORTER_OTLP_HEADERS=x-honeycomb-team={key}\n"),
+                format!(
+                    "exporters:\n  otlp:\n    endpoint: api.honeycomb.io:443\n    headers:\n      x-honeycomb-team: {key}\n"
+                ),
+                format!("libhoney.Init(libhoney.Config{{APIKey: \"{key}\", Dataset: \"ci\"}})\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let good = key('x', "ik", 58, 2);
+        let mut upper = good.clone();
+        upper.replace_range(30..31, "Q");
+        let mut dashed = good.clone();
+        dashed.replace_range(30..31, "-");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key('x', "ik", 57, 2),
+                key('x', "ik", 59, 2),
+                upper,
+                dashed,
+                format!("hcik_{}", filler(LOWER_ALNUM, 59, 2)),
+                format!("hcAik_{}", filler(LOWER_ALNUM, 58, 2)),
+                key('x', "mk", 58, 2),
+                format!("x{good}"),
+                format!("_{good}"),
+                format!("{good}x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_and_the_gated_management_key_are_unclaimed() {
+        for input in [
+            format!("{{\"id\": \"hcxik_{}\"}}", filler(LOWER_ALNUM, 26, 3)),
+            format!("environment hcxen_{}\n", filler(LOWER_ALNUM, 26, 3)),
+            format!("HONEYCOMB_API_KEY={}\n", filler(LOWER_ALNUM, 32, 4)),
+            format!(
+                "Authorization: Bearer hcxmk_{}:{}\n",
+                filler(LOWER_ALNUM, 26, 5),
+                filler(LOWER_ALNUM, 32, 6)
+            ),
+            "HONEYCOMB_API_KEY=${HONEYCOMB_API_KEY}\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_are_isolated() {
+        assert_isolated(DETECTOR);
+    }
+
+    #[test]
+    fn a_repetition_line_is_unclaimed() {
+        assert_repetition_line_is_unclaimed(DETECTOR, &key('x', "ik", 58, 5));
+        assert_repetition_line_is_unclaimed(DETECTOR, "hcxik_");
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key('x', "ic", 58, 6));
     }
 }

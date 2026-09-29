@@ -13821,6 +13821,123 @@
       "type": "paddle_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "honeycomb-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "honeycomb-api-key-positive-bare",
+            "honeycomb-api-key-positive-chat-sentence",
+            "honeycomb-api-key-positive-crlf-unicode-prefix",
+            "honeycomb-api-key-positive-curl-bearer",
+            "honeycomb-api-key-positive-dotenv",
+            "honeycomb-api-key-positive-json-config",
+            "honeycomb-api-key-positive-json-token-key",
+            "honeycomb-api-key-positive-libhoney-config",
+            "honeycomb-api-key-positive-log",
+            "honeycomb-api-key-positive-otel-collector-yaml",
+            "honeycomb-api-key-positive-otel-headers-env",
+            "honeycomb-api-key-positive-punctuation-adjacent",
+            "honeycomb-api-key-positive-python-sdk-call",
+            "honeycomb-api-key-positive-repeated-value",
+            "honeycomb-api-key-positive-second-sample",
+            "honeycomb-api-key-positive-second-sample-dotenv",
+            "honeycomb-api-key-positive-shell-export",
+            "honeycomb-api-key-positive-team-header",
+            "honeycomb-api-key-positive-tool-call-arguments",
+            "honeycomb-api-key-positive-x-api-key-header",
+            "honeycomb-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "honeycomb-api-key-overlap-bearer-header",
+            "honeycomb-api-key-overlap-context",
+            "honeycomb-api-key-overlap-second-sample-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "honeycomb-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "honeycomb-api-key-boundary-dash-in-body",
+            "honeycomb-api-key-boundary-glued-suffix",
+            "honeycomb-api-key-boundary-identifier-glue",
+            "honeycomb-api-key-boundary-long-body",
+            "honeycomb-api-key-boundary-management-shape",
+            "honeycomb-api-key-boundary-missing-type-letter",
+            "honeycomb-api-key-boundary-short-body",
+            "honeycomb-api-key-boundary-uppercase-byte",
+            "honeycomb-api-key-boundary-uppercase-type-letter"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "honeycomb-api-key-negative-environment-id",
+            "honeycomb-api-key-negative-key-id",
+            "honeycomb-api-key-negative-management-key-gated",
+            "honeycomb-api-key-negative-shell-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "honeycomb-api-key-boundary-dash-in-body",
+            "honeycomb-api-key-boundary-glued-suffix",
+            "honeycomb-api-key-boundary-identifier-glue",
+            "honeycomb-api-key-boundary-long-body",
+            "honeycomb-api-key-boundary-management-shape",
+            "honeycomb-api-key-boundary-missing-type-letter",
+            "honeycomb-api-key-boundary-short-body",
+            "honeycomb-api-key-boundary-uppercase-byte",
+            "honeycomb-api-key-boundary-uppercase-type-letter"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for honeycomb_ingest_key (honeycomb-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "honeycomb_ingest_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -14012,6 +14129,7 @@
             "helicone-api-key-adversarial-long-suffix",
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
+            "honeycomb-api-key-adversarial-long-run",
             "huggingface-adversarial-long-suffix",
             "inngest-signing-key-adversarial-long-run",
             "invisible-adversarial-dense-seams",
@@ -14478,6 +14596,7 @@
             "helicone-api-key-adversarial-long-suffix",
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
+            "honeycomb-api-key-adversarial-long-run",
             "huggingface-adversarial-long-suffix",
             "inngest-signing-key-adversarial-long-run",
             "invisible-adversarial-dense-seams",

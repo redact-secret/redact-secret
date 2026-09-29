@@ -83,6 +83,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `helicone_write_api_key` | `helicone-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider validator regexes and generators), `[a-z0-9]` per ruling R8, grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `heroku_api_key` | `heroku-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #740 adds the documented 41-character `HRKU-` + lower-case UUID generation beside `HRKU-AA` + 58, grammar in `detectors::heroku`'s module doc |
 | `heroku_api_key_legacy` | `heroku-api-key-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository; issue #714 excludes a UUID assigned to an identifier-shaped key (last word `id` or `uuid`, e.g. `HEROKU_APP_ID`) from the `heroku` keyword gate, grammar in `detectors::heroku`'s module doc; issue #743 also accepts two documented multi-line layouts (a Heroku `.netrc` entry's `password`, `heroku auth:token` output, held open by an incremental retention hint) and excludes a UUID that is a URL path segment; issue #934 excludes an all-one-digit UUID placeholder (`00000000-0000-0000-0000-000000000000`); issue #933 adds a third multi-line layout, the `Token:` row of `heroku authorizations:<verb>` table output; issue #936 reports a UUID read through any of the three layouts at `high` (redact), the same-line keyword path staying `medium` unless the key names Heroku |
+| `honeycomb_ingest_key` | `honeycomb-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Honeycomb docs prefix; provider SDK regex, length gate and fixtures, R1 and R5); management keys stay issuance-gated and unclaimed, grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `huggingface_token` | `huggingface-token` | `always-redact` | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `inngest_signing_key` | `inngest-signing-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Inngest provider code constants, docs generation command and SDK fixtures), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `jwt` | `jwt` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
@@ -865,6 +866,7 @@ benchmarks arrival and profile evidence.
 | `crates-io:api-token` | `crates-io-token` | `cio` + exactly 32 `[A-Za-z0-9]` (35 in total); `cio_tp_` + exactly 32 `[A-Za-z0-9]` (39 in total), tried first | `crates_io_api_token`, `crates_io_trusted_publishing_token` | T1 (crates.io server generators, R1) |
 | `dynatrace:api-token` | `dynatrace-token` | `dt0` + `c`\|`s` + 2 digits + `.` + exactly 24 `[A-Z2-7]` + `.` + exactly 64 `[A-Z2-7]` (96 in total), the whole token as the span; the byte before `dt0` must not be `[A-Za-z0-9_.-]` unless it ends a `%20`, and a `.` after the token rejects only when another `[A-Za-z0-9_-]` byte follows it | `dynatrace_token` | T1 (docs structure, lengths and prefix table; base32 alphabet from the provider generator, R1) |
 | `paddle:api-key` | `paddle-api-key` | `pdl_live_apikey_`\|`pdl_sdbx_apikey_` + exactly 26 `[a-z0-9]` + `_` + exactly 22 `[A-Za-z0-9]` + `_` + exactly 3 `[A-Za-z0-9]` (69 in total, five `_`) | `paddle_api_key` | T1 (provider docs regex and length) |
+| `honeycomb:api-key` (ingest only) | `honeycomb-api-key` | `hc` + one `[a-z]` + `ik_` (environment) or `ic_` (classic) + exactly 58 `[a-z0-9]` (64 in total) | `honeycomb_ingest_key` | T1 (docs prefix; SDK regex, 64-byte gate and fixtures, R1 and R5); management key issuance-gated |
 
 crates.io ([#1031](https://github.com/redact-secret/redact-secret/issues/1031),
 [handoff](../audits/evidence/1014/crates-io.md)). `cio` is a 3-letter
@@ -905,6 +907,22 @@ False negatives: legacy keys from before 2025-05-06 (50 unprefixed
 69-byte layout. Cost: two prefixes on the shared known-format scan plus a
 53-byte post check.
 
+Honeycomb ([#1034](https://github.com/redact-secret/redact-secret/issues/1034),
+[handoff](../audits/evidence/1014/honeycomb.md)). Only ingest keys are
+claimed. Environment (`ik`) and classic (`ic`) ingest keys are one type: the
+docs define the key value as the key id and secret concatenated with no
+separator, so the whole 64 bytes are the span. **Management keys
+(`hc[a-z]mk_` + 26 + `:` + 32) stay unclaimed**: they are issuance-gated on
+the alphabet of both segments (the docs placeholder is digits only and no
+fixture exists), and `honeycomb_management_key` is added only after a
+maintainer-issued key clears that gate. Key ids alone (`hc?ik_`/`hc?mk_` +
+26, `hc?lk_`, `hc?en_`) are non-secret and fail the 58-byte body.
+False negatives: management keys, 22-character configuration keys and
+32-hex classic keys outside named contexts, and a glued key. False
+positives: an unrelated `hc?ik_`/`hc?ic_` + 58 lowercase alphanumerics; none
+is known. Cost: one `hc` prefix on the shared known-format scan plus a
+62-byte post check.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -936,6 +954,7 @@ False negatives: legacy keys from before 2025-05-06 (50 unprefixed
 | crates.io `cio` + 32 alphanumeric API tokens and `cio_tp_` + 32 alphanumeric trusted-publishing tokens are reported as `crates_io_api_token` and `crates_io_trusted_publishing_token` at provider specificity, bare or in any context; the trusted-publishing check character is not a rejection gate ([#1031](https://github.com/redact-secret/redact-secret/issues/1031), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Dynatrace `dt0[cs]NN.` + 24 + `.` + 64 base32 access and platform tokens are reported whole as `dynatrace_token` at provider specificity, bare or in any context, including after `Api-Token%20`; the token identifier alone stays unclaimed ([#1032](https://github.com/redact-secret/redact-secret/issues/1032), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Paddle `pdl_live_apikey_`/`pdl_sdbx_apikey_` + 26 + `_` + 22 + `_` + 3 API keys are reported as `paddle_api_key` at provider specificity, bare or in any context; the `apikey_` key id alone and legacy unprefixed keys stay unclaimed ([#1033](https://github.com/redact-secret/redact-secret/issues/1033), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Honeycomb `hc[a-z]ik_`/`hc[a-z]ic_` + 58 lowercase alphanumeric ingest keys are reported as `honeycomb_ingest_key` at provider specificity, bare or in any context; management keys stay unclaimed until their issuance check, and key ids, configuration and classic hex keys stay unclaimed ([#1034](https://github.com/redact-secret/redact-secret/issues/1034), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

@@ -42,6 +42,7 @@ mod gitlab;
 mod grafana;
 mod helicone;
 mod heroku;
+mod honeycomb;
 mod inngest;
 mod jwt;
 mod keyword_gated_keys;
@@ -247,6 +248,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(crates_io::CRATES_IO),
         Box::new(dynatrace::DynatraceTokenDetector),
         Box::new(paddle::PADDLE_API_KEY),
+        Box::new(honeycomb::HONEYCOMB_INGEST_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -541,6 +543,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(paddle::PADDLE_API_KEY.shapes())],
     ),
     (
+        honeycomb::HONEYCOMB_INGEST_KEY.detector_id(),
+        &[Literals::Shapes(honeycomb::HONEYCOMB_INGEST_KEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -720,6 +726,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("crates-io-token", Pack::Provider),
     ("dynatrace-token", Pack::Provider),
     ("paddle-api-key", Pack::Provider),
+    ("honeycomb-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -856,6 +863,7 @@ mod tests {
                 "crates-io-token",
                 "dynatrace-token",
                 "paddle-api-key",
+                "honeycomb-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1226,6 +1234,10 @@ mod tests {
             "pdl_sdbx_apikey_{}_{}_{}",
             "syntheticrevokedpaddle0000", "SyntheticRevokedSecret", "X9z"
         );
+        let honeycomb_api_key_input = format!(
+            "hcxik_{}{}",
+            "syntheticrevokedhoneycombingestkey", "0123456789abcdefghijklmn"
+        );
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1341,6 +1353,7 @@ mod tests {
             ("crates-io-token", crates_io_token_input.as_str()),
             ("dynatrace-token", dynatrace_token_input.as_str()),
             ("paddle-api-key", paddle_api_key_input.as_str()),
+            ("honeycomb-api-key", honeycomb_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

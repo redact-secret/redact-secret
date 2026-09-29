@@ -911,6 +911,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z",
       "schemes": null
+    },
+    {
+      "type": "honeycomb_ingest_key",
+      "detector": "honeycomb-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "schemes": null
     }
   ],
   "consumers": [

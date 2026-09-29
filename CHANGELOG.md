@@ -41,6 +41,9 @@ evidence is linked from each published version.
   - `paddle-api-key` (#1033): Paddle Billing `pdl_live_apikey_` and
     `pdl_sdbx_apikey_` API keys in the documented 69-character layout
     (`paddle_api_key`); the `apikey_` key id alone stays unclaimed.
+  - `honeycomb-api-key` (#1034): Honeycomb `hc?ik_`/`hc?ic_` + 58 ingest
+    keys (`honeycomb_ingest_key`). Management keys stay unclaimed until a
+    maintainer issuance check settles their alphabet.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 126/126 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 127/127 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 126 |
+| supported | 127 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 137.
+Coverage declarations: 138.
 
 ## Coverage by detector
 
@@ -72,6 +72,7 @@ Coverage declarations: 137.
 | helicone-api-key | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| honeycomb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | inngest-signing-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -196,6 +197,7 @@ Coverage declarations: 137.
 | helicone_write_api_key | helicone-api-key | provider | supported | not-applicable | none |
 | heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
+| honeycomb_ingest_key | honeycomb-api-key | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | inngest_signing_key | inngest-signing-key | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
@@ -282,15 +284,15 @@ Coverage declarations: 137.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 137 | 0 | 0 |
-| boundary | 126 | 0 | 0 |
-| host-context | 126 | 0 | 0 |
+| adversarial | 138 | 0 | 0 |
+| boundary | 127 | 0 | 0 |
+| host-context | 127 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 137 | 0 | 0 |
-| near-miss-negative | 126 | 0 | 0 |
-| overlap | 126 | 0 | 0 |
-| positive | 126 | 0 | 0 |
-| range | 137 | 0 | 0 |
+| malformed | 138 | 0 | 0 |
+| near-miss-negative | 127 | 0 | 0 |
+| overlap | 127 | 0 | 0 |
+| positive | 127 | 0 | 0 |
+| range | 138 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
