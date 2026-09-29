@@ -254,6 +254,15 @@ evidence is linked from each published version.
   part; a `|` right after a reviewed email label is now a field boundary.
   After any other text (`|emailx|…`, `|user|a|…`) the `|` stays part of the
   local part.
+- An incremental session took quadratic time on whitespace-only lines
+  after an open assignment or `Authorization` header (#986). Each closed
+  line renormalized the whole retained unit and scanned back across every
+  blank line to decide whether the construct was still open, so
+  `API_KEY=` followed by 40,000 lines of eight spaces took about 9 s in a
+  release build, and minutes fit inside the CLI's default 1 MiB token
+  limit. The session now keeps the scan copy as text arrives and re-checks
+  the open assignment only when a line with content closes; the same input
+  takes about 40 ms. Output is unchanged.
 
 ### Performance
 

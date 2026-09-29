@@ -90,6 +90,16 @@ pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 pub(crate) use twilio::has_open_twilio_cli_table;
 
+/// `true` when appending `appended` to any input leaves both
+/// [`has_open_contextual_assignment`] and [`has_open_bearer_authorization`]
+/// unchanged. Each first skips trailing [`text::is_js_whitespace`] and then
+/// reads only what precedes it, so text made of nothing else is invisible to
+/// them. The incremental session relies on this to re-evaluate the two tail
+/// checks only when a line with other content closes (issue #986).
+pub(crate) fn is_open_tail_neutral(appended: &str) -> bool {
+    appended.chars().all(text::is_js_whitespace)
+}
+
 /// Every built-in detector, in canonical registration order.
 #[must_use]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {

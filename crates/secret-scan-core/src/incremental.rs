@@ -64,11 +64,13 @@
 //! [`finalize`]: IncrementalSanitizer::finalize
 //! [`abort`]: IncrementalSanitizer::abort
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 
 use crate::detectors::{
     PrivateKeyRetentionTracker, has_open_bearer_authorization, has_open_confluent_properties,
     has_open_contextual_assignment, has_open_heroku_legacy_context, has_open_twilio_cli_table,
+    is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 #[cfg(test)]
@@ -330,6 +332,40 @@ fn find_next_newline(chunk: &str, from: usize) -> Option<usize> {
         .map(|index| index + from)
 }
 
+/// The last result of the two open-construct checks whose backward scan is
+/// unbounded, [`has_open_contextual_assignment`] and
+/// [`has_open_bearer_authorization`]: whether either reports an open construct
+/// over the first `checked_len` bytes of the unit's scan copy. Both are
+/// unchanged by appended whitespace ([`is_open_tail_neutral`]), so the result
+/// is recomputed only when a closed line brings other content, and every gap
+/// of blank lines is crossed once instead of once per line (issue #986).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct OpenTailCache {
+    checked_len: usize,
+    open: bool,
+}
+
+/// Which lookback retention hints apply: whether the registry holds the
+/// detector each one serves. The registry never changes after construction,
+/// so this is decided once instead of on every closed line.
+#[derive(Clone, Copy, Debug)]
+#[allow(clippy::struct_excessive_bools)]
+struct LookbackHints {
+    heroku_legacy: bool,
+    twilio_auth_token: bool,
+    confluent_legacy: bool,
+}
+
+impl LookbackHints {
+    fn of(registry: &DetectorRegistry) -> Self {
+        Self {
+            heroku_legacy: registry.contains(HEROKU_LEGACY_DETECTOR_ID),
+            twilio_auth_token: registry.contains(TWILIO_AUTH_TOKEN_DETECTOR_ID),
+            confluent_legacy: registry.contains(CONFLUENT_LEGACY_DETECTOR_ID),
+        }
+    }
+}
+
 /// A bounded, side-effect-free incremental sanitizer session over built-in
 /// detectors. Custom detectors are not accepted: each has no retention
 /// declaration, so the session cannot bound what it must hold open.
@@ -366,6 +402,13 @@ pub struct IncrementalSanitizer {
     limits: IncrementalLimits,
     state: SessionState,
     retained: String,
+    /// The scan copy of `retained`, normalized piece by piece as it is
+    /// appended. Held only once a piece of this unit actually lost an
+    /// invisible code point; until then the scan copy is `retained` itself,
+    /// so an ordinary unit is never copied (issue #986).
+    scanned: Option<String>,
+    open_tail: OpenTailCache,
+    lookbacks: LookbackHints,
     finalized_bytes: usize,
     total_input_bytes: usize,
     finding_count: usize,
@@ -515,6 +558,7 @@ impl IncrementalSanitizer {
         policy: Box<dyn IncrementalPolicy>,
         formatter: Box<dyn PlaceholderFormatter>,
     ) -> Self {
+        let lookbacks = LookbackHints::of(&registry);
         Self {
             registry,
             policy,
@@ -522,6 +566,9 @@ impl IncrementalSanitizer {
             limits,
             state: SessionState::Accepting,
             retained: String::new(),
+            scanned: None,
+            open_tail: OpenTailCache::default(),
+            lookbacks,
             finalized_bytes: 0,
             total_input_bytes: 0,
             finding_count: 0,
@@ -580,6 +627,8 @@ impl IncrementalSanitizer {
     /// contract is to drop them.
     fn discard_retained(&mut self) {
         self.retained = String::new();
+        self.scanned = None;
+        self.open_tail = OpenTailCache::default();
         self.private_key.reset();
         self.multiline_open = false;
         self.multiline_detected = false;
@@ -607,27 +656,73 @@ impl IncrementalSanitizer {
     /// split by an invisible code point at a line end would not read as an
     /// open construct, the unit would close early, and the same input would
     /// yield different findings under a different partition.
-    fn has_open_single_line_construct(&self) -> bool {
-        let scanned = NormalizedInput::new(&self.retained).into_text();
-        has_open_contextual_assignment(&scanned)
-            || has_open_bearer_authorization(&scanned)
+    ///
+    /// The scan copy is maintained as pieces arrive rather than rebuilt here,
+    /// and the two tail checks, whose backward scan crosses any run of blank
+    /// lines, reuse their last result when only whitespace has arrived since
+    /// (issue #986). The three lookback checks read a bounded number of lines
+    /// and run as before.
+    fn has_open_single_line_construct(&mut self) -> bool {
+        let scanned = self.scanned.as_deref().unwrap_or(&self.retained);
+        if !is_open_tail_neutral(&scanned[self.open_tail.checked_len..]) {
+            self.open_tail.open =
+                has_open_contextual_assignment(scanned) || has_open_bearer_authorization(scanned);
+        }
+        self.open_tail.checked_len = scanned.len();
+
+        let lookbacks = self.lookbacks;
+        let open = self.open_tail.open
+            || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
+            || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
+            || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned));
+        #[cfg(test)]
+        self.assert_open_construct_matches_the_rescan(open);
+        open
+    }
+
+    /// Differential check (issue #986): the maintained scan copy and the
+    /// cached tail result equal what a fresh normalization and rescan of the
+    /// whole retained unit report, after every closed line of every test that
+    /// drives a session.
+    #[cfg(test)]
+    fn assert_open_construct_matches_the_rescan(&self, open: bool) {
+        let rescanned = NormalizedInput::new(&self.retained).into_text();
+        assert_eq!(
+            self.scanned.as_deref().unwrap_or(&self.retained),
+            rescanned,
+            "maintained scan copy"
+        );
+        let tail_open =
+            has_open_contextual_assignment(&rescanned) || has_open_bearer_authorization(&rescanned);
+        assert_eq!(self.open_tail.open, tail_open, "cached tail checks");
+        let reference = tail_open
             || (self.registry.contains(HEROKU_LEGACY_DETECTOR_ID)
-                && has_open_heroku_legacy_context(&scanned))
+                && has_open_heroku_legacy_context(&rescanned))
             || (self.registry.contains(TWILIO_AUTH_TOKEN_DETECTOR_ID)
-                && has_open_twilio_cli_table(&scanned))
+                && has_open_twilio_cli_table(&rescanned))
             || (self.registry.contains(CONFLUENT_LEGACY_DETECTOR_ID)
-                && has_open_confluent_properties(&scanned))
+                && has_open_confluent_properties(&rescanned));
+        assert_eq!(open, reference, "open single-line construct");
     }
 
     fn append_retained(&mut self, piece: &str, closes_line: bool) -> Result<(), SecretScanError> {
+        // The tracker and the open-construct checks read the scan copy, as
+        // the detectors will. A piece is whole code points, so normalizing
+        // piece by piece equals normalizing the unit. Every limit below is a
+        // memory bound and stays measured in original bytes.
+        let normalized = NormalizedInput::new(piece).into_text();
+        match (&mut self.scanned, &normalized) {
+            (Some(scanned), _) => scanned.push_str(&normalized),
+            (None, Cow::Owned(normalized)) => {
+                let mut scanned = String::with_capacity(self.retained.len() + normalized.len());
+                scanned.push_str(&self.retained);
+                scanned.push_str(normalized);
+                self.scanned = Some(scanned);
+            }
+            (None, Cow::Borrowed(_)) => {}
+        }
         self.retained.push_str(piece);
-        // The tracker reads delimiters from the scan copy, as the detector
-        // will. A piece is whole code points, so normalizing piece by piece
-        // equals normalizing the unit. Only the tracker sees the copy: every
-        // limit below is a memory bound and stays measured in original bytes.
-        let (has_begin, has_open) = self
-            .private_key
-            .append(&NormalizedInput::new(piece).into_text());
+        let (has_begin, has_open) = self.private_key.append(&normalized);
         self.multiline_detected |= has_begin;
         self.multiline_open = has_open;
 
@@ -882,6 +977,8 @@ mod tests {
     fn assert_nothing_retained(sanitizer: &IncrementalSanitizer) {
         assert_eq!(sanitizer.retained, "");
         assert_eq!(sanitizer.retained.capacity(), 0);
+        assert!(sanitizer.scanned.is_none());
+        assert_eq!(sanitizer.open_tail, OpenTailCache::default());
         assert!(!sanitizer.multiline_open);
         assert!(!sanitizer.multiline_detected);
     }
@@ -1017,6 +1114,97 @@ mod tests {
         assert_eq!(default_session().profile(), Some(Profile::Full));
         let common = IncrementalSanitizer::with_common_built_in(generous_limits()).unwrap();
         assert_eq!(common.profile(), Some(Profile::Common));
+    }
+
+    /// Runs `input` split at every char boundary into two chunks, and once
+    /// a char at a time, through a `full` and a PII-aware session. Every
+    /// closed line runs [`IncrementalSanitizer::assert_open_construct_matches_the_rescan`],
+    /// and every partition must reproduce the one-chunk output.
+    fn assert_every_partition_matches_the_rescan(input: &str) {
+        fn run(sanitizer: &mut IncrementalSanitizer, chunks: &[&str]) -> (String, Vec<Finding>) {
+            let mut text = String::new();
+            let mut findings = Vec::new();
+            for chunk in chunks {
+                let result = sanitizer.append(chunk).unwrap();
+                text.push_str(result.text());
+                findings.extend_from_slice(result.findings());
+            }
+            let result = sanitizer.finalize().unwrap();
+            text.push_str(result.text());
+            findings.extend_from_slice(result.findings());
+            (text, findings)
+        }
+        let selection = PiiSelection::parse(&["pii:global"]).unwrap();
+        let sessions: [fn(&PiiSelection) -> IncrementalSanitizer; 2] = [
+            |_| default_session(),
+            |selection| {
+                IncrementalSanitizer::with_built_in_and_pii(generous_limits(), selection).unwrap()
+            },
+        ];
+        for session in sessions {
+            let reference = run(&mut session(&selection), &[input]);
+            let mut boundaries: Vec<usize> = (1..input.len())
+                .filter(|&at| input.is_char_boundary(at))
+                .collect();
+            if input.len() > 512 {
+                boundaries.retain(|at| at % 61 == 0 || input.as_bytes()[at - 1] == b'\n');
+            }
+            for at in boundaries {
+                let chunks = [&input[..at], &input[at..]];
+                assert_eq!(run(&mut session(&selection), &chunks), reference, "{at}");
+            }
+            let mut chars = Vec::new();
+            let mut rest = input;
+            while let Some(ch) = rest.chars().next() {
+                chars.push(&rest[..ch.len_utf8()]);
+                rest = &rest[ch.len_utf8()..];
+            }
+            assert_eq!(run(&mut session(&selection), &chars), reference);
+        }
+    }
+
+    #[test]
+    fn the_maintained_open_construct_state_matches_a_rescan_over_the_incremental_corpus() {
+        let corpus: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/fixtures/incremental-corpus.json"
+        ))
+        .unwrap();
+        let fixtures = corpus["fixtures"].as_array().unwrap();
+        assert!(fixtures.len() >= 90, "the incremental corpus shrank");
+        for fixture in fixtures {
+            assert_every_partition_matches_the_rescan(fixture["input"].as_str().unwrap());
+        }
+    }
+
+    #[test]
+    fn the_maintained_open_construct_state_matches_a_rescan_across_whitespace_gaps() {
+        // Whitespace-only lines keep the cached tail result; the line that
+        // brings content re-evaluates it. The gaps mix every whitespace kind
+        // the tail checks skip, and an invisible code point makes the scan
+        // copy diverge mid-unit.
+        let gaps = [
+            "\n\n\n",
+            "        \n        \n",
+            "\r\n \t\r\n",
+            "\u{2028}\n\u{FEFF}\u{00A0}\n",
+            "\u{200B}\n \u{200B} \n",
+        ];
+        for gap in gaps {
+            for input in [
+                format!("API_KEY={gap}{MARKER}\nnext\n"),
+                format!("API_KEY{gap}={gap}{MARKER}\n"),
+                format!("API_\u{200B}KEY={gap}{MARKER}\n"),
+                format!("config \"token\":{gap}{MARKER}\n"),
+                format!("Authorization:{gap}Bearer {MARKER}\n"),
+                format!("x-authorization{gap}Bearer {MARKER}\n"),
+                format!("plain words{gap}api_key={gap}={gap}{MARKER}\n"),
+                format!(
+                    "machine api.heroku.com{gap}login user@example.invalid{gap}password {MARKER}\n"
+                ),
+            ] {
+                assert_every_partition_matches_the_rescan(&input);
+            }
+        }
     }
 
     // Whether a `common` incremental session's cumulative output matches
