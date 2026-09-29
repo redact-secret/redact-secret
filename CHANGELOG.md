@@ -149,10 +149,27 @@ evidence is linked from each published version.
   ambiguous names (`GITHUB_CREDENTIALS`) stay silent. The `common` profile,
   which has no provider detectors, now redacts provider-named assignments.
   Cost: a non-secret literal under a provider-named credential variable,
-  such as a malformed near miss or a public key id (`CONFLUENT_CLOUD_API_KEY`),
-  is reported. See `docs/audits/evidence/948/README.md`.
+  such as a malformed near miss, is reported. See
+  `docs/audits/evidence/948/README.md`.
 
 ### Fixed
+
+- Placeholders, masked and elided key displays, Make-escaped substitutions,
+  public keys and the Confluent key id are no longer reported as
+  `contextual_secret` under any credential name (#993). This covers:
+  - placeholders with a provider or qualifier word (`your-bot-token-here`,
+    `YOUR_MAILGUN_API_KEY`, `whsec_YOUR_SIGNING_SECRET`) and counting-run
+    stand-ins (`ghp_abc123`, `xoxb-123-456-abc`);
+  - full-length masked keys (`********-****-…`, `PMAK-****…`, `********…-us6`)
+    and elided displays (`ATATT3xFfGF0...`);
+  - Make-escaped substitutions (`$$(heroku auth:token)`);
+  - documented public keys (`pk_live_`, `pk_test_`, `sb_publishable_`,
+    `pk-lf-`, `phc_`, `pk_<env>_`);
+  - Confluent's public API key id under a Confluent-named key.
+
+  Random material glued to a placeholder, secret-key prefixes, a short
+  `********x` mask and a longer visible head stay reported. See
+  `docs/audits/evidence/993/README.md`.
 
 - Streaming false negatives: an incremental session missed a credential that
   a whole-input scan of the same text redacts (#990, found by the #985

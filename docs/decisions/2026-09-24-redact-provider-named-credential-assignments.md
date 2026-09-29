@@ -194,13 +194,11 @@ This supersedes section 2's provider exception for high-signal names and the
 - **FP cost:** a non-secret literal of 8+ bytes under a provider-named
   credential variable, the cost section 2 already accepted for
   `MYAPP_API_KEY`. The malformed-by-construction controls that motivated the
-  exception are reported again (`GITHUB_TOKEN=ghp_abc123` warns, a
-  full-length near miss redacts), and so is a public id kept under a
-  provider's `_API_KEY` name (a Confluent Cloud API key id, a Datadog key
-  record id).
+  exception are reported again: a full-length near miss redacts, a short
+  one warns. Placeholders, masks, public keys and the Confluent key id are
+  excluded under every name by #993; 177 of the 203 benchmark negatives
+  stay reported, all random material under a provider credential name.
 
-Evidence (46 canonical fixtures, 244 common-profile expectations, 203
-benchmark construction negatives, all with the same action as under
-`MYAPP_`): [`docs/audits/evidence/948/README.md`](../audits/evidence/948/README.md).
+Evidence: [`docs/audits/evidence/948/README.md`](../audits/evidence/948/README.md).
 Tests: `generic_token` unit tests and
 `tests/provider_named_fallback_948.rs`.

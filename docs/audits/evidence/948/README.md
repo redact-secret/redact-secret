@@ -85,7 +85,8 @@ canonical corpus and places each under
 ## Benchmark construction negatives
 
 The benchmark corpus generators were run locally at
-`redact-secret-benchmarks` `7af585a` (`fixtures/generated/build.mjs`, plus
+`redact-secret-benchmarks` `7af585a` and again at `develop` `7598bf1`, with
+the same result (`fixtures/generated/build.mjs`, plus
 the committed `accuracy`, `real-world-shapes`, `token-contexts` and
 `shadow-scoring-authored` corpora; 4,992 fixtures). Each fixture was scanned
 with the default registry before and after the change. This is not a
@@ -103,24 +104,26 @@ show.
 - **All 203 are the generic rule, not a new one.** The same 203 inputs with
   the provider prefix rewritten to `MYAPP_` produce the same actions, 203 of
   203.
-- **The benign values among them** are the placeholders and public ids that
-  the generic rule already reports under any name:
-  - masks such as `********-****-…` and `…-us6`, and `00••••…`;
-  - `ATATT3xFfGF0...` and `sntrys_eyJ...`;
-  - `your-bot-token-here`, `your-travis-api-token`, `YOUR_MAILGUN_API_KEY`,
-    `whsec_YOUR_SIGNING_SECRET`, `ntn_yourinternalintegrationtokenhere`,
-    `PMAK-<your-api-key>` and `xxxx…-usX`;
-  - a Make-escaped `$$(heroku auth:token)`;
-  - `pk_live_`, `sb_publishable_` and `pk-lf-` public keys under
-    secret-named variables;
-  - the Confluent Cloud API key id under `CONFLUENT_CLOUD_API_KEY`.
-
-  They are follow-up candidates for the generic placeholder rules. Nothing
-  in #948 makes them different from `MYAPP_API_KEY`.
-- **3 positives gain a second, collateral finding:** the Confluent Cloud API
-  key id on the line above the secret (`beta8-209`/`beta8-213c` Confluent
-  env, shell and Actions layouts). The secret itself keeps its typed
-  `confluent_cloud_api_secret` finding.
+- **The benign values among them** were placeholders, masks, public keys
+  and public ids that the generic rule already reported under any name.
+  [#993](https://github.com/redact-secret/redact-secret/issues/993), on the
+  same branch, excludes them under every name
+  ([evidence](../993/README.md)). After #993, 26 of the 203 are silent
+  again, including the four `negative-controls` (`short-github`,
+  `short-gitlab`, `short-npm`, `short-slack`).
+- **177 remain after #993, all intended by #948.** Each is random or
+  secret-shaped material under the provider's own credential variable: a
+  malformed twin, a near miss, a truncated or glued value. 176 redact and 1
+  warns (`mailgun-api-key-short-body`). By corpus: `context-edges` 42,
+  `detector-coverage` 30, `beta8-207` 28, `beta8-208` 11, `beta8-259` 10,
+  `beta8-263` 10, `beta8-212` 7, `beta8-213f` 7, `credential-formats` 6,
+  `sendgrid-regressions` 6, `beta8-211` 6, `beta8-213d` 4, `token-contexts` 4
+  (`must-not-flag`), `beta8-209` 3, `beta8-210` 2, `beta8-384a` 1. These
+  benchmark labels need relabelling in `redact-secret-benchmarks`. The rescan
+  found no false positive left among them.
+- **The 3 collateral findings on positives are gone after #993.** The
+  Confluent key id is no longer redacted beside its typed secret, so
+  positives match `main` again.
 
 ## Performance
 
