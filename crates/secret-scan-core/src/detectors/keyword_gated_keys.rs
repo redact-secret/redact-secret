@@ -57,10 +57,15 @@
 //!    (`# deepgram: Authorization: Token <value>`). `Bearer` forms are
 //!    already `bearer-token`'s.
 //!
-//! A value under a `masked_`-led key (`masked_api_key=`, a `LiteLLM` debug
-//! field) is not claimed: the key is not a credential name
-//! (`decision-redact-provider-named-credential-assignments` section 2) and
-//! the provider keyword is not adjacent. This is policy, not a gap.
+//! 5. **Model route** (High, issue #1018): a credential-named key on a line
+//!    that names a `LiteLLM`-style provider route, the keyword directly
+//!    followed by `/` and a model name (`cohere/command-r-plus`). This
+//!    covers a proxy debug line that logs the key under `masked_api_key=`
+//!    without masking it. A key led by `masked_`/`redacted_`/`hashed_` (or
+//!    another value-checked lead) qualifies only when the value does not
+//!    show masking or hashing (a 40-hex run under `hashed_` is a digest),
+//!    and a `publishable_` key never does; the masked display
+//!    (`9ctA****...lwCk`) is never a run of the key's shape anyway.
 //!
 //! A key ending in an identifier or location segment (`_id`, `_url`,
 //! `_org`, ...) never qualifies (`MISTRAL_KEY_ID=`, `DEEPGRAM_PROJECT_ID=`),
@@ -82,7 +87,7 @@
 //! Types are confidence-gated (not in `ALWAYS_REDACT_TYPES`), like Twilio.
 
 use super::text::lines;
-use crate::detectors::generic_token::normalize_name;
+use crate::detectors::generic_token::{masking_lead_hides_value, normalize_name};
 use crate::detectors::pattern::{self, Alphabet};
 use crate::detectors::text;
 use crate::error::DetectorFailure;
@@ -115,6 +120,7 @@ struct Spec {
     named_signal: &'static str,
     constructor_signal: &'static str,
     adjacent_signal: &'static str,
+    route_signal: &'static str,
     /// Accepts an `Authorization: Token <value>` header on a keyword line.
     token_header: bool,
     /// The provider's API host domain (lowercase). A token header on a line
@@ -142,6 +148,7 @@ const MISTRAL: Spec = Spec {
     named_signal: "mistral-named-assignment",
     constructor_signal: "mistral-sdk-constructor",
     adjacent_signal: "mistral-keyword-adjacent",
+    route_signal: "mistral-model-route",
     token_header: false,
     api_host_domain: None,
 };
@@ -155,6 +162,7 @@ const COHERE: Spec = Spec {
     named_signal: "cohere-named-assignment",
     constructor_signal: "cohere-sdk-constructor",
     adjacent_signal: "cohere-keyword-adjacent",
+    route_signal: "cohere-model-route",
     token_header: false,
     api_host_domain: None,
 };
@@ -168,6 +176,7 @@ const AI21: Spec = Spec {
     named_signal: "ai21-named-assignment",
     constructor_signal: "ai21-sdk-constructor",
     adjacent_signal: "ai21-keyword-adjacent",
+    route_signal: "ai21-model-route",
     token_header: false,
     api_host_domain: None,
 };
@@ -181,6 +190,7 @@ const DEEPGRAM: Spec = Spec {
     named_signal: "deepgram-named-assignment",
     constructor_signal: "deepgram-sdk-constructor",
     adjacent_signal: "deepgram-keyword-adjacent",
+    route_signal: "deepgram-model-route",
     token_header: true,
     api_host_domain: Some("deepgram.com"),
 };
@@ -362,6 +372,23 @@ fn names_host_under(line: &str, domain: &str) -> bool {
     })
 }
 
+/// `true` when `line` names a `LiteLLM`-style provider route: a keyword
+/// that does not continue a wider identifier on its left, then `/` and an
+/// alphanumeric model-name byte (`cohere/command-r-plus`,
+/// `mistral/mistral-large-latest`). Issue #1018.
+fn names_model_route(line: &str, spec: &Spec) -> bool {
+    let lowered = line.to_ascii_lowercase();
+    let bytes = lowered.as_bytes();
+    spec.keywords.iter().any(|keyword| {
+        lowered.match_indices(keyword).any(|(at, _)| {
+            let end = at + keyword.len();
+            (at == 0 || !is_boundary_byte(bytes[at - 1]))
+                && bytes.get(end) == Some(&b'/')
+                && bytes.get(end + 1).is_some_and(u8::is_ascii_alphanumeric)
+        })
+    })
+}
+
 fn contains_keyword_ci(window: &str, spec: &Spec) -> Option<usize> {
     let lowered = window.to_ascii_lowercase();
     spec.keywords
@@ -377,6 +404,7 @@ fn context(
     start: usize,
     end: usize,
     header_context: HeaderContext,
+    model_route: bool,
 ) -> Option<(Confidence, &'static str)> {
     let bytes = line.as_bytes();
     if let Some(key) = text::assignment_key(bytes, start) {
@@ -390,6 +418,9 @@ fn context(
         }
         if inside_provider_call(line, spec, key_start) {
             return Some((Confidence::High, spec.constructor_signal));
+        }
+        if model_route && !masking_lead_hides_value(&normalized, &line[start..end]) {
+            return Some((Confidence::High, spec.route_signal));
         }
         let window =
             String::from_utf8_lossy(&bytes[key_start.saturating_sub(KEYWORD_WINDOW)..key_start])
@@ -575,13 +606,16 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
         } else {
             HeaderContext::Keyword
         };
+        let model_route = names_model_route(line, spec);
         for (start, end) in runs {
             if text::is_repeated_character_filler(&line[start..end])
                 || text::is_labelled_digest(line, start)
             {
                 continue;
             }
-            let Some((confidence, signal)) = context(line, spec, start, end, header_context) else {
+            let Some((confidence, signal)) =
+                context(line, spec, start, end, header_context, model_route)
+            else {
                 continue;
             };
             let Some(range) = ByteRange::new(line_start + start, line_start + end) else {
@@ -792,6 +826,36 @@ mod tests {
     }
 
     #[test]
+    fn issue_1018_a_model_route_qualifies_an_unmasked_credential_key() {
+        let c = alnum40();
+        for input in [
+            format!(
+                "18:22:04 - LiteLLM Proxy:DEBUG: router.py:1841 - cohere/command-r-plus call failed; masked_api_key={c} reason=AuthenticationError"
+            ),
+            format!("cohere/command-r-plus call failed; api_key={c}"),
+            format!("model=cohere/command-r redacted_api_key=\"{c}\""),
+        ] {
+            assert_exact(&COHERE, &input, &c, Confidence::High);
+        }
+        let m = alnum32();
+        assert_exact(
+            &MISTRAL,
+            &format!("mistral/mistral-large-latest failed; masked_api_key={m}"),
+            &m,
+            Confidence::High,
+        );
+        // A masked display is never a run of the key's shape.
+        let masked = format!("{}{}{}", &c[..4], "*".repeat(32), &c[36..]);
+        assert!(
+            run(
+                &COHERE,
+                &format!("cohere/command-r masked_api_key={masked}")
+            )
+            .is_empty()
+        );
+    }
+
+    #[test]
     fn issue_932_benign_twins_stay_silent() {
         let c = alnum40();
         let d = lower40();
@@ -812,11 +876,14 @@ mod tests {
             format!("Cohere.builder().clientName(\"{d}\").build();"),
             format!("Other.builder().token(\"{d}\").build();"),
             format!("load(\"cohere\").token(\"{d}\")"),
-            // Policy (decision-redact-provider-named-credential-assignments
-            // section 2): a `masked_`-led key is not a credential name, and
-            // the provider keyword is too far from the key.
+            // Issue #1018: a model route only qualifies a credential-named
+            // key, and a hash-led key over a hex digest stays a digest.
+            format!("DEBUG: cohere/command-r-plus call failed; request_id={c}"),
+            format!("DEBUG: mycohere/command-r call failed; api_key={c}"),
+            format!("DEBUG: cohere/ call failed; api_key={c}"),
             format!(
-                "DEBUG: router.py:1841 - cohere/command-r-plus call failed; masked_api_key={c} reason=AuthenticationError"
+                "DEBUG: cohere/command-r-plus call failed on retry; hashed_api_key={}",
+                "0123456789abcdef".repeat(3).get(..40).unwrap_or_default()
             ),
         ] {
             assert!(run(&DEEPGRAM, &input).is_empty(), "{input}");

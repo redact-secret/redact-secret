@@ -34,6 +34,12 @@ evidence is linked from each published version.
   (`sk-ant-admin01-<your-key>`, `-YOUR_KEY`, `-...`), matching the
   `sk-ant-api01-`/`sk-ant-api03-` siblings (#1015). A well-formed Admin key is
   still `anthropic_admin_api_key`, and an off-grammar body is still reported.
+- A complete, unmasked value under a `masked_`/`redacted_`/`hashed_`-led
+  credential name is reported again (#1018): the lead excludes only a value
+  that shows masking or hashing, and the keyword-gated providers read a
+  `LiteLLM` model route (`cohere/command-r-plus`), so an unmasked Cohere key
+  under `masked_api_key=` is `cohere_api_key` / redact. Masked displays stay
+  silent; `publishable_` names are unchanged.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
