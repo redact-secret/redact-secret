@@ -362,7 +362,7 @@
         "beta8-207--atlassian-api-token-ticket-paste"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "a4d7c595ce3a478192dc0bc95dfe7efbce06f646",
       "canonicalFixtures": {
@@ -386,7 +386,7 @@
           "evidence": []
         }
       },
-      "note": "atlassian-api-token stopped its span at the `=` of a 192-byte token and left the `=` + 8 uppercase hex tail (read as a CRC32 by CredSweeper; shape per #643 and redact-secret-benchmarks#238) unredacted at high/redact. The detector now extends a match over an immediately following `=` + exactly 8 `[0-9A-F]` bytes when the byte after them is neither a body byte nor another `=`; the tail's value is not validated. A token without the tail is matched exactly as before (no-suffix control), and a 9-hex tail is not absorbed. The incremental fixture covers a chunk split between the body and `=` and between `=` and the hex. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. The corpus hash is the beta8-207 corpus hash from the issue. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207)."
+      "note": "atlassian-api-token stopped its span at the `=` of a 192-byte token and left the `=` + 8 uppercase hex tail (read as a CRC32 by CredSweeper; shape per #643 and redact-secret-benchmarks#238) unredacted at high/redact. The detector now extends a match over an immediately following `=` + exactly 8 `[0-9A-F]` bytes when the byte after them is neither a body byte nor another `=`; the tail's value is not validated. A token without the tail is matched exactly as before (no-suffix control), and a 9-hex tail is not absorbed. The incremental fixture covers a chunk split between the body and `=` and between `=` and the hex. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. The corpus hash is the beta8-207 corpus hash from the issue. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207). The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-supabase-layout-twins",
@@ -399,7 +399,7 @@
         "beta8-207--supabase-token-dash-delimiter-twin"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "a4d7c595ce3a478192dc0bc95dfe7efbce06f646",
       "canonicalFixtures": {
@@ -422,7 +422,7 @@
           "evidence": []
         }
       },
-      "note": "supabase-token accepted any sb_secret_ value with at least 20 bytes of [A-Za-z0-9_-]. It now requires exactly the documented layout: a 22-byte random part, `_` at body offset 22, and an 8-byte checksum part, all base64url (Supabase self-hosted auth-keys page, which states hosted keys use the same format; provider script docker/utils/add-new-auth-keys.sh; research in redact-secret-benchmarks#231). The delimiter is checked by position because both segments may contain `_` and `-`. The checksum value is not validated: the provider script hashes a project ref, the hosted input is undocumented, and the self-hosted constant would reject every hosted key. No incremental case: the value is one bounded token. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207)."
+      "note": "supabase-token accepted any sb_secret_ value with at least 20 bytes of [A-Za-z0-9_-]. It now requires exactly the documented layout: a 22-byte random part, `_` at body offset 22, and an 8-byte checksum part, all base64url (Supabase self-hosted auth-keys page, which states hosted keys use the same format; provider script docker/utils/add-new-auth-keys.sh; research in redact-secret-benchmarks#231). The delimiter is checked by position because both segments may contain `_` and `-`. The checksum value is not validated: the provider script hashes a project ref, the hosted input is undocumented, and the self-hosted constant would reject every hosted key. No incremental case: the value is one bounded token. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207). The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-heroku-legacy-multi-line",
@@ -434,7 +434,7 @@
         "beta8-207--heroku-api-key-legacy-auth-token-output"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "f0c713c9f0baa373688dba67f58cd9d9ceaa4a55",
       "canonicalFixtures": {
@@ -458,7 +458,7 @@
           "evidence": []
         }
       },
-      "note": "False negative. heroku-api-key-legacy's same-line heroku gate missed a multi-line .netrc entry (machine api.heroku.com two lines above password <uuid>) and heroku auth:token output (the token alone on the next line), both asked for by redact-secret-benchmarks#232 (corpus beta8-207, benchmark commit 85dc5604892243111aa2230b4081e82e168c86b7, published 0.1.0-beta.7). The fix accepts exactly those two layouts: a password token's value inside a .netrc entry whose machine host names heroku, with at most two login/account lines between, and a whole-line UUID right after a line ending in heroku auth:token. The negative control keeps a UUID after an unrelated line clean. Incremental: the session gets a retention hint that holds the machine or command line open until the token line, so both partition fixtures match the whole-input scan at every boundary. Canonical inputs are freshly built synthetic values. Both gates stay pending."
+      "note": "False negative. heroku-api-key-legacy's same-line heroku gate missed a multi-line .netrc entry (machine api.heroku.com two lines above password <uuid>) and heroku auth:token output (the token alone on the next line), both asked for by redact-secret-benchmarks#232 (corpus beta8-207, benchmark commit 85dc5604892243111aa2230b4081e82e168c86b7, published 0.1.0-beta.7). The fix accepts exactly those two layouts: a password token's value inside a .netrc entry whose machine host names heroku, with at most two login/account lines between, and a whole-line UUID right after a line ending in heroku auth:token. The negative control keeps a UUID after an unrelated line clean. Incremental: the session gets a retention hint that holds the machine or command line open until the token line, so both partition fixtures match the whole-input scan at every boundary. Canonical inputs are freshly built synthetic values. Both gates stay pending. The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-heroku-legacy-url-path",
@@ -469,7 +469,7 @@
         "beta8-207--heroku-api-key-legacy-app-url-path-public-id"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "f0c713c9f0baa373688dba67f58cd9d9ceaa4a55",
       "canonicalFixtures": {
@@ -488,7 +488,7 @@
           "evidence": []
         }
       },
-      "note": "False positive. A Heroku app UUID in a Platform API URL path (https://api.heroku.com/apps/<uuid>/...) was flagged medium/warn because the line names heroku; #714's identifier-key exclusion does not cover a path segment. The fix never reports a UUID whose preceding byte is '/'. The existing same-line HEROKU_API_KEY=<uuid> positive stays exact. No incremental case: the change is inside one line with no retention state. Canonical input is a freshly built synthetic value. Both gates stay pending."
+      "note": "False positive. A Heroku app UUID in a Platform API URL path (https://api.heroku.com/apps/<uuid>/...) was flagged medium/warn because the line names heroku; #714's identifier-key exclusion does not cover a path segment. The fix never reports a UUID whose preceding byte is '/'. The existing same-line HEROKU_API_KEY=<uuid> positive stays exact. No incremental case: the change is inside one line with no retention state. Canonical input is a freshly built synthetic value. Both gates stay pending. The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-labelled-digest-controls",
@@ -500,7 +500,7 @@
         "beta8-207--confluent-cloud-api-secret-legacy-image-digest-encoded-value"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "95166f152a1f4e656f5e227655ac570c9b0cdd8e",
       "canonicalFixtures": {
@@ -520,7 +520,7 @@
           "evidence": []
         }
       },
-      "note": "twilio-auth-token and confluent-cloud-api-secret-legacy flagged a hex digest introduced by a hash-algorithm label (md5=, @sha256:) on a line naming their provider (#744, benchmarks #207 corpus beta8-207). The fix adds the shared text::is_labelled_digest check, applied to both Twilio detectors and the Confluent legacy detector: a value directly after <algorithm>= or <algorithm>: is a digest. The two negative fixtures pin the reported shapes; the existing dotenv-keyword positives are the controls that keep TWILIO_AUTH_TOKEN=<32 hex> [18,50) and CONFLUENT_API_SECRET=<64 bytes> [21,85) exact. No incremental case: the check reads only bytes on the candidate's own line, before the candidate. Canonical inputs are freshly constructed synthetic values; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "twilio-auth-token and confluent-cloud-api-secret-legacy flagged a hex digest introduced by a hash-algorithm label (md5=, @sha256:) on a line naming their provider (#744, benchmarks #207 corpus beta8-207). The fix adds the shared text::is_labelled_digest check, applied to both Twilio detectors and the Confluent legacy detector: a value directly after <algorithm>= or <algorithm>: is a digest. The two negative fixtures pin the reported shapes; the existing dotenv-keyword positives are the controls that keep TWILIO_AUTH_TOKEN=<32 hex> [18,50) and CONFLUENT_API_SECRET=<64 bytes> [21,85) exact. No incremental case: the check reads only bytes on the candidate's own line, before the candidate. Canonical inputs are freshly constructed synthetic values; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-bearer-long-placeholder",
@@ -531,7 +531,7 @@
         "beta8-207--bearer-token-your-access-token-placeholder"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "95166f152a1f4e656f5e227655ac570c9b0cdd8e",
       "canonicalFixtures": {
@@ -553,7 +553,7 @@
           "evidence": []
         }
       },
-      "note": "bearer-token redacted upper-snake instructional placeholders of 16 or more bytes (YOUR_ACCESS_TOKEN) that the #468 placeholder vocabulary did not cover; shorter ones were clean only because of the 16-byte minimum (#745, benchmarks #207 corpus beta8-207). The fix adds is_instructional_token_placeholder: a your/insert/enter/paste lead word followed only by credential words naming a token, key, secret, or jwt. Two negatives pin the issue's drafts; the 40-byte base64url positive keeps [22,62) exact and the random-suffix positive shows one unlisted word keeps a value detected. No incremental case: the change is inside one bounded match. Canonical inputs are freshly constructed synthetic values; gates stay pending."
+      "note": "bearer-token redacted upper-snake instructional placeholders of 16 or more bytes (YOUR_ACCESS_TOKEN) that the #468 placeholder vocabulary did not cover; shorter ones were clean only because of the 16-byte minimum (#745, benchmarks #207 corpus beta8-207). The fix adds is_instructional_token_placeholder: a your/insert/enter/paste lead word followed only by credential words naming a token, key, secret, or jwt. Two negatives pin the issue's drafts; the 40-byte base64url positive keeps [22,62) exact and the random-suffix positive shows one unlisted word keeps a value detected. No incremental case: the change is inside one bounded match. Canonical inputs are freshly constructed synthetic values; gates stay pending. The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-generic-twilio-sid",
@@ -564,7 +564,7 @@
         "beta8-207--twilio-api-key-secret-wrong-companion-near-miss"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "95166f152a1f4e656f5e227655ac570c9b0cdd8e",
       "canonicalFixtures": {
@@ -584,7 +584,7 @@
           "evidence": []
         }
       },
-      "note": "generic-token warned on a Twilio API Key SID after a 'credentials:' label in the wrong-companion control (SK + AC, no secret) (#746, benchmarks #207 corpus beta8-207). Twilio documents AC and SK SIDs as identifiers (https://www.twilio.com/docs/iam/api-keys), so this is fixed as a false positive, not recorded as a policy-decision: generic-token now excludes a value that is exactly AC/SK + 32 lowercase hex. The uppercase-body positive pins that only the exact SID shape is excluded. The issue's proposed 'credentials: <32 hex>' clean control is not added: an ambiguous name warns on a 32-hex value whenever its entropy reaches 3.5, so its outcome depends on the sampled value rather than on this change. No incremental case. Canonical inputs are freshly constructed synthetic values; gates stay pending."
+      "note": "generic-token warned on a Twilio API Key SID after a 'credentials:' label in the wrong-companion control (SK + AC, no secret) (#746, benchmarks #207 corpus beta8-207). Twilio documents AC and SK SIDs as identifiers (https://www.twilio.com/docs/iam/api-keys), so this is fixed as a false positive, not recorded as a policy-decision: generic-token now excludes a value that is exactly AC/SK + 32 lowercase hex. The uppercase-body positive pins that only the exact SID shape is excluded. The issue's proposed 'credentials: <32 hex>' clean control is not added: an ambiguous name warns on a 32-hex value whenever its entropy reaches 3.5, so its outcome depends on the sampled value rather than on this change. No incremental case. Canonical inputs are freshly constructed synthetic values; gates stay pending. The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-207-telegram-atlassian-account-id",
@@ -595,7 +595,7 @@
         "beta8-207--atlassian-api-token-account-id-public-id"
       ],
       "corpusHashes": [
-        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+        "e6ce8806740df85e8414e318216513b2621ae794ac4abc66a7b22c873b7fa927"
       ],
       "fixingCommit": "a4d7c595ce3a478192dc0bc95dfe7efbce06f646",
       "canonicalFixtures": {
@@ -616,7 +616,7 @@
           "evidence": []
         }
       },
-      "note": "telegram-bot-token reported an Atlassian account id (`<digits>:<8-4-4-4-12 uuid>`, a public identifier) as a bot token at high/redact. The detector now rejects a candidate whose secret segment is exactly a canonical hexadecimal UUID (either case); nothing else about the grammar changes, so a secret that is near but not exactly a UUID, or that continues past one, is still detected, and the 10-digit + 35-byte control stays exact. The narrower exact-35 rule from #660 was not adopted here because Telegram documents no length and the current contract is a floor. No incremental case: the change is inside one bounded match. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207)."
+      "note": "telegram-bot-token reported an Atlassian account id (`<digits>:<8-4-4-4-12 uuid>`, a public identifier) as a bot token at high/redact. The detector now rejects a candidate whose secret segment is exactly a canonical hexadecimal UUID (either case); nothing else about the grammar changes, so a secret that is near but not exactly a UUID, or that continues past one, is still detected, and the 10-digit + 35-byte control stays exact. The narrower exact-35 rule from #660 was not adopted here because Telegram documents no length and the current contract is a floor. No incremental case: the change is inside one bounded match. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207). The corpus hash was re-pinned from 8b886af5... to the beta8-207 hash e6ce8806... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-749",
@@ -702,7 +702,7 @@
         "beta8-212--pinecone-api-key-header-placeholder-placeholder"
       ],
       "corpusHashes": [
-        "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc",
+        "a4516e08db3f963a347f362803196ee0d71e306cd24c130b676651f78dc6c66c",
         "3ccd0a1980bf279fd3a2aa033c44734dd8a0e73a043498057c22084300cedfb4"
       ],
       "fixingCommit": "99d83c4c4d8070da754fcf021f1be43cdebd7afc",
@@ -725,7 +725,7 @@
           "evidence": []
         }
       },
-      "note": "generic-token reported instructional placeholders such as YOUR_API_KEY assigned to a credential-like name, including the beta8-213d Mailchimp docs-template control and the beta8-212 Pinecone Api-Key header control. The fix (PR #758) moves #755's is_instructional_token_placeholder into detectors/text.rs and has generic-token apply it: a your/insert/enter/paste lead word followed only by lead or credential words, at least one naming a token, key, secret or jwt. Two negatives pin the placeholder shapes; a random-suffix placeholder and a random 40-byte value in the same assignment stay detected at exact ranges. No incremental case: the change is inside one bounded match. Canonical inputs are freshly built synthetic values; no benchmark fixture input was copied. Benchmark measurement: corpora beta8-213d and beta8-212. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from bbdcd601... to the beta8-212 hash 3ccd0a19... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "generic-token reported instructional placeholders such as YOUR_API_KEY assigned to a credential-like name, including the beta8-213d Mailchimp docs-template control and the beta8-212 Pinecone Api-Key header control. The fix (PR #758) moves #755's is_instructional_token_placeholder into detectors/text.rs and has generic-token apply it: a your/insert/enter/paste lead word followed only by lead or credential words, at least one naming a token, key, secret or jwt. Two negatives pin the placeholder shapes; a random-suffix placeholder and a random 40-byte value in the same assignment stay detected at exact ranges. No incremental case: the change is inside one bounded match. Canonical inputs are freshly built synthetic values; no benchmark fixture input was copied. Benchmark measurement: corpora beta8-213d and beta8-212. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from bbdcd601... to the beta8-212 hash 3ccd0a19... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 165039a8... to the beta8-213d hash a4516e08... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-404",
@@ -774,7 +774,7 @@
         "detector-coverage--openai-token-shape-3-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "e762020b345d5ee2d85662f2a735b40dc392bdb9",
       "canonicalFixtures": {
@@ -791,7 +791,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage openai-token-shape-1/2/3 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #409, docs/audits/evidence/405/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage openai-token-shape-1/2/3 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #409, docs/audits/evidence/405/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-406",
@@ -804,7 +804,7 @@
         "detector-coverage--slack-token-shape-1-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "c4326c779ebe2f4f9720cbf0b5fdb12f99e6f2c3",
       "canonicalFixtures": {
@@ -821,7 +821,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage slack-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #410, docs/audits/evidence/406/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage slack-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #410, docs/audits/evidence/406/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-407",
@@ -834,7 +834,7 @@
         "detector-coverage--docker-token-shape-1-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "8e7c5032cb7c3477833ee806bcab61c03036230a",
       "canonicalFixtures": {
@@ -851,7 +851,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage docker-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #413, docs/audits/evidence/407/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage docker-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #413, docs/audits/evidence/407/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-408",
@@ -864,7 +864,7 @@
         "detector-coverage--cloudflare-token-shape-1-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "a8dc90c65fcfde9009b07855d2c5820893962a95",
       "canonicalFixtures": {
@@ -881,7 +881,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage cloudflare-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #412, docs/audits/evidence/408/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage cloudflare-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #412, docs/audits/evidence/408/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-551",
@@ -895,7 +895,7 @@
         "detector-coverage--slack-token-rotation-dash-identifier-embedding"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "86577d8e5b7db7a5a6c4ecfd6fc6ee8ab215909a",
       "canonicalFixtures": {
@@ -912,7 +912,7 @@
           "evidence": []
         }
       },
-      "note": "linear-token and slack-token matched an OAuth or rotation token shape embedded inside a wider identifier (trailing or dash-joined), one shared boundary root cause across several families. The fix (PR #562) makes the interim guards exact-length and adds embedding-rejection unit tests in the detector crates; it only adjusted existing slack and linear corpus fixtures to the new exact lengths and added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "linear-token and slack-token matched an OAuth or rotation token shape embedded inside a wider identifier (trailing or dash-joined), one shared boundary root cause across several families. The fix (PR #562) makes the interim guards exact-length and adds embedding-rejection unit tests in the detector crates; it only adjusted existing slack and linear corpus fixtures to the new exact lengths and added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-552",
@@ -925,7 +925,7 @@
         "detector-coverage--generic-token-client-secret-markdown-inline-code-boundary"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "11dba979d98a5c91420bf82a66e86eb6a9d5c559",
       "canonicalFixtures": {
@@ -944,7 +944,7 @@
           "evidence": []
         }
       },
-      "note": "generic-token missed an api_key, password or client_secret assignment whose value sits inside markdown inline code. The fix (PR #561) repairs the inline-code assignment boundary; one synchronous regression case pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "generic-token missed an api_key, password or client_secret assignment whose value sits inside markdown inline code. The fix (PR #561) repairs the inline-code assignment boundary; one synchronous regression case pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-670",
@@ -960,7 +960,7 @@
         "detector-coverage--discord-bot-token-three-segments-current-reset-bot-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "c053505335844d763491a85eb57826cbb7aeee8a",
       "canonicalFixtures": {
@@ -981,7 +981,7 @@
           "evidence": []
         }
       },
-      "note": "discord-bot-token missed the current three-segment bot token shapes (26/6/38 and 24/6/38). The fix (PR #676) accepts both; two positives pin the new-bot and reset-bot shapes and a negative keeps the 19-digit legacy id shape rejected. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "discord-bot-token missed the current three-segment bot token shapes (26/6/38 and 24/6/38). The fix (PR #676) accepts both; two positives pin the new-bot and reset-bot shapes and a negative keeps the 19-digit legacy id shape rejected. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-671",
@@ -994,7 +994,7 @@
         "detector-coverage--datadog-application-key-prefixed-env-marker-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "2ca56a29ea19f93ec111370a5d4a8115cb8ddf33",
       "canonicalFixtures": {
@@ -1026,7 +1026,7 @@
           "evidence": []
         }
       },
-      "note": "datadog-application-key missed current ddapp_-prefixed application keys. The fix (PR #679) adds the ddapp_ shape next to the keyword-gated legacy shape. The canonical cases are the 14 new ddapp_ positives, boundaries, negatives and adversarial cases the PR added; the PR's datadog-application-key-legacy-* cases are renamed or relocated pre-existing legacy fixtures and are not listed. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "datadog-application-key missed current ddapp_-prefixed application keys. The fix (PR #679) adds the ddapp_ shape next to the keyword-gated legacy shape. The canonical cases are the 14 new ddapp_ positives, boundaries, negatives and adversarial cases the PR added; the PR's datadog-application-key-legacy-* cases are renamed or relocated pre-existing legacy fixtures and are not listed. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-672",
@@ -1039,7 +1039,7 @@
         "detector-coverage--new-relic-license-key-current-format-unicode-crlf"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "0c3228926a01d44945a82a41d291fd98fd1a8b99",
       "canonicalFixtures": {
@@ -1056,7 +1056,7 @@
           "evidence": []
         }
       },
-      "note": "new-relic-license-key missed the current 32-hex FFFFNRAL license key shape and its EU-region variant. The fix (PR #682) adds the shape in crates/secret-scan-core/src/detectors/new_relic.rs with unit tests only; it added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "new-relic-license-key missed the current 32-hex FFFFNRAL license key shape and its EU-region variant. The fix (PR #682) adds the shape in crates/secret-scan-core/src/detectors/new_relic.rs with unit tests only; it added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-714",
@@ -1067,7 +1067,7 @@
         "detector-coverage--heroku-api-key-legacy-public-id"
       ],
       "corpusHashes": [
-        "8029b3b1e20ee410766126ebeaaa842bb27fbd6a96444e258489176ad6aece78"
+        "2587a13fa45732c24ed688db911d1c95b1d69f4b5fff1f879dbc6a614219f84f"
       ],
       "fixingCommit": "6a2dca04b9f88b82f1b88a7acfeeb93a82510c21",
       "canonicalFixtures": {
@@ -1086,7 +1086,7 @@
           "evidence": []
         }
       },
-      "note": "heroku-api-key-legacy flagged the value of a HEROKU_APP_ID public identifier. The fix (PR #715) excludes identifier-named keys from the legacy UUID gate; one synchronous negative pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
+      "note": "heroku-api-key-legacy flagged the value of a HEROKU_APP_ID public identifier. The fix (PR #715) excludes identifier-named keys from the legacy UUID gate; one synchronous negative pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated. The corpus hash was re-pinned from 249101e7... to the detector-coverage hash bea811f2... at the resynced benchmarks/pin-manifest.json (benchmarks revision 8e77b92b, develop e8b38c33) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from bea811f2... to the detector-coverage hash 8029b3b1... at the resynced benchmarks/pin-manifest.json (benchmarks revision 9353089e, develop 3cd8d652) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated. The corpus hash was re-pinned from 8029b3b1... to the detector-coverage hash 2587a13f... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-815",
@@ -1743,7 +1743,7 @@
       ],
       "corpusHashes": [
         "4aed4e9db10d1140766f34455ec639253a14ff90f441267fc88320b685b69781",
-        "7f349443bb7e4f4feafba6fc7235c8c988770a5b451904210f2b637e9a30b2a1"
+        "2cfa47eb4066358148c6e80a4f638fb33f627cce04362a1984c913d3e50fbed5"
       ],
       "fixingCommit": "9605eb5d7094fc8a408a42e6bf7bd419299e13bf",
       "canonicalFixtures": {
@@ -1775,7 +1775,7 @@
           "evidence": []
         }
       },
-      "note": "Found while graduating the #860 families (redact-secret-benchmarks#434, #436) on candidate main 1127bf9. False positive: generic-token warned on three Inngest/Resend documentation placeholders the #860 handoffs list as benign (signkey-test-12345, re_123456789, re_yourkey). The fixing commit excludes a counting digit run and a glued your-word credential phrase behind a short vendor prefix; other digit sequences, leftover material and bare glued values stay reported. The corpus hashes are the graduated beta8-436c and beta8-436d hashes, re-pinned from dfea2bc6... and 8fa9514b... when redact-secret-benchmarks#452 reached develop (benchmarks revision 9353089e, develop 3cd8d652), while the benchmarkRevalidation gate was still pending. The pytest FAKE_TOKEN span in the same issue stays on product-911. Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36480272622 at main 1db8ff3, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, and the Python wheel). benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the fixed-candidate rerun is recorded on develop until develop is promoted."
+      "note": "Found while graduating the #860 families (redact-secret-benchmarks#434, #436) on candidate main 1127bf9. False positive: generic-token warned on three Inngest/Resend documentation placeholders the #860 handoffs list as benign (signkey-test-12345, re_123456789, re_yourkey). The fixing commit excludes a counting digit run and a glued your-word credential phrase behind a short vendor prefix; other digit sequences, leftover material and bare glued values stay reported. The corpus hashes are the graduated beta8-436c and beta8-436d hashes, re-pinned from dfea2bc6... and 8fa9514b... when redact-secret-benchmarks#452 reached develop (benchmarks revision 9353089e, develop 3cd8d652), while the benchmarkRevalidation gate was still pending. The pytest FAKE_TOKEN span in the same issue stays on product-911. Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36480272622 at main 1db8ff3, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, and the Python wheel). benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the fixed-candidate rerun is recorded on develop until develop is promoted. The corpus hash was re-pinned from 7f349443... to the beta8-436d hash 2cfa47eb... at the resynced benchmarks/pin-manifest.json (benchmarks revision 71622456, develop 96609730) while the benchmarkRevalidation gate was still pending, so no measurement was invalidated."
     }
   ]
 }
