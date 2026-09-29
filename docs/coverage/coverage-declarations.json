@@ -13579,6 +13579,127 @@
       "type": "crates_io_trusted_publishing_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "dynatrace-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "dynatrace-token-positive-api-token-header",
+            "dynatrace-token-positive-bare",
+            "dynatrace-token-positive-chat-sentence",
+            "dynatrace-token-positive-crlf-unicode-prefix",
+            "dynatrace-token-positive-curl-api-token",
+            "dynatrace-token-positive-curl-bearer",
+            "dynatrace-token-positive-dotenv",
+            "dynatrace-token-positive-json-config",
+            "dynatrace-token-positive-json-token-key",
+            "dynatrace-token-positive-kubernetes-secret",
+            "dynatrace-token-positive-log",
+            "dynatrace-token-positive-otel-percent-encoded-header",
+            "dynatrace-token-positive-punctuation-adjacent",
+            "dynatrace-token-positive-python-sdk-call",
+            "dynatrace-token-positive-repeated-value",
+            "dynatrace-token-positive-second-sample",
+            "dynatrace-token-positive-second-sample-dotenv",
+            "dynatrace-token-positive-sentence-period",
+            "dynatrace-token-positive-shell-export",
+            "dynatrace-token-positive-tool-call-arguments",
+            "dynatrace-token-positive-x-api-key-header",
+            "dynatrace-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "dynatrace-token-overlap-bearer-header",
+            "dynatrace-token-overlap-context",
+            "dynatrace-token-overlap-second-sample-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "dynatrace-token-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "dynatrace-token-boundary-dash-separator",
+            "dynatrace-token-boundary-dot-glued-suffix",
+            "dynatrace-token-boundary-identifier-glue",
+            "dynatrace-token-boundary-long-public",
+            "dynatrace-token-boundary-long-secret",
+            "dynatrace-token-boundary-lowercase-byte",
+            "dynatrace-token-boundary-non-base32-digit",
+            "dynatrace-token-boundary-short-public",
+            "dynatrace-token-boundary-short-secret",
+            "dynatrace-token-boundary-unknown-type-letter",
+            "dynatrace-token-boundary-wrong-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "dynatrace-token-negative-docs-placeholder",
+            "dynatrace-token-negative-shell-reference",
+            "dynatrace-token-negative-token-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "dynatrace-token-boundary-dash-separator",
+            "dynatrace-token-boundary-dot-glued-suffix",
+            "dynatrace-token-boundary-identifier-glue",
+            "dynatrace-token-boundary-long-public",
+            "dynatrace-token-boundary-long-secret",
+            "dynatrace-token-boundary-lowercase-byte",
+            "dynatrace-token-boundary-non-base32-digit",
+            "dynatrace-token-boundary-short-public",
+            "dynatrace-token-boundary-short-secret",
+            "dynatrace-token-boundary-unknown-type-letter",
+            "dynatrace-token-boundary-wrong-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for dynatrace_token (dynatrace-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "dynatrace_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13752,6 +13873,7 @@
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
             "doppler-token-adversarial-long-suffix",
+            "dynatrace-token-adversarial-long-run",
             "e2b-api-key-adversarial-long-suffix",
             "elevenlabs-api-key-adversarial-dense-findings",
             "elevenlabs-api-key-adversarial-long-glued-region",
@@ -14216,6 +14338,7 @@
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
             "doppler-token-adversarial-long-suffix",
+            "dynatrace-token-adversarial-long-run",
             "e2b-api-key-adversarial-long-suffix",
             "elevenlabs-api-key-adversarial-dense-findings",
             "elevenlabs-api-key-adversarial-long-glued-region",

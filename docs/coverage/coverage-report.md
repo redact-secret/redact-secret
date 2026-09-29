@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 124/124 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 125/125 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 124 |
+| supported | 125 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 135.
+Coverage declarations: 136.
 
 ## Coverage by detector
 
@@ -55,6 +55,7 @@ Coverage declarations: 135.
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | doppler-token | 7 | supported: 7, intentionally-unsupported: 0, unresolved: 0 |
+| dynatrace-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | e2b-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | elevenlabs-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -172,6 +173,7 @@ Coverage declarations: 135.
 | doppler_service_account_identity_token | doppler-token | provider | supported | not-applicable | none |
 | doppler_service_account_token | doppler-token | provider | supported | not-applicable | none |
 | doppler_service_token | doppler-token | provider | supported | not-applicable | none |
+| dynatrace_token | dynatrace-token | provider | supported | not-applicable | none |
 | e2b_api_key | e2b-api-key | provider | supported | not-applicable | none |
 | elevenlabs_api_key | elevenlabs-api-key | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
@@ -278,15 +280,15 @@ Coverage declarations: 135.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 135 | 0 | 0 |
-| boundary | 124 | 0 | 0 |
-| host-context | 124 | 0 | 0 |
+| adversarial | 136 | 0 | 0 |
+| boundary | 125 | 0 | 0 |
+| host-context | 125 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 135 | 0 | 0 |
-| near-miss-negative | 124 | 0 | 0 |
-| overlap | 124 | 0 | 0 |
-| positive | 124 | 0 | 0 |
-| range | 135 | 0 | 0 |
+| malformed | 136 | 0 | 0 |
+| near-miss-negative | 125 | 0 | 0 |
+| overlap | 125 | 0 | 0 |
+| positive | 125 | 0 | 0 |
+| range | 136 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

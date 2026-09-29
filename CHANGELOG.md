@@ -35,6 +35,9 @@ evidence is linked from each published version.
     (`crates_io_api_token`) and `cio_tp_` + 32 trusted-publishing tokens
     (`crates_io_trusted_publishing_token`); the check character is not a
     rejection gate.
+  - `dynatrace-token` (#1032): Dynatrace `dt0c01`/`dt0sNN` access and
+    platform tokens, `<prefix>.<24>.<64>` uppercase base32, reported whole as
+    `dynatrace_token`; the token identifier alone stays unclaimed.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

@@ -31,6 +31,7 @@ mod datadog;
 mod daytona;
 mod discord;
 mod doppler;
+mod dynatrace;
 mod e2b;
 mod elevenlabs;
 mod firebase;
@@ -243,6 +244,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(runpod::RUNPOD_API_KEY),
         Box::new(cerebras::CEREBRAS_API_KEY),
         Box::new(crates_io::CRATES_IO),
+        Box::new(dynatrace::DynatraceTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -529,6 +531,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(crates_io::CRATES_IO.shapes())],
     ),
     (
+        dynatrace::ID,
+        &[Literals::Strs(dynatrace::REQUIRED_LITERALS)],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -706,6 +712,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("runpod-api-key", Pack::Provider),
     ("cerebras-api-key", Pack::Provider),
     ("crates-io-token", Pack::Provider),
+    ("dynatrace-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -840,6 +847,7 @@ mod tests {
                 "runpod-api-key",
                 "cerebras-api-key",
                 "crates-io-token",
+                "dynatrace-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1201,6 +1209,11 @@ mod tests {
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
         let crates_io_token_input = format!("cio{}", "SyntheticRevokedCratesIoToken000");
+        let dynatrace_token_input = format!(
+            "dt0c01.{}.{}",
+            "SYNTHETICREVOKEDDYNATRCE",
+            "SYNTHETICREVOKED".repeat(4)
+        );
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1314,6 +1327,7 @@ mod tests {
             ("runpod-api-key", runpod_api_key_input.as_str()),
             ("cerebras-api-key", cerebras_api_key_input.as_str()),
             ("crates-io-token", crates_io_token_input.as_str()),
+            ("dynatrace-token", dynatrace_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

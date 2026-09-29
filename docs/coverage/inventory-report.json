@@ -5645,12 +5645,69 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "crates_io_trusted_publishing_token"
+    },
+    {
+      "detector": "dynatrace-token",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "kubernetes",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "dynatrace-token-positive-api-token-header",
+        "dynatrace-token-positive-bare",
+        "dynatrace-token-positive-chat-sentence",
+        "dynatrace-token-positive-crlf-unicode-prefix",
+        "dynatrace-token-positive-curl-api-token",
+        "dynatrace-token-positive-curl-bearer",
+        "dynatrace-token-positive-dotenv",
+        "dynatrace-token-positive-json-config",
+        "dynatrace-token-positive-json-token-key",
+        "dynatrace-token-positive-kubernetes-secret",
+        "dynatrace-token-positive-log",
+        "dynatrace-token-positive-otel-percent-encoded-header",
+        "dynatrace-token-positive-punctuation-adjacent",
+        "dynatrace-token-positive-python-sdk-call",
+        "dynatrace-token-positive-repeated-value",
+        "dynatrace-token-positive-second-sample",
+        "dynatrace-token-positive-second-sample-dotenv",
+        "dynatrace-token-positive-sentence-period",
+        "dynatrace-token-positive-shell-export",
+        "dynatrace-token-positive-tool-call-arguments",
+        "dynatrace-token-positive-x-api-key-header",
+        "dynatrace-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "dynatrace_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 124,
+    "supported": 125,
     "unresolved": 0
   }
 }

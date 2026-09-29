@@ -61,6 +61,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `doppler_service_account_identity_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `doppler_service_account_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `doppler_service_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `dynatrace_token` | `dynatrace-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Dynatrace docs for structure and lengths; base32 alphabet from the provider's `dttoken` generator, R1), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `e2b_api_key` | `e2b-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `elevenlabs_api_key` | `elevenlabs-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -861,6 +862,7 @@ benchmarks arrival and profile evidence.
 | Family | Detector | Grammar | Finding type | Tier |
 | --- | --- | --- | --- | --- |
 | `crates-io:api-token` | `crates-io-token` | `cio` + exactly 32 `[A-Za-z0-9]` (35 in total); `cio_tp_` + exactly 32 `[A-Za-z0-9]` (39 in total), tried first | `crates_io_api_token`, `crates_io_trusted_publishing_token` | T1 (crates.io server generators, R1) |
+| `dynatrace:api-token` | `dynatrace-token` | `dt0` + `c`\|`s` + 2 digits + `.` + exactly 24 `[A-Z2-7]` + `.` + exactly 64 `[A-Z2-7]` (96 in total), the whole token as the span; the byte before `dt0` must not be `[A-Za-z0-9_.-]` unless it ends a `%20`, and a `.` after the token rejects only when another `[A-Za-z0-9_-]` byte follows it | `dynatrace_token` | T1 (docs structure, lengths and prefix table; base32 alphabet from the provider generator, R1) |
 
 crates.io ([#1031](https://github.com/redact-secret/redact-secret/issues/1031),
 [handoff](../audits/evidence/1014/crates-io.md)). `cio` is a 3-letter
@@ -872,6 +874,22 @@ identifier bytes, and pre-`cio` legacy tokens, which the server no longer
 accepts. False positives: a standalone 35-byte alphanumeric value that starts
 with `cio` (about one random run in 238,000). Cost: two prefixes on the
 shared known-format scan.
+
+Dynatrace ([#1032](https://github.com/redact-secret/redact-secret/issues/1032),
+[handoff](../audits/evidence/1014/dynatrace.md)). Classic `dt0c01` access
+tokens and `dt0s01`–`dt0s16` platform tokens share one type. The span is the
+whole token, not only the secret portion, so the redacted output keeps no
+half-token; the token identifier alone (`<prefix>.<24>`, documented as safe to
+log) fails the fixed width and stays unclaimed. `Authorization: Api-Token …`
+resolves to the provider type over `authorization_credential`. The leading
+boundary also accepts a percent-encoded space, because Dynatrace's
+OpenTelemetry exporter setup writes `Authorization=Api-Token%20<token>`; the
+trailing boundary lets a sentence-ending period through. Scanners that allow
+lowercase or `0`, `1`, `8`, `9` (`[a-z0-9]`, `[A-Z0-9]`) are wider than the
+issued grammar and are not followed. False negatives: a lowercased copy, a
+glued value, and any future format of another alphabet or width. False
+positives: an unrelated `dt0[cs]NN.` + 24 + `.` + 64 base32 value; none is
+known. Cost: one literal search for `dt0` and a 96-byte fixed-width check.
 
 ## Rules
 
@@ -902,6 +920,7 @@ shared known-format scan.
 | RunPod `rpa_` + 31–128 alphanumeric API keys are reported as `runpod_api_key` at provider specificity, bare or in any context; Redirect.pizza `rpa_` + 30 and `rps_` S3 secrets stay unclaimed ([#974](https://github.com/redact-secret/redact-secret/issues/974), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Cerebras `csk-` or `csk_` + exactly 48 `[A-Za-z0-9_-]` API keys are reported as `cerebras_api_key` at provider specificity, bare or in any context; Pinecone `pcsk_` keys stay `pinecone_api_key` only ([#975](https://github.com/redact-secret/redact-secret/issues/975), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | crates.io `cio` + 32 alphanumeric API tokens and `cio_tp_` + 32 alphanumeric trusted-publishing tokens are reported as `crates_io_api_token` and `crates_io_trusted_publishing_token` at provider specificity, bare or in any context; the trusted-publishing check character is not a rejection gate ([#1031](https://github.com/redact-secret/redact-secret/issues/1031), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Dynatrace `dt0[cs]NN.` + 24 + `.` + 64 base32 access and platform tokens are reported whole as `dynatrace_token` at provider specificity, bare or in any context, including after `Api-Token%20`; the token identifier alone stays unclaimed ([#1032](https://github.com/redact-secret/redact-secret/issues/1032), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

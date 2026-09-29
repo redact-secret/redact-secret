@@ -38,6 +38,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 }
 
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const BASE32: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 /// The #860 index contexts plus a few host forms.
 fn contexts(key: &str) -> Vec<String> {
@@ -139,6 +140,8 @@ fn every_family_value() -> Vec<(&'static str, String)> {
     vec![
         ("crates-io-token", crates_io::api_token(1)),
         ("crates-io-token", crates_io::trusted_publishing_token(2)),
+        ("dynatrace-token", dynatrace::token("c01", 24, 64, 1)),
+        ("dynatrace-token", dynatrace::token("s16", 24, 64, 2)),
     ]
 }
 
@@ -255,5 +258,103 @@ mod crates_io {
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&api_token(7));
         assert_partition_parity(&trusted_publishing_token(8));
+    }
+}
+
+mod dynatrace {
+    use super::*;
+
+    const DETECTOR: &str = "dynatrace-token";
+    const TYPE: &str = "dynatrace_token";
+
+    pub(super) fn token(kind: &str, public: usize, secret: usize, seed: usize) -> String {
+        format!(
+            "dt0{kind}.{}.{}",
+            filler(BASE32, public, seed),
+            filler(BASE32, secret, seed + 1)
+        )
+    }
+
+    #[test]
+    fn classic_and_platform_tokens_win_every_context_as_the_sole_finding() {
+        for (kind, seed) in [("c01", 1), ("s01", 4), ("s16", 7)] {
+            let key = token(kind, 24, 64, seed);
+            assert_eq!(key.len(), 96);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("DT_API_TOKEN={key}\n"),
+                format!(
+                    "curl -H 'Authorization: Api-Token {key}' https://example.invalid/api/v2/metrics\n"
+                ),
+                format!("Authorization: Api-Token {key}\n"),
+                format!(
+                    "apiVersion: v1\nkind: Secret\nmetadata:\n  name: dynakube\ndata:\n  apiToken: {key}\n"
+                ),
+                format!("OTEL_EXPORTER_OTLP_HEADERS=Authorization=Api-Token%20{key}\n"),
+                format!(
+                    "exporters:\n  otlphttp:\n    headers:\n      Authorization: \"Api-Token {key}\"\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let good = token("c01", 24, 64, 2);
+        let mut lower = good.clone();
+        lower.replace_range(10..11, "q");
+        let mut digit = good.clone();
+        digit.replace_range(50..51, "1");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token("c01", 23, 64, 2),
+                token("c01", 25, 64, 2),
+                token("c01", 24, 63, 2),
+                token("c01", 24, 65, 2),
+                token("x01", 24, 64, 2),
+                token("c1", 24, 64, 2),
+                good.replacen("dt0", "dt1", 1),
+                lower,
+                digit,
+                format!("{}-{}", &good[..31], &good[32..]),
+                format!("x{good}"),
+                format!("_{good}"),
+                format!("{good}x"),
+                format!("{good}.x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            format!(
+                "INFO created token dt0s01.{} for ingest\n",
+                filler(BASE32, 24, 3)
+            ),
+            "curl -H \"Authorization: Api-Token dt0c01.abc123.abcdefg\"\n".to_owned(),
+            "DT_API_TOKEN=${DT_API_TOKEN}\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_are_isolated() {
+        assert_isolated(DETECTOR);
+    }
+
+    #[test]
+    fn a_repetition_line_is_unclaimed() {
+        assert_repetition_line_is_unclaimed(DETECTOR, &token("s01", 24, 64, 5));
+        assert_repetition_line_is_unclaimed(DETECTOR, "dt0c01.");
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&token("c01", 24, 64, 6));
     }
 }

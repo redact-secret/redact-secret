@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3293,
+  "fixtureCount": 3333,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -78004,6 +78004,764 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [],
+      "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "dynatrace-token-positive-bare",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 96
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "dynatrace-token-positive-dotenv",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DT_API_TOKEN=\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 109
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-shell-export",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export DT_API_TOKEN=\"\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\"\n",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 117
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-yaml",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  DT_API_TOKEN: \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\n",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 117
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-json-config",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"DT_API_TOKEN\": \"\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\"}",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 114
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-json-token-key",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\"}",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 107
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-python-sdk-call",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\")",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 121
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-x-api-key-header",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 107
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-curl-bearer",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 127
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-tool-call-arguments",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\"}}",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 134
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-chat-sentence",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is my key \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 111
+        }
+      ],
+      "note": "A value pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-log",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO  calling API with credential \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED for request 7",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 151
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-positive-punctuation-adjacent",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED).",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 97
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "dynatrace-token-positive-crlf-unicode-prefix",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\n\r\n",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 120
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "dynatrace-token-positive-repeated-value",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 96
+        },
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 97,
+          "end": 193
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "dynatrace-token-positive-second-sample",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0s16.REVOKEDSYNTHETICPLATFORM.ABCDEFGHIJKLMNOPQRSTUVWXYZ234567ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 96
+        }
+      ],
+      "note": "The second-sample shape is reported on its own."
+    },
+    {
+      "id": "dynatrace-token-positive-second-sample-dotenv",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DT_API_TOKEN=\u0064t0s16.REVOKEDSYNTHETICPLATFORM.ABCDEFGHIJKLMNOPQRSTUVWXYZ234567ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 109
+        }
+      ],
+      "note": "The second-sample shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "dynatrace-token-overlap-bearer-header",
+      "detector": "dynatrace-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\n",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 118
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "dynatrace-token-overlap-context",
+      "detector": "dynatrace-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 109
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "dynatrace-token-overlap-second-sample-bearer",
+      "detector": "dynatrace-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0064t0s16.REVOKEDSYNTHETICPLATFORM.ABCDEFGHIJKLMNOPQRSTUVWXYZ234567ABCDEFGHIJKLMNOPQRSTUVWXYZ234567\n",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 118
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "dynatrace-token-positive-api-token-header",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Api-Token \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 121
+        }
+      ],
+      "note": "The documented Api-Token header resolves to the provider type over the authorization candidate."
+    },
+    {
+      "id": "dynatrace-token-positive-curl-api-token",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Api-Token \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED' https://example.invalid/api/v2/metrics",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 34,
+          "end": 130
+        }
+      ],
+      "note": "A curl Api-Token header is reported at exactly the token."
+    },
+    {
+      "id": "dynatrace-token-positive-kubernetes-secret",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "apiVersion: v1\nkind: Secret\nmetadata:\n  name: dynakube\ndata:\n  apiToken: \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\n",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 73,
+          "end": 169
+        }
+      ],
+      "note": "A DynaKube secret apiToken value is reported at exactly the token."
+    },
+    {
+      "id": "dynatrace-token-positive-otel-percent-encoded-header",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OTEL_EXPORTER_OTLP_HEADERS=Authorization=Api-Token%20\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 53,
+          "end": 149
+        }
+      ],
+      "note": "The OpenTelemetry exporter header with a percent-encoded space is reported at exactly the token."
+    },
+    {
+      "id": "dynatrace-token-positive-sentence-period",
+      "detector": "dynatrace-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "chat"
+      ],
+      "input": "The token is \u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED.",
+      "expected": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 109
+        }
+      ],
+      "note": "A sentence-ending period stays outside the span."
+    },
+    {
+      "id": "dynatrace-token-boundary-short-public",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRC.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "A 23-byte public portion is not the documented 24."
+    },
+    {
+      "id": "dynatrace-token-boundary-long-public",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCEZ.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "A 25-byte public portion is not the documented 24."
+    },
+    {
+      "id": "dynatrace-token-boundary-short-secret",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKE",
+      "expected": [],
+      "note": "A 63-byte secret portion is not the documented 64."
+    },
+    {
+      "id": "dynatrace-token-boundary-long-secret",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDZ",
+      "expected": [],
+      "note": "A 65-byte secret portion is rejected whole."
+    },
+    {
+      "id": "dynatrace-token-boundary-lowercase-byte",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTqETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "Base32 is uppercase; a lowercase byte is never generated."
+    },
+    {
+      "id": "dynatrace-token-boundary-non-base32-digit",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNT8ETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "Base32 has no 0, 1, 8 or 9."
+    },
+    {
+      "id": "dynatrace-token-boundary-unknown-type-letter",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0x01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "The type letter is c or s."
+    },
+    {
+      "id": "dynatrace-token-boundary-wrong-version",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dt1c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "The prefix is dt0."
+    },
+    {
+      "id": "dynatrace-token-boundary-dash-separator",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE-SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "The portions are joined by dots."
+    },
+    {
+      "id": "dynatrace-token-boundary-identifier-glue",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "A glued leading byte makes it part of a wider identifier."
+    },
+    {
+      "id": "dynatrace-token-boundary-dot-glued-suffix",
+      "detector": "dynatrace-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED.x",
+      "expected": [],
+      "note": "A dot continuing into another identifier byte is glue, not a sentence end."
+    },
+    {
+      "id": "dynatrace-token-negative-token-identifier",
+      "detector": "dynatrace-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "INFO created token \u0064t0s01.SYNTHETICREVOKEDDYNATRCE for ingest",
+      "expected": [],
+      "note": "The token identifier alone is documented as safe to log."
+    },
+    {
+      "id": "dynatrace-token-negative-docs-placeholder",
+      "detector": "dynatrace-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Api-Token \u0064t0c01.abc123.abcdefg\"",
+      "expected": [],
+      "note": "The docs placeholder fails both portion lengths."
+    },
+    {
+      "id": "dynatrace-token-negative-shell-reference",
+      "detector": "dynatrace-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DT_API_TOKEN=${DT_API_TOKEN}\n",
+      "expected": [],
+      "note": "A shell reference is not a token."
+    },
+    {
+      "id": "dynatrace-token-adversarial-long-run",
+      "detector": "dynatrace-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
       "expected": [],
       "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
     }

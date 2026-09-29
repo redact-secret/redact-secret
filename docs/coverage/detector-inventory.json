@@ -897,6 +897,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0063io_tp_SyntheticRevokedTrustPubToken000",
       "schemes": null
+    },
+    {
+      "type": "dynatrace_token",
+      "detector": "dynatrace-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "schemes": null
     }
   ],
   "consumers": [
