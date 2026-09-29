@@ -11,7 +11,9 @@ stability.
   proposals. Public support is best-effort; the project makes no response-time or
   long-term-support commitment. For a false positive or missed detection, use
   the [reporting guide](docs/guides/reporting-detection-issues.md) and its
-  issue forms instead of a freeform issue.
+  issue forms instead of a freeform issue. `redact-secret-www` is private, so
+  website problems (broken links, wrong content, translation, playground) are
+  also filed here, via the website feedback form.
 - Report suspected vulnerabilities privately as described in
   [SECURITY.md](SECURITY.md), not in a public issue.
 - Read [ARCHITECTURE.md](ARCHITECTURE.md), [CONVENTIONS.md](CONVENTIONS.md), and the

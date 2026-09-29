@@ -1,0 +1,64 @@
+name: Website feedback / 웹사이트 피드백
+description: A broken link, wrong or outdated content, a translation issue, or a problem with the playground on the redact-secret website.
+title: "[website] "
+labels:
+  - area:site
+body:
+  - type: markdown
+    attributes:
+      value: |
+        `redact-secret-www` is private, so website problems are reported here
+        instead. Work that comes out of this report is tracked in
+        `redact-secret-www` and links back to this issue; the report itself
+        stays here. 웹사이트 문제는 이 저장소에서 제보해 주세요.
+
+        Do not paste any real credentials or personal data, even if you were
+        testing the playground with them.
+
+  - type: input
+    id: page-url
+    attributes:
+      label: Page URL
+      placeholder: "https://redact-secret.dev/..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem is this?
+      options:
+        - Broken link
+        - Wrong or outdated content
+        - Translation (EN/KO)
+        - Playground
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+
+  - type: dropdown
+    id: locale
+    attributes:
+      label: Locale
+      options:
+        - en
+        - ko
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: safety-ack
+    attributes:
+      label: Safety acknowledgement
+      options:
+        - label: >-
+            I have not included any real credential or real personal data in
+            this report, including anything I typed into the playground.
+          required: true

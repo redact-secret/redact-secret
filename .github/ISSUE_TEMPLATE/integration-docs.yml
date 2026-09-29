@@ -1,6 +1,9 @@
 name: Integration or docs feedback / 통합·문서 피드백
 description: Report an installation problem, adapter behavior, unclear guide, or missing example.
 title: "[integration/docs] "
+labels:
+  - documentation
+  - area:integration
 body:
   - type: markdown
     attributes:
