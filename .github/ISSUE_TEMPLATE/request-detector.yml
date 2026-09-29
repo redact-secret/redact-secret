@@ -18,6 +18,15 @@ body:
         [Security advisories](https://github.com/redact-secret/redact-secret/security/advisories/new).
         A request does not imply a commitment or stable classification.
 
+        Provider and credential-family research is tracked in
+        [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks),
+        not in this repository. Maintainers open or link the research issue
+        there, using its
+        [research-family form](https://github.com/redact-secret/redact-secret-benchmarks/issues/new?template=research-family.yml),
+        and a detector request here is answered by linking that issue. You are
+        welcome to open that form yourself for a provider you know well.
+        프로바이더 연구는 이 저장소가 아니라 benchmarks 저장소의 위 양식에서 추적합니다.
+
   - type: dropdown
     id: category
     attributes:
