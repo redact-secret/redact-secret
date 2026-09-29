@@ -904,6 +904,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0070olar_pat_SyntheticRevoked-Polar_PersonalToken0000000",
       "schemes": null
+    },
+    {
+      "type": "sonarqube_user_token",
+      "detector": "sonarqube-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073qu_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "sonarqube_analysis_token",
+      "detector": "sonarqube-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073qa_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
     }
   ],
   "consumers": [

@@ -92,6 +92,7 @@ export const CANONICAL_IDS = [
   "cerebras-api-key",
   "bitwarden-secrets-manager-access-token",
   "polar-token",
+  "sonarqube-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -132,6 +133,7 @@ export const GROUPS = {
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
     "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
     "inngest-signing-key",
+    "sonarqube-token",
   ],
   "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
   saas: [

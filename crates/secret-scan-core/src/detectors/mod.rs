@@ -73,6 +73,7 @@ mod sendgrid;
 mod sentry;
 mod shopify;
 mod slack;
+mod sonarqube;
 mod stripe;
 mod telegram;
 mod terraform;
@@ -242,6 +243,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(cerebras::CEREBRAS_API_KEY),
         Box::new(bitwarden::BitwardenSecretsManagerAccessTokenDetector),
         Box::new(polar::POLAR),
+        Box::new(sonarqube::SONARQUBE),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -529,6 +531,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     ),
     ("polar-token", &[Literals::Shapes(polar::POLAR.shapes())]),
     (
+        "sonarqube-token",
+        &[Literals::Shapes(sonarqube::SONARQUBE.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -707,6 +713,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("cerebras-api-key", Pack::Provider),
     ("bitwarden-secrets-manager-access-token", Pack::Provider),
     ("polar-token", Pack::Provider),
+    ("sonarqube-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -842,6 +849,7 @@ mod tests {
                 "cerebras-api-key",
                 "bitwarden-secrets-manager-access-token",
                 "polar-token",
+                "sonarqube-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1233,6 +1241,7 @@ mod tests {
             "polar_oat_{}",
             "SyntheticRevokedPolarOrganizationToken00000"
         );
+        let sonarqube_token_input = format!("squ_{}", "5e7c0ded".repeat(5));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -1329,6 +1338,7 @@ mod tests {
                 bitwarden_secrets_manager_access_token_input.as_str(),
             ),
             ("polar-token", polar_token_input.as_str()),
+            ("sonarqube-token", sonarqube_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

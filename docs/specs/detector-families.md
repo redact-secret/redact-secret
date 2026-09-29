@@ -125,6 +125,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `slack_app_level_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `slack_token` | `slack-token` | `always-redact` | [Freeze the Slack bot token grammar as a three-section dash-separated shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `slack_user_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `sonarqube_analysis_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
+| `sonarqube_user_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #934 excludes a body that is one repeated character (`sk_test_` plus a run of `x`) |
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -865,6 +867,7 @@ profile evidence.
 | --- | --- | --- | --- | --- |
 | `bitwarden:secrets-manager-access-token` | `bitwarden-secrets-manager-access-token` | `0.` + UUID (8-4-4-4-12 hex, either case) + `.` + exactly 30 `[A-Za-z0-9]` + `:` + 22 `[A-Za-z0-9+/]` + `==` (94 in total); the byte before `0` must not be `[A-Za-z0-9._-]` and the byte after `==` must not be `[A-Za-z0-9+/=]` | `bitwarden_secrets_manager_access_token` | T1 (provider parser, server generator and docs example, R1) |
 | `polar:organization-access-token` | `polar-token` | `polar_oat_` + exactly 43 `[A-Za-z0-9]`; `polar_pat_`, `polar_at_u_`, `polar_at_o_`, `polar_rt_u_`, `polar_rt_o_`, `polar_cs_` or `polar_crt_` + exactly 43 `[A-Za-z0-9_-]` | `polar_organization_access_token` (`polar_oat_`), `polar_api_credential` (the other API roles) | T1 (provider server generator and prefix constants, R1 and R9) |
+| `sonarqube:token` | `sonarqube-token` | `squ_`, `sqa_` or `sqp_` + exactly 40 `[0-9a-f]` (44 in total) | `sonarqube_user_token` (`squ_`), `sonarqube_analysis_token` (`sqa_`, `sqp_`) | T1 (provider server generator and token type enum, R1) |
 
 Bitwarden ([#1019](https://github.com/redact-secret/redact-secret/issues/1019),
 [handoff](../audits/evidence/1014/bitwarden.md)). The token carries the
@@ -900,6 +903,20 @@ generator change, and the misattributed webhook secret. False positives: an
 unrelated `polar_<role>_` + exactly 43 URL-safe bytes; none is known. Cost:
 eight prefixes on the shared known-format scan.
 
+SonarQube ([#1021](https://github.com/redact-secret/redact-secret/issues/1021),
+[handoff](../audits/evidence/1014/sonarqube.md)). The server generator writes
+`sq` + the type letter + `_` + 20 random bytes as lowercase hex. A user
+token acts as the user, administration included, and gets its own type; the
+global and project analysis tokens share one. Without the prefix the body is
+SHA-1 shaped, so the prefix is load-bearing and unprefixed legacy tokens
+(before SonarQube 9.5) stay with generic context. `sqb_` project badge
+tokens are read-only and published in badge URLs by design (Q5), so they are
+never claimed. False negatives: legacy tokens outside named contexts, badge
+tokens, SonarQube Cloud `sqco_` tokens and an uppercased copy. False
+positives: an unrelated `squ_`/`sqa_`/`sqp_` + exactly 40 lowercase hex,
+such as an identifier that suffixes a SHA-1; rare. Cost: three prefixes on
+the shared known-format scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -924,6 +941,7 @@ eight prefixes on the shared known-format scan.
 | W&B `wandb_v1_` + 64–96 `[A-Za-z0-9_]` API keys are reported as `wandb_api_key` at provider specificity, bare or in any context; a leading `<host>-` label stays outside the span, and the band is tolerant around the documented 77 until an issuance check ([#917](https://github.com/redact-secret/redact-secret/issues/917), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Bitwarden Secrets Manager `0.<uuid>.<30 alphanumeric>:<22 Base64>==` access tokens are reported as `bitwarden_secrets_manager_access_token` at provider specificity, bare or in any context; unpadded keys, other versions and Password Manager API keys stay unclaimed ([#1019](https://github.com/redact-secret/redact-secret/issues/1019), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Polar `polar_oat_` + 43 alphanumeric organization access tokens and `polar_pat_`/`polar_at_u_`/`polar_at_o_`/`polar_rt_u_`/`polar_rt_o_`/`polar_cs_`/`polar_crt_` + 43 `[A-Za-z0-9_-]` API credentials are reported as two finding types at provider specificity, bare or in any context; the checksum never rejects a match, `polar_ci_` and checkout secrets stay unclaimed, and `whsec_` stays with Stripe ([#1020](https://github.com/redact-secret/redact-secret/issues/1020), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent to one more family |
+| SonarQube `squ_` user tokens and `sqa_`/`sqp_` analysis tokens (+ 40 lowercase hex) are reported as two finding types at provider specificity, bare or in any context; `sqb_` badge tokens and unprefixed legacy tokens stay unclaimed ([#1021](https://github.com/redact-secret/redact-secret/issues/1021), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy and the public-key exclusion precedent to one more family |
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API keys are reported as `nvidia_api_key` at provider specificity, bare or in any context; the legacy prefixless NGC key stays unclaimed ([#972](https://github.com/redact-secret/redact-secret/issues/972), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |

@@ -5703,12 +5703,103 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "polar_api_credential"
+    },
+    {
+      "detector": "sonarqube-token",
+      "evidence": {
+        "fixtureCount": 42,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sonarqube-token-positive-bare",
+        "sonarqube-token-positive-chat-sentence",
+        "sonarqube-token-positive-crlf-unicode-prefix",
+        "sonarqube-token-positive-curl-bearer",
+        "sonarqube-token-positive-dotenv",
+        "sonarqube-token-positive-json-config",
+        "sonarqube-token-positive-json-token-key",
+        "sonarqube-token-positive-legacy-login",
+        "sonarqube-token-positive-log",
+        "sonarqube-token-positive-punctuation-adjacent",
+        "sonarqube-token-positive-repeated-value",
+        "sonarqube-token-positive-sdk-call",
+        "sonarqube-token-positive-shell-export",
+        "sonarqube-token-positive-tool-call-arguments",
+        "sonarqube-token-positive-x-api-key-header",
+        "sonarqube-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sonarqube_user_token"
+    },
+    {
+      "detector": "sonarqube-token",
+      "evidence": {
+        "fixtureCount": 42,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sonarqube-token-positive-github-actions-env",
+        "sonarqube-token-positive-global-analysis-bare",
+        "sonarqube-token-positive-global-analysis-chat",
+        "sonarqube-token-positive-gradle-system-prop",
+        "sonarqube-token-positive-project-analysis-bare",
+        "sonarqube-token-positive-project-analysis-json-token",
+        "sonarqube-token-positive-properties-file"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sonarqube_analysis_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 125,
+    "supported": 127,
     "unresolved": 0
   }
 }

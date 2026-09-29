@@ -34,6 +34,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 }
 
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const LOWER_HEX: &[u8] = b"0123456789abcdef";
 const BASE64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /// The probe contexts plus a few host forms.
@@ -335,6 +336,90 @@ mod polar {
     }
 }
 
+mod sonarqube {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "sonarqube-token";
+    const USER: &str = "sonarqube_user_token";
+    const ANALYSIS: &str = "sonarqube_analysis_token";
+
+    pub(super) fn token(prefix: &str, seed: usize) -> String {
+        format!("{prefix}{}", filler(LOWER_HEX, 40, seed))
+    }
+
+    #[test]
+    fn every_type_wins_every_context_as_the_sole_finding() {
+        for (prefix, type_name) in [("squ_", USER), ("sqa_", ANALYSIS), ("sqp_", ANALYSIS)] {
+            let token = token(prefix, 1);
+            assert_eq!(token.len(), 44);
+            assert_sole_provider_finding(DETECTOR, type_name, &token);
+            for input in [
+                format!("SONAR_TOKEN={token}\n"),
+                format!("env:\n  SONAR_TOKEN: {token}\n"),
+                format!("sonar-scanner -Dsonar.token={token}\n"),
+                format!("sonar-scanner -Dsonar.login={token}\n"),
+                format!("sonar.projectKey=app\nsonar.token={token}\n"),
+                format!("systemProp.sonar.token={token}\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, type_name, &token);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(LOWER_HEX, 40, 2);
+        let base = format!("squ_{body}");
+        let mut upper = body.clone();
+        upper.replace_range(3..4, "A");
+        let mut non_hex = body.clone();
+        non_hex.replace_range(3..4, "g");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("squ_{}", &body[..39]),
+                format!("{base}0"),
+                format!("squ_{upper}"),
+                format!("squ_{non_hex}"),
+                format!("sqx_{body}"),
+                format!("SQU_{body}"),
+                format!("xsqu_{body}"),
+                format!("_{base}"),
+                format!("{base}_"),
+                format!("{base}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn badge_tokens_and_bare_shas_are_unclaimed() {
+        let body = filler(LOWER_HEX, 40, 3);
+        for input in [
+            format!(
+                "![Quality Gate](https://sonar.example.invalid/api/project_badges/measure?project=app&metric=alert_status&token=sqb_{body})\n"
+            ),
+            format!("commit {body}\n"),
+            format!("SONAR_TOKEN=sqco_{body}\n"),
+            "SONAR_TOKEN=${{ secrets.SONAR_TOKEN }}\n".to_owned(),
+            "SONAR_TOKEN=squ_xxxxxxxx\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"squ_".repeat(20_000));
+        assert_unclaimed(DETECTOR, &token("sqa_", 4).repeat(200));
+        assert_repetition_line(DETECTOR, &token("sqp_", 4), 200);
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&token("squ_", 5));
+    }
+}
+
 /// Each #1014 family keeps its own finding on one line next to the others
 /// and an existing prefixed family, and no family claims another's key.
 mod isolation {
@@ -344,10 +429,8 @@ mod isolation {
         vec![
             (bitwarden::DETECTOR, bitwarden::token(9)),
             (polar::DETECTOR, polar::oat(9)),
-            (
-                "e2b-api-key",
-                format!("e2b_{}", filler(b"0123456789abcdef", 40, 9)),
-            ),
+            (sonarqube::DETECTOR, sonarqube::token("squ_", 9)),
+            ("e2b-api-key", format!("e2b_{}", filler(LOWER_HEX, 40, 9))),
         ]
     }
 

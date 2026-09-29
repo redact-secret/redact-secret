@@ -43,6 +43,10 @@ evidence is linked from each published version.
     `polar_crt_` + 43 URL-safe API credentials (`polar_api_credential`); the
     public `polar_ci_` client id is never claimed, and Polar `whsec_` webhook
     secrets stay with `stripe-token`.
+  - `sonarqube-token` (#1021): SonarQube Server `squ_` user tokens
+    (`sonarqube_user_token`) and `sqa_`/`sqp_` global and project analysis
+    tokens (`sonarqube_analysis_token`), each + 40 lowercase hex; public
+    `sqb_` badge tokens are never claimed.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
