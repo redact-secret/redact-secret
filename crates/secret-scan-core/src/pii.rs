@@ -1320,6 +1320,10 @@ impl LineOccurrences {
 }
 
 #[cfg(test)]
+#[path = "pii/context_association_tests.rs"]
+mod context_association_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
