@@ -75,7 +75,7 @@
     "assessment:rust:self-test": "cargo run --release --locked -p redact-secret --example assessment_adapter -- self-test",
     "assessment:cli:self-test": "node scripts/assessment-cli-run.mjs --self-test",
     "benchmark-pins:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_benchmark_pins.py' && python3 -B scripts/check-benchmark-pins.py",
-    "detector-family-coverage:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_detector_family_coverage.py' && python3 -B scripts/check-detector-family-coverage.py",
+    "detector-family-coverage:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_detector_family_coverage.py' && python3 -B scripts/check-detector-family-coverage.py --strict",
     "support-matrix:check":"python3 -B -m unittest discover -s scripts/tests -p 'test_generate_support_matrix_docs.py' && python3 -B scripts/generate-support-matrix-docs.py --check",
     "support-matrix:generate": "python3 -B scripts/generate-support-matrix-docs.py",
     "site-feed:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_generate_site_feed.py' && python3 -B scripts/generate-site-feed.py --check",

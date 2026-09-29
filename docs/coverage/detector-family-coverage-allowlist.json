@@ -1,0 +1,33 @@
+{
+  "$comment": "Reviewed exceptions for scripts/check-detector-family-coverage.py --strict (issue #995). Each entry is a known gap with the reason it is accepted. A detector missing from the pinned support matrix that is not listed here fails CI, and an entry that is no longer a gap also fails, so the list can only shrink.",
+  "unmeasured": {
+    "ai21-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "apify-api-token": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "aws-bedrock-long-term-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "aws-bedrock-short-term-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "cohere-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "composio-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "convex-deployment-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "deepgram-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "doppler-token": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "e2b-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "elevenlabs-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "firecrawl-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "helicone-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "inngest-signing-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "mistral-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "onepassword-service-account-token": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "posthog-token": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "resend-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "tavily-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "together-ai-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "trigger-dev-token": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it.",
+    "wandb-api-key": "Shipped after the pinned matrix snapshot; family intake open in redact-secret-benchmarks (#473). Remove when the re-pinned matrix lists it."
+  },
+  "stale": {
+    "github-fine-grained-pat": "The pinned matrix keys a finer-grained detector id the inventory folds into `github-token`; clears when the matrix is regenerated against current detector ids.",
+    "slack-app-level-token": "The pinned matrix keys a finer-grained detector id the inventory folds into `slack-token`; clears when the matrix is regenerated against current detector ids.",
+    "slack-user-token": "The pinned matrix keys a finer-grained detector id the inventory folds into `slack-token`; clears when the matrix is regenerated against current detector ids.",
+    "stripe-webhook-signing-secret": "The pinned matrix keys a finer-grained detector id the inventory folds into `stripe-token`; clears when the matrix is regenerated against current detector ids."
+  }
+}

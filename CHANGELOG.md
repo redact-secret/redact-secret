@@ -77,6 +77,12 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `npm run detector-family-coverage:check` now runs `--strict` (#995): a detector
+  with no family in the pinned support matrix fails CI unless it has a reasoned
+  entry in `docs/coverage/detector-family-coverage-allowlist.json`, which holds
+  the 22 unmeasured detectors and four stale matrix ids known today and fails
+  when an entry stops being a gap.
+
 - Opt-in PII support status (#901). Under `pii-v1`, the Beta.11
   qualification of candidate core `8b6a5fde` made `pii:global:network-address`,
   `pii:global:email`, `pii:global:payment-card`, `pii:global:iban`, and
