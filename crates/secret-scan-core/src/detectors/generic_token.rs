@@ -7,7 +7,7 @@
 
 use super::pattern::{self, PrefixShape};
 use super::text::{
-    OPENCODE_REFERENCE_KINDS, ascii_run_len, char_at, ends_with_ci,
+    OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, ends_with_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
     is_glued_instructional_placeholder, is_horizontal_js_whitespace,
     is_instructional_token_placeholder, is_js_whitespace, is_line_start, is_opencode_reference,
@@ -275,8 +275,16 @@ const MIN_AUTHORIZATION_VALUE_LENGTH: usize = 12;
 /// kind of input, so a ruleset author's `CorpPassphrase` and a scanned input's
 /// `CorpPassphrase=` assignment normalize to the identical key.
 pub(crate) fn normalize_name(name: &str) -> String {
-    let bytes = name.as_bytes();
     let mut out = String::with_capacity(name.len() + 4);
+    normalize_name_into(name, &mut out);
+    out
+}
+
+/// [`normalize_name`] written into `out`, replacing its contents, so a loop
+/// can reuse one buffer instead of allocating per name (issue #984).
+fn normalize_name_into(name: &str, out: &mut String) {
+    out.clear();
+    let bytes = name.as_bytes();
     for (index, &byte) in bytes.iter().enumerate() {
         if index > 0 {
             let previous = bytes[index - 1];
@@ -291,7 +299,6 @@ pub(crate) fn normalize_name(name: &str) -> String {
             other => other.to_ascii_lowercase() as char,
         });
     }
-    out
 }
 
 fn is_open_assignment_boundary_char(ch: char) -> bool {
@@ -1804,9 +1811,9 @@ fn delimited_reference_value(input: &str, start: usize) -> Option<(usize, usize)
 /// substitution prefix (`{env:`/`{file:`), regardless of whether it goes on
 /// to close with a matching `}` before the value ends.
 fn starts_with_opencode_prefix(input: &str, start: usize) -> bool {
-    OPENCODE_REFERENCE_KINDS
+    OPENCODE_REFERENCE_OPENERS
         .iter()
-        .any(|kind| input[start..].starts_with(&format!("{{{kind}:")))
+        .any(|open| input[start..].starts_with(open))
 }
 
 /// Scans an unquoted value up to the next boundary character, rejecting
@@ -2187,6 +2194,8 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let otpauth_spans = otpauth_uri_spans(input);
     let jwk_lines = jwk_line_spans(input);
     let mut templates = OpenTemplateTracker::default();
+    // One buffer for every assignment's normalized name (issue #984).
+    let mut normalized = String::new();
 
     while cursor < input.len() {
         let Some(AssignmentPrefix {
@@ -2219,13 +2228,14 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             && (!call_open || form == ValueForm::Quoted)
         {
             let value = &input[value_start..value_end];
-            let mut normalized = normalize_name(&input[name_start..name_end]);
+            normalize_name_into(&input[name_start..name_end], &mut normalized);
             if matches!(names, NameSource::BuiltIn)
                 && is_jwk_secret_member(input, name_start, name_end, &jwk_lines)
             {
                 // A JWK secret member is private key material; it takes the
                 // `private_key` name's high-signal bucket (issue #821).
-                normalized = String::from("private_key");
+                normalized.clear();
+                normalized.push_str("private_key");
             }
             // The templated-lookup check runs only for a pair that would
             // otherwise be reported (issue #989).
