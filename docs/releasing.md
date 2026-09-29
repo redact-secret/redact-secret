@@ -309,16 +309,17 @@ tag or registry-install success: those jobs are separate.
 ### npm dist-tag policy
 
 The release workflow publishes every `0.1.0-beta.N` npm package with
-`--tag beta` only. The `latest` tag is therefore not set by any workflow. On
-2026-09-28 `latest` and `beta` both pointed to `0.1.0-beta.10` on all ten npm
-packages, and `latest` had been moved by hand, outside the workflows, several
-times since beta.1 (see [release status](releases/status.md)).
+`--tag beta` only. The `latest` tag is therefore not set by any workflow;
+every `latest` move since beta.1 was made by hand, outside the workflows. The
+current observed `latest` and `beta` values, with the date they were observed,
+are in [release status](releases/status.md) (on 2026-09-29 both were
+`0.1.0-beta.11` on all ten npm packages).
 
 Policy:
 
-- A release does not move `latest`. After the Beta.11 publish, `beta` is
-  `0.1.0-beta.11` but a bare `npm i @redact-secret/core` still resolves
-  `0.1.0-beta.10`, unless `latest` is moved again.
+- A release does not move `latest`. Right after a publish, `beta` names the
+  new version but a bare `npm i @redact-secret/core` still resolves the previous
+  one until `latest` is moved.
 - Moving `latest` is a separate publication action that needs its own explicit
   approval under the [release authority](../AGENTS.md#release-authority). It is
   not part of `Release` or `Reconcile Release`, and approving a release does not
