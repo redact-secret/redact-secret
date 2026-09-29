@@ -99,6 +99,17 @@ evidence is linked from each published version.
   `policy-qualified` stable profile of T3 project-policy families; the docs
   generator and drift gate read it, and the support matrix names the new
   evaluator gates in plain words. The site feed is regenerated from it.
+  The #995 coverage allowlist drops its 22 unmeasured entries, since every
+  shipped detector is now measured, and lists 18 matrix ids the inventory
+  folds into a shipped detector, 14 of them finding types the benchmarks
+  harness scores as their own arrival families (for example the six
+  `doppler-*` types of `doppler-token`).
+- `npm run detector-family-coverage:check` now runs `--strict` (#995): a detector
+  with no family in the pinned support matrix fails CI unless it has a reasoned
+  entry in `docs/coverage/detector-family-coverage-allowlist.json`, which holds
+  the 22 unmeasured detectors and four stale matrix ids known today and fails
+  when an entry stops being a gap.
+
 - Opt-in PII support status (#901). Under `pii-v1`, the Beta.11
   qualification of candidate core `8b6a5fde` made `pii:global:network-address`,
   `pii:global:email`, `pii:global:payment-card`, `pii:global:iban`, and

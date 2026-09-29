@@ -196,15 +196,17 @@ keys its contracts by come from `redact-secret-benchmarks`' own
 registry, so a new provider or credential family needs a taxonomy entry
 there too before it has an id for the contract to key on.
 
-**Detector-to-family mapping report.** `npm run detector-family-coverage:check`
-(`scripts/check-detector-family-coverage.py`, offline) lists each detector in
-`docs/coverage/detector-inventory.json` that no family in the pinned
-`benchmarks/support-matrix.json` names. It is report-only for now, because the
-detectors under "not yet measured" in [`docs/support-matrix.md`](docs/support-matrix.md)
-already have no family; `--strict` fails on any such detector and becomes the
-gate once the pinned matrix covers them. A matrix entry naming a detector the
-inventory lacks (four today) is reported the same way. New detectors should
-not add to the list.
+**Detector-to-family mapping gate.** `npm run detector-family-coverage:check`
+(`scripts/check-detector-family-coverage.py --strict`, offline) lists each
+detector in `docs/coverage/detector-inventory.json` that no family in the
+pinned `benchmarks/support-matrix.json` names, and each matrix entry naming a
+detector the inventory lacks. The gaps that exist today (the detectors under
+"not yet measured" in [`docs/support-matrix.md`](docs/support-matrix.md) and four
+stale matrix ids) are recorded with a reason each in
+[`docs/coverage/detector-family-coverage-allowlist.json`](docs/coverage/detector-family-coverage-allowlist.json).
+A new detector without a family fails CI unless you add a reviewed, reasoned
+entry there; an entry that is no longer a gap also fails, so the allowlist only
+shrinks as the pinned matrix is refreshed.
 
 **This checklist is necessary, never sufficient, for `stable`.** Clearing
 it means the evidence *exists*; reaching `stable` in
