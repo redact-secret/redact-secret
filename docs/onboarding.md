@@ -9,10 +9,38 @@ Findings, errors, snapshots, and diagnostics must not copy matched values.
 
 ## Run the repository checks
 
-From the root, with a supported Node version and Rust 1.88 or newer:
+From the root, with a supported Node version and Rust 1.88 or newer, run
+`npm ci` once. While iterating, run only the scope your change touches.
+`npm run check:changed` reads your branch's changes against `origin/main` and
+prints the scoped commands to run (`-- --run` runs them); a path no scope
+covers makes it print `npm run ci` instead.
+
+| Change | Read first | Run |
+| --- | --- | --- |
+| Documentation or Markdown only | [conventions](../CONVENTIONS.md) | `npm run check:docs` |
+| ADR or spec file (`docs/decisions/`, `docs/specs/`) | [decision router](decisions/DECISIONS.md), the spec file it changes | `npm run check:docs` |
+| Detector, PII context, or policy in the core | [architecture](../ARCHITECTURE.md), [detector families](specs/detector-families.md), [contextual detection](specs/contextual-detection.md) | `npm run check:rust && npm run check:detector` |
+| Conformance fixture | [conformance corpus](../conformance/README.md) | `npm run check:detector && npm run check:js && npm run check:rust` |
+| Other Rust: engine, CLI, bindings | [engine](specs/engine.md), [workspace policy](rust-workspace.md) | `npm run check:rust` (plus `check:js` for the Node or wasm binding) |
+| JavaScript wrapper or examples | [architecture](../ARCHITECTURE.md) | `npm run check:js` |
+| Release, CI workflow, packaging, or `scripts/` | [release runbook](releasing.md), [distribution](specs/distribution.md), [evidence and gates](specs/evidence-and-gates.md) | `npm run check:release` |
+
+Each `check:<scope>` script in `package.json` chains existing gates from
+`npm run ci`; `check:rust` also runs `cargo fmt`, `cargo clippy` and
+`cargo test`, and `check:js` needs `npm run examples:install` once. Every
+gate in `npm run ci` belongs to at least one scope, and
+`npm run check-scopes:test` fails if one does not. Scopes are a local
+convenience: CI runs the full suite below on every pull request, so you are
+not expected to reproduce the platform matrix, the wheel build, or the
+artifact qualifiers locally to open one.
+
+### Full suite
+
+The complete local sequence, and what CI enforces before merge:
 
 ```bash
 npm ci
+npm run examples:install
 npm run ci
 npm run rust:check
 cargo fmt --all --check
