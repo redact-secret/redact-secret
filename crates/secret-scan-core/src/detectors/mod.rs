@@ -18,6 +18,7 @@ mod aws_bedrock;
 mod azure_devops;
 mod bearer_token;
 mod browserbase;
+mod cerebras;
 mod clickhouse_cloud;
 mod cloudflare;
 mod composio;
@@ -235,6 +236,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(nvidia::NVIDIA_API_KEY),
         Box::new(browserbase::BROWSERBASE_API_KEY),
         Box::new(runpod::RUNPOD_API_KEY),
+        Box::new(cerebras::CEREBRAS_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -513,6 +515,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(runpod::RUNPOD_API_KEY.shapes())],
     ),
     (
+        cerebras::CEREBRAS_API_KEY.detector_id(),
+        &[Literals::Shapes(cerebras::CEREBRAS_API_KEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -688,6 +694,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("nvidia-api-key", Pack::Provider),
     ("browserbase-api-key", Pack::Provider),
     ("runpod-api-key", Pack::Provider),
+    ("cerebras-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -820,6 +827,7 @@ mod tests {
                 "nvidia-api-key",
                 "browserbase-api-key",
                 "runpod-api-key",
+                "cerebras-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1194,6 +1202,8 @@ mod tests {
         );
         let browserbase_api_key_input = format!("bb_live_{}", "SyntheticRevokedBrowserbaseKey0000");
         let runpod_api_key_input = format!("rpa_{}", "SyntheticRevokedRunpodApiKey00000000");
+        let cerebras_api_key_input =
+            format!("csk-{}", &"SyntheticRevokedCerebrasApiKey_".repeat(2)[..48]);
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
@@ -1289,6 +1299,7 @@ mod tests {
             ("nvidia-api-key", nvidia_api_key_input.as_str()),
             ("browserbase-api-key", browserbase_api_key_input.as_str()),
             ("runpod-api-key", runpod_api_key_input.as_str()),
+            ("cerebras-api-key", cerebras_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

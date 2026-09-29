@@ -13236,6 +13236,130 @@
       "type": "runpod_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "cerebras-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "cerebras-api-key-positive-bare",
+            "cerebras-api-key-positive-chat-sentence",
+            "cerebras-api-key-positive-crlf-unicode-prefix",
+            "cerebras-api-key-positive-curl-bearer",
+            "cerebras-api-key-positive-dotenv",
+            "cerebras-api-key-positive-js-client-option",
+            "cerebras-api-key-positive-json-config",
+            "cerebras-api-key-positive-json-token-key",
+            "cerebras-api-key-positive-log",
+            "cerebras-api-key-positive-lowercase-alphanumeric-body",
+            "cerebras-api-key-positive-lowercase-alphanumeric-body-dotenv",
+            "cerebras-api-key-positive-openai-compatible-client",
+            "cerebras-api-key-positive-punctuation-adjacent",
+            "cerebras-api-key-positive-repeated-value",
+            "cerebras-api-key-positive-sdk-call",
+            "cerebras-api-key-positive-shell-export",
+            "cerebras-api-key-positive-tool-call-arguments",
+            "cerebras-api-key-positive-underscore-prefix",
+            "cerebras-api-key-positive-underscore-prefix-dotenv",
+            "cerebras-api-key-positive-x-api-key-header",
+            "cerebras-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "cerebras-api-key-overlap-bearer-header",
+            "cerebras-api-key-overlap-context",
+            "cerebras-api-key-overlap-lowercase-alphanumeric-body-bearer",
+            "cerebras-api-key-overlap-underscore-prefix-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "cerebras-api-key-adversarial-long-body-run",
+            "cerebras-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "cerebras-api-key-boundary-body-47",
+            "cerebras-api-key-boundary-body-49",
+            "cerebras-api-key-boundary-dot-in-body",
+            "cerebras-api-key-boundary-dot-prefix",
+            "cerebras-api-key-boundary-letter-glued-prefix",
+            "cerebras-api-key-boundary-pinecone-dash-glue",
+            "cerebras-api-key-boundary-pinecone-underscore-glue",
+            "cerebras-api-key-boundary-plus-in-body",
+            "cerebras-api-key-boundary-underscore-body-47",
+            "cerebras-api-key-boundary-underscore-body-49",
+            "cerebras-api-key-boundary-underscore-glued-prefix",
+            "cerebras-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "cerebras-api-key-negative-ci-secret-reference",
+            "cerebras-api-key-negative-placeholders",
+            "cerebras-api-key-negative-prefix-only"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "cerebras-api-key-boundary-body-47",
+            "cerebras-api-key-boundary-body-49",
+            "cerebras-api-key-boundary-dot-in-body",
+            "cerebras-api-key-boundary-dot-prefix",
+            "cerebras-api-key-boundary-letter-glued-prefix",
+            "cerebras-api-key-boundary-pinecone-dash-glue",
+            "cerebras-api-key-boundary-pinecone-underscore-glue",
+            "cerebras-api-key-boundary-plus-in-body",
+            "cerebras-api-key-boundary-underscore-body-47",
+            "cerebras-api-key-boundary-underscore-body-49",
+            "cerebras-api-key-boundary-underscore-glued-prefix",
+            "cerebras-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for cerebras_api_key (cerebras-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "cerebras_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13382,6 +13506,8 @@
             "bearer-token-adversarial-long-join-chain",
             "browserbase-api-key-adversarial-long-body-run",
             "browserbase-api-key-adversarial-long-run",
+            "cerebras-api-key-adversarial-long-body-run",
+            "cerebras-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
             "clickhouse-cloud-api-secret-adversarial-long-run",
             "cloudflare-adversarial-long-suffix",
@@ -13843,6 +13969,8 @@
             "bearer-token-adversarial-long-join-chain",
             "browserbase-api-key-adversarial-long-body-run",
             "browserbase-api-key-adversarial-long-run",
+            "cerebras-api-key-adversarial-long-body-run",
+            "cerebras-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
             "clickhouse-cloud-api-secret-adversarial-long-run",
             "cloudflare-adversarial-long-suffix",

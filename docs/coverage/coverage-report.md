@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 121/121 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 122/122 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 121 |
+| supported | 122 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 132.
+Coverage declarations: 133.
 
 ## Coverage by detector
 
@@ -35,6 +35,7 @@ Coverage declarations: 132.
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| cerebras-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -140,6 +141,7 @@ Coverage declarations: 132.
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
+| cerebras_api_key | cerebras-api-key | provider | supported | not-applicable | none |
 | clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
@@ -273,15 +275,15 @@ Coverage declarations: 132.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 132 | 0 | 0 |
-| boundary | 121 | 0 | 0 |
-| host-context | 121 | 0 | 0 |
+| adversarial | 133 | 0 | 0 |
+| boundary | 122 | 0 | 0 |
+| host-context | 122 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 132 | 0 | 0 |
-| near-miss-negative | 121 | 0 | 0 |
-| overlap | 121 | 0 | 0 |
-| positive | 121 | 0 | 0 |
-| range | 132 | 0 | 0 |
+| malformed | 133 | 0 | 0 |
+| near-miss-negative | 122 | 0 | 0 |
+| overlap | 122 | 0 | 0 |
+| positive | 122 | 0 | 0 |
+| range | 133 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

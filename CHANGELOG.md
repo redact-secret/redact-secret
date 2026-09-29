@@ -24,6 +24,9 @@ evidence is linked from each published version.
     open-ended rule with a cap.
   - `runpod-api-key` (#974): RunPod `rpa_` + 31–128 alphanumeric API keys
     (`runpod_api_key`), with a policy floor above Redirect.pizza's width.
+  - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
+    `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
+    keys stay `pinecone_api_key` only.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

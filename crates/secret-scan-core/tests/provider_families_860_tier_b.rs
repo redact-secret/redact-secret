@@ -1260,3 +1260,182 @@ mod runpod {
         assert_partition_parity(&key(46, 8));
     }
 }
+
+mod cerebras {
+    use super::*;
+
+    const DETECTOR: &str = "cerebras-api-key";
+    const TYPE: &str = "cerebras_api_key";
+
+    /// `csk-` or `csk_` + a 48-byte body over `[A-Za-z0-9_-]` that starts
+    /// and ends alphanumeric.
+    fn key(prefix: &str, len: usize, seed: usize) -> String {
+        let mut body = filler(ALNUM_DASH, len, seed).into_bytes();
+        body[0] = b'N';
+        body[len - 1] = b'z';
+        format!("{prefix}{}", String::from_utf8(body).unwrap())
+    }
+
+    /// A real-shape Pinecone key: `pcsk_` + a 5- or 6-byte label + `_` + a
+    /// 63-byte secret, built at run time.
+    fn pinecone(label_len: usize, seed: usize) -> String {
+        format!(
+            "pcsk_{}_{}",
+            filler(ALNUM, label_len, seed),
+            filler(ALNUM, 63, seed + 1)
+        )
+    }
+
+    #[test]
+    fn both_prefixes_win_every_context_as_the_sole_finding() {
+        let lower = format!("csk-{}", &"abcdefghij0123456789".repeat(3)[..48]);
+        for key in [
+            key("csk-", 48, 1),
+            key("csk_", 48, 2),
+            key("csk-", 48, 3),
+            lower,
+        ] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("CEREBRAS_API_KEY={key}\n"),
+                format!("client = Cerebras(api_key=\"{key}\")\n"),
+                format!(
+                    "client = OpenAI(base_url=\"https://api.cerebras.ai/v1\", api_key=\"{key}\")\n"
+                ),
+                format!(
+                    "curl -H \"Authorization: Bearer {key}\" https://api.cerebras.ai/v1/models\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    /// The leading boundary keeps Pinecone's `pcsk_` out: a real-shape
+    /// Pinecone key stays `pinecone_api_key` only, in every context.
+    #[test]
+    fn a_real_shape_pinecone_key_stays_pinecone_only() {
+        for (label_len, seed) in [(5, 1), (6, 2)] {
+            let pcsk = pinecone(label_len, seed);
+            assert_sole_provider_finding("pinecone-api-key", "pinecone_api_key", &pcsk);
+            for input in contexts(&pcsk) {
+                let (_, findings) = whole_input(&input);
+                assert!(
+                    detector_findings(&findings, DETECTOR).is_empty(),
+                    "{input}: {findings:?}"
+                );
+            }
+        }
+        // A Pinecone key and a Cerebras key side by side: one finding each.
+        let (_, findings) = whole_input(&format!("{} {}\n", pinecone(5, 3), key("csk-", 48, 3)));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "pinecone-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = key("", 48, 4);
+        let dotted = format!("{}.{}", &body[..20], &body[21..]);
+        let plus = format!("{}+{}", &body[..20], &body[21..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key("csk-", 47, 4),
+                key("csk-", 49, 4),
+                key("csk_", 47, 4),
+                key("csk_", 49, 4),
+                format!("csk-{dotted}"),
+                format!("csk_{plus}"),
+                format!("CSK-{body}"),
+                format!("CSK_{body}"),
+                format!("csk.{body}"),
+                format!("pcsk_{body}"),
+                format!("pcsk-{body}"),
+                format!("xcsk-{body}"),
+                format!("_csk-{body}"),
+                format!("-csk_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "CEREBRAS_API_KEY=csk-your-key-here\n".to_owned(),
+            "CEREBRAS_API_KEY=csk_...\n".to_owned(),
+            "CEREBRAS_API_KEY=csk-xxxx\n".to_owned(),
+            "CEREBRAS_API_KEY=${{ secrets.CEREBRAS_API_KEY }}\n".to_owned(),
+            "the prefix is csk-\n".to_owned(),
+            format!("PINECONE_API_KEY={}\n", pinecone(5, 5)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_stays_unclaimed_and_each_family_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("CEREBRAS_API_KEY={jwt}\n"));
+        let cerebras = key("csk_", 48, 6);
+        let others = [
+            ("daytona-api-key", format!("dtn_{}", "5e7c0ded".repeat(8))),
+            ("nvidia-api-key", format!("nvapi-{}", filler(ALNUM, 64, 6))),
+            (
+                "browserbase-api-key",
+                format!("bb_live_{}", filler(ALNUM, 32, 6)),
+            ),
+            ("runpod-api-key", format!("rpa_{}", filler(ALNUM, 46, 6))),
+        ];
+        let line: Vec<&str> = std::iter::once(cerebras.as_str())
+            .chain(others.iter().map(|(_, key)| key.as_str()))
+            .collect();
+        let (_, findings) = whole_input(&format!("{}\n", line.join(" ")));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        for (detector, key) in &others {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+            assert_unclaimed(DETECTOR, &format!("{key}\n"));
+        }
+        assert_eq!(findings.len(), 5, "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "csk-".repeat(20_000),
+            "csk_".repeat(20_000),
+            format!("csk-{}", "aB3_-".repeat(4_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key("csk-", 48, 7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key("csk-", 48, 8));
+        assert_partition_parity(&key("csk_", 48, 9));
+        assert_partition_parity(&pinecone(5, 10));
+    }
+}

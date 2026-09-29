@@ -876,6 +876,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0072pa_SyntheticRevokedRunpodApiKey00000000",
       "schemes": null
+    },
+    {
+      "type": "cerebras_api_key",
+      "detector": "cerebras-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063sk-SyntheticRevokedCerebrasApiKey_SyntheticRevokedC",
+      "schemes": null
     }
   ],
   "consumers": [
