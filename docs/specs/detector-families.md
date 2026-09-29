@@ -30,6 +30,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `aws_bedrock_short_term_api_key` | `aws-bedrock-short-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; two families rather than one (client-minted presigned URL vs issued credential), `bedrock-api-key-` prefix + fixed 133-byte Base64 head + standard Base64 alphabet (T1, maintainer ruling accepted 2026-09-27 on the AWS token-generator SDKs (python/js/java) plus the AWS Security Blog, [#779](https://github.com/redact-secret/redact-secret/issues/779)), tail floor and total length T2, recorded in [#864 evidence](../audits/evidence/864/README.md) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `bitwarden_secrets_manager_access_token` | `bitwarden-secrets-manager-access-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider parser, server generator and docs example, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `cerebras_api_key` | `cerebras-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 prefixes and width (provider validator, R1; staff statement, R3 as of 2025-10), alphabet by policy (R10), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `clickhouse_cloud_api_secret` | `clickhouse-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-04 (provider staff statement and staff-authored regex, R2 and R3; the older 39-byte example is set aside by R3 date order), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
@@ -832,6 +833,51 @@ such as a snake_case identifier of exactly that width or a padded placeholder
 known-format scan; `c` is a common lead byte, so the shared prefilter skips
 the scan on input where the byte pairs of neither prefix all occur.
 
+## Beta.12 broad-discovery provider families (#1014)
+
+The families of issue
+[#1014](https://github.com/redact-secret/redact-secret/issues/1014)
+([ranked candidates](../audits/evidence/1014/README.md)) are each a new
+detector with provider-specific finding types, `Provider` specificity, high
+confidence and always redacted, so overlap resolution reports one provider
+finding per span over `contextual_secret`, `bearer_token` and
+`authorization_credential`. The frozen contract for each family, with its
+sources, tier rationale, excluded shapes and issuance checklist, is its step-3
+handoff; this section records only the implemented grammar and its
+trade-offs.
+
+Shared rules: a value is rejected when the byte before it or after it
+continues an identifier (`[A-Za-z0-9_-]`, adjusted per family where noted),
+so an embedded, over-long or glued value is an intentional false negative,
+never a truncated match. A provider checksum never rejects a shape-valid
+match: security comes first, so a failed checksum is not an intentional false
+negative, and ruling Q1 of the handoff index stays open for the maintainer.
+Documented-public siblings (ruling Q5) stay unclaimed. None of these
+providers is added to `generic-token`'s dedicated-provider deferral list: each
+has shapes these contracts exclude, and deferral would turn a provider-named
+assignment of one into a silent miss. No row is a support-status claim;
+promotion stays gated on core conformance and the benchmarks arrival and
+profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `bitwarden:secrets-manager-access-token` | `bitwarden-secrets-manager-access-token` | `0.` + UUID (8-4-4-4-12 hex, either case) + `.` + exactly 30 `[A-Za-z0-9]` + `:` + 22 `[A-Za-z0-9+/]` + `==` (94 in total); the byte before `0` must not be `[A-Za-z0-9._-]` and the byte after `==` must not be `[A-Za-z0-9+/=]` | `bitwarden_secrets_manager_access_token` | T1 (provider parser, server generator and docs example, R1) |
+
+Bitwarden ([#1019](https://github.com/redact-secret/redact-secret/issues/1019),
+[handoff](../audits/evidence/1014/bitwarden.md)). The token carries the
+machine account's client secret and the key that decrypts its secrets. The
+`0.` lead is too common to index, so the scan anchors on the closing `==` and
+checks the fixed 94-byte layout that ends there, O(1) per `==`. The leading
+boundary adds `.` so `10.<uuid>…` and `v0.<uuid>…` are not claimed; the
+trailing boundary is the Base64 alphabet plus `=`. The UUID accepts both
+cases because the parser does. False negatives: an unpadded key (the parser
+accepts it, the generator never emits it), a future version other than `0`,
+a token split across lines, and Password Manager `user.`/`organization.` API
+keys, which have no token grammar and stay with generic context. False
+positives: an unrelated `0.` + UUID + `.` + 30 alphanumerics + `:` + padded
+16-byte Base64 value; none is known. Cost: one `==` search plus a fixed
+layout check.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -854,6 +900,7 @@ the scan on input where the byte pairs of neither prefix all occur.
 | Resend `re_` + 8 + `_` + 24 alphanumeric API keys with both letter cases are reported as `resend_api_key` at provider specificity, bare or in any context ([#915](https://github.com/redact-secret/redact-secret/issues/915), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Apify `apify_api_` + 20–128 alphanumeric API tokens are reported as `apify_api_token` at provider specificity, bare or in any context; `apify_ui_` stays unclaimed ([#916](https://github.com/redact-secret/redact-secret/issues/916), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | W&B `wandb_v1_` + 64–96 `[A-Za-z0-9_]` API keys are reported as `wandb_api_key` at provider specificity, bare or in any context; a leading `<host>-` label stays outside the span, and the band is tolerant around the documented 77 until an issuance check ([#917](https://github.com/redact-secret/redact-secret/issues/917), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Bitwarden Secrets Manager `0.<uuid>.<30 alphanumeric>:<22 Base64>==` access tokens are reported as `bitwarden_secrets_manager_access_token` at provider specificity, bare or in any context; unpadded keys, other versions and Password Manager API keys stay unclaimed ([#1019](https://github.com/redact-secret/redact-secret/issues/1019), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API keys are reported as `nvidia_api_key` at provider specificity, bare or in any context; the legacy prefixless NGC key stays unclaimed ([#972](https://github.com/redact-secret/redact-secret/issues/972), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |

@@ -883,6 +883,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0063sk-SyntheticRevokedCerebrasApiKey_SyntheticRevokedC",
       "schemes": null
+    },
+    {
+      "type": "bitwarden_secrets_manager_access_token",
+      "detector": "bitwarden-secrets-manager-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0030.5e7c0ded-0000-4000-8000-5e7c0ded0000.SyntheticRevokedBitwardenSecre:SyntheticRevokedKey000==",
+      "schemes": null
     }
   ],
   "consumers": [

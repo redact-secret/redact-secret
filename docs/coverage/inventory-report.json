@@ -5549,12 +5549,64 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "cerebras_api_key"
+    },
+    {
+      "detector": "bitwarden-secrets-manager-access-token",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "bitwarden-sm-access-token-positive-bare",
+        "bitwarden-sm-access-token-positive-chat-sentence",
+        "bitwarden-sm-access-token-positive-crlf-unicode-prefix",
+        "bitwarden-sm-access-token-positive-curl-bearer",
+        "bitwarden-sm-access-token-positive-docker-env",
+        "bitwarden-sm-access-token-positive-dotenv",
+        "bitwarden-sm-access-token-positive-github-actions-with",
+        "bitwarden-sm-access-token-positive-json-config",
+        "bitwarden-sm-access-token-positive-json-token-key",
+        "bitwarden-sm-access-token-positive-log",
+        "bitwarden-sm-access-token-positive-mcp-env-block",
+        "bitwarden-sm-access-token-positive-punctuation-adjacent",
+        "bitwarden-sm-access-token-positive-repeated-value",
+        "bitwarden-sm-access-token-positive-sdk-call",
+        "bitwarden-sm-access-token-positive-shell-export",
+        "bitwarden-sm-access-token-positive-tool-call-arguments",
+        "bitwarden-sm-access-token-positive-uppercase-uuid",
+        "bitwarden-sm-access-token-positive-x-api-key-header",
+        "bitwarden-sm-access-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "bitwarden_secrets_manager_access_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 122,
+    "supported": 123,
     "unresolved": 0
   }
 }

@@ -13360,6 +13360,129 @@
       "type": "cerebras_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "bitwarden-secrets-manager-access-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "bitwarden-sm-access-token-positive-bare",
+            "bitwarden-sm-access-token-positive-chat-sentence",
+            "bitwarden-sm-access-token-positive-crlf-unicode-prefix",
+            "bitwarden-sm-access-token-positive-curl-bearer",
+            "bitwarden-sm-access-token-positive-docker-env",
+            "bitwarden-sm-access-token-positive-dotenv",
+            "bitwarden-sm-access-token-positive-github-actions-with",
+            "bitwarden-sm-access-token-positive-json-config",
+            "bitwarden-sm-access-token-positive-json-token-key",
+            "bitwarden-sm-access-token-positive-log",
+            "bitwarden-sm-access-token-positive-mcp-env-block",
+            "bitwarden-sm-access-token-positive-punctuation-adjacent",
+            "bitwarden-sm-access-token-positive-repeated-value",
+            "bitwarden-sm-access-token-positive-sdk-call",
+            "bitwarden-sm-access-token-positive-shell-export",
+            "bitwarden-sm-access-token-positive-tool-call-arguments",
+            "bitwarden-sm-access-token-positive-uppercase-uuid",
+            "bitwarden-sm-access-token-positive-x-api-key-header",
+            "bitwarden-sm-access-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "bitwarden-sm-access-token-overlap-bearer-header",
+            "bitwarden-sm-access-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "bitwarden-sm-access-token-adversarial-glued-tokens",
+            "bitwarden-sm-access-token-adversarial-padding-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "bitwarden-sm-access-token-boundary-colon-as-dot",
+            "bitwarden-sm-access-token-boundary-glued-digit-prefix",
+            "bitwarden-sm-access-token-boundary-glued-letter-prefix",
+            "bitwarden-sm-access-token-boundary-glued-trailing",
+            "bitwarden-sm-access-token-boundary-key-21",
+            "bitwarden-sm-access-token-boundary-key-23",
+            "bitwarden-sm-access-token-boundary-key-single-pad",
+            "bitwarden-sm-access-token-boundary-key-unpadded",
+            "bitwarden-sm-access-token-boundary-secret-29",
+            "bitwarden-sm-access-token-boundary-secret-31",
+            "bitwarden-sm-access-token-boundary-secret-dash",
+            "bitwarden-sm-access-token-boundary-uuid-undashed",
+            "bitwarden-sm-access-token-boundary-version-1"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "bitwarden-sm-access-token-negative-env-reference",
+            "bitwarden-sm-access-token-negative-password-manager-client-id",
+            "bitwarden-sm-access-token-negative-uuid-json-file",
+            "bitwarden-sm-access-token-negative-version-and-uuid"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "bitwarden-sm-access-token-boundary-colon-as-dot",
+            "bitwarden-sm-access-token-boundary-glued-digit-prefix",
+            "bitwarden-sm-access-token-boundary-glued-letter-prefix",
+            "bitwarden-sm-access-token-boundary-glued-trailing",
+            "bitwarden-sm-access-token-boundary-key-21",
+            "bitwarden-sm-access-token-boundary-key-23",
+            "bitwarden-sm-access-token-boundary-key-single-pad",
+            "bitwarden-sm-access-token-boundary-key-unpadded",
+            "bitwarden-sm-access-token-boundary-secret-29",
+            "bitwarden-sm-access-token-boundary-secret-31",
+            "bitwarden-sm-access-token-boundary-secret-dash",
+            "bitwarden-sm-access-token-boundary-uuid-undashed",
+            "bitwarden-sm-access-token-boundary-version-1"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for bitwarden_secrets_manager_access_token (bitwarden-secrets-manager-access-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "bitwarden_secrets_manager_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13504,6 +13627,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
+            "bitwarden-sm-access-token-adversarial-glued-tokens",
+            "bitwarden-sm-access-token-adversarial-padding-run",
             "browserbase-api-key-adversarial-long-body-run",
             "browserbase-api-key-adversarial-long-run",
             "cerebras-api-key-adversarial-long-body-run",
@@ -13967,6 +14092,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
+            "bitwarden-sm-access-token-adversarial-glued-tokens",
+            "bitwarden-sm-access-token-adversarial-padding-run",
             "browserbase-api-key-adversarial-long-body-run",
             "browserbase-api-key-adversarial-long-run",
             "cerebras-api-key-adversarial-long-body-run",

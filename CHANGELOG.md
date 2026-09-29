@@ -27,6 +27,16 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- New provider detectors from the #1014 broad-discovery handoffs, each always
+  redacted at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences
+  generic detection missed. No support-status claim until benchmarks
+  arrival evidence:
+  - `bitwarden-secrets-manager-access-token` (#1019): Bitwarden Secrets
+    Manager machine-account access tokens, `0.` + UUID + `.` + 30
+    alphanumeric client secret + `:` + a padded 16-byte Base64 key
+    (`bitwarden_secrets_manager_access_token`).
 
 ## 0.1.0-beta.11 — 2026-09-29
 

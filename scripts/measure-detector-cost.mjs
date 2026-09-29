@@ -90,6 +90,7 @@ export const CANONICAL_IDS = [
   "browserbase-api-key",
   "runpod-api-key",
   "cerebras-api-key",
+  "bitwarden-secrets-manager-access-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -124,6 +125,7 @@ export const GROUPS = {
     "daytona-api-key",
     "clickhouse-cloud-api-secret",
     "runpod-api-key",
+    "bitwarden-secrets-manager-access-token",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
