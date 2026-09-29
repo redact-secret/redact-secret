@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2990,
+  "fixtureCount": 2999,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16336,6 +16336,132 @@
       "input": "resend.api_key = \"re_yourkey\"\n",
       "expected": [],
       "note": "Issue #949: an instructional placeholder glued into one word (your + key) behind a vendor prefix is not a secret. Applied only behind a vendor prefix; a leftover letter or digit keeps the value detected."
+    },
+    {
+      "id": "contextual-negative-993-qualified-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DISCORD_TOKEN=your-bot-token-here\n",
+      "expected": [],
+      "note": "Issue #993: an instructional placeholder whose words are all on the #756 lists, now including the qualifiers bot, signing, webhook, integration, internal, admin, account, org, project and deploy, is silent under a generic or a provider name."
+    },
+    {
+      "id": "contextual-negative-993-provider-word-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILGUN_API_KEY=YOUR_MAILGUN_API_KEY\n",
+      "expected": [],
+      "note": "Issue #993: every provider segment of generic-token's rule-2 list counts as a placeholder provider word, so YOUR_MAILGUN_API_KEY is silent; a provider on neither list (YOUR_ACMECLOUD_API_KEY) stays reported."
+    },
+    {
+      "id": "contextual-negative-993-counting-run-body",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITHUB_TOKEN=ghp_abc123\n",
+      "expected": [],
+      "note": "Issue #993: a short vendor prefix before a 6-12 byte body of counting runs (abc123, 123-456-abc) is a documentation stand-in; ghp_abd123 or a full-length synthetic body stays reported."
+    },
+    {
+      "id": "contextual-negative-993-masked-key-display",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=********-****-****-****-************\n",
+      "expected": [],
+      "note": "Issue #993: a full-length key shown as at least 16 mask characters with its layout kept (separators, a visible head of at most 12, a region label of at most 4) is a masked display; a short mask such as ********x stays reported (#264)."
+    },
+    {
+      "id": "contextual-negative-993-ellipsis-display",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "JIRA_API_TOKEN=ATATT3xFfGF0...\n",
+      "expected": [],
+      "note": "Issue #993: a head of at most 12 characters followed only by an ellipsis is an elided documentation display; the elided key is not in the text."
+    },
+    {
+      "id": "contextual-negative-993-make-escaped-substitution",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "deploy:\n\tHEROKU_API_KEY=$$(heroku auth:token) ./scripts/release.sh\n",
+      "expected": [],
+      "note": "Issue #993: a Make-escaped command substitution ($$(...), $${VAR}, $$VAR) is resolved at run time; the unquoted value reads only its first word."
+    },
+    {
+      "id": "contextual-negative-993-public-key-prefix",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "STRIPE_WEBHOOK_SECRET=pk_live_q7Wm2XbK9vRt4LcN8zPd3HsF6gJy5TkA\n",
+      "expected": [],
+      "note": "Issue #993: a documented public key (pk_live_, pk_test_, sb_publishable_, pk-lf-, phc_, pk_<env>_) under a secret-named variable is not a secret; sk_live_ and other secret prefixes stay reported."
+    },
+    {
+      "id": "contextual-negative-993-confluent-key-id",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_CLOUD_API_KEY=ABCD1234567890AB\n",
+      "expected": [],
+      "note": "Issue #993: Confluent's public API key id (16 [A-Z0-9], Confluent's own example) under a Confluent-named key is silent; the same shape under another name stays reported."
+    },
+    {
+      "id": "contextual-positive-993-placeholder-glued-to-material",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DISCORD_TOKEN=your-bot-token-q7Wm2XbK9vRt4LcN8zPd\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 14,
+          "end": 49
+        }
+      ],
+      "note": "Issue #993 twin: random material after the listed placeholder words keeps the value reported, so the widened vocabulary never silences a real-shaped secret."
     },
     {
       "id": "contextual-negative-hash-non-credential-name",

@@ -76,7 +76,7 @@ fn a_placeholder_glued_to_random_material_or_an_unlisted_word_stays_detected() {
         "MISTRAL_API_KEY=YOUR_MISTRAL_API_KEY_9f2cQ7xLm4Rt".to_owned(),
         "Authorization: Bearer tvly-YOUR_API_KEY_9f2cQ7xLm4Rt".to_owned(),
         "Authorization: Bearer tvly-your-9f2cQ7xLm4RtVb8N".to_owned(),
-        "API_KEY=YOUR_MAILCHIMP_API_KEY".to_owned(),
+        "API_KEY=YOUR_ACMECLOUD_API_KEY".to_owned(),
         format!("MISTRAL_API_KEY=your-{MISTRAL}"),
     ] {
         assert!(!findings(&input).is_empty(), "{input}");

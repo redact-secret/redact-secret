@@ -2065,7 +2065,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 255,
+        "fixtureCount": 264,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2105,6 +2105,7 @@
         "contextual-host-javascript",
         "contextual-host-log",
         "contextual-host-shell",
+        "contextual-positive-993-placeholder-glued-to-material",
         "contextual-positive-assignment",
         "contextual-positive-aws-secret-access-key",
         "contextual-positive-aws-secret-access-key-quoted-colon",
@@ -2197,7 +2198,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 255,
+        "fixtureCount": 264,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2273,7 +2274,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 255,
+        "fixtureCount": 264,
         "hostContextsExercised": [
           "chat",
           "curl",
