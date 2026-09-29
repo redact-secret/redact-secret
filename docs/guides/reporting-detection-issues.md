@@ -16,9 +16,12 @@ in [SECURITY.md](../../SECURITY.md) — never a public issue.
 | A crash, thrown error, binding mismatch, or other code defect | [Bug report](https://github.com/redact-secret/redact-secret/issues/new?template=bug-report.yml) |
 | A broken link, wrong content, translation, or playground problem on the website | [Website feedback](https://github.com/redact-secret/redact-secret/issues/new?template=website-feedback.yml) |
 
-A usage question or an early idea that isn't a reproducible bug or a concrete
-request belongs in [Discussions](https://github.com/redact-secret/redact-secret/discussions)
-instead of an issue.
+Issues are for reproducible bugs and concrete, focused proposals. A usage
+question, an early idea, or "here is how we use it" belongs in
+[Discussions](https://github.com/redact-secret/redact-secret/discussions)
+instead — **Q&A** for questions, **Ideas** for early requests, **Show and
+tell** for integration reports. Support in both issues and Discussions is
+best-effort; there is no response-time or long-term-support commitment.
 
 The reproduction steps below apply to false positives and missed detections.
 For a detector request, a public format link and a short use case are enough.

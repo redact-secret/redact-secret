@@ -1,0 +1,30 @@
+title: "[Q&A] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask a usage or integration question. 사용법이나 통합에 대한 질문을 남겨주세요.
+        This board is best-effort; there is no response-time commitment. For a
+        reproducible bug or a concrete request, use an
+        [issue](https://github.com/redact-secret/redact-secret/issues/new/choose)
+        instead.
+
+        Do not paste any real, revoked-but-real, or real-derived credential or
+        real personal data here — this board has no automatic scan.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety-ack
+    attributes:
+      label: Safety acknowledgement
+      options:
+        - label: >-
+            I have not included any real, revoked-but-real, or real-derived
+            credential, or any real personal data, in this post.
+          required: true
