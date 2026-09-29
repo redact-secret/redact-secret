@@ -1,0 +1,78 @@
+name: Bug report / 버그 신고
+description: A crash, thrown error, API contract violation, binding mismatch, or a redaction output that is wrong for a reason other than a detection judgement.
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for a crash, a thrown error, an API contract violation,
+        a binding mismatch (JS/Python/Rust/CLI give different results for the
+        same input), or a redaction output that is wrong for a reason other
+        than a detection judgement. 탐지 판단(오탐/미탐) 문제는 아래 폼을 대신 사용하세요.
+
+        If the problem is that a value was flagged when it shouldn't have
+        been, or missed when it should have been caught, use
+        [False positive report](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml)
+        or
+        [Missed detection report](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml)
+        instead — this form is for code defects, not detection judgements.
+
+        Do not paste any real, revoked-but-real, or real-derived credentials,
+        personal data, customer logs, screenshots, or prompt exports. Build a
+        minimal synthetic reproduction instead. For a suspected security
+        vulnerability, use the
+        [private security advisory form](https://github.com/redact-secret/redact-secret/security/advisories/new).
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package and exact version
+      description: >-
+        e.g. `@redact-secret/core@0.1.0-beta.11`, `redact-secret==0.1.0b11`,
+        `redact-secret-cli 0.1.0-beta.11`, or a commit SHA.
+      placeholder: "@redact-secret/core@0.1.0-beta.11"
+    validations:
+      required: true
+
+  - type: input
+    id: binding-runtime
+    attributes:
+      label: Binding and runtime
+      description: >-
+        e.g. "Node 20.11 on Linux x64", "Python 3.12 CPython on macOS arm64",
+        "browser WebAssembly, Chrome 128", or "CLI, Rust 1.79".
+      placeholder: "Node 20.11 on Linux x64"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal synthetic reproduction
+      description: >-
+        A minimal script or input, using only independently authored synthetic
+        values, that reproduces the problem. Never a real credential or real
+        personal data, even truncated or masked.
+      render: text
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety-ack
+    attributes:
+      label: Safety acknowledgement
+      options:
+        - label: >-
+            I have not included any live, revoked-but-real, or real-derived
+            credential, or any real personal data, anywhere in this report or
+            its attachments.
+          required: true

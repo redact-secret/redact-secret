@@ -3,6 +3,9 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/redact-secret/redact-secret/security/advisories/new
     about: Report a suspected vulnerability privately. Do not use a public issue.
+  - name: Questions and ideas
+    url: https://github.com/redact-secret/redact-secret/discussions
+    about: Ask a usage question or float an early idea. Convert a concrete request to the detector request form.
   - name: Reporting guide
     url: https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md
     about: Choose a safe form for detector requests, detection results, or integration feedback.

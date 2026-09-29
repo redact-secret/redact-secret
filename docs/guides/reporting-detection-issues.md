@@ -13,6 +13,15 @@ in [SECURITY.md](../../SECURITY.md) — never a public issue.
 | A supported credential was missed or given the wrong action | [Missed detection report](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml) |
 | A provider credential or PII entity should be supported | [Request a detector](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml) |
 | Installation, adapter behavior, or a guide was confusing | [Integration or docs feedback](https://github.com/redact-secret/redact-secret/issues/new?template=integration-docs.yml) |
+| A crash, thrown error, binding mismatch, or other code defect | [Bug report](https://github.com/redact-secret/redact-secret/issues/new?template=bug-report.yml) |
+| A broken link, wrong content, translation, or playground problem on the website | [Website feedback](https://github.com/redact-secret/redact-secret/issues/new?template=website-feedback.yml) |
+
+Issues are for reproducible bugs and concrete, focused proposals. A usage
+question, an early idea, or "here is how we use it" belongs in
+[Discussions](https://github.com/redact-secret/redact-secret/discussions)
+instead — **Q&A** for questions, **Ideas** for early requests, **Show and
+tell** for integration reports. Support in both issues and Discussions is
+best-effort; there is no response-time or long-term-support commitment.
 
 The reproduction steps below apply to false positives and missed detections.
 For a detector request, a public format link and a short use case are enough.
@@ -100,6 +109,18 @@ only detector ids, confidence, action, and offsets — no text from your file.
 | Detector family (if known) | Narrows triage; leave blank if you don't know which detector is involved. |
 | Expected action | States the disagreement precisely — `allow` expected but got a finding, or a finding expected but got `allow`, etc. |
 | Safe reproduction shape | Without it, a report cannot be reproduced or triaged at all. |
+
+## Form field ids
+
+`bug-report.yml`: `package-version`, `binding-runtime`, `what-happened`,
+`repro`, `safety-ack`.
+
+`website-feedback.yml`: `page-url`, `kind`, `description`, `locale`,
+`safety-ack`.
+
+These ids are stable by design: a future site feedback page prefills these
+forms by field id through query parameters, so renaming an id breaks that
+prefill.
 
 ## What happens after you file
 
