@@ -40,5 +40,12 @@ unicode-normalization = "=0.1.25"
 # decision-govern-cross-language-conformance rejects.
 serde_json = "1"
 
+# Scan-cost harness with per-detector attribution (issue #981). A plain
+# binary on the public API: no benchmarking dependency, and `include` above
+# keeps it out of the published package.
+[[bench]]
+name = "scan_cost"
+harness = false
+
 [lints]
 workspace = true
