@@ -756,15 +756,37 @@
       "detector": "vercel-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 11,
+        "count": 33,
         "fixtureIds": [
+          "vercel-app-access-positive-bare",
+          "vercel-app-access-positive-dotenv",
+          "vercel-app-access-positive-json-token-key",
+          "vercel-app-refresh-positive-bare",
+          "vercel-app-refresh-positive-dotenv",
+          "vercel-app-refresh-positive-json-token-key",
+          "vercel-pat-positive-bare",
+          "vercel-pat-positive-chat-sentence",
+          "vercel-pat-positive-cli-flag",
+          "vercel-pat-positive-crlf-unicode-prefix",
+          "vercel-pat-positive-curl-bearer",
+          "vercel-pat-positive-dotenv",
+          "vercel-pat-positive-github-actions",
+          "vercel-pat-positive-json-token-key",
+          "vercel-pat-positive-log",
+          "vercel-pat-positive-punctuation-adjacent",
+          "vercel-pat-positive-repeated-value",
+          "vercel-pat-positive-shell-export",
+          "vercel-pat-positive-typescript-sdk",
+          "vercel-pat-positive-yaml",
           "vercel-positive-all-prefixes",
+          "vercel-positive-class-isolation",
           "vercel-positive-crlf-unicode-prefix",
           "vercel-positive-doc-style-placeholder",
           "vercel-positive-dotenv",
           "vercel-positive-json",
           "vercel-positive-log",
           "vercel-positive-min-length",
+          "vercel-positive-oauth-token-response",
           "vercel-positive-punctuation-adjacent",
           "vercel-positive-qualified",
           "vercel-positive-repeated-value",
@@ -773,7 +795,7 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 7,
+        "count": 9,
         "fixtureIds": [
           "vercel-negative-deployment-id",
           "vercel-negative-embedded-in-wider-identifier",
@@ -781,15 +803,22 @@
           "vercel-negative-lookalike",
           "vercel-negative-masked-secret-prefix",
           "vercel-negative-ordinary-reference",
-          "vercel-negative-placeholder"
+          "vercel-negative-placeholder",
+          "vercel-pat-negative-embedded-in-wider-identifier",
+          "vercel-pat-negative-masked"
         ]
       },
       "hostContextsExercised": [
+        "chat",
+        "curl",
         "dotenv",
+        "github-actions",
+        "http",
         "json",
         "log",
         "plain-text",
         "shell",
+        "typescript",
         "yaml"
       ]
     }

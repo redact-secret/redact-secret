@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3252,
+  "fixtureCount": 3297,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -32372,6 +32372,1004 @@
         }
       ],
       "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+    },
+    {
+      "id": "vercel-pat-positive-bare",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "The `vcp_` marker plus exactly 56 alphanumerics (60 total) is a Vercel personal access token on its own (#1036, research #1013)."
+    },
+    {
+      "id": "vercel-pat-positive-dotenv",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 73
+        }
+      ],
+      "note": "A bare dotenv assignment is detected by format alone."
+    },
+    {
+      "id": "vercel-pat-overlap-bearer",
+      "detector": "vercel-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 82
+        }
+      ],
+      "note": "The provider type wins the overlap with bearer_token and reports only the 60-byte personal access token."
+    },
+    {
+      "id": "vercel-pat-positive-json-token-key",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\"}",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 71
+        }
+      ],
+      "note": "A quoted JSON value is detected; the quotes are not part of the match."
+    },
+    {
+      "id": "vercel-pat-positive-shell-export",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export VERCEL_TOKEN=\"\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\"\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 81
+        }
+      ],
+      "note": "A quoted shell export is detected; the quotes are not part of the match."
+    },
+    {
+      "id": "vercel-pat-positive-cli-flag",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "vercel deploy --prod --token \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 89
+        }
+      ],
+      "note": "The Vercel CLI `--token` flag value is detected."
+    },
+    {
+      "id": "vercel-pat-positive-github-actions",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "jobs:\n  deploy:\n    env:\n      VERCEL_TOKEN: \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\n    run: vercel deploy --prod\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 45,
+          "end": 105
+        }
+      ],
+      "note": "A workflow env value is detected."
+    },
+    {
+      "id": "vercel-pat-positive-yaml",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "vercel:\n  token: \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 77
+        }
+      ],
+      "note": "A YAML mapping value is detected."
+    },
+    {
+      "id": "vercel-pat-positive-curl-bearer",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\" https://api.vercel.com/v2/user\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 91
+        }
+      ],
+      "note": "A curl Bearer header value is detected at exactly the token span."
+    },
+    {
+      "id": "vercel-pat-positive-typescript-sdk",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const vercel = new Vercel({ bearerToken: \"\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\" });\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 102
+        }
+      ],
+      "note": "An SDK constructor argument is detected."
+    },
+    {
+      "id": "vercel-pat-positive-chat-sentence",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is my token \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000 can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 77
+        }
+      ],
+      "note": "A token pasted mid-sentence in chat is detected."
+    },
+    {
+      "id": "vercel-pat-positive-log",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T00:00:00Z INFO deploy token=\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000 project=example\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 39,
+          "end": 99
+        }
+      ],
+      "note": "A token in a structured log line is detected."
+    },
+    {
+      "id": "vercel-pat-positive-punctuation-adjacent",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate (\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000), then redeploy.",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 68
+        }
+      ],
+      "note": "Surrounding prose punctuation bounds the match."
+    },
+    {
+      "id": "vercel-pat-positive-crlf-unicode-prefix",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\n\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\r\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 74
+        }
+      ],
+      "note": "A match after a CRLF line and a Unicode-prefixed comment is found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "vercel-pat-positive-repeated-value",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000 \u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 61,
+          "end": 121
+        }
+      ],
+      "note": "An identical value repeated is reported once per occurrence."
+    },
+    {
+      "id": "vercel-pat-overlap-context",
+      "detector": "vercel-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 73
+        }
+      ],
+      "note": "The provider type wins the overlap with contextual_secret."
+    },
+    {
+      "id": "vercel-pat-fallback-body-55",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture00000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "A 55-byte body is one short of the exact 56, so it is not a typed personal access token. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-fallback-body-57",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture0000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 61
+        }
+      ],
+      "note": "A 57-byte body is not truncated to the typed 56. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-fallback-underscore-in-body",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture0_0000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "`_` is outside the typed body alphabet. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-fallback-dash-in-body",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture0-0000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "`-` is outside the typed body alphabet. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-fallback-glued-suffix",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000_backup",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 67
+        }
+      ],
+      "note": "A typed value glued to a wider identifier is not boundary-delimited as a typed value. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-fallback-body-55-chat",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is my token \u0076cp_SyntheticRevokedVercelFixture00000000000000000000000000 can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 76
+        }
+      ],
+      "note": "An off-contract body pasted in prose is still redacted. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-fallback-underscore-prose",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The token \u0076cp_SyntheticRevokedVercelFixture0_0000000000000000000000000, rotated yesterday.",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 10,
+          "end": 70
+        }
+      ],
+      "note": "An off-contract body in a prose sentence is still redacted. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-pat-boundary-wrong-case-prefix",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "VCP_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [],
+      "note": "The marker is case-sensitive."
+    },
+    {
+      "id": "vercel-pat-boundary-dash-marker",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "vcp-SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [],
+      "note": "The marker ends in `_`, not `-`."
+    },
+    {
+      "id": "vercel-pat-boundary-glued-prefix",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [],
+      "note": "A marker preceded by an alphanumeric byte is a slice of a wider identifier."
+    },
+    {
+      "id": "vercel-pat-negative-masked",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Your token vcp_****1234 was created; see vcp_... in the docs.",
+      "expected": [],
+      "note": "Masked displays and placeholders carry no body."
+    },
+    {
+      "id": "vercel-pat-negative-embedded-in-wider-identifier",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacy\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [],
+      "note": "An embedded marker is never carved out of a wider identifier."
+    },
+    {
+      "id": "vercel-pat-adversarial-long-suffix",
+      "detector": "vercel-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 9700,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 9600
+        }
+      ],
+      "note": "A long run built from the typed value repeated is one aggregate vercel_token match, as before #1036: no typed 60-byte value is carved out of it, and the scan stays linear and bounded."
+    },
+    {
+      "id": "vercel-app-access-positive-bare",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "The `vca_` marker plus exactly 56 alphanumerics (60 total) is a Vercel app access token on its own (#1036, research #1013)."
+    },
+    {
+      "id": "vercel-app-access-positive-dotenv",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 73
+        }
+      ],
+      "note": "A bare dotenv assignment is detected by format alone."
+    },
+    {
+      "id": "vercel-app-access-overlap-bearer",
+      "detector": "vercel-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 82
+        }
+      ],
+      "note": "The provider type wins the overlap with bearer_token and reports only the 60-byte app access token."
+    },
+    {
+      "id": "vercel-app-access-positive-json-token-key",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000\"}",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 71
+        }
+      ],
+      "note": "A quoted JSON value is detected; the quotes are not part of the match."
+    },
+    {
+      "id": "vercel-app-access-fallback-body-55",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076ca_SyntheticRevokedVercelFixture00000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "A 55-byte body is one short of the exact 56, so it is not a typed app access token. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-app-access-fallback-body-57",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076ca_SyntheticRevokedVercelFixture0000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 61
+        }
+      ],
+      "note": "A 57-byte body is not truncated to the typed 56. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-app-access-fallback-underscore-in-body",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076ca_SyntheticRevokedVercelFixture0_0000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "`_` is outside the typed body alphabet. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-app-refresh-positive-bare",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "The `vcr_` marker plus exactly 56 alphanumerics (60 total) is a Vercel app refresh token on its own (#1036, research #1013)."
+    },
+    {
+      "id": "vercel-app-refresh-positive-dotenv",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 73
+        }
+      ],
+      "note": "A bare dotenv assignment is detected by format alone."
+    },
+    {
+      "id": "vercel-app-refresh-overlap-bearer",
+      "detector": "vercel-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 82
+        }
+      ],
+      "note": "The provider type wins the overlap with bearer_token and reports only the 60-byte app refresh token."
+    },
+    {
+      "id": "vercel-app-refresh-positive-json-token-key",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000\"}",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 71
+        }
+      ],
+      "note": "A quoted JSON value is detected; the quotes are not part of the match."
+    },
+    {
+      "id": "vercel-app-refresh-fallback-body-55",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cr_SyntheticRevokedVercelFixture00000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "A 55-byte body is one short of the exact 56, so it is not a typed app refresh token. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-app-refresh-fallback-body-57",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cr_SyntheticRevokedVercelFixture0000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 61
+        }
+      ],
+      "note": "A 57-byte body is not truncated to the typed 56. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-app-refresh-fallback-underscore-in-body",
+      "detector": "vercel-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cr_SyntheticRevokedVercelFixture0_0000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "`_` is outside the typed body alphabet. Security-first fallback (#1036): the pre-split aggregate match is kept whole as the unqualified vercel_token, so no redaction is lost."
+    },
+    {
+      "id": "vercel-positive-oauth-token-response",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"access_token\": \"\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000\", \"token_type\": \"Bearer\", \"expires_in\": 3600, \"refresh_token\": \"\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000\"}",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 78
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 143,
+          "end": 203
+        }
+      ],
+      "note": "A Sign in with Vercel token response: the app access and app refresh tokens each report their own type (#1036)."
+    },
+    {
+      "id": "vercel-positive-class-isolation",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000\n\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000\n\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000\n\u0076ci_SyntheticRevokedVercelFixture000000000000000000000000000\n\u0076ck_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 61,
+          "end": 121
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 122,
+          "end": 182
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 183,
+          "end": 243
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 244,
+          "end": 304
+        }
+      ],
+      "note": "The same 56-byte body under each marker reports that marker's class; vci_ and vck_ stay on the unqualified vercel_token (#1036, pending Q-VC)."
     },
     {
       "id": "huggingface-positive-exact-length",

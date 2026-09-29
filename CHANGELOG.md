@@ -5,6 +5,22 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Breaking and compatibility changes
+
+- `vercel-token` now reports one finding type per Vercel credential class
+  instead of `vercel_token` for every prefix (#1036, research #1013):
+  `vcp_` is `vercel_personal_access_token`, `vca_` `vercel_app_access_token`
+  and `vcr_` `vercel_app_refresh_token`, each only for the marker plus exactly
+  56 `[A-Za-z0-9]` (60 bytes). `vci_` and `vck_` keep `vercel_token` and their
+  previous shape unchanged; that type now claims no grammar for them, pending
+  a maintainer ruling. Code that filters, allowlists, or counts findings by
+  `vercel_token` stops seeing exact-contract `vcp_`, `vca_` and `vcr_` values
+  and must match the three new types as well. The detector id and always-redact action are
+  unchanged. A `vcp_`, `vca_` or `vcr_` value with any other body (shorter,
+  longer, or with `_` or `-`) is still reported as `vercel_token` exactly as
+  before, bare and in prose included: every span and redaction is unchanged,
+  only the type of an exact-contract value is new.
+
 ### Added
 
 - New provider detectors from the #860 issuance-gated handoffs released by

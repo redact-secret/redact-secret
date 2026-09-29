@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 122/122 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 125/125 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 122 |
+| supported | 125 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 133.
+Coverage declarations: 136.
 
 ## Coverage by detector
 
@@ -120,7 +120,7 @@ Coverage declarations: 133.
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| vercel-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| vercel-token | 4 | supported: 4, intentionally-unsupported: 0, unresolved: 0 |
 | wandb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | xai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 
@@ -247,6 +247,9 @@ Coverage declarations: 133.
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
 | vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
+| vercel_app_access_token | vercel-token | provider | supported | not-applicable | none |
+| vercel_app_refresh_token | vercel-token | provider | supported | not-applicable | none |
+| vercel_personal_access_token | vercel-token | provider | supported | not-applicable | none |
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
 | wandb_api_key | wandb-api-key | provider | supported | not-applicable | none |
 | xai_api_key | xai-api-key | provider | supported | not-applicable | none |
@@ -275,15 +278,15 @@ Coverage declarations: 133.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 133 | 0 | 0 |
-| boundary | 122 | 0 | 0 |
-| host-context | 122 | 0 | 0 |
+| adversarial | 136 | 0 | 0 |
+| boundary | 125 | 0 | 0 |
+| host-context | 125 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 133 | 0 | 0 |
-| near-miss-negative | 122 | 0 | 0 |
-| overlap | 122 | 0 | 0 |
-| positive | 122 | 0 | 0 |
-| range | 133 | 0 | 0 |
+| malformed | 136 | 0 | 0 |
+| near-miss-negative | 125 | 0 | 0 |
+| overlap | 125 | 0 | 0 |
+| positive | 125 | 0 | 0 |
+| range | 136 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

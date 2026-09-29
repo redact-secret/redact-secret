@@ -137,7 +137,10 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `twilio_auth_token` | `twilio-auth-token` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); issue #933 also reads the `Auth Token` column of a `twilio` CLI table (bounded, with an incremental retention hint), reported `high` (redact) since issue #936 |
 | `vault_token` | `vault-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `vendor_prefixed_credential` | `generic-token` | `always-redact` | [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md) |
-| `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `vercel_app_access_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vca_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2, one provider value), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); grammar and trade-offs in [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
+| `vercel_app_refresh_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vcr_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2, body shared with the `vca_` example), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
+| `vercel_personal_access_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vcp_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
+| `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; since issue #1036 the unqualified compatibility type: every `vci_` and `vck_` match, and every `vcp_`/`vca_`/`vcr_` match off the exact-56 contract (security-first fallback), all at the unchanged pre-split `>= 20` `[A-Za-z0-9_-]` shape. It claims no grammar (pending maintainer ruling Q-VC); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
 | `wandb_api_key` | `wandb-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (W&B test constant, R5), alphabet T1 (SDK validator, R1); the 64–96 band is a tolerant range around the documented width, grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `xai_api_key` | `xai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 <!-- detector-families:end -->
@@ -290,7 +293,64 @@ generated finding-type inventory above.
 | `docker:personal-access-token`, `docker:oauth-access-token` | T1 on the provider-stated `dckr_pat_` / `dckr_oat_` prefixes; the OAT body is exactly 27 (the provider example) or 32 bytes (#708). | [#647](../audits/evidence/647/README.md), [#648](../audits/evidence/648/README.md), [#575](../audits/evidence/575/README.md) |
 | `elevenlabs:api-key` | `sk_` + exactly 48 lowercase hex, with an optional `_residency_<[a-z0-9]+>` suffix inside the finding span so a residency key is redacted whole. T1 on the `sk_` prefix and the suffix, maintainer ruling accepted 2026-09-27 on provider SDK code (`elevenlabs-python` `speech_engine/server.py` and `resource.py`, `elevenlabs-js` `SpeechEngineResource.ts`; the provider documents neither in prose), following the `huggingface:api-token` precedent; the 48-hex body stays T2 (trufflehog v2, betterleaks, measured public fragments) — no provider document or staff statement states its length or alphabet. Stripe `sk_live_`/`sk_test_`/`sk_org_`, Pollinations `sk_` + 32, 47/49-hex, uppercase and filler bodies and any other `_` suffix stay unclaimed; the legacy bare 32-hex form stays marker-gated under `generic-token` (`elevenlabs` is deliberately not a dedicated-provider segment). | [#865](https://github.com/redact-secret/redact-secret/issues/865), [#788](https://github.com/redact-secret/redact-secret/issues/788), [redact-secret-benchmarks#384](https://github.com/redact-secret/redact-secret-benchmarks/issues/384) |
 | `supabase:secret-key` | T1 on the provider-documented `sb_secret_` + 22 + `_` + 8 base64url layout (self-hosted auth-keys page, which states hosted keys share the format, and the provider key script); the `_` is checked by position, and the checksum value is not validated because the hosted input is undocumented (#742). | [#742](https://github.com/redact-secret/redact-secret/issues/742), [redact-secret-benchmarks#231](https://github.com/redact-secret/redact-secret-benchmarks/issues/231) |
-| `vercel:personal-access-token`, `vercel:integration-token`, `vercel:app-access-token`, `vercel:app-refresh-token`, `vercel:api-key` | Five independently meaningful modern credential classes are tracked separately. `vcp_`, `vca_`, `vcr_`, and `vck_` are evidence-backed literal markers; the integration source establishes only `vci`, not the underscore. All five remain pending/T0 because no complete body grammar or boundary is documented. The current aggregate `vercel_token` runtime finding and its unreviewed suffix floor do not establish these contracts. Unprefixed examples stay outside the modern contract with issuance status unresolved. | [#858](../audits/evidence/858/README.md) |
+| `vercel:personal-access-token`, `vercel:app-access-token`, `vercel:app-refresh-token` | T2 on `vcp_` / `vca_` / `vcr_` + exactly 56 `[A-Za-z0-9]` (60 in total), no `_` or `-` in the body, no checksum requirement; each reports its own finding type (#1036). A value with the marker but another body keeps the pre-split `vercel_token` finding (security-first fallback). `vca_` and `vcr_` are thin: one checksum-valid provider value, whose body the `vcr_` example reuses. The legacy unprefixed 24-character form is excluded from all three. | [#1013 vercel](../audits/evidence/1013/vercel.md), [#858](../audits/evidence/858/README.md) |
+| `vercel:integration-token`, `vercel:api-key` | Still pending, T0 on the body: `vck_` is a provider-backed marker, but no provider source writes `vci_` with the underscore, and neither has a full-length provider value. Both keep the interim `>= 20` `[A-Za-z0-9_-]` shape and the unqualified compatibility type `vercel_token`, so their redaction is not reduced; no grammar is claimed. Unblocks on maintainer ruling Q-VC (one generator family) or one issued value each. | [#1013 vercel](../audits/evidence/1013/vercel.md), [#858](../audits/evidence/858/README.md) |
+
+## Vercel per-class split (#1036)
+
+`vercel-token` reports one finding type per Vercel credential class
+([#1036](https://github.com/redact-secret/redact-secret/issues/1036), research
+[#1013](../audits/evidence/1013/vercel.md), taxonomy
+[#858](../audits/evidence/858/README.md)), under one detector id, the
+one-detector, several-types model of `github-token`. `Provider` specificity,
+high confidence, always redacted.
+
+Matching is unchanged: every prefix is matched exactly as before #1036, the
+marker plus at least 20 `[A-Za-z0-9_-]` in one maximal run, with a
+`[A-Za-z0-9_-]` boundary on both sides. Every span, and so every redaction,
+equals the pre-split detector's (pinned by an oracle test against the
+pre-split table). Only the finding type of a match is refined:
+
+| Matched value | Finding type | Tier |
+| --- | --- | --- |
+| `vcp_` + exactly 56 `[A-Za-z0-9]` (60 in total) | `vercel_personal_access_token` | T2 (provider CLI example as a shape, CredSweeper, Kingfisher) |
+| `vca_` + exactly 56 `[A-Za-z0-9]` | `vercel_app_access_token` | T2, thin (one checksum-valid provider value, copied by both peer rules) |
+| `vcr_` + exactly 56 `[A-Za-z0-9]` | `vercel_app_refresh_token` | T2, thin (the provider example reuses the `vca_` body) |
+| any other match: `vcp_`/`vca_`/`vcr_` off the exact contract, and every `vci_`/`vck_` | `vercel_token` | none claimed; `vci_`/`vck_` pending Q-VC |
+
+Security-first fallback: a `vcp_`, `vca_` or `vcr_` value whose body is not
+exactly 56 alphanumerics (55 or 57 bytes, a `_` or `-` in the body, a glued
+`..._backup` or `...-1`) is still reported, whole and redacted, as the
+unqualified `vercel_token`, in every context, bare and in prose included.
+Nothing redacted before #1036 becomes unredacted. Because the run is maximal,
+a typed value glued to a wider identifier is reported whole as
+`vercel_token`, never truncated to a typed 60-byte span. The markers are
+case-sensitive. The CRC-32/base62 tail Kingfisher checks is not required: it
+is provider-backed on one `vca_` value only, and the provider's own CLI
+`vcp_` example fails it. `dpl_` deployment ids, `prj_`/`team_` ids, every
+other `vc?_` letter and the legacy unprefixed 24-character form stay
+unclaimed. `vercel` stays in `generic-token`'s dedicated-provider deferral
+list, unchanged.
+
+`vci_` and `vck_` always report `vercel_token`, which claims no grammar for
+them. The shared shape's alphabet equals its boundary, so a glued
+`..._backup` is absorbed into the match, the open-floor defect #551 left out
+of scope; it is kept so no redaction is lost, until Q-VC or issuance decides a
+grammar.
+
+Compatibility: `vercel_token` shipped for all five prefixes. Code that
+filters, allowlists or counts findings by `vercel_token` no longer sees
+exact-contract `vcp_`, `vca_` or `vcr_` values; it must also match the three
+new types. `vercel_token` still reports every other match. The detector id
+and the always-redact action are unchanged.
+
+False negatives: none added; the match set is the pre-#1036 one. False
+positives: unchanged in count and span. A 56-byte alphanumeric filler after a
+typed marker (`vcp_` + 56 `x`) is typed as a personal access token, and the
+open-floor false positives of the old shape (short, over-long or punctuated
+bodies after any marker) stay, now under `vercel_token`. Cost: one byte-class
+check of each matched span; prefixes, lead bytes and prefilter literals are
+unchanged.
 
 ## Beta.8 arrival contracts
 
@@ -844,6 +904,7 @@ the scan on input where the byte pairs of neither prefix all occur.
 | Doppler `dp.<type>.` tokens (seven documented types, 40–44 alphanumeric body, optional `dp.st.` environment segment) are reported as one finding type per type at provider specificity, bare or in any context ([#903](https://github.com/redact-secret/redact-secret/issues/903), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the GitHub one-type-per-family precedent to one more family |
 | Trigger.dev `tr_<env>_sk_` + 24 and `tr_<env>_` + 24 or 20 alphanumeric secret keys (four documented env slugs), and `tr_pat_` + 40 `[1-9a-km-z]` personal access tokens, are reported as two finding types at provider specificity, bare or in any context; `pk_<env>_`, `tr_oat_` and JWT forms stay unclaimed ([#904](https://github.com/redact-secret/redact-secret/issues/904), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | E2B `e2b_` + exactly 40 lowercase hex API keys are reported as `e2b_api_key` at provider specificity, bare or in any context; retired `sk_e2b_` tokens and `e2b_` module names stay unclaimed ([#905](https://github.com/redact-secret/redact-secret/issues/905), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| Vercel `vcp_`, `vca_` and `vcr_` + exactly 56 `[A-Za-z0-9]` are reported as `vercel_personal_access_token`, `vercel_app_access_token` and `vercel_app_refresh_token` at provider specificity; every other `vercel-token` match (`vci_`, `vck_`, and typed markers off the exact contract) stays `vercel_token` at the unchanged pre-split shape, so no redaction is lost ([#1036](https://github.com/redact-secret/redact-secret/issues/1036), section above). | generic policy default, no dedicated ADR; applies the GitHub one-type-per-family precedent and the existing exact-length prefixed policy to one more family |
 | PostHog `phx_` personal and `phs_` project secret API keys (42–49 alphanumeric) are reported as two finding types at provider specificity, bare or in any context; the public `phc_` project token is never claimed ([#906](https://github.com/redact-secret/redact-secret/issues/906), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent (Stripe `pk_`) to one more family |
 | Helicone `sk-`/`pk-` + `helicone` + optional `-eu`/`-rl` + four 7-byte `[a-z0-9]` groups, and the `sk-helicone-proxy-` key with a trailing UUID, are reported as `helicone_api_key` (`sk-`) and `helicone_write_api_key` (`pk-`, redacted by default) at provider specificity, bare or in any context; legacy bare `sk-`, `-cp-` and `-gov` forms stay unclaimed ([#907](https://github.com/redact-secret/redact-secret/issues/907), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family, with the group alphabet fixed by ruling R8 |
 | Firecrawl `fc-` + a dashless lowercase UUIDv4 (32 hex, version and variant nibbles enforced) is reported as `firecrawl_api_key` at provider specificity, bare or in any context; legacy dashed UUIDs, `fco_` and `fcmcp_` stay unclaimed ([#908](https://github.com/redact-secret/redact-secret/issues/908), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |

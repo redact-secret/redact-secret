@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-98 built-in detectors emit 122 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+98 built-in detectors emit 125 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -213,7 +213,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `linear-token` | `linear_token` | `always-redact` | — |
 | `supabase-token` | `supabase_secret_key` | `always-redact` | — |
 | `supabase-management-token` | `supabase_personal_access_token` | `always-redact` | — |
-| `vercel-token` | `vercel_token` | `always-redact` | — |
+| `vercel-token` | `vercel_token`, `vercel_personal_access_token`, `vercel_app_access_token`, `vercel_app_refresh_token` | `always-redact` | — |
 | `npm-token` | `npm_access_token` | `always-redact` | — |
 | `google-api-key` | `google_api_key` | `always-redact` | — |
 | `sendgrid-token` | `sendgrid_api_key` | `always-redact` | — |
