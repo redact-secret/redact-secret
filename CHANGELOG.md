@@ -27,6 +27,14 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+### Fixed
+
+- `gitlab-token` reports a routable GitLab personal access token
+  (`glpat-<payload>.<version>.<length><crc>`, every PAT GitLab.com issues
+  since 2025-07-24) as one `gitlab_token` finding through its last CRC byte
+  when the length holder and CRC-32 verify (#1022). Before, the finding
+  stopped at the first `.` and the version, length and CRC tail stayed in
+  plaintext. A tail that does not verify keeps the unchanged legacy match.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

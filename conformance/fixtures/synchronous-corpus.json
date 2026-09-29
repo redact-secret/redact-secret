@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3252,
+  "fixtureCount": 3269,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -77235,6 +77235,377 @@
         }
       ],
       "note": "Issue #919 follow-up (benchmarks #436): twin: the issuance-gated eyJ2 cloud body stays claimed by the exact name, whole value."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-bare-min-payload",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-NUbipx4-GNVcjqx5AHOVdkry5BI.01.0r05vkgdz",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "Issue #1022: a routable \u0067lpat- token with the minimum 27-byte payload, a verifying length holder and CRC-32 is one finding through its last CRC byte."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-bare-max-payload",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-nu18DLSZgnv29ELTahov3_FMTbipw3-GNUbjqx4-HOVcjry5AHPWdkrz6BIPXelsz7CJQXfmt07DKRYfnu18DLSZgnv29ELTahov3_FMTbipw3-GNUbjqx4-HOVcjry5AHPWdkrz6BIPXelsz7CJQXfmt07DKRYfnu18DLSZgnv29ELTahov3_FMTbipw3-GNUbjqx4-HOVcjry5AHPWdkrz6BIPXelsz7CJQXfmt07DKRYfnu18DLSZgnv29ELTahov3_FMTbipw3-GNUbjqx4-HOVcjry5AHPWdkrz6BIP.01.8c17utfuy",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 319
+        }
+      ],
+      "note": "Issue #1022: the 300-byte design-cap payload is still one whole finding."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-dotenv",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITLAB_TOKEN=\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 96
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the whole routable value, not the contextual_secret over it."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-private-token-header",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "PRIVATE-TOKEN: \u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3\n",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 98
+        }
+      ],
+      "note": "GitLab's PRIVATE-TOKEN header carries the whole routable value."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-curl-bearer",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3\" https://gitlab.com/api/v4/user\n",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 114
+        }
+      ],
+      "note": "The provider finding wins the overlap with bearer_token at the same whole span."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-json",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3\"}",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 94
+        }
+      ],
+      "note": "A JSON token member is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-yaml",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "gitlab:\n  private_token: \u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3\n",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 108
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-sdk-call",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "gl = gitlab.Gitlab(url, private_token=\"\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3\")\n",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 39,
+          "end": 122
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-routable-pat-regression-sentence-period",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text",
+        "chat"
+      ],
+      "input": "My new token is \u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3. Why does the API return 401?",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 99
+        }
+      ],
+      "note": "Issue #1022 regression: before the fix the finding stopped at the first '.', leaving the .<version>.<length><crc> tail in plaintext; the span now ends at the last CRC byte and a sentence period after it stays outside."
+    },
+    {
+      "id": "gitlab-routable-pat-boundary-crc-mismatch",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv0",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "Issue #1022: a CRC that does not verify is not reported whole; the legacy \u0067lpat- match over the payload run is unchanged from before, so no previously redacted byte is released."
+    },
+    {
+      "id": "gitlab-routable-pat-boundary-length-holder-mismatch",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1r0m5ylv3",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "Issue #1022: a length holder that does not equal the payload length is not reported whole; the legacy payload match stays."
+    },
+    {
+      "id": "gitlab-routable-pat-boundary-unversioned-form",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.1s13x0hng",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "Issue #1022: the unversioned 2024-11 to 2025-04 form (no version field) is not claimed whole (GitLab.com issuance not evidenced); the legacy payload match stays."
+    },
+    {
+      "id": "gitlab-routable-pat-boundary-payload-below-floor",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-07CJQYfmt08DKRYgnu18ELSZgo.01.0q0la7t3x",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 32
+        }
+      ],
+      "note": "Issue #1022: a 26-byte payload is below the 27-byte routable floor; the legacy match over the payload (26 >= 20) stays."
+    },
+    {
+      "id": "gitlab-routable-pat-boundary-glued-trailing-byte",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-ahov2_FMTaipw3_GNUbiqx4-GOVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYf.01.1s0m5ylv3x",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "Issue #1022: a [A-Za-z0-9_-] byte glued after the CRC rejects the routable form; the legacy payload match stays."
+    },
+    {
+      "id": "gitlab-routable-pat-positive-legacy-twenty-byte-unchanged",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lpat-DKRYfnu18FNUbipx4BIP.",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 26
+        }
+      ],
+      "note": "Issue #1022: the legacy 20-byte \u0067lpat- value keeps its finding, and a sentence period after it does not make it routable."
+    },
+    {
+      "id": "gitlab-routable-pat-boundary-runner-routable-sibling",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0067lrt-OVcjqy5AHOWdkry6BIPWelsz6CJQXemt07CKRYfm.01.1415v6i1s",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 58
+        }
+      ],
+      "note": "A routable \u0067lrt- runner token stays the runner detector's; the \u0067lpat- routable branch does not claim it."
+    },
+    {
+      "id": "gitlab-routable-pat-adversarial-repeated-dotted-prefix",
+      "detector": "gitlab-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 60000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.\u0067lpat-.01.",
+      "expected": [],
+      "note": "Repeated prefixes with an empty payload and a dotted tail never reach the payload floor, and the scan stays linear."
     }
   ]
 }

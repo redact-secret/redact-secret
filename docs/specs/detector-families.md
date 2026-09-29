@@ -71,7 +71,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `github_oauth_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `gitlab_runner_authentication_token` | `gitlab-runner-authentication-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
-| `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); the routable `glpat-` form is reported whole since [#1022](https://github.com/redact-secret/redact-secret/issues/1022) (T1), grammar in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `google_api_key` | `google-api-key` | `always-redact` | [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](../decisions/2026-09-24-redact-google-api-keys-inside-firebase-web-config.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_cloud_access_policy_token` | `grafana-cloud-access-policy-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_service_account_token` | `grafana-service-account-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
@@ -831,6 +831,36 @@ such as a snake_case identifier of exactly that width or a padded placeholder
 (the #867 precedent); rare. Cost: two four-byte prefixes on the shared
 known-format scan; `c` is a common lead byte, so the shared prefilter skips
 the scan on input where the byte pairs of neither prefix all occur.
+## Unsupported-variant contracts (#1012)
+
+Issue [#1012](https://github.com/redact-secret/redact-secret/issues/1012)
+froze contract research for the credential variants the pinned support
+matrix lists as `unsupported`
+([evidence](../audits/evidence/1012/README.md)). This section records the
+READY outcomes and product gaps that are implemented. No row is a
+support-status claim; promotion stays gated on core conformance and the
+benchmarks arrival and profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `gitlab:routable-personal-access-token` | `gitlab-token` | `glpat-` + unpadded base64url `[A-Za-z0-9_-]{27,300}` + `.` + 2 base36 version + `.` + 2 base36 payload length (equal to the payload length) + 7 base36 CRC-32 of every byte from `g` through the length holder; the whole value is the span, and a `[A-Za-z0-9_-]` byte glued after the CRC rejects the routable form | `gitlab_token` (unchanged) | T1 (GitLab generator, decoder, PAT model and design document; provider-authored rules, R2) |
+
+GitLab routable personal access tokens
+([#1022](https://github.com/redact-secret/redact-secret/issues/1022),
+[handoff](../audits/evidence/1012/gitlab-routable-personal-access-token.md)).
+Every PAT GitLab.com has issued since 2025-07-24 is routable. Before #1022
+the legacy `glpat-` + 20 run stopped at the first `.`, so the
+`.<version>.<length><crc>` tail stayed in plaintext after redaction. The
+routable branch reuses the offline length-holder and CRC-32 check of the
+routable `glrt-` form (#730) and reports the whole value. A value whose tail
+does not verify (the unversioned 2024-11 to 2025-04 form, an instance or
+admin-custom prefix whose CRC covers another prefix, a corrupted CRC, a
+glued byte) is not reported whole, and keeps the unchanged legacy match over
+the payload run, so no previously redacted byte is released. False
+negatives: the tail of those non-verifying forms; a future version whose
+layout changes. False positives: none known; a chance CRC match is about one
+in 78 billion. Cost: one CRC-32 over at most 319 bytes, only after a
+`glpat-` run that ends at `.`.
 
 ## Rules
 
@@ -883,6 +913,7 @@ the scan on input where the byte pairs of neither prefix all occur.
 | The Cloudflare account-token prefix is adopted under the frozen `cfut_` contract. | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Hugging Face organization-token prefix is adopted under `hf_`'s frozen body grammar, tiered as T2. | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack credential family is completed: the user-token grammar and the rotation family's version section are frozen. | [Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| A routable GitLab `glpat-` personal access token whose length holder and CRC-32 verify is reported as one `gitlab_token` finding through its last CRC byte; a non-verifying dotted tail keeps the legacy payload match ([#1022](https://github.com/redact-secret/redact-secret/issues/1022), section above). This closes the routable-PAT gap the GitLab inventory ADR tracked. | generic policy default, no dedicated ADR; applies the existing routable `glrt-` grammar (#730) to one more GitLab prefix |
 | The GitLab token-prefix table is inventoried, and its two undeclared prefixes are given a contract. | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `pinecone-api-key` reports a legacy lowercase `8-4-4-4-12` UUID as `pinecone_api_key` at high confidence only when it is the value assigned to a Pinecone API-key name on the same line: a name normalizing to `pinecone_api_key`/`pinecone_apikey`/`pinecone_key`, or to `api_key`/`apikey` on a line containing `pinecone`. A bare UUID, a UUID under an id-named key, a UUID whose name is on another line, and an all-one-digit placeholder UUID stay unclaimed ([#702](https://github.com/redact-secret/redact-secret/issues/702)). | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
 | GitHub's six token families map onto six independent finding types under one detector. | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |

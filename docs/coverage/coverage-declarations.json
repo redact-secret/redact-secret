@@ -1089,7 +1089,17 @@
             "gitlab-positive-log",
             "gitlab-positive-min-length",
             "gitlab-positive-personal-access",
-            "gitlab-positive-yaml"
+            "gitlab-positive-yaml",
+            "gitlab-routable-pat-positive-bare-max-payload",
+            "gitlab-routable-pat-positive-bare-min-payload",
+            "gitlab-routable-pat-positive-curl-bearer",
+            "gitlab-routable-pat-positive-dotenv",
+            "gitlab-routable-pat-positive-json",
+            "gitlab-routable-pat-positive-legacy-twenty-byte-unchanged",
+            "gitlab-routable-pat-positive-private-token-header",
+            "gitlab-routable-pat-positive-sdk-call",
+            "gitlab-routable-pat-positive-yaml",
+            "gitlab-routable-pat-regression-sentence-period"
           ],
           "state": "supported"
         },
@@ -1103,7 +1113,8 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "gitlab-adversarial-long-suffix"
+            "gitlab-adversarial-long-suffix",
+            "gitlab-routable-pat-adversarial-repeated-dotted-prefix"
           ],
           "state": "supported"
         },
@@ -1116,7 +1127,12 @@
             "gitlab-boundary-delimiter",
             "gitlab-boundary-invalid-alphabet",
             "gitlab-boundary-routable-short-payload",
-            "gitlab-boundary-routable-truncated-match"
+            "gitlab-boundary-routable-truncated-match",
+            "gitlab-routable-pat-boundary-crc-mismatch",
+            "gitlab-routable-pat-boundary-glued-trailing-byte",
+            "gitlab-routable-pat-boundary-length-holder-mismatch",
+            "gitlab-routable-pat-boundary-payload-below-floor",
+            "gitlab-routable-pat-boundary-unversioned-form"
           ],
           "state": "supported"
         },
@@ -1142,7 +1158,12 @@
             "gitlab-boundary-delimiter",
             "gitlab-boundary-invalid-alphabet",
             "gitlab-boundary-routable-short-payload",
-            "gitlab-boundary-routable-truncated-match"
+            "gitlab-boundary-routable-truncated-match",
+            "gitlab-routable-pat-boundary-crc-mismatch",
+            "gitlab-routable-pat-boundary-glued-trailing-byte",
+            "gitlab-routable-pat-boundary-length-holder-mismatch",
+            "gitlab-routable-pat-boundary-payload-below-floor",
+            "gitlab-routable-pat-boundary-unversioned-form"
           ],
           "state": "supported"
         },
@@ -13541,6 +13562,7 @@
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
+            "gitlab-routable-pat-adversarial-repeated-dotted-prefix",
             "gitlab-runner-token-adversarial-long-suffix",
             "google-adversarial-long-suffix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
@@ -14004,6 +14026,7 @@
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
+            "gitlab-routable-pat-adversarial-repeated-dotted-prefix",
             "gitlab-runner-token-adversarial-long-suffix",
             "google-adversarial-long-suffix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",

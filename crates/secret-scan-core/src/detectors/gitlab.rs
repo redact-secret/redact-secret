@@ -31,6 +31,11 @@ const PREFIXES: [&str; 12] = [
 ///   short payload is missed entirely rather than matched at a wrong length.
 ///   (`glrt-`, whose routable form is provider-code-backed, is handled by
 ///   [`GitlabRunnerAuthenticationTokenDetector`].)
+/// - Since issue #1022, a routable `glpat-` personal access token (every PAT
+///   GitLab.com issues since 2025-07-24) is reported whole, through its
+///   `.<version>.<length><crc>` tail, when its length holder and CRC-32
+///   verify ([`routable_pat_end`]). Before, the finding stopped at the first
+///   `.` and the tail stayed in plaintext.
 /// - The legacy, unprefixed runner *registration* token (distinct from the
 ///   `glrt-`/`glrtr-` runner *authentication* token above) is opaque and, per
 ///   GitLab's own migration guide, provider-deprecated.
@@ -46,6 +51,7 @@ impl Detector for GitlabTokenDetector {
         input: &str,
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
+        let bytes = input.as_bytes();
         let mut candidates = Vec::new();
         for (start, end) in pattern::scan_prefixed_runs(
             input,
@@ -54,17 +60,54 @@ impl Detector for GitlabTokenDetector {
             pattern::is_alnum_dash,
             pattern::is_alnum_dash,
         ) {
+            // A routable personal access token continues past the run's `.`
+            // (issue #1022): its whole value is one finding when the length
+            // holder and CRC-32 verify. Anything else keeps the legacy match
+            // over the run, so no previously redacted byte is released.
+            let routable = routable_pat_end(bytes, start, end);
+            let (end, signals) = match routable {
+                Some(end) => (end, PAT_ROUTABLE_SIGNALS.as_slice()),
+                None => (end, LEGACY_SIGNALS.as_slice()),
+            };
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
             candidates.push(
                 Candidate::new("gitlab_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["gitlab-documented-prefix", "opaque-suffix"]),
+                    .with_signals(signals.iter().copied()),
             );
         }
         Ok(candidates)
     }
+}
+
+const PAT_PREFIX: &str = "glpat-";
+const LEGACY_SIGNALS: [&str; 2] = ["gitlab-documented-prefix", "opaque-suffix"];
+const PAT_ROUTABLE_SIGNALS: [&str; 3] = [
+    "gitlab-documented-prefix",
+    "gitlab-routable-grammar",
+    "gitlab-routable-crc",
+];
+
+/// The end of a routable personal access token whose `glpat-` prefix starts
+/// at `start` and whose payload run ends at `run_end`, or `None` when the
+/// value is not one (issue #1022, `docs/audits/evidence/1012/`
+/// `gitlab-routable-personal-access-token.md`, READY-T1 from GitLab's
+/// generator, decoder and design document):
+/// `glpat-<base64url 27-300>.<2 base36 version>.<2 base36 payload length><7
+/// base36 CRC-32>`, the CRC taken over every byte from the prefix through
+/// the length holder, the same offline check as the routable `glrt-` form.
+/// A byte of `[A-Za-z0-9_-]` glued after the CRC rejects the routable form.
+/// The unversioned 2024-11 form, instance and admin-custom prefixes (whose
+/// CRC covers another prefix) and a tail that does not verify return `None`,
+/// and the caller keeps the legacy match over the payload.
+fn routable_pat_end(bytes: &[u8], start: usize, run_end: usize) -> Option<usize> {
+    if !bytes[start..].starts_with(PAT_PREFIX.as_bytes()) || bytes.get(run_end) != Some(&b'.') {
+        return None;
+    }
+    let end = routable_end(bytes, start, start + PAT_PREFIX.len(), run_end)?;
+    (!bytes.get(end).copied().is_some_and(is_token_char)).then_some(end)
 }
 
 const RUNNER_PREFIX: &str = "glrt-";
@@ -311,6 +354,118 @@ mod tests {
     #[test]
     fn does_not_match_a_legacy_unprefixed_runner_registration_token() {
         assert_eq!(detect("f7c2b1a9e4d6038f5a1c2e9b0d7f4a63").len(), 0);
+    }
+
+    /// A synthetic routable `glpat-` value built at run time from filler:
+    /// the length holder and CRC-32 are computed over it, so it verifies and
+    /// was never issued (issue #1022).
+    fn routable_pat(payload: &str) -> String {
+        let head = format!(
+            "glpat-{payload}.01.{}",
+            String::from_utf8(base36_padded(payload.len() as u64, 2).unwrap()).unwrap()
+        );
+        let crc = base36_padded(u64::from(crc32(head.as_bytes())), 7).unwrap();
+        format!("{head}{}", String::from_utf8(crc).unwrap())
+    }
+
+    fn filler(len: usize) -> String {
+        "SyntheticRevokedPatPayload_-0123456789"
+            .chars()
+            .cycle()
+            .take(len)
+            .collect()
+    }
+
+    fn ranges(input: &str) -> Vec<(usize, usize, bool)> {
+        detect(input)
+            .iter()
+            .map(|candidate| {
+                (
+                    candidate.range().start(),
+                    candidate.range().end(),
+                    candidate
+                        .signals()
+                        .iter()
+                        .any(|signal| signal == "gitlab-routable-crc"),
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn a_routable_pat_is_reported_whole_through_its_crc() {
+        for width in [27, 28, 64, 235, 300] {
+            let value = routable_pat(&filler(width));
+            let input = format!("PRIVATE-TOKEN: {value}.");
+            assert_eq!(
+                ranges(&input),
+                vec![(15, 15 + value.len(), true)],
+                "{width}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_routable_pat_whose_tail_does_not_verify_keeps_the_legacy_payload_match() {
+        let value = routable_pat(&filler(40));
+        let payload_end = value.find('.').unwrap();
+        let tail = &value[payload_end..];
+        let mut bad_crc = value.clone();
+        let last = bad_crc.pop().unwrap();
+        bad_crc.push(if last == '0' { '1' } else { '0' });
+        let bad_length = value.replacen(&tail[..6], ".01.0z", 1);
+        for input in [
+            bad_crc,
+            bad_length,
+            value.replacen(".01.", ".1.", 1),
+            value.replacen(".01.", ".001.", 1),
+            value.replacen(".01.", "01.", 1),
+            value.replacen(".01.", ".0A.", 1),
+            value.to_uppercase().replacen("GLPAT-", "glpat-", 1),
+            format!("{value}x"),
+            format!("{value}_"),
+            format!("{value}-"),
+        ] {
+            let found = ranges(&input);
+            assert!(found.iter().all(|(_, _, routable)| !routable), "{input}");
+            assert!(
+                found
+                    .iter()
+                    .all(|&(_, end, _)| end <= input.find('.').unwrap_or(input.len())),
+                "{input}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_payload_below_27_is_not_routable() {
+        let value = routable_pat(&filler(26));
+        assert_eq!(ranges(&value), vec![(0, value.find('.').unwrap(), false)]);
+    }
+
+    #[test]
+    fn the_legacy_twenty_byte_pat_is_unchanged() {
+        let value = format!("glpat-{}", filler(20));
+        assert_eq!(ranges(&format!("{value}.")), vec![(0, value.len(), false)]);
+    }
+
+    #[test]
+    fn a_routable_runner_value_is_not_claimed_by_the_pat_branch() {
+        let value = routable_pat(&filler(40)).replacen("glpat-", "glrt-", 1);
+        assert!(detect(&value).is_empty());
+    }
+
+    #[test]
+    fn repeated_routable_pats_are_each_reported_whole() {
+        let value = routable_pat(&filler(40));
+        let input = format!("{value} ").repeat(50);
+        let found = ranges(&input);
+        assert_eq!(found.len(), 50);
+        assert!(
+            found
+                .iter()
+                .all(|&(start, end, routable)| routable && end - start == value.len())
+        );
     }
 
     fn runner(input: &str) -> Vec<Candidate> {

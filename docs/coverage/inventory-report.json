@@ -529,18 +529,22 @@
     {
       "detector": "gitlab-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 41,
         "hostContextsExercised": [
+          "chat",
+          "curl",
           "dotenv",
           "http",
           "json",
           "log",
           "plain-text",
+          "python",
           "shell",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -558,7 +562,17 @@
         "gitlab-positive-log",
         "gitlab-positive-min-length",
         "gitlab-positive-personal-access",
-        "gitlab-positive-yaml"
+        "gitlab-positive-yaml",
+        "gitlab-routable-pat-positive-bare-max-payload",
+        "gitlab-routable-pat-positive-bare-min-payload",
+        "gitlab-routable-pat-positive-curl-bearer",
+        "gitlab-routable-pat-positive-dotenv",
+        "gitlab-routable-pat-positive-json",
+        "gitlab-routable-pat-positive-legacy-twenty-byte-unchanged",
+        "gitlab-routable-pat-positive-private-token-header",
+        "gitlab-routable-pat-positive-sdk-call",
+        "gitlab-routable-pat-positive-yaml",
+        "gitlab-routable-pat-regression-sentence-period"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
