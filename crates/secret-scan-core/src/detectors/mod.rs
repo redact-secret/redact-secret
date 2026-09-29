@@ -57,6 +57,7 @@ mod pattern;
 mod pinecone;
 mod posthog;
 mod postman;
+mod prefilter;
 mod private_key;
 mod resend;
 mod ruleset_adapter;
@@ -76,7 +77,9 @@ mod vault;
 mod wandb;
 
 use crate::types::Detector;
+use additional_providers::{KnownFormatProviderDetector, TypedKnownFormatProviderDetector};
 use connection_string::ConnectionStringDetector;
+pub(crate) use prefilter::{PairSet, RequiredLiterals};
 use private_key::PrivateKeyDetector;
 
 pub(crate) use bearer_token::has_open_bearer_authorization;
@@ -90,102 +93,268 @@ pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 pub(crate) use twilio::has_open_twilio_cli_table;
 
+/// A built-in detector and the literals it declares for the shared
+/// prefilter ([`prefilter`], issue #983).
+///
+/// The declaration lives here, next to the constructor, and reaches the
+/// registry's private [`RegisteredDetector`](crate::registry::RegisteredDetector)
+/// field; it is never part of the public `Detector` trait, so a custom
+/// detector can neither declare nor inherit one.
+pub(crate) struct BuiltIn {
+    pub(crate) detector: Box<dyn Detector>,
+    pub(crate) required: Option<RequiredLiterals>,
+}
+
+impl BuiltIn {
+    /// A detector that runs on every call: it cannot name a case-sensitive
+    /// literal of two or more bytes that every candidate requires.
+    fn always(detector: Box<dyn Detector>) -> Self {
+        Self {
+            detector,
+            required: None,
+        }
+    }
+
+    /// A detector whose every candidate requires one of `literals` in the
+    /// scan copy.
+    fn requiring(
+        detector: Box<dyn Detector>,
+        literals: impl IntoIterator<Item = &'static [u8]>,
+    ) -> Self {
+        Self {
+            detector,
+            required: RequiredLiterals::any_of(literals),
+        }
+    }
+
+    /// A table-driven detector: its literals are its shapes' prefixes.
+    fn known_format(detector: KnownFormatProviderDetector) -> Self {
+        let prefixes = detector.prefixes().map(str::as_bytes);
+        Self::requiring(Box::new(detector), prefixes)
+    }
+
+    /// A table-driven detector with a finding type per shape: its literals
+    /// are its shapes' prefixes.
+    fn typed_known_format(detector: TypedKnownFormatProviderDetector) -> Self {
+        let prefixes = detector.prefixes().map(str::as_bytes);
+        Self::requiring(Box::new(detector), prefixes)
+    }
+}
+
 /// Every built-in detector, in canonical registration order.
+#[cfg(test)]
 #[must_use]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
+    built_in_entries()
+        .into_iter()
+        .map(|entry| entry.detector)
+        .collect()
+}
+
+/// [`built_in_detectors`] with each detector's prefilter declaration.
+// One entry per detector, in canonical order: splitting it would only hide
+// the order this list pins.
+#[allow(clippy::too_many_lines)]
+#[must_use]
+pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
     vec![
-        Box::new(PrivateKeyDetector),
-        Box::new(aws::AwsAccessKeyDetector),
-        Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
-        Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
-        Box::new(github::GitHubTokenDetector),
-        Box::new(gitlab::GitlabTokenDetector),
-        Box::new(openai::OpenAiTokenDetector),
-        Box::new(anthropic::AnthropicTokenDetector),
-        Box::new(shopify::ShopifyTokenDetector),
-        Box::new(vault::VaultTokenDetector),
-        Box::new(stripe::StripeTokenDetector),
-        Box::new(slack::SlackTokenDetector),
-        Box::new(additional_providers::PYPI),
-        Box::new(additional_providers::HUGGING_FACE),
-        Box::new(additional_providers::DOCKER),
-        Box::new(cloudflare::CLOUDFLARE),
-        Box::new(additional_providers::DIGITALOCEAN),
-        Box::new(linear::LINEAR),
-        Box::new(additional_providers::SUPABASE),
-        Box::new(additional_providers::SUPABASE_PAT),
-        Box::new(additional_providers::VERCEL),
-        Box::new(additional_providers::NPM),
-        Box::new(additional_providers::GOOGLE),
-        Box::new(sendgrid::SendgridTokenDetector),
-        Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
-        Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
-        Box::new(notion::NotionTokenDetector),
-        Box::new(atlassian::AtlassianApiTokenDetector),
-        Box::new(twilio::TwilioAuthTokenDetector),
-        Box::new(twilio::TwilioApiKeySecretDetector),
-        telegram::telegram_bot_token_detector(),
-        Box::new(discord::DiscordBotTokenDetector),
-        Box::new(sentry::SentryUserAuthTokenDetector),
-        Box::new(sentry::SentryOrgAuthTokenDetector),
-        Box::new(datadog::DatadogApiKeyDetector),
-        Box::new(datadog::DATADOG_APPLICATION_KEY),
-        Box::new(datadog::DatadogApplicationKeyLegacyDetector),
-        Box::new(grafana::GrafanaServiceAccountTokenDetector),
-        Box::new(additional_providers::GRAFANA_CLOUD),
-        Box::new(new_relic::NewRelicUserApiKeyDetector),
-        Box::new(new_relic::NewRelicLicenseKeyDetector),
-        Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
-        Box::new(mailgun::MailgunApiKeyDetector),
-        Box::new(okta::OktaApiTokenDetector),
-        Box::new(firebase::FirebaseServerKeyDetector),
-        Box::new(terraform::TerraformCloudTokenDetector),
-        Box::new(additional_providers::PULUMI),
-        Box::new(ai_inference::REPLICATE),
-        Box::new(ai_inference::GROQ),
-        Box::new(ai_inference::XAI),
-        Box::new(ai_inference::OPENROUTER),
-        Box::new(ai_inference::PERPLEXITY),
-        Box::new(ai_inference::FIREWORKS),
-        Box::new(elevenlabs::ElevenLabsApiKeyDetector),
-        Box::new(together_tavily::TOGETHER_AI),
-        Box::new(together_tavily::TAVILY),
-        Box::new(pinecone::PineconeApiKeyDetector),
-        Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
-        Box::new(databricks::DATABRICKS),
-        Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
-        Box::new(confluent::ConfluentLegacyApiSecretDetector),
-        Box::new(netlify::NetlifyPersonalAccessTokenDetector),
-        Box::new(neon::NEON),
-        Box::new(langsmith::LangsmithApiKeyDetector),
-        Box::new(langfuse::LangfuseSecretKeyDetector),
-        Box::new(postman::POSTMAN),
-        Box::new(postman::POSTMAN_COLLECTION_ACCESS_KEY),
-        Box::new(heroku::HEROKU_API_KEY),
-        Box::new(heroku::HerokuApiKeyLegacyDetector),
-        Box::new(travisci::TravisCiApiTokenDetector),
-        Box::new(keyword_gated_keys::MistralApiKeyDetector),
-        Box::new(keyword_gated_keys::CohereApiKeyDetector),
-        Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
-        Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
-        Box::new(doppler::DopplerTokenDetector),
-        Box::new(trigger_dev::TRIGGER_DEV),
-        Box::new(e2b::E2B),
-        Box::new(posthog::POSTHOG),
-        Box::new(helicone::HELICONE),
-        Box::new(firecrawl::FIRECRAWL),
-        Box::new(composio::COMPOSIO),
-        Box::new(convex::ConvexDeploymentKeyDetector),
-        Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
-        Box::new(inngest::INNGEST_SIGNING_KEY),
-        Box::new(resend::RESEND_API_KEY),
-        Box::new(apify::APIFY_API_TOKEN),
-        Box::new(wandb::WANDB_API_KEY),
-        jwt::jwt_detector(),
-        bearer_token::bearer_token_detector(),
-        Box::new(ConnectionStringDetector),
-        otpauth::otpauth_detector(),
-        generic_token::generic_token_detector(),
+        BuiltIn::requiring(
+            Box::new(PrivateKeyDetector),
+            private_key::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(aws::AwsAccessKeyDetector),
+            aws::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
+            aws_bedrock::long_term_required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
+            aws_bedrock::short_term_required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(github::GitHubTokenDetector),
+            github::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(gitlab::GitlabTokenDetector),
+            gitlab::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(openai::OpenAiTokenDetector),
+            openai::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(anthropic::AnthropicTokenDetector),
+            anthropic::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(shopify::ShopifyTokenDetector),
+            shopify::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(vault::VaultTokenDetector),
+            vault::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(stripe::StripeTokenDetector),
+            stripe::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(slack::SlackTokenDetector),
+            slack::required_literals(),
+        ),
+        BuiltIn::known_format(additional_providers::PYPI),
+        BuiltIn::known_format(additional_providers::HUGGING_FACE),
+        BuiltIn::known_format(additional_providers::DOCKER),
+        BuiltIn::known_format(cloudflare::CLOUDFLARE),
+        BuiltIn::known_format(additional_providers::DIGITALOCEAN),
+        BuiltIn::known_format(linear::LINEAR),
+        BuiltIn::known_format(additional_providers::SUPABASE),
+        BuiltIn::known_format(additional_providers::SUPABASE_PAT),
+        BuiltIn::known_format(additional_providers::VERCEL),
+        BuiltIn::known_format(additional_providers::NPM),
+        BuiltIn::known_format(additional_providers::GOOGLE),
+        BuiltIn::requiring(
+            Box::new(sendgrid::SendgridTokenDetector),
+            sendgrid::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
+            microsoft_entra::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
+            azure_devops::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(notion::NotionTokenDetector),
+            notion::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(atlassian::AtlassianApiTokenDetector),
+            atlassian::required_literals(),
+        ),
+        BuiltIn::always(Box::new(twilio::TwilioAuthTokenDetector)),
+        BuiltIn::always(Box::new(twilio::TwilioApiKeySecretDetector)),
+        BuiltIn::requiring(
+            telegram::telegram_bot_token_detector(),
+            telegram::required_literals(),
+        ),
+        BuiltIn::always(Box::new(discord::DiscordBotTokenDetector)),
+        BuiltIn::requiring(
+            Box::new(sentry::SentryUserAuthTokenDetector),
+            sentry::user_required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(sentry::SentryOrgAuthTokenDetector),
+            sentry::org_required_literals(),
+        ),
+        BuiltIn::always(Box::new(datadog::DatadogApiKeyDetector)),
+        BuiltIn::known_format(datadog::DATADOG_APPLICATION_KEY),
+        BuiltIn::always(Box::new(datadog::DatadogApplicationKeyLegacyDetector)),
+        BuiltIn::requiring(
+            Box::new(grafana::GrafanaServiceAccountTokenDetector),
+            grafana::required_literals(),
+        ),
+        BuiltIn::known_format(additional_providers::GRAFANA_CLOUD),
+        BuiltIn::requiring(
+            Box::new(new_relic::NewRelicUserApiKeyDetector),
+            new_relic::user_required_literals(),
+        ),
+        BuiltIn::always(Box::new(new_relic::NewRelicLicenseKeyDetector)),
+        BuiltIn::requiring(
+            Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
+            mailchimp::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(mailgun::MailgunApiKeyDetector),
+            mailgun::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(okta::OktaApiTokenDetector),
+            okta::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(firebase::FirebaseServerKeyDetector),
+            firebase::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(terraform::TerraformCloudTokenDetector),
+            terraform::required_literals(),
+        ),
+        BuiltIn::known_format(additional_providers::PULUMI),
+        BuiltIn::known_format(ai_inference::REPLICATE),
+        BuiltIn::known_format(ai_inference::GROQ),
+        BuiltIn::known_format(ai_inference::XAI),
+        BuiltIn::known_format(ai_inference::OPENROUTER),
+        BuiltIn::known_format(ai_inference::PERPLEXITY),
+        BuiltIn::known_format(ai_inference::FIREWORKS),
+        BuiltIn::requiring(
+            Box::new(elevenlabs::ElevenLabsApiKeyDetector),
+            elevenlabs::required_literals(),
+        ),
+        BuiltIn::known_format(together_tavily::TOGETHER_AI),
+        BuiltIn::known_format(together_tavily::TAVILY),
+        BuiltIn::always(Box::new(pinecone::PineconeApiKeyDetector)),
+        BuiltIn::requiring(
+            Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
+            gitlab::runner_required_literals(),
+        ),
+        BuiltIn::known_format(databricks::DATABRICKS),
+        BuiltIn::known_format(confluent::CONFLUENT_CLOUD_API_SECRET),
+        BuiltIn::always(Box::new(confluent::ConfluentLegacyApiSecretDetector)),
+        BuiltIn::requiring(
+            Box::new(netlify::NetlifyPersonalAccessTokenDetector),
+            netlify::required_literals(),
+        ),
+        BuiltIn::known_format(neon::NEON),
+        BuiltIn::requiring(
+            Box::new(langsmith::LangsmithApiKeyDetector),
+            langsmith::required_literals(),
+        ),
+        BuiltIn::requiring(
+            Box::new(langfuse::LangfuseSecretKeyDetector),
+            langfuse::required_literals(),
+        ),
+        BuiltIn::known_format(postman::POSTMAN),
+        BuiltIn::known_format(postman::POSTMAN_COLLECTION_ACCESS_KEY),
+        BuiltIn::known_format(heroku::HEROKU_API_KEY),
+        BuiltIn::always(Box::new(heroku::HerokuApiKeyLegacyDetector)),
+        BuiltIn::always(Box::new(travisci::TravisCiApiTokenDetector)),
+        BuiltIn::always(Box::new(keyword_gated_keys::MistralApiKeyDetector)),
+        BuiltIn::always(Box::new(keyword_gated_keys::CohereApiKeyDetector)),
+        BuiltIn::always(Box::new(keyword_gated_keys::Ai21ApiKeyDetector)),
+        BuiltIn::always(Box::new(keyword_gated_keys::DeepgramApiKeyDetector)),
+        BuiltIn::requiring(
+            Box::new(doppler::DopplerTokenDetector),
+            doppler::required_literals(),
+        ),
+        BuiltIn::typed_known_format(trigger_dev::TRIGGER_DEV),
+        BuiltIn::known_format(e2b::E2B),
+        BuiltIn::typed_known_format(posthog::POSTHOG),
+        BuiltIn::typed_known_format(helicone::HELICONE),
+        BuiltIn::known_format(firecrawl::FIRECRAWL),
+        BuiltIn::typed_known_format(composio::COMPOSIO),
+        BuiltIn::always(Box::new(convex::ConvexDeploymentKeyDetector)),
+        BuiltIn::requiring(
+            Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
+            onepassword::required_literals(),
+        ),
+        BuiltIn::known_format(inngest::INNGEST_SIGNING_KEY),
+        BuiltIn::known_format(resend::RESEND_API_KEY),
+        BuiltIn::known_format(apify::APIFY_API_TOKEN),
+        BuiltIn::known_format(wandb::WANDB_API_KEY),
+        BuiltIn::requiring(jwt::jwt_detector(), jwt::required_literals()),
+        BuiltIn::always(bearer_token::bearer_token_detector()),
+        BuiltIn::requiring(
+            Box::new(ConnectionStringDetector),
+            connection_string::required_literals(),
+        ),
+        BuiltIn::requiring(otpauth::otpauth_detector(), otpauth::required_literals()),
+        BuiltIn::always(generic_token::generic_token_detector()),
     ]
 }
 
@@ -199,15 +368,31 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
 /// rule. [`BUILT_IN_PACKS`] pins, in tests, that this list is exactly the
 /// `Pack::Common` members of the canonical order.
 #[must_use]
-pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
+pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
     vec![
-        Box::new(PrivateKeyDetector),
-        jwt::jwt_detector(),
-        bearer_token::bearer_token_detector(),
-        Box::new(ConnectionStringDetector),
-        otpauth::otpauth_detector(),
-        generic_token::generic_token_detector(),
+        BuiltIn::requiring(
+            Box::new(PrivateKeyDetector),
+            private_key::required_literals(),
+        ),
+        BuiltIn::requiring(jwt::jwt_detector(), jwt::required_literals()),
+        BuiltIn::always(bearer_token::bearer_token_detector()),
+        BuiltIn::requiring(
+            Box::new(ConnectionStringDetector),
+            connection_string::required_literals(),
+        ),
+        BuiltIn::requiring(otpauth::otpauth_detector(), otpauth::required_literals()),
+        BuiltIn::always(generic_token::generic_token_detector()),
     ]
+}
+
+/// [`common_built_in_entries`] without the prefilter declarations.
+#[cfg(test)]
+#[must_use]
+pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
+    common_built_in_entries()
+        .into_iter()
+        .map(|entry| entry.detector)
+        .collect()
 }
 
 /// Which profiles a built-in detector belongs to

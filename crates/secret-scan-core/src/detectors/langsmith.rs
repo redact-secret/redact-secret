@@ -95,6 +95,12 @@ impl Detector for LangsmithApiKeyDetector {
     }
 }
 
+/// The literals one of which every `langsmith-api-key` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    PREFIXES.into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

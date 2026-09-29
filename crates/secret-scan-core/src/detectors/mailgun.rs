@@ -154,6 +154,11 @@ const BODY_LEN: usize = 32;
 const TRIPLET_SEGMENTS: [usize; 3] = [32, 8, 8];
 /// `32 + 1 + 8 + 1 + 8`.
 const TRIPLET_LEN: usize = 50;
+/// A lowercase hex byte followed by `-`: the end of a triplet's first
+/// segment and its first separator, one per hex digit.
+const TRIPLET_SEPARATOR_PAIRS: [&str; 16] = [
+    "0-", "1-", "2-", "3-", "4-", "5-", "6-", "7-", "8-", "9-", "a-", "b-", "c-", "d-", "e-", "f-",
+];
 
 /// Mailgun's own product name, case-insensitively, the same substring
 /// gitleaks' independent `mailgun-private-api-token` and
@@ -310,6 +315,18 @@ impl Detector for MailgunApiKeyDetector {
         }
         Ok(candidates)
     }
+}
+
+/// The literals one of which every `mailgun-api-key` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// The `key-` path, and for the hex-triplet path a lowercase hex byte
+/// followed by the `-` between its first two segments.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [KEY_LITERAL]
+        .into_iter()
+        .chain(TRIPLET_SEPARATOR_PAIRS)
+        .map(str::as_bytes)
 }
 
 #[cfg(test)]

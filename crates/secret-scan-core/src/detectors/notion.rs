@@ -123,6 +123,12 @@ fn ntn_end(bytes: &[u8], ends: &[usize], suffix_start: usize) -> Option<usize> {
     Some(suffix_start + NTN_DIGIT_LEN + NTN_SUFFIX_LEN)
 }
 
+/// The literals one of which every `notion-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [SECRET_PREFIX, NTN_PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

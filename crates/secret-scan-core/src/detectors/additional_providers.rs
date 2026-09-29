@@ -48,6 +48,14 @@ impl KnownFormatProviderDetector {
             boundary,
         }
     }
+
+    /// Every shape's prefix: each candidate starts with one of them, so
+    /// they are this detector's literals for the shared prefilter
+    /// (`super::prefilter`, issue #983).
+    pub(super) fn prefixes(&self) -> impl Iterator<Item = &'static str> + use<> {
+        let shapes = self.shapes;
+        shapes.iter().map(|shape| shape.prefix)
+    }
 }
 
 impl Detector for KnownFormatProviderDetector {
@@ -108,6 +116,12 @@ impl TypedKnownFormatProviderDetector {
             types,
             boundary,
         }
+    }
+
+    /// Every shape's prefix, as [`KnownFormatProviderDetector::prefixes`].
+    pub(super) fn prefixes(&self) -> impl Iterator<Item = &'static str> + use<> {
+        let shapes = self.shapes;
+        shapes.iter().map(|shape| shape.prefix)
     }
 
     /// The finding type of the shape the scan selected at `start`.

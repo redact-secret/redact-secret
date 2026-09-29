@@ -166,6 +166,19 @@ fn exact_run(bytes: &[u8], start: usize, len: usize) -> bool {
         .is_some_and(|run| run.iter().all(|&byte| pattern::is_alnum(byte)))
 }
 
+/// The literals one of which every `github-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// All three families: the classic `gh?_` prefixes, the installation
+/// prefix, and the fine-grained prefix.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    CLASSIC_FAMILY_PREFIXES
+        .into_iter()
+        .map(|(prefix, _)| prefix)
+        .chain([INSTALLATION_PREFIX, FINE_GRAINED_PREFIX])
+        .map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

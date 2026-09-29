@@ -130,6 +130,14 @@ fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
     matches
 }
 
+/// The literals one of which every `stripe-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// The shared key table's prefixes and the separate `whsec_` scan.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    STRIPE.prefixes().chain([WEBHOOK_PREFIX]).map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

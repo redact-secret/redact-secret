@@ -146,6 +146,12 @@ fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize
     pattern::boundary_ok(bytes, start, end, is_alnum).then_some((start, end))
 }
 
+/// The literals one of which every Azure DevOps candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [ANCHOR].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

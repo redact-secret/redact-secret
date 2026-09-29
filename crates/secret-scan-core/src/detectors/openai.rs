@@ -193,6 +193,12 @@ fn segmented_end(bytes: &[u8], ends: &[usize], body_start: usize, lens: &[usize]
     None
 }
 
+/// The literals one of which every `openai-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

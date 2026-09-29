@@ -92,6 +92,12 @@ fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
     Some(secret_start + SECRET_LEN)
 }
 
+/// The literals one of which every `sendgrid-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [PREFIX].into_iter()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

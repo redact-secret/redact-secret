@@ -80,6 +80,12 @@ impl Detector for LangfuseSecretKeyDetector {
     }
 }
 
+/// The literals one of which every `langfuse-secret-key` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

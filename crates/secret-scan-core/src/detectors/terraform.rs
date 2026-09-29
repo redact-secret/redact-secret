@@ -161,6 +161,12 @@ fn match_at(bytes: &[u8], alnum_ends: &[usize], marker_start: usize) -> Option<B
     ByteRange::new(prefix_start, end)
 }
 
+/// The literals one of which every `terraform-cloud-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [MARKER].into_iter()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

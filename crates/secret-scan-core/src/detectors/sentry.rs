@@ -226,6 +226,18 @@ fn org_match_at(bytes: &[u8], base64_ends: &[usize], start: usize) -> Option<usi
     Some(signature_end)
 }
 
+/// The literals one of which every Sentry user-token candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn user_required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [USER_PREFIX].into_iter().map(str::as_bytes)
+}
+
+/// The literals one of which every Sentry org-token candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn org_required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [ORG_PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

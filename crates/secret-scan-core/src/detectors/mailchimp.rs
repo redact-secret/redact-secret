@@ -320,6 +320,15 @@ impl Detector for MailchimpMarketingApiKeyDetector {
     }
 }
 
+/// The literals one of which every `mailchimp-api-key` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// The keyword gate is case-insensitive and cannot be declared; the
+/// datacenter suffix every candidate ends in can.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [DATACENTER_LITERAL].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -34,6 +34,11 @@ struct Delimiter {
     label: usize,
 }
 
+/// The start of every `BEGIN` delimiter [`find_next_delimiter`] accepts.
+const DELIMITER_BEGIN: &str = "-----BEGIN ";
+/// The start of every `END` delimiter [`find_next_delimiter`] accepts.
+const DELIMITER_END: &str = "-----END ";
+
 /// Finds the next `-----BEGIN <label>-----` / `-----END <label>-----`
 /// delimiter at or after `from`, scanning one byte at a time. `label` is an
 /// index into [`LABELS`].
@@ -42,14 +47,12 @@ fn find_next_delimiter(input: &str, from: usize) -> Option<Delimiter> {
     let mut position = from;
     while position + 5 <= bytes.len() {
         if &bytes[position..position + 5] == b"-----" {
-            for (kind, keyword) in [(DelimiterKind::Begin, "BEGIN"), (DelimiterKind::End, "END")] {
-                let keyword_start = position + 5;
-                let keyword_end = keyword_start + keyword.len();
-                if keyword_end < bytes.len()
-                    && bytes[keyword_start..keyword_end] == *keyword.as_bytes()
-                    && bytes[keyword_end] == b' '
-                {
-                    let label_start = keyword_end + 1;
+            for (kind, lead) in [
+                (DelimiterKind::Begin, DELIMITER_BEGIN),
+                (DelimiterKind::End, DELIMITER_END),
+            ] {
+                if bytes[position..].starts_with(lead.as_bytes()) {
+                    let label_start = position + lead.len();
                     for (label, name) in LABELS.iter().enumerate() {
                         let label_end = label_start + name.len();
                         let suffix_end = label_end + 5;
@@ -333,6 +336,17 @@ impl Detector for PrivateKeyDetector {
 
         Ok(candidates)
     }
+}
+
+/// The literals one of which every private-key candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// Every candidate span comes from a `-----BEGIN <label>-----` or
+/// `-----END <label>-----` delimiter [`find_next_delimiter`] found.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [DELIMITER_BEGIN, DELIMITER_END]
+        .into_iter()
+        .map(str::as_bytes)
 }
 
 #[cfg(test)]

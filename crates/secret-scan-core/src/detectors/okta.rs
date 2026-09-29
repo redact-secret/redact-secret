@@ -258,6 +258,12 @@ impl Detector for OktaApiTokenDetector {
     }
 }
 
+/// The literals one of which every `okta-api-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [TOKEN_PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -251,6 +251,18 @@ impl Detector for GitlabRunnerAuthenticationTokenDetector {
     }
 }
 
+/// The literals one of which every `gitlab-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    PREFIXES.into_iter().map(str::as_bytes)
+}
+
+/// The literals one of which every GitLab runner candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn runner_required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [RUNNER_PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

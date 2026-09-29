@@ -284,6 +284,18 @@ impl Detector for AwsBedrockShortTermApiKeyDetector {
     }
 }
 
+/// The literals one of which every long-term Bedrock key candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn long_term_required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [LONG_TERM_PREFIX].into_iter().map(str::as_bytes)
+}
+
+/// The literals one of which every short-term Bedrock key candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) fn short_term_required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [SHORT_TERM_PREFIX].into_iter().map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

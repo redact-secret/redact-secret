@@ -445,6 +445,19 @@ fn digit_section_end(
     (digit_min..=digit_max).contains(&len).then_some(end)
 }
 
+/// The literals one of which every `slack-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// One per pass in [`scan`]: bot, user, each rotation prefix, app-level and
+/// the interim shapes.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    [BOT_PREFIX, USER_PREFIX, APP_LEVEL_PREFIX]
+        .into_iter()
+        .chain(ROTATION_PREFIXES)
+        .chain(INTERIM_SHAPES.iter().map(|shape| shape.prefix))
+        .map(str::as_bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

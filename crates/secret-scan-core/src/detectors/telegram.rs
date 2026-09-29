@@ -89,6 +89,9 @@ const MIN_SECRET_LEN: usize = 34;
 /// for anything else.
 const URL_PATH_PREFIX: &[u8] = b"/bot";
 
+/// A digit followed by the `:` that ends a token's id, one per digit.
+const ID_SEPARATOR_PAIRS: [&str; 10] = ["0:", "1:", "2:", "3:", "4:", "5:", "6:", "7:", "8:", "9:"];
+
 /// `true` for an ASCII digit, as a byte predicate for [`RunCursor`].
 fn is_ascii_digit(byte: u8) -> bool {
     byte.is_ascii_digit()
@@ -216,6 +219,15 @@ fn boundary_ok(bytes: &[u8], start: usize, end: usize) -> bool {
 #[must_use]
 pub fn telegram_bot_token_detector() -> Box<dyn Detector> {
     Box::new(TelegramBotTokenDetector)
+}
+
+/// The literals one of which every `telegram-bot-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// A candidate's digit id ends in `:`, so it contains a digit followed by
+/// `:`.
+pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
+    ID_SEPARATOR_PAIRS.into_iter().map(str::as_bytes)
 }
 
 #[cfg(test)]
