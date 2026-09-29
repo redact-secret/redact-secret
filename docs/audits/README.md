@@ -15,8 +15,9 @@ epic), and **evidence** (a single issue's frozen record, `evidence/<issue>/`).
 
 ## Releases
 
-Start with the [beta.10 candidate public-contract review](beta10-candidate-public-contract-review.md).
-The [beta.9 candidate public-contract review](beta9-candidate-public-contract-review.md),
+Start with the [beta.11 candidate public-contract review](beta11-candidate-public-contract-review.md).
+The [beta.10](beta10-candidate-public-contract-review.md) and
+[beta.9](beta9-candidate-public-contract-review.md) candidate public-contract reviews,
 the [beta.6 candidate public-contract review](beta6-candidate-public-contract-review.md),
 the [beta.5 release readiness review](beta5-release-readiness-review.md), the
 [beta.5](beta5-candidate-public-contract-review.md) and
@@ -27,7 +28,8 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 
 | Topic | Evidence |
 | --- | --- |
-| Beta.10 candidate identity and public contract | [Current candidate review](beta10-candidate-public-contract-review.md) |
+| Beta.11 candidate identity and public contract | [Current candidate review](beta11-candidate-public-contract-review.md) |
+| Beta.10 candidate identity and public contract | [Historical candidate review](beta10-candidate-public-contract-review.md) |
 | Beta.9 candidate identity and public contract | [Historical candidate review](beta9-candidate-public-contract-review.md) |
 | Beta.6 candidate identity and public contract | [Historical candidate review](beta6-candidate-public-contract-review.md) |
 | Beta.5 release readiness | [Pre-candidate review and fixes](beta5-release-readiness-review.md) |

@@ -77,6 +77,33 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `benchmarks/support-matrix.json` is regenerated in candidate mode for the
+  Beta.11 candidate: redact-secret-benchmarks develop `0ecd501` (#503),
+  classification `evidence/860/8b6a5fd/support-status-candidate-feed-safe.json`
+  of product `8b6a5fde` (the candidate artifacts of run `e795030e`, declared
+  0.1.0-beta.10), with trufflehog 3.97.4 and gitleaks 8.30.1. The matrix
+  covers 76 providers and 152 families: 105 stable (80 documented, 25
+  empirical, 0 policy-qualified), 20 provisional, 9 pending and 18
+  unsupported, and every shipped detector now has a status (22 had none).
+  Six families leave `stable` for `provisional`:
+  `anthropic:secret-api-key`, `azure-devops:personal-access-token`,
+  `confluent:cloud-api-secret-legacy`, `mailchimp:marketing-api-key`,
+  `slack:user-token` and `stripe:webhook-signing-secret`, on unresolved
+  peer-scanner disagreements and, for Slack, unreviewed mutation findings.
+  The same harness reads the published 0.1.0-beta.10 as provisional on all
+  six, so these are benchmark-side gates, not product regressions; each is
+  acknowledged in `benchmarks/support-matrix-drift-acknowledgements.json`.
+  The previous matrix was the 2026-09-25 measurement of 0.1.0-beta.7.
+  `benchmarks/support-matrix-schema.json` now pins benchmarks `main`
+  `7af585a` (the schema is unchanged at `0ecd501`), whose contract adds the
+  `policy-qualified` stable profile of T3 project-policy families; the docs
+  generator and drift gate read it, and the support matrix names the new
+  evaluator gates in plain words. The site feed is regenerated from it.
+  The #995 coverage allowlist drops its 22 unmeasured entries, since every
+  shipped detector is now measured, and lists 18 matrix ids the inventory
+  folds into a shipped detector, 14 of them finding types the benchmarks
+  harness scores as their own arrival families (for example the six
+  `doppler-*` types of `doppler-token`).
 - `npm run detector-family-coverage:check` now runs `--strict` (#995): a detector
   with no family in the pinned support matrix fails CI unless it has a reasoned
   entry in `docs/coverage/detector-family-coverage-allowlist.json`, which holds
@@ -122,7 +149,11 @@ evidence is linked from each published version.
   468,090 / 159,706 B for `full` and 317,150 / 113,968 B for `common`
   (the `common` figure also reflects the #929 fix below; alone that fix
   brought `common` to 590,801 / 229,049 B); the `pii` builds are 741,825 / 275,512 B
-  and 590,846 / 229,048 B. Both default builds remain above the
+  and 590,846 / 229,048 B. Those figures are #937's own measurement. The
+  other Beta.11 changes grow every build again; at the release candidate the
+  default builds are 542,445 / 187,230 B (`full`) and 356,480 / 127,667 B
+  (`common`), and the `pii` builds 833,757 / 310,058 B and
+  647,891 / 248,491 B. Both default builds remain above the
   0.1.0-beta.8 size budgets (137,639 and 100,058 B gzip, +5%): the rest of
   the growth predates the PII runtime. The `measure-wasm-profiles.mjs --guard-only` CI
   guard now fails when a default build links any part of the PII runtime.

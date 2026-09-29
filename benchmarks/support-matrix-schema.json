@@ -10,7 +10,7 @@
     "sourceReport": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schemaVersion", "generatedAt", "runId", "revision", "dirty", "criteriaSchemaVersion"],
+      "required": ["schemaVersion", "generatedAt", "runId", "revision", "dirty", "criteriaSchemaVersion", "fixtureIndex", "taxonomyDigest", "scannerObservations"],
       "properties": {
         "schemaVersion": { "const": 1 },
         "generatedAt": { "type": "string" },
@@ -18,6 +18,36 @@
         "revision": { "type": "string" },
         "dirty": { "type": ["boolean", "null"] },
         "criteriaSchemaVersion": { "const": 1 },
+        "scannerObservations": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "observedAt", "sourceRunId"],
+            "properties": {
+              "source": { "enum": ["fresh", "snapshot"] },
+              "observedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
+              "sourceRunId": { "type": "string", "minLength": 1 },
+              "snapshotDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "inputDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            },
+            "allOf": [{
+              "if": { "properties": { "source": { "const": "snapshot" } }, "required": ["source"] },
+              "then": { "properties": { "snapshotDigest": true, "inputDigest": true }, "required": ["snapshotDigest", "inputDigest"] }
+            }]
+          }
+        },
+        "fixtureIndex": {
+          "type": "object", "additionalProperties": false,
+          "required": ["schemaVersion", "algorithm", "digest", "fixtureCount"],
+          "properties": {
+            "schemaVersion": { "const": 1 }, "algorithm": { "const": "sha256" },
+            "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "fixtureCount": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "taxonomyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "publishedPackage": {
           "description": "Published mode only: the released package the pinned redact-secret entry loaded. Absent on a candidate run, which carries product instead.",
           "type": "object",
@@ -65,14 +95,14 @@
     },
     "stableDistribution": {
       "type": "object", "additionalProperties": false, "required": ["documented", "empirical"],
-      "properties": { "documented": { "type": "integer", "minimum": 0 }, "empirical": { "type": "integer", "minimum": 0 } }
+      "properties": { "documented": { "type": "integer", "minimum": 0 }, "empirical": { "type": "integer", "minimum": 0 }, "policy-qualified": { "type": "integer", "minimum": 0 } }
     },
     "families": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["provider", "family", "familyName", "status", "evidenceTier", "evidenceBasis", "qualificationProfile", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "empiricalEvidence", "fixtureProfile", "detectors", "reason"],
+        "required": ["provider", "family", "familyName", "status", "evidenceTier", "evidenceBasis", "qualificationProfile", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "empiricalEvidence", "fixtureProfile", "detectors", "reason", "profileCoverage"],
         "properties": {
           "provider": { "type": ["string", "null"] },
           "family": { "type": "string" },
@@ -80,7 +110,7 @@
           "status": { "enum": ["stable", "provisional", "pending", "unsupported"] },
           "evidenceTier": { "enum": ["T0", "T1", "T2", "T3", null] },
           "evidenceBasis": { "enum": ["provider-documented", "independently-corroborated", "empirically-observed", "project-policy", "none"] },
-          "qualificationProfile": { "enum": ["documented", "empirical", null] },
+          "qualificationProfile": { "enum": ["documented", "empirical", "policy-qualified", null] },
           "providerSource": {
             "type": ["object", "null"],
             "additionalProperties": false,
@@ -133,6 +163,7 @@
               "supportsBareValues": { "type": "boolean" }
             }
           },
+          "policyQualification": { "type": ["object", "null"] },
           "fixtureProfile": {
             "type": ["object", "null"], "additionalProperties": false,
             "required": ["positiveCases", "positiveAxes", "benignCases", "controlAxes", "twinPairs", "totalFixtures", "contextTwinPairs", "confusionAxes"],
@@ -154,7 +185,7 @@
     "fixtureProfile": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["profilesVersion", "claimed", "explicit", "target", "cellsMet", "cells", "debt"],
+      "required": ["profilesVersion", "claimed", "explicit", "target", "cellsMet", "cells", "requiredCells", "requiredButEmptyAxisIds", "debt"],
       "properties": {
         "profilesVersion": { "type": "integer", "minimum": 1 },
         "claimed": { "enum": ["arrival-provisional", "stable-documented", "stable-empirical", "context-constrained-empirical", null] },
@@ -177,6 +208,24 @@
             "controlAxisIds": { "type": "array", "items": { "type": "string" } },
             "confusionAxisIds": { "type": "array", "items": { "type": "string" } }
           }
+        },
+        "requiredCells": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "totalFixtures": { "type": "integer", "minimum": 1 },
+            "positiveCases": { "type": "integer", "minimum": 1 },
+            "benignControls": { "type": "integer", "minimum": 1 },
+            "twinPairs": { "type": "integer", "minimum": 1 },
+            "positiveContextAxes": { "type": "integer", "minimum": 1 },
+            "controlAxes": { "type": "integer", "minimum": 1 },
+            "confusionAxes": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "requiredButEmptyAxisIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["positiveContextAxes", "controlAxes", "confusionAxes"] }
         },
         "debt": {
           "type": "array",

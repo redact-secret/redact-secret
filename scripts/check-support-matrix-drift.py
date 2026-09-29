@@ -75,6 +75,13 @@ ACKNOWLEDGEMENTS_PATH = ROOT / "benchmarks" / "support-matrix-drift-acknowledgem
 # the tier stays T2 either way.
 EMPIRICAL_EVIDENCE_BASES = ("independently-corroborated", "empirically-observed")
 
+# The stable qualification profiles. redact-secret-benchmarks'
+# `decision-qualify-bounded-t3-credential-policy` (benchmarks a66dbef) added
+# `policy-qualified`, open only to T3 `project-policy` families. A matrix from
+# before that contract (every release baseline up to 0.1.0-beta.10) has no
+# `policy-qualified` key in `stableDistribution`; a missing key reads as zero.
+QUALIFICATION_PROFILES = ("documented", "empirical", "policy-qualified")
+
 EVIDENCE_FIELDS = (
     "evidenceTier",
     "evidenceBasis",
@@ -143,6 +150,8 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
                     f"{label}: {name}: empirical qualification is not T2 "
                     "independently-corroborated or empirically-observed"
                 )
+            if profile == "policy-qualified" and (tier != "T3" or basis != "project-policy"):
+                errors.append(f"{label}: {name}: policy-qualified qualification is not T3 project-policy")
 
     if "stableDistribution" in matrix:
         actual = {
@@ -150,9 +159,12 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
                 entry.get("status") == "stable" and entry.get("qualificationProfile") == profile
                 for entry in families
             )
-            for profile in ("documented", "empirical")
+            for profile in QUALIFICATION_PROFILES
         }
-        if matrix.get("stableDistribution") != actual:
+        recorded = matrix.get("stableDistribution")
+        if isinstance(recorded, dict) and not set(recorded) - set(QUALIFICATION_PROFILES):
+            recorded = {profile: recorded.get(profile, 0) for profile in QUALIFICATION_PROFILES}
+        if recorded != actual:
             errors.append(
                 f"{label}: stableDistribution {matrix.get('stableDistribution')} does not match {actual}"
             )

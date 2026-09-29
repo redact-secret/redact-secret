@@ -67,7 +67,7 @@ README_END = "<!-- support-matrix:end -->"
 
 STATUS_ORDER = ("stable", "provisional", "pending", "unsupported")
 EVIDENCE_TIER_ORDER = ("T1", "T2", "T3", "T0")
-QUALIFICATION_PROFILE_ORDER = ("documented", "empirical")
+QUALIFICATION_PROFILE_ORDER = ("documented", "empirical", "policy-qualified")
 
 # The evidence bases a T2 family may carry under the `empirical` qualification
 # profile. redact-secret-benchmarks' decision
@@ -75,6 +75,14 @@ QUALIFICATION_PROFILE_ORDER = ("documented", "empirical")
 # added the corroborated route beside the provider-issued observation route;
 # the tier stays T2 either way.
 EMPIRICAL_EVIDENCE_BASES = ("independently-corroborated", "empirically-observed")
+
+# redact-secret-benchmarks' `decision-qualify-bounded-t3-credential-policy`
+# (benchmarks a66dbef) added a third stable profile, `policy-qualified`,
+# open only to T3 `project-policy` families and never changing their tier or
+# basis. A matrix from before that contract has no `policy-qualified` key in
+# `stableDistribution`; a missing key reads as zero.
+POLICY_QUALIFIED_TIER = "T3"
+POLICY_QUALIFIED_BASIS = "project-policy"
 
 EVIDENCE_BASIS_COPY = {
     "provider-documented": "Provider documentation",
@@ -86,10 +94,13 @@ EVIDENCE_BASIS_COPY = {
 
 STATUS_COPY = {
     "stable": (
-        "Officially supported. The family qualified in one of two ways: its format is "
-        "documented by the provider (`documented`), or several independent sources "
+        "Officially supported. The family qualified in one of three ways: its format is "
+        "documented by the provider (`documented`); several independent sources "
         "corroborate it or it was checked against keys the provider actually issued, "
-        "with stricter test and behavior checks (`empirical`). "
+        "with stricter test and behavior checks (`empirical`); or, for a generic family "
+        "whose boundary this project decides rather than a provider, its exact spans, "
+        "actions and exclusions passed public and protected holdout checks "
+        "(`policy-qualified`). "
         "An empirically qualified family is never described as provider-documented. You "
         "can rely on this family's detection and its precision behavior. Stable does not "
         "mean every historical or future variant of this credential is detected -- see "
@@ -148,6 +159,14 @@ REASON_GATE_GROUPS = {
     "empirical.uncertainty": "boundary",
     "qualificationProfile": "policy",
     "positiveContractTier": "no-contract",
+    # Gates the beta.8 evidence contract (benchmarks cfaeac4) never emitted;
+    # the current contract emits them for families measured since.
+    "benign.falseAlarms": "false-alarms",
+    "twinFailures": "twin-misses",
+    "metamorphic.criticalFailures": "robustness",
+    "mutation.unresolvedCritical": "review",
+    "differential.unresolvedContractDisagreements": "peer-disagreements",
+    "policy.protected-holdout": "holdout",
 }
 
 # A `fixtureProfile <profile>: <actual> <cell> < <required> (<n> short)`
@@ -182,11 +201,18 @@ REASON_GROUP_COPY = (
     ("twins", "more near-miss twin pairs"),
     ("fixtures", "more test fixtures overall"),
     ("boundary", "a defined supported-context boundary with its uncertainty stated"),
+    ("false-alarms", "no false alarm on its benign controls"),
+    ("twin-misses", "no missed detection on its near-miss twin pairs"),
+    ("robustness", "detection that survives format-preserving changes to the surrounding text"),
+    ("review", "its open fixture-versus-detector findings reviewed"),
+    ("peer-disagreements", "its disagreements with other scanners about the format settled"),
+    ("holdout", "a passing protected holdout run on the frozen candidate"),
 )
 
-# A raw reason segment that names an evaluator gate: `profile.gate: ...`,
+# A raw reason segment that names an evaluator gate: `profile.gate: ...`
+# (the gate may be hyphenated, as in `policy.protected-holdout`),
 # `qualificationProfile: ...` or `positiveContractTier T0 ...`.
-GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*\.[A-Za-z.]+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
+GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*\.[A-Za-z.-]+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
 
 
 def user_facing_reason(reason: str) -> str:
@@ -249,6 +275,17 @@ def user_facing_reason(reason: str) -> str:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def stable_distribution(matrix: dict) -> dict | None:
+    """The matrix's `stableDistribution` keyed by every profile this script
+    knows, a profile the matrix predates (`policy-qualified` before benchmarks
+    a66dbef) reading as zero. An unknown profile key is returned unchanged so
+    the comparison against the families fails."""
+    recorded = matrix.get("stableDistribution")
+    if not isinstance(recorded, dict) or set(recorded) - set(QUALIFICATION_PROFILE_ORDER):
+        return recorded
+    return {profile: recorded.get(profile, 0) for profile in QUALIFICATION_PROFILE_ORDER}
 
 
 BUILT_IN_PACKS_TABLE = re.compile(r"BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];")
@@ -334,6 +371,8 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
                 f"{name}: empirical qualification must remain T2 independently-corroborated "
                 "or empirically-observed evidence"
             )
+        if profile == "policy-qualified" and (tier != POLICY_QUALIFIED_TIER or basis != POLICY_QUALIFIED_BASIS):
+            errors.append(f"{name}: policy-qualified qualification must remain T3 project-policy evidence")
 
     if matrix.get("familyCount") != len(families):
         errors.append(f"familyCount {matrix.get('familyCount')} != {len(families)} families present")
@@ -355,7 +394,7 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
         )
         for profile in QUALIFICATION_PROFILE_ORDER
     }
-    if matrix.get("stableDistribution") != actual_stable_distribution:
+    if stable_distribution(matrix) != actual_stable_distribution:
         errors.append(
             f"stableDistribution {matrix.get('stableDistribution')} does not match the stable families actually "
             f"present {actual_stable_distribution}"
@@ -448,7 +487,7 @@ def render_matrix_markdown(matrix: dict, unmeasured: list[str] | tuple[str, ...]
         lines.append(STATUS_COPY[status])
         lines.append("")
 
-    stable_distribution = matrix["stableDistribution"]
+    stable_counts = stable_distribution(matrix)
     tier_counts = _tier_counts(matrix)
     lines.extend(
         [
@@ -458,7 +497,7 @@ def render_matrix_markdown(matrix: dict, unmeasured: list[str] | tuple[str, ...]
             "",
             _markdown_table(
                 ["Qualification profile", "Stable families"],
-                [[profile.capitalize(), str(stable_distribution[profile])] for profile in QUALIFICATION_PROFILE_ORDER],
+                [[profile.capitalize(), str(stable_counts[profile])] for profile in QUALIFICATION_PROFILE_ORDER],
             ),
             "",
             "Evidence tiers across all families:",
@@ -561,11 +600,11 @@ def _last_column(family: dict, status: str) -> str:
 
 def render_readme_fragment(matrix: dict, unmeasured: list[str] | tuple[str, ...] = ()) -> str:
     distribution = matrix["distribution"]
-    stable_distribution = matrix["stableDistribution"]
+    stable_counts = stable_distribution(matrix)
     tier_counts = _tier_counts(matrix)
     counts = ", ".join(f"{status}: {distribution.get(status, 0)}" for status in STATUS_ORDER)
     profile_counts = ", ".join(
-        f"{profile}: {stable_distribution[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
+        f"{profile}: {stable_counts[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
     )
     evidence_counts = ", ".join(f"{tier}: {tier_counts[tier]}" for tier in EVIDENCE_TIER_ORDER)
     not_measured = (
@@ -649,7 +688,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         "",
         "Stable qualification: "
         + ", ".join(
-            f"{profile} {matrix['stableDistribution'][profile]}" for profile in QUALIFICATION_PROFILE_ORDER
+            f"{profile} {stable_distribution(matrix)[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
         )
         + ". Evidence tiers: "
         + ", ".join(f"{tier} {_tier_counts(matrix)[tier]}" for tier in EVIDENCE_TIER_ORDER)

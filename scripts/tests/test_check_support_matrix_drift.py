@@ -138,6 +138,20 @@ class ValidateMatrixTests(unittest.TestCase):
         )
         self.assertEqual(DRIFT.validate_matrix("candidate", candidate, SCHEMA), [])
 
+    def test_accepts_a_t3_policy_qualified_stable_family(self) -> None:
+        # redact-secret-benchmarks' decision-qualify-bounded-t3-credential-policy (a66dbef).
+        candidate = matrix(
+            [family("generic:bearer-token", "stable", tier="T3", basis="project-policy", profile="policy-qualified")]
+        )
+        candidate["stableDistribution"]["policy-qualified"] = 1
+        schema = json.loads(json.dumps(SCHEMA))
+        schema["properties"]["families"]["items"]["properties"]["qualificationProfile"]["enum"].append("policy-qualified")
+        self.assertEqual(DRIFT.validate_matrix("candidate", candidate, schema), [])
+        candidate["families"][0]["evidenceTier"] = "T1"
+        self.assertTrue(
+            any("policy-qualified" in error for error in DRIFT.validate_matrix("candidate", candidate, schema))
+        )
+
     def test_accepts_a_t2_corroborated_empirical_stable_family(self) -> None:
         # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration:
         # the corroborated route carries evidenceBasis independently-corroborated.

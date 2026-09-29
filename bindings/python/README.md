@@ -13,7 +13,8 @@ Findings never include the matched secret.
 
 Redact Secret is not a DLP platform and does not detect every secret: it
 finds supported credential formats and, only when you opt in, six bounded
-structured PII families (qualification pending), and an empty finding list does not
+structured PII families (five `provisional`, US SSN `pending`, none `stable`),
+and an empty finding list does not
 prove text is secret-free. It complements repository and history scanners
 rather than replacing them. Per-family support is published in the generated
 [support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
