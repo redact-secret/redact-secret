@@ -5219,12 +5219,65 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "wandb_api_key"
+    },
+    {
+      "detector": "daytona-api-key",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terraform",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "daytona-api-key-positive-bare",
+        "daytona-api-key-positive-chat-sentence",
+        "daytona-api-key-positive-crlf-unicode-prefix",
+        "daytona-api-key-positive-curl-bearer",
+        "daytona-api-key-positive-dotenv",
+        "daytona-api-key-positive-js-client-option",
+        "daytona-api-key-positive-json-config",
+        "daytona-api-key-positive-json-token-key",
+        "daytona-api-key-positive-log",
+        "daytona-api-key-positive-punctuation-adjacent",
+        "daytona-api-key-positive-repeated-value",
+        "daytona-api-key-positive-sdk-call",
+        "daytona-api-key-positive-shell-export",
+        "daytona-api-key-positive-terraform-variable",
+        "daytona-api-key-positive-tool-call-arguments",
+        "daytona-api-key-positive-x-api-key-header",
+        "daytona-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "daytona_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 116,
+    "supported": 117,
     "unresolved": 0
   }
 }

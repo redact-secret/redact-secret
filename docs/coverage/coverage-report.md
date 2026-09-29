@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 116/116 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 117/117 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 116 |
+| supported | 117 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 127.
+Coverage declarations: 128.
 
 ## Coverage by detector
 
@@ -45,6 +45,7 @@ Coverage declarations: 127.
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| daytona-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | deepgram-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -148,6 +149,7 @@ Coverage declarations: 127.
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
 | datadog_application_key_legacy | datadog-application-key-legacy | provider | supported | not-applicable | none |
+| daytona_api_key | daytona-api-key | provider | supported | not-applicable | none |
 | deepgram_api_key | deepgram-api-key | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
@@ -263,15 +265,15 @@ Coverage declarations: 127.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 127 | 0 | 0 |
-| boundary | 116 | 0 | 0 |
-| host-context | 116 | 0 | 0 |
+| adversarial | 128 | 0 | 0 |
+| boundary | 117 | 0 | 0 |
+| host-context | 117 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 127 | 0 | 0 |
-| near-miss-negative | 116 | 0 | 0 |
-| overlap | 116 | 0 | 0 |
-| positive | 116 | 0 | 0 |
-| range | 127 | 0 | 0 |
+| malformed | 128 | 0 | 0 |
+| near-miss-negative | 117 | 0 | 0 |
+| overlap | 117 | 0 | 0 |
+| positive | 117 | 0 | 0 |
+| range | 128 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

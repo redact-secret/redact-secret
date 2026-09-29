@@ -841,6 +841,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
       "schemes": null
+    },
+    {
+      "type": "daytona_api_key",
+      "detector": "daytona-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064tn_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
     }
   ],
   "consumers": [

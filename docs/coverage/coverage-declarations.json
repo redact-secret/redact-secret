@@ -12626,6 +12626,125 @@
       "type": "wandb_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "daytona-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "daytona-api-key-positive-bare",
+            "daytona-api-key-positive-chat-sentence",
+            "daytona-api-key-positive-crlf-unicode-prefix",
+            "daytona-api-key-positive-curl-bearer",
+            "daytona-api-key-positive-dotenv",
+            "daytona-api-key-positive-js-client-option",
+            "daytona-api-key-positive-json-config",
+            "daytona-api-key-positive-json-token-key",
+            "daytona-api-key-positive-log",
+            "daytona-api-key-positive-punctuation-adjacent",
+            "daytona-api-key-positive-repeated-value",
+            "daytona-api-key-positive-sdk-call",
+            "daytona-api-key-positive-shell-export",
+            "daytona-api-key-positive-terraform-variable",
+            "daytona-api-key-positive-tool-call-arguments",
+            "daytona-api-key-positive-x-api-key-header",
+            "daytona-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "daytona-api-key-overlap-bearer-header",
+            "daytona-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "daytona-api-key-adversarial-long-hex-run",
+            "daytona-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "daytona-api-key-boundary-body-63",
+            "daytona-api-key-boundary-body-65",
+            "daytona-api-key-boundary-dash-glued-suffix",
+            "daytona-api-key-boundary-dash-prefix",
+            "daytona-api-key-boundary-glued-prefix",
+            "daytona-api-key-boundary-non-hex-letter",
+            "daytona-api-key-boundary-trailing-uppercase",
+            "daytona-api-key-boundary-underscore-glued-prefix",
+            "daytona-api-key-boundary-underscore-glued-suffix",
+            "daytona-api-key-boundary-uppercase-hex-byte",
+            "daytona-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "daytona-api-key-negative-artifact-marker",
+            "daytona-api-key-negative-bare-sha256-digest",
+            "daytona-api-key-negative-ci-secret-reference",
+            "daytona-api-key-negative-placeholders",
+            "daytona-api-key-negative-runner-key",
+            "daytona-api-key-negative-secret-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "daytona-api-key-boundary-body-63",
+            "daytona-api-key-boundary-body-65",
+            "daytona-api-key-boundary-dash-glued-suffix",
+            "daytona-api-key-boundary-dash-prefix",
+            "daytona-api-key-boundary-glued-prefix",
+            "daytona-api-key-boundary-non-hex-letter",
+            "daytona-api-key-boundary-trailing-uppercase",
+            "daytona-api-key-boundary-underscore-glued-prefix",
+            "daytona-api-key-boundary-underscore-glued-suffix",
+            "daytona-api-key-boundary-uppercase-hex-byte",
+            "daytona-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for daytona_api_key (daytona-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "daytona_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12785,6 +12904,8 @@
             "datadog-application-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-long-suffix",
             "datadog-application-key-legacy-adversarial-dense-findings",
+            "daytona-api-key-adversarial-long-hex-run",
+            "daytona-api-key-adversarial-long-run",
             "deepgram-api-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
@@ -13236,6 +13357,8 @@
             "datadog-application-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-long-suffix",
             "datadog-application-key-legacy-adversarial-dense-findings",
+            "daytona-api-key-adversarial-long-hex-run",
+            "daytona-api-key-adversarial-long-run",
             "deepgram-api-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",

@@ -5,6 +5,16 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- New provider detectors from the #860 issuance-gated handoffs released by
+  rulings R9 and R10, each always redacted at provider specificity so it wins
+  overlap resolution over `contextual_secret`, `bearer_token` and
+  `authorization_credential`. None is a support-status claim; promotion stays
+  gated on core conformance and the benchmarks arrival and profile evidence:
+  - `daytona-api-key` (#970): Daytona `dtn_` + exactly 64 lowercase-hex API
+    keys (`daytona_api_key`), T1 as of provider code v0.190.0.
+
 ## 0.1.0-beta.11 — 2026-09-29
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.11/README.md).

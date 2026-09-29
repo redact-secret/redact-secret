@@ -24,6 +24,7 @@ mod connection_string;
 mod convex;
 mod databricks;
 mod datadog;
+mod daytona;
 mod discord;
 mod doppler;
 mod e2b;
@@ -225,6 +226,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(resend::RESEND_API_KEY),
         Box::new(apify::APIFY_API_TOKEN),
         Box::new(wandb::WANDB_API_KEY),
+        Box::new(daytona::DAYTONA_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -481,6 +483,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(wandb::WANDB_API_KEY.shapes())],
     ),
     (
+        daytona::DAYTONA_API_KEY.detector_id(),
+        &[Literals::Shapes(daytona::DAYTONA_API_KEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -651,6 +657,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("resend-api-key", Pack::Provider),
     ("apify-api-token", Pack::Provider),
     ("wandb-api-key", Pack::Provider),
+    ("daytona-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -777,6 +784,7 @@ mod tests {
                 "resend-api-key",
                 "apify-api-token",
                 "wandb-api-key",
+                "daytona-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1142,6 +1150,7 @@ mod tests {
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
         );
         let apify_api_token_input = format!("apify_api_{}", "SyntheticRevokedApifyToken0000000000");
+        let daytona_api_key_input = format!("dtn_{}", "5e7c0ded".repeat(8));
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
@@ -1229,6 +1238,7 @@ mod tests {
             ("resend-api-key", resend_api_key_input.as_str()),
             ("apify-api-token", apify_api_token_input.as_str()),
             ("wandb-api-key", wandb_api_key_input.as_str()),
+            ("daytona-api-key", daytona_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

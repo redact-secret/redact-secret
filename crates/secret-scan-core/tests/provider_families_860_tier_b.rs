@@ -1,5 +1,6 @@
-//! Issue #860 Tier B provider families (#912–#917) through the public API
-//! with the full default registry.
+//! Issue #860 Tier B provider families (#912–#917) and the Beta.12
+//! credential families (#970–#975) through the public API with the full
+//! default registry.
 //!
 //! Every key is built at run time from a literal prefix plus a seeded
 //! synthetic filler, so no realistic key literal is committed. The filler
@@ -99,9 +100,15 @@ fn assert_twins_unclaimed(detector: &str, twins: &[String]) {
 }
 
 fn assert_partition_parity(key: &str) {
-    let input = format!("Authorization: Bearer {key}\n");
-    let (expected_text, expected) = whole_input(&input);
-    for pieces in utf8_byte_partitions(&input) {
+    assert_input_partition_parity(&format!("Authorization: Bearer {key}\n"));
+    assert_input_partition_parity(&format!("{key}\n"));
+}
+
+/// Every two-chunk partition of `input` reports the whole-input findings and
+/// redacted text.
+fn assert_input_partition_parity(input: &str) {
+    let (expected_text, expected) = whole_input(input);
+    for pieces in utf8_byte_partitions(input) {
         let session = run(&as_chunks(&pieces));
         assert_eq!(session.text(), expected_text, "{pieces:?}");
         let findings = session.findings();
@@ -583,5 +590,143 @@ mod wandb {
     #[test]
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&key(77, 7));
+    }
+}
+
+mod daytona {
+    use super::*;
+
+    const DETECTOR: &str = "daytona-api-key";
+    const TYPE: &str = "daytona_api_key";
+
+    fn key(seed: usize) -> String {
+        format!("dtn_{}", filler(LOWER_HEX, 64, seed))
+    }
+
+    #[test]
+    fn the_exact_shape_wins_every_context_as_the_sole_finding() {
+        for key in [key(1), key(2), format!("dtn_{}", "5e7c0ded".repeat(8))] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("DAYTONA_API_KEY={key}\n"),
+                format!("daytona = Daytona(DaytonaConfig(api_key=\"{key}\"))\n"),
+                format!("const daytona = new Daytona({{ apiKey: '{key}' }});\n"),
+                format!("variable \"daytona_api_key\" {{\n  default = \"{key}\"\n}}\n"),
+                format!(
+                    "curl -H \"Authorization: Bearer {key}\" https://app.daytona.io/api/sandbox\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(LOWER_HEX, 64, 4);
+        let upper = format!("{}A{}", &body[..30], &body[31..]);
+        let non_hex = format!("{}g{}", &body[..30], &body[31..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("dtn_{}", &body[..63]),
+                format!("dtn_{body}0"),
+                format!("dtn_{upper}"),
+                format!("dtn_{non_hex}"),
+                format!("dtn_{body}A"),
+                format!("dtn_{body}g"),
+                format!("DTN_{body}"),
+                format!("dtn-{body}"),
+                format!("xdtn_{body}"),
+                format!("_dtn_{body}"),
+                format!("dtn_{body}_"),
+                format!("dtn_{body}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let digest = filler(LOWER_HEX, 64, 5);
+        for input in [
+            "DAYTONA_API_KEY=dtn_***\n".to_owned(),
+            "DAYTONA_API_KEY=dtn_...\n".to_owned(),
+            "DAYTONA_API_KEY=dtn_1234567890\n".to_owned(),
+            "secret: dtn_secret_SyntheticRevokedPlaceholder\n".to_owned(),
+            "stdout marker dtn_artifact_SyntheticRevokedMarker\n".to_owned(),
+            "DAYTONA_API_KEY=${{ secrets.DAYTONA_API_KEY }}\n".to_owned(),
+            "the prefix is dtn_\n".to_owned(),
+            format!("sha256: {digest}\n"),
+            format!("DAYTONA_RUNNER_KEY={digest}\n"),
+            format!("{digest}\n"),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_daytona_jwt_stays_with_the_jwt_detector() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        for input in [
+            format!("DAYTONA_JWT_TOKEN={jwt}\n"),
+            format!("Authorization: Bearer {jwt}\n"),
+        ] {
+            let (_, findings) = whole_input(&input);
+            assert!(!findings.is_empty(), "{input}");
+            assert!(
+                detector_findings(&findings, DETECTOR).is_empty(),
+                "{findings:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn other_hex_keys_are_not_claimed_and_a_key_draws_no_other_provider() {
+        let other_hex = "5e7c0ded".repeat(8);
+        for input in [
+            format!("signkey-test-{other_hex}\n"),
+            format!("INNGEST_SIGNING_KEY=signkey-prod-{other_hex}\n"),
+            format!("sk-{other_hex}\n"),
+            format!("fc-{}\n", "0123456789ab4def8123456789abcdef"),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        // A key beside another provider's key: two findings, each its own.
+        let daytona = key(6);
+        let inngest = format!("signkey-test-{other_hex}");
+        let input = format!("{daytona} {inngest}\n");
+        let (_, findings) = whole_input(&input);
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "inngest-signing-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "dtn_".repeat(20_000),
+            format!("dtn_{}", "5e7c0ded".repeat(2_500)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(8));
     }
 }

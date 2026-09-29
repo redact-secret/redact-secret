@@ -84,6 +84,7 @@ export const CANONICAL_IDS = [
   "resend-api-key",
   "apify-api-token",
   "wandb-api-key",
+  "daytona-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -113,6 +114,7 @@ export const GROUPS = {
     "heroku-api-key", "heroku-api-key-legacy", "doppler-token",
     "convex-deployment-key",
     "onepassword-service-account-token",
+    "daytona-api-key",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
