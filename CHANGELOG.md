@@ -116,7 +116,11 @@ evidence is linked from each published version.
   468,090 / 159,706 B for `full` and 317,150 / 113,968 B for `common`
   (the `common` figure also reflects the #929 fix below; alone that fix
   brought `common` to 590,801 / 229,049 B); the `pii` builds are 741,825 / 275,512 B
-  and 590,846 / 229,048 B. Both default builds remain above the
+  and 590,846 / 229,048 B. Those figures are #937's own measurement. The
+  other Beta.11 changes grow every build again; at the release candidate the
+  default builds are 542,445 / 187,230 B (`full`) and 356,480 / 127,667 B
+  (`common`), and the `pii` builds 833,757 / 310,058 B and
+  647,891 / 248,491 B. Both default builds remain above the
   0.1.0-beta.8 size budgets (137,639 and 100,058 B gzip, +5%): the rest of
   the growth predates the PII runtime. The `measure-wasm-profiles.mjs --guard-only` CI
   guard now fails when a default build links any part of the PII runtime.

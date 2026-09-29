@@ -324,7 +324,8 @@ reported under that detector's type and confidence instead of the
 provider-specific one — for example `warn` where `full` would `redact`. It
 adds no false positive: it only drops candidates `full` would have reported.
 Measured against `full` over the whole canonical corpus, `common` saves about
-29% transfer size (default builds, 159,706 → 113,968 B gzip) and processes 3–6× faster in the browser, with zero new
+32% transfer size (default builds of the Beta.11 candidate, 187,230 → 127,667 B
+gzip level 9) and processes 3–6× faster in the browser, with zero new
 false positives and identical findings wherever no provider detector would
 have competed ([evidence](../audits/evidence/382/README.md)).
 

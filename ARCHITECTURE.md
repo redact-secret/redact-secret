@@ -3,7 +3,7 @@
 ## Overview
 
 Redact Secret is a deterministic, cross-language text-inspection product for
-detecting and redacting credentials (plus opt-in structured PII, qualification pending) before untrusted content crosses a trust
+detecting and redacting credentials (plus opt-in structured PII: five families `provisional`, US SSN `pending`, none `stable`) before untrusted content crosses a trust
 boundary. One Rust core is the canonical implementation of built-in detection,
 candidate normalization and overlap resolution, policy evaluation, redaction,
 and bounded incremental sanitization.
@@ -105,7 +105,7 @@ The binding and package layout is:
 | `crates/secret-scan-core` | Canonical detector, policy, redaction, and incremental behavior | crates.io library crate |
 | `crates/secret-scan-cli` | Process arguments, files, standard streams, output, and exit codes | `redact-secret` binary |
 | `bindings/node` | N-API conversion between Node.js and the Rust core | Eight `@redact-secret/node-<platform>` packages (glibc and musl Linux, macOS, Windows) |
-| `bindings/wasm` | `wasm-bindgen` conversion between browsers and the Rust core | `@redact-secret/wasm` (root `full`, `./common`) |
+| `bindings/wasm` | `wasm-bindgen` conversion between browsers and the Rust core | `@redact-secret/wasm` (root `full`, `./common`, and their `./pii`, `./common/pii` builds) |
 | `bindings/python` | PyO3 extension and Python-facing package surface | PyPI `redact-secret`, imported as `redact_secret` |
 | `packages/javascript` | One typed API with runtime-specific loading | `@redact-secret/core` |
 | `conformance` | Language-neutral behavioral fixtures and schema | Repository contract, not a package |
@@ -719,8 +719,11 @@ evidence foundation under the accepted
 [`pii-v1` domain, scope, arbitration, and activation contract](./docs/decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
 ([#578](https://github.com/redact-secret/redact-secret/issues/578),
 [#579](https://github.com/redact-secret/redact-secret/issues/579)), shipped
-opt-in in beta.10, all with `pending` qualification until #579's remaining
-runtime/profile/artifact-size and cross-domain qualification evidence lands. That
+opt-in in beta.10. Under `pii-v1`, the Beta.11 qualification made email,
+payment card, network address, IBAN, and phone `provisional`; US SSN stays
+`pending` ([#1003](https://github.com/redact-secret/redact-secret/issues/1003)),
+and no family is `stable` (see the
+[detection reference](./docs/reference/detection.md#opt-in-pii-availability-is-not-support)). That
 model keeps type evidence separate from sensitivity, uses explicit global or
 jurisdictional scope, and makes PII activation orthogonal to the existing
 `full`/`common` credential profiles. Its English/Korean context input is the
