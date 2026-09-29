@@ -229,7 +229,7 @@ Evidence tiers across all families:
 
 ### Not yet measured
 
-8 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
+9 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
 
 | Detector | Measured support status |
 | --- | --- |
@@ -240,4 +240,5 @@ Evidence tiers across all families:
 | `daytona-api-key` | not yet measured |
 | `dynatrace-token` | not yet measured |
 | `nvidia-api-key` | not yet measured |
+| `paddle-api-key` | not yet measured |
 | `runpod-api-key` | not yet measured |

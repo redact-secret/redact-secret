@@ -13700,6 +13700,127 @@
       "type": "dynatrace_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "paddle-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "paddle-api-key-positive-bare",
+            "paddle-api-key-positive-chat-sentence",
+            "paddle-api-key-positive-crlf-unicode-prefix",
+            "paddle-api-key-positive-curl-bearer",
+            "paddle-api-key-positive-dotenv",
+            "paddle-api-key-positive-json-config",
+            "paddle-api-key-positive-json-token-key",
+            "paddle-api-key-positive-log",
+            "paddle-api-key-positive-punctuation-adjacent",
+            "paddle-api-key-positive-python-client",
+            "paddle-api-key-positive-python-sdk-call",
+            "paddle-api-key-positive-repeated-value",
+            "paddle-api-key-positive-sdk-constructor",
+            "paddle-api-key-positive-second-sample",
+            "paddle-api-key-positive-second-sample-dotenv",
+            "paddle-api-key-positive-shell-export",
+            "paddle-api-key-positive-tool-call-arguments",
+            "paddle-api-key-positive-x-api-key-header",
+            "paddle-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "paddle-api-key-overlap-bearer-header",
+            "paddle-api-key-overlap-context",
+            "paddle-api-key-overlap-second-sample-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "paddle-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "paddle-api-key-boundary-dash-separator",
+            "paddle-api-key-boundary-glued-suffix",
+            "paddle-api-key-boundary-identifier-glue",
+            "paddle-api-key-boundary-long-id",
+            "paddle-api-key-boundary-long-secret",
+            "paddle-api-key-boundary-long-suffix",
+            "paddle-api-key-boundary-missing-apikey",
+            "paddle-api-key-boundary-short-id",
+            "paddle-api-key-boundary-short-secret",
+            "paddle-api-key-boundary-short-suffix",
+            "paddle-api-key-boundary-unknown-environment",
+            "paddle-api-key-boundary-uppercase-in-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "paddle-api-key-negative-docs-regex",
+            "paddle-api-key-negative-legacy-shape",
+            "paddle-api-key-negative-shell-reference",
+            "paddle-api-key-negative-webhook-key-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "paddle-api-key-boundary-dash-separator",
+            "paddle-api-key-boundary-glued-suffix",
+            "paddle-api-key-boundary-identifier-glue",
+            "paddle-api-key-boundary-long-id",
+            "paddle-api-key-boundary-long-secret",
+            "paddle-api-key-boundary-long-suffix",
+            "paddle-api-key-boundary-missing-apikey",
+            "paddle-api-key-boundary-short-id",
+            "paddle-api-key-boundary-short-secret",
+            "paddle-api-key-boundary-short-suffix",
+            "paddle-api-key-boundary-unknown-environment",
+            "paddle-api-key-boundary-uppercase-in-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for paddle_api_key (paddle-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "paddle_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13926,6 +14047,7 @@
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
+            "paddle-api-key-adversarial-long-run",
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
             "posthog-token-adversarial-long-suffix",
@@ -14391,6 +14513,7 @@
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
+            "paddle-api-key-adversarial-long-run",
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
             "posthog-token-adversarial-long-suffix",

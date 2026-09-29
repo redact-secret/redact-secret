@@ -60,6 +60,7 @@ mod okta;
 mod onepassword;
 mod openai;
 mod otpauth;
+mod paddle;
 mod pattern;
 mod pinecone;
 mod posthog;
@@ -245,6 +246,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(cerebras::CEREBRAS_API_KEY),
         Box::new(crates_io::CRATES_IO),
         Box::new(dynatrace::DynatraceTokenDetector),
+        Box::new(paddle::PADDLE_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -535,6 +537,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Strs(dynatrace::REQUIRED_LITERALS)],
     ),
     (
+        paddle::PADDLE_API_KEY.detector_id(),
+        &[Literals::Shapes(paddle::PADDLE_API_KEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -713,6 +719,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("cerebras-api-key", Pack::Provider),
     ("crates-io-token", Pack::Provider),
     ("dynatrace-token", Pack::Provider),
+    ("paddle-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -848,6 +855,7 @@ mod tests {
                 "cerebras-api-key",
                 "crates-io-token",
                 "dynatrace-token",
+                "paddle-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1214,6 +1222,10 @@ mod tests {
             "SYNTHETICREVOKEDDYNATRCE",
             "SYNTHETICREVOKED".repeat(4)
         );
+        let paddle_api_key_input = format!(
+            "pdl_sdbx_apikey_{}_{}_{}",
+            "syntheticrevokedpaddle0000", "SyntheticRevokedSecret", "X9z"
+        );
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1328,6 +1340,7 @@ mod tests {
             ("cerebras-api-key", cerebras_api_key_input.as_str()),
             ("crates-io-token", crates_io_token_input.as_str()),
             ("dynatrace-token", dynatrace_token_input.as_str()),
+            ("paddle-api-key", paddle_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

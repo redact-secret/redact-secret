@@ -904,6 +904,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
       "schemes": null
+    },
+    {
+      "type": "paddle_api_key",
+      "detector": "paddle-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z",
+      "schemes": null
     }
   ],
   "consumers": [

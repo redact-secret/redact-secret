@@ -92,6 +92,7 @@ export const CANONICAL_IDS = [
   "cerebras-api-key",
   "crates-io-token",
   "dynatrace-token",
+  "paddle-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -141,6 +142,7 @@ export const GROUPS = {
     "resend-api-key",
     "apify-api-token",
     "browserbase-api-key",
+    "paddle-api-key",
   ],
 };
 

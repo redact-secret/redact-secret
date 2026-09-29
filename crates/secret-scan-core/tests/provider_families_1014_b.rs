@@ -39,6 +39,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const BASE32: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+const LOWER_ALNUM: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
 
 /// The #860 index contexts plus a few host forms.
 fn contexts(key: &str) -> Vec<String> {
@@ -142,6 +143,8 @@ fn every_family_value() -> Vec<(&'static str, String)> {
         ("crates-io-token", crates_io::trusted_publishing_token(2)),
         ("dynatrace-token", dynatrace::token("c01", 24, 64, 1)),
         ("dynatrace-token", dynatrace::token("s16", 24, 64, 2)),
+        ("paddle-api-key", paddle::key("live", 26, 22, 3, 1)),
+        ("paddle-api-key", paddle::key("sdbx", 26, 22, 3, 2)),
     ]
 }
 
@@ -356,5 +359,99 @@ mod dynatrace {
     #[test]
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&token("c01", 24, 64, 6));
+    }
+}
+
+mod paddle {
+    use super::*;
+
+    const DETECTOR: &str = "paddle-api-key";
+    const TYPE: &str = "paddle_api_key";
+
+    pub(super) fn key(env: &str, id: usize, secret: usize, suffix: usize, seed: usize) -> String {
+        format!(
+            "pdl_{env}_apikey_{}_{}_{}",
+            filler(LOWER_ALNUM, id, seed),
+            filler(ALNUM, secret, seed + 1),
+            filler(ALNUM, suffix, seed + 2)
+        )
+    }
+
+    #[test]
+    fn live_and_sandbox_keys_win_every_context_as_the_sole_finding() {
+        for (env, seed) in [("live", 1), ("sdbx", 4), ("live", 7)] {
+            let key = key(env, 26, 22, 3, seed);
+            assert_eq!(key.len(), 69);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("PADDLE_API_KEY={key}\n"),
+                format!(
+                    "const paddle = new Paddle('{key}', {{ environment: Environment.sandbox }});\n"
+                ),
+                format!("paddle = Client(\"{key}\")\n"),
+                format!(
+                    "curl -H 'Authorization: Bearer {key}' https://example.invalid/customers\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let good = key("sdbx", 26, 22, 3, 2);
+        let mut upper_in_id = good.clone();
+        upper_in_id.replace_range(20..21, "Q");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key("sdbx", 25, 22, 3, 2),
+                key("sdbx", 27, 22, 3, 2),
+                key("sdbx", 26, 21, 3, 2),
+                key("sdbx", 26, 23, 3, 2),
+                key("sdbx", 26, 22, 2, 2),
+                key("sdbx", 26, 22, 4, 2),
+                key("test", 26, 22, 3, 2),
+                good.replacen("apikey_", "", 1),
+                format!("{}-{}", &good[..42], &good[43..]),
+                upper_in_id,
+                format!("x{good}"),
+                format!("_{good}"),
+                format!("{good}x"),
+                format!("{good}_x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            format!(
+                "{{\"event_type\": \"api_key.created\", \"data\": {{\"id\": \"apikey_{}\"}}}}",
+                filler(LOWER_ALNUM, 26, 3)
+            ),
+            format!("legacy={}\n", filler(LOWER_ALNUM, 50, 4)),
+            "PADDLE_API_KEY=${PADDLE_API_KEY}\n".to_owned(),
+            "^pdl_(live|sdbx)_apikey_[a-z\\d]{26}_[a-zA-Z\\d]{22}_[a-zA-Z\\d]{3}$\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_are_isolated() {
+        assert_isolated(DETECTOR);
+    }
+
+    #[test]
+    fn a_repetition_line_is_unclaimed() {
+        assert_repetition_line_is_unclaimed(DETECTOR, &key("live", 26, 22, 3, 5));
+        assert_repetition_line_is_unclaimed(DETECTOR, "pdl_live_apikey_");
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key("sdbx", 26, 22, 3, 6));
     }
 }

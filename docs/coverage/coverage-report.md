@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 125/125 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 126/126 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 125 |
+| supported | 126 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 136.
+Coverage declarations: 137.
 
 ## Coverage by detector
 
@@ -94,6 +94,7 @@ Coverage declarations: 136.
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| paddle-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | posthog-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
@@ -218,6 +219,7 @@ Coverage declarations: 136.
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
+| paddle_api_key | paddle-api-key | provider | supported | not-applicable | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
 | posthog_personal_api_key | posthog-token | provider | supported | not-applicable | none |
@@ -280,15 +282,15 @@ Coverage declarations: 136.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 136 | 0 | 0 |
-| boundary | 125 | 0 | 0 |
-| host-context | 125 | 0 | 0 |
+| adversarial | 137 | 0 | 0 |
+| boundary | 126 | 0 | 0 |
+| host-context | 126 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 136 | 0 | 0 |
-| near-miss-negative | 125 | 0 | 0 |
-| overlap | 125 | 0 | 0 |
-| positive | 125 | 0 | 0 |
-| range | 136 | 0 | 0 |
+| malformed | 137 | 0 | 0 |
+| near-miss-negative | 126 | 0 | 0 |
+| overlap | 126 | 0 | 0 |
+| positive | 126 | 0 | 0 |
+| range | 137 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

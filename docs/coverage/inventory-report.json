@@ -5702,12 +5702,67 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "dynatrace_token"
+    },
+    {
+      "detector": "paddle-api-key",
+      "evidence": {
+        "fixtureCount": 39,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "paddle-api-key-positive-bare",
+        "paddle-api-key-positive-chat-sentence",
+        "paddle-api-key-positive-crlf-unicode-prefix",
+        "paddle-api-key-positive-curl-bearer",
+        "paddle-api-key-positive-dotenv",
+        "paddle-api-key-positive-json-config",
+        "paddle-api-key-positive-json-token-key",
+        "paddle-api-key-positive-log",
+        "paddle-api-key-positive-punctuation-adjacent",
+        "paddle-api-key-positive-python-client",
+        "paddle-api-key-positive-python-sdk-call",
+        "paddle-api-key-positive-repeated-value",
+        "paddle-api-key-positive-sdk-constructor",
+        "paddle-api-key-positive-second-sample",
+        "paddle-api-key-positive-second-sample-dotenv",
+        "paddle-api-key-positive-shell-export",
+        "paddle-api-key-positive-tool-call-arguments",
+        "paddle-api-key-positive-x-api-key-header",
+        "paddle-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "paddle_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 125,
+    "supported": 126,
     "unresolved": 0
   }
 }

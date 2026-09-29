@@ -38,6 +38,9 @@ evidence is linked from each published version.
   - `dynatrace-token` (#1032): Dynatrace `dt0c01`/`dt0sNN` access and
     platform tokens, `<prefix>.<24>.<64>` uppercase base32, reported whole as
     `dynatrace_token`; the token identifier alone stays unclaimed.
+  - `paddle-api-key` (#1033): Paddle Billing `pdl_live_apikey_` and
+    `pdl_sdbx_apikey_` API keys in the documented 69-character layout
+    (`paddle_api_key`); the `apikey_` key id alone stays unclaimed.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
