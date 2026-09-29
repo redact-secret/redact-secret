@@ -242,6 +242,8 @@ the canonical fixtures under `conformance/fixtures/`, which live above the
 package root and cannot travel with it. `cargo package` therefore verifies
 the published crate by building the library alone, and reports the excluded
 test targets as warnings.
+The `scan_cost` bench (`benches/scan_cost.rs`) stays out the same way;
+`cargo package` reports it as an ignored benchmark.
 
 ### Unsafe code
 
@@ -391,6 +393,33 @@ To recheck the registry names before a publication:
 python3 scripts/check-rust-workspace.py --recheck-crate-name
 python3 scripts/check-python-package.py --recheck-pypi-name
 ```
+
+## Scan-cost harness
+
+`crates/secret-scan-core/benches/scan_cost.rs` (#981) times the core on
+fixed synthetic workloads and attributes the cost to each built-in detector.
+It is a `harness = false` binary with no benchmarking dependency. It uses only
+the public API, and it keeps `std::time::Instant` in the bench, outside
+`src/`.
+
+```bash
+cargo bench -p redact-secret --bench scan_cost -- --list
+cargo bench -p redact-secret --bench scan_cost -- scale-logs-64k
+cargo bench -p redact-secret --bench scan_cost -- --runs 5 --json minified-json > out.json
+```
+
+For each workload it reports the whole-input `scan_and_redact` and an
+`IncrementalSanitizer` session fed in fixed chunks (64 KiB, the CLI's read
+size, plus 4096 bytes on `scale-logs-256k`). It then times every
+registered detector's `detect()` over the whole input and once per line, the
+same loop `collect_candidates` runs. Each figure is the median of `--runs`
+repetitions (default 21) after one warm-up. `--filter` (or a bare argument)
+selects workloads by substring, `--no-detectors` skips attribution, and
+`--json` prints one JSON document for evidence records to cite. Progress goes
+to stderr. The workloads, their known limits, and a baseline on `main` are in
+[`docs/audits/evidence/981/README.md`](audits/evidence/981/README.md).
+It measures this repository's code for engineering work. Release budget
+judgements stay in `redact-secret-benchmarks`.
 
 ## Python packaging
 
