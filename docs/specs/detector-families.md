@@ -30,6 +30,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `aws_bedrock_short_term_api_key` | `aws-bedrock-short-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; two families rather than one (client-minted presigned URL vs issued credential), `bedrock-api-key-` prefix + fixed 133-byte Base64 head + standard Base64 alphabet (T1, maintainer ruling accepted 2026-09-27 on the AWS token-generator SDKs (python/js/java) plus the AWS Security Blog, [#779](https://github.com/redact-secret/redact-secret/issues/779)), tail floor and total length T2, recorded in [#864 evidence](../audits/evidence/864/README.md) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `clickhouse_cloud_api_secret` | `clickhouse-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-04 (provider staff statement and staff-authored regex, R2 and R3; the older 39-byte example is set aside by R3 date order), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `composio_org_api_key` | `composio-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and a dated staff statement under R3; `uak_` width under R6), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
@@ -621,6 +622,7 @@ core conformance and the benchmarks arrival and profile evidence.
 | `apify:api-token` | `apify-api-token` | `apify_api_` + 20–128 `[A-Za-z0-9]`; a glued `_` or `-` after the run rejects the match; a body over 128 is rejected whole | `apify_api_token` | T1 (prefix R4; alphabet and 20-byte floor from the provider's own leak linter, R2); the 128 cap is policy |
 | `wandb:api-key` | `wandb-api-key` | `wandb_v1_` + 64–96 `[A-Za-z0-9_]` (documented example width 77, total "about 86"); the byte before the prefix must not be `[A-Za-z0-9_]` (a `<host>-` label stays outside the span), and the byte after must not be `[A-Za-z0-9_-]` | `wandb_api_key` | prefix T1 (R5), alphabet T1 (R1); tolerant width band by orchestrator decision on #917 |
 | `daytona:api-key` | `daytona-api-key` | `dtn_` + exactly 64 `[0-9a-f]` (68 in total); a `[A-Za-z0-9_-]` byte before the prefix or after the body rejects the match | `daytona_api_key` | T1 as of v0.190.0 (provider generator, R1; dated provider code, R9) |
+| `clickhouse-cloud:api-key` | `clickhouse-cloud-api-secret` | `4b1d` + exactly 38 `[A-Za-z0-9]` (42 in total) with at least one uppercase letter in the body; a `[A-Za-z0-9_-]` byte before the prefix or after the body rejects the match | `clickhouse_cloud_api_secret` | T1 as of 2025-04-16 (provider staff statement and regex, R2 and R3); the uppercase guard is policy |
 
 Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
 [handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
@@ -726,6 +728,27 @@ shapes, and caller-chosen provisioning values. False positives: `dtn_` +
 exactly 64 lowercase hex that is not a key; none is known. Cost: one prefix on
 the shared known-format scan.
 
+ClickHouse Cloud ([#971](https://github.com/redact-secret/redact-secret/issues/971),
+[handoff](../audits/evidence/860/clickhouse-cloud.md)). A ClickHouse employee
+stated the `4b1d` prefix and wrote the rule `4b1d[A-Za-z0-9]{38}` (gitleaks PR
+#1826, merged 2025-04-16), and the provider's Terraform examples carry the same
+42-byte mixed-case shape. A 39-byte knowledge-base example from 2023 is older,
+so R3's date order sets it aside. `4b1d` is valid hexadecimal, so the leading
+`[A-Za-z0-9_-]` boundary is load-bearing: it keeps `4b1d` inside a longer hex or
+base64 run and in a UUID (`-4b1d-`) from starting a match, and a 40- or
+64-digit digest that begins `4b1d` fails the run length. The policy guard
+requires at least one uppercase letter in the body, which removes lowercase
+and all-digit identifiers that begin `4b1d` at a cost of (36/62)^38, about
+1e-9, of random keys. The provider type wins the secret's span over
+`connection_string_password` and `authorization_credential` in Basic-auth
+forms; the key ID beside it has no marker and stays unclaimed, and
+`clickhouse` is not deferred by `generic-token`. False negatives: a second
+live width if one exists, secrets supplied through the pre-hashed `hashData`
+route, an all-lowercase body (about 1e-9), and key IDs outside named contexts.
+False positives: a mixed-case alphanumeric run of exactly 42 bytes that begins
+`4b1d` at a boundary; rare. Cost: one four-byte prefix on the shared
+known-format scan plus a 38-byte post check.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -749,6 +772,7 @@ the shared known-format scan.
 | Apify `apify_api_` + 20–128 alphanumeric API tokens are reported as `apify_api_token` at provider specificity, bare or in any context; `apify_ui_` stays unclaimed ([#916](https://github.com/redact-secret/redact-secret/issues/916), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | W&B `wandb_v1_` + 64–96 `[A-Za-z0-9_]` API keys are reported as `wandb_api_key` at provider specificity, bare or in any context; a leading `<host>-` label stays outside the span, and the band is tolerant around the documented 77 until an issuance check ([#917](https://github.com/redact-secret/redact-secret/issues/917), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

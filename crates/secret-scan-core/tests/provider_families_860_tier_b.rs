@@ -730,3 +730,179 @@ mod daytona {
         assert_partition_parity(&key(8));
     }
 }
+
+mod clickhouse_cloud {
+    use super::*;
+
+    const DETECTOR: &str = "clickhouse-cloud-api-secret";
+    const TYPE: &str = "clickhouse_cloud_api_secret";
+
+    fn secret(seed: usize) -> String {
+        format!("4b1d{}", filler(ALNUM, 38, seed))
+    }
+
+    #[test]
+    fn the_exact_shape_wins_every_context_as_the_sole_finding() {
+        for secret in [
+            secret(1),
+            secret(2),
+            format!("4b1d{}", "SyntheticRevokedClickhouseSecret000000"),
+        ] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &secret);
+            for input in [
+                format!("CLICKHOUSE_CLOUD_API_SECRET={secret}\n"),
+                format!(
+                    "resource \"clickhouse_service\" \"s\" {{\n  token_secret = \"{secret}\"\n}}\n"
+                ),
+                format!("provider \"clickhouse\" {{\n  token_secret = \"{secret}\"\n}}\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &secret);
+            }
+        }
+    }
+
+    /// The provider type wins the secret's span over the connection-string
+    /// password and authorization-credential candidates it overlaps, and the
+    /// key ID beside it is not claimed as a provider secret.
+    #[test]
+    fn the_provider_type_wins_the_secret_span_in_basic_auth_forms() {
+        let secret = secret(3);
+        for input in [
+            format!("curl --user $KEY_ID:{secret} https://api.clickhouse.cloud/v1/organizations\n"),
+            format!("curl -u KEYID:{secret} https://api.clickhouse.cloud/v1/organizations\n"),
+            format!("curl https://KEYID:{secret}@api.clickhouse.cloud/v1/organizations\n"),
+            format!("CLICKHOUSE_CLOUD_API_URL=https://KEYID:{secret}@api.clickhouse.cloud\n"),
+            format!("Authorization: Bearer {secret}\n"),
+        ] {
+            let (text, findings) = whole_input(&input);
+            let start = input.find(&secret).unwrap();
+            let span = (start, start + secret.len());
+            let covering: Vec<&Finding> = findings
+                .iter()
+                .filter(|f| f.range().start() < span.1 && span.0 < f.range().end())
+                .collect();
+            assert_eq!(covering.len(), 1, "{input}: {findings:?}");
+            assert_eq!(covering[0].detector(), DETECTOR, "{input}");
+            assert_eq!(covering[0].type_name(), TYPE, "{input}");
+            assert_eq!(covering[0].action(), Action::Redact, "{input}");
+            assert_eq!(
+                (covering[0].range().start(), covering[0].range().end()),
+                span,
+                "{input}"
+            );
+            assert!(!text.contains(&secret), "{input}");
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 38, 4);
+        let lower = body.to_ascii_lowercase();
+        let hex: String = body
+            .bytes()
+            .map(|byte| char::from(LOWER_HEX[usize::from(byte) % 16]))
+            .collect();
+        let dashed = format!("{}-{}", &body[..20], &body[21..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("4b1d{}", &body[..37]),
+                format!("4b1d{body}a"),
+                // The 39-byte knowledge-base shape: 35 bytes after the prefix.
+                format!("4b1d{}", &body[..35]),
+                format!("4b1d{lower}"),
+                format!("4b1d{hex}"),
+                format!("4b1d{dashed}"),
+                format!("4B1D{body}"),
+                format!("4b1c{body}"),
+                format!("a4b1d{body}"),
+                format!("_4b1d{body}"),
+                format!("-4b1d{body}"),
+                format!("4b1d{body}_"),
+                format!("4b1d{body}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn hex_digests_uuids_and_placeholders_are_unclaimed() {
+        let digest = "0123456789abcdef".repeat(4);
+        let sha1 = format!("4b1d{}", &digest[..36]);
+        let sha256 = format!("4b1d{}", &digest[..60]);
+        let upper_sha256 = format!("4b1d{}", digest[..60].to_ascii_uppercase());
+        assert_eq!((sha1.len(), sha256.len(), upper_sha256.len()), (40, 64, 64));
+        for input in [
+            format!("sha1: {sha1}\n"),
+            format!("sha256: {sha256}\n"),
+            format!("sha256: {upper_sha256}\n"),
+            format!("{sha256}\n"),
+            "id: 123e4567-4b1d-12d3-a456-426614174000\n".to_owned(),
+            "id: 123e4567-e89b-4b1d-a456-426614174000\n".to_owned(),
+            "urn:uuid:4b1d0000-0000-4000-8000-000000000000\n".to_owned(),
+            "key_secret = \"mykeysecret\"\n".to_owned(),
+            "key_id = \"mykeyid\"\n".to_owned(),
+            "CLICKHOUSE_CLOUD_API_SECRET=${CLICKHOUSE_CLOUD_API_SECRET}\n".to_owned(),
+            "the prefix is 4b1d\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_keys_are_not_claimed_and_a_secret_draws_no_other_provider() {
+        // A Daytona key whose hex body embeds `4b1d` is one alphanumeric run,
+        // so the leading boundary keeps ClickHouse out of it.
+        let embedded = format!("dtn_{}4b1d{}", "0".repeat(20), "a".repeat(40));
+        assert_eq!(embedded.len(), 68);
+        let (_, findings) = whole_input(&format!("{embedded}\n"));
+        assert!(
+            detector_findings(&findings, DETECTOR).is_empty(),
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "daytona-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        // A ClickHouse secret beside a Daytona key: two findings, each its own.
+        let daytona = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let (_, findings) = whole_input(&format!("{daytona} {}\n", secret(5)));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "daytona-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "4b1d".repeat(20_000),
+            format!("4b1d{}", "aB3".repeat(7_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let secret = secret(6);
+        let line = format!("{secret} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&secret));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        let secret = secret(7);
+        assert_partition_parity(&secret);
+        assert_input_partition_parity(&format!(
+            "curl --user $KEY_ID:{secret} https://api.clickhouse.cloud\n"
+        ));
+    }
+}

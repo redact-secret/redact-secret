@@ -5272,12 +5272,63 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "daytona_api_key"
+    },
+    {
+      "detector": "clickhouse-cloud-api-secret",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terraform",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "clickhouse-cloud-api-secret-positive-bare",
+        "clickhouse-cloud-api-secret-positive-chat-sentence",
+        "clickhouse-cloud-api-secret-positive-crlf-unicode-prefix",
+        "clickhouse-cloud-api-secret-positive-curl-bearer",
+        "clickhouse-cloud-api-secret-positive-dotenv",
+        "clickhouse-cloud-api-secret-positive-json-config",
+        "clickhouse-cloud-api-secret-positive-json-token-key",
+        "clickhouse-cloud-api-secret-positive-log",
+        "clickhouse-cloud-api-secret-positive-punctuation-adjacent",
+        "clickhouse-cloud-api-secret-positive-python-requests-auth",
+        "clickhouse-cloud-api-secret-positive-repeated-value",
+        "clickhouse-cloud-api-secret-positive-sdk-call",
+        "clickhouse-cloud-api-secret-positive-shell-export",
+        "clickhouse-cloud-api-secret-positive-terraform-token-secret",
+        "clickhouse-cloud-api-secret-positive-tool-call-arguments",
+        "clickhouse-cloud-api-secret-positive-x-api-key-header",
+        "clickhouse-cloud-api-secret-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "clickhouse_cloud_api_secret"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 117,
+    "supported": 118,
     "unresolved": 0
   }
 }

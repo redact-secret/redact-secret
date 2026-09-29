@@ -12745,6 +12745,133 @@
       "type": "daytona_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "clickhouse-cloud-api-secret",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "clickhouse-cloud-api-secret-positive-bare",
+            "clickhouse-cloud-api-secret-positive-chat-sentence",
+            "clickhouse-cloud-api-secret-positive-crlf-unicode-prefix",
+            "clickhouse-cloud-api-secret-positive-curl-bearer",
+            "clickhouse-cloud-api-secret-positive-dotenv",
+            "clickhouse-cloud-api-secret-positive-json-config",
+            "clickhouse-cloud-api-secret-positive-json-token-key",
+            "clickhouse-cloud-api-secret-positive-log",
+            "clickhouse-cloud-api-secret-positive-punctuation-adjacent",
+            "clickhouse-cloud-api-secret-positive-python-requests-auth",
+            "clickhouse-cloud-api-secret-positive-repeated-value",
+            "clickhouse-cloud-api-secret-positive-sdk-call",
+            "clickhouse-cloud-api-secret-positive-shell-export",
+            "clickhouse-cloud-api-secret-positive-terraform-token-secret",
+            "clickhouse-cloud-api-secret-positive-tool-call-arguments",
+            "clickhouse-cloud-api-secret-positive-x-api-key-header",
+            "clickhouse-cloud-api-secret-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "clickhouse-cloud-api-secret-overlap-bearer-header",
+            "clickhouse-cloud-api-secret-overlap-context",
+            "clickhouse-cloud-api-secret-overlap-curl-user-basic-auth",
+            "clickhouse-cloud-api-secret-overlap-url-basic-auth"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
+            "clickhouse-cloud-api-secret-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "clickhouse-cloud-api-secret-boundary-all-hex-body",
+            "clickhouse-cloud-api-secret-boundary-all-lowercase-body",
+            "clickhouse-cloud-api-secret-boundary-body-35-kb-shape",
+            "clickhouse-cloud-api-secret-boundary-body-37",
+            "clickhouse-cloud-api-secret-boundary-body-39",
+            "clickhouse-cloud-api-secret-boundary-dash-glued-prefix",
+            "clickhouse-cloud-api-secret-boundary-dash-in-body",
+            "clickhouse-cloud-api-secret-boundary-glued-prefix",
+            "clickhouse-cloud-api-secret-boundary-glued-suffix",
+            "clickhouse-cloud-api-secret-boundary-near-prefix",
+            "clickhouse-cloud-api-secret-boundary-underscore-glued-prefix",
+            "clickhouse-cloud-api-secret-boundary-underscore-glued-suffix",
+            "clickhouse-cloud-api-secret-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "clickhouse-cloud-api-secret-negative-docs-placeholders",
+            "clickhouse-cloud-api-secret-negative-key-id-alone",
+            "clickhouse-cloud-api-secret-negative-sha1-digest",
+            "clickhouse-cloud-api-secret-negative-sha256-digest",
+            "clickhouse-cloud-api-secret-negative-shell-reference",
+            "clickhouse-cloud-api-secret-negative-uppercase-sha256-digest",
+            "clickhouse-cloud-api-secret-negative-uuid-middle-group",
+            "clickhouse-cloud-api-secret-negative-uuid-third-group"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "clickhouse-cloud-api-secret-boundary-all-hex-body",
+            "clickhouse-cloud-api-secret-boundary-all-lowercase-body",
+            "clickhouse-cloud-api-secret-boundary-body-35-kb-shape",
+            "clickhouse-cloud-api-secret-boundary-body-37",
+            "clickhouse-cloud-api-secret-boundary-body-39",
+            "clickhouse-cloud-api-secret-boundary-dash-glued-prefix",
+            "clickhouse-cloud-api-secret-boundary-dash-in-body",
+            "clickhouse-cloud-api-secret-boundary-glued-prefix",
+            "clickhouse-cloud-api-secret-boundary-glued-suffix",
+            "clickhouse-cloud-api-secret-boundary-near-prefix",
+            "clickhouse-cloud-api-secret-boundary-underscore-glued-prefix",
+            "clickhouse-cloud-api-secret-boundary-underscore-glued-suffix",
+            "clickhouse-cloud-api-secret-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for clickhouse_cloud_api_secret (clickhouse-cloud-api-secret), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "clickhouse_cloud_api_secret"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -12889,6 +13016,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
+            "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
+            "clickhouse-cloud-api-secret-adversarial-long-run",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
             "composio-api-key-adversarial-long-suffix",
@@ -13342,6 +13471,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
+            "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
+            "clickhouse-cloud-api-secret-adversarial-long-run",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
             "composio-api-key-adversarial-long-suffix",

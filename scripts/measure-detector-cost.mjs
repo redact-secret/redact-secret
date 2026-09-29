@@ -85,6 +85,7 @@ export const CANONICAL_IDS = [
   "apify-api-token",
   "wandb-api-key",
   "daytona-api-key",
+  "clickhouse-cloud-api-secret",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -115,6 +116,7 @@ export const GROUPS = {
     "convex-deployment-key",
     "onepassword-service-account-token",
     "daytona-api-key",
+    "clickhouse-cloud-api-secret",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",

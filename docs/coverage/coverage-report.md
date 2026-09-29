@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 117/117 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 118/118 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 117 |
+| supported | 118 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 128.
+Coverage declarations: 129.
 
 ## Coverage by detector
 
@@ -34,6 +34,7 @@ Coverage declarations: 128.
 | aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | composio-api-key | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
@@ -135,6 +136,7 @@ Coverage declarations: 128.
 | aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
+| clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
 | composio_org_api_key | composio-api-key | provider | supported | not-applicable | none |
@@ -265,15 +267,15 @@ Coverage declarations: 128.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 128 | 0 | 0 |
-| boundary | 117 | 0 | 0 |
-| host-context | 117 | 0 | 0 |
+| adversarial | 129 | 0 | 0 |
+| boundary | 118 | 0 | 0 |
+| host-context | 118 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 128 | 0 | 0 |
-| near-miss-negative | 117 | 0 | 0 |
-| overlap | 117 | 0 | 0 |
-| positive | 117 | 0 | 0 |
-| range | 128 | 0 | 0 |
+| malformed | 129 | 0 | 0 |
+| near-miss-negative | 118 | 0 | 0 |
+| overlap | 118 | 0 | 0 |
+| positive | 118 | 0 | 0 |
+| range | 129 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

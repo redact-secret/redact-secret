@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3037,
+  "fixtureCount": 3081,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -73028,6 +73028,785 @@
       "input": "\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_\u0064tn_",
       "expected": [],
       "note": "Repeated prefixes with no hex body never reach 64 bytes, and the scan stays linear and bounded."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-bare",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-dotenv",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CLICKHOUSE_CLOUD_API_SECRET=\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 70
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-shell-export",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CLICKHOUSE_CLOUD_API_SECRET=\"\u0034b1dSyntheticRevokedClickhouseSecret000000\"\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 78
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-yaml",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  CLICKHOUSE_CLOUD_API_SECRET: \u0034b1dSyntheticRevokedClickhouseSecret000000\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 78
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-json-config",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"CLICKHOUSE_CLOUD_API_SECRET\": \"\u0034b1dSyntheticRevokedClickhouseSecret000000\"}",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 75
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-json-token-key",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0034b1dSyntheticRevokedClickhouseSecret000000\"}",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-sdk-call",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = ClickHouseCloud(key_id=\"SyntheticKeyId\", key_secret=\"\u0034b1dSyntheticRevokedClickhouseSecret000000\")\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 62,
+          "end": 104
+        }
+      ],
+      "note": "An SDK client construction is reported at exactly the key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-overlap-bearer-header",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0034b1dSyntheticRevokedClickhouseSecret000000\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 64
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-x-api-key-header",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-curl-bearer",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0034b1dSyntheticRevokedClickhouseSecret000000\" https://api.clickhouse.cloud/v1/organizations\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 73
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-tool-call-arguments",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"call_api\",\"arguments\":{\"api_key\":\"\u0034b1dSyntheticRevokedClickhouseSecret000000\"}}",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-chat-sentence",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0034b1dSyntheticRevokedClickhouseSecret000000 can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 57
+        }
+      ],
+      "note": "A key pasted into a chat sentence is reported at exactly the key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-log",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO client init api_key=\u0034b1dSyntheticRevokedClickhouseSecret000000 user=ci\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 88
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-punctuation-adjacent",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0034b1dSyntheticRevokedClickhouseSecret000000.",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-crlf-unicode-prefix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0034b1dSyntheticRevokedClickhouseSecret000000\n\r\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 66
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-overlap-context",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-repeated-value",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret000000 \u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        },
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-terraform-token-secret",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terraform"
+      ],
+      "input": "provider \"clickhouse\" {\n  organization_id = \"00000000-0000-4000-8000-000000000000\"\n  token_key       = \"SyntheticKeyId\"\n  token_secret    = \"\u0034b1dSyntheticRevokedClickhouseSecret000000\"\n}\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 141,
+          "end": 183
+        }
+      ],
+      "note": "A Terraform provider token_secret is reported at exactly the secret."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-overlap-curl-user-basic-auth",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user $KEY_ID:\u0034b1dSyntheticRevokedClickhouseSecret000000 https://api.clickhouse.cloud/v1/organizations\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 62
+        }
+      ],
+      "note": "The provider type wins the secret span over the Basic-auth password candidates."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-overlap-url-basic-auth",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "curl https://SyntheticKeyId:\u0034b1dSyntheticRevokedClickhouseSecret000000@api.clickhouse.cloud/v1/organizations\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 70
+        }
+      ],
+      "note": "The provider type wins the secret span in URL userinfo over the connection-string password candidate."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-positive-python-requests-auth",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "requests.get(URL, auth=(\"SyntheticKeyId\", \"\u0034b1dSyntheticRevokedClickhouseSecret000000\"))\n",
+      "expected": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "A requests Basic-auth tuple is reported at exactly the secret."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-body-37",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret00000",
+      "expected": [],
+      "note": "37 alphanumerics is one under the staff regex's 38."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-body-39",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret000000a",
+      "expected": [],
+      "note": "39 alphanumerics is one over the staff regex's 38; a body is never truncated."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-body-35-kb-shape",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret000",
+      "expected": [],
+      "note": "The 2023 39-byte knowledge-base shape (35 after the prefix) is set aside by date order."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-all-lowercase-body",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dsyntheticrevokedclickhousesecret000000",
+      "expected": [],
+      "note": "A body with no uppercase letter fails the case guard."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-all-hex-body",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1d0123456789abcdef0123456789abcdef012345",
+      "expected": [],
+      "note": "An all-hex 42-byte identifier fails the case guard."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-dash-in-body",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClic-houseSecret000000",
+      "expected": [],
+      "note": "A dash inside the body stops the run below 38."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-uppercase-prefix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "4B1DSyntheticRevokedClickhouseSecret000000",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-near-prefix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "4b1cSyntheticRevokedClickhouseSecret000000",
+      "expected": [],
+      "note": "A different fourth byte is not the prefix."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-glued-prefix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "a\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-underscore-glued-prefix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [],
+      "note": "An underscore glued before the prefix rejects the match."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-dash-glued-prefix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "expected": [],
+      "note": "A dash glued before the prefix rejects the match."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-glued-suffix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret000000a",
+      "expected": [],
+      "note": "A letter glued after the body rejects the match."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-boundary-underscore-glued-suffix",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0034b1dSyntheticRevokedClickhouseSecret000000_",
+      "expected": [],
+      "note": "An underscore glued after the body rejects the match."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-sha1-digest",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sha1: \u0034b1d0123456789abcdef0123456789abcdef0123\n",
+      "expected": [],
+      "note": "A 40-digit hex digest that begins with the prefix is not a key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-sha256-digest",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sha256: \u0034b1d0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [],
+      "note": "A 64-digit hex digest that begins with the prefix is not a key."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-uppercase-sha256-digest",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sha256: \u0034b1d0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789AB\n",
+      "expected": [],
+      "note": "A 64-byte digest with uppercase hex fails the run length even though it has uppercase letters."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-uuid-middle-group",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "id: 123e4567-\u0034b1d-12d3-a456-426614174000\n",
+      "expected": [],
+      "note": "A UUID group is preceded by a dash, so it is not a start."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-uuid-third-group",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "id: 123e4567-e89b-\u0034b1d-a456-426614174000\n",
+      "expected": [],
+      "note": "A UUID's version group is preceded by a dash, so it is not a start."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-key-id-alone",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "CLICKHOUSE_CLOUD_API_KEY_ID=SyntheticRevokedKeyId\n",
+      "expected": [],
+      "note": "The key ID has no marker and stays unclaimed by the provider type."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-docs-placeholders",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The docs use the placeholder names mykeyid and mykeysecret for the pair.\n",
+      "expected": [],
+      "note": "The docs' mykeyid and mykeysecret placeholders are not keys."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-negative-shell-reference",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CLICKHOUSE_CLOUD_API_SECRET=${CLICKHOUSE_CLOUD_API_SECRET}\n",
+      "expected": [],
+      "note": "A shell variable reference is not a literal secret."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-adversarial-long-run",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d",
+      "expected": [],
+      "note": "Repeated prefixes with no complete body never reach 38 bytes, and the scan stays linear and bounded."
+    },
+    {
+      "id": "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
+      "detector": "clickhouse-cloud-api-secret",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0034b1daB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3",
+      "expected": [],
+      "note": "A prefix followed by an alphanumeric run far over 38 is rejected whole, and the scan stays linear and bounded."
     },
     {
       "id": "daytona-api-key-adversarial-long-hex-run",

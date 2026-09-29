@@ -14,6 +14,9 @@ evidence is linked from each published version.
   gated on core conformance and the benchmarks arrival and profile evidence:
   - `daytona-api-key` (#970): Daytona `dtn_` + exactly 64 lowercase-hex API
     keys (`daytona_api_key`), T1 as of provider code v0.190.0.
+  - `clickhouse-cloud-api-secret` (#971): ClickHouse Cloud `4b1d` + 38
+    alphanumeric API key secrets (`clickhouse_cloud_api_secret`), with an
+    uppercase guard that keeps hex digests and UUIDs out.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

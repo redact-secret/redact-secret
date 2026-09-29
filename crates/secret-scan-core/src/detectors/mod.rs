@@ -17,6 +17,7 @@ mod aws;
 mod aws_bedrock;
 mod azure_devops;
 mod bearer_token;
+mod clickhouse_cloud;
 mod cloudflare;
 mod composio;
 mod confluent;
@@ -227,6 +228,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(apify::APIFY_API_TOKEN),
         Box::new(wandb::WANDB_API_KEY),
         Box::new(daytona::DAYTONA_API_KEY),
+        Box::new(clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -487,6 +489,12 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(daytona::DAYTONA_API_KEY.shapes())],
     ),
     (
+        clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET.detector_id(),
+        &[Literals::Shapes(
+            clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET.shapes(),
+        )],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -658,6 +666,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("apify-api-token", Pack::Provider),
     ("wandb-api-key", Pack::Provider),
     ("daytona-api-key", Pack::Provider),
+    ("clickhouse-cloud-api-secret", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -691,6 +700,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::too_many_lines)]
     fn built_in_order_matches_the_typescript_oracle() {
         let detectors = built_in_detectors();
         let ids: Vec<&str> = detectors.iter().map(|d| d.id()).collect();
@@ -785,6 +795,7 @@ mod tests {
                 "apify-api-token",
                 "wandb-api-key",
                 "daytona-api-key",
+                "clickhouse-cloud-api-secret",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1151,6 +1162,8 @@ mod tests {
         );
         let apify_api_token_input = format!("apify_api_{}", "SyntheticRevokedApifyToken0000000000");
         let daytona_api_key_input = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let clickhouse_cloud_api_secret_input =
+            format!("4b1d{}", "SyntheticRevokedClickhouseSecret000000");
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
@@ -1239,6 +1252,10 @@ mod tests {
             ("apify-api-token", apify_api_token_input.as_str()),
             ("wandb-api-key", wandb_api_key_input.as_str()),
             ("daytona-api-key", daytona_api_key_input.as_str()),
+            (
+                "clickhouse-cloud-api-secret",
+                clickhouse_cloud_api_secret_input.as_str(),
+            ),
         ];
         assert_provider_candidates(&cases);
     }

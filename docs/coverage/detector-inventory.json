@@ -848,6 +848,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0064tn_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
       "schemes": null
+    },
+    {
+      "type": "clickhouse_cloud_api_secret",
+      "detector": "clickhouse-cloud-api-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "schemes": null
     }
   ],
   "consumers": [
