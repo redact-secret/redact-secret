@@ -310,6 +310,7 @@ struct FamilyAlternative {
 struct PiiDomain {
     _selection: PiiSelection,
     families: Vec<Box<dyn PiiFamily>>,
+    vocabulary: ContextVocabulary,
 }
 
 impl PiiDomain {
@@ -319,6 +320,7 @@ impl PiiDomain {
         Self {
             _selection: selection,
             families,
+            vocabulary: ContextVocabulary::new(),
         }
     }
 
@@ -351,14 +353,14 @@ impl PiiDomain {
             .collect::<BTreeSet<_>>()
             .into_iter()
             .collect();
-        let contexts = context_matches(input, &context_candidates);
+        let contexts = self.vocabulary.matches(input, &context_candidates);
         let mut contextualized = Vec::with_capacity(detected.len());
         for mut item in detected {
             let alternative = &mut item.alternative;
             if alternative.identity == IdentityState::Established {
+                // `context_candidates` is sorted and distinct.
                 let matches = context_candidates
-                    .iter()
-                    .position(|candidate| *candidate == (alternative.range, alternative.domain))
+                    .binary_search(&(alternative.range, alternative.domain))
                     .map_or(&[][..], |index| contexts[index].as_slice());
                 apply_context_contract(
                     alternative,
@@ -725,19 +727,16 @@ mod pii_context_table;
 /// a Korean form (`ip 주소`, `클라이언트 ip`) matches in any case (issue #927);
 /// Hangul has no case and is unchanged.
 fn normalize_context(value: &str) -> String {
-    let visible = value.chars().filter(|character| {
-        let code_point = *character as u32;
-        !crate::invisible_table::INVISIBLE_RANGES
-            .iter()
-            .any(|(start, end)| (*start..=*end).contains(&code_point))
-    });
+    let visible = value
+        .chars()
+        .filter(|character| !is_governed_invisible(*character));
     let mut tokenized = String::new();
     let mut in_separator = false;
     for character in visible
         .nfc()
         .map(|character| character.to_ascii_lowercase())
     {
-        let separator = character.is_whitespace() || matches!(character, '_' | '-' | ':' | '=');
+        let separator = is_context_separator(character);
         if separator {
             if !in_separator {
                 tokenized.push(' ');
@@ -749,6 +748,18 @@ fn normalize_context(value: &str) -> String {
         }
     }
     tokenized
+}
+
+fn is_governed_invisible(character: char) -> bool {
+    let code_point = character as u32;
+    crate::invisible_table::INVISIBLE_RANGES
+        .iter()
+        .any(|(start, end)| (*start..=*end).contains(&code_point))
+}
+
+/// A separator of the context-only view, after ASCII case folding.
+fn is_context_separator(character: char) -> bool {
+    character.is_whitespace() || matches!(character, '_' | '-' | ':' | '=')
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -815,153 +826,244 @@ struct ContextOccurrence<'a> {
     end: usize,
 }
 
-#[allow(
-    clippy::too_many_lines,
-    reason = "the bounded association rules are one ordered contract"
-)]
-fn context_matches(
-    input: &str,
-    candidates: &[(ByteRange, IdentityDomain)],
-) -> Vec<Vec<ContextMatch>> {
-    let mut result = vec![Vec::new(); candidates.len()];
-    for (candidate_index, (range, domain)) in candidates.iter().copied().enumerate() {
-        let (line_start, line_end) = logical_line_bounds(input, range);
-        let before_barrier = candidates
+/// One vocabulary form in the context-only comparison view, normalized once
+/// when the adapter is built rather than once per candidate (issue #902).
+struct NormalizedForm {
+    text: String,
+    scalars: usize,
+}
+
+/// The generated `pii-context/v2` vocabulary with every form already passed
+/// through [`normalize_context`], in table then form order.
+struct ContextVocabulary {
+    entries: Vec<(&'static ContextEntry, Vec<NormalizedForm>)>,
+}
+
+impl ContextVocabulary {
+    fn new() -> Self {
+        let entries = pii_context_table::CONTEXT_ENTRIES
+            .iter()
+            .map(|entry| {
+                let forms = entry
+                    .forms
+                    .iter()
+                    .map(|form| {
+                        let text = normalize_context(form);
+                        let scalars = text.chars().count();
+                        NormalizedForm { text, scalars }
+                    })
+                    .collect();
+                (entry, forms)
+            })
+            .collect();
+        Self { entries }
+    }
+
+    /// The context entries each candidate associates with, index for index.
+    ///
+    /// Positions are the scalar offsets of the context-only view of the
+    /// candidate's logical line, exactly as `pii-context/v2` defines them.
+    /// Candidates are grouped by logical line once, so the barriers, the
+    /// line offsets and the equidistance rule cost O(log k) per candidate or
+    /// context occurrence instead of a rescan of the input or of every
+    /// candidate (issue #902).
+    #[allow(
+        clippy::too_many_lines,
+        reason = "the bounded association rules are one ordered contract"
+    )]
+    fn matches(
+        &self,
+        input: &str,
+        candidates: &[(ByteRange, IdentityDomain)],
+    ) -> Vec<Vec<ContextMatch>> {
+        let mut result = vec![Vec::new(); candidates.len()];
+        if candidates.is_empty() {
+            return result;
+        }
+        let lines = LogicalLines::new(input);
+        let mut by_start: Vec<(usize, usize)> = candidates
             .iter()
             .enumerate()
-            .filter(|(index, (other, _))| {
-                *index != candidate_index
-                    && other.end() <= range.start()
-                    && other.end() >= line_start
-            })
-            .map(|(_, (other, _))| other.end())
-            .max()
-            .unwrap_or(line_start);
-        let after_barrier = candidates
+            .map(|(index, (range, _))| (range.start(), index))
+            .collect();
+        by_start.sort_unstable();
+        let mut by_end: Vec<(usize, usize)> = candidates
             .iter()
             .enumerate()
-            .filter(|(index, (other, _))| {
-                *index != candidate_index
-                    && other.start() >= range.end()
-                    && other.start() <= line_end
-            })
-            .map(|(_, (other, _))| other.start())
-            .min()
-            .unwrap_or(line_end);
-        let mut found = Vec::new();
-        let before = normalize_context(&input[before_barrier..range.start()]);
-        let after = normalize_context(&input[range.end()..after_barrier]);
-        let before_offset = normalize_context(&input[line_start..before_barrier])
-            .chars()
-            .count();
-        let after_offset = normalize_context(&input[line_start..range.end()])
-            .chars()
-            .count();
-        for entry in pii_context_table::CONTEXT_ENTRIES
+            .map(|(index, (range, _))| (range.end(), index))
+            .collect();
+        by_end.sort_unstable();
+        // Equidistance counts each distinct range once (issue #922).
+        let ranges: Vec<ByteRange> = candidates
             .iter()
-            .filter(|entry| entry.domains.contains(&domain))
-        {
-            for form in entry.forms {
-                for (side, view) in [(0usize, before.as_str()), (1usize, after.as_str())] {
-                    if entry.kind == ContextKind::FieldLabel && side == 1 {
+            .map(|(range, _)| *range)
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect();
+
+        // Candidates keyed by their logical line, each with its barriers:
+        // `(candidate index, before barrier, after barrier)`.
+        let mut groups: BTreeMap<(usize, usize), Vec<[usize; 3]>> = BTreeMap::new();
+        for (candidate_index, (range, _)) in candidates.iter().enumerate() {
+            let (line_start, line_end) = lines.bounds(input.len(), *range);
+            let before_barrier = by_end[..by_end.partition_point(|(end, _)| *end <= range.start())]
+                .iter()
+                .rev()
+                .find(|(_, index)| *index != candidate_index)
+                .map(|(end, _)| *end)
+                .filter(|end| *end >= line_start)
+                .unwrap_or(line_start);
+            let after_barrier = by_start
+                [by_start.partition_point(|(start, _)| *start < range.end())..]
+                .iter()
+                .find(|(_, index)| *index != candidate_index)
+                .map(|(start, _)| *start)
+                .filter(|start| *start <= line_end)
+                .unwrap_or(line_end);
+            groups.entry((line_start, line_end)).or_default().push([
+                candidate_index,
+                before_barrier,
+                after_barrier,
+            ]);
+        }
+
+        for ((line_start, line_end), members) in groups {
+            let window: Vec<ByteRange> = ranges
+                [ranges.partition_point(|range| range.start() < line_start)..]
+                .iter()
+                .take_while(|range| range.start() <= line_end)
+                .filter(|range| range.end() <= line_end)
+                .copied()
+                .collect();
+            let mut positions: Vec<usize> = window.iter().map(|range| range.start()).collect();
+            for [candidate_index, before_barrier, _] in &members {
+                positions.push(*before_barrier);
+                positions.push(candidates[*candidate_index].0.end());
+            }
+            positions.sort_unstable();
+            positions.dedup();
+            let offsets = LineOffsets::new(input, line_start, positions);
+            let occurrences = LineOccurrences::new(input, &window, &offsets);
+
+            for [candidate_index, before_barrier, after_barrier] in members {
+                let (range, domain) = candidates[candidate_index];
+                let mut found = Vec::new();
+                let before = normalize_context(&input[before_barrier..range.start()]);
+                let after = normalize_context(&input[range.end()..after_barrier]);
+                let before_offset = offsets.at(before_barrier);
+                let after_offset = offsets.at(range.end());
+                let views = [
+                    (0usize, before.as_str(), before.chars().count()),
+                    (1usize, after.as_str(), after.chars().count()),
+                ];
+                for (entry, forms) in self
+                    .entries
+                    .iter()
+                    .filter(|(entry, _)| entry.domains.contains(&domain))
+                {
+                    for form in forms {
+                        for (side, view, view_scalars) in views {
+                            if entry.kind == ContextKind::FieldLabel && side == 1 {
+                                continue;
+                            }
+                            // Matches arrive in position order, so the scalar
+                            // count before each one is carried forward rather
+                            // than recounted from the start of the view.
+                            let mut counted_bytes = 0;
+                            let mut counted_scalars = 0;
+                            for (position, _) in view.match_indices(form.text.as_str()) {
+                                let byte_end = position + form.text.len();
+                                let boundary_ok = view[..position]
+                                    .chars()
+                                    .next_back()
+                                    .is_none_or(|character| is_context_boundary(entry, character))
+                                    && view[byte_end..].chars().next().is_none_or(|character| {
+                                        is_context_boundary(entry, character)
+                                    });
+                                if !boundary_ok {
+                                    continue;
+                                }
+                                counted_scalars += view[counted_bytes..position].chars().count();
+                                counted_bytes = position;
+                                let local_start = counted_scalars;
+                                let distance = if side == 0 {
+                                    view_scalars - local_start - form.scalars
+                                } else {
+                                    local_start
+                                };
+                                let limit = if entry.kind == ContextKind::FieldLabel {
+                                    16
+                                } else {
+                                    64
+                                };
+                                if distance > limit {
+                                    continue;
+                                }
+                                if entry.kind == ContextKind::FieldLabel
+                                    && !view[byte_end..]
+                                        .chars()
+                                        .all(|character| is_field_gap(entry, character))
+                                {
+                                    continue;
+                                }
+                                let occurrence_start = if side == 0 {
+                                    before_offset
+                                } else {
+                                    after_offset
+                                } + local_start;
+                                let occurrence_end = occurrence_start + form.scalars;
+                                if occurrences.equidistant(
+                                    entry.kind,
+                                    occurrence_start,
+                                    occurrence_end,
+                                ) {
+                                    continue;
+                                }
+                                found.push(ContextOccurrence {
+                                    entry,
+                                    side,
+                                    start: occurrence_start,
+                                    end: occurrence_end,
+                                });
+                            }
+                        }
+                    }
+                }
+                found.sort_by(|a, b| {
+                    (b.end - b.start)
+                        .cmp(&(a.end - a.start))
+                        .then_with(|| b.entry.strength.cmp(&a.entry.strength))
+                        .then_with(|| b.entry.class.cmp(&a.entry.class))
+                        .then_with(|| a.entry.id.as_bytes().cmp(b.entry.id.as_bytes()))
+                        .then_with(|| a.start.cmp(&b.start))
+                });
+                let mut accepted_occurrences: Vec<ContextOccurrence<'_>> = Vec::new();
+                let mut selected: Vec<ContextMatch> = Vec::new();
+                for occurrence in found {
+                    if accepted_occurrences.iter().any(|accepted| {
+                        accepted.side == occurrence.side
+                            && accepted.start < occurrence.end
+                            && occurrence.start < accepted.end
+                    }) {
                         continue;
                     }
-                    let normalized_form = normalize_context(form);
-                    for (position, _) in view.match_indices(&normalized_form) {
-                        let byte_end = position + normalized_form.len();
-                        let boundary_ok = view[..position]
-                            .chars()
-                            .next_back()
-                            .is_none_or(|character| is_context_boundary(entry, character))
-                            && view[byte_end..]
-                                .chars()
-                                .next()
-                                .is_none_or(|character| is_context_boundary(entry, character));
-                        if !boundary_ok {
-                            continue;
-                        }
-                        let distance = if side == 0 {
-                            view[byte_end..].chars().count()
-                        } else {
-                            view[..position].chars().count()
-                        };
-                        let limit = if entry.kind == ContextKind::FieldLabel {
-                            16
-                        } else {
-                            64
-                        };
-                        if distance > limit {
-                            continue;
-                        }
-                        if entry.kind == ContextKind::FieldLabel
-                            && !view[byte_end..]
-                                .chars()
-                                .all(|character| is_field_gap(entry, character))
-                        {
-                            continue;
-                        }
-                        let local_start = view[..position].chars().count();
-                        let scalar_span = normalized_form.chars().count();
-                        let occurrence_start = if side == 0 {
-                            before_offset
-                        } else {
-                            after_offset
-                        } + local_start;
-                        let occurrence_end = occurrence_start + scalar_span;
-                        if equidistant_from_candidates(
-                            input,
-                            entry.kind,
-                            line_start,
-                            line_end,
-                            occurrence_start,
-                            occurrence_end,
-                            candidates,
-                        ) {
-                            continue;
-                        }
-                        found.push(ContextOccurrence {
-                            entry,
-                            side,
-                            start: occurrence_start,
-                            end: occurrence_end,
+                    accepted_occurrences.push(occurrence);
+                    if selected
+                        .iter()
+                        .all(|item| item.entry_id != occurrence.entry.id)
+                    {
+                        selected.push(ContextMatch {
+                            entry_id: occurrence.entry.id,
+                            class: occurrence.entry.class,
+                            strength: occurrence.entry.strength,
                         });
                     }
                 }
+                result[candidate_index] = selected;
             }
         }
-        found.sort_by(|a, b| {
-            (b.end - b.start)
-                .cmp(&(a.end - a.start))
-                .then_with(|| b.entry.strength.cmp(&a.entry.strength))
-                .then_with(|| b.entry.class.cmp(&a.entry.class))
-                .then_with(|| a.entry.id.as_bytes().cmp(b.entry.id.as_bytes()))
-                .then_with(|| a.start.cmp(&b.start))
-        });
-        let mut accepted_occurrences: Vec<ContextOccurrence<'_>> = Vec::new();
-        let mut selected: Vec<ContextMatch> = Vec::new();
-        for occurrence in found {
-            if accepted_occurrences.iter().any(|accepted| {
-                accepted.side == occurrence.side
-                    && accepted.start < occurrence.end
-                    && occurrence.start < accepted.end
-            }) {
-                continue;
-            }
-            accepted_occurrences.push(occurrence);
-            if selected
-                .iter()
-                .all(|item| item.entry_id != occurrence.entry.id)
-            {
-                selected.push(ContextMatch {
-                    entry_id: occurrence.entry.id,
-                    class: occurrence.entry.class,
-                    strength: occurrence.entry.strength,
-                });
-            }
-        }
-        result[candidate_index] = selected;
+        result
     }
-    result
 }
 
 fn is_context_boundary(entry: &ContextEntry, character: char) -> bool {
@@ -1003,68 +1105,218 @@ fn is_logical_line_break(character: char) -> bool {
     )
 }
 
-fn logical_line_bounds(input: &str, range: ByteRange) -> (usize, usize) {
-    let mut line_start = 0;
-    for (index, character) in input[..range.start()].char_indices() {
-        if is_logical_line_break(character) {
-            line_start = index + character.len_utf8();
-        }
-    }
-    let line_end = input[range.end()..]
-        .char_indices()
-        .find(|(_, character)| is_logical_line_break(*character))
-        .map_or(input.len(), |(index, _)| range.end() + index);
-    (line_start, line_end)
+/// Every candidate's context matches under the generated vocabulary, for
+/// tests that exercise the association rules without a family.
+#[cfg(test)]
+fn context_matches(
+    input: &str,
+    candidates: &[(ByteRange, IdentityDomain)],
+) -> Vec<Vec<ContextMatch>> {
+    ContextVocabulary::new().matches(input, candidates)
 }
 
-/// Whether a context occurrence is equally near two candidate occurrences
-/// it could associate with. A field label only associates with a candidate
-/// after it, so a candidate that ends before the label never makes it
-/// equidistant (`pii-context/v2`, issue #924); a natural-language label may
-/// associate either way and keeps the two-sided rule.
-fn equidistant_from_candidates(
-    input: &str,
-    kind: ContextKind,
-    line_start: usize,
-    line_end: usize,
-    occurrence_start: usize,
-    occurrence_end: usize,
-    candidates: &[(ByteRange, IdentityDomain)],
-) -> bool {
-    // Equidistance separates two occurrences. Alternatives of different
-    // identity domains at one exact range are one occurrence with two
-    // interpretations, so each range counts once (issue #922).
-    let ranges: BTreeSet<ByteRange> = candidates.iter().map(|(range, _)| *range).collect();
-    let mut distances = Vec::new();
-    for range in &ranges {
-        if range.start() < line_start || range.end() > line_end {
-            continue;
+/// The byte index and length of every logical line break of an input, found
+/// in one pass so a candidate's line is two binary searches away.
+struct LogicalLines {
+    breaks: Vec<(usize, usize)>,
+}
+
+impl LogicalLines {
+    fn new(input: &str) -> Self {
+        Self {
+            breaks: input
+                .char_indices()
+                .filter(|(_, character)| is_logical_line_break(*character))
+                .map(|(index, character)| (index, character.len_utf8()))
+                .collect(),
         }
-        let candidate_start = normalize_context(&input[line_start..range.start()])
-            .chars()
-            .count();
-        let candidate_end = candidate_start
-            + normalize_context(&input[range.start()..range.end()])
-                .chars()
-                .count();
-        if kind == ContextKind::FieldLabel && candidate_end <= occurrence_start {
-            continue;
-        }
-        let distance = if candidate_end <= occurrence_start {
-            occurrence_start - candidate_end
-        } else {
-            candidate_start.saturating_sub(occurrence_end)
-        };
-        distances.push(distance);
     }
-    let Some(nearest) = distances.iter().min() else {
-        return false;
-    };
-    distances
-        .iter()
-        .filter(|distance| *distance == nearest)
-        .count()
-        > 1
+
+    /// The logical line around `range`: from just after the last break that
+    /// starts before the range to the first break at or after its end. A
+    /// break inside the range does not split it.
+    fn bounds(&self, input_len: usize, range: ByteRange) -> (usize, usize) {
+        let before = self
+            .breaks
+            .partition_point(|(index, _)| *index < range.start());
+        let line_start = before
+            .checked_sub(1)
+            .map_or(0, |last| self.breaks[last].0 + self.breaks[last].1);
+        let after = self
+            .breaks
+            .partition_point(|(index, _)| *index < range.end());
+        let line_end = self
+            .breaks
+            .get(after)
+            .map_or(input_len, |(index, _)| *index);
+        (line_start, line_end)
+    }
+}
+
+/// Whether NFC never joins `character` with anything before it, so the
+/// context-only view of a text splits there: an ASCII scalar or a
+/// precomposed Hangul syllable is a starter that no canonical composition
+/// takes as its second element, and canonical reordering never moves a mark
+/// across a starter. Governed invisible code points are never ASCII or
+/// Hangul syllables, so removing them first does not move such a split.
+fn starts_normalization_segment(character: char) -> bool {
+    character.is_ascii() || ('\u{AC00}'..='\u{D7A3}').contains(&character)
+}
+
+/// The scalar count of [`normalize_context`] kept as a running state, so the
+/// count of a prefix grows by feeding text instead of renormalizing it.
+#[derive(Clone, Copy, Default)]
+struct ContextScalars {
+    count: usize,
+    in_separator: bool,
+}
+
+impl ContextScalars {
+    fn push(&mut self, character: char) {
+        if is_context_separator(character.to_ascii_lowercase()) {
+            if !self.in_separator {
+                self.count += 1;
+                self.in_separator = true;
+            }
+        } else {
+            self.count += 1;
+            self.in_separator = false;
+        }
+    }
+
+    /// Continues the count over `text`. The result equals the count of
+    /// `normalize_context` over everything fed so far only when nothing was
+    /// fed before or `text` is empty or starts a normalization segment
+    /// ([`starts_normalization_segment`]).
+    fn feed(&mut self, text: &str) {
+        if text.is_ascii() {
+            for byte in text.bytes() {
+                self.push(char::from(byte));
+            }
+        } else {
+            for character in text
+                .chars()
+                .filter(|character| !is_governed_invisible(*character))
+                .nfc()
+            {
+                self.push(character);
+            }
+        }
+    }
+}
+
+/// `normalize_context(&input[line_start..position]).chars().count()` for a
+/// sorted set of positions of one logical line, computed in one pass over
+/// the line.
+struct LineOffsets {
+    positions: Vec<usize>,
+    offsets: Vec<usize>,
+}
+
+impl LineOffsets {
+    fn new(input: &str, line_start: usize, positions: Vec<usize>) -> Self {
+        let mut committed = ContextScalars::default();
+        let mut cursor = line_start;
+        let offsets = positions
+            .iter()
+            .map(|&position| {
+                let pending = &input[cursor..position];
+                if let Some((split, _)) = pending
+                    .char_indices()
+                    .rev()
+                    .find(|(_, character)| starts_normalization_segment(*character))
+                {
+                    committed.feed(&pending[..split]);
+                    cursor += split;
+                }
+                let mut partial = committed;
+                partial.feed(&input[cursor..position]);
+                partial.count
+            })
+            .collect();
+        Self { positions, offsets }
+    }
+
+    fn at(&self, position: usize) -> usize {
+        self.positions
+            .binary_search(&position)
+            .map_or(0, |index| self.offsets[index])
+    }
+}
+
+/// The distinct candidate ranges of one logical line in context-view scalar
+/// coordinates, indexed for [`LineOccurrences::equidistant`].
+struct LineOccurrences {
+    /// `(end, start)` of every range, sorted.
+    by_end: Vec<(usize, usize)>,
+    /// The two smallest starts among `by_end[index..]`; `usize::MAX` when
+    /// absent.
+    smallest_starts_from: Vec<(usize, usize)>,
+}
+
+impl LineOccurrences {
+    fn new(input: &str, window: &[ByteRange], offsets: &LineOffsets) -> Self {
+        let mut by_end: Vec<(usize, usize)> = window
+            .iter()
+            .map(|range| {
+                let start = offsets.at(range.start());
+                let mut scalars = ContextScalars::default();
+                scalars.feed(&input[range.start()..range.end()]);
+                (start + scalars.count, start)
+            })
+            .collect();
+        by_end.sort_unstable();
+        let mut smallest_starts_from = vec![(usize::MAX, usize::MAX); by_end.len() + 1];
+        for index in (0..by_end.len()).rev() {
+            let (first, second) = smallest_starts_from[index + 1];
+            let start = by_end[index].1;
+            smallest_starts_from[index] = if start <= first {
+                (start, first)
+            } else {
+                (first, second.min(start))
+            };
+        }
+        Self {
+            by_end,
+            smallest_starts_from,
+        }
+    }
+
+    /// Whether a context occurrence is equally near two candidate
+    /// occurrences it could associate with. A field label only associates
+    /// with a candidate after it, so a candidate that ends before the label
+    /// never makes it equidistant (`pii-context/v2`, issue #924); a
+    /// natural-language label may associate either way and keeps the
+    /// two-sided rule. Only the two nearest candidates on each side can
+    /// decide it, so it is two lookups rather than a pass over the line.
+    fn equidistant(
+        &self,
+        kind: ContextKind,
+        occurrence_start: usize,
+        occurrence_end: usize,
+    ) -> bool {
+        let split = self
+            .by_end
+            .partition_point(|(end, _)| *end <= occurrence_start);
+        let mut nearest = [usize::MAX; 4];
+        let mut count = 0;
+        if kind == ContextKind::NaturalLanguageLabel {
+            for (end, _) in self.by_end[..split].iter().rev().take(2) {
+                nearest[count] = occurrence_start - end;
+                count += 1;
+            }
+        }
+        let (first, second) = self.smallest_starts_from[split];
+        for start in [first, second] {
+            if start != usize::MAX {
+                nearest[count] = start.saturating_sub(occurrence_end);
+                count += 1;
+            }
+        }
+        let nearest = &mut nearest[..count];
+        nearest.sort_unstable();
+        nearest.len() > 1 && nearest[0] == nearest[1]
+    }
 }
 
 #[cfg(test)]
