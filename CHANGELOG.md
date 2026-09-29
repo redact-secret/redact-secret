@@ -292,6 +292,16 @@ evidence is linked from each published version.
   `latency/*/processing-ratio` rows are within budget (0.54-0.83 of beta.8;
   `browser-wasm` `scale-logs-small-whole` 1.23 against its 1.30 allowance).
   See `docs/audits/evidence/950/README.md`.
+- An incremental session now detects all the lines that close in one
+  `append` call together, instead of running every detector once per line
+  (#985). Policy and redaction still run line by line, so text, findings,
+  ids, ranges, actions, errors, error order and callback calls are
+  unchanged. On the #981 harness the incremental path takes 35-41% less
+  time on logs and on a 10 MiB mixed workload (`scale-logs-256k` 31.7 ms to
+  19.8 ms). A line that a detector could read together with an earlier line
+  (after a lone `\r`, or one starting with `=`, `:` or `bearer`) starts a
+  new batch, and PII detection still runs per line. See
+  `docs/audits/evidence/985/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

@@ -418,6 +418,16 @@ impl Candidate {
     pub(crate) const fn rejects_invisible_normalization(&self) -> bool {
         self.reject_invisible_normalization
     }
+
+    /// This candidate with its range moved `by` bytes later, or `None` if
+    /// that overflows.
+    pub(crate) fn shifted(mut self, by: usize) -> Option<Self> {
+        self.range = ByteRange::new(
+            self.range.start().checked_add(by)?,
+            self.range.end().checked_add(by)?,
+        )?;
+        Some(self)
+    }
 }
 
 /// An independent detection unit.

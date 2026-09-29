@@ -65,12 +65,11 @@
 //! [`abort`]: IncrementalSanitizer::abort
 
 use std::borrow::Cow;
-use std::collections::HashMap;
 
 use crate::detectors::{
-    PrivateKeyRetentionTracker, has_open_bearer_authorization, has_open_confluent_properties,
-    has_open_contextual_assignment, has_open_heroku_legacy_context, has_open_twilio_cli_table,
-    is_open_tail_neutral,
+    PrivateKeyRetentionTracker, continues_previous_line, has_open_bearer_authorization,
+    has_open_confluent_properties, has_open_contextual_assignment, has_open_heroku_legacy_context,
+    has_open_twilio_cli_table, is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 #[cfg(test)]
@@ -79,6 +78,7 @@ use crate::normalize::NormalizedInput;
 use crate::pii::PiiSelection;
 #[cfg(test)]
 use crate::pipeline::detect;
+use crate::pipeline::detect_units;
 #[cfg(not(test))]
 use crate::pipeline::run_detector_pipeline;
 use crate::policy::DefaultPolicy;
@@ -323,6 +323,28 @@ pub enum SessionState {
 /// with absolute UTF-8 byte offsets into the logical whole-session input.
 pub type IncrementalResult = ScanResult;
 
+/// Text and findings released by one `append` or `finalize` call so far.
+#[derive(Default)]
+struct Released {
+    text: String,
+    findings: Vec<Finding>,
+}
+
+/// `found` with its range moved `by` bytes later.
+fn offset_by(found: &DetectedFinding, by: usize) -> Result<DetectedFinding, SecretScanError> {
+    let range = found.range();
+    let range = ByteRange::new(range.start() + by, range.end() + by)
+        .ok_or(SecretScanErrorCode::InvalidCandidate)?;
+    Ok(DetectedFinding::new(
+        found.id(),
+        found.type_name(),
+        found.detector(),
+        found.confidence(),
+        range,
+    )?
+    .with_obfuscation(found.obfuscation()))
+}
+
 /// Finds the byte offset of the next `\n` or `\r` at or after `from`, or
 /// `None` when `chunk` has no more line terminators.
 fn find_next_newline(chunk: &str, from: usize) -> Option<usize> {
@@ -401,11 +423,17 @@ pub struct IncrementalSanitizer {
     formatter: Box<dyn PlaceholderFormatter>,
     limits: IncrementalLimits,
     state: SessionState,
+    /// Closed units waiting in the current batch, then the current unit.
     retained: String,
-    /// The scan copy of `retained`, normalized piece by piece as it is
+    /// Where the current unit starts in `retained`.
+    unit_start: usize,
+    /// Where each closed unit in the batch ends in `retained`, ascending;
+    /// the last one is `unit_start`.
+    unit_ends: Vec<usize>,
+    /// The scan copy of the current unit, normalized piece by piece as it is
     /// appended. Held only once a piece of this unit actually lost an
-    /// invisible code point; until then the scan copy is `retained` itself,
-    /// so an ordinary unit is never copied (issue #986).
+    /// invisible code point; until then the scan copy is the unit itself, so
+    /// an ordinary unit is never copied (issue #986).
     scanned: Option<String>,
     open_tail: OpenTailCache,
     lookbacks: LookbackHints,
@@ -422,6 +450,16 @@ pub struct IncrementalSanitizer {
     /// scorer never runs on the public incremental path.
     #[cfg(test)]
     shadow: Option<Vec<ShadowComparison>>,
+    /// Processes every unit as soon as it closes, as before batching: the
+    /// reference the batched path is compared with (issue #985).
+    #[cfg(test)]
+    unbatched: bool,
+    /// Units detected together in one pipeline call so far.
+    #[cfg(test)]
+    batched_units: usize,
+    /// The most bytes `retained` has held.
+    #[cfg(test)]
+    peak_retained: usize,
 }
 
 impl std::fmt::Debug for IncrementalSanitizer {
@@ -566,6 +604,8 @@ impl IncrementalSanitizer {
             limits,
             state: SessionState::Accepting,
             retained: String::new(),
+            unit_start: 0,
+            unit_ends: Vec::new(),
             scanned: None,
             open_tail: OpenTailCache::default(),
             lookbacks,
@@ -578,6 +618,12 @@ impl IncrementalSanitizer {
             multiline_detected: false,
             #[cfg(test)]
             shadow: None,
+            #[cfg(test)]
+            unbatched: false,
+            #[cfg(test)]
+            batched_units: 0,
+            #[cfg(test)]
+            peak_retained: 0,
         }
     }
 
@@ -627,19 +673,19 @@ impl IncrementalSanitizer {
     /// contract is to drop them.
     fn discard_retained(&mut self) {
         self.retained = String::new();
+        self.unit_start = 0;
+        self.unit_ends = Vec::new();
+        self.reset_unit_state();
+    }
+
+    /// Clears the parser state derived from the current unit: at a unit
+    /// boundary, and with the plaintext it was derived from.
+    fn reset_unit_state(&mut self) {
         self.scanned = None;
         self.open_tail = OpenTailCache::default();
         self.private_key.reset();
         self.multiline_open = false;
         self.multiline_detected = false;
-    }
-
-    /// Finishes a unit whose text and findings have been produced: its bytes
-    /// become finalized input that advances absolute offsets, and the
-    /// plaintext behind them is discarded.
-    fn finish_unit(&mut self) {
-        self.finalized_bytes += self.retained.len();
-        self.discard_retained();
     }
 
     /// Discards retained plaintext and parser state and transitions to
@@ -651,19 +697,23 @@ impl IncrementalSanitizer {
         error
     }
 
-    /// Judges the retained text the way [`process_unit`](Self::process_unit)
-    /// will scan it: on the scan copy. Judged on the raw buffer, a keyword
-    /// split by an invisible code point at a line end would not read as an
-    /// open construct, the unit would close early, and the same input would
-    /// yield different findings under a different partition.
+    /// Judges the current unit the way the pipeline will scan it: on the
+    /// scan copy. Judged on the raw buffer, a keyword split by an invisible
+    /// code point at a line end would not read as an open construct, the
+    /// unit would close early, and the same input would yield different
+    /// findings under a different partition.
     ///
     /// The scan copy is maintained as pieces arrive rather than rebuilt here,
     /// and the two tail checks, whose backward scan crosses any run of blank
     /// lines, reuse their last result when only whitespace has arrived since
     /// (issue #986). The three lookback checks read a bounded number of lines
-    /// and run as before.
+    /// and run as before. Only the current unit is judged: closed units
+    /// waiting in the batch are never part of it (issue #985).
     fn has_open_single_line_construct(&mut self) -> bool {
-        let scanned = self.scanned.as_deref().unwrap_or(&self.retained);
+        let scanned = self
+            .scanned
+            .as_deref()
+            .unwrap_or(&self.retained[self.unit_start..]);
         if !is_open_tail_neutral(&scanned[self.open_tail.checked_len..]) {
             self.open_tail.open =
                 has_open_contextual_assignment(scanned) || has_open_bearer_authorization(scanned);
@@ -682,13 +732,14 @@ impl IncrementalSanitizer {
 
     /// Differential check (issue #986): the maintained scan copy and the
     /// cached tail result equal what a fresh normalization and rescan of the
-    /// whole retained unit report, after every closed line of every test that
+    /// whole current unit report, after every closed line of every test that
     /// drives a session.
     #[cfg(test)]
     fn assert_open_construct_matches_the_rescan(&self, open: bool) {
-        let rescanned = NormalizedInput::new(&self.retained).into_text();
+        let unit = &self.retained[self.unit_start..];
+        let rescanned = NormalizedInput::new(unit).into_text();
         assert_eq!(
-            self.scanned.as_deref().unwrap_or(&self.retained),
+            self.scanned.as_deref().unwrap_or(unit),
             rescanned,
             "maintained scan copy"
         );
@@ -705,7 +756,27 @@ impl IncrementalSanitizer {
         assert_eq!(open, reference, "open single-line construct");
     }
 
-    fn append_retained(&mut self, piece: &str, closes_line: bool) -> Result<(), SecretScanError> {
+    /// Adds `piece` to the current unit and enforces the limits on it.
+    ///
+    /// Every limit is measured on the current unit alone, exactly as when
+    /// each unit was processed as soon as it closed: closed units waiting in
+    /// the batch are not retained constructs. They are processed first
+    /// whenever the buffer would otherwise outgrow `max_buffered_bytes`, and
+    /// before any limit failure, so a failure in an earlier unit is still
+    /// the one reported (issue #985).
+    fn append_retained(
+        &mut self,
+        piece: &str,
+        closes_line: bool,
+        released: &mut Released,
+    ) -> Result<(), SecretScanError> {
+        if !self.unit_ends.is_empty()
+            && self.retained.len() + piece.len() > self.limits.max_buffered_bytes()
+        {
+            self.flush_batch(released)
+                .map_err(|error| self.fail_with(error))?;
+        }
+
         // The tracker and the open-construct checks read the scan copy, as
         // the detectors will. A piece is whole code points, so normalizing
         // piece by piece equals normalizing the unit. Every limit below is a
@@ -714,14 +785,19 @@ impl IncrementalSanitizer {
         match (&mut self.scanned, &normalized) {
             (Some(scanned), _) => scanned.push_str(&normalized),
             (None, Cow::Owned(normalized)) => {
-                let mut scanned = String::with_capacity(self.retained.len() + normalized.len());
-                scanned.push_str(&self.retained);
+                let unit = &self.retained[self.unit_start..];
+                let mut scanned = String::with_capacity(unit.len() + normalized.len());
+                scanned.push_str(unit);
                 scanned.push_str(normalized);
                 self.scanned = Some(scanned);
             }
             (None, Cow::Borrowed(_)) => {}
         }
         self.retained.push_str(piece);
+        #[cfg(test)]
+        {
+            self.peak_retained = self.peak_retained.max(self.retained.len());
+        }
         let (has_begin, has_open) = self.private_key.append(&normalized);
         self.multiline_detected |= has_begin;
         self.multiline_open = has_open;
@@ -731,108 +807,248 @@ impl IncrementalSanitizer {
         } else {
             self.limits.max_token_bytes()
         };
+        let unit_length = self.retained.len() - self.unit_start;
         let open_length = if closes_line {
-            self.retained.len() - 1
+            unit_length - 1
         } else {
-            self.retained.len()
+            unit_length
         };
-        if open_length > construct_limit {
-            let code = if self.multiline_detected {
+        let exceeded = if open_length > construct_limit {
+            Some(if self.multiline_detected {
                 SecretScanErrorCode::MultilineLimitExceeded
             } else {
                 SecretScanErrorCode::TokenLimitExceeded
-            };
-            return Err(self.fail_with(code.into()));
-        }
-        if self.retained.len() > self.limits.max_buffered_bytes() {
-            return Err(self.fail_with(SecretScanErrorCode::BufferLimitExceeded.into()));
+            })
+        } else if unit_length > self.limits.max_buffered_bytes() {
+            Some(SecretScanErrorCode::BufferLimitExceeded)
+        } else {
+            None
+        };
+        if let Some(code) = exceeded {
+            let error = self.flush_batch(released).err().unwrap_or(code.into());
+            return Err(self.fail_with(error));
         }
         Ok(())
     }
 
-    /// Runs detection, policy, and redaction over `self.retained` as one
-    /// closed unit, without mutating any lifecycle or retention state.
-    /// Callers finish the unit (advance `finalized_bytes`, clear retained
-    /// state) on success, or call [`fail_with`](Self::fail_with) on error.
-    fn process_unit(&mut self) -> Result<IncrementalResult, SecretScanError> {
-        let input_offset = self.finalized_bytes;
+    /// Ends the current unit at the end of the buffer and adds it to the
+    /// batch of closed units (issue #985).
+    ///
+    /// A unit that a detector could bind to the text before it starts a new
+    /// batch instead ([`starts_new_batch`](Self::starts_new_batch)), so every
+    /// batch scans each of its units exactly as that unit alone would scan.
+    fn close_unit(&mut self, released: &mut Released) -> Result<(), SecretScanError> {
+        if !self.unit_ends.is_empty() && self.starts_new_batch() {
+            self.flush_batch(released)?;
+        }
+        self.unit_ends.push(self.retained.len());
+        self.unit_start = self.retained.len();
+        self.reset_unit_state();
         #[cfg(test)]
-        let finding_offset = self.finding_count;
-        #[cfg(test)]
-        let mut unit_shadow = self.shadow.as_ref().map(|_| Vec::new());
-        #[cfg(test)]
-        let detected = detect(&self.retained, &self.registry, unit_shadow.as_mut())?;
-        #[cfg(not(test))]
-        let detected = run_detector_pipeline(&self.retained, &self.registry)?;
+        if self.unbatched {
+            self.flush_batch(released)?;
+        }
+        Ok(())
+    }
 
-        let mut findings: Vec<Finding> = Vec::with_capacity(detected.len());
-        for local in &detected {
-            let range = local.range();
+    /// Whether the current unit, about to close behind at least one closed
+    /// unit, must not share a batch with the units before it. See the audit
+    /// in `docs/audits/evidence/985/README.md`.
+    ///
+    /// - After a lone `\r`: every unit ends at `\n` or `\r`, but several
+    ///   detectors split their input into lines at `\n` only, so without a
+    ///   `\n` between them two units would read as one line. A `\r\n` pair is
+    ///   two units, the second a lone `\n`, and stays batchable.
+    /// - A unit whose text starts with a construct a detector continues from
+    ///   the text before it ([`continues_previous_line`]).
+    fn starts_new_batch(&self) -> bool {
+        let unit = &self.retained[self.unit_start..];
+        let after_lone_carriage_return =
+            self.retained.as_bytes()[self.unit_start - 1] == b'\r' && !unit.starts_with('\n');
+        after_lone_carriage_return
+            || continues_previous_line(self.scanned.as_deref().unwrap_or(unit))
+    }
+
+    /// Detects, applies policy to and redacts every closed unit in the batch,
+    /// then drops their plaintext.
+    ///
+    /// Detection runs once over the whole batch when its units are
+    /// separable ([`detect_units`]); otherwise, or when that call fails, each
+    /// unit is scanned alone, which reproduces the failure in the order
+    /// unit-by-unit processing would meet it. Policy and redaction always run
+    /// unit by unit, so every callback sees the same calls in the same order
+    /// and every per-unit bound (`redact`'s input, finding and placeholder
+    /// checks) applies to the same text as before.
+    fn flush_batch(&mut self, released: &mut Released) -> Result<(), SecretScanError> {
+        if self.unit_ends.is_empty() {
+            return Ok(());
+        }
+        let batch_length = self.unit_start;
+        #[cfg(test)]
+        let (finding_offset, mut batch_shadow) =
+            (self.finding_count, self.shadow.as_ref().map(|_| Vec::new()));
+
+        let batched = if self.unit_ends.len() > 1 {
+            let batch = &self.retained[..batch_length];
+            #[cfg(test)]
+            let detected = detect_units(
+                batch,
+                &self.registry,
+                &self.unit_ends,
+                batch_shadow.as_mut(),
+            );
+            #[cfg(not(test))]
+            let detected = detect_units(batch, &self.registry, &self.unit_ends, None);
+            detected.ok().flatten()
+        } else {
+            None
+        };
+
+        let unit_ends = std::mem::take(&mut self.unit_ends);
+        let mut unit_begin = 0;
+        match batched {
+            Some(detected) => {
+                #[cfg(test)]
+                {
+                    self.batched_units += unit_ends.len();
+                }
+                let mut detected = detected.into_iter().peekable();
+                for &unit_end in &unit_ends {
+                    let mut unit_findings = Vec::new();
+                    while let Some(found) =
+                        detected.next_if(|found| found.range().start() < unit_end)
+                    {
+                        unit_findings.push(found);
+                    }
+                    self.finalize_unit(unit_begin, unit_end, &unit_findings, released)?;
+                    unit_begin = unit_end;
+                }
+                #[cfg(test)]
+                self.record_unit_shadow(batch_shadow, finding_offset, self.finalized_bytes)?;
+            }
+            None => {
+                for &unit_end in &unit_ends {
+                    let unit = &self.retained[unit_begin..unit_end];
+                    #[cfg(test)]
+                    let (finding_offset, mut unit_shadow) =
+                        (self.finding_count, self.shadow.as_ref().map(|_| Vec::new()));
+                    #[cfg(test)]
+                    let detected = detect(unit, &self.registry, unit_shadow.as_mut())?;
+                    #[cfg(not(test))]
+                    let detected = run_detector_pipeline(unit, &self.registry)?;
+                    let detected = detected
+                        .iter()
+                        .map(|found| offset_by(found, unit_begin))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    self.finalize_unit(unit_begin, unit_end, &detected, released)?;
+                    #[cfg(test)]
+                    self.record_unit_shadow(
+                        unit_shadow,
+                        finding_offset,
+                        self.finalized_bytes + unit_begin,
+                    )?;
+                    unit_begin = unit_end;
+                }
+            }
+        }
+
+        self.finalized_bytes += batch_length;
+        self.retained = if batch_length == self.retained.len() {
+            String::new()
+        } else {
+            self.retained[batch_length..].to_owned()
+        };
+        self.unit_start = 0;
+        self.unit_ends = unit_ends;
+        self.unit_ends.clear();
+        Ok(())
+    }
+
+    /// Applies policy to and redacts the closed unit `retained[begin..end]`,
+    /// given its findings with ranges in `retained` coordinates, and appends
+    /// the result to `released`.
+    ///
+    /// Global and unit-local findings are built together in one pass; the
+    /// placeholder formatter reaches a finding's global form by its position,
+    /// since both lists are ordered by start.
+    fn finalize_unit(
+        &mut self,
+        begin: usize,
+        end: usize,
+        detected: &[DetectedFinding],
+        released: &mut Released,
+    ) -> Result<(), SecretScanError> {
+        let input_offset = self.finalized_bytes;
+        let mut global_findings: Vec<Finding> = Vec::with_capacity(detected.len());
+        let mut local_findings: Vec<Finding> = Vec::with_capacity(detected.len());
+        for found in detected {
+            let range = found.range();
             let global_range =
                 ByteRange::new(range.start() + input_offset, range.end() + input_offset)
-                    .ok_or_else(|| SecretScanError::from(SecretScanErrorCode::InvalidCandidate))?;
-            let global_id = format!("finding-{}", self.finding_count + 1);
+                    .ok_or(SecretScanErrorCode::InvalidCandidate)?;
+            let id = format!("finding-{}", self.finding_count + 1);
             let global_detected = DetectedFinding::new(
-                global_id,
-                local.type_name(),
-                local.detector(),
-                local.confidence(),
+                id.as_str(),
+                found.type_name(),
+                found.detector(),
+                found.confidence(),
                 global_range,
             )?
-            .with_obfuscation(local.obfuscation());
+            .with_obfuscation(found.obfuscation());
             let context = IncrementalPolicyContext::new(self.finding_count);
             let action = self
                 .policy
                 .evaluate(&global_detected, &context)
                 .map_err(|_| SecretScanError::from(SecretScanErrorCode::PolicyFailure))?;
-            findings.push(global_detected.with_action(action));
+            let local_range = ByteRange::new(range.start() - begin, range.end() - begin)
+                .ok_or(SecretScanErrorCode::InvalidCandidate)?;
+            let local_detected = DetectedFinding::new(
+                id,
+                found.type_name(),
+                found.detector(),
+                found.confidence(),
+                local_range,
+            )?
+            .with_obfuscation(found.obfuscation());
+            local_findings.push(local_detected.with_action(action));
+            global_findings.push(global_detected.with_action(action));
             self.finding_count += 1;
         }
 
-        let local_findings: Vec<Finding> = findings
-            .iter()
-            .map(|finding| {
-                let range = finding.range();
-                let local_range =
-                    ByteRange::new(range.start() - input_offset, range.end() - input_offset)
-                        .ok_or_else(|| {
-                            SecretScanError::from(SecretScanErrorCode::InvalidCandidate)
-                        })?;
-                Ok(DetectedFinding::new(
-                    finding.id(),
-                    finding.type_name(),
-                    finding.detector(),
-                    finding.confidence(),
-                    local_range,
-                )?
-                .with_obfuscation(finding.obfuscation())
-                .with_action(finding.action()))
-            })
-            .collect::<Result<Vec<_>, SecretScanError>>()?;
-
-        let by_id: HashMap<&str, &Finding> = findings
-            .iter()
-            .map(|finding| (finding.id(), finding))
-            .collect();
         let placeholder_offset = self.placeholder_count;
         let formatter = self.formatter.as_ref();
         let wrapped = |local_finding: &Finding, local_context: &PlaceholderContext| {
-            let Some(global_finding) = by_id.get(local_finding.id()) else {
+            let Ok(index) = local_findings
+                .binary_search_by_key(&local_finding.range().start(), |finding| {
+                    finding.range().start()
+                })
+            else {
                 return Err(FormatterFailure);
             };
             let global_context =
                 PlaceholderContext::new(placeholder_offset + local_context.placeholder_index());
-            formatter.format(global_finding, &global_context)
+            formatter.format(&global_findings[index], &global_context)
         };
+        let text = redact(&self.retained[begin..end], &local_findings, &wrapped)?;
 
-        let text = redact(&self.retained, &local_findings, &wrapped)?;
-
-        self.placeholder_count += findings
+        self.placeholder_count += global_findings
             .iter()
             .filter(|finding| finding.action().replaces_text())
             .count();
+        released.text.push_str(&text);
+        released.findings.extend(global_findings);
+        Ok(())
+    }
 
-        #[cfg(test)]
+    /// Appends the shadow comparisons of findings finalized from
+    /// `finding_offset`, found in text starting at `input_offset`.
+    #[cfg(test)]
+    fn record_unit_shadow(
+        &mut self,
+        unit_shadow: Option<Vec<ShadowComparison>>,
+        finding_offset: usize,
+        input_offset: usize,
+    ) -> Result<(), SecretScanError> {
         if let (Some(recorded), Some(unit_shadow)) = (self.shadow.as_mut(), unit_shadow) {
             for comparison in unit_shadow {
                 recorded.push(
@@ -842,8 +1058,7 @@ impl IncrementalSanitizer {
                 );
             }
         }
-
-        Ok(IncrementalResult::new(text, findings))
+        Ok(())
     }
 
     /// Appends `chunk` to the logical input.
@@ -884,30 +1099,26 @@ impl IncrementalSanitizer {
         }
         self.total_input_bytes += chunk.len();
 
-        let mut emitted = String::new();
-        let mut findings = Vec::new();
+        // Lines that close in this call are collected into one batch and
+        // processed together at the end of the call (issue #985).
+        let mut released = Released::default();
         let mut cursor = 0usize;
         while cursor < chunk.len() {
             let Some(newline) = find_next_newline(chunk, cursor) else {
-                self.append_retained(&chunk[cursor..], false)?;
+                self.append_retained(&chunk[cursor..], false, &mut released)?;
                 break;
             };
-            self.append_retained(&chunk[cursor..=newline], true)?;
+            self.append_retained(&chunk[cursor..=newline], true, &mut released)?;
 
             if !self.multiline_open && !self.has_open_single_line_construct() {
-                match self.process_unit() {
-                    Ok(result) => {
-                        self.finish_unit();
-                        let (text, unit_findings) = result.into_parts();
-                        emitted.push_str(&text);
-                        findings.extend(unit_findings);
-                    }
-                    Err(error) => return Err(self.fail_with(error)),
-                }
+                self.close_unit(&mut released)
+                    .map_err(|error| self.fail_with(error))?;
             }
             cursor = newline + 1;
         }
-        Ok(IncrementalResult::new(emitted, findings))
+        self.flush_batch(&mut released)
+            .map_err(|error| self.fail_with(error))?;
+        Ok(IncrementalResult::new(released.text, released.findings))
     }
 
     /// Supplies the end-of-input boundary, finalizing any remaining
@@ -921,14 +1132,16 @@ impl IncrementalSanitizer {
     /// the `accepting` state (including a second `finalize`).
     pub fn finalize(&mut self) -> Result<IncrementalResult, SecretScanError> {
         self.require_accepting()?;
-        match self.process_unit() {
-            Ok(result) => {
-                self.finish_unit();
-                self.state = SessionState::Finalized;
-                Ok(result)
-            }
-            Err(error) => Err(self.fail_with(error)),
-        }
+        // Every `append` leaves the batch empty, so the last unit is
+        // processed alone.
+        let mut released = Released::default();
+        self.unit_ends.push(self.retained.len());
+        self.unit_start = self.retained.len();
+        self.flush_batch(&mut released)
+            .map_err(|error| self.fail_with(error))?;
+        self.discard_retained();
+        self.state = SessionState::Finalized;
+        Ok(IncrementalResult::new(released.text, released.findings))
     }
 
     /// Discards retained plaintext and emits no further text or findings.
@@ -944,6 +1157,10 @@ impl IncrementalSanitizer {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "incremental/batch_tests.rs"]
+mod batch_tests;
 
 #[cfg(test)]
 mod tests {

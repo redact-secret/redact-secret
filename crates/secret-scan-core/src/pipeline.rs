@@ -8,15 +8,16 @@
 
 use std::cmp::Ordering;
 
-use crate::error::{SecretScanError, SecretScanErrorCode};
+use crate::error::{DetectorFailure, SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
 use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
+use crate::pii::is_reserved_detector_id;
 use crate::policy::default_action_for;
 use crate::redact::redact_with_limits;
 use crate::registry::{DetectorRegistry, RegisteredDetector};
 use crate::types::{
-    Action, ByteRange, Candidate, Confidence, DetectedFinding, DetectorContext, Finding,
+    Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     Obfuscation, PlaceholderFormatter, Policy, PolicyContext, ScanResult, Specificity,
     is_identifier,
 };
@@ -59,7 +60,13 @@ struct RankedCandidate<'a> {
     range: ByteRange,
     obfuscation: Obfuscation,
     detector_order: usize,
+    /// Emission order among this detector's candidates in the same unit
+    /// ([`detect_units`]); for a single unit, the index in the detector's
+    /// output.
     candidate_order: usize,
+    /// Index in the detector's output for the whole call, which the shadow
+    /// comparison uses to find the candidate again.
+    emission_index: usize,
 }
 
 impl RankedCandidate<'_> {
@@ -89,6 +96,7 @@ fn validate_candidate<'a>(
     candidate: &'a Candidate,
     detector_order: usize,
     candidate_order: usize,
+    emission_index: usize,
 ) -> Result<RankedCandidate<'a>, SecretScanError> {
     let type_name = candidate.type_name();
     let scanned = normalized.text();
@@ -137,14 +145,23 @@ fn validate_candidate<'a>(
         obfuscation,
         detector_order,
         candidate_order,
+        emission_index,
     })
 }
 
 /// Runs every detector over the scan copy. The returned ranges index
 /// `scanned`, not the original input.
+///
+/// `boundaries` are the scan-copy offsets between incremental units
+/// ([`detect_units`]). The PII detector runs on each unit separately, as it
+/// did when every unit was scanned alone: its context arbitration compares
+/// every candidate with every other and locates each one's line from the
+/// start of its input, so over a batch of units its cost would grow with the
+/// batch rather than with each unit (issue #985).
 fn collect_candidates(
     scanned: &str,
     registry: &DetectorRegistry,
+    boundaries: &[usize],
 ) -> Result<Vec<Vec<Candidate>>, SecretScanError> {
     let context = DetectorContext::new(scanned.len());
     // Sized once up front: collecting through `Result` loses the iterator's
@@ -152,14 +169,39 @@ fn collect_candidates(
     // incremental session makes one call per closed line (issue #950).
     let mut per_detector = Vec::with_capacity(registry.len());
     for registered in registry.detectors() {
+        let detector = registered.detector();
+        let candidates = if boundaries.is_empty() || !is_reserved_detector_id(registered.id()) {
+            detector.detect(scanned, &context)
+        } else {
+            detect_each_unit(detector, scanned, boundaries)
+        };
         per_detector.push(
-            registered
-                .detector()
-                .detect(scanned, &context)
-                .map_err(|_| SecretScanError::from(SecretScanErrorCode::DetectorFailure))?,
+            candidates.map_err(|_| SecretScanError::from(SecretScanErrorCode::DetectorFailure))?,
         );
     }
     Ok(per_detector)
+}
+
+/// Runs `detector` on every unit of `scanned` between `boundaries` alone and
+/// returns the candidates in unit order, with ranges indexing `scanned`.
+fn detect_each_unit(
+    detector: &dyn Detector,
+    scanned: &str,
+    boundaries: &[usize],
+) -> Result<Vec<Candidate>, DetectorFailure> {
+    let mut candidates = Vec::new();
+    let mut begin = 0;
+    for end in boundaries.iter().copied().chain([scanned.len()]) {
+        let unit = &scanned[begin..end];
+        // A unit alone with an empty scan copy is never scanned.
+        if !unit.is_empty() {
+            for candidate in detector.detect(unit, &DetectorContext::new(unit.len()))? {
+                candidates.push(candidate.shifted(begin).ok_or(DetectorFailure)?);
+            }
+        }
+        begin = end;
+    }
+    Ok(candidates)
 }
 
 /// This candidate's rank within [`Specificity`], `0` for [`Specificity::Entropy`]
@@ -406,24 +448,83 @@ pub(crate) fn detect(
     registry: &DetectorRegistry,
     shadow: Option<&mut Vec<ShadowComparison>>,
 ) -> Result<Vec<DetectedFinding>, SecretScanError> {
+    detect_units(input, registry, &[], shadow).map(Option::unwrap_or_default)
+}
+
+/// [`detect`] over `input` made of consecutive incremental units, each
+/// ending at the next of `unit_ends` (ascending original offsets inside
+/// `input`, each just after a line terminator; `input.len()` ends the last
+/// unit and may be omitted). Issue #985.
+///
+/// The result equals running [`detect`] on each unit alone and
+/// concatenating, apart from finding ids, provided each detector's
+/// candidates inside a unit do not depend on the text of other units (the
+/// per-detector audit in `docs/audits/evidence/985/`; the incremental session
+/// never batches a unit the audit found a detector reading across). Three
+/// things this function makes hold by construction rather than by that
+/// audit:
+///
+/// - The PII detector runs on each unit alone ([`collect_candidates`]).
+/// - A candidate's emission order, the last overlap-resolution key, is
+///   counted within its unit, as a scan of that unit alone would count it.
+/// - No candidate may reach a unit boundary. One that ends at or crosses
+///   the end of a unit other than the last could interact with the next
+///   unit's candidates or read its text, so the call returns `Ok(None)` and
+///   the caller scans unit by unit instead.
+///
+/// With every candidate inside one unit, the optimal disjoint selection of
+/// the whole call decomposes into the selection of each unit: candidates of
+/// different units never overlap, the evidence weight's tiers compare the
+/// same way for any base above the unit's candidate count, and every
+/// earlier unit's total is a common addend.
+pub(crate) fn detect_units(
+    input: &str,
+    registry: &DetectorRegistry,
+    unit_ends: &[usize],
+    shadow: Option<&mut Vec<ShadowComparison>>,
+) -> Result<Option<Vec<DetectedFinding>>, SecretScanError> {
     if input.is_empty() {
-        return Ok(Vec::new());
+        return Ok(Some(Vec::new()));
     }
 
     let normalized = NormalizedInput::new(input);
     let scanned = normalized.text();
     if scanned.is_empty() {
-        return Ok(Vec::new());
+        return Ok(Some(Vec::new()));
     }
 
-    let per_detector = collect_candidates(scanned, registry)?;
+    // The boundaries between units, in scan-copy offsets. Nothing removed
+    // is a line terminator, so a boundary never falls inside a removed run.
+    let boundaries: Vec<usize> = unit_ends
+        .iter()
+        .filter(|&&end| end < input.len())
+        .map(|&end| normalized.to_scanned_offset(end))
+        .collect();
+
+    let per_detector = collect_candidates(scanned, registry, &boundaries)?;
 
     let mut ranked: Vec<RankedCandidate<'_>> = Vec::new();
+    let mut unit_counts: Vec<usize> = Vec::new();
     for ((detector_order, registered), candidates) in
         registry.detectors().iter().enumerate().zip(&per_detector)
     {
-        for (candidate_order, candidate) in candidates.iter().enumerate() {
+        if !boundaries.is_empty() && !candidates.is_empty() {
+            unit_counts.clear();
+            unit_counts.resize(boundaries.len() + 1, 0);
+        }
+        for (emission_index, candidate) in candidates.iter().enumerate() {
             let range = candidate.range();
+            let candidate_order = if boundaries.is_empty() {
+                emission_index
+            } else {
+                let unit = boundaries.partition_point(|&boundary| boundary <= range.start());
+                if boundaries.get(unit).is_some_and(|&end| range.end() >= end) {
+                    return Ok(None);
+                }
+                let order = unit_counts[unit];
+                unit_counts[unit] += 1;
+                order
+            };
             if candidate.rejects_invisible_normalization() && normalized.touches_removed_run(range)
             {
                 continue;
@@ -440,6 +541,7 @@ pub(crate) fn detect(
                 candidate,
                 detector_order,
                 candidate_order,
+                emission_index,
             )?);
         }
     }
@@ -451,7 +553,7 @@ pub(crate) fn detect(
 
     if let Some(shadow) = shadow {
         for (index, selected) in accepted.iter().enumerate() {
-            let candidate = &per_detector[selected.detector_order][selected.candidate_order];
+            let candidate = &per_detector[selected.detector_order][selected.emission_index];
             let scanned_range = candidate.range();
             shadow.push(ShadowComparison::of(
                 index,
@@ -476,7 +578,8 @@ pub(crate) fn detect(
             )?
             .with_obfuscation(candidate.obfuscation))
         })
-        .collect()
+        .collect::<Result<Vec<_>, SecretScanError>>()
+        .map(Some)
 }
 
 /// Runs the detector pipeline and evaluates `policy` once per finding.
@@ -646,6 +749,7 @@ mod tests {
             obfuscation: Obfuscation::None,
             detector_order,
             candidate_order,
+            emission_index: candidate_order,
         }
     }
 
