@@ -291,8 +291,19 @@ evidence is linked from each published version.
   `mailchimp`, `mailgun`, `new-relic`, `okta`, `pinecone`, `travisci`,
   `twilio` and the keyword-gated keys) and `discord` and `telegram` measure
   runs on demand without a table. A whole-input scan of 10 MiB of prose
-  allocated 1,952 MiB before and 32 MiB after, and ran about 10% faster.
+  allocated 1,952 MiB before and 32 MiB after. The #981 harness's 10 MiB
+  mixed workload runs about 22% faster whole-input and incremental.
   Findings and output are unchanged. See `docs/audits/evidence/982/README.md`.
+- Built-in detectors that can only match text containing one of a few
+  literals (a provider prefix such as `ghp_`, a marker such as `.atlasv1.`)
+  are skipped when the scan copy cannot contain any of them (#983). The
+  pipeline builds one small set of the input's byte pairs per call. 75 of
+  the 92 `full` detectors and 4 of the 6 `common` ones declare their
+  literals. Custom detectors and the 17 built-ins that cannot declare one
+  (`generic-token`, `bearer-token`, the keyword-gated and bare-shape
+  detectors) always run. On the #981 harness the 64 KiB logs workload runs
+  43% faster whole-input and 48% faster incremental, on top of #982.
+  Findings and output are unchanged. See `docs/audits/evidence/983/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

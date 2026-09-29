@@ -4,9 +4,11 @@
 findings) allocated 1,952.0 MiB in 1,211,389 allocations on main
 `04b3e212`. On `beta11/980-pattern-prefilter` it allocates 32.0 MiB in 82
 allocations. Peak live heap during the scan fell from 160.0 MiB to 6.0 MiB
-above the pre-scan baseline. The scan median fell from about 1,165 ms to
-about 1,050 ms on a loaded host (about 10%). No finding, range, action or
-output byte changed, and no dependency was added.
+above the pre-scan baseline. On the #981 harness, `mixed-10m` fell from
+748 ms to 580 ms whole-input and from 1,510 ms to 1,185 ms incremental
+(about 22%), and the 64 KiB logs workload from 4.26 ms to 3.64 ms whole and
+8.14 ms to 6.86 ms incremental. No finding, range, action or output byte
+changed, and no dependency was added.
 
 Issue [#982](https://github.com/redact-secret/redact-secret/issues/982),
 parent [#980](https://github.com/redact-secret/redact-secret/issues/980).
@@ -31,17 +33,40 @@ scope implemented here.
   before) three times. The host was shared with other builds, so single
   medians moved by up to 2x. The figures below leave out the two outlier
   rounds (a `before` median of 1,380 ms and one of 2,290 ms).
-- The #981 harness (`benches/scan_cost.rs`) was not yet on `main` or pushed
-  when this was measured. The orchestrator can rerun it once it lands.
+- **Harness.** The #981 harness (`benches/scan_cost.rs`, head `5c814dc9`)
+  was built three times: main `04b3e212` plus the harness, this issue's
+  commits (`3a2ad91a`) plus the harness, and the branch with #983 on top.
+  The three binaries ran interleaved in four rounds (A B C, C B A, A B C,
+  C B A) with `--no-detectors --json` (5 runs for `mixed-10m`, 11 for
+  `scale-logs-256k`, 21 otherwise). The tables give the median of the four
+  round medians. Findings counts were identical on every build.
 
 ## Numbers
+
+Allocation probe (10 MiB of prose):
 
 | | main `04b3e212` | this branch |
 | --- | ---: | ---: |
 | Bytes allocated per 10 MiB scan | 1,952.0 MiB | 32.0 MiB |
 | Allocations per scan | 1,211,389 | 82 |
 | Peak live heap above baseline | 160.0 MiB | 6.0 MiB |
-| Scan median (ms), clean rounds | 1,159, 1,166, 1,167, 1,177 | 1,047, 1,047, 1,048, 1,054, 1,088 |
+| Probe scan median (ms), clean rounds | 1,159, 1,166, 1,167, 1,177 | 1,047, 1,047, 1,048, 1,054, 1,088 |
+
+#981 harness, milliseconds (this issue alone; #983 is recorded in
+[its own evidence](../983/README.md)):
+
+| Workload | Path | main `04b3e212` | after #982 |
+| --- | --- | ---: | ---: |
+| `mixed-10m` (10,239 findings) | whole | 748.5 | 579.9 |
+| | incremental 65536 | 1,510.0 | 1,184.6 |
+| `scale-logs-256k` | whole | 18.44 | 14.26 |
+| | incremental 4096 | 32.17 | 26.23 |
+| `scale-logs-64k` | whole | 4.26 | 3.64 |
+| | incremental 65536 | 8.14 | 6.86 |
+| `unicode-invisible-64k` (269 findings) | whole | 4.09 | 2.98 |
+| | incremental 65536 | 8.34 | 6.89 |
+| `provider-tables-64k` (112 findings) | whole | 4.91 | 3.76 |
+| | incremental 65536 | 8.05 | 6.68 |
 
 ## What changed
 
