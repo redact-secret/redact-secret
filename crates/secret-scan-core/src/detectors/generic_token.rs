@@ -1651,6 +1651,18 @@ fn is_prefixed_filler_body(value: &str) -> bool {
 /// The longest vendor prefix [`is_vendor_prefixed_placeholder`] strips.
 const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 
+/// Dedicated-detector prefixes longer than
+/// [`MAX_VENDOR_PLACEHOLDER_PREFIX_LEN`] that are stripped all the same, each
+/// written without its trailing separator. Issue #1015: `sk-ant-admin01` is
+/// the Anthropic Admin prefix, and its documentation placeholders
+/// (`sk-ant-admin01-<your-key>`) get the same treatment as the 12-byte
+/// `sk-ant-api01`/`sk-ant-api03` siblings. Listing the exact prefix keeps the
+/// general 12-byte cap for every other lowercase lead (`longvendorname_`).
+const LONG_VENDOR_PLACEHOLDER_PREFIXES: &[&str] = &["sk-ant-admin01"];
+
+/// The longest entry of [`LONG_VENDOR_PLACEHOLDER_PREFIXES`].
+const MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 14;
+
 /// `true` for a documentation placeholder behind a short vendor prefix:
 /// `pplx-your-api-key-here`, `lsv2_pt_your_key_here`, `pcsk_***`,
 /// `pul-xxxxxxxx`, `xapp-<your-app-level-token>`. The prefix is at most
@@ -1670,8 +1682,13 @@ const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
     value
         .char_indices()
-        .take_while(|&(index, _)| index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN)
-        .filter(|&(index, ch)| index > 0 && matches!(ch, '_' | '-'))
+        .take_while(|&(index, _)| index <= MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN)
+        .filter(|&(index, ch)| {
+            index > 0
+                && matches!(ch, '_' | '-')
+                && (index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN
+                    || LONG_VENDOR_PLACEHOLDER_PREFIXES.contains(&&value[..index]))
+        })
         .any(|(index, _)| {
             let rest = &value[index + 1..];
             let prefix = &value[..index];
@@ -3519,6 +3536,20 @@ mod tests {
         ] {
             assert!(detect(input).is_empty(), "{input}");
         }
+    }
+
+    #[test]
+    fn the_vendor_placeholder_prefix_limit_covers_the_anthropic_admin_prefix() {
+        // Issue #1015: the 14-byte `sk-ant-admin01` prefix is stripped like
+        // its 12-byte siblings; any other lead over 12 bytes is not.
+        assert!(is_vendor_prefixed_placeholder("sk-ant-admin01-<your-key>"));
+        assert!(is_vendor_prefixed_placeholder("sk-ant-admin01-YOUR_KEY"));
+        assert!(is_vendor_prefixed_placeholder("sk-ant-admin01-..."));
+        assert!(!is_vendor_prefixed_placeholder("sk-ant-admin02-<your-key>"));
+        assert!(!is_vendor_prefixed_placeholder("abcdefghijklmn-<your-key>"));
+        assert!(!is_vendor_prefixed_placeholder(
+            "sk-ant-admin01-Ab3Cd4Ef5Gh6"
+        ));
     }
 
     #[test]

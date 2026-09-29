@@ -28,6 +28,13 @@ evidence is linked from each published version.
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
 
+### Fixed
+
+- `generic-token` no longer redacts Anthropic Admin documentation placeholders
+  (`sk-ant-admin01-<your-key>`, `-YOUR_KEY`, `-...`), matching the
+  `sk-ant-api01-`/`sk-ant-api03-` siblings (#1015). A well-formed Admin key is
+  still `anthropic_admin_api_key`, and an off-grammar body is still reported.
+
 ## 0.1.0-beta.11 — 2026-09-29
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.11/README.md).
