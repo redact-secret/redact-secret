@@ -283,6 +283,16 @@ evidence is linked from each published version.
   `latency/*/processing-ratio` rows are within budget (0.54-0.83 of beta.8;
   `browser-wasm` `scale-logs-small-whole` 1.23 against its 1.30 allowance).
   See `docs/audits/evidence/950/README.md`.
+- Detectors no longer allocate an 8-byte-per-input-byte run-length table on
+  every call (#982). Detectors anchored on a literal (`firebase`, `gitlab`
+  runner, `grafana`, `microsoft-entra`, `notion`, `openai`, `sendgrid`,
+  `sentry` org, `stripe` `whsec_`, `terraform`) build it only once the
+  literal occurs. Per-line run tokenizers (`confluent`, `datadog`, `heroku`,
+  `mailchimp`, `mailgun`, `new-relic`, `okta`, `pinecone`, `travisci`,
+  `twilio` and the keyword-gated keys) and `discord` and `telegram` measure
+  runs on demand without a table. A whole-input scan of 10 MiB of prose
+  allocated 1,952 MiB before and 32 MiB after, and ran about 10% faster.
+  Findings and output are unchanged. See `docs/audits/evidence/982/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28
 
