@@ -3,56 +3,56 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-29T17:18:37.076Z",
-    "runId": "02b5a600-3120-4cb4-a544-2729a08228ce",
-    "revision": "ec9ffbecb06a9411ec5e9e4490cd0d59511043e0",
+    "generatedAt": "2026-09-29T18:57:14.213Z",
+    "runId": "596058a9-2843-4488-8b9d-05c4f545a795",
+    "revision": "a30282d90f31a7a059cd1a0262e9f1b3ec8423b3",
     "dirty": false,
     "criteriaSchemaVersion": 1,
     "fixtureIndex": {
       "schemaVersion": 1,
       "algorithm": "sha256",
-      "digest": "1f960b1a6d21e89d76eec06536cab2865f58780e93276c12bfc8cadac4935106",
-      "fixtureCount": 4777
+      "digest": "5919a6764b77a9bb1f11925640c53ccb371a3fdacc8d9835a741eecda5689d42",
+      "fixtureCount": 4827
     },
     "taxonomyDigest": "c6a528022e77c840cf3e244784c071fe218bbfafad75d5a28dc45e8a6ab5518c",
     "product": {
-      "sourceCommit": "8b6a5fde52ecb4dfce13f09c7a947062d21483c7",
+      "sourceCommit": "94fc18a974f659ea882c89120dbf1adb3acf2f28",
       "packageName": "@redact-secret/core",
-      "declaredVersion": "0.1.0-beta.10",
+      "declaredVersion": "0.1.0-beta.11",
       "artifacts": [
         {
           "role": "package",
-          "sha256": "467111e288a3677e0e13d11f907a33e358a3161bfb1109f6115f80b16c33f74c"
+          "sha256": "3e70490584e529be5097fc8a9a3655cb57a3d2f31b58ef173bf614aab4134b05"
         },
         {
           "role": "node",
-          "sha256": "19f41652389a9234c2648b058d3a05f60a305114a016c656e93fa35f23ee05ea"
+          "sha256": "db1f0574d7f15e1346ffe16550dc32a5a4f5b99e2a29f9a6bf94f792fc07dccb"
         },
         {
           "role": "wasm",
-          "sha256": "61d135ba611a154433be9a9a56a38bf4a5fc8747a6b9d5fdf6e4dd6891666f2d"
+          "sha256": "5d9cb24714b5af25e2411644328b1d64f5583f92107cd2f5b9d2fbbe462813f6"
         }
       ]
     },
     "scannerObservations": {
       "redact-secret": {
         "source": "fresh",
-        "observedAt": "2026-09-29T17:18:24.752Z",
-        "sourceRunId": "02b5a600-3120-4cb4-a544-2729a08228ce"
+        "observedAt": "2026-09-29T18:56:59.514Z",
+        "sourceRunId": "596058a9-2843-4488-8b9d-05c4f545a795"
       },
       "gitleaks": {
         "source": "snapshot",
-        "observedAt": "2026-09-29T17:17:13.180Z",
-        "sourceRunId": "7a289b82-16d8-4970-8e35-4e2846d74ef0",
-        "snapshotDigest": "15366d3ce138ba0fb72b124215db1aef106a194fbd1653be62450989be24e875",
-        "inputDigest": "358873ed36d6c91a88f4700d948d084bc079ad978e8380c55f713eab911cfdbd"
+        "observedAt": "2026-09-29T18:25:31.952Z",
+        "sourceRunId": "8e6aaff0-245b-4d77-8c60-d614f254cebd",
+        "snapshotDigest": "0ecf0a49c06855aa42e927b747449cb4613861d833aba7064191116444e9121b",
+        "inputDigest": "6acc513ed78005a7ce3774e00329318f142f840c87e89950482b46d46243b795"
       },
       "trufflehog": {
         "source": "snapshot",
-        "observedAt": "2026-09-29T17:17:13.180Z",
-        "sourceRunId": "7a289b82-16d8-4970-8e35-4e2846d74ef0",
-        "snapshotDigest": "0734ebdce7374e5f5d8f80552a6208f1e55e62a3958ec60a101102adf6fc0d2d",
-        "inputDigest": "358873ed36d6c91a88f4700d948d084bc079ad978e8380c55f713eab911cfdbd"
+        "observedAt": "2026-09-29T18:25:31.952Z",
+        "sourceRunId": "8e6aaff0-245b-4d77-8c60-d614f254cebd",
+        "snapshotDigest": "6945b28926fc2bfd44755436998fdcd3c0f46d177ed8feee8ff2450be021fea4",
+        "inputDigest": "6acc513ed78005a7ce3774e00329318f142f840c87e89950482b46d46243b795"
       }
     }
   },
@@ -1466,8 +1466,8 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 7,
-        "mutation": 1,
+        "metamorphic": 14,
+        "mutation": 2,
         "differential": 4
       },
       "empiricalEvidence": {
@@ -1493,33 +1493,36 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 20,
-        "positiveAxes": 15,
+        "positiveCases": 27,
+        "positiveAxes": 17,
         "benignCases": 31,
         "controlAxes": 6,
         "twinPairs": 20,
-        "totalFixtures": 71,
+        "totalFixtures": 78,
         "contextTwinPairs": 14,
         "confusionAxes": 8
       },
       "detectors": [
         "cohere-api-key"
       ],
-      "reason": "metamorphic.criticalFailures: 7 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 1 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled.",
+      "reason": "metamorphic.criticalFailures: 14 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 2 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled.",
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "context-constrained-empirical",
         "explicit": false,
         "target": "context-constrained-empirical",
         "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "stable-empirical",
           "context-constrained-empirical"
         ],
         "cells": {
-          "totalFixtures": 71,
-          "positiveCases": 3,
+          "totalFixtures": 78,
+          "positiveCases": 10,
           "benignControls": 31,
           "twinPairs": 20,
-          "positiveContextAxes": 15,
+          "positiveContextAxes": 17,
           "controlAxes": 6,
           "confusionAxes": 8,
           "positiveContextAxisIds": [
@@ -1528,6 +1531,8 @@
             "#379 · cohere-api-key · sdk-config",
             "#379 · cohere-api-key · source-code",
             "#379 · cohere-api-key · tool-output",
+            "#384e · cohere-api-key · ci-config",
+            "#384e · cohere-api-key · cli",
             "#384e · cohere-api-key · container-config",
             "#384e · cohere-api-key · env",
             "#384e · cohere-api-key · header",
@@ -1610,12 +1615,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 13,
-        "positiveAxes": 7,
+        "positiveCases": 16,
+        "positiveAxes": 9,
         "benignCases": 10,
         "controlAxes": 6,
         "twinPairs": 10,
-        "totalFixtures": 33,
+        "totalFixtures": 36,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -1628,22 +1633,27 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented"
+        ],
         "cells": {
-          "totalFixtures": 33,
-          "positiveCases": 3,
+          "totalFixtures": 36,
+          "positiveCases": 6,
           "benignControls": 10,
           "twinPairs": 10,
-          "positiveContextAxes": 7,
+          "positiveContextAxes": 9,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434g · composio-org-api-key · ci-config",
             "#434g · composio-org-api-key · container-config",
             "#434g · composio-org-api-key · env",
             "#434g · composio-org-api-key · header",
             "#434g · composio-org-api-key · prose",
             "#434g · composio-org-api-key · sdk-config",
             "#434g · composio-org-api-key · shell-export",
+            "#434g · composio-org-api-key · source-code",
             "#434g · composio-org-api-key · structured-file"
           ],
           "controlAxisIds": [
@@ -1676,14 +1686,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 3,
-            "required": 6,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -1727,12 +1730,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 16,
-        "positiveAxes": 8,
+        "positiveCases": 19,
+        "positiveAxes": 10,
         "benignCases": 15,
         "controlAxes": 6,
         "twinPairs": 14,
-        "totalFixtures": 45,
+        "totalFixtures": 48,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -1745,22 +1748,28 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "context-constrained-empirical"
+        ],
         "cells": {
-          "totalFixtures": 45,
-          "positiveCases": 3,
+          "totalFixtures": 48,
+          "positiveCases": 6,
           "benignControls": 15,
           "twinPairs": 14,
-          "positiveContextAxes": 8,
+          "positiveContextAxes": 10,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434g · composio-api-key · ci-config",
             "#434g · composio-api-key · container-config",
             "#434g · composio-api-key · env",
             "#434g · composio-api-key · header",
             "#434g · composio-api-key · prose",
             "#434g · composio-api-key · sdk-config",
             "#434g · composio-api-key · shell-export",
+            "#434g · composio-api-key · source-code",
             "#434g · composio-api-key · structured-file",
             "composio-api-key"
           ],
@@ -1794,14 +1803,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 3,
-            "required": 6,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -1845,12 +1847,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 13,
-        "positiveAxes": 7,
+        "positiveCases": 16,
+        "positiveAxes": 9,
         "benignCases": 10,
         "controlAxes": 6,
         "twinPairs": 10,
-        "totalFixtures": 33,
+        "totalFixtures": 36,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -1863,22 +1865,27 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented"
+        ],
         "cells": {
-          "totalFixtures": 33,
-          "positiveCases": 3,
+          "totalFixtures": 36,
+          "positiveCases": 6,
           "benignControls": 10,
           "twinPairs": 10,
-          "positiveContextAxes": 7,
+          "positiveContextAxes": 9,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434g · composio-user-api-key · ci-config",
             "#434g · composio-user-api-key · container-config",
             "#434g · composio-user-api-key · env",
             "#434g · composio-user-api-key · header",
             "#434g · composio-user-api-key · prose",
             "#434g · composio-user-api-key · sdk-config",
             "#434g · composio-user-api-key · shell-export",
+            "#434g · composio-user-api-key · source-code",
             "#434g · composio-user-api-key · structured-file"
           ],
           "controlAxisIds": [
@@ -1911,14 +1918,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 3,
-            "required": 6,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -2804,9 +2804,9 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 14,
-        "mutation": 4,
-        "differential": 8
+        "metamorphic": 21,
+        "mutation": 5,
+        "differential": 10
       },
       "empiricalEvidence": {
         "observations": 0,
@@ -2831,33 +2831,36 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 21,
-        "positiveAxes": 15,
+        "positiveCases": 29,
+        "positiveAxes": 18,
         "benignCases": 30,
         "controlAxes": 6,
         "twinPairs": 22,
-        "totalFixtures": 73,
+        "totalFixtures": 81,
         "contextTwinPairs": 16,
         "confusionAxes": 8
       },
       "detectors": [
         "deepgram-api-key"
       ],
-      "reason": "twinFailures: 2 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | metamorphic.criticalFailures: 14 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 4 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 8 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled.",
+      "reason": "twinFailures: 2 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | metamorphic.criticalFailures: 21 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 5 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 10 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled.",
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "context-constrained-empirical",
         "explicit": false,
         "target": "context-constrained-empirical",
         "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "stable-empirical",
           "context-constrained-empirical"
         ],
         "cells": {
-          "totalFixtures": 73,
-          "positiveCases": 2,
+          "totalFixtures": 81,
+          "positiveCases": 10,
           "benignControls": 30,
           "twinPairs": 22,
-          "positiveContextAxes": 15,
+          "positiveContextAxes": 18,
           "controlAxes": 6,
           "confusionAxes": 8,
           "positiveContextAxisIds": [
@@ -2867,6 +2870,8 @@
             "#379 · deepgram-api-key · log",
             "#379 · deepgram-api-key · source-code",
             "#379 · deepgram-api-key · structured-file",
+            "#384e · deepgram-api-key · ci-config",
+            "#384e · deepgram-api-key · cli",
             "#384e · deepgram-api-key · container-config",
             "#384e · deepgram-api-key · env",
             "#384e · deepgram-api-key · header",
@@ -2874,6 +2879,7 @@
             "#384e · deepgram-api-key · sdk-config",
             "#384e · deepgram-api-key · shell-export",
             "#384e · deepgram-api-key · source-code",
+            "#384e · deepgram-api-key · structured-file",
             "#384e · deepgram-api-key · tool-output",
             "deepgram-api-key"
           ],
@@ -4460,12 +4466,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 16,
+        "positiveCases": 17,
         "positiveAxes": 10,
         "benignCases": 15,
         "controlAxes": 6,
         "twinPairs": 11,
-        "totalFixtures": 42,
+        "totalFixtures": 43,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -4478,10 +4484,13 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented"
+        ],
         "cells": {
-          "totalFixtures": 42,
-          "positiveCases": 5,
+          "totalFixtures": 43,
+          "positiveCases": 6,
           "benignControls": 15,
           "twinPairs": 11,
           "positiveContextAxes": 10,
@@ -4529,14 +4538,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 5,
-            "required": 6,
-            "shortfall": 1
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -4844,12 +4846,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 16,
-        "positiveAxes": 10,
+        "positiveCases": 19,
+        "positiveAxes": 11,
         "benignCases": 15,
         "controlAxes": 6,
         "twinPairs": 14,
-        "totalFixtures": 45,
+        "totalFixtures": 48,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -4862,16 +4864,21 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "context-constrained-empirical"
+        ],
         "cells": {
-          "totalFixtures": 45,
-          "positiveCases": 3,
+          "totalFixtures": 48,
+          "positiveCases": 6,
           "benignControls": 15,
           "twinPairs": 14,
-          "positiveContextAxes": 10,
+          "positiveContextAxes": 11,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434f · firecrawl-api-key · ci-config",
             "#434f · firecrawl-api-key · cli",
             "#434f · firecrawl-api-key · container-config",
             "#434f · firecrawl-api-key · env",
@@ -4913,14 +4920,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 3,
-            "required": 6,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -8149,12 +8149,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 14,
-        "positiveAxes": 7,
+        "positiveCases": 16,
+        "positiveAxes": 9,
         "benignCases": 15,
         "controlAxes": 6,
         "twinPairs": 14,
-        "totalFixtures": 43,
+        "totalFixtures": 45,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -8167,16 +8167,21 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented"
+        ],
         "cells": {
-          "totalFixtures": 43,
-          "positiveCases": 4,
+          "totalFixtures": 45,
+          "positiveCases": 6,
           "benignControls": 15,
           "twinPairs": 14,
-          "positiveContextAxes": 7,
+          "positiveContextAxes": 9,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434e · helicone-api-key · ci-config",
+            "#434e · helicone-api-key · container-config",
             "#434e · helicone-api-key · env",
             "#434e · helicone-api-key · header",
             "#434e · helicone-api-key · prose",
@@ -8215,14 +8220,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 4,
-            "required": 6,
-            "shortfall": 2
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -9626,8 +9624,8 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 0,
-        "mutation": 0,
+        "metamorphic": 14,
+        "mutation": 2,
         "differential": 3
       },
       "empiricalEvidence": {
@@ -9652,34 +9650,41 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 15,
-        "positiveAxes": 10,
+        "positiveCases": 25,
+        "positiveAxes": 12,
         "benignCases": 26,
         "controlAxes": 6,
         "twinPairs": 17,
-        "totalFixtures": 58,
+        "totalFixtures": 68,
         "contextTwinPairs": 12,
         "confusionAxes": 8
       },
       "detectors": [
         "mistral-api-key"
       ],
-      "reason": "empirical.corroborated.minimumClasses: 1 < 2 — At least two corroboration classes other than a summary class. Peer scanner rules copy one another (#215 found tool shapes 'possibly copied from one source'), so scanner rules alone never qualify: one reference must be provider-owned code, a provider example or an independent implementation. (corroborated route) | empirical.minimumObservations: 0 < 5 — Observed route (#205): five safe provider-issued observations are the minimum empirical sample. Since the 2026-09-24 amendment of #177 this route is optional: meeting it strengthens a T2 family's evidence basis to empirically-observed, and the corroborated route qualifies without any observation. (observed route, optional) | empirical.minimumSubjects: 0 < 2 — Observed route: observations must span at least two pseudonymous accounts or projects. (observed route, optional) | empirical.minimumIssuanceDates: 0 < 2 — Observed route: observations must span at least two issuance dates. (observed route, optional) | empirical.minimumCorroborationClasses: 1 < 2 — Observed route: two corroboration classes, summary classes excluded, must agree with the observed structure. (observed route, optional) | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled. | fixtureProfile context-constrained-empirical: 0 positive/context cases < 1 (1 short)",
+      "reason": "empirical.corroborated.minimumClasses: 1 < 2 — At least two corroboration classes other than a summary class. Peer scanner rules copy one another (#215 found tool shapes 'possibly copied from one source'), so scanner rules alone never qualify: one reference must be provider-owned code, a provider example or an independent implementation. (corroborated route) | empirical.minimumObservations: 0 < 5 — Observed route (#205): five safe provider-issued observations are the minimum empirical sample. Since the 2026-09-24 amendment of #177 this route is optional: meeting it strengthens a T2 family's evidence basis to empirically-observed, and the corroborated route qualifies without any observation. (observed route, optional) | empirical.minimumSubjects: 0 < 2 — Observed route: observations must span at least two pseudonymous accounts or projects. (observed route, optional) | empirical.minimumIssuanceDates: 0 < 2 — Observed route: observations must span at least two issuance dates. (observed route, optional) | empirical.minimumCorroborationClasses: 1 < 2 — Observed route: two corroboration classes, summary classes excluded, must agree with the observed structure. (observed route, optional) | metamorphic.criticalFailures: 14 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 2 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled.",
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "context-constrained-empirical",
         "explicit": false,
         "target": "context-constrained-empirical",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "stable-empirical",
+          "context-constrained-empirical"
+        ],
         "cells": {
-          "totalFixtures": 58,
-          "positiveCases": 0,
+          "totalFixtures": 68,
+          "positiveCases": 10,
           "benignControls": 26,
           "twinPairs": 17,
-          "positiveContextAxes": 10,
+          "positiveContextAxes": 12,
           "controlAxes": 6,
           "confusionAxes": 8,
           "positiveContextAxisIds": [
+            "#384e · mistral-api-key · ci-config",
+            "#384e · mistral-api-key · cli",
             "#384e · mistral-api-key · container-config",
             "#384e · mistral-api-key · env",
             "#384e · mistral-api-key · header",
@@ -9718,14 +9723,7 @@
           "confusionAxes": 6
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 0,
-            "required": 1,
-            "shortfall": 1
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -11452,12 +11450,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 14,
-        "positiveAxes": 9,
+        "positiveCases": 17,
+        "positiveAxes": 10,
         "benignCases": 16,
         "controlAxes": 6,
         "twinPairs": 11,
-        "totalFixtures": 41,
+        "totalFixtures": 44,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -11470,16 +11468,20 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented"
+        ],
         "cells": {
-          "totalFixtures": 41,
-          "positiveCases": 3,
+          "totalFixtures": 44,
+          "positiveCases": 6,
           "benignControls": 16,
           "twinPairs": 11,
-          "positiveContextAxes": 9,
+          "positiveContextAxes": 10,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434d · posthog-token · ci-config",
             "#434d · posthog-token · cli",
             "#434d · posthog-token · container-config",
             "#434d · posthog-token · env",
@@ -11520,14 +11522,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 3,
-            "required": 6,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -11571,12 +11566,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 8,
+        "positiveCases": 14,
+        "positiveAxes": 9,
         "benignCases": 11,
         "controlAxes": 6,
         "twinPairs": 11,
-        "totalFixtures": 33,
+        "totalFixtures": 36,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -11591,14 +11586,15 @@
         "target": "stable-documented",
         "cellsMet": [],
         "cells": {
-          "totalFixtures": 33,
-          "positiveCases": 0,
+          "totalFixtures": 36,
+          "positiveCases": 3,
           "benignControls": 11,
           "twinPairs": 11,
-          "positiveContextAxes": 8,
+          "positiveContextAxes": 9,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
+            "#434d · posthog-project-secret-api-key · ci-config",
             "#434d · posthog-project-secret-api-key · cli",
             "#434d · posthog-project-secret-api-key · container-config",
             "#434d · posthog-project-secret-api-key · env",
@@ -11641,9 +11637,9 @@
         "debt": [
           {
             "cell": "positiveCases",
-            "actual": 0,
+            "actual": 3,
             "required": 6,
-            "shortfall": 6
+            "shortfall": 3
           }
         ]
       }
@@ -12499,12 +12495,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 16,
-        "positiveAxes": 10,
+        "positiveCases": 17,
+        "positiveAxes": 11,
         "benignCases": 14,
         "controlAxes": 5,
         "twinPairs": 11,
-        "totalFixtures": 41,
+        "totalFixtures": 42,
         "contextTwinPairs": 0,
         "confusionAxes": 9
       },
@@ -12517,17 +12513,21 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented"
+        ],
         "cells": {
-          "totalFixtures": 41,
-          "positiveCases": 5,
+          "totalFixtures": 42,
+          "positiveCases": 6,
           "benignControls": 14,
           "twinPairs": 11,
-          "positiveContextAxes": 10,
+          "positiveContextAxes": 11,
           "controlAxes": 5,
           "confusionAxes": 9,
           "positiveContextAxisIds": [
             "#436d · resend-api-key · cli",
+            "#436d · resend-api-key · container-config",
             "#436d · resend-api-key · env",
             "#436d · resend-api-key · header",
             "#436d · resend-api-key · prose",
@@ -12566,14 +12566,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 5,
-            "required": 6,
-            "shortfall": 1
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -15021,12 +15014,12 @@
       },
       "policyQualification": null,
       "fixtureProfile": {
-        "positiveCases": 15,
-        "positiveAxes": 9,
+        "positiveCases": 18,
+        "positiveAxes": 11,
         "benignCases": 16,
         "controlAxes": 6,
         "twinPairs": 16,
-        "totalFixtures": 47,
+        "totalFixtures": 50,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
@@ -15039,17 +15032,23 @@
         "claimed": "stable-documented",
         "explicit": false,
         "target": "stable-documented",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "context-constrained-empirical"
+        ],
         "cells": {
-          "totalFixtures": 47,
-          "positiveCases": 3,
+          "totalFixtures": 50,
+          "positiveCases": 6,
           "benignControls": 16,
           "twinPairs": 16,
-          "positiveContextAxes": 9,
+          "positiveContextAxes": 11,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
             "#434b · trigger-dev-token · ci-config",
+            "#434b · trigger-dev-token · cli",
+            "#434b · trigger-dev-token · container-config",
             "#434b · trigger-dev-token · env",
             "#434b · trigger-dev-token · header",
             "#434b · trigger-dev-token · prose",
@@ -15089,14 +15088,7 @@
           "controlAxes": 4
         },
         "requiredButEmptyAxisIds": [],
-        "debt": [
-          {
-            "cell": "positiveCases",
-            "actual": 3,
-            "required": 6,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
