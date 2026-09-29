@@ -6,8 +6,8 @@ Your application handles text it does not fully control: user input, pasted
 configuration, error messages, HTTP bodies, and tool results. Before that text
 leaves the request and lands somewhere that keeps or repeats it, pass it
 through Redact Secret. It finds supported credential formats (plus opt-in
-structured PII, qualification pending) and returns the
-text with those matches replaced, plus findings that describe what was
+structured PII: five families `provisional`, US SSN `pending`, none `stable`)
+and returns the text with those matches replaced, plus findings that describe what was
 found and where without ever including the secret itself. It runs in your
 process. It makes no network calls and sends no telemetry, and the same input
 always gives the same result.
@@ -55,7 +55,7 @@ See [browser and server boundaries](#browser-and-server-boundaries) and
 ## What it does not replace
 
 - **It is not a DLP platform.** It finds credentials, plus opt-in structured PII (six bounded
-  families, qualification pending), not general personal data, and
+  families: five `provisional`, US SSN `pending`), not general personal data, and
   it has no policy console, quarantine, or hosted service.
 - **It does not detect every secret.** Detection is limited to supported
   formats and deliberately favors precision. Truncated, new, or unsupported
@@ -199,13 +199,14 @@ PII activation is opt-in and defaults off across Rust, JavaScript, Python, and
 the CLI. The shared `pii-domain` adapter registers the context-qualified
 `pii:global:email`, `pii:global:iban`, `pii:global:network-address`,
 `pii:global:payment-card`, and `pii:global:phone` families. They suppress only
-their reviewed named
-negative classes and remain `pending` until
-exact-artifact `pii-v1` benchmark evidence is reviewed; availability alone is
-not a support claim. The jurisdictional `pii:us` selector closes over those
-global families plus `pii:us:ssn`; `pii:family:us:ssn` selects only SSNs. The
-SSN family uses SSA-published structural exclusions and reviewed field labels,
-not issuance or identity lookup. No other jurisdiction or national identifier
+their reviewed named negative classes. Under `pii-v1` these five global
+families are `provisional`, not `stable`, from the Beta.11 qualification of
+candidate core `8b6a5fde`; availability alone is not a support claim, and phone
+covers only `+1` / NANP numbers. The jurisdictional `pii:us` selector closes
+over those global families plus `pii:us:ssn`; `pii:family:us:ssn` selects only
+SSNs. The SSN family (United States only) uses SSA-published structural
+exclusions and reviewed field labels, not issuance or identity lookup, and it
+stays `pending`: it is available when selected but did not qualify. No other jurisdiction or national identifier
 is available, and these six bounded families are not general PII coverage; the
 [detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support)
 lists what each one excludes. See the [email family contract](docs/contracts/pii/email-v1.md),

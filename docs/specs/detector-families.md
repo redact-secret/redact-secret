@@ -195,8 +195,8 @@ reviewed email field label glued to the address by `=` (`email=`,
 local part, so a logfmt or `.env` record is labelled
 ([#926](https://github.com/redact-secret/redact-secret/issues/926)). This
 row applies the accepted cross-family PII policy to one family and therefore
-does not create a new ADR. Its support state remains `pending` until the exact
-merged artifact's benchmark evidence is reviewed.
+does not create a new ADR. Its `pii-v1` support state is `provisional`, not `stable`, from the Beta.11
+qualification summarized below.
 
 `pii:global:iban` likewise uses the one `pii-domain` adapter. Its exact
 selector is `pii:family:global:iban`, public type is `pii_global_iban`,
@@ -206,8 +206,8 @@ family-contract version is `1`, and `contextRequirement` is
 103 country lengths and `iban-mod97` v1 provenance, bounded compact/print
 normalization, sensitivity semantics, safe fixtures, and false-positive and
 false-negative costs. This applies existing PII policy to one family and adds
-no ADR. Its support state remains `pending` until exact merged-artifact
-benchmark evidence is reviewed.
+no ADR. Its `pii-v1` support state is `provisional`, not `stable`, from the Beta.11
+qualification summarized below.
 
 `pii:global:payment-card` applies the same policy through `pii-domain`. Its
 exact selector is `pii:family:global:payment-card`, public type is
@@ -219,8 +219,8 @@ and reviewed payment-card field context. Only compact values and the explicit
 PANs are whole-value non-sensitive controls. The full grammar, sources, bounded
 normalization, and collision costs are frozen in the
 [payment-card family contract](../contracts/pii/payment-card-v1.md). This row
-applies existing policy and creates no ADR. Its support state remains `pending`
-until the exact merged artifact's benchmark evidence is reviewed.
+applies existing policy and creates no ADR. Its `pii-v1` support state is `provisional`, not `stable`, from the Beta.11
+qualification summarized below.
 
 `pii:global:phone` applies the same policy through `pii-domain`. Its exact
 selector is `pii:family:global:phone`, public type is `pii_global_phone`,
@@ -233,8 +233,9 @@ whole-candidate `555-01xx` exchange/line values are non-sensitive controls.
 The full typed authority, grammar, safe-fixture plan, and deliberately severe
 false-negative boundary are frozen in the
 [phone family contract](../contracts/pii/phone-v1.md). This row applies
-existing policy and creates no ADR. Its support state remains `pending` until
-the exact merged artifact's benchmark evidence is reviewed.
+existing policy and creates no ADR. Its `pii-v1` support state is `provisional`, not `stable`, from the Beta.11
+qualification summarized below. It covers only the `+1` / NANP
+subset.
 
 `pii:us:ssn` applies the same policy through `pii-domain`. Its exact selector
 is `pii:family:us:ssn`, public type is `pii_jurisdiction_us_ssn`,
@@ -246,15 +247,24 @@ only SSA-published current structural exclusions: area `000`, `666`, and
 geography, and identity are not inferred. The
 [US SSN family contract](../contracts/pii/us-ssn-v1.md) freezes sources,
 boundaries, field context, safe generation, and tradeoffs. This applies
-existing PII policy and creates no ADR. Its support state remains `pending`
-until the exact merged artifact's benchmark evidence is reviewed; it does not
-yet complete the `pii-v1` arrival gate.
+existing PII policy and creates no ADR. Its support state remains `pending`:
+its Beta.11 protected run did not meet `identity-only-classification`, so it
+does not yet complete the `pii-v1` arrival gate.
 
-All six structured PII families are `pending` under `pii-v1`; none is
-`provisional` or `stable`. Selecting a family makes it available and is not a
-support claim. US SSN is the only jurisdictional family; no other jurisdiction
-or national identifier is available. Each family's beta.11 disposition is
-recorded in
+Under `pii-v1`, the Beta.11 qualification of candidate core
+`8b6a5fde52ecb4dfce13f09c7a947062d21483c7` made network-address, email,
+payment-card, IBAN, and phone `provisional`; US SSN stays `pending` because its
+protected run missed `identity-only-classification` and its one attempt is
+spent. None is `stable`: the five met `profile-cost` only through a
+maintainer-accepted tradeoff for the PII-on cost cells, and that route never
+assigns `stable`. Evidence: the
+[final record](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/final-core-8b6a5fde.md),
+the [protected disposition](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/core-8b6a5fde52ec/pii-beta11-protected-disposition-v2.json),
+and the [cost acceptance](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/benchmarks/accepted-pii-profile-cost.json).
+Selecting a family makes it available and is not a support claim, and PII
+stays opt-in and separate from the credential detector profiles. US SSN is the
+only jurisdictional family; no other jurisdiction or national identifier is
+available. Each family's disposition is tracked in
 [redact-secret-benchmarks#428](https://github.com/redact-secret/redact-secret-benchmarks/issues/428).
 
 ## Evidence-backed family applications

@@ -29,8 +29,9 @@ available `pii:global:email`, `pii:global:iban`, `pii:global:network-address`,
 `pii:family:global:*` selector for
 exact selection. `--pii pii:us` closes over those global families plus
 `pii:us:ssn`; `--pii pii:family:us:ssn` selects only SSNs. They require reviewed
-high-signal context and remain `pending` until exact-artifact benchmark
-evidence is reviewed. Invalid, unsupported, unavailable, and conflicting
+high-signal context. Under `pii-v1`, the five global families are `provisional` (not `stable`;
+phone covers `+1` / NANP only) and US SSN is `pending`; see
+[detection](../reference/detection.md#opt-in-pii-availability-is-not-support). Invalid, unsupported, unavailable, and conflicting
 selections use fixed input-free diagnostics.
 
 ```bash

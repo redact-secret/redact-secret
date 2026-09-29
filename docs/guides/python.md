@@ -86,8 +86,10 @@ and use `pii_activation()` to record the canonical activation identity.
 `pii:global:phone`; each can be
 selected exactly with its `pii:family:global:*` selector. `("pii:us",)` closes
 over those global families plus `pii:us:ssn`; `("pii:family:us:ssn",)` selects
-only SSNs. They require reviewed high-signal context and
-remain `pending` until exact-artifact benchmark evidence is reviewed.
+only SSNs. They require reviewed high-signal context.
+Under `pii-v1`, the five global families are `provisional` (not `stable`;
+phone covers `+1` / NANP only) and US SSN is `pending`; see
+[detection](../reference/detection.md#opt-in-pii-availability-is-not-support).
 Equivalent selection is idempotent; a different later selection raises the
 fixed, input-free `PiiActivationConflictError`.
 

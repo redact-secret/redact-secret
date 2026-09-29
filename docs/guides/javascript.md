@@ -26,8 +26,9 @@ the global selector, then inspect the canonical identity with
 `pii:family:global:*` selector for
 exact selection. The `pii:us` selector closes over those global families plus
 `pii:us:ssn`; `pii:family:us:ssn` selects only SSNs. They need reviewed
-high-signal context and remain `pending` until exact-artifact benchmark
-evidence is reviewed. Reordered or duplicate equivalent selectors are
+high-signal context. Under `pii-v1`, the five global families are `provisional` (not `stable`;
+phone covers `+1` / NANP only) and US SSN is `pending`; see
+[detection](../reference/detection.md#opt-in-pii-availability-is-not-support). Reordered or duplicate equivalent selectors are
 idempotent; a later different selection fails with the fixed,
 input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
 the same contract while retaining `credentials=common` in its identity.

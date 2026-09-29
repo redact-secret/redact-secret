@@ -77,6 +77,28 @@ evidence is linked from each published version.
 
 ### Changed
 
+- Opt-in PII support status (#901). Under `pii-v1`, the Beta.11
+  qualification of candidate core `8b6a5fde` made `pii:global:network-address`,
+  `pii:global:email`, `pii:global:payment-card`, `pii:global:iban`, and
+  `pii:global:phone` `provisional`, not `stable`. `pii:us:ssn` stays `pending`:
+  its protected run missed `identity-only-classification` (one of two
+  identity-only comparisons disagreed on sensitivity), and its one attempt is
+  spent. No family is `stable`; the five met `profile-cost` only through a
+  maintainer-accepted tradeoff for the PII-on cost cells. PII stays opt-in and
+  off by default, separate from the credential detector profiles, and
+  selecting a family makes it available without making it qualified.
+  Jurisdiction: the five families use the global selectors, phone covers only
+  `+1` / NANP numbers, and SSN is United States only (`pii:us`,
+  `pii:family:us:ssn`); no other jurisdiction or national identifier exists.
+  Known exclusions are each family's frozen contract limits, for example
+  quoted or comment-bearing email forms, payment brands outside Visa,
+  Mastercard, American Express, Discover, and JCB, other phone country codes,
+  lowercase or irregularly spaced IBANs, IPv6 zone ids, and SSN issuance or
+  identity checks; names, postal addresses, dates of birth, and free-text
+  personal data are not detected. See the
+  [detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support),
+  the [final record](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/final-core-8b6a5fde.md),
+  and the [protected disposition](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/core-8b6a5fde52ec/pii-beta11-protected-disposition-v2.json).
 - The default browser WebAssembly artifacts no longer carry the PII domain
   runtime (#937). Since 0.1.0-beta.10 every WASM build linked the
   `pii-domain` adapter, its families, and their Unicode normalization
