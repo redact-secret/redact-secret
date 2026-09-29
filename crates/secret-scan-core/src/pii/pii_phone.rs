@@ -263,8 +263,18 @@ fn has_word_extension_marker(value: &str, name: &str) -> bool {
     if !rest.as_bytes()[0].is_ascii_whitespace() {
         return false;
     }
-    let payload = rest.trim_start_matches(|character: char| character.is_ascii_whitespace());
-    payload.is_empty() || payload.as_bytes().first().is_some_and(u8::is_ascii_digit)
+    // The payload is read on the marker's own line: a line break ends it
+    // exactly as the end of the input does, so a marker at a line end is an
+    // empty extension whatever the next line holds, and a scan of that line
+    // alone agrees with a scan of the whole input (issue #990).
+    let payload = rest.trim_start_matches(|character: char| {
+        character.is_ascii_whitespace() && !matches!(character, '\n' | '\r')
+    });
+    payload.is_empty()
+        || payload
+            .as_bytes()
+            .first()
+            .is_some_and(|&byte| byte.is_ascii_digit() || matches!(byte, b'\n' | b'\r'))
 }
 
 fn reserved_555_control(candidate: &ParsedCandidate) -> bool {
@@ -327,6 +337,22 @@ mod tests {
         ] {
             assert_eq!(detect_phones(input).len(), 1, "{input}");
         }
+    }
+
+    #[test]
+    fn an_extension_marker_at_a_line_end_is_judged_on_its_own_line() {
+        // Issue #990: what follows the line break never decides, so a scan
+        // of the line alone agrees with a scan of the whole input.
+        for input in [
+            "212-555-2345 ext\nhello",
+            "212-555-2345 ext\n123",
+            "212-555-2345 ext. \r\nhello",
+            "212-555-2345 extension\rhello",
+            "212-555-2345 ext\n",
+        ] {
+            assert!(detect_phones(input).is_empty(), "{input:?}");
+        }
+        assert_eq!(detect_phones("212-555-2345 extra\nhello").len(), 1);
     }
 
     #[test]

@@ -48,6 +48,150 @@ pub(super) fn is_line_start(input: &str, pos: usize) -> bool {
     pos == 0 || prev_char(input, pos).is_some_and(is_js_line_terminator)
 }
 
+/// Where the line that starts at `start` ends, and where the next one
+/// starts (`bytes.len() + 1` when there is none).
+///
+/// A line ends at `\n`, which belongs to neither line, or after a lone `\r`
+/// (one followed by anything but `\n`), which stays at the end of its line
+/// the way the `\r` of a CRLF pair does. These are the line ends the
+/// incremental session closes a unit at, so a detector that reads context
+/// from "the same line" or from a bounded number of earlier lines sees the
+/// same lines whether it scans one unit or the whole input (issue #990).
+/// A `\r` that ends the input stays in its line, as it did before, so on
+/// input with only LF or CRLF line endings the lines are unchanged.
+fn line_end_from(bytes: &[u8], start: usize) -> (usize, usize) {
+    let mut at = start;
+    while at < bytes.len() {
+        match bytes[at] {
+            b'\n' => return (at, at + 1),
+            b'\r' if bytes.get(at + 1).is_some_and(|&next| next != b'\n') => {
+                return (at + 1, at + 1);
+            }
+            _ => at += 1,
+        }
+    }
+    (bytes.len(), bytes.len() + 1)
+}
+
+/// Every line of `input` as a byte range, per [`line_end_from`]: without its
+/// `\n`, with a trailing `\r` (of a CRLF pair or a lone one) kept. Each byte
+/// belongs to at most one range, so bounded work per line is bounded work
+/// overall. An input ending in `\n` yields a final empty line.
+///
+/// Every keyword-gated detector walks the whole input through this, so the
+/// search for the next `\n` or `\r` reads eight bytes per step
+/// ([`next_line_byte`]).
+pub(super) fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
+    let bytes = input.as_bytes();
+    let mut start = 0usize;
+    std::iter::from_fn(move || {
+        if start > bytes.len() {
+            return None;
+        }
+        let at = next_line_byte(bytes, start);
+        let (end, next) = match (bytes.get(at), bytes.get(at + 1)) {
+            (Some(b'\n'), _) => (at, at + 1),
+            // The `\r` of a CRLF pair stays in its line.
+            (Some(_), Some(b'\n')) => (at + 1, at + 2),
+            // A lone `\r` ends its line after itself.
+            (Some(_), Some(_)) => (at + 1, at + 1),
+            // No terminator left, or a `\r` that ends the input.
+            (Some(_), None) | (None, _) => (bytes.len(), bytes.len() + 1),
+        };
+        let line = (start, end);
+        start = next;
+        Some(line)
+    })
+}
+
+/// The index of the first `\n` or `\r` at or after `from`, or `bytes.len()`.
+///
+/// Eight bytes are tested per step with the word-at-a-time zero-byte test:
+/// in `v - 0x01..01 & !v & 0x80..80` the lowest set bit marks the first zero
+/// byte of `v` exactly (a borrow can only mark bytes above it), so XOR-ing the
+/// word with each terminator and taking the lowest mark of either finds the
+/// first terminator. This keeps the per-line search as cheap for a short
+/// line as a byte loop and several times cheaper for a long one.
+fn next_line_byte(bytes: &[u8], from: usize) -> usize {
+    const ONES: u64 = u64::from_le_bytes([0x01; 8]);
+    const HIGHS: u64 = u64::from_le_bytes([0x80; 8]);
+    const NEWLINES: u64 = u64::from_le_bytes([b'\n'; 8]);
+    const RETURNS: u64 = u64::from_le_bytes([b'\r'; 8]);
+    let mut at = from;
+    while let Some(chunk) = bytes.get(at..at + 8) {
+        let mut word = [0u8; 8];
+        word.copy_from_slice(chunk);
+        let word = u64::from_le_bytes(word);
+        let newline = word ^ NEWLINES;
+        let carriage_return = word ^ RETURNS;
+        let found = ((newline.wrapping_sub(ONES) & !newline)
+            | (carriage_return.wrapping_sub(ONES) & !carriage_return))
+            & HIGHS;
+        if found != 0 {
+            return at + (found.trailing_zeros() / 8) as usize;
+        }
+        at += 8;
+    }
+    bytes[at.min(bytes.len())..]
+        .iter()
+        .position(|&byte| byte == b'\n' || byte == b'\r')
+        .map_or(bytes.len(), |offset| at + offset)
+}
+
+/// The line ([`lines`]) that holds `start..end`, a span with no line break
+/// inside it, as a byte range. Only that line is read.
+pub(super) fn line_around(input: &str, start: usize, end: usize) -> (usize, usize) {
+    let bytes = input.as_bytes();
+    // A lone `\r` right before `start` ends the previous line.
+    let line_start = if start > 0 && bytes[start - 1] == b'\r' && bytes.get(start) != Some(&b'\n') {
+        start
+    } else {
+        line_start_before(input, start)
+    };
+    (line_start, line_end_from(bytes, end).0)
+}
+
+/// Where the line that ends at `end` starts: after the last line break
+/// before it, a `\n` or a lone `\r` ([`line_end_from`]). A `\r` at
+/// `end - 1` is not a break here: it is followed by `\n`, by the end of the
+/// input, or it is the break that ends this line's predecessor at `end`.
+/// Both searches are `memrchr` scans over this line alone.
+fn line_start_before(input: &str, end: usize) -> usize {
+    let head = &input[..end];
+    let after_newline = head.rfind('\n').map_or(0, |at| at + 1);
+    // No `\n` lies between `after_newline` and `end`, so every `\r` there
+    // but the last byte is followed by another byte of the line: a lone one.
+    let line = &input[after_newline..end];
+    let line = line.strip_suffix('\r').unwrap_or(line);
+    line.rfind('\r')
+        .map_or(after_newline, |offset| after_newline + offset + 1)
+}
+
+/// The last `count` lines of `input` per [`lines`], oldest first, after
+/// dropping one trailing `\n`: the complete lines a retention hint reads
+/// back over. Only the tail is read, so the cost is the length of those
+/// lines, not of `input`.
+pub(super) fn last_lines(input: &str, count: usize) -> Vec<&str> {
+    let complete = input.strip_suffix('\n').unwrap_or(input);
+    let bytes = complete.as_bytes();
+    let mut tail = Vec::with_capacity(count);
+    let mut end = bytes.len();
+    while tail.len() < count {
+        let start = line_start_before(complete, end);
+        tail.push(&complete[start..end]);
+        if start == 0 {
+            break;
+        }
+        end = if bytes[start - 1] == b'\n' {
+            start - 1
+        } else {
+            start
+        };
+    }
+    tail.reverse();
+    tail
+}
+
 /// Advances `start` past every consecutive character matching `pred`.
 pub(super) fn skip_while_chars(input: &str, start: usize, pred: fn(char) -> bool) -> usize {
     let mut cursor = start;
@@ -603,5 +747,88 @@ mod provider_named_assignment_tests {
                 "{line}"
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod line_tests {
+    use super::{last_lines, line_around, lines};
+
+    fn split(input: &str) -> Vec<&str> {
+        lines(input)
+            .map(|(start, end)| &input[start..end])
+            .collect()
+    }
+
+    #[test]
+    fn lines_end_at_a_newline_and_after_a_lone_carriage_return() {
+        assert_eq!(split("a\nb"), ["a", "b"]);
+        assert_eq!(split("a\r\nb\r\n"), ["a\r", "b\r", ""]);
+        assert_eq!(split("a\rb\rc"), ["a\r", "b\r", "c"]);
+        assert_eq!(split("a\r\rb"), ["a\r", "\r", "b"]);
+        // A `\r` that ends the input stays in its line.
+        assert_eq!(split("a\r"), ["a\r"]);
+        assert_eq!(split(""), [""]);
+    }
+
+    /// Every string of up to six symbols over `a`, `\r`, `\n` and a
+    /// three-byte code point, each also with a run of `a` in the middle so
+    /// the terminators fall on both sides of the short-line walk's window.
+    fn generated_inputs() -> Vec<String> {
+        let alphabet = ["a", "\r", "\n", "\u{597D}"];
+        let mut inputs = Vec::new();
+        for len in 0..=6u32 {
+            for mut code in 0..4usize.pow(len) {
+                let mut symbols = Vec::new();
+                for _ in 0..len {
+                    symbols.push(alphabet[code % 4]);
+                    code /= 4;
+                }
+                let (head, tail) = symbols.split_at(symbols.len() / 2);
+                for padding in [0, 28, 31, 32, 33, 40] {
+                    inputs.push(format!(
+                        "{}{}{}",
+                        head.concat(),
+                        "a".repeat(padding),
+                        tail.concat()
+                    ));
+                }
+            }
+        }
+        inputs
+    }
+
+    #[test]
+    fn lines_agree_with_the_byte_by_byte_line_end_over_generated_inputs() {
+        for input in generated_inputs() {
+            let mut expected = Vec::new();
+            let mut start = 0;
+            while start <= input.len() {
+                let (end, next) = super::line_end_from(input.as_bytes(), start);
+                expected.push((start, end));
+                start = next;
+            }
+            assert_eq!(lines(&input).collect::<Vec<_>>(), expected, "{input:?}");
+        }
+    }
+
+    #[test]
+    fn the_last_lines_are_the_tail_of_lines_over_generated_inputs() {
+        for input in generated_inputs() {
+            let complete = input.strip_suffix('\n').unwrap_or(&input);
+            let all = split(complete);
+            for count in 1..=4 {
+                let expected = &all[all.len().saturating_sub(count)..];
+                assert_eq!(last_lines(&input, count), expected, "{input:?} {count}");
+            }
+        }
+    }
+
+    #[test]
+    fn the_line_around_a_span_is_the_line_that_holds_it() {
+        let input = "x\ra \"k\" b\r\ny";
+        let at = input.find("\"k\"").unwrap();
+        let (start, end) = line_around(input, at, at + 3);
+        assert_eq!(&input[start..end], "a \"k\" b\r");
     }
 }

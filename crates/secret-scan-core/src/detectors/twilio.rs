@@ -103,6 +103,7 @@
 //! reflects it -- collapsing a keyword-only `Medium` match to an
 //! unconditional redact would overstate the weaker heuristic's reliability.
 
+use super::text::lines;
 use crate::detectors::pattern::{self, Alphabet, RunLength};
 use crate::detectors::text;
 use crate::error::DetectorFailure;
@@ -115,29 +116,6 @@ fn is_lower_hex(byte: u8) -> bool {
 
 const SECRET_LEN: usize = 32;
 const CONTEXT_KEYWORD: &str = "twilio";
-
-/// Every line of `input` as a byte range, excluding the terminating `\n`
-/// itself (a trailing `\r` stays part of the line; it never affects context
-/// lookups, since neither the identifier nor the `twilio` keyword scan
-/// treats `\r` specially). Each byte of `input` belongs to exactly one
-/// yielded range, so a caller that does bounded work per line does bounded
-/// work overall, not bounded work per candidate found within a line.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
-}
 
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
@@ -281,12 +259,7 @@ fn open_cli_table_column(previous: &[&str]) -> Option<usize> {
 /// arrives (issue #933). The window it holds is exactly the one
 /// [`TwilioAuthTokenDetector`] reads back.
 pub(crate) fn has_open_twilio_cli_table(input: &str) -> bool {
-    let complete = input.strip_suffix('\n').unwrap_or(input);
-    let mut tail: Vec<&str> = complete
-        .rsplit('\n')
-        .take(CLI_TABLE_LOOKBACK_LINES)
-        .collect();
-    tail.reverse();
+    let tail = text::last_lines(input, CLI_TABLE_LOOKBACK_LINES);
     tail.last().is_some_and(|last| is_twilio_cli_command(last))
         || open_cli_table_column(&tail).is_some()
 }

@@ -139,6 +139,7 @@
 //! never by the current-format detector regardless of context, since it
 //! carries no `HRKU-` prefix.
 
+use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -207,27 +208,6 @@ const UUID_DASH_OFFSETS: [usize; 4] = [8, 13, 18, 23];
 /// A value is never a slice of a wider `[A-Za-z0-9_-]` identifier, matching
 /// [`CURRENT_BOUNDARY`]'s own reasoning.
 const LEGACY_BOUNDARY: Alphabet = pattern::is_alnum_dash;
-
-/// Every line of `input` as a byte range excluding the terminating `\n` (a
-/// trailing `\r` stays part of the line). Mirrors [`super::confluent::lines`]
-/// and [`super::twilio::lines`]; duplicated rather than shared, matching
-/// those modules' own "keep context-gating logic self-contained" reasoning.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
-}
 
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
@@ -514,9 +494,7 @@ fn is_token_table_row_value(line: &str, value_start: usize, value_end: usize) ->
 /// always contains the context line whenever the whole-input scan would use
 /// it.
 pub(crate) fn has_open_heroku_legacy_context(input: &str) -> bool {
-    let complete = input.strip_suffix('\n').unwrap_or(input);
-    let mut tail: Vec<&str> = complete.rsplit('\n').take(LOOKBACK_LINES).collect();
-    tail.reverse();
+    let tail = text::last_lines(input, LOOKBACK_LINES);
     tail.last()
         .is_some_and(|last| is_heroku_auth_token_command(last))
         || ends_inside_heroku_netrc_entry(&tail)

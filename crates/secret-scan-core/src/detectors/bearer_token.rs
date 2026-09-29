@@ -304,15 +304,17 @@ fn is_identifier_boundary_char(ch: char) -> bool {
     ch.is_ascii_alphanumeric() || matches!(ch, '_' | '-')
 }
 
-/// `true` when `s` ends with `authorization` (case-insensitive) and the
-/// character immediately before it, if any, is outside the identifier
-/// boundary charset.
+/// `true` when `s` ends with an `authorization` (case-insensitive) that the
+/// detector reads as a header name: the character before it, if any, is
+/// outside the identifier boundary charset, or it is the tail of a
+/// `Proxy-Authorization` header ([`preceded_by_proxy_prefix`], issue #990).
 fn ends_with_authorization_boundary(s: &str) -> bool {
     if !ends_with_ci(s, "authorization") {
         return false;
     }
     let prefix_len = s.len() - "authorization".len();
     prev_char(s, prefix_len).is_none_or(|ch| !is_identifier_boundary_char(ch))
+        || preceded_by_proxy_prefix(s.as_bytes(), prefix_len)
 }
 
 /// Internal retention hint for the built-in incremental scanner: `true` when
@@ -462,6 +464,15 @@ impl Detector for BearerTokenDetector {
             let boundary_blocked = cursor > 0
                 && is_boundary_identifier_char(bytes[cursor - 1])
                 && !(header && preceded_by_proxy_prefix(bytes, cursor));
+            // An `authorization` that ends a wider header name
+            // (`X-Authorization:`) is not the header this grammar reads, but
+            // the `Bearer` credential after it is still a bare `Bearer`
+            // match. Resuming past the value here hid it, on its own line
+            // and on the next one alike (issue #990).
+            if boundary_blocked && header {
+                cursor += 1;
+                continue;
+            }
             // A joined value is excluded only when every run is filler or
             // placeholder vocabulary: `YOUR_ID:<real secret>` stays
             // detected, so a placeholder half never hides a real half.
@@ -618,6 +629,10 @@ mod tests {
             "authorization: ",
             "authorization \t: ",
             "line one\nauthorization:",
+            // Issue #990: the detector reads a `Proxy-Authorization` header.
+            "Proxy-Authorization:",
+            "proxy-authorization \n",
+            "x: Proxy-Authorization\n:\n",
         ] {
             assert!(has_open_bearer_authorization(open), "{open:?}");
         }
@@ -631,11 +646,36 @@ mod tests {
             "authorizationx",
             "notauthorization",
             "x-authorization",
+            "xproxy-authorization:",
             "authorization: Bearer SYNTHETIC_REVOKED_VALUE",
             "plain text",
         ] {
             assert!(!has_open_bearer_authorization(closed), "{closed:?}");
         }
+    }
+
+    #[test]
+    fn a_bearer_value_after_a_wider_authorization_header_name_is_a_bare_match() {
+        // Issue #990: `X-Authorization` is not the header, so the header
+        // floor does not apply, but the `Bearer` value after it is still a
+        // bare match at the bare floor, on the same line or the next.
+        for input in [
+            "X-Authorization: Bearer SYNTHETIC_REVOKED_WIDER_HEADER",
+            "X-Authorization:\nBearer SYNTHETIC_REVOKED_WIDER_HEADER",
+            "HTTP_AUTHORIZATION: bearer SYNTHETIC_REVOKED_WIDER_HEADER",
+        ] {
+            let candidates = detect(input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(
+                &input[start..end],
+                "SYNTHETIC_REVOKED_WIDER_HEADER",
+                "{input:?}"
+            );
+        }
+        // Below the bare floor it stays silent: only a real header name
+        // lowers the floor to 12.
+        assert!(detect("X-Authorization: Bearer SYNTHrevoked7").is_empty());
+        assert_eq!(detect("Proxy-Authorization: Bearer SYNTHrevoked7").len(), 1);
     }
 
     #[test]

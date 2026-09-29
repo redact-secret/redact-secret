@@ -81,6 +81,7 @@
 //!
 //! Types are confidence-gated (not in `ALWAYS_REDACT_TYPES`), like Twilio.
 
+use super::text::lines;
 use crate::detectors::generic_token::normalize_name;
 use crate::detectors::pattern::{self, Alphabet};
 use crate::detectors::text;
@@ -187,23 +188,6 @@ const DEEPGRAM: Spec = Spec {
 /// `[A-Za-z0-9_-]`: a run is never a slice of a wider identifier.
 fn is_boundary_byte(byte: u8) -> bool {
     pattern::is_alnum(byte) || matches!(byte, b'_' | b'-')
-}
-
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
 }
 
 /// Every non-overlapping, boundary-checked bare run of exactly `spec.len`

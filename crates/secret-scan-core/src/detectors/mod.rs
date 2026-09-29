@@ -120,11 +120,12 @@ pub(crate) fn is_open_tail_neutral(appended: &str) -> bool {
 ///   and before `bearer` (`match_scheme_at`), so a unit starting with `:` or
 ///   `bearer` can complete a header begun on an earlier line.
 ///
-/// Their retention hints hold most of those layouts in one unit, but not
-/// every one the grammars accept (a backticked or glued name, a JWK member,
-/// `X-Authorization:`), and whole-input scanning already reads them
-/// together. Excluding the unit from the batch keeps each batch equal to
-/// per-unit processing without changing either grammar.
+/// Since issue #990 their retention hints hold every such layout the
+/// grammars accept in one unit (a backticked, glued or escaped quoted name,
+/// a JWK member, `Proxy-Authorization:`), so a unit that closes behind one
+/// no longer binds to it. The exclusion is kept as a guard: it costs a
+/// batch split on rare lines, and it keeps each batch equal to per-unit
+/// processing should a grammar and its hint drift apart again.
 pub(crate) fn continues_previous_line(unit: &str) -> bool {
     let start = unit.trim_start_matches(text::is_js_whitespace);
     start.starts_with(['=', ':'])

@@ -64,6 +64,7 @@
 //!   because Travis build, job and repository ids are numeric and commit
 //!   SHAs are 40 hex bytes.
 
+use super::text::lines;
 use crate::detectors::pattern::{self, Alphabet};
 use crate::detectors::text;
 use crate::error::DetectorFailure;
@@ -82,26 +83,6 @@ const BOUNDARY: Alphabet = pattern::is_alnum_dash;
 /// [`BOUNDARY`] plus `_`.
 fn is_boundary_byte(byte: u8) -> bool {
     BOUNDARY(byte) || byte == b'_'
-}
-
-/// Every line of `input` as a byte range, without its `\n`. The line is the
-/// unit the incremental scanner hands a detector, so whole-input and
-/// incremental scanning agree.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
 }
 
 /// `true` when [`CONTEXT_KEYWORD`] occurs anywhere in `line`.

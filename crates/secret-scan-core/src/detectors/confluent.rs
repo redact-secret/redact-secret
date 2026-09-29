@@ -94,6 +94,7 @@
 //! bootstrap host strings all carry a `-` outside this module's alphabets
 //! and are excluded automatically, with no special-casing needed.
 
+use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -206,28 +207,6 @@ pub(super) const CONFLUENT_CLOUD_API_SECRET: KnownFormatProviderDetector =
         is_confluent_secret_boundary,
     );
 
-/// Every line of `input` as a byte range excluding the terminating `\n`
-/// (a trailing `\r` stays part of the line). Mirrors
-/// [`super::twilio::lines`]; duplicated rather than shared, since neither
-/// module depends on the other and each keeps its own context-gating logic
-/// self-contained.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
-}
-
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
     let bytes = line.as_bytes();
@@ -324,12 +303,7 @@ fn is_basic_auth_user_info_secret(line: &str, value_start: usize) -> bool {
 /// The window it holds is exactly the one
 /// [`ConfluentLegacyApiSecretDetector`] reads back.
 pub(crate) fn has_open_confluent_properties(input: &str) -> bool {
-    let complete = input.strip_suffix('\n').unwrap_or(input);
-    let mut tail: Vec<&str> = complete
-        .rsplit('\n')
-        .take(PROPERTIES_LOOKBACK_LINES)
-        .collect();
-    tail.reverse();
+    let tail = text::last_lines(input, PROPERTIES_LOOKBACK_LINES);
     ends_inside_confluent_properties(&tail)
 }
 
