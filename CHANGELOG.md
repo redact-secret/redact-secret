@@ -390,11 +390,13 @@ evidence is linked from each published version.
   the start of the input to find the candidate's line, compare it with every
   other candidate, renormalize every vocabulary form, and renormalize the
   whole line once per candidate for every context label it weighed. It now
-  normalizes the vocabulary once when the adapter is built and groups
+  normalizes the vocabulary once per process, on first use, and groups
   candidates by line once per call. Under `pii:global`, a whole-input scan
   of the 94,720-byte benchmarks `validator-heavy` workload goes from about
   165 ms to about 7 ms (optimized, Apple M4), and 125 PII records on one
-  line from about 21 s to about 1.4 ms. Findings, ranges, actions and output
+  line from about 21 s to about 1.4 ms. The `_pii` WebAssembly builds grow
+  by about 5.8 KB (2.4 KB gzip), and building a registry, a session or
+  `initialize()` does no extra work. Findings, ranges, actions and output
   are unchanged. See `docs/audits/evidence/902/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28

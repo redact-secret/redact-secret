@@ -54,8 +54,9 @@ The line index removes about three quarters of the multi-line cost. The
 barriers and equidistance rescans account for most of the rest. Normalizing
 the vocabulary once per call helps a little whole-input but makes the
 incremental path about three times slower (23 ms to 64-78 ms), because that
-path calls PII once per line. That is why the vocabulary is normalized when
-the adapter is built instead.
+path calls PII once per line. That is why the vocabulary is normalized once
+and kept: first when the adapter is built, and since the follow-up below,
+once per process on first use.
 
 ## What changed
 
@@ -63,9 +64,10 @@ File references are to `crates/secret-scan-core/src/pii.rs`.
 
 - **Vocabulary normalized once.** `ContextVocabulary::new` runs every form
   of the generated `pii-context/v2` table through `normalize_context` and
-  records its scalar count. `PiiDomain::new` builds it once per adapter, so
-  a registry or an incremental session pays for it once. The generated
-  table and its generator are unchanged.
+  records its scalar count. It is built once per process, the first time a
+  candidate needs it (`ContextVocabulary::shared`, a `OnceLock`; see
+  [the WebAssembly follow-up](#webassembly-follow-up-incremental-memory-and-size)).
+  The generated table and its generator are unchanged.
 - **Line bounds by binary search.** `LogicalLines` records every logical
   line break once per call. A candidate's bounds are two `partition_point`
   lookups with the same rule as before: from just after the last break
@@ -211,6 +213,165 @@ context association.
 
 The old figures are single runs. The old code was not run at 500 records
 or more: its cost grows faster than k² there, so it would take hours.
+
+## WebAssembly follow-up: incremental, memory and size
+
+The benchmarks `pii-profile-cost-v2` runs at `main` `ec9224d9` reported
+three Wasm regressions against `8f97f14d` and attributed them to #902
+(`a0836266`) (redact-secret-benchmarks `evidence/901/428/final-core-ec9224d9.md`):
+Wasm incremental PII-on time (`chromium-wasm/full/us-ssn-exact/validator-heavy`
+53.6 to 90.6 ms, `node-wasm` 67.4 to 94.4 ms, same EPYC 7763), Node-Wasm RSS
+PII-on over off (+10.1 to +15.9 percent, was +4.3 to +9.7), Chromium
+`initialize`, and about 41 KB more in each `_pii` Wasm build, 32.8 KB of it
+from #902.
+
+### Method
+
+Wasm artifacts were built with `scripts/build-browser-artifact.mjs` (full
+and common, each with its `_pii` variant) at `8f97f14d` (base), `ec9224d9`
+(main) and the fix, each in its own target directory. A throwaway Node
+script (never committed) follows the benchmarks `node-sample.mjs` order in
+one fresh process per sample: load the `_pii` module, `initialize(selectors)`,
+one whole-input `scan`, then one incremental session fed the benchmarks'
+127-code-unit chunks. It also times a second session in the same process
+(warm). Workload: `validator-heavy`, 4,096 lines. Selections: `us-ssn-exact`
+(`pii:family:us:ssn`), `global` (`pii:global`), `beta10-full`
+(`pii:family:us:ssn` + `pii:global`). Medians of 12 fresh processes per
+cell, builds interleaved ABBA, Node 22.16, Apple M4 (macOS 26.5.2), loaded
+by other work. Native figures come from a probe example (never committed)
+on the public API: medians of 11 runs, two ABBA rounds, ranges shown.
+
+### Causes
+
+1. **Size: new monomorphizations.** `twiggy diff` of the `_pii` build,
+   `8f97f14d` to `a0836266`: `sort_unstable` on `(usize, usize)` and on
+   `usize` (+12.4 KB with their `ipnsort`/`heapsort`/small-sort helpers), a
+   third NFC instantiation (`ContextScalars::feed` over its own
+   `Filter<Chars, closure>` type, +6 KB with its decomposition sorts),
+   `BTreeMap`/`BTreeSet` iterators for the line groups and distinct ranges
+   (+1.6 KB), and the association inlined into `contextualized` (+5.6 KB
+   net).
+2. **`initialize` and memory: the vocabulary was built with the
+   registry.** `PiiDomain::new` normalized every form when a registry or
+   session was built, so `initialize()` ran (and a JIT compiled) the NFC
+   path before any scan, and every incremental session built its own copy.
+   Node `initialize` went from 1.26 to 1.42 ms in the probe.
+3. **Incremental time after a whole-input scan: JIT tier-up, not PII
+   work.** In V8, a Wasm function first runs as baseline (Liftoff) code
+   and is recompiled with TurboFan in the background once it has run
+   enough. Before #902 the whole-input scan spent 60-450 ms in PII context
+   arbitration, so every hot function, credential detectors included, had
+   been optimized before the incremental session began. The whole-input
+   scan now takes 10-30 ms, and the incremental session, which runs right
+   after it, pays for the tier-up that is still in flight. The controls
+   show the PII code itself is not slower:
+   - **Warm** (second session in the same process): main is 19-46 percent
+     faster than base in every selection.
+   - **10 ms pause** between the whole scan and the session: main and the
+     fix are faster than base (`us-ssn-exact` 19.8 base, 16.9 main, 16.8
+     fix; `global` 28.4, 20.2, 20.0).
+   - **Cold** (session before any scan): `us-ssn-exact` 35.0 base, 32.7
+     main, 34.3 fix; `global` 49.0, 41.6, 39.1.
+   - **Baseline tier only** (`node --liftoff-only`, #902 alone):
+     `us-ssn-exact` incremental 52.6 base, 44.6 #902.
+   - Per tenth of the first session, the fix is slower than base for the
+     first 70 percent and faster afterwards, the shape of code that tiers
+     up partway through.
+
+### What changed
+
+File references are to `crates/secret-scan-core/src/pii.rs`.
+
+- The vocabulary is a process-wide `OnceLock` (`ContextVocabulary::shared`),
+  built the first time a call has a candidate to associate. Building a
+  registry, an incremental session or `initialize()` no longer normalizes
+  anything, and every session shares one copy.
+- `contextualized` skips association entirely when no candidate is
+  established.
+- One small generic `heap_sort` (O(n log n), no allocation) replaces the
+  `sort_unstable` calls. The distinct ranges use the `Vec<ByteRange>::sort`
+  the core already links, and the line groups are a sorted `Vec` instead of
+  a `BTreeMap`. The equidistance tie test counts the minimum instead of
+  sorting four numbers.
+- `normalize_context` and `ContextScalars::feed` share one iterator,
+  `visible_nfc` (a named `is_visible` filter), so NFC is instantiated for
+  it once, as before #902.
+- The per-candidate association is `ContextVocabulary::associate`,
+  `#[inline(never)]`, so the per-call driver stays small.
+
+Output is unchanged: the #902 differential tests pass unchanged, and the
+native probe's output hashes are identical across base, main and the fix
+for all three selections, whole-input and incremental.
+
+### Size
+
+`_pii` builds, bytes (gzip -9). `ec9224d9` also carries #948 and #993,
+which add 8,194 B raw (2,482 B gzip) to the full `_pii` build and 8,267 B
+to the common one, measured as `ec9224d9` minus `a0836266`.
+
+| Build | `8f97f14d` | `a0836266` (#902 only) | `ec9224d9` | fix | #902 share, before → after |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| full `_pii` raw | 819,756 | 852,522 | 860,716 | 833,757 | +32,766 → +5,807 |
+| full `_pii` gzip | 302,112 | 312,324 | 314,806 | 306,971 | +10,212 → +2,377 |
+| common `_pii` raw | 633,839 | 666,625 | 674,892 | 647,891 | +32,786 → +5,785 |
+| common `_pii` gzip | 240,396 | 250,468 | 253,442 | 245,057 | +10,072 → +2,348 |
+
+The default (non-PII) builds are 70 B larger than `ec9224d9` (full
+542,445, common 356,480). The remaining 5.8 KB is the association itself
+(`associate` 4.4 KB, the line helpers and one `heap_sort` per key type).
+
+### Node-Wasm, benchmarks order
+
+Milliseconds and MB, `validator-heavy`. `incremental` is the metric the
+benchmarks report; `warm` is a second session in the same process.
+
+| Profile / selection | Build | initialize | whole | incremental | warm | peak RSS |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| full / us-ssn-exact | base | 1.26 | 82.4 | 19.9 | 15.9 | 71.4 |
+| | main | 1.42 | 17.8 | 23.5 | 12.9 | 73.1 |
+| | fix | 1.22 | 17.1 | 21.9 | 12.9 | 71.8 |
+| full / global | base | 1.11 | 360.0 | 29.2 | 26.0 | 71.8 |
+| | main | 1.29 | 22.5 | 24.6 | 17.0 | 73.5 |
+| | fix | 1.13 | 25.3 | 23.1 | 16.6 | 72.4 |
+| full / beta10-full | base | 1.24 | 467.2 | 34.1 | 31.8 | 73.2 |
+| | main | 1.39 | 25.8 | 24.9 | 19.6 | 73.8 |
+| | fix | 1.24 | 26.9 | 24.1 | 19.4 | 72.6 |
+| common / us-ssn-exact | base | 1.01 | 74.5 | 12.9 | 10.7 | 70.4 |
+| | main | 1.19 | 9.7 | 14.6 | 7.3 | 71.4 |
+| | fix | 1.02 | 9.7 | 13.7 | 6.8 | 70.2 |
+| common / global | base | 0.93 | 352.0 | 22.6 | 20.8 | 71.1 |
+| | main | 1.13 | 16.3 | 17.1 | 11.7 | 71.2 |
+| | fix | 0.92 | 16.2 | 14.9 | 11.4 | 69.9 |
+| common / beta10-full | base | 1.06 | 457.9 | 27.0 | 26.4 | 71.2 |
+| | main | 1.23 | 20.3 | 17.1 | 14.3 | 72.7 |
+| | fix | 1.04 | 19.6 | 16.1 | 14.0 | 70.7 |
+
+`initialize` and peak RSS are back at base. `global` and `beta10-full`
+incremental are faster than base. **`us-ssn-exact` incremental, measured
+right after the whole-input scan, is still 7-10 percent slower than base
+on this host (full 19.9 to 21.9 ms, common 12.9 to 13.7 ms), down from
+15-18 percent at `ec9224d9`.** By the controls above, that remainder is
+tier-up the old, slower whole-input scan used to absorb; it goes away with
+a 10 ms pause and is not in the PII code. It is larger on the benchmarks'
+slower two-core x64 runners, where background compilation takes longer.
+Removing it from the product would mean making the whole-input scan slower
+again, so this change does not try to. Whether the benchmarks'
+`incremental` metric should run in its own process, or after a settle
+period, is a benchmarks protocol question left to the maintainer.
+
+### Native, unchanged by the fix
+
+| Selection | Build | whole | incremental, 127-byte chunks | incremental, 64 KiB |
+| --- | --- | ---: | ---: | ---: |
+| us-ssn-exact | base | 36.0-43.0 | 9.8-12.1 | 8.1-10.0 |
+| | main | 4.1-4.4 | 7.7-8.1 | 6.1-6.2 |
+| | fix | 4.1-5.2 | 7.7-8.1 | 6.1-6.6 |
+| global | base | 166-220 | 16.9-18.0 | 15.0-17.8 |
+| | main | 6.5-6.6 | 10.6-11.7 | 8.8-9.0 |
+| | fix | 6.5-6.9 | 10.5-10.7 | 8.8-9.0 |
+| beta10-full | base | 219-292 | 20.9-25.1 | 18.8-22.6 |
+| | main | 7.9-8.2 | 12.5-12.6 | 10.6-10.8 |
+| | fix | 8.1-8.4 | 12.4-12.5 | 10.5-10.7 |
 
 ## Left out
 
