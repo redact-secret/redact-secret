@@ -2226,10 +2226,12 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 // `private_key` name's high-signal bucket (issue #821).
                 normalized = String::from("private_key");
             }
+            // `is_templated_lookup_path` looks back along the line, so it runs
+            // only for a pair that would otherwise be reported (issue #989).
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
-                && !is_templated_lookup_path(input, name_start, value)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
+                && !is_templated_lookup_path(input, name_start, value)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 let name_signal =
