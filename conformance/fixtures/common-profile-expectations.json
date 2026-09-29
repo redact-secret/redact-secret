@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 3286,
+  "fixtureCount": 3296,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -3290,6 +3290,16 @@
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":95,"start":51,"type":"contextual_secret"}],"id":"aws-secret-access-key-name-positive-sdk-camel-case"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":69,"start":28,"type":"contextual_secret"}],"id":"aws-secret-access-key-name-positive-yaml"},
     {"expected":[],"id":"aws-secret-access-key-name-negative-reference"},
-    {"expected":[],"id":"aws-secret-access-key-name-negative-cloudformation-ref"}
+    {"expected":[],"id":"aws-secret-access-key-name-negative-cloudformation-ref"},
+    {"expected":[],"id":"aws-asia-positive-digits-outside-base32"},
+    {"expected":[],"id":"aws-asia-positive-dotenv"},
+    {"expected":[],"id":"aws-asia-positive-credentials-file"},
+    {"expected":[],"id":"aws-asia-positive-sts-json"},
+    {"expected":[],"id":"aws-asia-positive-chat-sentence"},
+    {"expected":[],"id":"aws-asia-boundary-body-fifteen"},
+    {"expected":[],"id":"aws-asia-boundary-body-seventeen"},
+    {"expected":[],"id":"aws-asia-boundary-lowercase-byte"},
+    {"expected":[],"id":"aws-asia-boundary-asib-prefix"},
+    {"expected":[],"id":"aws-asia-negative-other-iam-identifiers"}
   ]
 }

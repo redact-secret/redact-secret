@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3286,
+  "fixtureCount": 3296,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -77922,6 +77922,182 @@
       "input": "SecretAccessKey: !Ref SecretParameter\n",
       "expected": [],
       "note": "A CloudFormation intrinsic under the name stays silent."
+    },
+    {
+      "id": "aws-asia-positive-digits-outside-base32",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ASIASYNTHETIC0189TMP",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 20
+        }
+      ],
+      "note": "Issue #1027 (#1012 READY-T2): ASIA + exactly 16 [A-Z0-9]; digits 0, 1, 8 and 9 outside Base32 are inside the contract's wider class."
+    },
+    {
+      "id": "aws-asia-positive-dotenv",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_ACCESS_KEY_ID=ASIASYNTHETIC0189TMP\n",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 38
+        }
+      ],
+      "note": "Issue #1027: an env assignment reports the temporary ID exactly, typed and actioned like AKIA."
+    },
+    {
+      "id": "aws-asia-positive-credentials-file",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[default]\naws_access_key_id = ASIASYNTHETIC0189TMP\nregion = us-east-1\n",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 50
+        }
+      ],
+      "note": "Issue #1027: the ~/.aws/credentials layout."
+    },
+    {
+      "id": "aws-asia-positive-sts-json",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"Credentials\": {\"AccessKeyId\": \"ASIASYNTHETIC0189TMP\", \"Expiration\": \"2026-09-29T00:00:00Z\"}}",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 53
+        }
+      ],
+      "note": "Issue #1027: the sts assume-role JSON output."
+    },
+    {
+      "id": "aws-asia-positive-chat-sentence",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text",
+        "chat"
+      ],
+      "input": "My temporary key ASIASYNTHETIC0189TMP gets AccessDenied, why?",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 37
+        }
+      ],
+      "note": "Issue #1027: a chat sentence."
+    },
+    {
+      "id": "aws-asia-boundary-body-fifteen",
+      "detector": "aws-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ASIASYNTHETIC0189TM",
+      "expected": [],
+      "note": "Issue #1027: a 15-byte body is not the 20-byte ID."
+    },
+    {
+      "id": "aws-asia-boundary-body-seventeen",
+      "detector": "aws-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ASIASYNTHETIC0189TMPX",
+      "expected": [],
+      "note": "Issue #1027: a 17-byte body is rejected whole, never truncated."
+    },
+    {
+      "id": "aws-asia-boundary-lowercase-byte",
+      "detector": "aws-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ASIASYNTHETIc0189TMP",
+      "expected": [],
+      "note": "Issue #1027: a lowercase byte is outside [A-Z0-9]."
+    },
+    {
+      "id": "aws-asia-boundary-asib-prefix",
+      "detector": "aws-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ASIBSYNTHETIC0189TMP",
+      "expected": [],
+      "note": "Issue #1027: ASIB is not a documented access key prefix."
+    },
+    {
+      "id": "aws-asia-negative-other-iam-identifiers",
+      "detector": "aws-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ABIASYNTHETIC0189TMP ACCASYNTHETIC0189TMP AGPASYNTHETIC0189TMP",
+      "expected": [],
+      "note": "#1012: ABIA (bearer-token CloudTrail ID), ACCA (service-specific credential ID) and AGPA (group ID) are identifiers, not access key IDs."
     }
   ]
 }

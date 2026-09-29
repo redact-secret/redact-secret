@@ -110,6 +110,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "aws-asia-positive-chat-sentence",
+            "aws-asia-positive-credentials-file",
+            "aws-asia-positive-digits-outside-base32",
+            "aws-asia-positive-dotenv",
+            "aws-asia-positive-sts-json",
             "aws-positive-akia",
             "aws-positive-asia-canonical",
             "aws-positive-example-shaped-value-in-comment-context",
@@ -138,6 +143,10 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "aws-asia-boundary-asib-prefix",
+            "aws-asia-boundary-body-fifteen",
+            "aws-asia-boundary-body-seventeen",
+            "aws-asia-boundary-lowercase-byte",
             "aws-boundary-embedded"
           ],
           "state": "supported"
@@ -145,6 +154,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "aws-asia-negative-other-iam-identifiers",
             "aws-negative-account-id",
             "aws-negative-arn-resource",
             "aws-negative-arn-role",
@@ -159,6 +169,10 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "aws-asia-boundary-asib-prefix",
+            "aws-asia-boundary-body-fifteen",
+            "aws-asia-boundary-body-seventeen",
+            "aws-asia-boundary-lowercase-byte",
             "aws-boundary-embedded"
           ],
           "state": "supported"

@@ -422,3 +422,78 @@ mod aws_secret_access_key_names {
         ));
     }
 }
+
+mod aws_sts_temporary_access_key_id {
+    use super::*;
+
+    const DETECTOR: &str = "aws-access-key";
+    const TYPE: &str = "aws_access_key_id";
+    /// `[A-Z0-9]`, deliberately including `0 1 8 9` outside Base32: the
+    /// contract is the wider class (#1012 contradiction 1).
+    const UPPER_ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    fn id(prefix: &str, seed: usize) -> String {
+        format!("{prefix}{}", filler(UPPER_ALNUM, 16, seed))
+    }
+
+    #[test]
+    fn asia_is_typed_and_actioned_exactly_like_akia_in_every_context() {
+        for prefix in ["ASIA", "AKIA"] {
+            let value = id(prefix, 1);
+            for input in [
+                value.clone(),
+                format!("AWS_ACCESS_KEY_ID={value}\n"),
+                format!("export AWS_ACCESS_KEY_ID=\"{value}\"\n"),
+                format!("[default]\naws_access_key_id = {value}\n"),
+                format!("{{\"Credentials\": {{\"AccessKeyId\": \"{value}\"}}}}"),
+                format!("Here are my temporary credentials: {value} why is it denied?"),
+                format!("({value})."),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &value);
+            }
+        }
+    }
+
+    #[test]
+    fn one_property_twins_are_unclaimed() {
+        let value = id("ASIA", 2);
+        let mut lower = value.clone();
+        lower.replace_range(10..11, "q");
+        for twin in [
+            format!("ASIA{}", filler(UPPER_ALNUM, 15, 2)),
+            format!("ASIA{}", filler(UPPER_ALNUM, 17, 2)),
+            lower,
+            value.replacen("ASIA", "ASIB", 1),
+            value.replacen("ASIA", "asia", 1),
+            format!("x{value}"),
+            format!("{value}0"),
+            format!("9{value}"),
+        ] {
+            for input in [twin.clone(), format!("AWS_ACCESS_KEY_ID={twin}\n")] {
+                assert_unclaimed(DETECTOR, &input);
+            }
+        }
+    }
+
+    #[test]
+    fn other_iam_identifiers_are_unclaimed() {
+        for prefix in ["AIDA", "AROA", "ABIA", "ACCA", "AGPA", "ANPA"] {
+            assert_unclaimed(DETECTOR, &format!("{}\n", id(prefix, 3)));
+        }
+        assert_unclaimed(DETECTOR, &"A".repeat(20));
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"ASIA".repeat(20_000));
+        let value = id("ASIA", 4);
+        let (text, findings) = whole_input(&format!("{value} ").repeat(300));
+        assert_eq!(findings.len(), 300);
+        assert!(!text.contains(&value));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("aws_access_key_id = {}\n", id("ASIA", 5)));
+    }
+}

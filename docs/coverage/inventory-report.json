@@ -104,12 +104,15 @@
     {
       "detector": "aws-access-key",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 29,
         "hostContextsExercised": [
+          "chat",
           "dotenv",
           "javascript",
+          "json",
           "log",
-          "plain-text"
+          "plain-text",
+          "toml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -123,6 +126,11 @@
         ]
       },
       "evidenceFixtureIds": [
+        "aws-asia-positive-chat-sentence",
+        "aws-asia-positive-credentials-file",
+        "aws-asia-positive-digits-outside-base32",
+        "aws-asia-positive-dotenv",
+        "aws-asia-positive-sts-json",
         "aws-positive-akia",
         "aws-positive-asia-canonical",
         "aws-positive-example-shaped-value-in-comment-context",

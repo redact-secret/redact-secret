@@ -27,6 +27,10 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- The AWS temporary access key ID contract (`ASIA` + exactly 16 `[A-Z0-9]`,
+  T2) is recorded beside `AKIA` with conformance fixtures and tests (#1027).
+  Grammar, type and action are unchanged.
+
 ### Fixed
 
 - `gitlab-token` reports a routable GitLab personal access token

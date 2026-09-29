@@ -10,7 +10,11 @@ use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, 
 const PREFIXES: [&str; 2] = ["AKIA", "ASIA"];
 
 /// Restricts matches to the two documented AWS access-key prefixes and their
-/// fixed length. This intentionally excludes other AWS identifiers such as
+/// fixed length: `AKIA` (long-term IAM user keys) and `ASIA` (temporary STS
+/// credentials, an identifier usable only with its secret and session
+/// token), each + exactly 16 `[A-Z0-9]`, typed and actioned alike. The
+/// `ASIA` contract is READY-T2 in issue #1012
+/// (`docs/audits/evidence/1012/aws-sts-temporary-access-key.md`, #1027). This intentionally excludes other AWS identifiers such as
 /// role and user IDs; unknown or future prefixes are false negatives until
 /// explicitly added.
 pub(super) struct AwsAccessKeyDetector;
@@ -78,6 +82,29 @@ mod tests {
     fn detects_the_asia_prefix() {
         let input = format!("ASIA{}", "SYNTHETICEXAMPLE");
         assert_eq!(detect(&input).len(), 1);
+    }
+
+    /// Issue #1027 (#1012 READY-T2): `ASIA` + exactly 16 `[A-Z0-9]`, the
+    /// same type, confidence and specificity as `AKIA`, with digits outside
+    /// Base32 in the body.
+    #[test]
+    fn asia_mirrors_akia_and_rejects_its_one_property_twins() {
+        let value = format!("ASIA{}", "SYNTHETIC0189EXA");
+        let candidates = detect(&value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "aws_access_key_id");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        for twin in [
+            format!("ASIA{}", "SYNTHETIC0189EX"),
+            format!("ASIA{}", "SYNTHETIC0189EXAM"),
+            format!("ASIA{}", "SYNTHETIc0189EXA"),
+            format!("ASIB{}", "SYNTHETIC0189EXA"),
+            format!("x{value}"),
+            format!("{value}9"),
+        ] {
+            assert!(detect(&twin).is_empty(), "{twin}");
+        }
     }
 
     #[test]
