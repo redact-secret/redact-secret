@@ -29,15 +29,15 @@ and a GitHub Release page are separate facts.
 
 Observed on 2026-09-29 (the npm registry's `dist-tags` for each package), all
 ten npm packages (`@redact-secret/core`, `@redact-secret/wasm` and the eight
-native addons) have `beta` at `0.1.0-beta.11` and `latest` still at
-`0.1.0-beta.10`. The release workflow
+native addons) have both `beta` and `latest` at `0.1.0-beta.11`. The release workflow
 publishes prereleases with `--tag beta` only, so it never sets `latest`; every
 `latest` value in this file was set by hand, outside the release workflows.
 The history of that hand-moved tag, as observed: beta.1 (beta.5 for the musl
 addons) until 2026-09-24, beta.6 on 2026-09-24, beta.7 on 2026-09-25, beta.8 at
 an unrecorded time after 2026-09-25, and beta.10 at an unrecorded time on or
 before 2026-09-28 (an earlier revision of this page recorded beta.8 as the
-2026-09-28 value; the registry showed beta.10 when re-observed the same day). Use
+2026-09-28 value; the registry showed beta.10 when re-observed the same day),
+and beta.11 on 2026-09-29 at 18:47Z. Use
 `@redact-secret/core@0.1.0-beta.11` or `@redact-secret/core@beta` to select the
 current beta. Python spells beta.7 as `0.1.0b7`, beta.9 as `0.1.0b9`, beta.10
 as `0.1.0b10` and beta.11 as `0.1.0b11`; PyPI has no dist-tag equivalent, so `pip install redact-secret`
@@ -46,8 +46,11 @@ a prerelease.
 
 The `latest` policy for Beta.11 is recorded in
 [releasing](../releasing.md#npm-dist-tag-policy): the Beta.11 publish did not
-move `latest`, so a bare `npm i @redact-secret/core` still resolves beta.10
-until `latest` is moved again as a separate, explicitly approved action.
+move `latest`. The maintainer separately approved moving it on 2026-09-29, and
+all ten packages were moved together with `npm dist-tag add … latest` (passkey
+2FA per package); re-observed afterwards, every package reads
+`{"latest":"0.1.0-beta.11","beta":"0.1.0-beta.11"}`, so a bare
+`npm i @redact-secret/core` now resolves beta.11.
 
 Beta.8's manifest is reconstructed, because its run's manifest job failed ([#799](https://github.com/redact-secret/redact-secret/issues/799)); no publication was partial. Beta.9's release run failed only at its `npm:@redact-secret/core` publish job's pre-publish `release:check` gate, on an unrelated `examples/mcp-redact` dependency, not the actual `npm publish` step or a redact-secret artifact defect; Reconcile Release repaired it. Both beta.9's and beta.10's manifests are reconstructed, because this repository's manifest job has never itself populated the tag/registry/verification evidence a durable record requires (see each [record](0.1.0-beta.9/README.md) for what each reconstruction corrects). Beta.11's release run succeeded end to end; its manifest is reconstructed for the same missing evidence and because one musl addon's registry-state snapshot was an npm propagation-lag false negative, which a Reconcile Release dry run confirmed as already published ([record](0.1.0-beta.11/README.md)). No beta.8, beta.9, beta.10 or beta.11 publication was partial by the time of publication.
 

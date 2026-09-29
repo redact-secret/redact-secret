@@ -144,9 +144,11 @@ workflow's own reports:
 
 - **npm:** all ten packages are at `0.1.0-beta.11`, each shasum equal to the
   manifest's published digest. The `beta` dist-tag is `0.1.0-beta.11`.
-  `latest` is still `0.1.0-beta.10`, as the
-  [dist-tag policy](../../releasing.md#npm-dist-tag-policy) requires. Moving
-  it is a separate, explicitly approved action.
+  The publish left `latest` at `0.1.0-beta.10`, as the
+  [dist-tag policy](../../releasing.md#npm-dist-tag-policy) requires. The
+  maintainer then separately approved moving it, and at 18:47Z all ten
+  packages were moved together to `latest` = `0.1.0-beta.11`, re-observed
+  from the registry afterwards.
 - **crates.io:** both crate checksums equal the inventory's crate digests.
   Neither version is yanked.
 - **PyPI:** all nine file hashes equal the inventory's Python entries.
