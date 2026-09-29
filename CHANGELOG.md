@@ -140,6 +140,29 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- Streaming false negatives: an incremental session missed a credential that
+  a whole-input scan of the same text redacts (#990, found by the #985
+  audit). Incremental output now equals the whole-input result at every
+  chunk boundary for these layouts:
+  - `generic-token`: a backticked name (`` `password ``), a quoted name glued
+    to the text before it (`x"password"`), an escaped quoted name
+    (`{\"password\"`) or a JWK secret member (`"k"` on a `"kty"` line),
+    with the `=`/`:` operator on the next line. The session closed the
+    name's line and missed the value.
+  - `bearer-token`: `Proxy-Authorization:` with `Bearer <token>` on the next
+    line, for a 12-15 byte token (the header floor).
+  - `X-Authorization: Bearer <token>` (and any header name that ends in
+    `authorization`) is now a bare `Bearer` match in a whole-input scan too,
+    on the same line or the next. The whole-input scan used to skip the
+    value; a streamed session reported it.
+  - Lone `\r` line endings: every detector now ends a line after a lone `\r`,
+    as the incremental session, `^` anchoring and PII already did. On
+    `\r`-only input a keyword on one line (`datadog`, `pinecone`, ...) no
+    longer gates a value on the next, and a `twilio` CLI command line no
+    longer holds every later line open until `TokenLimitExceeded`. LF and
+    CRLF input is unaffected.
+  - PII phone: an `ext` marker at a line end is an empty extension and drops
+    the number, whatever the next line holds, in both paths.
 - `generic-token` took quadratic time on long single-line input (#989), a
   regression since 0.1.0-beta.10. The templated-lookup check added by #911
   looked back to the start of the line for every `name: value` pair, so one

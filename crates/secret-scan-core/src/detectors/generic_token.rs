@@ -338,6 +338,11 @@ pub(crate) const RULESET_NAMES_DETECTOR_ID: &str = "generic-token-ruleset-names"
 /// alternation here has no `m` flag in the TypeScript oracle: `^` anchors to
 /// the absolute start of `input`, which is exactly byte offset `0` of the
 /// slice this function receives.
+///
+/// The name forms it accepts are a superset of those
+/// [`parse_name_and_operator`] can join to an operator on a later line
+/// (issue #990): holding a line the grammar would not join only delays its
+/// output, while closing one it would join loses the value in a stream.
 pub(crate) fn has_open_contextual_assignment(input: &str) -> bool {
     let mut end = rskip_while_chars(input, input.len(), is_js_whitespace);
 
@@ -379,18 +384,39 @@ pub(crate) fn has_open_contextual_assignment(input: &str) -> bool {
         return false;
     }
 
-    let mut boundary_pos = name_start;
-    if let Some(ch @ ('"' | '\'')) = prev_char(input, boundary_pos) {
-        boundary_pos -= ch.len_utf8();
-    }
-    let boundary_ok = boundary_pos == 0
-        || prev_char(input, boundary_pos).is_some_and(is_open_assignment_boundary_char);
+    // Every character the assignment grammar accepts directly before a name
+    // ([`is_prefix_boundary_char`], plus the line start and a call's `(`)
+    // holds the line open, so no name it can join to an operator on a later
+    // line is closed away from it (issue #990). A quote or backtick is a
+    // boundary on its own: `x"password"`, `{\"password\"` and
+    // `` `password `` are names to the grammar, whatever precedes the quote.
+    let boundary_ok = prev_char(input, name_start)
+        .is_none_or(|ch| is_open_assignment_boundary_char(ch) || matches!(ch, '"' | '\'' | '`'));
     if !boundary_ok {
         return false;
     }
 
-    let normalized = normalize_name(&input[name_start..name_end]);
-    is_high_signal_name(&normalized) || is_ambiguous_name(&normalized)
+    let name = &input[name_start..name_end];
+    let normalized = normalize_name(name);
+    is_high_signal_name(&normalized)
+        || is_ambiguous_name(&normalized)
+        || is_open_jwk_secret_member(input, name_start, name_end)
+}
+
+/// `true` when the name at `name_start..name_end` is a quoted JWK secret
+/// member on a line that carries `"kty"` ([`is_jwk_secret_member`]), so the
+/// grammar reads it as `private_key` once its operator arrives (issue #990).
+/// Only the name's own line is read: from the line break before the name
+/// to the next one after it, which in a retained unit is the unit's tail.
+fn is_open_jwk_secret_member(input: &str, name_start: usize, name_end: usize) -> bool {
+    if !(JWK_SECRET_MEMBERS.contains(&&input[name_start..name_end])
+        && input[..name_start].ends_with('"')
+        && input[name_end..].starts_with('"'))
+    {
+        return false;
+    }
+    let (line_start, line_end) = super::text::line_around(input, name_start, name_end);
+    input[line_start..line_end].contains("\"kty\"")
 }
 
 // --- non-secret reference exclusions -----------------------------------
@@ -2096,18 +2122,13 @@ fn otpauth_uri_spans(input: &str) -> Vec<(usize, usize)> {
 /// Public members (`n`, `e`, `x`, `y`, `crv`, `kid`) are never listed.
 const JWK_SECRET_MEMBERS: &[&str] = &["k", "d", "p", "q", "dp", "dq", "qi"];
 
-/// The byte spans of every line that carries a quoted `"kty"` member, in
-/// one linear pass, so a JWK member check never rescans a line.
+/// The byte spans of every line ([`super::text::lines`]) that carries a
+/// quoted `"kty"` member, in one linear pass, so a JWK member check never
+/// rescans a line.
 fn jwk_line_spans(input: &str) -> Vec<(usize, usize)> {
-    let mut spans = Vec::new();
-    let mut line_start = 0usize;
-    for line in input.split_inclusive('\n') {
-        if line.contains("\"kty\"") {
-            spans.push((line_start, line_start + line.len()));
-        }
-        line_start += line.len();
-    }
-    spans
+    super::text::lines(input)
+        .filter(|&(start, end)| input[start..end].contains("\"kty\""))
+        .collect()
 }
 
 /// `true` when the assignment name at `name_start..name_end` is a quoted
@@ -4795,8 +4816,32 @@ mod tests {
             "AWS_SECRET_ACCESS_KEY=",
             "auth",
             "credential:",
+            // Issue #990: every name form the grammar joins to an operator
+            // on a later line.
+            "`password\n",
+            "x\"password\"\n",
+            "x'secret'\n  \n",
+            "{\\\"password\\\"\n",
+            "{\"kty\":\"oct\",\"k\"\n",
+            "{\"kty\":\"RSA\",\"qi\"\r\n",
+            "{\"kty\":\"oct\",\"k\":",
         ] {
             assert!(has_open_contextual_assignment(open), "{open:?}");
+        }
+    }
+
+    #[test]
+    fn open_jwk_member_hint_reads_only_the_members_own_line() {
+        for closed in [
+            // No `"kty"` on the member's line, before or after a break.
+            "{\"k\"\n",
+            "{\"kty\":\"oct\"}\n{\"k\"\n",
+            "{\"kty\":\"oct\"}\r{\"k\"\n",
+            // Unquoted, or not a secret member.
+            "{\"kty\":\"oct\",k\n",
+            "{\"kty\":\"RSA\",\"n\"\n",
+        ] {
+            assert!(!has_open_contextual_assignment(closed), "{closed:?}");
         }
     }
 

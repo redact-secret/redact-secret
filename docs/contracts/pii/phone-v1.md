@@ -53,7 +53,9 @@ allocation. A second extension-like continuation after an otherwise valid
 extension invalidates the whole candidate; no first-extension substring is
 recovered. Continuation markers require an exact marker boundary and an
 extension-shaped payload, so ordinary following prose whose word begins with
-`ext` or `x` does not suppress the preceding candidate. ASCII dot or slash
+`ext` or `x` does not suppress the preceding candidate. A payload is read on
+the marker's own line only: a word marker at a line end is an empty extension,
+as at the end of the input, whatever the next line holds (issue #990). ASCII dot or slash
 displays, mixed separators, dialing prefixes,
 vanity letters, Unicode digits/punctuation, RFC 3966 `tel:` / `sms:` URIs,
 governed invisibles, and adjacent identifier, percent, combining-mark, or

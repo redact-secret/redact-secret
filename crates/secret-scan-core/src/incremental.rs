@@ -855,18 +855,17 @@ impl IncrementalSanitizer {
     /// unit, must not share a batch with the units before it. See the audit
     /// in `docs/audits/evidence/985/README.md`.
     ///
-    /// - After a lone `\r`: every unit ends at `\n` or `\r`, but several
-    ///   detectors split their input into lines at `\n` only, so without a
-    ///   `\n` between them two units would read as one line. A `\r\n` pair is
-    ///   two units, the second a lone `\n`, and stays batchable.
-    /// - A unit whose text starts with a construct a detector continues from
-    ///   the text before it ([`continues_previous_line`]).
+    /// That is a unit whose text starts with a construct a detector continues
+    /// from the text before it ([`continues_previous_line`]).
+    ///
+    /// A unit after a lone `\r` used to start a new batch too, because
+    /// several detectors split lines at `\n` only and read two
+    /// `\r`-separated units as one line. Every detector now ends a line at a
+    /// lone `\r` as well, as the session ends a unit there (issue #990), so
+    /// such units batch like any others.
     fn starts_new_batch(&self) -> bool {
         let unit = &self.retained[self.unit_start..];
-        let after_lone_carriage_return =
-            self.retained.as_bytes()[self.unit_start - 1] == b'\r' && !unit.starts_with('\n');
-        after_lone_carriage_return
-            || continues_previous_line(self.scanned.as_deref().unwrap_or(unit))
+        continues_previous_line(self.scanned.as_deref().unwrap_or(unit))
     }
 
     /// Detects, applies policy to and redacts every closed unit in the batch,

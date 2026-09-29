@@ -165,6 +165,7 @@
 //!   positive; this is the same class of risk every other keyword-gated
 //!   bare-format detector in this registry already accepts.
 
+use super::text::lines;
 use crate::detectors::pattern::{self, Alphabet};
 use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
@@ -189,29 +190,6 @@ const BOUNDARY: Alphabet = pattern::is_alnum_dash;
 /// the module doc's unresolved provider facts).
 fn is_key_hex(byte: u8) -> bool {
     byte.is_ascii_hexdigit()
-}
-
-/// Every line of `input` as a byte range, excluding the terminating `\n`
-/// itself (a trailing `\r` stays part of the line). Mirrors
-/// [`super::new_relic`]'s own `lines` helper, which documents why "line" is
-/// the right unit: it is the same processing unit the incremental sanitizer
-/// hands a detector, so whole-input and incremental scanning stay
-/// behaviorally identical.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
 }
 
 /// `true` when [`CONTEXT_KEYWORD`] occurs (case-insensitively) anywhere in

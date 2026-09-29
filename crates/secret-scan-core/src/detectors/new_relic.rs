@@ -159,6 +159,7 @@
 //!   positive; this is the same class of risk every other keyword-gated
 //!   bare-format detector in this registry already accepts.
 
+use super::text::lines;
 use crate::detectors::pattern::{self, RunLength};
 use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
@@ -235,29 +236,6 @@ impl Detector for NewRelicUserApiKeyDetector {
         }
         Ok(candidates)
     }
-}
-
-/// Every line of `input` as a byte range, excluding the terminating `\n`
-/// itself (a trailing `\r` stays part of the line). Mirrors
-/// [`super::twilio`]'s own `lines` helper, which documents why "line" is the
-/// right unit: it is the same processing unit the incremental sanitizer
-/// hands a detector, so whole-input and incremental scanning stay
-/// behaviorally identical.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
 }
 
 /// `true` when any of [`CONTEXT_KEYWORDS`] occurs (case-insensitively)

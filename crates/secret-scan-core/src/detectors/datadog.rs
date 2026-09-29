@@ -203,6 +203,7 @@
 //! generation) is broader application-API authority, even though the core
 //! applies different policy classes across the confidence gradient.
 
+use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -250,29 +251,6 @@ const LEGACY_APPLICATION_KEY_MARKERS: &[&str] = &[
     "dd-app-key",
     "ddappkey",
 ];
-
-/// Every line of `input` as a byte range, excluding the terminating `\n`
-/// itself (a trailing `\r` stays part of the line; it never affects context
-/// lookups, since neither a marker nor the `datadog` keyword scan treats
-/// `\r` specially). Each byte of `input` belongs to exactly one yielded
-/// range, so a caller that does bounded work per line does bounded work
-/// overall, not bounded work per candidate found within a line.
-fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
-    let bytes = input.as_bytes();
-    let mut start = 0usize;
-    std::iter::from_fn(move || {
-        if start > bytes.len() {
-            return None;
-        }
-        let end = bytes[start..]
-            .iter()
-            .position(|&byte| byte == b'\n')
-            .map_or(bytes.len(), |offset| start + offset);
-        let line = (start, end);
-        start = end + 1;
-        Some(line)
-    })
-}
 
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
