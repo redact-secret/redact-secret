@@ -135,13 +135,17 @@ BENCHMARKS_DEVELOP_BRANCH = "develop"
 # of that repository's own `benchmarks/`.
 BENCHMARKS_MANIFEST_PATH = "benchmarks/pin-manifest.json"
 BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH = "schemas/support-matrix-v1.json"
-# The beta.8 support-evidence contract, pinned to an immutable benchmarks
-# commit: the `main` merge (redact-secret-benchmarks#280) that the vendored
-# benchmarks/support-matrix.json was generated at, so the schema and the matrix
-# it validates carry the same fields (corroboration counts, profileCoverage).
+# The support-evidence contract, pinned to an immutable benchmarks `main`
+# commit whose `schemas/support-matrix-v1.json` is byte-identical to the one
+# at 0ecd501f (the develop merge of redact-secret-benchmarks#503), where the
+# vendored benchmarks/support-matrix.json was generated for the Beta.11 candidate, so the schema and the matrix it
+# validates carry the same fields (scanner observations, fixture index,
+# taxonomy digest, the `policy-qualified` profile of benchmarks a66dbef).
+# The previous pin was cfaeac4 (redact-secret-benchmarks#280), the beta.8
+# contract.
 # The benchmarks manifest continues to track the living `main` copy
 # independently.
-BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF = "cfaeac4d83a4c98cffd77328d3416eb920a7d25b"
+BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF = "7af585a8346ee6844bf2025a2c2f77c2aef903ae"
 # (local vendored path, upstream path, upstream ref) for every file `--sync`
 # rewrites and checks 5 and 6 compare byte-for-byte.
 VENDORED_FILES: tuple[tuple[Path, str, str | None], ...] = (

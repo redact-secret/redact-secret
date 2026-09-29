@@ -164,6 +164,38 @@ class ValidateMatrixTests(unittest.TestCase):
         self.assertEqual(GEN.validate_matrix(m, SCHEMA), [])
         self.assertEqual(m["families"][0]["evidenceTier"], "T2")
 
+    def test_accepts_t3_policy_qualified_stable_and_a_matrix_that_predates_it(self) -> None:
+        # redact-secret-benchmarks' decision-qualify-bounded-t3-credential-policy (a66dbef).
+        schema = {**SCHEMA}
+        m = matrix(
+            [
+                family(
+                    None,
+                    "generic:bearer-token",
+                    "Bearer credential",
+                    "stable",
+                    tier="T3",
+                    basis="project-policy",
+                    profile="policy-qualified",
+                )
+            ]
+        )
+        m["stableDistribution"]["policy-qualified"] = 1
+        policy_schema = {
+            "properties": {
+                **SCHEMA["properties"],
+                "families": {"items": {"properties": {
+                    **SCHEMA["properties"]["families"]["items"]["properties"],
+                    "qualificationProfile": {"enum": ["documented", "empirical", "policy-qualified", None]},
+                }}},
+            }
+        }
+        self.assertEqual(GEN.validate_matrix(m, policy_schema), [])
+        m["families"][0]["evidenceTier"] = "T1"
+        self.assertTrue(any("policy-qualified" in e for e in GEN.validate_matrix(m, policy_schema)))
+        # A beta.8-contract matrix has no policy-qualified key; it reads as zero.
+        self.assertEqual(GEN.validate_matrix(matrix([family("widget", "widget:token", "Widget token", "stable")]), schema), [])
+
     def test_accepts_t2_corroborated_empirical_stable(self) -> None:
         # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration.
         m = matrix(
@@ -671,6 +703,19 @@ class UserFacingReasonTests(unittest.TestCase):
         self.assertEqual(
             text, "Not yet stable: needs a defined supported-context boundary with its uncertainty stated."
         )
+
+    def test_current_contract_gates_read_as_plain_language(self) -> None:
+        text = GEN.user_facing_reason(
+            "mutation.unresolvedCritical: 9 > 0 — unreviewed | "
+            "differential.unresolvedContractDisagreements: 3 > 0 — unsettled | "
+            "policy.protected-holdout: not-run (requires pass on frozen candidate)"
+        )
+        self.assertEqual(
+            text,
+            "Not yet stable: needs its open fixture-versus-detector findings reviewed, its disagreements with "
+            "other scanners about the format settled and a passing protected holdout run on the frozen candidate.",
+        )
+        self.assert_plain(text)
 
     def test_project_policy_family_is_explained_without_tier_names(self) -> None:
         text = GEN.user_facing_reason(
