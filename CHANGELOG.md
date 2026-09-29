@@ -140,6 +140,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` took quadratic time on long single-line input (#989), a
+  regression since 0.1.0-beta.10. The templated-lookup check added by #911
+  looked back to the start of the line for every `name: value` pair, so one
+  256 KiB line of minified JSON took about 2 s to scan (optimized, Apple M4)
+  and a line of dense `"api_key":"…"` pairs about 0.6 s. The check now runs
+  only for a pair that would otherwise be reported, and the open `{{ ... }}`
+  state is carried forward along the line, so the same inputs take about
+  20 ms and 29 ms. Findings and redacted output are unchanged.
 - The `common` WebAssembly profile linked every provider detector (#929).
   In the published 0.1.0-beta.10, `@redact-secret/wasm/common` (and so
   `@redact-secret/core/common` in a browser, and its Node fallback to
