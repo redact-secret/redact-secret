@@ -69,19 +69,37 @@ answer are all equal to that reference. This runs after every closed line of
 every crate unit test that drives a session. Two new unit tests drive it
 specifically:
 
-- `the_maintained_open_construct_state_matches_a_rescan_over_the_incremental_corpus`:
-  every fixture in `conformance/fixtures/incremental-corpus.json` (98), at
-  every two-chunk char boundary and one character per chunk, through a
-  `full` session and a `pii:global` session. Each partition must also
-  reproduce the one-chunk output.
-- `the_maintained_open_construct_state_matches_a_rescan_across_whitespace_gaps`:
-  assignments, `:=`/quoted JSON names, `Authorization` headers and a Heroku
-  `.netrc` entry, separated by gaps of blank lines, space lines, `\r\n` with
-  tabs, U+2028/U+FEFF/U+00A0, and U+200B (which makes the scan copy diverge
-  in the middle of the unit).
+- `the_maintained_open_construct_state_matches_a_rescan_over_generated_inputs`:
+  300 deterministic pseudo-random sequences built from the pieces the five
+  checks react to:
+  - names, operators and quotes;
+  - `Authorization` variants and `bearer`;
+  - Heroku, Twilio, Confluent and PEM layout lines;
+  - every whitespace kind the tail checks skip, and invisible code points.
 
-As a mutation check, treating `=` as tail-neutral makes the second test fail
-at the `cached tail checks` assertion.
+  Each sequence runs whole, one character per chunk, and at every two-chunk
+  split, under `full` and `pii:global`. Every partition must also reproduce
+  the one-chunk output.
+- `the_maintained_open_construct_state_matches_a_rescan_across_whitespace_gaps`:
+  assignments, `:=` and quoted JSON names, `Authorization` headers, and the
+  Heroku, Twilio, Confluent and PEM layouts, separated by gaps of blank
+  lines, space lines, `\r\n` with tabs, U+2028/U+FEFF/U+00A0, and U+200B.
+  U+200B makes the scan copy diverge in the middle of the unit.
+
+The core's source check (`scripts/check-rust-workspace.py`) forbids
+`include_str!` anywhere under `src/`. That rules out reading
+`conformance/fixtures/incremental-corpus.json` from a unit test, so the
+rescan assertion cannot run over the corpus directly. The corpus still
+exercises the cached state through the public API:
+
+- `tests/incremental_partitions.rs` compares every UTF-8 and `&str` partition
+  with the whole-input reference.
+- `tests/incremental_batching.rs` (#985) compares chunked runs with one line
+  per `append`.
+
+**Mutation checks.** Treating `=` as tail-neutral fails both unit tests at
+the `cached tail checks` assertion. Treating `:` as tail-neutral fails the
+generated-input test.
 
 `tests/adversarial_bounds.rs` gains
 `whitespace_lines_after_an_open_assignment_stay_linear_in_a_session`:
@@ -121,5 +139,11 @@ assignment), and 474/435 ms against 479/420 ms for 10,000 dense `pii:global`
 lines (1.0 MB). Those units are one line long, so the whole-unit pass that
 was removed was already cheap on them.
 
-The #981 harness (`crates/secret-scan-core/benches/scan_cost.rs`) had not
-been pushed when this was measured.
+**#981 harness.** On `open-assignment-whitespace-10k` (`API_KEY=` then
+10,000 lines of eight spaces, incremental in 64 KiB chunks), `main` plus the
+harness (`5c814dc9`) takes 440 ms, and this change 7.8 ms. The whole-input
+scan of the same bytes takes 6.2-6.5 ms in both. These are medians of three
+interleaved rounds of 11 runs on the same host. The method and the other
+workloads are in [#985's evidence](../985/README.md#numbers). None of those
+other workloads moved with this change, because their units close on every
+line.

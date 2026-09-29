@@ -1164,15 +1164,79 @@ mod tests {
     }
 
     #[test]
-    fn the_maintained_open_construct_state_matches_a_rescan_over_the_incremental_corpus() {
-        let corpus: serde_json::Value = serde_json::from_str(include_str!(
-            "../../../conformance/fixtures/incremental-corpus.json"
-        ))
-        .unwrap();
-        let fixtures = corpus["fixtures"].as_array().unwrap();
-        assert!(fixtures.len() >= 90, "the incremental corpus shrank");
-        for fixture in fixtures {
-            assert_every_partition_matches_the_rescan(fixture["input"].as_str().unwrap());
+    fn the_maintained_open_construct_state_matches_a_rescan_over_generated_inputs() {
+        // Deterministic pseudo-random sequences of the pieces the five checks
+        // react to: names, operators, quotes, header words, layout lines,
+        // every kind of whitespace they skip, and invisible code points. Each
+        // runs whole, one char per chunk, and at a few split points, under
+        // `full` and `pii:global`; every closed line asserts the rescan.
+        const PIECES: &[&str] = &[
+            "api_key",
+            "API_KEY",
+            "password",
+            "\"token\"",
+            "`secret`",
+            "k",
+            "\"kty\":\"oct\",",
+            "Authorization",
+            "x-authorization",
+            "Proxy-Authorization",
+            "bearer",
+            "Bearer",
+            "=",
+            ":",
+            "=\n",
+            ":\n",
+            "api_key:\n",
+            "Authorization:\n",
+            "\n  ",
+            ":=",
+            "\\\"",
+            "'",
+            "{",
+            "(",
+            ",",
+            ";",
+            "#",
+            "&",
+            "?",
+            "value",
+            MARKER,
+            " ",
+            "  ",
+            "\t",
+            "\n",
+            "\n",
+            "\r",
+            "\r\n",
+            "\u{2028}",
+            "\u{FEFF}",
+            "\u{00A0}",
+            "\u{200B}",
+            "\u{00AD}",
+            "machine api.heroku.com",
+            "login user@example.invalid",
+            "$ twilio api:core:accounts:list",
+            "SID  Auth Token",
+            "heroku auth:token",
+            "schema.registry.url=https://psrc.example.invalid",
+            "basic.auth.user.info=KEY:",
+            "-----BEGIN PRIVATE KEY-----",
+            "-----END PRIVATE KEY-----",
+            "\u{e9}",
+            "\u{65e5}",
+        ];
+        let mut state: u64 = 0x9E37_79B9_7F4A_7C15;
+        let mut next = |bound: usize| {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            usize::try_from(state >> 33).unwrap() % bound
+        };
+        for _ in 0..300 {
+            let length = 1 + next(14);
+            let input: String = (0..length).map(|_| PIECES[next(PIECES.len())]).collect();
+            assert_every_partition_matches_the_rescan(&input);
         }
     }
 
@@ -1200,6 +1264,15 @@ mod tests {
                 format!("plain words{gap}api_key={gap}={gap}{MARKER}\n"),
                 format!(
                     "machine api.heroku.com{gap}login user@example.invalid{gap}password {MARKER}\n"
+                ),
+                format!(
+                    "$ twilio api:core:accounts:list{gap}SID  Auth Token{gap}AC{MARKER}  {MARKER}\n"
+                ),
+                format!(
+                    "schema.registry.url=https://psrc.example.invalid{gap}basic.auth.user.info=KEY:{MARKER}\n"
+                ),
+                format!(
+                    "-----BEGIN PRIVATE KEY-----{gap}{MARKER}{gap}-----END PRIVATE KEY-----{gap}api_key={gap}{MARKER}\n"
                 ),
             ] {
                 assert_every_partition_matches_the_rescan(&input);
