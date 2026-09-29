@@ -17,6 +17,7 @@ mod aws;
 mod aws_bedrock;
 mod azure_devops;
 mod bearer_token;
+mod browserbase;
 mod clickhouse_cloud;
 mod cloudflare;
 mod composio;
@@ -231,6 +232,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(daytona::DAYTONA_API_KEY),
         Box::new(clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET),
         Box::new(nvidia::NVIDIA_API_KEY),
+        Box::new(browserbase::BROWSERBASE_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -501,6 +503,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(nvidia::NVIDIA_API_KEY.shapes())],
     ),
     (
+        browserbase::BROWSERBASE_API_KEY.detector_id(),
+        &[Literals::Shapes(browserbase::BROWSERBASE_API_KEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -674,6 +680,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("daytona-api-key", Pack::Provider),
     ("clickhouse-cloud-api-secret", Pack::Provider),
     ("nvidia-api-key", Pack::Provider),
+    ("browserbase-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -804,6 +811,7 @@ mod tests {
                 "daytona-api-key",
                 "clickhouse-cloud-api-secret",
                 "nvidia-api-key",
+                "browserbase-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1176,6 +1184,7 @@ mod tests {
             "nvapi-{}End",
             "SyntheticRevokedNvidiaApiKeyFixture_".repeat(2)
         );
+        let browserbase_api_key_input = format!("bb_live_{}", "SyntheticRevokedBrowserbaseKey0000");
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
@@ -1269,6 +1278,7 @@ mod tests {
                 clickhouse_cloud_api_secret_input.as_str(),
             ),
             ("nvidia-api-key", nvidia_api_key_input.as_str()),
+            ("browserbase-api-key", browserbase_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

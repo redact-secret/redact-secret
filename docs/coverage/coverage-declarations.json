@@ -12991,6 +12991,127 @@
       "type": "nvidia_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "browserbase-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "browserbase-api-key-positive-bare",
+            "browserbase-api-key-positive-body-cap",
+            "browserbase-api-key-positive-body-cap-dotenv",
+            "browserbase-api-key-positive-body-floor",
+            "browserbase-api-key-positive-body-floor-dotenv",
+            "browserbase-api-key-positive-chat-sentence",
+            "browserbase-api-key-positive-crlf-unicode-prefix",
+            "browserbase-api-key-positive-curl-bearer",
+            "browserbase-api-key-positive-dotenv",
+            "browserbase-api-key-positive-json-config",
+            "browserbase-api-key-positive-json-token-key",
+            "browserbase-api-key-positive-log",
+            "browserbase-api-key-positive-mcp-env-block",
+            "browserbase-api-key-positive-punctuation-adjacent",
+            "browserbase-api-key-positive-repeated-value",
+            "browserbase-api-key-positive-sdk-call",
+            "browserbase-api-key-positive-shell-export",
+            "browserbase-api-key-positive-stagehand-option",
+            "browserbase-api-key-positive-tool-call-arguments",
+            "browserbase-api-key-positive-x-api-key-header",
+            "browserbase-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "browserbase-api-key-overlap-bearer-header",
+            "browserbase-api-key-overlap-body-cap-bearer",
+            "browserbase-api-key-overlap-body-floor-bearer",
+            "browserbase-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "browserbase-api-key-adversarial-long-body-run",
+            "browserbase-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "browserbase-api-key-boundary-body-129",
+            "browserbase-api-key-boundary-body-19",
+            "browserbase-api-key-boundary-dash-glued-prefix",
+            "browserbase-api-key-boundary-dash-prefix",
+            "browserbase-api-key-boundary-glued-dash",
+            "browserbase-api-key-boundary-glued-prefix",
+            "browserbase-api-key-boundary-glued-underscore",
+            "browserbase-api-key-boundary-underscore-glued-prefix",
+            "browserbase-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "browserbase-api-key-negative-ci-secret-reference",
+            "browserbase-api-key-negative-cookie-name",
+            "browserbase-api-key-negative-placeholders",
+            "browserbase-api-key-negative-project-id",
+            "browserbase-api-key-negative-session-identifier",
+            "browserbase-api-key-negative-test-key"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "browserbase-api-key-boundary-body-129",
+            "browserbase-api-key-boundary-body-19",
+            "browserbase-api-key-boundary-dash-glued-prefix",
+            "browserbase-api-key-boundary-dash-prefix",
+            "browserbase-api-key-boundary-glued-dash",
+            "browserbase-api-key-boundary-glued-prefix",
+            "browserbase-api-key-boundary-glued-underscore",
+            "browserbase-api-key-boundary-underscore-glued-prefix",
+            "browserbase-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for browserbase_api_key (browserbase-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "browserbase_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13135,6 +13256,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
+            "browserbase-api-key-adversarial-long-body-run",
+            "browserbase-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
             "clickhouse-cloud-api-secret-adversarial-long-run",
             "cloudflare-adversarial-long-suffix",
@@ -13592,6 +13715,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
+            "browserbase-api-key-adversarial-long-body-run",
+            "browserbase-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
             "clickhouse-cloud-api-secret-adversarial-long-run",
             "cloudflare-adversarial-long-suffix",

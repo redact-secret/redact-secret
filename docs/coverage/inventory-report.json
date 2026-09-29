@@ -5380,12 +5380,68 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "nvidia_api_key"
+    },
+    {
+      "detector": "browserbase-api-key",
+      "evidence": {
+        "fixtureCount": 42,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "browserbase-api-key-positive-bare",
+        "browserbase-api-key-positive-body-cap",
+        "browserbase-api-key-positive-body-cap-dotenv",
+        "browserbase-api-key-positive-body-floor",
+        "browserbase-api-key-positive-body-floor-dotenv",
+        "browserbase-api-key-positive-chat-sentence",
+        "browserbase-api-key-positive-crlf-unicode-prefix",
+        "browserbase-api-key-positive-curl-bearer",
+        "browserbase-api-key-positive-dotenv",
+        "browserbase-api-key-positive-json-config",
+        "browserbase-api-key-positive-json-token-key",
+        "browserbase-api-key-positive-log",
+        "browserbase-api-key-positive-mcp-env-block",
+        "browserbase-api-key-positive-punctuation-adjacent",
+        "browserbase-api-key-positive-repeated-value",
+        "browserbase-api-key-positive-sdk-call",
+        "browserbase-api-key-positive-shell-export",
+        "browserbase-api-key-positive-stagehand-option",
+        "browserbase-api-key-positive-tool-call-arguments",
+        "browserbase-api-key-positive-x-api-key-header",
+        "browserbase-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "browserbase_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 119,
+    "supported": 120,
     "unresolved": 0
   }
 }

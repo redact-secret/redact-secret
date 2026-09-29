@@ -30,6 +30,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `aws_bedrock_short_term_api_key` | `aws-bedrock-short-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; two families rather than one (client-minted presigned URL vs issued credential), `bedrock-api-key-` prefix + fixed 133-byte Base64 head + standard Base64 alphabet (T1, maintainer ruling accepted 2026-09-27 on the AWS token-generator SDKs (python/js/java) plus the AWS Security Blog, [#779](https://github.com/redact-secret/redact-secret/issues/779)), tail floor and total length T2, recorded in [#864 evidence](../audits/evidence/864/README.md) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `clickhouse_cloud_api_secret` | `clickhouse-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-04 (provider staff statement and staff-authored regex, R2 and R3; the older 39-byte example is set aside by R3 date order), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
@@ -625,6 +626,7 @@ core conformance and the benchmarks arrival and profile evidence.
 | `daytona:api-key` | `daytona-api-key` | `dtn_` + exactly 64 `[0-9a-f]` (68 in total); a `[A-Za-z0-9_-]` byte before the prefix or after the body rejects the match | `daytona_api_key` | T1 as of v0.190.0 (provider generator, R1; dated provider code, R9) |
 | `clickhouse-cloud:api-key` | `clickhouse-cloud-api-secret` | `4b1d` + exactly 38 `[A-Za-z0-9]` (42 in total) with at least one uppercase letter in the body; a `[A-Za-z0-9_-]` byte before the prefix or after the body rejects the match | `clickhouse_cloud_api_secret` | T1 as of 2025-04-16 (provider staff statement and regex, R2 and R3); the uppercase guard is policy |
 | `nvidia:ngc-api-key` | `nvidia-api-key` | `nvapi-` + 60–128 `[A-Za-z0-9_-]`; a `[A-Za-z0-9_-]` byte before the prefix rejects the match, and a body over 128 is rejected whole | `nvidia_api_key` | T1 (prefix R1 and R6; alphabet and 60-byte floor from the provider's own scanning rule, R2); the 128 cap is policy |
+| `browserbase:api-key` | `browserbase-api-key` | `bb_live_` + 20–128 `[A-Za-z0-9]`; a glued `_` or `-` after the run rejects the match, and a body over 128 is rejected whole | `browserbase_api_key` | T1 (prefix from provider docs; alphabet and 20-byte floor from the provider's CI gate, R2); the 128 cap is policy |
 
 Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
 [handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
@@ -770,6 +772,22 @@ outside named contexts. False positives: `nvapi-` + 60–128
 `[A-Za-z0-9_-]` that is not a key, such as a padded placeholder (the #867
 precedent). Cost: one prefix on the shared known-format scan.
 
+Browserbase ([#973](https://github.com/redact-secret/redact-secret/issues/973),
+[handoff](../audits/evidence/860/browserbase.md)). The provider's own CI gate
+accepts `bb_live_` + at least 20 alphanumerics and no source states an exact
+width, so the contract uses that open-ended rule and adds a 128-byte cap as
+project policy (the Apify precedent). The body alphabet is narrower than the
+boundary, so `bb_live_session_...` identifiers and
+`bb_live_your_api_key_here` placeholders stay unclaimed. `bb_test_` keys are
+still issuance-gated, and `bb_<timestamp>` cookie names and project-ID UUIDs
+are not this shape. `browserbase` is not deferred by `generic-token`, so a
+`bb_test_` key keeps its contextual finding under `BROWSERBASE_API_KEY`. False
+negatives: a key whose body contains `_` or `-`, a body under 20, an over-long
+run, and every `bb_test_` key outside named contexts. False positives:
+`bb_live_` + 20–128 alphanumerics that is not a key, such as a padded
+placeholder (the #867 precedent). Cost: one prefix on the shared known-format
+scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -795,6 +813,7 @@ precedent). Cost: one prefix on the shared known-format scan.
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API keys are reported as `nvidia_api_key` at provider specificity, bare or in any context; the legacy prefixless NGC key stays unclaimed ([#972](https://github.com/redact-secret/redact-secret/issues/972), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Browserbase `bb_live_` + 20–128 alphanumeric API keys are reported as `browserbase_api_key` at provider specificity, bare or in any context; `bb_test_` stays unclaimed ([#973](https://github.com/redact-secret/redact-secret/issues/973), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

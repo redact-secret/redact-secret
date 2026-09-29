@@ -19,6 +19,9 @@ evidence is linked from each published version.
     uppercase guard that keeps hex digests and UUIDs out.
   - `nvidia-api-key` (#972): NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API
     keys (`nvidia_api_key`), the provider's own open-ended rule with a cap.
+  - `browserbase-api-key` (#973): Browserbase `bb_live_` + 20–128
+    alphanumeric API keys (`browserbase_api_key`), the provider's own
+    open-ended rule with a cap.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

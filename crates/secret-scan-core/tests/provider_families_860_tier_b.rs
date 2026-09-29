@@ -1031,3 +1031,119 @@ mod nvidia {
         assert_partition_parity(&key(64, 11));
     }
 }
+
+mod browserbase {
+    use super::*;
+
+    const DETECTOR: &str = "browserbase-api-key";
+    const TYPE: &str = "browserbase_api_key";
+
+    fn key(len: usize, seed: usize) -> String {
+        format!("bb_live_{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        for (seed, len) in [20, 32, 128].into_iter().enumerate() {
+            let key = key(len, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("BROWSERBASE_API_KEY={key}\n"),
+                format!(
+                    "curl -H \"X-BB-API-Key: {key}\" https://api.browserbase.com/v1/sessions\n"
+                ),
+                format!("bb = Browserbase(api_key=\"{key}\")\n"),
+                format!("const stagehand = new Stagehand({{ apiKey: \"{key}\" }});\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"browserbase\":{{\"env\":{{\"BROWSERBASE_API_KEY\":\"{key}\"}}}}}}}}"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 32, 4);
+        let base = format!("bb_live_{body}");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key(19, 4),
+                key(129, 4),
+                format!("{base}_"),
+                format!("{base}-"),
+                format!("{base}_x"),
+                format!("{base}-1"),
+                format!("BB_LIVE_{body}"),
+                format!("bb-live-{body}"),
+                format!("x{base}"),
+                format!("_{base}"),
+                format!("-{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let test_key =
+            |len: usize| format!("BROWSERBASE_API_KEY=bb_test_{}\n", filler(ALNUM, len, 5));
+        for input in [
+            test_key(8),
+            test_key(32),
+            test_key(64),
+            "BROWSERBASE_API_KEY=bb_live_...\n".to_owned(),
+            "BROWSERBASE_API_KEY=bb_live_your_api_key_here\n".to_owned(),
+            "session id bb_live_session_SyntheticRevokedIdentifier01\n".to_owned(),
+            "cookie bb_1727612345 was set\n".to_owned(),
+            "project 123e4567-e89b-42d3-a456-426614174000\n".to_owned(),
+            "BROWSERBASE_API_KEY=${{ secrets.BROWSERBASE_API_KEY }}\n".to_owned(),
+            "the prefix is bb_live_\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_stays_unclaimed_and_each_family_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("BROWSERBASE_API_KEY={jwt}\n"));
+        let browserbase = key(32, 6);
+        let daytona = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let nvidia = format!("nvapi-{}", filler(ALNUM, 64, 6));
+        let (_, findings) = whole_input(&format!("{browserbase} {daytona} {nvidia}\n"));
+        for detector in [DETECTOR, "daytona-api-key", "nvidia-api-key"] {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+        }
+        assert_eq!(findings.len(), 3, "{findings:?}");
+        for other in [&daytona, &nvidia] {
+            assert_unclaimed(DETECTOR, &format!("{other}\n"));
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "bb_live_".repeat(20_000),
+            format!("bb_live_{}", "aB3".repeat(7_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(32, 7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(32, 8));
+    }
+}

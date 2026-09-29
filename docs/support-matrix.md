@@ -229,10 +229,11 @@ Evidence tiers across all families:
 
 ### Not yet measured
 
-3 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
+4 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
 
 | Detector | Measured support status |
 | --- | --- |
+| `browserbase-api-key` | not yet measured |
 | `clickhouse-cloud-api-secret` | not yet measured |
 | `daytona-api-key` | not yet measured |
 | `nvidia-api-key` | not yet measured |

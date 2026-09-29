@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-95 built-in detectors emit 119 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+96 built-in detectors emit 120 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -288,6 +288,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `daytona-api-key` | `daytona_api_key` | `always-redact` | — |
 | `clickhouse-cloud-api-secret` | `clickhouse_cloud_api_secret` | `always-redact` | — |
 | `nvidia-api-key` | `nvidia_api_key` | `always-redact` | — |
+| `browserbase-api-key` | `browserbase_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

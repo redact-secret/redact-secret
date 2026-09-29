@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3122,
+  "fixtureCount": 3164,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -74556,6 +74556,795 @@
       "input": "\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-",
       "expected": [],
       "note": "Repeated prefixes with no body never reach the 60-byte floor, and the scan stays linear and bounded."
+    },
+    {
+      "id": "browserbase-api-key-positive-bare",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "browserbase-api-key-positive-dotenv",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BROWSERBASE_API_KEY=\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 62
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "browserbase-api-key-positive-shell-export",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export BROWSERBASE_API_KEY=\"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\"\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 70
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "browserbase-api-key-positive-yaml",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  BROWSERBASE_API_KEY: \u0062b_live_SyntheticRevokedBrowserbaseKey0000\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 70
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "browserbase-api-key-positive-json-config",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"BROWSERBASE_API_KEY\": \"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\"}",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 67
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "browserbase-api-key-positive-json-token-key",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\"}",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "browserbase-api-key-positive-sdk-call",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "bb = Browserbase(api_key=\"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\")\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 68
+        }
+      ],
+      "note": "An SDK client construction is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-overlap-bearer-header",
+      "detector": "browserbase-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062b_live_SyntheticRevokedBrowserbaseKey0000\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 64
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "browserbase-api-key-positive-x-api-key-header",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-BB-API-Key: \u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 56
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-positive-curl-bearer",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0062b_live_SyntheticRevokedBrowserbaseKey0000\" https://api.browserbase.com/v1/sessions\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 73
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "browserbase-api-key-positive-tool-call-arguments",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"call_api\",\"arguments\":{\"api_key\":\"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\"}}",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-positive-chat-sentence",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0062b_live_SyntheticRevokedBrowserbaseKey0000 can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 57
+        }
+      ],
+      "note": "A key pasted into a chat sentence is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-positive-log",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO client init api_key=\u0062b_live_SyntheticRevokedBrowserbaseKey0000 user=ci\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 88
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-positive-punctuation-adjacent",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0062b_live_SyntheticRevokedBrowserbaseKey0000.",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "browserbase-api-key-positive-crlf-unicode-prefix",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u0062b_live_SyntheticRevokedBrowserbaseKey0000\n\r\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 66
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "browserbase-api-key-overlap-context",
+      "detector": "browserbase-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "browserbase-api-key-positive-repeated-value",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000 \u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        },
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "browserbase-api-key-positive-body-floor",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrow",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 28
+        }
+      ],
+      "note": "A 20-byte body is the provider CI gate's floor."
+    },
+    {
+      "id": "browserbase-api-key-positive-body-floor-dotenv",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BROWSERBASE_API_KEY=\u0062b_live_SyntheticRevokedBrow",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 48
+        }
+      ],
+      "note": "A 20-byte body is the provider CI gate's floor."
+    },
+    {
+      "id": "browserbase-api-key-overlap-body-floor-bearer",
+      "detector": "browserbase-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062b_live_SyntheticRevokedBrow\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 50
+        }
+      ],
+      "note": "A 20-byte body is the provider CI gate's floor."
+    },
+    {
+      "id": "browserbase-api-key-positive-body-cap",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbas",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 136
+        }
+      ],
+      "note": "A 128-byte body is the policy cap."
+    },
+    {
+      "id": "browserbase-api-key-positive-body-cap-dotenv",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BROWSERBASE_API_KEY=\u0062b_live_SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbas",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 156
+        }
+      ],
+      "note": "A 128-byte body is the policy cap."
+    },
+    {
+      "id": "browserbase-api-key-overlap-body-cap-bearer",
+      "detector": "browserbase-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062b_live_SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbas\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 158
+        }
+      ],
+      "note": "A 128-byte body is the policy cap."
+    },
+    {
+      "id": "browserbase-api-key-positive-stagehand-option",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const stagehand = new Stagehand({ apiKey: \"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\" });\n",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "A Stagehand constructor option is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-positive-mcp-env-block",
+      "detector": "browserbase-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\":{\"browserbase\":{\"command\":\"npx\",\"args\":[\"-y\",\"@browserbasehq/mcp\"],\"env\":{\"BROWSERBASE_API_KEY\":\"\u0062b_live_SyntheticRevokedBrowserbaseKey0000\"}}}}",
+      "expected": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 111,
+          "end": 153
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the key."
+    },
+    {
+      "id": "browserbase-api-key-boundary-body-19",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBro",
+      "expected": [],
+      "note": "19 alphanumerics is one under the provider gate's 20-byte floor."
+    },
+    {
+      "id": "browserbase-api-key-boundary-body-129",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbaseKey0000SyntheticRevokedBrowserbase",
+      "expected": [],
+      "note": "129 alphanumerics is one over the policy cap; a run is never truncated."
+    },
+    {
+      "id": "browserbase-api-key-boundary-glued-underscore",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000_x",
+      "expected": [],
+      "note": "An underscore glued after the run rejects the match."
+    },
+    {
+      "id": "browserbase-api-key-boundary-glued-dash",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000-1",
+      "expected": [],
+      "note": "A dash glued after the run rejects the match."
+    },
+    {
+      "id": "browserbase-api-key-boundary-uppercase-prefix",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "BB_LIVE_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "browserbase-api-key-boundary-dash-prefix",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bb-live-SyntheticRevokedBrowserbaseKey0000",
+      "expected": [],
+      "note": "The prefix separators are underscores."
+    },
+    {
+      "id": "browserbase-api-key-boundary-glued-prefix",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "browserbase-api-key-boundary-underscore-glued-prefix",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [],
+      "note": "An underscore glued before the prefix rejects the match."
+    },
+    {
+      "id": "browserbase-api-key-boundary-dash-glued-prefix",
+      "detector": "browserbase-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "expected": [],
+      "note": "A dash glued before the prefix rejects the match."
+    },
+    {
+      "id": "browserbase-api-key-negative-placeholders",
+      "detector": "browserbase-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like \u0062b_live_... or \u0062b_live_your_api_key_here in the docs.",
+      "expected": [],
+      "note": "Placeholders are prefix-only or glue an underscore into the run."
+    },
+    {
+      "id": "browserbase-api-key-negative-test-key",
+      "detector": "browserbase-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The sandbox key is bb_test_SyntheticRevokedBrowserbaseKey0000\n",
+      "expected": [],
+      "note": "A bb_test_ key is a different, issuance-gated shape."
+    },
+    {
+      "id": "browserbase-api-key-negative-session-identifier",
+      "detector": "browserbase-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "session id \u0062b_live_session_SyntheticRevokedIdentifier01\n",
+      "expected": [],
+      "note": "A bb_live_session_ identifier has a short run before its underscore."
+    },
+    {
+      "id": "browserbase-api-key-negative-cookie-name",
+      "detector": "browserbase-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cookie bb_1727612345 was set\n",
+      "expected": [],
+      "note": "A bb_<timestamp> cookie name has no bb_live_ prefix."
+    },
+    {
+      "id": "browserbase-api-key-negative-project-id",
+      "detector": "browserbase-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "project 123e4567-e89b-42d3-a456-426614174000\n",
+      "expected": [],
+      "note": "A project-ID UUID is not an API key."
+    },
+    {
+      "id": "browserbase-api-key-negative-ci-secret-reference",
+      "detector": "browserbase-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}\n",
+      "expected": [],
+      "note": "A CI secret reference is not a literal key."
+    },
+    {
+      "id": "browserbase-api-key-adversarial-long-run",
+      "detector": "browserbase-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_\u0062b_live_",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach the 20-byte floor, and the scan stays linear and bounded."
+    },
+    {
+      "id": "browserbase-api-key-adversarial-long-body-run",
+      "detector": "browserbase-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0062b_live_aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3aB3",
+      "expected": [],
+      "note": "A prefix followed by an alphanumeric run far over the 128-byte cap is rejected whole, and the scan stays linear and bounded."
     },
     {
       "id": "nvidia-api-key-adversarial-long-body-run",

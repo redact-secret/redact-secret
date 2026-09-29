@@ -862,6 +862,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture_SyntheticRevokedNvidiaApiKeyFixture_End",
       "schemes": null
+    },
+    {
+      "type": "browserbase_api_key",
+      "detector": "browserbase-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "schemes": null
     }
   ],
   "consumers": [

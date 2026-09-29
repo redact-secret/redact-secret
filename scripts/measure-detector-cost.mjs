@@ -87,6 +87,7 @@ export const CANONICAL_IDS = [
   "daytona-api-key",
   "clickhouse-cloud-api-secret",
   "nvidia-api-key",
+  "browserbase-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -132,6 +133,7 @@ export const GROUPS = {
     "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token", "posthog-token",
     "resend-api-key",
     "apify-api-token",
+    "browserbase-api-key",
   ],
 };
 
