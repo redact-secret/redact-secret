@@ -42,6 +42,7 @@
 //! contextual detection target.
 
 use crate::detectors::pattern::{self, is_alnum};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -148,9 +149,7 @@ fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize
 
 /// The literals one of which every Azure DevOps candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [ANCHOR].into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[ANCHOR])];
 
 #[cfg(test)]
 mod tests {

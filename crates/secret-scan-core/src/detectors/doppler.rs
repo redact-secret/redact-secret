@@ -44,6 +44,7 @@
 //! stays linear.
 
 use crate::detectors::pattern;
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -175,9 +176,7 @@ impl Detector for DopplerTokenDetector {
 
 /// The literals one of which every `doppler-token` candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [LEAD].into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[LEAD])];
 
 #[cfg(test)]
 mod tests {

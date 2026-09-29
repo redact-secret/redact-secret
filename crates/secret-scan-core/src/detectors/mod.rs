@@ -77,10 +77,11 @@ mod vault;
 mod wandb;
 
 use crate::types::Detector;
-use additional_providers::{KnownFormatProviderDetector, TypedKnownFormatProviderDetector};
 use connection_string::ConnectionStringDetector;
-pub(crate) use prefilter::{PairSet, RequiredLiterals};
 use private_key::PrivateKeyDetector;
+
+use prefilter::Literals;
+pub(crate) use prefilter::{PairSet, RequiredLiterals};
 
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
@@ -93,268 +94,102 @@ pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 pub(crate) use twilio::has_open_twilio_cli_table;
 
-/// A built-in detector and the literals it declares for the shared
-/// prefilter ([`prefilter`], issue #983).
-///
-/// The declaration lives here, next to the constructor, and reaches the
-/// registry's private [`RegisteredDetector`](crate::registry::RegisteredDetector)
-/// field; it is never part of the public `Detector` trait, so a custom
-/// detector can neither declare nor inherit one.
-pub(crate) struct BuiltIn {
-    pub(crate) detector: Box<dyn Detector>,
-    pub(crate) required: Option<RequiredLiterals>,
-}
-
-impl BuiltIn {
-    /// A detector that runs on every call: it cannot name a case-sensitive
-    /// literal of two or more bytes that every candidate requires.
-    fn always(detector: Box<dyn Detector>) -> Self {
-        Self {
-            detector,
-            required: None,
-        }
-    }
-
-    /// A detector whose every candidate requires one of `literals` in the
-    /// scan copy.
-    fn requiring(
-        detector: Box<dyn Detector>,
-        literals: impl IntoIterator<Item = &'static [u8]>,
-    ) -> Self {
-        Self {
-            detector,
-            required: RequiredLiterals::any_of(literals),
-        }
-    }
-
-    /// A table-driven detector: its literals are its shapes' prefixes.
-    fn known_format(detector: KnownFormatProviderDetector) -> Self {
-        let prefixes = detector.prefixes().map(str::as_bytes);
-        Self::requiring(Box::new(detector), prefixes)
-    }
-
-    /// A table-driven detector with a finding type per shape: its literals
-    /// are its shapes' prefixes.
-    fn typed_known_format(detector: TypedKnownFormatProviderDetector) -> Self {
-        let prefixes = detector.prefixes().map(str::as_bytes);
-        Self::requiring(Box::new(detector), prefixes)
-    }
-}
-
 /// Every built-in detector, in canonical registration order.
-#[cfg(test)]
 #[must_use]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
-    built_in_entries()
-        .into_iter()
-        .map(|entry| entry.detector)
-        .collect()
-}
-
-/// [`built_in_detectors`] with each detector's prefilter declaration.
-// One entry per detector, in canonical order: splitting it would only hide
-// the order this list pins.
-#[allow(clippy::too_many_lines)]
-#[must_use]
-pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
     vec![
-        BuiltIn::requiring(
-            Box::new(PrivateKeyDetector),
-            private_key::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(aws::AwsAccessKeyDetector),
-            aws::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
-            aws_bedrock::long_term_required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
-            aws_bedrock::short_term_required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(github::GitHubTokenDetector),
-            github::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(gitlab::GitlabTokenDetector),
-            gitlab::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(openai::OpenAiTokenDetector),
-            openai::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(anthropic::AnthropicTokenDetector),
-            anthropic::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(shopify::ShopifyTokenDetector),
-            shopify::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(vault::VaultTokenDetector),
-            vault::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(stripe::StripeTokenDetector),
-            stripe::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(slack::SlackTokenDetector),
-            slack::required_literals(),
-        ),
-        BuiltIn::known_format(additional_providers::PYPI),
-        BuiltIn::known_format(additional_providers::HUGGING_FACE),
-        BuiltIn::known_format(additional_providers::DOCKER),
-        BuiltIn::known_format(cloudflare::CLOUDFLARE),
-        BuiltIn::known_format(additional_providers::DIGITALOCEAN),
-        BuiltIn::known_format(linear::LINEAR),
-        BuiltIn::known_format(additional_providers::SUPABASE),
-        BuiltIn::known_format(additional_providers::SUPABASE_PAT),
-        BuiltIn::known_format(additional_providers::VERCEL),
-        BuiltIn::known_format(additional_providers::NPM),
-        BuiltIn::known_format(additional_providers::GOOGLE),
-        BuiltIn::requiring(
-            Box::new(sendgrid::SendgridTokenDetector),
-            sendgrid::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
-            microsoft_entra::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
-            azure_devops::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(notion::NotionTokenDetector),
-            notion::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(atlassian::AtlassianApiTokenDetector),
-            atlassian::required_literals(),
-        ),
-        BuiltIn::always(Box::new(twilio::TwilioAuthTokenDetector)),
-        BuiltIn::always(Box::new(twilio::TwilioApiKeySecretDetector)),
-        BuiltIn::requiring(
-            telegram::telegram_bot_token_detector(),
-            telegram::required_literals(),
-        ),
-        BuiltIn::always(Box::new(discord::DiscordBotTokenDetector)),
-        BuiltIn::requiring(
-            Box::new(sentry::SentryUserAuthTokenDetector),
-            sentry::user_required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(sentry::SentryOrgAuthTokenDetector),
-            sentry::org_required_literals(),
-        ),
-        BuiltIn::always(Box::new(datadog::DatadogApiKeyDetector)),
-        BuiltIn::known_format(datadog::DATADOG_APPLICATION_KEY),
-        BuiltIn::always(Box::new(datadog::DatadogApplicationKeyLegacyDetector)),
-        BuiltIn::requiring(
-            Box::new(grafana::GrafanaServiceAccountTokenDetector),
-            grafana::required_literals(),
-        ),
-        BuiltIn::known_format(additional_providers::GRAFANA_CLOUD),
-        BuiltIn::requiring(
-            Box::new(new_relic::NewRelicUserApiKeyDetector),
-            new_relic::user_required_literals(),
-        ),
-        BuiltIn::always(Box::new(new_relic::NewRelicLicenseKeyDetector)),
-        BuiltIn::requiring(
-            Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
-            mailchimp::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(mailgun::MailgunApiKeyDetector),
-            mailgun::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(okta::OktaApiTokenDetector),
-            okta::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(firebase::FirebaseServerKeyDetector),
-            firebase::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(terraform::TerraformCloudTokenDetector),
-            terraform::required_literals(),
-        ),
-        BuiltIn::known_format(additional_providers::PULUMI),
-        BuiltIn::known_format(ai_inference::REPLICATE),
-        BuiltIn::known_format(ai_inference::GROQ),
-        BuiltIn::known_format(ai_inference::XAI),
-        BuiltIn::known_format(ai_inference::OPENROUTER),
-        BuiltIn::known_format(ai_inference::PERPLEXITY),
-        BuiltIn::known_format(ai_inference::FIREWORKS),
-        BuiltIn::requiring(
-            Box::new(elevenlabs::ElevenLabsApiKeyDetector),
-            elevenlabs::required_literals(),
-        ),
-        BuiltIn::known_format(together_tavily::TOGETHER_AI),
-        BuiltIn::known_format(together_tavily::TAVILY),
-        BuiltIn::always(Box::new(pinecone::PineconeApiKeyDetector)),
-        BuiltIn::requiring(
-            Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
-            gitlab::runner_required_literals(),
-        ),
-        BuiltIn::known_format(databricks::DATABRICKS),
-        BuiltIn::known_format(confluent::CONFLUENT_CLOUD_API_SECRET),
-        BuiltIn::always(Box::new(confluent::ConfluentLegacyApiSecretDetector)),
-        BuiltIn::requiring(
-            Box::new(netlify::NetlifyPersonalAccessTokenDetector),
-            netlify::required_literals(),
-        ),
-        BuiltIn::known_format(neon::NEON),
-        BuiltIn::requiring(
-            Box::new(langsmith::LangsmithApiKeyDetector),
-            langsmith::required_literals(),
-        ),
-        BuiltIn::requiring(
-            Box::new(langfuse::LangfuseSecretKeyDetector),
-            langfuse::required_literals(),
-        ),
-        BuiltIn::known_format(postman::POSTMAN),
-        BuiltIn::known_format(postman::POSTMAN_COLLECTION_ACCESS_KEY),
-        BuiltIn::known_format(heroku::HEROKU_API_KEY),
-        BuiltIn::always(Box::new(heroku::HerokuApiKeyLegacyDetector)),
-        BuiltIn::always(Box::new(travisci::TravisCiApiTokenDetector)),
-        BuiltIn::always(Box::new(keyword_gated_keys::MistralApiKeyDetector)),
-        BuiltIn::always(Box::new(keyword_gated_keys::CohereApiKeyDetector)),
-        BuiltIn::always(Box::new(keyword_gated_keys::Ai21ApiKeyDetector)),
-        BuiltIn::always(Box::new(keyword_gated_keys::DeepgramApiKeyDetector)),
-        BuiltIn::requiring(
-            Box::new(doppler::DopplerTokenDetector),
-            doppler::required_literals(),
-        ),
-        BuiltIn::typed_known_format(trigger_dev::TRIGGER_DEV),
-        BuiltIn::known_format(e2b::E2B),
-        BuiltIn::typed_known_format(posthog::POSTHOG),
-        BuiltIn::typed_known_format(helicone::HELICONE),
-        BuiltIn::known_format(firecrawl::FIRECRAWL),
-        BuiltIn::typed_known_format(composio::COMPOSIO),
-        BuiltIn::always(Box::new(convex::ConvexDeploymentKeyDetector)),
-        BuiltIn::requiring(
-            Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
-            onepassword::required_literals(),
-        ),
-        BuiltIn::known_format(inngest::INNGEST_SIGNING_KEY),
-        BuiltIn::known_format(resend::RESEND_API_KEY),
-        BuiltIn::known_format(apify::APIFY_API_TOKEN),
-        BuiltIn::known_format(wandb::WANDB_API_KEY),
-        BuiltIn::requiring(jwt::jwt_detector(), jwt::required_literals()),
-        BuiltIn::always(bearer_token::bearer_token_detector()),
-        BuiltIn::requiring(
-            Box::new(ConnectionStringDetector),
-            connection_string::required_literals(),
-        ),
-        BuiltIn::requiring(otpauth::otpauth_detector(), otpauth::required_literals()),
-        BuiltIn::always(generic_token::generic_token_detector()),
+        Box::new(PrivateKeyDetector),
+        Box::new(aws::AwsAccessKeyDetector),
+        Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
+        Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
+        Box::new(github::GitHubTokenDetector),
+        Box::new(gitlab::GitlabTokenDetector),
+        Box::new(openai::OpenAiTokenDetector),
+        Box::new(anthropic::AnthropicTokenDetector),
+        Box::new(shopify::ShopifyTokenDetector),
+        Box::new(vault::VaultTokenDetector),
+        Box::new(stripe::StripeTokenDetector),
+        Box::new(slack::SlackTokenDetector),
+        Box::new(additional_providers::PYPI),
+        Box::new(additional_providers::HUGGING_FACE),
+        Box::new(additional_providers::DOCKER),
+        Box::new(cloudflare::CLOUDFLARE),
+        Box::new(additional_providers::DIGITALOCEAN),
+        Box::new(linear::LINEAR),
+        Box::new(additional_providers::SUPABASE),
+        Box::new(additional_providers::SUPABASE_PAT),
+        Box::new(additional_providers::VERCEL),
+        Box::new(additional_providers::NPM),
+        Box::new(additional_providers::GOOGLE),
+        Box::new(sendgrid::SendgridTokenDetector),
+        Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
+        Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
+        Box::new(notion::NotionTokenDetector),
+        Box::new(atlassian::AtlassianApiTokenDetector),
+        Box::new(twilio::TwilioAuthTokenDetector),
+        Box::new(twilio::TwilioApiKeySecretDetector),
+        telegram::telegram_bot_token_detector(),
+        Box::new(discord::DiscordBotTokenDetector),
+        Box::new(sentry::SentryUserAuthTokenDetector),
+        Box::new(sentry::SentryOrgAuthTokenDetector),
+        Box::new(datadog::DatadogApiKeyDetector),
+        Box::new(datadog::DATADOG_APPLICATION_KEY),
+        Box::new(datadog::DatadogApplicationKeyLegacyDetector),
+        Box::new(grafana::GrafanaServiceAccountTokenDetector),
+        Box::new(additional_providers::GRAFANA_CLOUD),
+        Box::new(new_relic::NewRelicUserApiKeyDetector),
+        Box::new(new_relic::NewRelicLicenseKeyDetector),
+        Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
+        Box::new(mailgun::MailgunApiKeyDetector),
+        Box::new(okta::OktaApiTokenDetector),
+        Box::new(firebase::FirebaseServerKeyDetector),
+        Box::new(terraform::TerraformCloudTokenDetector),
+        Box::new(additional_providers::PULUMI),
+        Box::new(ai_inference::REPLICATE),
+        Box::new(ai_inference::GROQ),
+        Box::new(ai_inference::XAI),
+        Box::new(ai_inference::OPENROUTER),
+        Box::new(ai_inference::PERPLEXITY),
+        Box::new(ai_inference::FIREWORKS),
+        Box::new(elevenlabs::ElevenLabsApiKeyDetector),
+        Box::new(together_tavily::TOGETHER_AI),
+        Box::new(together_tavily::TAVILY),
+        Box::new(pinecone::PineconeApiKeyDetector),
+        Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
+        Box::new(databricks::DATABRICKS),
+        Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
+        Box::new(confluent::ConfluentLegacyApiSecretDetector),
+        Box::new(netlify::NetlifyPersonalAccessTokenDetector),
+        Box::new(neon::NEON),
+        Box::new(langsmith::LangsmithApiKeyDetector),
+        Box::new(langfuse::LangfuseSecretKeyDetector),
+        Box::new(postman::POSTMAN),
+        Box::new(postman::POSTMAN_COLLECTION_ACCESS_KEY),
+        Box::new(heroku::HEROKU_API_KEY),
+        Box::new(heroku::HerokuApiKeyLegacyDetector),
+        Box::new(travisci::TravisCiApiTokenDetector),
+        Box::new(keyword_gated_keys::MistralApiKeyDetector),
+        Box::new(keyword_gated_keys::CohereApiKeyDetector),
+        Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
+        Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
+        Box::new(doppler::DopplerTokenDetector),
+        Box::new(trigger_dev::TRIGGER_DEV),
+        Box::new(e2b::E2B),
+        Box::new(posthog::POSTHOG),
+        Box::new(helicone::HELICONE),
+        Box::new(firecrawl::FIRECRAWL),
+        Box::new(composio::COMPOSIO),
+        Box::new(convex::ConvexDeploymentKeyDetector),
+        Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
+        Box::new(inngest::INNGEST_SIGNING_KEY),
+        Box::new(resend::RESEND_API_KEY),
+        Box::new(apify::APIFY_API_TOKEN),
+        Box::new(wandb::WANDB_API_KEY),
+        jwt::jwt_detector(),
+        bearer_token::bearer_token_detector(),
+        Box::new(ConnectionStringDetector),
+        otpauth::otpauth_detector(),
+        generic_token::generic_token_detector(),
     ]
 }
 
@@ -368,31 +203,304 @@ pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
 /// rule. [`BUILT_IN_PACKS`] pins, in tests, that this list is exactly the
 /// `Pack::Common` members of the canonical order.
 #[must_use]
-pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
+pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
-        BuiltIn::requiring(
-            Box::new(PrivateKeyDetector),
-            private_key::required_literals(),
-        ),
-        BuiltIn::requiring(jwt::jwt_detector(), jwt::required_literals()),
-        BuiltIn::always(bearer_token::bearer_token_detector()),
-        BuiltIn::requiring(
-            Box::new(ConnectionStringDetector),
-            connection_string::required_literals(),
-        ),
-        BuiltIn::requiring(otpauth::otpauth_detector(), otpauth::required_literals()),
-        BuiltIn::always(generic_token::generic_token_detector()),
+        Box::new(PrivateKeyDetector),
+        jwt::jwt_detector(),
+        bearer_token::bearer_token_detector(),
+        Box::new(ConnectionStringDetector),
+        otpauth::otpauth_detector(),
+        generic_token::generic_token_detector(),
     ]
 }
 
-/// [`common_built_in_entries`] without the prefilter declarations.
-#[cfg(test)]
+/// A built-in detector and the literals it declares for the shared
+/// prefilter ([`prefilter`], issue #983).
+///
+/// Only [`built_in_entries`] and [`common_built_in_entries`] make one, from
+/// the detectors this crate constructs, and the registry keeps the
+/// declaration in a private field. It is never part of the public
+/// `Detector` trait, so a custom detector neither declares nor inherits
+/// one, even under a built-in id.
+pub(crate) struct BuiltIn {
+    pub(crate) detector: Box<dyn Detector>,
+    pub(crate) required: Option<RequiredLiterals>,
+}
+
+/// [`built_in_detectors`], each with its prefilter declaration.
 #[must_use]
-pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
-    common_built_in_entries()
+pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
+    built_in_detectors()
         .into_iter()
-        .map(|entry| entry.detector)
+        .map(|detector| BuiltIn {
+            required: built_in_required_literals(detector.id()),
+            detector,
+        })
         .collect()
+}
+
+/// [`common_built_in_detectors`], each with its prefilter declaration.
+#[must_use]
+pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
+    common_built_in_detectors()
+        .into_iter()
+        .map(|detector| BuiltIn {
+            required: common_required_literals(detector.id()),
+            detector,
+        })
+        .collect()
+}
+
+/// The prefilter declarations of the declared `full` built-ins (issue
+/// #983), keyed by detector id. Plain data, so the declarations add almost
+/// no code to a WebAssembly build.
+///
+/// Every declared detector names its literals from its own grammar
+/// constants: a table-driven detector's shape prefixes, or the module's
+/// `REQUIRED_LITERALS`. The 17 built-ins that cannot declare a
+/// case-sensitive literal every candidate needs are absent (pinned by
+/// `prefilter::tests::only_the_reviewed_built_ins_run_on_every_call`).
+const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
+    ("aws-access-key", aws::REQUIRED_LITERALS),
+    (
+        "aws-bedrock-long-term-api-key",
+        aws_bedrock::LONG_TERM_REQUIRED_LITERALS,
+    ),
+    (
+        "aws-bedrock-short-term-api-key",
+        aws_bedrock::SHORT_TERM_REQUIRED_LITERALS,
+    ),
+    ("github-token", github::REQUIRED_LITERALS),
+    ("gitlab-token", gitlab::REQUIRED_LITERALS),
+    ("openai-token", openai::REQUIRED_LITERALS),
+    ("anthropic-token", anthropic::REQUIRED_LITERALS),
+    ("shopify-token", shopify::REQUIRED_LITERALS),
+    ("vault-token", vault::REQUIRED_LITERALS),
+    ("stripe-token", stripe::REQUIRED_LITERALS),
+    ("slack-token", slack::REQUIRED_LITERALS),
+    ("sendgrid-token", sendgrid::REQUIRED_LITERALS),
+    (
+        "microsoft-entra-client-secret",
+        microsoft_entra::REQUIRED_LITERALS,
+    ),
+    (
+        "azure-devops-personal-access-token",
+        azure_devops::REQUIRED_LITERALS,
+    ),
+    ("notion-token", notion::REQUIRED_LITERALS),
+    ("atlassian-api-token", atlassian::REQUIRED_LITERALS),
+    ("telegram-bot-token", telegram::REQUIRED_LITERALS),
+    ("sentry-user-auth-token", sentry::USER_REQUIRED_LITERALS),
+    ("sentry-org-auth-token", sentry::ORG_REQUIRED_LITERALS),
+    ("grafana-service-account-token", grafana::REQUIRED_LITERALS),
+    ("new-relic-user-api-key", new_relic::USER_REQUIRED_LITERALS),
+    ("mailchimp-api-key", mailchimp::REQUIRED_LITERALS),
+    ("mailgun-api-key", mailgun::REQUIRED_LITERALS),
+    ("okta-api-token", okta::REQUIRED_LITERALS),
+    ("firebase-server-key", firebase::REQUIRED_LITERALS),
+    ("terraform-cloud-token", terraform::REQUIRED_LITERALS),
+    ("elevenlabs-api-key", elevenlabs::REQUIRED_LITERALS),
+    (
+        "gitlab-runner-authentication-token",
+        gitlab::RUNNER_REQUIRED_LITERALS,
+    ),
+    ("netlify-token", netlify::REQUIRED_LITERALS),
+    ("langsmith-api-key", langsmith::REQUIRED_LITERALS),
+    ("langfuse-secret-key", langfuse::REQUIRED_LITERALS),
+    ("doppler-token", doppler::REQUIRED_LITERALS),
+    (
+        "onepassword-service-account-token",
+        onepassword::REQUIRED_LITERALS,
+    ),
+    (
+        additional_providers::PYPI.detector_id(),
+        &[Literals::Shapes(additional_providers::PYPI.shapes())],
+    ),
+    (
+        additional_providers::DOCKER.detector_id(),
+        &[Literals::Shapes(additional_providers::DOCKER.shapes())],
+    ),
+    (
+        cloudflare::CLOUDFLARE.detector_id(),
+        &[Literals::Shapes(cloudflare::CLOUDFLARE.shapes())],
+    ),
+    (
+        linear::LINEAR.detector_id(),
+        &[Literals::Shapes(linear::LINEAR.shapes())],
+    ),
+    (
+        additional_providers::SUPABASE.detector_id(),
+        &[Literals::Shapes(additional_providers::SUPABASE.shapes())],
+    ),
+    (
+        additional_providers::VERCEL.detector_id(),
+        &[Literals::Shapes(additional_providers::VERCEL.shapes())],
+    ),
+    (
+        additional_providers::NPM.detector_id(),
+        &[Literals::Shapes(additional_providers::NPM.shapes())],
+    ),
+    (
+        additional_providers::GOOGLE.detector_id(),
+        &[Literals::Shapes(additional_providers::GOOGLE.shapes())],
+    ),
+    (
+        datadog::DATADOG_APPLICATION_KEY.detector_id(),
+        &[Literals::Shapes(datadog::DATADOG_APPLICATION_KEY.shapes())],
+    ),
+    (
+        additional_providers::PULUMI.detector_id(),
+        &[Literals::Shapes(additional_providers::PULUMI.shapes())],
+    ),
+    (
+        ai_inference::REPLICATE.detector_id(),
+        &[Literals::Shapes(ai_inference::REPLICATE.shapes())],
+    ),
+    (
+        ai_inference::GROQ.detector_id(),
+        &[Literals::Shapes(ai_inference::GROQ.shapes())],
+    ),
+    (
+        ai_inference::XAI.detector_id(),
+        &[Literals::Shapes(ai_inference::XAI.shapes())],
+    ),
+    (
+        ai_inference::OPENROUTER.detector_id(),
+        &[Literals::Shapes(ai_inference::OPENROUTER.shapes())],
+    ),
+    (
+        ai_inference::PERPLEXITY.detector_id(),
+        &[Literals::Shapes(ai_inference::PERPLEXITY.shapes())],
+    ),
+    (
+        ai_inference::FIREWORKS.detector_id(),
+        &[Literals::Shapes(ai_inference::FIREWORKS.shapes())],
+    ),
+    (
+        together_tavily::TOGETHER_AI.detector_id(),
+        &[Literals::Shapes(together_tavily::TOGETHER_AI.shapes())],
+    ),
+    (
+        together_tavily::TAVILY.detector_id(),
+        &[Literals::Shapes(together_tavily::TAVILY.shapes())],
+    ),
+    (
+        databricks::DATABRICKS.detector_id(),
+        &[Literals::Shapes(databricks::DATABRICKS.shapes())],
+    ),
+    (
+        neon::NEON.detector_id(),
+        &[Literals::Shapes(neon::NEON.shapes())],
+    ),
+    (
+        postman::POSTMAN.detector_id(),
+        &[Literals::Shapes(postman::POSTMAN.shapes())],
+    ),
+    (
+        heroku::HEROKU_API_KEY.detector_id(),
+        &[Literals::Shapes(heroku::HEROKU_API_KEY.shapes())],
+    ),
+    (
+        trigger_dev::TRIGGER_DEV.detector_id(),
+        &[Literals::Shapes(trigger_dev::TRIGGER_DEV.shapes())],
+    ),
+    (
+        e2b::E2B.detector_id(),
+        &[Literals::Shapes(e2b::E2B.shapes())],
+    ),
+    (
+        posthog::POSTHOG.detector_id(),
+        &[Literals::Shapes(posthog::POSTHOG.shapes())],
+    ),
+    (
+        helicone::HELICONE.detector_id(),
+        &[Literals::Shapes(helicone::HELICONE.shapes())],
+    ),
+    (
+        firecrawl::FIRECRAWL.detector_id(),
+        &[Literals::Shapes(firecrawl::FIRECRAWL.shapes())],
+    ),
+    (
+        composio::COMPOSIO.detector_id(),
+        &[Literals::Shapes(composio::COMPOSIO.shapes())],
+    ),
+    (
+        inngest::INNGEST_SIGNING_KEY.detector_id(),
+        &[Literals::Shapes(inngest::INNGEST_SIGNING_KEY.shapes())],
+    ),
+    (
+        resend::RESEND_API_KEY.detector_id(),
+        &[Literals::Shapes(resend::RESEND_API_KEY.shapes())],
+    ),
+    (
+        apify::APIFY_API_TOKEN.detector_id(),
+        &[Literals::Shapes(apify::APIFY_API_TOKEN.shapes())],
+    ),
+    (
+        wandb::WANDB_API_KEY.detector_id(),
+        &[Literals::Shapes(wandb::WANDB_API_KEY.shapes())],
+    ),
+    (
+        additional_providers::HUGGING_FACE.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::HUGGING_FACE.shapes(),
+        )],
+    ),
+    (
+        additional_providers::DIGITALOCEAN.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::DIGITALOCEAN.shapes(),
+        )],
+    ),
+    (
+        additional_providers::SUPABASE_PAT.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::SUPABASE_PAT.shapes(),
+        )],
+    ),
+    (
+        additional_providers::GRAFANA_CLOUD.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::GRAFANA_CLOUD.shapes(),
+        )],
+    ),
+    (
+        confluent::CONFLUENT_CLOUD_API_SECRET.detector_id(),
+        &[Literals::Shapes(
+            confluent::CONFLUENT_CLOUD_API_SECRET.shapes(),
+        )],
+    ),
+    (
+        postman::POSTMAN_COLLECTION_ACCESS_KEY.detector_id(),
+        &[Literals::Shapes(
+            postman::POSTMAN_COLLECTION_ACCESS_KEY.shapes(),
+        )],
+    ),
+];
+
+/// The prefilter declaration of the built-in detector `id`, or `None` when
+/// it runs on every call.
+fn built_in_required_literals(id: &str) -> Option<RequiredLiterals> {
+    DECLARED_LITERALS
+        .iter()
+        .find(|(declared, _)| *declared == id)
+        .map_or_else(
+            || common_required_literals(id),
+            |(_, groups)| RequiredLiterals::any_of(groups),
+        )
+}
+
+/// The prefilter declaration of the `common` built-in detector `id`, or
+/// `None` when it runs on every call. Names only `common` modules, like
+/// [`common_built_in_detectors`].
+fn common_required_literals(id: &str) -> Option<RequiredLiterals> {
+    match id {
+        "private-key" => RequiredLiterals::any_of(private_key::REQUIRED_LITERALS),
+        "jwt" => RequiredLiterals::any_of(jwt::REQUIRED_LITERALS),
+        "connection-string" => RequiredLiterals::any_of(connection_string::REQUIRED_LITERALS),
+        "otpauth-uri" => RequiredLiterals::any_of(otpauth::REQUIRED_LITERALS),
+        _ => None,
+    }
 }
 
 /// Which profiles a built-in detector belongs to

@@ -24,6 +24,7 @@
 
 use crate::detectors::additional_providers::STRIPE;
 use crate::detectors::pattern;
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -134,9 +135,10 @@ fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
 /// shared prefilter (`super::prefilter`, issue #983).
 ///
 /// The shared key table's prefixes and the separate `whsec_` scan.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    STRIPE.prefixes().chain([WEBHOOK_PREFIX]).map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Shapes(STRIPE.shapes()),
+    Literals::Strs(&[WEBHOOK_PREFIX]),
+];
 
 #[cfg(test)]
 mod tests {

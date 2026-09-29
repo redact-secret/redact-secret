@@ -18,6 +18,7 @@
 //! (Supabase legacy-anon-JWT row) for the full rationale, including the accepted false-negative risk of
 //! trusting an unverified payload claim.
 
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -227,9 +228,7 @@ pub fn jwt_detector() -> Box<dyn Detector> {
 
 /// The literals one of which every `jwt` candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [HEADER_LEAD].into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[HEADER_LEAD])];
 
 #[cfg(test)]
 mod tests {

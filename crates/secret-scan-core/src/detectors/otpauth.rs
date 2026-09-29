@@ -15,6 +15,7 @@
 //! recognizing it would require a separate, riskier contextual rule over
 //! unadorned base32 text, which this detector deliberately does not attempt.
 
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -206,9 +207,7 @@ pub fn otpauth_detector() -> Box<dyn Detector> {
 
 /// The literals one of which every `otpauth` candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    PREFIXES.into_iter().map(|(prefix, _)| prefix.as_bytes())
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Prefixes(&PREFIXES)];
 
 #[cfg(test)]
 mod tests {

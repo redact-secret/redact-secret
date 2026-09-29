@@ -15,6 +15,7 @@
 //! make a `ghs_` token far longer and JWT-shaped.
 
 use crate::detectors::pattern::{self, RunLength};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -171,13 +172,10 @@ fn exact_run(bytes: &[u8], start: usize, len: usize) -> bool {
 ///
 /// All three families: the classic `gh?_` prefixes, the installation
 /// prefix, and the fine-grained prefix.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    CLASSIC_FAMILY_PREFIXES
-        .into_iter()
-        .map(|(prefix, _)| prefix)
-        .chain([INSTALLATION_PREFIX, FINE_GRAINED_PREFIX])
-        .map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Prefixes(&CLASSIC_FAMILY_PREFIXES),
+    Literals::Strs(&[INSTALLATION_PREFIX, FINE_GRAINED_PREFIX]),
+];
 
 #[cfg(test)]
 mod tests {

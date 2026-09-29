@@ -166,6 +166,7 @@
 //!   bare-format detector in this registry already accepts.
 
 use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -325,9 +326,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
 ///
 /// The keyword gate is case-insensitive and cannot be declared; the
 /// datacenter suffix every candidate ends in can.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [DATACENTER_LITERAL].into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[DATACENTER_LITERAL])];
 
 #[cfg(test)]
 mod tests {

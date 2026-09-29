@@ -9,6 +9,7 @@
 //! not classified as a key. This mirrors `src/detectors/private-key.ts`
 //! (`decision-govern-cross-language-conformance`).
 
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -343,11 +344,8 @@ impl Detector for PrivateKeyDetector {
 ///
 /// Every candidate span comes from a `-----BEGIN <label>-----` or
 /// `-----END <label>-----` delimiter [`find_next_delimiter`] found.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [DELIMITER_BEGIN, DELIMITER_END]
-        .into_iter()
-        .map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] =
+    &[Literals::Strs(&[DELIMITER_BEGIN, DELIMITER_END])];
 
 #[cfg(test)]
 mod tests {

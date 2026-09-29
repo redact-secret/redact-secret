@@ -40,6 +40,7 @@
 //! [`scan`] composes the shape from the shared `pattern` primitives.
 
 use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -195,9 +196,7 @@ fn segmented_end(bytes: &[u8], ends: &[usize], body_start: usize, lens: &[usize]
 
 /// The literals one of which every `openai-token` candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [PREFIX].into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[PREFIX])];
 
 #[cfg(test)]
 mod tests {

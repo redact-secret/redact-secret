@@ -67,6 +67,7 @@
 //!   and are out of scope for this detector.
 
 use crate::detectors::pattern::{RunCursor, is_alnum_dash};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -226,9 +227,7 @@ pub fn telegram_bot_token_detector() -> Box<dyn Detector> {
 ///
 /// A candidate's digit id ends in `:`, so it contains a digit followed by
 /// `:`.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    ID_SEPARATOR_PAIRS.into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&ID_SEPARATOR_PAIRS)];
 
 #[cfg(test)]
 mod tests {

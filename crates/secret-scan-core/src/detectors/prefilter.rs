@@ -20,6 +20,8 @@
 //! cannot name such a literal (`generic-token`, keyword-gated detectors,
 //! bare-shape detectors such as `discord`), always run.
 
+use super::pattern::PrefixShape;
+
 /// Bits in a [`PairSet`]. A power of two, so the hash keeps its top bits.
 const PAIR_SET_BITS: usize = 1024;
 
@@ -71,6 +73,34 @@ impl PairSet {
     }
 }
 
+/// One group of a detector's declared literals, named the way its grammar
+/// already holds them, so a declaration reuses the scan's own constants
+/// instead of retyping them. Plain data: a declaration is a `const`, and
+/// flattening it is one non-generic function, which keeps the declarations
+/// out of the WebAssembly code size.
+#[derive(Clone, Copy)]
+pub(super) enum Literals {
+    /// Byte-string constants (`b"SG."`).
+    Bytes(&'static [&'static [u8]]),
+    /// String constants (`"ghp_"`).
+    Strs(&'static [&'static str]),
+    /// The first string of each pair of a `(prefix, finding type)` table.
+    Prefixes(&'static [(&'static str, &'static str)]),
+    /// The prefix of each shape of a [`PrefixShape`] table.
+    Shapes(&'static [PrefixShape<'static>]),
+}
+
+impl Literals {
+    fn push_into(self, into: &mut Vec<&'static [u8]>) {
+        match self {
+            Self::Bytes(literals) => into.extend_from_slice(literals),
+            Self::Strs(literals) => into.extend(literals.iter().map(|literal| literal.as_bytes())),
+            Self::Prefixes(pairs) => into.extend(pairs.iter().map(|(prefix, _)| prefix.as_bytes())),
+            Self::Shapes(shapes) => into.extend(shapes.iter().map(|shape| shape.prefix.as_bytes())),
+        }
+    }
+}
+
 /// The case-sensitive literals at least one of which occurs in the scan
 /// copy whenever a detector proposes any candidate.
 ///
@@ -83,17 +113,19 @@ pub(crate) struct RequiredLiterals {
 }
 
 impl RequiredLiterals {
-    /// A declaration from `literals`, or `None` (always run the detector)
-    /// when the list is empty or holds a literal shorter than two bytes.
-    pub(crate) fn any_of<I>(literals: I) -> Option<Self>
-    where
-        I: IntoIterator<Item = &'static [u8]>,
-    {
-        let literals: Box<[&'static [u8]]> = literals.into_iter().collect();
+    /// A declaration from every literal in `groups`, or `None` (always run
+    /// the detector) when there is none or one is shorter than two bytes.
+    pub(super) fn any_of(groups: &[Literals]) -> Option<Self> {
+        let mut literals = Vec::new();
+        for group in groups {
+            group.push_into(&mut literals);
+        }
         if literals.is_empty() || literals.iter().any(|literal| literal.len() < 2) {
             return None;
         }
-        Some(Self { literals })
+        Some(Self {
+            literals: literals.into_boxed_slice(),
+        })
     }
 
     /// `false` only when no declared literal can occur in the text `pairs`
@@ -135,14 +167,23 @@ mod tests {
 
     #[test]
     fn declarations_refuse_short_or_empty_literal_lists() {
-        assert!(RequiredLiterals::any_of([]).is_none());
-        assert!(RequiredLiterals::any_of([b"ghp_".as_slice(), b"x"]).is_none());
-        assert!(RequiredLiterals::any_of([b"ghp_".as_slice(), b"gho_"]).is_some());
+        assert!(RequiredLiterals::any_of(&[]).is_none());
+        assert!(RequiredLiterals::any_of(&[Literals::Strs(&[])]).is_none());
+        assert!(RequiredLiterals::any_of(&[Literals::Strs(&["ghp_", "x"])]).is_none());
+        assert!(
+            RequiredLiterals::any_of(&[Literals::Strs(&["ghp_"]), Literals::Bytes(&[b"x"])])
+                .is_none()
+        );
+        assert!(RequiredLiterals::any_of(&[Literals::Strs(&["ghp_", "gho_"])]).is_some());
     }
 
     #[test]
     fn a_declaration_matches_when_any_literal_may_occur() {
-        let required = RequiredLiterals::any_of([b"ghp_".as_slice(), b"glpat-"]).unwrap();
+        let required = RequiredLiterals::any_of(&[
+            Literals::Prefixes(&[("ghp_", "github_token")]),
+            Literals::Bytes(&[b"glpat-"]),
+        ])
+        .unwrap();
         assert!(required.may_match(&PairSet::of(b"token glpat-abc")));
         assert!(!required.may_match(&PairSet::of(b"plain prose only")));
         assert!(!required.may_match(&PairSet::of(b"")));

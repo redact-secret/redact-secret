@@ -70,6 +70,7 @@
 //! above and are not classified by either detector.
 
 use crate::detectors::pattern::{self, RunLength, is_alnum_underscore};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -228,15 +229,11 @@ fn org_match_at(bytes: &[u8], base64_ends: &[usize], start: usize) -> Option<usi
 
 /// The literals one of which every Sentry user-token candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn user_required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [USER_PREFIX].into_iter().map(str::as_bytes)
-}
+pub(super) const USER_REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[USER_PREFIX])];
 
 /// The literals one of which every Sentry org-token candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn org_required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [ORG_PREFIX].into_iter().map(str::as_bytes)
-}
+pub(super) const ORG_REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[ORG_PREFIX])];
 
 #[cfg(test)]
 mod tests {

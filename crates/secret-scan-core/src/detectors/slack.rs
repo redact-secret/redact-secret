@@ -88,6 +88,7 @@
 //! as beta.4.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -450,13 +451,11 @@ fn digit_section_end(
 ///
 /// One per pass in [`scan`]: bot, user, each rotation prefix, app-level and
 /// the interim shapes.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [BOT_PREFIX, USER_PREFIX, APP_LEVEL_PREFIX]
-        .into_iter()
-        .chain(ROTATION_PREFIXES)
-        .chain(INTERIM_SHAPES.iter().map(|shape| shape.prefix))
-        .map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Strs(&[BOT_PREFIX, USER_PREFIX, APP_LEVEL_PREFIX]),
+    Literals::Strs(&ROTATION_PREFIXES),
+    Literals::Shapes(&INTERIM_SHAPES),
+];
 
 #[cfg(test)]
 mod tests {

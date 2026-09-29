@@ -46,6 +46,7 @@
 //! crate already makes.
 
 use crate::detectors::pattern::{self, is_alnum};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -140,9 +141,7 @@ fn match_at(bytes: &[u8], alnum_ends: &[usize], hex_ends: &[usize], start: usize
 
 /// The literals one of which every Grafana service-account candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [PREFIX].into_iter()
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Bytes(&[PREFIX])];
 
 #[cfg(test)]
 mod tests {

@@ -26,6 +26,7 @@ use super::text::{
     is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
     matches_placeholder_vocabulary, starts_with_bare_dollar_reference,
 };
+use crate::detectors::prefilter::Literals;
 use crate::entropy::shannon_entropy;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -754,11 +755,10 @@ impl Detector for ConnectionStringDetector {
 ///
 /// Every URI candidate follows a `://`, and every Azure Storage candidate
 /// follows an `AccountKey=` anchor.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [SCHEME_SEPARATOR, AZURE_ACCOUNT_KEY_ANCHOR]
-        .into_iter()
-        .map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[
+    SCHEME_SEPARATOR,
+    AZURE_ACCOUNT_KEY_ANCHOR,
+])];
 
 #[cfg(test)]
 mod tests {

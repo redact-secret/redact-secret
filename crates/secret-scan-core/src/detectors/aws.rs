@@ -3,6 +3,7 @@
 //! Mirrors `src/detectors/aws.ts`.
 
 use crate::detectors::pattern::{self, RunLength};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -47,9 +48,7 @@ impl Detector for AwsAccessKeyDetector {
 
 /// The literals one of which every `aws-access-key` candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    PREFIXES.into_iter().map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&PREFIXES)];
 
 #[cfg(test)]
 mod tests {

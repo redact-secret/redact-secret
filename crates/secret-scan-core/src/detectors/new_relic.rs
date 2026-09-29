@@ -160,6 +160,7 @@
 //!   bare-format detector in this registry already accepts.
 
 use crate::detectors::pattern::{self, RunLength};
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -376,9 +377,7 @@ impl Detector for NewRelicLicenseKeyDetector {
 
 /// The literals one of which every New Relic user-key candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
-pub(super) fn user_required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [USER_API_KEY_PREFIX].into_iter().map(str::as_bytes)
-}
+pub(super) const USER_REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[USER_API_KEY_PREFIX])];
 
 #[cfg(test)]
 mod tests {

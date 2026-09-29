@@ -142,6 +142,7 @@
 //!   accepts.
 
 use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -322,12 +323,10 @@ impl Detector for MailgunApiKeyDetector {
 ///
 /// The `key-` path, and for the hex-triplet path a lowercase hex byte
 /// followed by the `-` between its first two segments.
-pub(super) fn required_literals() -> impl Iterator<Item = &'static [u8]> {
-    [KEY_LITERAL]
-        .into_iter()
-        .chain(TRIPLET_SEPARATOR_PAIRS)
-        .map(str::as_bytes)
-}
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Strs(&[KEY_LITERAL]),
+    Literals::Strs(&TRIPLET_SEPARATOR_PAIRS),
+];
 
 #[cfg(test)]
 mod tests {
