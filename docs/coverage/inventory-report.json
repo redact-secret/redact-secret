@@ -2079,7 +2079,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 276,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2113,6 +2113,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "aws-secret-access-key-name-positive-sdk-camel-case",
+        "aws-secret-access-key-name-positive-sts-json",
+        "aws-secret-access-key-name-positive-yaml",
         "contextual-host-chat",
         "contextual-host-dotenv",
         "contextual-host-http",
@@ -2218,7 +2221,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 276,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2294,7 +2297,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 276,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",

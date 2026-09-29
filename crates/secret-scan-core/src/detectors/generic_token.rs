@@ -27,6 +27,9 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
     "refresh_token",
     "session_token",
     "aws_secret_access_key",
+    // The unprefixed AWS API member (`"SecretAccessKey"` in STS, IAM and
+    // CloudFormation JSON, `secretAccessKey` in the SDKs), issue #1026.
+    "secret_access_key",
     "aws_session_token",
     "password",
     "passwd",

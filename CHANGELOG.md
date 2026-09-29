@@ -40,6 +40,10 @@ evidence is linked from each published version.
   or at line start) as a high `contextual_secret` (#1024). The leading `_`
   kept them outside the assignment grammar, so private-registry tokens and
   legacy UUIDs on these lines had no finding.
+- `generic-token` treats `secret_access_key` as a high-signal credential name
+  (#1026), so the AWS API member `"SecretAccessKey": "..."` (STS, IAM and
+  CloudFormation JSON, SDK `secretAccessKey`) is redacted at any width. Before,
+  only `aws_secret_access_key` was a name and the JSON form had no finding.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

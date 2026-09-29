@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 3281,
+  "fixtureCount": 3286,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -3285,6 +3285,11 @@
     {"expected":[],"id":"npmrc-authtoken-negative-placeholder"},
     {"expected":[],"id":"npmrc-negative-non-credential-keys"},
     {"expected":[],"id":"npmrc-authtoken-boundary-glued-scope"},
-    {"expected":[],"id":"npmrc-auth-adversarial-repeated-keys"}
+    {"expected":[],"id":"npmrc-auth-adversarial-repeated-keys"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":78,"start":37,"type":"contextual_secret"}],"id":"aws-secret-access-key-name-positive-sts-json"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":95,"start":51,"type":"contextual_secret"}],"id":"aws-secret-access-key-name-positive-sdk-camel-case"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":69,"start":28,"type":"contextual_secret"}],"id":"aws-secret-access-key-name-positive-yaml"},
+    {"expected":[],"id":"aws-secret-access-key-name-negative-reference"},
+    {"expected":[],"id":"aws-secret-access-key-name-negative-cloudformation-ref"}
   ]
 }

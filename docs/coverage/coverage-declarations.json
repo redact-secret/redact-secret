@@ -5205,6 +5205,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "aws-secret-access-key-name-positive-sdk-camel-case",
+            "aws-secret-access-key-name-positive-sts-json",
+            "aws-secret-access-key-name-positive-yaml",
             "contextual-host-chat",
             "contextual-host-dotenv",
             "contextual-host-http",
@@ -5408,6 +5411,9 @@
         {
           "dimension": "host-context",
           "evidenceFixtureIds": [
+            "aws-secret-access-key-name-positive-sdk-camel-case",
+            "aws-secret-access-key-name-positive-sts-json",
+            "aws-secret-access-key-name-positive-yaml",
             "contextual-adversarial-overlong",
             "contextual-host-chat",
             "contextual-host-dotenv",

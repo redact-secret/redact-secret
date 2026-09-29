@@ -367,3 +367,58 @@ mod npmrc_credential_keys {
         ));
     }
 }
+
+mod aws_secret_access_key_names {
+    use super::*;
+
+    const B64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    /// The API member names every width: a 41-byte temporary secret too.
+    #[test]
+    fn the_secret_access_key_member_is_redacted_in_every_casing() {
+        for width in [40, 41, 44] {
+            let value = filler(B64, width, width);
+            for input in [
+                format!("{{\"SecretAccessKey\": \"{value}\"}}"),
+                format!(
+                    "{{\"Credentials\": {{\"AccessKeyId\": \"ASIA{}\", \"SecretAccessKey\": \"{value}\", \"Expiration\": \"2026-09-29T00:00:00Z\"}}}}",
+                    filler(b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567", 16, 1)
+                ),
+                format!("const creds = {{ secretAccessKey: \"{value}\" }};\n"),
+                format!("secret_access_key: {value}\n"),
+                format!("  SecretAccessKey: '{value}'\n"),
+            ] {
+                let (text, findings) = whole_input(&input);
+                assert!(!text.contains(&value), "{input}: {findings:?}");
+                let start = input.find(&value).unwrap();
+                assert!(
+                    findings.iter().any(|f| f.action() == Action::Redact
+                        && f.range().start() == start
+                        && f.range().end() == start + value.len()),
+                    "{input}: {findings:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn references_under_the_name_stay_silent() {
+        for input in [
+            "{\"SecretAccessKey\": \"${AWS_SECRET_ACCESS_KEY}\"}",
+            "SecretAccessKey: !Ref SecretParameter\n",
+            "secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,\n",
+            "{\"SecretAccessKey\": \"<secret>\"}",
+        ] {
+            let (_, findings) = whole_input(input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!(
+            "{{\"SecretAccessKey\": \"{}\"}}\n",
+            filler(B64, 41, 2)
+        ));
+    }
+}
