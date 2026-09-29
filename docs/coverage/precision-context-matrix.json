@@ -884,9 +884,6 @@
     "openai-positive-project",
     "openai-positive-punctuation-adjacent",
     "openai-positive-repeated-value",
-    "openai-positive-shell-quoted",
-    "openai-positive-yaml",
-    "openai-positive-yaml-crlf",
     "slack-boundary-app-level-letter-in-digit-section",
     "slack-boundary-app-level-missing-section",
     "slack-boundary-app-level-opaque-body",
@@ -918,9 +915,6 @@
     "slack-positive-punctuation-adjacent",
     "slack-positive-qualified",
     "slack-positive-repeated-value",
-    "slack-positive-shell-quoted",
-    "slack-positive-yaml",
-    "slack-positive-yaml-crlf",
     "slack-user-token-boundary-dash-in-secret",
     "slack-user-token-boundary-empty-secret",
     "slack-user-token-boundary-letter-in-numeric-section",
@@ -1397,11 +1391,11 @@
       "contractTier": "negative",
       "detector": "cloudflare-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "cloudflare-negative-shell-quoted",
-      "kind": "negative",
-      "note": "Malformed twin (39-byte body) of cloudflare-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (39-byte body) of cloudflare-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): cloudflare-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -1416,11 +1410,11 @@
       "contractTier": "negative",
       "detector": "cloudflare-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "cloudflare-negative-toml",
-      "kind": "negative",
-      "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-toml in the same TOML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-toml in the same TOML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): cloudflare-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -1530,11 +1524,11 @@
       "contractTier": "negative",
       "detector": "cloudflare-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "cloudflare-paired-dotenv-malformed-body-short",
-      "kind": "negative",
-      "note": "Malformed twin (39-byte body, one short of the contracted 40) of cloudflare-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (39-byte body, one short of the contracted 40) of cloudflare-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): cloudflare-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -1549,11 +1543,11 @@
       "contractTier": "negative",
       "detector": "cloudflare-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "cloudflare-paired-json-malformed-checksum-nonhex",
-      "kind": "negative",
-      "note": "Malformed twin (non-hex checksum suffix) of cloudflare-positive-json in the same JSON context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (non-hex checksum suffix) of cloudflare-positive-json in the same JSON context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): cloudflare-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -1587,11 +1581,11 @@
       "contractTier": "negative",
       "detector": "cloudflare-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "cloudflare-paired-yaml-malformed-checksum-uppercase",
-      "kind": "negative",
-      "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-yaml in the same YAML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-yaml in the same YAML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): cloudflare-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -2244,11 +2238,11 @@
       "contractTier": "negative",
       "detector": "digitalocean-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "digitalocean-negative-dotenv-length-twin",
-      "kind": "negative",
-      "note": "A 63-byte twin under a provider-named dotenv assignment: the provider detector rejects it under the exact-length contract and no other default detector claims the value, so the default scan is silent.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "A 63-byte twin under a provider-named dotenv assignment: the provider detector rejects it under the exact-length contract and no other default detector claims the value, so the default scan is silent. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): digitalocean-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -3532,11 +3526,11 @@
       "contractTier": "negative",
       "detector": "docker-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "docker-negative-oat-one-short-json",
-      "kind": "negative",
-      "note": "Issue #370: the 31-byte organization access token twin as a quoted JSON value stays silent through the whole default registry.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Issue #370: the 31-byte organization access token twin as a quoted JSON value stays silent through the whole default registry. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): docker-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -3589,11 +3583,11 @@
       "contractTier": "negative",
       "detector": "docker-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "docker-negative-pat-one-short-dotenv",
-      "kind": "negative",
-      "note": "Issue #370: the 26-byte personal access token twin under a dotenv-style DOCKER_TOKEN= key is not rescued by the key name: docker-token declines the length and DOCKER_TOKEN is not a generic-token contextual key, so the whole default registry stays silent. Compare docker-overlap-context, where a generic contextual key (access_token=) does own the malformed value.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Issue #370: the 26-byte personal access token twin under a dotenv-style DOCKER_TOKEN= key is not rescued by the key name: docker-token declines the length and DOCKER_TOKEN is not a generic-token contextual key, so the whole default registry stays silent. Compare docker-overlap-context, where a generic contextual key (access_token=) does own the malformed value. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): docker-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -4599,11 +4593,11 @@
       "contractTier": "negative",
       "detector": "huggingface-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "huggingface-negative-dotenv",
-      "kind": "negative",
-      "note": "Malformed twin (one byte short) of huggingface-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (one byte short) of huggingface-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): huggingface-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -4637,11 +4631,11 @@
       "contractTier": "negative",
       "detector": "huggingface-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "huggingface-negative-json",
-      "kind": "negative",
-      "note": "Malformed twin (one byte short of the contracted 34-byte body) of huggingface-positive-json in the same JSON context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (one byte short of the contracted 34-byte body) of huggingface-positive-json in the same JSON context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): huggingface-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -4789,11 +4783,11 @@
       "contractTier": "negative",
       "detector": "huggingface-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "huggingface-negative-shell-quoted",
-      "kind": "negative",
-      "note": "Malformed twin (underscore-in-body) of huggingface-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (underscore-in-body) of huggingface-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): huggingface-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -4808,11 +4802,11 @@
       "contractTier": "negative",
       "detector": "huggingface-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "huggingface-negative-toml",
-      "kind": "negative",
-      "note": "Malformed twin (invalid-alphabet body byte) of huggingface-positive-toml in the same TOML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (invalid-alphabet body byte) of huggingface-positive-toml in the same TOML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): huggingface-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -4827,11 +4821,11 @@
       "contractTier": "negative",
       "detector": "huggingface-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "huggingface-negative-yaml",
-      "kind": "negative",
-      "note": "Malformed twin (invalid-alphabet body byte `!`) of huggingface-positive-yaml in the same YAML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (invalid-alphabet body byte `!`) of huggingface-positive-yaml in the same YAML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): huggingface-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -5547,11 +5541,11 @@
       "contractTier": "negative",
       "detector": "linear-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "linear-negative-dotenv",
-      "kind": "negative",
-      "note": "Malformed twin (39-byte body) of linear-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (39-byte body) of linear-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): linear-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -5680,11 +5674,11 @@
       "contractTier": "negative",
       "detector": "linear-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "linear-negative-toml",
-      "kind": "negative",
-      "note": "Malformed twin (invalid-alphabet body byte) of linear-positive-toml in the same TOML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (invalid-alphabet body byte) of linear-positive-toml in the same TOML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): linear-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -5794,11 +5788,11 @@
       "contractTier": "negative",
       "detector": "linear-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "linear-paired-shell-malformed-one-long",
-      "kind": "negative",
-      "note": "Malformed twin (41-byte body, one long) of linear-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (41-byte body, one long) of linear-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): linear-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -5813,11 +5807,11 @@
       "contractTier": "negative",
       "detector": "linear-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "linear-paired-yaml-malformed-invalid-alphabet",
-      "kind": "negative",
-      "note": "Malformed twin (invalid-alphabet body byte) of linear-positive-yaml in the same YAML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (invalid-alphabet body byte) of linear-positive-yaml in the same YAML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): linear-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -6870,7 +6864,7 @@
       "findingCount": 1,
       "fixtureId": "openai-negative-marker-dotenv",
       "kind": "overlap",
-      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity; the assignment name `OPENAI_API_KEY` is not itself a recognized contextual name, so this is the prefix-anchored match, not the name-anchored one.",
+      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity. Since #948 the provider-named high-signal key `OPENAI_API_KEY` qualifies for generic-token's contextual assignment rule, so the name-anchored `contextual_secret` (high) claims the value instead of the bare vendor-prefixed layer; openai-token still declines it.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -7000,11 +6994,11 @@
       "contractTier": "negative",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-negative-marker-shell-quoted",
-      "kind": "negative",
-      "note": "Malformed twin of openai-positive-marker-shell-quoted in the same shell context: the `sk-admin-` right segment is 73 bytes, one short of the contracted 74. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin of openai-positive-marker-shell-quoted in the same shell context: the `sk-admin-` right segment is 73 bytes, one short of the contracted 74. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): openai-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -7022,7 +7016,7 @@
       "findingCount": 1,
       "fixtureId": "openai-negative-marker-toml",
       "kind": "overlap",
-      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity.",
+      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity. Since #948 the provider-named high-signal key `openai_api_key` qualifies for generic-token's contextual assignment rule, so the name-anchored `contextual_secret` (high) claims the value instead of the bare vendor-prefixed layer; openai-token still declines it.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -7855,17 +7849,17 @@
       "contractTier": "malformed",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-positive-shell-quoted",
       "kind": "boundary",
-      "note": "Reclassified by issue #368: the value is marker-less (`sk-` + a long enough suffix), the broad shape the pre-#368 rule accepted. Under the reviewed contract openai-token no longer claims it, and no other default detector claims this input. Kept verbatim as an explicit record of the behavior change, not deleted. See openai-positive-marker-shell-quoted.",
-      "result": "silent",
+      "note": "Reclassified by issue #368: the value is marker-less (`sk-` + a long enough suffix), the broad shape the pre-#368 rule accepted. Under the reviewed contract openai-token no longer claims it, and no other default detector claims this input. Kept verbatim as an explicit record of the behavior change, not deleted. See openai-positive-marker-shell-quoted. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): openai-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [
@@ -7893,17 +7887,17 @@
       "contractTier": "malformed",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-positive-yaml",
       "kind": "boundary",
-      "note": "Reclassified by issue #368: the value is marker-less (`sk-` + a long enough suffix), the broad shape the pre-#368 rule accepted. Under the reviewed contract openai-token no longer claims it, and no other default detector claims this input. Kept verbatim as an explicit record of the behavior change, not deleted. See openai-positive-marker-yaml.",
-      "result": "silent",
+      "note": "Reclassified by issue #368: the value is marker-less (`sk-` + a long enough suffix), the broad shape the pre-#368 rule accepted. Under the reviewed contract openai-token no longer claims it, and no other default detector claims this input. Kept verbatim as an explicit record of the behavior change, not deleted. See openai-positive-marker-yaml. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): openai-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [
@@ -7912,17 +7906,17 @@
       "contractTier": "malformed",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-positive-yaml-crlf",
       "kind": "boundary",
-      "note": "Reclassified by issue #368: the value is marker-less (`sk-` + a long enough suffix), the broad shape the pre-#368 rule accepted. Under the reviewed contract openai-token no longer claims it, and no other default detector claims this input. Kept verbatim as an explicit record of the behavior change, not deleted. See openai-positive-marker-yaml-crlf.",
-      "result": "silent",
+      "note": "Reclassified by issue #368: the value is marker-less (`sk-` + a long enough suffix), the broad shape the pre-#368 rule accepted. Under the reviewed contract openai-token no longer claims it, and no other default detector claims this input. Kept verbatim as an explicit record of the behavior change, not deleted. See openai-positive-marker-yaml-crlf. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): openai-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [],
@@ -8491,11 +8485,11 @@
       "contractTier": "negative",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "slack-negative-bot-grammar-dotenv",
-      "kind": "negative",
-      "note": "Malformed twin (missing separator between the two numeric sections) of slack-positive-bot-grammar-dotenv in the same dotenv context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (missing separator between the two numeric sections) of slack-positive-bot-grammar-dotenv in the same dotenv context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): slack-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -8510,11 +8504,11 @@
       "contractTier": "negative",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "slack-negative-bot-grammar-toml",
-      "kind": "negative",
-      "note": "Malformed twin (the separator before the secret section replaced with `_`) of slack-positive-bot-grammar-toml in the same TOML context. Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin (the separator before the secret section replaced with `_`) of slack-positive-bot-grammar-toml in the same TOML context. Issue #375 context-pairing evidence. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): slack-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -9251,17 +9245,17 @@
       "contractTier": "malformed",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "slack-positive-shell-quoted",
       "kind": "boundary",
-      "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; SLACK_API_KEY= is not a generic-token contextual key either, so the whole default registry stays silent. Input unchanged; expectation corrected.",
-      "result": "silent",
+      "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; SLACK_API_KEY= is not a generic-token contextual key either, so the whole default registry stays silent. Input unchanged; expectation corrected. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): slack-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [
@@ -9346,17 +9340,17 @@
       "contractTier": "malformed",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "slack-positive-yaml",
       "kind": "boundary",
-      "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; slack_api_key: is not a generic-token contextual key either, so the whole default registry stays silent. Input unchanged; expectation corrected.",
-      "result": "silent",
+      "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; slack_api_key: is not a generic-token contextual key either, so the whole default registry stays silent. Input unchanged; expectation corrected. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): slack-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [
@@ -9365,17 +9359,17 @@
       "contractTier": "malformed",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "slack-positive-yaml-crlf",
       "kind": "boundary",
-      "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; slack_api_key: is not a generic-token contextual key either, so the whole default registry stays silent regardless of the CRLF line terminator. Input unchanged; expectation corrected.",
-      "result": "silent",
+      "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; slack_api_key: is not a generic-token contextual key either, so the whole default registry stays silent regardless of the CRLF line terminator. Input unchanged; expectation corrected. Since #948 generic-token claims a value under a provider-named high-signal key when the provider detector declines it, at the generic floors (`contextual_secret`, high): slack-token still rejects the value, and the whole default registry now reports it instead of staying silent (decision-redact-provider-named-credential-assignments, amendment #948).",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [

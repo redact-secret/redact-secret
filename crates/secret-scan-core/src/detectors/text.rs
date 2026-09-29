@@ -335,19 +335,55 @@ const PLACEHOLDER_LEAD_WORDS: &[&str] = &["your", "insert", "enter", "paste", "r
 
 /// Words that name the kind of credential a placeholder stands for. Every
 /// word after the lead word must come from this list.
+///
+/// Issue #993 adds the qualifiers provider documentation puts in front of a
+/// credential noun (`your-bot-token-here`, `whsec_YOUR_SIGNING_SECRET`,
+/// `ntn_yourinternalintegrationtokenhere`): `account`, `admin`, `bot`,
+/// `deploy`, `integration`, `internal`, `org`, `project`, `signing` and
+/// `webhook`.
 const PLACEHOLDER_CREDENTIAL_WORDS: &[&str] = &[
-    "access", "api", "app", "auth", "bearer", "client", "id", "jwt", "key", "oauth", "oauth2",
-    "personal", "refresh", "secret", "service", "session", "token", "user", "here", "with",
+    "access",
+    "account",
+    "admin",
+    "api",
+    "app",
+    "auth",
+    "bearer",
+    "bot",
+    "client",
+    "deploy",
+    "id",
+    "integration",
+    "internal",
+    "jwt",
+    "key",
+    "oauth",
+    "oauth2",
+    "org",
+    "personal",
+    "project",
+    "refresh",
+    "secret",
+    "service",
+    "session",
+    "signing",
+    "token",
+    "user",
+    "webhook",
+    "here",
+    "with",
 ];
 
 /// Provider names a documentation placeholder may carry between its lead word
 /// and the credential words (`YOUR_DEEPGRAM_API_KEY`,
 /// `replace-with-your-mistral-key`). A closed list of the AI-inference and
 /// developer-credential providers the built-in detectors name, not a
-/// vocabulary: a provider outside it (`YOUR_MAILCHIMP_API_KEY`) is one word
-/// off the lists and stays detected. Issue #774; `convex` and `fal` were
-/// added with their exact credential names in issue #919
-/// (`FAL_KEY=your_fal_key`).
+/// vocabulary. Issue #774; `convex` and `fal` were added with their exact
+/// credential names in issue #919 (`FAL_KEY=your_fal_key`). Since issue
+/// #993 every provider segment of `generic-token`'s rule-2 list
+/// ([`is_placeholder_provider_word`]) also counts (`YOUR_MAILGUN_API_KEY`,
+/// `your-travis-api-token`); a provider outside both lists
+/// (`YOUR_ACMECLOUD_API_KEY`) is one word off and stays detected.
 const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
     "ai",
     "ai21",
@@ -376,11 +412,21 @@ const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
 /// followed only by qualifiers (`YOUR_PERSONAL_ACCESS`) is not enough.
 const PLACEHOLDER_CREDENTIAL_NOUNS: &[&str] = &["jwt", "key", "secret", "token"];
 
+/// `true` for a provider word a placeholder may carry
+/// ([`PLACEHOLDER_PROVIDER_WORDS`] or a segment of `generic-token`'s
+/// provider list), case-insensitively.
+fn is_placeholder_provider_word(word: &str) -> bool {
+    PLACEHOLDER_PROVIDER_WORDS
+        .iter()
+        .chain(super::generic_token::DEDICATED_PROVIDER_SEGMENTS)
+        .any(|listed| word.eq_ignore_ascii_case(listed))
+}
+
 /// `true` for an instructional placeholder written as one glued word, such
 /// as `yourkey`, `yourapikey` or `YourSigningKeyHere` (issue #949): ASCII
 /// letters only, opening with a [`PLACEHOLDER_LEAD_WORDS`] entry, and the
 /// rest splitting exactly into [`PLACEHOLDER_CREDENTIAL_WORDS`],
-/// [`PLACEHOLDER_PROVIDER_WORDS`], lead words or `signing`, with at least
+/// [`PLACEHOLDER_PROVIDER_WORDS`], provider segments or lead words, with at least
 /// one [`PLACEHOLDER_CREDENTIAL_NOUNS`] entry, all case-insensitively.
 ///
 /// Without separators the word boundaries are ambiguous, so this is only
@@ -401,8 +447,8 @@ pub(super) fn is_glued_instructional_placeholder(value: &str) -> bool {
         PLACEHOLDER_CREDENTIAL_WORDS
             .iter()
             .chain(PLACEHOLDER_PROVIDER_WORDS)
+            .chain(super::generic_token::DEDICATED_PROVIDER_SEGMENTS)
             .chain(PLACEHOLDER_LEAD_WORDS)
-            .chain(&["signing"])
     };
     // reachable[i]: rest[..i] splits into listed words; with_noun[i]: one
     // such split names a credential noun. Bounded by the value's length
@@ -455,7 +501,7 @@ pub(super) fn is_instructional_token_placeholder(value: &str) -> bool {
     for word in words {
         if !is_listed(word, PLACEHOLDER_CREDENTIAL_WORDS)
             && !is_listed(word, PLACEHOLDER_LEAD_WORDS)
-            && !is_listed(word, PLACEHOLDER_PROVIDER_WORDS)
+            && !is_placeholder_provider_word(word)
         {
             return false;
         }

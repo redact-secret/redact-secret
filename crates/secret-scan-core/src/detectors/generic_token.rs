@@ -96,13 +96,19 @@ const NON_CREDENTIAL_TOKEN_NAMES: &[&str] = &[
 /// `secretName` was never a credential name (it ends in `name`).
 const OBJECT_REFERENCE_SECRET_NAMES: &[&str] = &["existing_secret", "existing_secret_name"];
 
-/// Name segments that name a provider with its own built-in detector. A
-/// prefixed name carrying one (`MAILCHIMP_API_KEY`, `GITHUB_TOKEN`,
-/// `DD_API_KEY`) belongs to that detector's contract, which decides whether
-/// the value is a credential: a value it declines (a truncated or
-/// mis-delimited near miss) stays silent instead of being claimed by
-/// `generic-token` (issue #702).
-const DEDICATED_PROVIDER_SEGMENTS: &[&str] = &[
+/// Name segments that name a provider with its own built-in detector
+/// (`MAILCHIMP_API_KEY`, `GITHUB_TOKEN`, `DD_API_KEY`).
+///
+/// Issue #702 made such a prefix disqualify every name, so the provider
+/// detector's contract alone decided and a value it declined got no finding.
+/// Since issue #948 a provider-prefixed *high-signal* name is claimed like a
+/// generic one ([`has_prefixed_credential_name`]): the provider detector
+/// still takes an on-grammar value through overlap resolution (provider
+/// specificity over contextual), and `generic-token` reports the value its
+/// grammar declines (format drift, a sibling key type, a truncated paste).
+/// A provider-prefixed *ambiguous* name (`GITHUB_CREDENTIALS`) still does
+/// not qualify.
+pub(super) const DEDICATED_PROVIDER_SEGMENTS: &[&str] = &[
     "anthropic",
     "atlassian",
     "jira",
@@ -179,41 +185,64 @@ const NON_SECRET_NAME_LEADS: &[&str] = &[
     "publishable",
 ];
 
-/// `true` when a prefixed name's prefix may make it a generic contextual
-/// name: it names no provider with a dedicated detector and does not say the
-/// value is redacted, hashed or public.
-fn prefix_is_generic(normalized: &str) -> bool {
-    let mut segments = normalized.split('_');
-    let lead_is_non_secret = segments
+/// `true` when a prefixed name's first segment says the value is not the
+/// secret itself (`redacted_api_key`, `hashed_token`, `publishable_key`).
+fn prefix_says_not_secret(normalized: &str) -> bool {
+    normalized
+        .split('_')
         .next()
-        .is_some_and(|lead| NON_SECRET_NAME_LEADS.contains(&lead));
-    !lead_is_non_secret
-        && !normalized
-            .split('_')
-            .any(|segment| DEDICATED_PROVIDER_SEGMENTS.contains(&segment))
-        && !DEDICATED_PROVIDER_PHRASES
+        .is_some_and(|lead| NON_SECRET_NAME_LEADS.contains(&lead))
+}
+
+/// `true` when a name carries a provider with a dedicated detector
+/// ([`DEDICATED_PROVIDER_SEGMENTS`], [`DEDICATED_PROVIDER_PHRASES`]).
+fn names_dedicated_provider(normalized: &str) -> bool {
+    normalized
+        .split('_')
+        .any(|segment| DEDICATED_PROVIDER_SEGMENTS.contains(&segment))
+        || DEDICATED_PROVIDER_PHRASES
             .iter()
             .any(|phrase| normalized.contains(phrase))
 }
 
 /// `true` when `normalized` is `<prefix>_<name>` for one of `names`, with a
-/// non-empty [`prefix_is_generic`] prefix: `myapp_api_key`, `db_password`,
-/// `jwt_secret`.
-fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
+/// non-empty prefix. The prefix is not checked.
+fn ends_with_prefixed_name(normalized: &str, names: &[&str]) -> bool {
     names.iter().any(|name| {
         normalized.len() > name.len() + 1
             && normalized.ends_with(name)
             && normalized.as_bytes()[normalized.len() - name.len() - 1] == b'_'
-    }) && prefix_is_generic(normalized)
+    })
+}
+
+/// `true` when `normalized` is `<prefix>_<name>` for one of `names` and the
+/// prefix neither names a provider with a dedicated detector nor says the
+/// value is redacted, hashed or public: `app_credentials`. The ambiguous
+/// bucket's prefix rule.
+fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
+    ends_with_prefixed_name(normalized, names)
+        && !prefix_says_not_secret(normalized)
+        && !names_dedicated_provider(normalized)
+}
+
+/// `true` when `normalized` is `<prefix>_<name>` for one of `names` and the
+/// prefix does not say the value is redacted, hashed or public:
+/// `myapp_api_key`, `db_password`, `jwt_secret`, and since issue #948
+/// `openai_api_key` and `stripe_secret_key`. The high-signal bucket's prefix
+/// rule; see [`DEDICATED_PROVIDER_SEGMENTS`] for why a provider prefix
+/// qualifies here.
+fn has_prefixed_credential_name(normalized: &str, names: &[&str]) -> bool {
+    ends_with_prefixed_name(normalized, names) && !prefix_says_not_secret(normalized)
 }
 
 /// `true` for a high-signal name: one of [`HIGH_SIGNAL_NAMES`] or
 /// [`EXACT_HIGH_SIGNAL_NAMES`], the same
 /// name behind a generic prefix (`MYAPP_API_KEY`, `DB_PASSWORD`,
 /// `JWT_SECRET`), or a prefixed `_token` name outside
-/// [`NON_CREDENTIAL_TOKEN_NAMES`] (`CI_DEPLOY_TOKEN`). A prefix that names a
-/// provider with its own detector does not qualify; see
-/// [`prefix_is_generic`].
+/// [`NON_CREDENTIAL_TOKEN_NAMES`] (`CI_DEPLOY_TOKEN`). A prefix that says
+/// the value is not the secret does not qualify; a provider prefix does
+/// since issue #948 (`OPENAI_API_KEY`, `GITHUB_TOKEN`); see
+/// [`has_prefixed_credential_name`].
 ///
 /// Issue #702: before this, only the bare names matched, so a secret under a
 /// prefixed variable for a service with no dedicated detector got no finding
@@ -226,11 +255,11 @@ pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
     }
     HIGH_SIGNAL_NAMES.contains(&normalized)
         || EXACT_HIGH_SIGNAL_NAMES.contains(&normalized)
-        || has_prefixed_name(normalized, HIGH_SIGNAL_NAMES)
+        || has_prefixed_credential_name(normalized, HIGH_SIGNAL_NAMES)
         || (!AMBIGUOUS_NAMES.contains(&normalized)
-            && has_prefixed_name(normalized, &["token"])
+            && has_prefixed_credential_name(normalized, &["token"])
             && !NON_CREDENTIAL_TOKEN_NAMES.contains(&normalized)
-            && !has_prefixed_name(normalized, NON_CREDENTIAL_TOKEN_NAMES))
+            && !ends_with_prefixed_name(normalized, NON_CREDENTIAL_TOKEN_NAMES))
 }
 
 /// `true` for an [`OBJECT_REFERENCE_SECRET_NAMES`] name, bare or prefixed.
@@ -244,8 +273,8 @@ fn is_object_reference_secret_name(normalized: &str) -> bool {
 }
 
 /// `true` for an ambiguous name: one of [`AMBIGUOUS_NAMES`] or the same name
-/// behind a prefix (`GITHUB_CREDENTIALS`), when it is not already
-/// [`is_high_signal_name`].
+/// behind a generic prefix (`APP_CREDENTIALS`, not `GITHUB_CREDENTIALS`),
+/// when it is not already [`is_high_signal_name`].
 fn is_ambiguous_name(normalized: &str) -> bool {
     !is_high_signal_name(normalized) && is_ambiguous_vocabulary_name(normalized)
 }
@@ -888,6 +917,154 @@ fn is_partially_masked_display(value: &str) -> bool {
         && run >= head.len() + tail.len()
 }
 
+/// The fewest mask characters that make a value a masked *key* display
+/// ([`is_masked_key_display`]): a full-length key shown as mask, never a
+/// short password echo such as `********x`.
+const MIN_MASKED_KEY_RUN: usize = 16;
+/// The longest visible tail a masked key display keeps after its last
+/// separator: a region or checksum label such as Mailchimp's `-us6`.
+const MAX_MASKED_KEY_TAIL: usize = 4;
+
+/// `true` for a separator a masked key display keeps between its segments.
+fn is_mask_separator(ch: char) -> bool {
+    matches!(ch, '-' | '_' | '.' | ':' | '=')
+}
+
+/// `true` for a full-length key shown as mask with its layout kept, the way
+/// a console, a settings page or a template prints it (issue #993):
+/// `********-****-****-****-************` (a UUID-shaped key),
+/// `PMAK-****…-****…`, `00••••…` (an Okta token), `3518930973:AA****…` (a
+/// Telegram bot token), `ATATT3xFfGF0****…=********` (an Atlassian token)
+/// and `********…-us6` (a Mailchimp key).
+///
+/// The value holds only `[A-Za-z0-9]`, one mask character ([`is_mask_char`])
+/// and the separators `-`, `_`, `.`, `:` and `=`. Its visible characters
+/// sit in a head before the first mask character (at most
+/// [`MAX_MASK_VISIBLE_SIDE`] of them) and, optionally, in one tail segment
+/// of at most [`MAX_MASKED_KEY_TAIL`] after the last separator; everything
+/// between is mask or separators, and there are at least
+/// [`MIN_MASKED_KEY_RUN`] mask characters. A visible character between two
+/// mask runs, a mixed mask, a longer head, or a short mask (`********x`,
+/// `x********`, the #264 near misses) keeps the value detected. No
+/// documented credential grammar contains `*` or `•`.
+fn is_masked_key_display(value: &str) -> bool {
+    let Some(first_mask) = value.find(is_mask_char) else {
+        return false;
+    };
+    let Some(mask) = value[first_mask..].chars().next() else {
+        return false;
+    };
+    let allowed = |ch: char| ch == mask || ch.is_ascii_alphanumeric() || is_mask_separator(ch);
+    if !value.chars().all(allowed) {
+        return false;
+    }
+    let head = &value[..first_mask];
+    let head_visible = head.chars().filter(char::is_ascii_alphanumeric).count();
+    if head_visible > MAX_MASK_VISIBLE_SIDE {
+        return false;
+    }
+    let rest = &value[first_mask..];
+    let body = match rest.rfind(is_mask_separator) {
+        Some(index)
+            if (1..=MAX_MASKED_KEY_TAIL).contains(&(rest.len() - index - 1))
+                && rest[index + 1..]
+                    .chars()
+                    .all(|ch| ch.is_ascii_alphanumeric()) =>
+        {
+            &rest[..index]
+        }
+        _ => rest,
+    };
+    body.chars().all(|ch| ch == mask || is_mask_separator(ch))
+        && body.chars().filter(|&ch| ch == mask).count() >= MIN_MASKED_KEY_RUN
+}
+
+/// `true` for a documentation display that shows a key's first few
+/// characters and elides the rest (issue #993): `ATATT3xFfGF0...`,
+/// `sntrys_eyJ...`, `sk-proj-…`. A head of 1 to [`MAX_MASK_VISIBLE_SIDE`]
+/// `[A-Za-z0-9_-]` characters followed only by three or more `.` or by
+/// `…`. The elided value is not in the text; a longer visible head, or
+/// anything after the ellipsis, keeps the value detected.
+fn is_ellipsis_truncated_display(value: &str) -> bool {
+    let head = value.trim_end_matches(['.', '\u{2026}']);
+    let ellipsis = &value[head.len()..];
+    let elided = ellipsis.contains('\u{2026}') || ellipsis.len() >= 3;
+    elided
+        && (1..=MAX_MASK_VISIBLE_SIDE).contains(&head.len())
+        && head
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+}
+
+/// `true` for a value that opens a Make-escaped reference (issue #993):
+/// `$$(heroku auth:token)`, `$${VAR}` or `$$VAR`, the forms a Makefile
+/// recipe writes for a shell command substitution or variable. An
+/// unquoted value ends at whitespace, so the command's first word is all
+/// the assignment grammar reads (`$$(heroku`); the value is resolved at run
+/// time and never holds the secret. A single-`$` opener without its closing
+/// delimiter (`$(SYNTHETIC...`, `` `SYNTHETIC... ``) stays detected, as
+/// before; a complete `$(...)` or backtick command is already excluded.
+fn starts_with_command_substitution(value: &str) -> bool {
+    value.starts_with("$$(")
+        || value.starts_with("$${")
+        || (value.starts_with("$$")
+            && value
+                .as_bytes()
+                .get(2)
+                .is_some_and(|byte| byte.is_ascii_alphabetic() || *byte == b'_'))
+}
+
+/// Documented public key prefixes: each provider states that a key behind
+/// it is safe to expose, and its own detector deliberately never claims it
+/// (issue #993). Stripe `pk_live_`/`pk_test_` (see
+/// `additional_providers.rs`), Supabase `sb_publishable_`, Langfuse `pk-lf-`
+/// (`langfuse.rs`), `PostHog` `phc_` (`posthog.rs`), and Trigger.dev
+/// `pk_<env>_` for its four environment slugs (`trigger_dev.rs`).
+const PUBLIC_KEY_PREFIXES: &[&str] = &[
+    "pk_live_",
+    "pk_test_",
+    "sb_publishable_",
+    "pk-lf-",
+    "phc_",
+    "pk_dev_",
+    "pk_stg_",
+    "pk_prod_",
+    "pk_preview_",
+];
+
+/// `true` for a value that is a documented public key
+/// ([`PUBLIC_KEY_PREFIXES`] and a non-empty `[A-Za-z0-9_-]` body), which a
+/// secret-named variable sometimes holds by mistake
+/// (`STRIPE_WEBHOOK_SECRET=pk_live_...`). A secret key's prefix
+/// (`sk_live_`, `sb_secret_`, `sk-lf-`, `phx_`) is not on the list, and a
+/// public prefix glued inside a longer value (`xpk_live_...`) does not
+/// match.
+fn is_public_key_value(value: &str) -> bool {
+    PUBLIC_KEY_PREFIXES.iter().any(|prefix| {
+        value.len() > prefix.len()
+            && value.starts_with(prefix)
+            && value[prefix.len()..]
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+    })
+}
+
+/// `true` for a Confluent Cloud API key id, the public half of a Confluent
+/// key pair ("It is not considered secret information", Confluent's
+/// overview, example `ABCD1234567890AB`), assigned to a name that carries
+/// `confluent` (`CONFLUENT_CLOUD_API_KEY=`, issue #993): exactly 16
+/// `[A-Z0-9]`. A Confluent secret is 64 bytes, so the id never hides one.
+/// The shape is community-observed rather than published, so it is read
+/// only under a Confluent-named key; under any other name
+/// (`KAFKA_API_KEY=`) a 16-byte uppercase value stays detected.
+fn is_confluent_key_id_assignment(name: &str, value: &str) -> bool {
+    name.split('_').any(|segment| segment == "confluent")
+        && value.len() == 16
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit())
+}
+
 // --- colon-namespaced scope identifiers (issue #727, benchmark gap
 // `product-727`) ----------------------------------------------------------
 
@@ -1194,6 +1371,10 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_secret_manager_reference(value)
         || is_repeated_character_filler(value)
         || is_partially_masked_display(value)
+        || is_masked_key_display(value)
+        || is_ellipsis_truncated_display(value)
+        || starts_with_command_substitution(value)
+        || is_public_key_value(value)
         || is_source_code_expression(value, form)
         || is_windows_env_reference(value)
         || is_sql_bind_parameter(value)
@@ -1231,7 +1412,7 @@ const CREDENTIAL_NAME_TAIL_WORDS: &[&str] = &[
 /// naming the key inside a Secret object (issue #911).
 ///
 /// Quoted values are out of scope, and so is any value carrying a
-/// placeholder lead word (`YOUR_MAILCHIMP_API_KEY`), which the #756
+/// placeholder lead word (`YOUR_ACMECLOUD_API_KEY`), which the #756
 /// instructional-placeholder rule governs. FN cost: a real secret that is an
 /// unquoted all-caps word chain ending in `_KEY`/`_TOKEN`/`_SECRET`/... .
 fn is_credential_variable_name_value(value: &str) -> bool {
@@ -1439,6 +1620,21 @@ const MIN_FILLER_LEN: usize = 8;
 /// matching exposes). A real credential body is never one repeated
 /// character.
 fn is_prefixed_filler(value: &str) -> bool {
+    // A template keeps a short region label after the filler
+    // (`xxxxxxxx…-usX`, a Mailchimp key, issue #993).
+    let without_label = value
+        .rsplit_once('-')
+        .filter(|(head, label)| {
+            !head.is_empty()
+                && (1..=MAX_MASKED_KEY_TAIL).contains(&label.len())
+                && label.bytes().all(|byte| byte.is_ascii_alphanumeric())
+        })
+        .map(|(head, _)| head);
+    is_prefixed_filler_body(value) || without_label.is_some_and(is_prefixed_filler_body)
+}
+
+/// [`is_prefixed_filler`] without the label rule.
+fn is_prefixed_filler_body(value: &str) -> bool {
     let body: Vec<u8> = value
         .bytes()
         .filter(|byte| !matches!(byte, b'-' | b'_' | b'.'))
@@ -1478,15 +1674,27 @@ pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
         .filter(|&(index, ch)| index > 0 && matches!(ch, '_' | '-'))
         .any(|(index, _)| {
             let rest = &value[index + 1..];
+            let prefix = &value[..index];
+            // An uppercase vendor prefix (`PMAK-<your-api-key>`) qualifies
+            // only in front of a whole `<...>` placeholder (issue #993).
+            let upper_prefix_ok = prefix
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+                && rest.len() > 2
+                && rest.starts_with('<')
+                && rest.ends_with('>')
+                && !rest[1..rest.len() - 1].contains(['<', '>']);
             !rest.is_empty()
-                && value[..index].bytes().all(|byte| {
-                    byte.is_ascii_lowercase()
-                        || byte.is_ascii_digit()
-                        || matches!(byte, b'_' | b'-')
-                })
+                && (upper_prefix_ok
+                    || prefix.bytes().all(|byte| {
+                        byte.is_ascii_lowercase()
+                            || byte.is_ascii_digit()
+                            || matches!(byte, b'_' | b'-')
+                    }))
                 && (is_instructional_token_placeholder(rest)
                     || is_glued_instructional_placeholder(rest)
                     || is_ascending_digit_run(rest)
+                    || is_counting_run_body(rest)
                     || starts_with_angle_bracket_reference(rest)
                     || is_repeated_character_filler(rest)
                     || is_generic_placeholder_word(&rest.to_ascii_lowercase()))
@@ -1510,6 +1718,49 @@ fn is_ascending_digit_run(value: &str) -> bool {
         && bytes
             .windows(2)
             .all(|pair| pair[1] == if pair[0] == b'9' { b'0' } else { pair[0] + 1 })
+}
+
+/// Shortest segment [`is_counting_run_body`] accepts.
+const MIN_COUNTING_SEGMENT: usize = 3;
+
+/// `true` for one counting run: consecutive lowercase letters (`abc`),
+/// consecutive digits (`123`, `9` then `0`), or a letter run followed by a
+/// digit run (`abc123`), at least [`MIN_COUNTING_SEGMENT`] bytes.
+fn is_counting_segment(segment: &str) -> bool {
+    let bytes = segment.as_bytes();
+    let digits_from = bytes
+        .iter()
+        .position(u8::is_ascii_digit)
+        .unwrap_or(bytes.len());
+    let (letters, digits) = bytes.split_at(digits_from);
+    let counts =
+        |run: &[u8], next: fn(u8) -> u8| run.windows(2).all(|pair| pair[1] == next(pair[0]));
+    bytes.len() >= MIN_COUNTING_SEGMENT
+        && letters.iter().all(u8::is_ascii_lowercase)
+        && digits.iter().all(u8::is_ascii_digit)
+        && counts(letters, |byte| byte + 1)
+        && counts(digits, |byte| if byte == b'9' { b'0' } else { byte + 1 })
+}
+
+/// The body length range [`is_counting_run_body`] accepts, separators
+/// excluded: a short documentation stand-in, never a full-length synthetic
+/// key body (`key-abcdefghijklmnopqrstuvwxyz012345` stays reported).
+const COUNTING_BODY_LEN: std::ops::RangeInclusive<usize> = 6..=12;
+
+/// `true` for a documentation body made of counting runs joined by `-` or
+/// `_`: `abc123` in `ghp_abc123`, `glpat-abc123` and `npm_abc123`, and
+/// `123-456-abc` in `xoxb-123-456-abc` (issue #993, the #949 counting-run
+/// rule widened to letters). Read only behind a vendor prefix
+/// ([`is_vendor_prefixed_placeholder`]) and only at
+/// [`COUNTING_BODY_LEN`]; random key material is a counting run with
+/// vanishing probability, so any other character keeps the value detected
+/// (`ghp_abd123`, `ghp_abc124`).
+fn is_counting_run_body(value: &str) -> bool {
+    let body_len = value
+        .bytes()
+        .filter(|byte| !matches!(byte, b'-' | b'_'))
+        .count();
+    COUNTING_BODY_LEN.contains(&body_len) && value.split(['-', '_']).all(is_counting_segment)
 }
 
 /// `true` when the whole value is a Twilio Account SID (`AC`) or API Key
@@ -1592,6 +1843,7 @@ fn assignment_confidence(
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
         || is_non_secret_reference(value, form)
+        || is_confluent_key_id_assignment(name, value)
     {
         return None;
     }
@@ -3111,11 +3363,27 @@ mod tests {
         }
     }
 
-    // issue #702: a prefix that names a provider with its own detector hands
-    // the value to that detector's contract, and a lead that says the value
-    // is redacted, hashed or public is not a secret name.
+    // issue #702: a lead that says the value is redacted, hashed or public
+    // is not a secret name.
     #[test]
-    fn provider_named_and_non_secret_prefixes_are_not_generic_names() {
+    fn non_secret_prefixes_are_not_generic_names() {
+        for name in [
+            "redactedApiKey",
+            "hashed_token",
+            "publishable_key",
+            "masked_api_key",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    // issue #948: a provider prefix no longer hands a high-signal name to
+    // the provider detector alone. `generic-token` proposes the value like
+    // it does under `MYAPP_API_KEY`, and overlap resolution lets a provider
+    // finding on the same value win on specificity.
+    #[test]
+    fn provider_prefixed_high_signal_names_are_generic_names() {
         for name in [
             "POSTMAN_API_KEY",
             "GITHUB_TOKEN",
@@ -3124,11 +3392,82 @@ mod tests {
             "NEW_RELIC_API_KEY",
             "stripeSecretKey",
             "SLACK_BOT_TOKEN",
-            "redactedApiKey",
-            "hashed_token",
-            "publishable_key",
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "HUGGING_FACE_HUB_TOKEN",
+            "GITHUB_CLIENT_SECRET",
         ] {
             let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].type_name(), "contextual_secret", "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+            assert_eq!(
+                candidates[0].specificity(),
+                Some(Specificity::Contextual),
+                "{input}"
+            );
+        }
+    }
+
+    // issue #948: every prefix of the rule-2 list, one segment or a phrase,
+    // qualifies for the high-signal bucket and stays out of the ambiguous
+    // one; the retention hint and the ruleset reserved-name check follow.
+    #[test]
+    fn every_dedicated_provider_prefix_qualifies_for_high_signal_names() {
+        for prefix in DEDICATED_PROVIDER_SEGMENTS
+            .iter()
+            .chain(DEDICATED_PROVIDER_PHRASES)
+        {
+            for suffix in [
+                "api_key",
+                "token",
+                "secret_key",
+                "client_secret",
+                "password",
+            ] {
+                let name = format!("{prefix}_{suffix}");
+                assert!(is_high_signal_name(&name), "{name}");
+                assert!(is_reserved_name(&name), "{name}");
+                assert!(
+                    has_open_contextual_assignment(&format!("{name}=")),
+                    "{name}"
+                );
+            }
+            for suffix in [
+                "credentials",
+                "auth",
+                "signing_key",
+                "csrf_token",
+                "api_key_id",
+            ] {
+                let name = format!("{prefix}_{suffix}");
+                assert!(!is_high_signal_name(&name), "{name}");
+                assert!(!is_ambiguous_name(&name), "{name}");
+            }
+        }
+    }
+
+    // issue #948 keeps the provider exclusion for the ambiguous bucket and
+    // for the request-scoped `_token` names, and a provider-prefixed
+    // identifier sibling was never a credential name.
+    #[test]
+    fn provider_prefixed_ambiguous_request_scoped_and_identifier_names_stay_clean() {
+        for name in [
+            "GITHUB_CREDENTIALS",
+            "OKTA_AUTH",
+            "SLACK_SIGNING_KEY",
+            "GITHUB_CSRF_TOKEN",
+            "STRIPE_NEXT_PAGE_TOKEN",
+            "SLACK_DEVICE_TOKEN",
+            "OPENAI_API_KEY_ID",
+            "STRIPE_API_URL",
+            "TWILIO_ACCOUNT_SID",
+            "OPENAI_ORG_ID",
+            "redacted_openai_api_key",
+            "MASKED_STRIPE_SECRET_KEY",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE_9f3K");
             assert!(detect(&input).is_empty(), "{input}");
         }
     }
@@ -3816,7 +4155,7 @@ mod tests {
             format!("    verify(payload, signing_secret={literal})"),
             format!("- secretKey: {literal}\n"),
             "password=\"ADMIN_PASSWORD_2f9QxL7m\"".to_owned(),
-            "API_KEY=YOUR_MAILCHIMP_API_KEY".to_owned(),
+            "API_KEY=YOUR_ACMECLOUD_API_KEY".to_owned(),
             "password=SYNTHETIC_REVOKED_DB_PASS_VALUE".to_owned(),
             "password=Admin_Password".to_owned(),
         ] {
@@ -4007,7 +4346,7 @@ mod tests {
         for (prefix, value, suffix) in [
             ("apiKey: \"", "YOUR_API_KEY_9f2cQ7xLm4Rt", "\""),
             ("apiKey: \"", "YOUR_API_KEY9f2cQ7xLm4Rt", "\""),
-            ("API_KEY=", "YOUR_MAILCHIMP_API_KEY", ""),
+            ("API_KEY=", "YOUR_ACMECLOUD_API_KEY", ""),
             ("API_KEY=", "KEY_YOUR_API_KEY", ""),
             (
                 "mailchimp.setConfig({ apiKey: \"",

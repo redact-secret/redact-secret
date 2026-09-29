@@ -137,8 +137,39 @@ evidence is linked from each published version.
   medium (warn). Cost: a non-credential value in one of these exact slots
   (a 32-hex id with a `-us<N>` suffix in prose) is redacted instead of
   warned.
+- Provider-named credential variables now redact off-grammar values (#948).
+  A value under `OPENAI_API_KEY=`, `STRIPE_SECRET_KEY=`, `GITHUB_TOKEN=` or
+  `"huggingfaceApiKey":` that the provider's own detector declines (format
+  drift, a legacy or sibling key type, a truncated paste) got no finding at
+  all. It now gets what the same value gets under `MYAPP_API_KEY=`: a
+  `generic-token` `contextual_secret` that redacts at 16+ bytes with
+  entropy 3.0, and warns from 8 bytes. An on-grammar value is still exactly
+  one typed provider finding. Placeholders, references, templates,
+  identifier siblings (`_id`, `_url`, `_sid`) and provider-prefixed
+  ambiguous names (`GITHUB_CREDENTIALS`) stay silent. The `common` profile,
+  which has no provider detectors, now redacts provider-named assignments.
+  Cost: a non-secret literal under a provider-named credential variable,
+  such as a malformed near miss, is reported. See
+  `docs/audits/evidence/948/README.md`.
 
 ### Fixed
+
+- Placeholders, masked and elided key displays, Make-escaped substitutions,
+  public keys and the Confluent key id are no longer reported as
+  `contextual_secret` under any credential name (#993). This covers:
+  - placeholders with a provider or qualifier word (`your-bot-token-here`,
+    `YOUR_MAILGUN_API_KEY`, `whsec_YOUR_SIGNING_SECRET`) and counting-run
+    stand-ins (`ghp_abc123`, `xoxb-123-456-abc`);
+  - full-length masked keys (`********-****-…`, `PMAK-****…`, `********…-us6`)
+    and elided displays (`ATATT3xFfGF0...`);
+  - Make-escaped substitutions (`$$(heroku auth:token)`);
+  - documented public keys (`pk_live_`, `pk_test_`, `sb_publishable_`,
+    `pk-lf-`, `phc_`, `pk_<env>_`);
+  - Confluent's public API key id under a Confluent-named key.
+
+  Random material glued to a placeholder, secret-key prefixes, a short
+  `********x` mask and a longer visible head stay reported. See
+  `docs/audits/evidence/993/README.md`.
 
 - Streaming false negatives: an incremental session missed a credential that
   a whole-input scan of the same text redacts (#990, found by the #985
