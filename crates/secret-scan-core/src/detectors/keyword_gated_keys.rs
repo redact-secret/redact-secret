@@ -28,7 +28,11 @@
 //! ## Adjacency contract
 //!
 //! Context is read on the value's own line only (the incremental sanitizer's
-//! processing unit), immediately before the value:
+//! processing unit), immediately before the value. One two-line layout is
+//! the exception (issue #1016): the `value:` key of a Kubernetes-style `env`
+//! entry takes the name of its sibling `name:` key on the adjacent line
+//! (`text::list_item_paired_name`), which the incremental session holds in
+//! one unit (`has_open_list_item_pair`).
 //!
 //! 1. **Named assignment** (High): the value is assigned to a key whose
 //!    normalized name carries the provider keyword and whose last segment is
@@ -405,11 +409,19 @@ fn context(
     end: usize,
     header_context: HeaderContext,
     model_route: bool,
+    paired_name: Option<&str>,
 ) -> Option<(Confidence, &'static str)> {
     let bytes = line.as_bytes();
     if let Some(key) = text::assignment_key(bytes, start) {
         let key_start = key.as_ptr() as usize - bytes.as_ptr() as usize;
-        let normalized = normalize_name(std::str::from_utf8(key).ok()?);
+        let key = std::str::from_utf8(key).ok()?;
+        // Issue #1016: a Kubernetes-style `env` entry's `value:` is assigned
+        // to the name of its sibling `name:` key.
+        let key = match paired_name {
+            Some(paired) if key == "value" => paired,
+            _ => key,
+        };
+        let normalized = normalize_name(key);
         if !is_credential_name(&normalized) {
             return None;
         }
@@ -589,7 +601,12 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
     }
     for (line_start, line_end) in lines(input) {
         let line = &input[line_start..line_end];
-        if !may_have_provider_context(line, spec) {
+        // Issue #1016: the provider may be named only by the sibling `name:`
+        // key of a Kubernetes-style `env` entry on the adjacent line.
+        let paired_name = text::list_item_paired_name(input, (line_start, line_end));
+        if !may_have_provider_context(line, spec)
+            && !paired_name.is_some_and(|name| may_have_provider_context(name, spec))
+        {
             continue;
         }
         let runs = scan_runs(line, spec);
@@ -613,9 +630,15 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
             {
                 continue;
             }
-            let Some((confidence, signal)) =
-                context(line, spec, start, end, header_context, model_route)
-            else {
+            let Some((confidence, signal)) = context(
+                line,
+                spec,
+                start,
+                end,
+                header_context,
+                model_route,
+                paired_name,
+            ) else {
                 continue;
             };
             let Some(range) = ByteRange::new(line_start + start, line_start + end) else {

@@ -69,7 +69,7 @@ use std::borrow::Cow;
 use crate::detectors::{
     PrivateKeyRetentionTracker, continues_previous_line, has_open_bearer_authorization,
     has_open_confluent_properties, has_open_contextual_assignment, has_open_heroku_legacy_context,
-    has_open_twilio_cli_table, is_open_tail_neutral,
+    has_open_list_item_pair, has_open_twilio_cli_table, is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 #[cfg(test)]
@@ -376,6 +376,7 @@ struct LookbackHints {
     heroku_legacy: bool,
     twilio_auth_token: bool,
     confluent_legacy: bool,
+    list_item_pair: bool,
 }
 
 impl LookbackHints {
@@ -384,8 +385,25 @@ impl LookbackHints {
             heroku_legacy: registry.contains(HEROKU_LEGACY_DETECTOR_ID),
             twilio_auth_token: registry.contains(TWILIO_AUTH_TOKEN_DETECTOR_ID),
             confluent_legacy: registry.contains(CONFLUENT_LEGACY_DETECTOR_ID),
+            list_item_pair: reads_list_item_pairs(registry),
         }
     }
+}
+
+/// Detectors that read a Kubernetes-style `env` entry's `name:`/`value:`
+/// pair across two lines (issue #1016).
+const LIST_ITEM_PAIR_DETECTOR_IDS: &[&str] = &[
+    "generic-token",
+    "mistral-api-key",
+    "cohere-api-key",
+    "ai21-api-key",
+    "deepgram-api-key",
+];
+
+fn reads_list_item_pairs(registry: &DetectorRegistry) -> bool {
+    LIST_ITEM_PAIR_DETECTOR_IDS
+        .iter()
+        .any(|id| registry.contains(id))
 }
 
 /// A bounded, side-effect-free incremental sanitizer session over built-in
@@ -724,7 +742,8 @@ impl IncrementalSanitizer {
         let open = self.open_tail.open
             || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
             || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
-            || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned));
+            || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
+            || (lookbacks.list_item_pair && has_open_list_item_pair(scanned));
         #[cfg(test)]
         self.assert_open_construct_matches_the_rescan(open);
         open
@@ -752,7 +771,8 @@ impl IncrementalSanitizer {
             || (self.registry.contains(TWILIO_AUTH_TOKEN_DETECTOR_ID)
                 && has_open_twilio_cli_table(&rescanned))
             || (self.registry.contains(CONFLUENT_LEGACY_DETECTOR_ID)
-                && has_open_confluent_properties(&rescanned));
+                && has_open_confluent_properties(&rescanned))
+            || (reads_list_item_pairs(&self.registry) && has_open_list_item_pair(&rescanned));
         assert_eq!(open, reference, "open single-line construct");
     }
 

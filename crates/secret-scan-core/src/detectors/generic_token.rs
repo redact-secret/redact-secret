@@ -2620,6 +2620,16 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 let rest = rest.to_owned();
                 normalized.clear();
                 normalized.push_str(&rest);
+            } else if matches!(names, NameSource::BuiltIn)
+                && &input[name_start..name_end] == "value"
+                && let Some(paired) = super::text::list_item_paired_name(
+                    input,
+                    super::text::line_around(input, name_start, name_end),
+                )
+            {
+                // Issue #1016: a Kubernetes-style `env` entry's `value:` is
+                // assigned to the name its sibling `name:` key gives.
+                normalize_name_into(paired, &mut normalized);
             }
             // The templated-lookup check runs only for a pair that would
             // otherwise be reported (issue #989).

@@ -98,6 +98,7 @@ pub(crate) use generic_token::{
 pub(crate) use heroku::has_open_heroku_legacy_context;
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
+pub(crate) use text::has_open_list_item_pair;
 pub(crate) use twilio::has_open_twilio_cli_table;
 
 /// `true` when appending `appended` to any input leaves both

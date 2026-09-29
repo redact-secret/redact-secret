@@ -743,6 +743,172 @@ pub(super) fn is_provider_named_assignment(
         })
 }
 
+// --- YAML list-item `name:`/`value:` pairs (issue #1016) -------------------
+
+/// One `key:` line of a YAML block sequence or mapping, as
+/// [`list_item_paired_name`] reads it.
+struct ItemKeyLine<'a> {
+    /// Byte column of the key within its line.
+    column: usize,
+    /// The key follows the `- ` that opens a sequence item.
+    item_start: bool,
+    key: &'a str,
+    /// Where the text after the `:` starts, within the line.
+    rest: usize,
+}
+
+/// Parses `^ *(- +)?[A-Za-z_][A-Za-z0-9_]*:( |\t|$)`: spaces only for the
+/// indentation (YAML forbids tabs there), an optional sequence-item dash,
+/// a plain key and its `:` indicator. A trailing `\r` counts as the line end.
+fn item_key_line(line: &str) -> Option<ItemKeyLine<'_>> {
+    let bytes = line.as_bytes();
+    let mut at = bytes.iter().take_while(|&&byte| byte == b' ').count();
+    let mut item_start = false;
+    if bytes.get(at) == Some(&b'-') && bytes.get(at + 1) == Some(&b' ') {
+        item_start = true;
+        at += 1;
+        at += bytes[at..].iter().take_while(|&&byte| byte == b' ').count();
+    }
+    let column = at;
+    if !bytes
+        .get(at)
+        .is_some_and(|&byte| byte.is_ascii_alphabetic() || byte == b'_')
+    {
+        return None;
+    }
+    at += bytes[at..]
+        .iter()
+        .take_while(|&&byte| byte.is_ascii_alphanumeric() || byte == b'_')
+        .count();
+    let key = &line[column..at];
+    if bytes.get(at) != Some(&b':') {
+        return None;
+    }
+    at += 1;
+    match bytes.get(at) {
+        None | Some(b' ' | b'\t' | b'\r') => Some(ItemKeyLine {
+            column,
+            item_start,
+            key,
+            rest: at,
+        }),
+        _ => None,
+    }
+}
+
+/// The plain or quoted scalar after `name:` when it is a whole environment-
+/// style name (`[A-Za-z_][A-Za-z0-9_.-]*`, at most 128 bytes), optionally
+/// followed by a `#` comment.
+fn item_name_scalar(line: &str, rest: usize) -> Option<&str> {
+    let bytes = line.as_bytes();
+    let mut at = rest + ascii_run_len(bytes, rest, |byte| matches!(byte, b' ' | b'\t'));
+    let quote = bytes
+        .get(at)
+        .copied()
+        .filter(|&byte| matches!(byte, b'"' | b'\''));
+    if quote.is_some() {
+        at += 1;
+    }
+    let start = at;
+    if !bytes
+        .get(at)
+        .is_some_and(|&byte| byte.is_ascii_alphabetic() || byte == b'_')
+    {
+        return None;
+    }
+    at += ascii_run_len(bytes, at, |byte| {
+        byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-')
+    });
+    let end = at;
+    if end - start > 128 {
+        return None;
+    }
+    if let Some(quote) = quote {
+        if bytes.get(at) != Some(&quote) {
+            return None;
+        }
+        at += 1;
+    }
+    let tail = line[at..].trim_start_matches([' ', '\t']);
+    (tail.is_empty() || tail == "\r" || tail.starts_with('#')).then_some(&line[start..end])
+}
+
+/// The line ([`lines`]) before the one starting at `line_start`.
+fn previous_line(input: &str, line_start: usize) -> Option<(usize, usize)> {
+    if line_start == 0 {
+        return None;
+    }
+    // A `\n` ends the previous line outside it; a lone `\r` stays in it.
+    let end = if input.as_bytes()[line_start - 1] == b'\n' {
+        line_start - 1
+    } else {
+        line_start
+    };
+    Some((line_start_before(input, end), end))
+}
+
+/// The line ([`lines`]) after the one ending at `line_end`.
+fn next_line(input: &str, line_end: usize) -> Option<(usize, usize)> {
+    let bytes = input.as_bytes();
+    let start = match bytes.get(line_end) {
+        Some(b'\n') => line_end + 1,
+        // A lone `\r` ended the line inside it: the next one starts here.
+        Some(_) if line_end > 0 && bytes[line_end - 1] == b'\r' => line_end,
+        _ => return None,
+    };
+    Some((start, line_end_from(bytes, start).0.min(bytes.len())))
+}
+
+/// Issue #1016: the credential name a Kubernetes-style `env` entry gives
+/// the value on `line` (a [`lines`] range), when that line is the
+/// `value:` key of a YAML sequence item whose sibling `name:` key sits on
+/// the adjacent line at the same key column:
+///
+/// ```yaml
+/// env:
+///   - name: DEEPGRAM_API_KEY
+///     value: "..."
+/// ```
+///
+/// Either order is read (`- value:` then `name:`), but only the two keys of
+/// one item: exactly one of the two lines opens the item with `- `, the
+/// other continues it, and nothing else sits between them. A later
+/// unrelated key, a value on a separate item, another indentation, a flow
+/// mapping (`- {name: A, value: b}`) or a JSON document are not paired.
+/// `valueFrom:` is a different key and never pairs. The detectors read the
+/// pair as the one-line assignment `<name>=<value>`, so every value
+/// exclusion of that form still applies.
+pub(super) fn list_item_paired_name(input: &str, line: (usize, usize)) -> Option<&str> {
+    let value_line = item_key_line(&input[line.0..line.1])?;
+    if value_line.key != "value" {
+        return None;
+    }
+    let other = if value_line.item_start {
+        next_line(input, line.1)?
+    } else {
+        previous_line(input, line.0)?
+    };
+    let other_text = &input[other.0..other.1];
+    let name_line = item_key_line(other_text)?;
+    (name_line.key == "name"
+        && name_line.item_start != value_line.item_start
+        && name_line.column == value_line.column)
+        .then(|| item_name_scalar(other_text, name_line.rest))
+        .flatten()
+}
+
+/// Internal retention hint for [`list_item_paired_name`] (issue #1016):
+/// `true` when the last complete line of `input` opens a YAML sequence item
+/// with a `name:` or `value:` key, so the incremental session holds it open
+/// for the one following line that can complete the pair. Holding a line
+/// that never pairs only delays its output by one line.
+pub(crate) fn has_open_list_item_pair(input: &str) -> bool {
+    last_lines(input, 1).first().is_some_and(|line| {
+        item_key_line(line)
+            .is_some_and(|parsed| parsed.item_start && matches!(parsed.key, "name" | "value"))
+    })
+}
+
 #[cfg(test)]
 mod provider_named_assignment_tests {
     use super::is_provider_named_assignment;
@@ -876,5 +1042,71 @@ mod line_tests {
         let at = input.find("\"k\"").unwrap();
         let (start, end) = line_around(input, at, at + 3);
         assert_eq!(&input[start..end], "a \"k\" b\r");
+    }
+}
+
+#[cfg(test)]
+mod list_item_pair_tests {
+    use super::{has_open_list_item_pair, lines, list_item_paired_name};
+
+    /// The paired name for the last non-empty line of `input`.
+    fn paired(input: &str) -> Option<&str> {
+        let line = lines(input)
+            .filter(|&(start, end)| start < end && !input[start..end].trim().is_empty())
+            .last()?;
+        list_item_paired_name(input, line)
+    }
+
+    #[test]
+    fn the_value_key_pairs_with_the_adjacent_name_of_its_item() {
+        assert_eq!(
+            paired("  - name: API_TOKEN\n    value: x\n"),
+            Some("API_TOKEN")
+        );
+        assert_eq!(
+            paired("- name: 'CO_API_KEY'\r\n  value: x\r\n"),
+            Some("CO_API_KEY")
+        );
+        assert_eq!(paired("- name: A\r  value: x\r"), Some("A"));
+        let reverse = "- value: x\n  name: B # c\n";
+        assert_eq!(list_item_paired_name(reverse, (0, 10)), Some("B"));
+    }
+
+    #[test]
+    fn anything_but_the_two_keys_of_one_item_is_not_a_pair() {
+        for input in [
+            "- name: A\n- value: x\n",
+            "- name: A\n    value: x\n",
+            "- name: A\n  image: b\n  value: x\n",
+            "name: A\nvalue: x\n",
+            "- {name: A, value: x}\n",
+            "- name: A\n  valueFrom: x\n",
+            "- name: two words\n  value: x\n",
+            "- name: A\n\t value: x\n",
+        ] {
+            assert_eq!(paired(input), None, "{input:?}");
+        }
+    }
+
+    #[test]
+    fn the_retention_hint_holds_exactly_an_item_opening_name_or_value_line() {
+        for open in [
+            "- name: A\n",
+            "env:\n  - name: A\n",
+            "  - value: x\r\n",
+            "- name: A\r",
+        ] {
+            assert!(has_open_list_item_pair(open), "{open:?}");
+        }
+        for closed in [
+            "",
+            "- name: A\n  value: x\n",
+            "- name: A\n\n",
+            "  name: A\n",
+            "- image: A\n",
+            "- {name: A}\n",
+        ] {
+            assert!(!has_open_list_item_pair(closed), "{closed:?}");
+        }
     }
 }

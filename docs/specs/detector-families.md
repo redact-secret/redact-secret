@@ -439,7 +439,11 @@ repeated-character filler, a value behind a hash label (`md5:`), a run of any
 other length or alphabet (31/33 bytes, `_`/`-` inside, uppercase Deepgram), and
 context on another line (a multi-line constructor keeps `api_key=` on a line
 that names nothing; that stays a false negative, as does any provider key under
-a keyword-free name such as `API_KEY=`). The bare `Bearer` header is
+a keyword-free name such as `API_KEY=`). One two-line layout is read since
+[#1016](https://github.com/redact-secret/redact-secret/issues/1016): a
+Kubernetes-style `env` entry, whose `value:` takes the name of the sibling
+`name:` key on the adjacent line (`- name: DEEPGRAM_API_KEY` /
+`value: "..."` is a named assignment, `high`). The bare `Bearer` header is
 `bearer-token`'s and is not repeated here.
 
 Trade-offs. False negatives: keys that differ from the inferred shape, and the

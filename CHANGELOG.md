@@ -40,6 +40,12 @@ evidence is linked from each published version.
   `LiteLLM` model route (`cohere/command-r-plus`), so an unmasked Cohere key
   under `masked_api_key=` is `cohere_api_key` / redact. Masked displays stay
   silent; `publishable_` names are unchanged.
+- A Kubernetes-style `env` entry (`- name: <NAME>` / `value: "<v>"` on two
+  lines, either order) is read as the assignment `<NAME>=<v>` (#1016):
+  `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed provider findings, and
+  any other credential name gives `generic-token` at its usual floors.
+  `valueFrom:`, placeholders and non-credential names stay silent, and the
+  incremental session holds the item's first line so chunked scans agree.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
