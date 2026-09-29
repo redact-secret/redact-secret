@@ -137,6 +137,20 @@ by `scripts/check-evidence-arrival.mjs` (`npm run arrival:check`, issue #52
 there). Satisfy every item below, in that repository's PR, so the check
 passes without anyone having to read the checker script itself:
 
+0. **Dossier verdict.** The family's entry in its provider dossier,
+   `benchmarks/support/dossiers/<provider>.md` in `redact-secret-benchmarks`,
+   has `research.verdict: ready`, and the product PR links that dossier by
+   its `main` URL
+   (`https://github.com/redact-secret/redact-secret-benchmarks/blob/main/benchmarks/support/dossiers/<provider>.md`;
+   living documentation links `main`, not a branch or a commit). Provider
+   research is tracked there, not in this repository; a detector request
+   ([issue form](.github/ISSUE_TEMPLATE/request-detector.yml)) is routed to
+   the benchmarks `research-family` form. This repository keeps no dossier of
+   its own: the detector module doc, the `docs/specs/detector-families.md`
+   row, and `docs/audits/evidence/<issue>/` remain the implementation record,
+   and the dossier links to them. Until the dossier convention lands in
+   `redact-secret-benchmarks` (issue #473 there), a family with no dossier
+   entry cites its research issue instead.
 1. **Provider or tool evidence.** In `benchmarks/lib/assessment.ts`, record
    a `providerSource`, `twinSource`, or `candidateSource` (each a `url`, an
    `observedAt` date, a `formatVersion`, and what it `covers`), or at least
@@ -181,6 +195,16 @@ keys its contracts by come from `redact-secret-benchmarks`' own
 `benchmarks/support/taxonomy.json`, not from this repository's detector
 registry, so a new provider or credential family needs a taxonomy entry
 there too before it has an id for the contract to key on.
+
+**Detector-to-family mapping report.** `npm run detector-family-coverage:check`
+(`scripts/check-detector-family-coverage.py`, offline) lists each detector in
+`docs/coverage/detector-inventory.json` that no family in the pinned
+`benchmarks/support-matrix.json` names. It is report-only for now, because the
+detectors under "not yet measured" in [`docs/support-matrix.md`](docs/support-matrix.md)
+already have no family; `--strict` fails on any such detector and becomes the
+gate once the pinned matrix covers them. A matrix entry naming a detector the
+inventory lacks (four today) is reported the same way. New detectors should
+not add to the list.
 
 **This checklist is necessary, never sufficient, for `stable`.** Clearing
 it means the evidence *exists*; reaching `stable` in
