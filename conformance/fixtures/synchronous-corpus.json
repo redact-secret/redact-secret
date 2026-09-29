@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3081,
+  "fixtureCount": 3122,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -73789,6 +73789,791 @@
       "input": "\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d\u0034b1d",
       "expected": [],
       "note": "Repeated prefixes with no complete body never reach 38 bytes, and the scan stays linear and bounded."
+    },
+    {
+      "id": "nvidia-api-key-positive-bare",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 81
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "nvidia-api-key-positive-dotenv",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NVIDIA_API_KEY=\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 96
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "nvidia-api-key-positive-shell-export",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export NVIDIA_API_KEY=\"\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\"\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 104
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "nvidia-api-key-positive-yaml",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  NVIDIA_API_KEY: \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 104
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "nvidia-api-key-positive-json-config",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"NVIDIA_API_KEY\": \"\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\"}",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 101
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "nvidia-api-key-positive-json-token-key",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\"}",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 92
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "nvidia-api-key-positive-sdk-call",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "llm = ChatNVIDIA(model=\"meta/llama-3.1-8b-instruct\", api_key=\"\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\")\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 62,
+          "end": 143
+        }
+      ],
+      "note": "An SDK client construction is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-overlap-bearer-header",
+      "detector": "nvidia-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 103
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "nvidia-api-key-positive-x-api-key-header",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 92
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-positive-curl-bearer",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\" https://integrate.api.nvidia.com/v1/models\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 112
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "nvidia-api-key-positive-tool-call-arguments",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"call_api\",\"arguments\":{\"api_key\":\"\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\"}}",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 124
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-positive-chat-sentence",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 96
+        }
+      ],
+      "note": "A key pasted into a chat sentence is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-positive-log",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO client init api_key=\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn user=ci\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 127
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-positive-punctuation-adjacent",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn.",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 92
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "nvidia-api-key-positive-crlf-unicode-prefix",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\n\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\n\r\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 105
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "nvidia-api-key-overlap-context",
+      "detector": "nvidia-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 92
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "nvidia-api-key-positive-repeated-value",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 81
+        },
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 82,
+          "end": 163
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "nvidia-api-key-positive-body-floor",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaAp",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 66
+        }
+      ],
+      "note": "A 60-byte body is the provider rule's floor."
+    },
+    {
+      "id": "nvidia-api-key-positive-body-floor-dotenv",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NVIDIA_API_KEY=\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaAp",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 81
+        }
+      ],
+      "note": "A 60-byte body is the provider rule's floor."
+    },
+    {
+      "id": "nvidia-api-key-overlap-body-floor-bearer",
+      "detector": "nvidia-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaAp\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 88
+        }
+      ],
+      "note": "A 60-byte body is the provider rule's floor."
+    },
+    {
+      "id": "nvidia-api-key-positive-body-cap",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvid",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 134
+        }
+      ],
+      "note": "A 128-byte body is the policy cap."
+    },
+    {
+      "id": "nvidia-api-key-positive-body-cap-dotenv",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NVIDIA_API_KEY=\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvid",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 149
+        }
+      ],
+      "note": "A 128-byte body is the policy cap."
+    },
+    {
+      "id": "nvidia-api-key-overlap-body-cap-bearer",
+      "detector": "nvidia-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvid\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 156
+        }
+      ],
+      "note": "A 128-byte body is the policy cap."
+    },
+    {
+      "id": "nvidia-api-key-positive-ngc-api-key-dotenv",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NGC_API_KEY=\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 93
+        }
+      ],
+      "note": "An NGC dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "nvidia-api-key-positive-openai-compatible-client",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = OpenAI(base_url=\"https://integrate.api.nvidia.com/v1\", api_key=\"\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn\")\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 73,
+          "end": 154
+        }
+      ],
+      "note": "An OpenAI-compatible client pointed at the NVIDIA endpoint is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-positive-js-client-option",
+      "detector": "nvidia-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const client = new OpenAI({ apiKey: '\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn', baseURL: 'https://integrate.api.nvidia.com/v1' });\n",
+      "expected": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 118
+        }
+      ],
+      "note": "A JavaScript client option is reported at exactly the key."
+    },
+    {
+      "id": "nvidia-api-key-boundary-body-59",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaA",
+      "expected": [],
+      "note": "59 body bytes is one under the provider rule's floor of 60."
+    },
+    {
+      "id": "nvidia-api-key-boundary-body-129",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidi",
+      "expected": [],
+      "note": "129 body bytes is one over the policy cap; a run is never truncated."
+    },
+    {
+      "id": "nvidia-api-key-boundary-dot-in-body",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u006evapi-SyntheticRevokedNvidiaApiKeyFi.ture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [],
+      "note": "A dot inside the body splits it into runs under the floor."
+    },
+    {
+      "id": "nvidia-api-key-boundary-uppercase-prefix",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "NVAPI-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "nvidia-api-key-boundary-underscore-prefix",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nvapi_SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [],
+      "note": "The prefix separator is a dash."
+    },
+    {
+      "id": "nvidia-api-key-boundary-glued-prefix",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "nvidia-api-key-boundary-underscore-glued-prefix",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [],
+      "note": "An underscore glued before the prefix rejects the match."
+    },
+    {
+      "id": "nvidia-api-key-boundary-dash-glued-prefix",
+      "detector": "nvidia-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-\u006evapi-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKeyFixture-Syn",
+      "expected": [],
+      "note": "A dash glued before the prefix rejects the match."
+    },
+    {
+      "id": "nvidia-api-key-negative-placeholders",
+      "detector": "nvidia-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Keys look like \u006evapi-..., \u006evapi-xxxx or \u006evapi-<your-key> in the docs.",
+      "expected": [],
+      "note": "Placeholders are below the floor or outside the alphabet."
+    },
+    {
+      "id": "nvidia-api-key-negative-sdk-names",
+      "detector": "nvidia-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Use the \u006evapi-sys crate and the \u006evapi-rs bindings.",
+      "expected": [],
+      "note": "NVAPI SDK and crate names are far below the 60-byte floor."
+    },
+    {
+      "id": "nvidia-api-key-negative-prefix-only",
+      "detector": "nvidia-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The prefix is \u006evapi-\n",
+      "expected": [],
+      "note": "A prefix alone at the end of a line is not a key."
+    },
+    {
+      "id": "nvidia-api-key-negative-other-prefix-run",
+      "detector": "nvidia-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "token: nvsk-SyntheticRevokedNvidiaApiKeyFixture-SyntheticRevokedNvidiaApiKey\n",
+      "expected": [],
+      "note": "A 64-byte run under a different prefix is not an NVIDIA key."
+    },
+    {
+      "id": "nvidia-api-key-negative-ci-secret-reference",
+      "detector": "nvidia-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}\n",
+      "expected": [],
+      "note": "A CI secret reference is not a literal key."
+    },
+    {
+      "id": "nvidia-api-key-adversarial-long-run",
+      "detector": "nvidia-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-\u006evapi-",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach the 60-byte floor, and the scan stays linear and bounded."
+    },
+    {
+      "id": "nvidia-api-key-adversarial-long-body-run",
+      "detector": "nvidia-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12106,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u006evapi-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-aB3_-",
+      "expected": [],
+      "note": "A prefix followed by a run far over the 128-byte cap is rejected whole, and the scan stays linear and bounded."
     },
     {
       "id": "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",

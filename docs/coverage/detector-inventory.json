@@ -855,6 +855,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0034b1dSyntheticRevokedClickhouseSecret000000",
       "schemes": null
+    },
+    {
+      "type": "nvidia_api_key",
+      "detector": "nvidia-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture_SyntheticRevokedNvidiaApiKeyFixture_End",
+      "schemes": null
     }
   ],
   "consumers": [

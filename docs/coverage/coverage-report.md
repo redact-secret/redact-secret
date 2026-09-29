@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 118/118 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 119/119 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 118 |
+| supported | 119 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 129.
+Coverage declarations: 130.
 
 ## Coverage by detector
 
@@ -84,6 +84,7 @@ Coverage declarations: 129.
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| nvidia-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | okta-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | onepassword-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
@@ -200,6 +201,7 @@ Coverage declarations: 129.
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
+| nvidia_api_key | nvidia-api-key | provider | supported | not-applicable | none |
 | okta_api_token | okta-api-token | provider | supported | not-applicable | none |
 | onepassword_service_account_token | onepassword-service-account-token | provider | supported | not-applicable | none |
 | openai_admin_api_key | openai-token | provider | supported | not-applicable | none |
@@ -267,15 +269,15 @@ Coverage declarations: 129.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 129 | 0 | 0 |
-| boundary | 118 | 0 | 0 |
-| host-context | 118 | 0 | 0 |
+| adversarial | 130 | 0 | 0 |
+| boundary | 119 | 0 | 0 |
+| host-context | 119 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 129 | 0 | 0 |
-| near-miss-negative | 118 | 0 | 0 |
-| overlap | 118 | 0 | 0 |
-| positive | 118 | 0 | 0 |
-| range | 129 | 0 | 0 |
+| malformed | 130 | 0 | 0 |
+| near-miss-negative | 119 | 0 | 0 |
+| overlap | 119 | 0 | 0 |
+| positive | 119 | 0 | 0 |
+| range | 130 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

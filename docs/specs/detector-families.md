@@ -94,6 +94,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `new_relic_user_api_key` | `new-relic-user-api-key` | `always-redact` | [Freeze the New Relic User API Key and License Key grammar as an exact-length prefixed shape and a keyword-gated bare hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `notion_integration_token` | `notion-token` | `always-redact` | [Freeze the Notion integration token grammar as two exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `npm_access_token` | `npm-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `nvidia_api_key` | `nvidia-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (prefix from provider docs and the `ngcsdk` constant, R1 and R6; alphabet and 60-byte floor from a provider-authored scanning rule, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `okta_api_token` | `okta-api-token` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::okta`'s own module doc, per issue #315 |
 | `onepassword_service_account_token` | `onepassword-service-account-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (1Password docs: prefix and Base64url encoding; the 250-byte floor is project policy), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `openai_admin_api_key` | `openai-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #774 splits the `sk-admin-` namespace out of the shared `openai_api_key` type (materially different blast radius: an organization Admin API key, not a project/service-account key). Grammar untouched: still the T2 marker-gated 58/74-byte contract from [#863](https://github.com/redact-secret/redact-secret/issues/863), [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -623,6 +624,7 @@ core conformance and the benchmarks arrival and profile evidence.
 | `wandb:api-key` | `wandb-api-key` | `wandb_v1_` + 64–96 `[A-Za-z0-9_]` (documented example width 77, total "about 86"); the byte before the prefix must not be `[A-Za-z0-9_]` (a `<host>-` label stays outside the span), and the byte after must not be `[A-Za-z0-9_-]` | `wandb_api_key` | prefix T1 (R5), alphabet T1 (R1); tolerant width band by orchestrator decision on #917 |
 | `daytona:api-key` | `daytona-api-key` | `dtn_` + exactly 64 `[0-9a-f]` (68 in total); a `[A-Za-z0-9_-]` byte before the prefix or after the body rejects the match | `daytona_api_key` | T1 as of v0.190.0 (provider generator, R1; dated provider code, R9) |
 | `clickhouse-cloud:api-key` | `clickhouse-cloud-api-secret` | `4b1d` + exactly 38 `[A-Za-z0-9]` (42 in total) with at least one uppercase letter in the body; a `[A-Za-z0-9_-]` byte before the prefix or after the body rejects the match | `clickhouse_cloud_api_secret` | T1 as of 2025-04-16 (provider staff statement and regex, R2 and R3); the uppercase guard is policy |
+| `nvidia:ngc-api-key` | `nvidia-api-key` | `nvapi-` + 60–128 `[A-Za-z0-9_-]`; a `[A-Za-z0-9_-]` byte before the prefix rejects the match, and a body over 128 is rejected whole | `nvidia_api_key` | T1 (prefix R1 and R6; alphabet and 60-byte floor from the provider's own scanning rule, R2); the 128 cap is policy |
 
 Convex ([#912](https://github.com/redact-secret/redact-secret/issues/912),
 [handoff](../audits/evidence/860/convex.md)). The anchor is the `|` separator
@@ -749,6 +751,25 @@ False positives: a mixed-case alphanumeric run of exactly 42 bytes that begins
 `4b1d` at a boundary; rare. Cost: one four-byte prefix on the shared
 known-format scan plus a 38-byte post check.
 
+NVIDIA ([#972](https://github.com/redact-secret/redact-secret/issues/972),
+[handoff](../audits/evidence/860/nvidia.md)). NGC Personal, NGC Service and
+build.nvidia.com keys share the `nvapi-` prefix. No provider source states an
+exact width, so the contract uses the provider's open-ended rule
+(`nvapi-[A-Za-z0-9_\-]{60,}`, R2) and adds a 128-byte cap as project policy,
+following the Apify precedent. The body alphabet equals the boundary, so the
+scan takes the whole maximal run and rejects it when it is under 60 or over
+128; it never truncates. A `.` is outside the alphabet: inside the first 60
+body bytes it leaves two runs under the floor, and after the 60th it ends the
+run as sentence punctuation does. `nvapi-` + fewer than 60 (NVAPI SDK and crate
+names, short fixtures) and `nvapi-...`/`nvapi-xxxx` placeholders stay
+unclaimed. `nvidia` and `ngc` are not deferred by `generic-token`, because
+deferral would silence the legacy prefixless 84-character NGC key under
+`NGC_API_KEY`. False negatives: a key shorter than 60 (none known), a body
+with a byte outside `[A-Za-z0-9_-]`, an over-long run, and the legacy key
+outside named contexts. False positives: `nvapi-` + 60–128
+`[A-Za-z0-9_-]` that is not a key, such as a padded placeholder (the #867
+precedent). Cost: one prefix on the shared known-format scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -773,6 +794,7 @@ known-format scan plus a 38-byte post check.
 | W&B `wandb_v1_` + 64–96 `[A-Za-z0-9_]` API keys are reported as `wandb_api_key` at provider specificity, bare or in any context; a leading `<host>-` label stays outside the span, and the band is tolerant around the documented 77 until an issuance check ([#917](https://github.com/redact-secret/redact-secret/issues/917), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API keys are reported as `nvidia_api_key` at provider specificity, bare or in any context; the legacy prefixless NGC key stays unclaimed ([#972](https://github.com/redact-secret/redact-secret/issues/972), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

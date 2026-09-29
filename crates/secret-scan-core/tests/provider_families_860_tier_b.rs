@@ -33,6 +33,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const LOWER_HEX: &[u8] = b"0123456789abcdef";
+const ALNUM_DASH: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 
 /// The nine #860 index contexts plus a few host forms.
 fn contexts(key: &str) -> Vec<String> {
@@ -904,5 +905,129 @@ mod clickhouse_cloud {
         assert_input_partition_parity(&format!(
             "curl --user $KEY_ID:{secret} https://api.clickhouse.cloud\n"
         ));
+    }
+}
+
+mod nvidia {
+    use super::*;
+
+    const DETECTOR: &str = "nvidia-api-key";
+    const TYPE: &str = "nvidia_api_key";
+
+    /// `nvapi-` + a `len`-byte body over `[A-Za-z0-9_-]` that starts and
+    /// ends alphanumeric.
+    fn key(len: usize, seed: usize) -> String {
+        let mut body = filler(ALNUM_DASH, len, seed).into_bytes();
+        body[0] = b'N';
+        body[len - 1] = b'z';
+        format!("nvapi-{}", String::from_utf8(body).unwrap())
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        for (seed, len) in [60, 64, 70, 128].into_iter().enumerate() {
+            let key = key(len, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("NVIDIA_API_KEY={key}\n"),
+                format!("NGC_API_KEY={key}\n"),
+                format!("llm = ChatNVIDIA(api_key=\"{key}\")\n"),
+                format!(
+                    "client = OpenAI(base_url=\"https://integrate.api.nvidia.com/v1\", api_key=\"{key}\")\n"
+                ),
+                format!(
+                    "curl -H \"Authorization: Bearer {key}\" https://integrate.api.nvidia.com/v1/models\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+        assert!(key(64, 9).contains('_') || key(64, 9).contains('-'));
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let base = key(64, 4);
+        let body = &base["nvapi-".len()..];
+        let dotted = format!("nvapi-{}.{}", &body[..30], &body[31..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key(59, 4),
+                key(129, 4),
+                dotted,
+                format!("NVAPI-{body}"),
+                format!("nvapi_{body}"),
+                format!("xnvapi-{body}"),
+                format!("_nvapi-{body}"),
+                format!("-nvapi-{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn a_dot_after_the_floor_ends_the_run_and_leaves_the_tail() {
+        let key = key(64, 5);
+        assert_sole_finding_in(&format!("{key}.tail\n"), DETECTOR, TYPE, &key);
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "NVIDIA_API_KEY=nvapi-...\n".to_owned(),
+            "NVIDIA_API_KEY=nvapi-xxxx\n".to_owned(),
+            "NVIDIA_API_KEY=nvapi-<your-key>\n".to_owned(),
+            "use the nvapi-sys crate and the nvapi-rs bindings\n".to_owned(),
+            "the prefix is nvapi-\n".to_owned(),
+            "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}\n".to_owned(),
+            format!("token: nvsk-{}\n", filler(ALNUM_DASH, 64, 6)),
+            // The legacy prefixless 84-character NGC key is not a provider
+            // shape and stays with generic context.
+            format!("NGC_API_KEY={}\n", filler(ALNUM, 84, 7)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_and_other_providers_keys_are_not_claimed_and_each_key_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("NVIDIA_API_KEY={jwt}\n"));
+        let nvidia = key(64, 8);
+        let daytona = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let (_, findings) = whole_input(&format!("{daytona} {nvidia}\n"));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "daytona-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+        assert_unclaimed(DETECTOR, &format!("{daytona}\n"));
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "nvapi-".repeat(20_000),
+            format!("nvapi-{}", "aB3_-".repeat(4_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(64, 10);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(64, 11));
     }
 }

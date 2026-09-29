@@ -12872,6 +12872,125 @@
       "type": "clickhouse_cloud_api_secret"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "nvidia-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "nvidia-api-key-positive-bare",
+            "nvidia-api-key-positive-body-cap",
+            "nvidia-api-key-positive-body-cap-dotenv",
+            "nvidia-api-key-positive-body-floor",
+            "nvidia-api-key-positive-body-floor-dotenv",
+            "nvidia-api-key-positive-chat-sentence",
+            "nvidia-api-key-positive-crlf-unicode-prefix",
+            "nvidia-api-key-positive-curl-bearer",
+            "nvidia-api-key-positive-dotenv",
+            "nvidia-api-key-positive-js-client-option",
+            "nvidia-api-key-positive-json-config",
+            "nvidia-api-key-positive-json-token-key",
+            "nvidia-api-key-positive-log",
+            "nvidia-api-key-positive-ngc-api-key-dotenv",
+            "nvidia-api-key-positive-openai-compatible-client",
+            "nvidia-api-key-positive-punctuation-adjacent",
+            "nvidia-api-key-positive-repeated-value",
+            "nvidia-api-key-positive-sdk-call",
+            "nvidia-api-key-positive-shell-export",
+            "nvidia-api-key-positive-tool-call-arguments",
+            "nvidia-api-key-positive-x-api-key-header",
+            "nvidia-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "nvidia-api-key-overlap-bearer-header",
+            "nvidia-api-key-overlap-body-cap-bearer",
+            "nvidia-api-key-overlap-body-floor-bearer",
+            "nvidia-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "nvidia-api-key-adversarial-long-body-run",
+            "nvidia-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "nvidia-api-key-boundary-body-129",
+            "nvidia-api-key-boundary-body-59",
+            "nvidia-api-key-boundary-dash-glued-prefix",
+            "nvidia-api-key-boundary-dot-in-body",
+            "nvidia-api-key-boundary-glued-prefix",
+            "nvidia-api-key-boundary-underscore-glued-prefix",
+            "nvidia-api-key-boundary-underscore-prefix",
+            "nvidia-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "nvidia-api-key-negative-ci-secret-reference",
+            "nvidia-api-key-negative-other-prefix-run",
+            "nvidia-api-key-negative-placeholders",
+            "nvidia-api-key-negative-prefix-only",
+            "nvidia-api-key-negative-sdk-names"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "nvidia-api-key-boundary-body-129",
+            "nvidia-api-key-boundary-body-59",
+            "nvidia-api-key-boundary-dash-glued-prefix",
+            "nvidia-api-key-boundary-dot-in-body",
+            "nvidia-api-key-boundary-glued-prefix",
+            "nvidia-api-key-boundary-underscore-glued-prefix",
+            "nvidia-api-key-boundary-underscore-prefix",
+            "nvidia-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for nvidia_api_key (nvidia-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "nvidia_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13084,6 +13203,8 @@
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
+            "nvidia-api-key-adversarial-long-body-run",
+            "nvidia-api-key-adversarial-long-run",
             "okta-api-token-adversarial-dense-findings",
             "onepassword-service-account-token-adversarial-long-run",
             "openai-adversarial-long-suffix",
@@ -13539,6 +13660,8 @@
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
+            "nvidia-api-key-adversarial-long-body-run",
+            "nvidia-api-key-adversarial-long-run",
             "okta-api-token-adversarial-dense-findings",
             "onepassword-service-account-token-adversarial-long-run",
             "openai-adversarial-long-suffix",

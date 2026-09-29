@@ -51,6 +51,7 @@ mod neon;
 mod netlify;
 mod new_relic;
 mod notion;
+mod nvidia;
 mod okta;
 mod onepassword;
 mod openai;
@@ -229,6 +230,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(wandb::WANDB_API_KEY),
         Box::new(daytona::DAYTONA_API_KEY),
         Box::new(clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET),
+        Box::new(nvidia::NVIDIA_API_KEY),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -495,6 +497,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         )],
     ),
     (
+        nvidia::NVIDIA_API_KEY.detector_id(),
+        &[Literals::Shapes(nvidia::NVIDIA_API_KEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -667,6 +673,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("wandb-api-key", Pack::Provider),
     ("daytona-api-key", Pack::Provider),
     ("clickhouse-cloud-api-secret", Pack::Provider),
+    ("nvidia-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -796,6 +803,7 @@ mod tests {
                 "wandb-api-key",
                 "daytona-api-key",
                 "clickhouse-cloud-api-secret",
+                "nvidia-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1164,6 +1172,10 @@ mod tests {
         let daytona_api_key_input = format!("dtn_{}", "5e7c0ded".repeat(8));
         let clickhouse_cloud_api_secret_input =
             format!("4b1d{}", "SyntheticRevokedClickhouseSecret000000");
+        let nvidia_api_key_input = format!(
+            "nvapi-{}End",
+            "SyntheticRevokedNvidiaApiKeyFixture_".repeat(2)
+        );
         let resend_api_key_input = format!("re_{}_{}", "Synth3ic", "RevokedResendFixtureKey0");
         let inngest_signing_key_input = format!("signkey-test-{}", "5e7c0ded".repeat(8));
         let onepassword_service_account_token_input =
@@ -1256,6 +1268,7 @@ mod tests {
                 "clickhouse-cloud-api-secret",
                 clickhouse_cloud_api_secret_input.as_str(),
             ),
+            ("nvidia-api-key", nvidia_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

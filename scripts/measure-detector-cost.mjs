@@ -86,6 +86,7 @@ export const CANONICAL_IDS = [
   "wandb-api-key",
   "daytona-api-key",
   "clickhouse-cloud-api-secret",
+  "nvidia-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -104,6 +105,7 @@ export const GROUPS = {
     "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "langsmith-api-key",
     "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key", "e2b-api-key", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
     "wandb-api-key",
+    "nvidia-api-key",
   ],
   cloud: [
     "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
