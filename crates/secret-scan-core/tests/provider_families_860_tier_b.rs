@@ -1,5 +1,6 @@
-//! Issue #860 Tier B provider families (#912–#917) through the public API
-//! with the full default registry.
+//! Issue #860 Tier B provider families (#912–#917) and the Beta.12
+//! credential families (#970–#975) through the public API with the full
+//! default registry.
 //!
 //! Every key is built at run time from a literal prefix plus a seeded
 //! synthetic filler, so no realistic key literal is committed. The filler
@@ -32,6 +33,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const LOWER_HEX: &[u8] = b"0123456789abcdef";
+const ALNUM_DASH: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 
 /// The nine #860 index contexts plus a few host forms.
 fn contexts(key: &str) -> Vec<String> {
@@ -99,9 +101,15 @@ fn assert_twins_unclaimed(detector: &str, twins: &[String]) {
 }
 
 fn assert_partition_parity(key: &str) {
-    let input = format!("Authorization: Bearer {key}\n");
-    let (expected_text, expected) = whole_input(&input);
-    for pieces in utf8_byte_partitions(&input) {
+    assert_input_partition_parity(&format!("Authorization: Bearer {key}\n"));
+    assert_input_partition_parity(&format!("{key}\n"));
+}
+
+/// Every two-chunk partition of `input` reports the whole-input findings and
+/// redacted text.
+fn assert_input_partition_parity(input: &str) {
+    let (expected_text, expected) = whole_input(input);
+    for pieces in utf8_byte_partitions(input) {
         let session = run(&as_chunks(&pieces));
         assert_eq!(session.text(), expected_text, "{pieces:?}");
         let findings = session.findings();
@@ -583,5 +591,851 @@ mod wandb {
     #[test]
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&key(77, 7));
+    }
+}
+
+mod daytona {
+    use super::*;
+
+    const DETECTOR: &str = "daytona-api-key";
+    const TYPE: &str = "daytona_api_key";
+
+    fn key(seed: usize) -> String {
+        format!("dtn_{}", filler(LOWER_HEX, 64, seed))
+    }
+
+    #[test]
+    fn the_exact_shape_wins_every_context_as_the_sole_finding() {
+        for key in [key(1), key(2), format!("dtn_{}", "5e7c0ded".repeat(8))] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("DAYTONA_API_KEY={key}\n"),
+                format!("daytona = Daytona(DaytonaConfig(api_key=\"{key}\"))\n"),
+                format!("const daytona = new Daytona({{ apiKey: '{key}' }});\n"),
+                format!("variable \"daytona_api_key\" {{\n  default = \"{key}\"\n}}\n"),
+                format!(
+                    "curl -H \"Authorization: Bearer {key}\" https://app.daytona.io/api/sandbox\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(LOWER_HEX, 64, 4);
+        let upper = format!("{}A{}", &body[..30], &body[31..]);
+        let non_hex = format!("{}g{}", &body[..30], &body[31..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("dtn_{}", &body[..63]),
+                format!("dtn_{body}0"),
+                format!("dtn_{upper}"),
+                format!("dtn_{non_hex}"),
+                format!("dtn_{body}A"),
+                format!("dtn_{body}g"),
+                format!("DTN_{body}"),
+                format!("dtn-{body}"),
+                format!("xdtn_{body}"),
+                format!("_dtn_{body}"),
+                format!("dtn_{body}_"),
+                format!("dtn_{body}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let digest = filler(LOWER_HEX, 64, 5);
+        for input in [
+            "DAYTONA_API_KEY=dtn_***\n".to_owned(),
+            "DAYTONA_API_KEY=dtn_...\n".to_owned(),
+            "DAYTONA_API_KEY=dtn_1234567890\n".to_owned(),
+            "secret: dtn_secret_SyntheticRevokedPlaceholder\n".to_owned(),
+            "stdout marker dtn_artifact_SyntheticRevokedMarker\n".to_owned(),
+            "DAYTONA_API_KEY=${{ secrets.DAYTONA_API_KEY }}\n".to_owned(),
+            "the prefix is dtn_\n".to_owned(),
+            format!("sha256: {digest}\n"),
+            format!("DAYTONA_RUNNER_KEY={digest}\n"),
+            format!("{digest}\n"),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_daytona_jwt_stays_with_the_jwt_detector() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        for input in [
+            format!("DAYTONA_JWT_TOKEN={jwt}\n"),
+            format!("Authorization: Bearer {jwt}\n"),
+        ] {
+            let (_, findings) = whole_input(&input);
+            assert!(!findings.is_empty(), "{input}");
+            assert!(
+                detector_findings(&findings, DETECTOR).is_empty(),
+                "{findings:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn other_hex_keys_are_not_claimed_and_a_key_draws_no_other_provider() {
+        let other_hex = "5e7c0ded".repeat(8);
+        for input in [
+            format!("signkey-test-{other_hex}\n"),
+            format!("INNGEST_SIGNING_KEY=signkey-prod-{other_hex}\n"),
+            format!("sk-{other_hex}\n"),
+            format!("fc-{}\n", "0123456789ab4def8123456789abcdef"),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        // A key beside another provider's key: two findings, each its own.
+        let daytona = key(6);
+        let inngest = format!("signkey-test-{other_hex}");
+        let input = format!("{daytona} {inngest}\n");
+        let (_, findings) = whole_input(&input);
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "inngest-signing-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "dtn_".repeat(20_000),
+            format!("dtn_{}", "5e7c0ded".repeat(2_500)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(8));
+    }
+}
+
+mod clickhouse_cloud {
+    use super::*;
+
+    const DETECTOR: &str = "clickhouse-cloud-api-secret";
+    const TYPE: &str = "clickhouse_cloud_api_secret";
+
+    fn secret(seed: usize) -> String {
+        format!("4b1d{}", filler(ALNUM, 38, seed))
+    }
+
+    #[test]
+    fn the_exact_shape_wins_every_context_as_the_sole_finding() {
+        for secret in [
+            secret(1),
+            secret(2),
+            format!("4b1d{}", "SyntheticRevokedClickhouseSecret000000"),
+        ] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &secret);
+            for input in [
+                format!("CLICKHOUSE_CLOUD_API_SECRET={secret}\n"),
+                format!(
+                    "resource \"clickhouse_service\" \"s\" {{\n  token_secret = \"{secret}\"\n}}\n"
+                ),
+                format!("provider \"clickhouse\" {{\n  token_secret = \"{secret}\"\n}}\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &secret);
+            }
+        }
+    }
+
+    /// The provider type wins the secret's span over the connection-string
+    /// password and authorization-credential candidates it overlaps, and the
+    /// key ID beside it is not claimed as a provider secret.
+    #[test]
+    fn the_provider_type_wins_the_secret_span_in_basic_auth_forms() {
+        let secret = secret(3);
+        for input in [
+            format!("curl --user $KEY_ID:{secret} https://api.clickhouse.cloud/v1/organizations\n"),
+            format!("curl -u KEYID:{secret} https://api.clickhouse.cloud/v1/organizations\n"),
+            format!("curl https://KEYID:{secret}@api.clickhouse.cloud/v1/organizations\n"),
+            format!("CLICKHOUSE_CLOUD_API_URL=https://KEYID:{secret}@api.clickhouse.cloud\n"),
+            format!("Authorization: Bearer {secret}\n"),
+        ] {
+            let (text, findings) = whole_input(&input);
+            let start = input.find(&secret).unwrap();
+            let span = (start, start + secret.len());
+            let covering: Vec<&Finding> = findings
+                .iter()
+                .filter(|f| f.range().start() < span.1 && span.0 < f.range().end())
+                .collect();
+            assert_eq!(covering.len(), 1, "{input}: {findings:?}");
+            assert_eq!(covering[0].detector(), DETECTOR, "{input}");
+            assert_eq!(covering[0].type_name(), TYPE, "{input}");
+            assert_eq!(covering[0].action(), Action::Redact, "{input}");
+            assert_eq!(
+                (covering[0].range().start(), covering[0].range().end()),
+                span,
+                "{input}"
+            );
+            assert!(!text.contains(&secret), "{input}");
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 38, 4);
+        let lower = body.to_ascii_lowercase();
+        let hex: String = body
+            .bytes()
+            .map(|byte| char::from(LOWER_HEX[usize::from(byte) % 16]))
+            .collect();
+        let dashed = format!("{}-{}", &body[..20], &body[21..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("4b1d{}", &body[..37]),
+                format!("4b1d{body}a"),
+                // The 39-byte knowledge-base shape: 35 bytes after the prefix.
+                format!("4b1d{}", &body[..35]),
+                format!("4b1d{lower}"),
+                format!("4b1d{hex}"),
+                format!("4b1d{dashed}"),
+                format!("4B1D{body}"),
+                format!("4b1c{body}"),
+                format!("a4b1d{body}"),
+                format!("_4b1d{body}"),
+                format!("-4b1d{body}"),
+                format!("4b1d{body}_"),
+                format!("4b1d{body}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn hex_digests_uuids_and_placeholders_are_unclaimed() {
+        let digest = "0123456789abcdef".repeat(4);
+        let sha1 = format!("4b1d{}", &digest[..36]);
+        let sha256 = format!("4b1d{}", &digest[..60]);
+        let upper_sha256 = format!("4b1d{}", digest[..60].to_ascii_uppercase());
+        assert_eq!((sha1.len(), sha256.len(), upper_sha256.len()), (40, 64, 64));
+        for input in [
+            format!("sha1: {sha1}\n"),
+            format!("sha256: {sha256}\n"),
+            format!("sha256: {upper_sha256}\n"),
+            format!("{sha256}\n"),
+            "id: 123e4567-4b1d-12d3-a456-426614174000\n".to_owned(),
+            "id: 123e4567-e89b-4b1d-a456-426614174000\n".to_owned(),
+            "urn:uuid:4b1d0000-0000-4000-8000-000000000000\n".to_owned(),
+            "key_secret = \"mykeysecret\"\n".to_owned(),
+            "key_id = \"mykeyid\"\n".to_owned(),
+            "CLICKHOUSE_CLOUD_API_SECRET=${CLICKHOUSE_CLOUD_API_SECRET}\n".to_owned(),
+            "the prefix is 4b1d\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_keys_are_not_claimed_and_a_secret_draws_no_other_provider() {
+        // A Daytona key whose hex body embeds `4b1d` is one alphanumeric run,
+        // so the leading boundary keeps ClickHouse out of it.
+        let embedded = format!("dtn_{}4b1d{}", "0".repeat(20), "a".repeat(40));
+        assert_eq!(embedded.len(), 68);
+        let (_, findings) = whole_input(&format!("{embedded}\n"));
+        assert!(
+            detector_findings(&findings, DETECTOR).is_empty(),
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "daytona-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        // A ClickHouse secret beside a Daytona key: two findings, each its own.
+        let daytona = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let (_, findings) = whole_input(&format!("{daytona} {}\n", secret(5)));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "daytona-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "4b1d".repeat(20_000),
+            format!("4b1d{}", "aB3".repeat(7_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let secret = secret(6);
+        let line = format!("{secret} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&secret));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        let secret = secret(7);
+        assert_partition_parity(&secret);
+        assert_input_partition_parity(&format!(
+            "curl --user $KEY_ID:{secret} https://api.clickhouse.cloud\n"
+        ));
+    }
+}
+
+mod nvidia {
+    use super::*;
+
+    const DETECTOR: &str = "nvidia-api-key";
+    const TYPE: &str = "nvidia_api_key";
+
+    /// `nvapi-` + a `len`-byte body over `[A-Za-z0-9_-]` that starts and
+    /// ends alphanumeric.
+    fn key(len: usize, seed: usize) -> String {
+        let mut body = filler(ALNUM_DASH, len, seed).into_bytes();
+        body[0] = b'N';
+        body[len - 1] = b'z';
+        format!("nvapi-{}", String::from_utf8(body).unwrap())
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        for (seed, len) in [60, 64, 70, 128].into_iter().enumerate() {
+            let key = key(len, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("NVIDIA_API_KEY={key}\n"),
+                format!("NGC_API_KEY={key}\n"),
+                format!("llm = ChatNVIDIA(api_key=\"{key}\")\n"),
+                format!(
+                    "client = OpenAI(base_url=\"https://integrate.api.nvidia.com/v1\", api_key=\"{key}\")\n"
+                ),
+                format!(
+                    "curl -H \"Authorization: Bearer {key}\" https://integrate.api.nvidia.com/v1/models\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+        assert!(key(64, 9).contains('_') || key(64, 9).contains('-'));
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let base = key(64, 4);
+        let body = &base["nvapi-".len()..];
+        let dotted = format!("nvapi-{}.{}", &body[..30], &body[31..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key(59, 4),
+                key(129, 4),
+                dotted,
+                format!("NVAPI-{body}"),
+                format!("nvapi_{body}"),
+                format!("xnvapi-{body}"),
+                format!("_nvapi-{body}"),
+                format!("-nvapi-{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn a_dot_after_the_floor_ends_the_run_and_leaves_the_tail() {
+        let key = key(64, 5);
+        assert_sole_finding_in(&format!("{key}.tail\n"), DETECTOR, TYPE, &key);
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "NVIDIA_API_KEY=nvapi-...\n".to_owned(),
+            "NVIDIA_API_KEY=nvapi-xxxx\n".to_owned(),
+            "NVIDIA_API_KEY=nvapi-<your-key>\n".to_owned(),
+            "use the nvapi-sys crate and the nvapi-rs bindings\n".to_owned(),
+            "the prefix is nvapi-\n".to_owned(),
+            "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}\n".to_owned(),
+            format!("token: nvsk-{}\n", filler(ALNUM_DASH, 64, 6)),
+            // The legacy prefixless 84-character NGC key is not a provider
+            // shape and stays with generic context.
+            format!("NGC_API_KEY={}\n", filler(ALNUM, 84, 7)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_and_other_providers_keys_are_not_claimed_and_each_key_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("NVIDIA_API_KEY={jwt}\n"));
+        let nvidia = key(64, 8);
+        let daytona = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let (_, findings) = whole_input(&format!("{daytona} {nvidia}\n"));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "daytona-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+        assert_unclaimed(DETECTOR, &format!("{daytona}\n"));
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "nvapi-".repeat(20_000),
+            format!("nvapi-{}", "aB3_-".repeat(4_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(64, 10);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(64, 11));
+    }
+}
+
+mod browserbase {
+    use super::*;
+
+    const DETECTOR: &str = "browserbase-api-key";
+    const TYPE: &str = "browserbase_api_key";
+
+    fn key(len: usize, seed: usize) -> String {
+        format!("bb_live_{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        for (seed, len) in [20, 32, 128].into_iter().enumerate() {
+            let key = key(len, seed);
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("BROWSERBASE_API_KEY={key}\n"),
+                format!(
+                    "curl -H \"X-BB-API-Key: {key}\" https://api.browserbase.com/v1/sessions\n"
+                ),
+                format!("bb = Browserbase(api_key=\"{key}\")\n"),
+                format!("const stagehand = new Stagehand({{ apiKey: \"{key}\" }});\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"browserbase\":{{\"env\":{{\"BROWSERBASE_API_KEY\":\"{key}\"}}}}}}}}"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 32, 4);
+        let base = format!("bb_live_{body}");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key(19, 4),
+                key(129, 4),
+                format!("{base}_"),
+                format!("{base}-"),
+                format!("{base}_x"),
+                format!("{base}-1"),
+                format!("BB_LIVE_{body}"),
+                format!("bb-live-{body}"),
+                format!("x{base}"),
+                format!("_{base}"),
+                format!("-{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let test_key =
+            |len: usize| format!("BROWSERBASE_API_KEY=bb_test_{}\n", filler(ALNUM, len, 5));
+        for input in [
+            test_key(8),
+            test_key(32),
+            test_key(64),
+            "BROWSERBASE_API_KEY=bb_live_...\n".to_owned(),
+            "BROWSERBASE_API_KEY=bb_live_your_api_key_here\n".to_owned(),
+            "session id bb_live_session_SyntheticRevokedIdentifier01\n".to_owned(),
+            "cookie bb_1727612345 was set\n".to_owned(),
+            "project 123e4567-e89b-42d3-a456-426614174000\n".to_owned(),
+            "BROWSERBASE_API_KEY=${{ secrets.BROWSERBASE_API_KEY }}\n".to_owned(),
+            "the prefix is bb_live_\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_stays_unclaimed_and_each_family_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("BROWSERBASE_API_KEY={jwt}\n"));
+        let browserbase = key(32, 6);
+        let daytona = format!("dtn_{}", "5e7c0ded".repeat(8));
+        let nvidia = format!("nvapi-{}", filler(ALNUM, 64, 6));
+        let (_, findings) = whole_input(&format!("{browserbase} {daytona} {nvidia}\n"));
+        for detector in [DETECTOR, "daytona-api-key", "nvidia-api-key"] {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+        }
+        assert_eq!(findings.len(), 3, "{findings:?}");
+        for other in [&daytona, &nvidia] {
+            assert_unclaimed(DETECTOR, &format!("{other}\n"));
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "bb_live_".repeat(20_000),
+            format!("bb_live_{}", "aB3".repeat(7_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(32, 7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(32, 8));
+    }
+}
+
+mod runpod {
+    use super::*;
+
+    const DETECTOR: &str = "runpod-api-key";
+    const TYPE: &str = "runpod_api_key";
+
+    fn key(len: usize, seed: usize) -> String {
+        format!("rpa_{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        // The observed 40-uppercase plus 6-mixed layout is not part of the
+        // contract, and neither is its absence.
+        let layout = format!("rpa_{}{}", "ABCDEFGHIJ".repeat(4), filler(ALNUM, 6, 3));
+        for key in [key(31, 1), key(46, 2), key(128, 3), layout] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("RUNPOD_API_KEY={key}\n"),
+                format!("runpod.api_key = \"{key}\"\n"),
+                format!("runpodctl config --apiKey {key}\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"runpod\":{{\"env\":{{\"RUNPOD_API_KEY\":\"{key}\"}}}}}}}}"
+                ),
+                format!("curl -H \"Authorization: Bearer {key}\" https://rest.runpod.io/v1/pods\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 46, 4);
+        let base = format!("rpa_{body}");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                // 30 is the Redirect.pizza width, below the policy floor.
+                key(30, 4),
+                key(129, 4),
+                format!("{base}_"),
+                format!("{base}-"),
+                format!("{base}_x"),
+                format!("{base}-1"),
+                format!("RPA_{body}"),
+                format!("rpa-{body}"),
+                format!("xrpa_{body}"),
+                format!("_{base}"),
+                format!("-{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            format!("REDIRECT_PIZZA_TOKEN={}\n", key(30, 5)),
+            "RUNPOD_API_KEY=rpa_...\n".to_owned(),
+            "RUNPOD_API_KEY=rpa_xxxx\n".to_owned(),
+            "RUNPOD_API_KEY=rpa_your_key\n".to_owned(),
+            "RUNPOD_API_KEY=rpa_your_runpod_api_key_goes_here_SyntheticRevoked\n".to_owned(),
+            format!("AWS_SECRET_ACCESS_KEY=rps_{}\n", filler(ALNUM, 40, 6)),
+            "RUNPOD_API_KEY=${{ secrets.RUNPOD_API_KEY }}\n".to_owned(),
+            "the prefix is rpa_\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_stays_unclaimed_and_each_family_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("RUNPOD_API_KEY={jwt}\n"));
+        let runpod = key(46, 6);
+        let browserbase = format!("bb_live_{}", filler(ALNUM, 32, 6));
+        let nvidia = format!("nvapi-{}", filler(ALNUM, 64, 6));
+        let (_, findings) = whole_input(&format!("{runpod} {browserbase} {nvidia}\n"));
+        for detector in [DETECTOR, "browserbase-api-key", "nvidia-api-key"] {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+        }
+        assert_eq!(findings.len(), 3, "{findings:?}");
+        for other in [&browserbase, &nvidia] {
+            assert_unclaimed(DETECTOR, &format!("{other}\n"));
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "rpa_".repeat(20_000),
+            format!("rpa_{}", "aB3".repeat(7_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(46, 7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(46, 8));
+    }
+}
+
+mod cerebras {
+    use super::*;
+
+    const DETECTOR: &str = "cerebras-api-key";
+    const TYPE: &str = "cerebras_api_key";
+
+    /// `csk-` or `csk_` + a 48-byte body over `[A-Za-z0-9_-]` that starts
+    /// and ends alphanumeric.
+    fn key(prefix: &str, len: usize, seed: usize) -> String {
+        let mut body = filler(ALNUM_DASH, len, seed).into_bytes();
+        body[0] = b'N';
+        body[len - 1] = b'z';
+        format!("{prefix}{}", String::from_utf8(body).unwrap())
+    }
+
+    /// A real-shape Pinecone key: `pcsk_` + a 5- or 6-byte label + `_` + a
+    /// 63-byte secret, built at run time.
+    fn pinecone(label_len: usize, seed: usize) -> String {
+        format!(
+            "pcsk_{}_{}",
+            filler(ALNUM, label_len, seed),
+            filler(ALNUM, 63, seed + 1)
+        )
+    }
+
+    #[test]
+    fn both_prefixes_win_every_context_as_the_sole_finding() {
+        let lower = format!("csk-{}", &"abcdefghij0123456789".repeat(3)[..48]);
+        for key in [
+            key("csk-", 48, 1),
+            key("csk_", 48, 2),
+            key("csk-", 48, 3),
+            lower,
+        ] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("CEREBRAS_API_KEY={key}\n"),
+                format!("client = Cerebras(api_key=\"{key}\")\n"),
+                format!(
+                    "client = OpenAI(base_url=\"https://api.cerebras.ai/v1\", api_key=\"{key}\")\n"
+                ),
+                format!(
+                    "curl -H \"Authorization: Bearer {key}\" https://api.cerebras.ai/v1/models\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    /// The leading boundary keeps Pinecone's `pcsk_` out: a real-shape
+    /// Pinecone key stays `pinecone_api_key` only, in every context.
+    #[test]
+    fn a_real_shape_pinecone_key_stays_pinecone_only() {
+        for (label_len, seed) in [(5, 1), (6, 2)] {
+            let pcsk = pinecone(label_len, seed);
+            assert_sole_provider_finding("pinecone-api-key", "pinecone_api_key", &pcsk);
+            for input in contexts(&pcsk) {
+                let (_, findings) = whole_input(&input);
+                assert!(
+                    detector_findings(&findings, DETECTOR).is_empty(),
+                    "{input}: {findings:?}"
+                );
+            }
+        }
+        // A Pinecone key and a Cerebras key side by side: one finding each.
+        let (_, findings) = whole_input(&format!("{} {}\n", pinecone(5, 3), key("csk-", 48, 3)));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(
+            detector_findings(&findings, "pinecone-api-key").len(),
+            1,
+            "{findings:?}"
+        );
+        assert_eq!(findings.len(), 2, "{findings:?}");
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = key("", 48, 4);
+        let dotted = format!("{}.{}", &body[..20], &body[21..]);
+        let plus = format!("{}+{}", &body[..20], &body[21..]);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                key("csk-", 47, 4),
+                key("csk-", 49, 4),
+                key("csk_", 47, 4),
+                key("csk_", 49, 4),
+                format!("csk-{dotted}"),
+                format!("csk_{plus}"),
+                format!("CSK-{body}"),
+                format!("CSK_{body}"),
+                format!("csk.{body}"),
+                format!("pcsk_{body}"),
+                format!("pcsk-{body}"),
+                format!("xcsk-{body}"),
+                format!("_csk-{body}"),
+                format!("-csk_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "CEREBRAS_API_KEY=csk-your-key-here\n".to_owned(),
+            "CEREBRAS_API_KEY=csk_...\n".to_owned(),
+            "CEREBRAS_API_KEY=csk-xxxx\n".to_owned(),
+            "CEREBRAS_API_KEY=${{ secrets.CEREBRAS_API_KEY }}\n".to_owned(),
+            "the prefix is csk-\n".to_owned(),
+            format!("PINECONE_API_KEY={}\n", pinecone(5, 5)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_stays_unclaimed_and_each_family_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("CEREBRAS_API_KEY={jwt}\n"));
+        let cerebras = key("csk_", 48, 6);
+        let others = [
+            ("daytona-api-key", format!("dtn_{}", "5e7c0ded".repeat(8))),
+            ("nvidia-api-key", format!("nvapi-{}", filler(ALNUM, 64, 6))),
+            (
+                "browserbase-api-key",
+                format!("bb_live_{}", filler(ALNUM, 32, 6)),
+            ),
+            ("runpod-api-key", format!("rpa_{}", filler(ALNUM, 46, 6))),
+        ];
+        let line: Vec<&str> = std::iter::once(cerebras.as_str())
+            .chain(others.iter().map(|(_, key)| key.as_str()))
+            .collect();
+        let (_, findings) = whole_input(&format!("{}\n", line.join(" ")));
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            1,
+            "{findings:?}"
+        );
+        for (detector, key) in &others {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+            assert_unclaimed(DETECTOR, &format!("{key}\n"));
+        }
+        assert_eq!(findings.len(), 5, "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "csk-".repeat(20_000),
+            "csk_".repeat(20_000),
+            format!("csk-{}", "aB3_-".repeat(4_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key("csk-", 48, 7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key("csk-", 48, 8));
+        assert_partition_parity(&key("csk_", 48, 9));
+        assert_partition_parity(&pinecone(5, 10));
     }
 }

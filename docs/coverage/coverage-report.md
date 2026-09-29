@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 116/116 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 122/122 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 116 |
+| supported | 122 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 127.
+Coverage declarations: 133.
 
 ## Coverage by detector
 
@@ -34,6 +34,9 @@ Coverage declarations: 127.
 | aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| cerebras-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | composio-api-key | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
@@ -45,6 +48,7 @@ Coverage declarations: 127.
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| daytona-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | deepgram-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -82,6 +86,7 @@ Coverage declarations: 127.
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| nvidia-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | okta-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | onepassword-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
@@ -97,6 +102,7 @@ Coverage declarations: 127.
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| runpod-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -134,6 +140,9 @@ Coverage declarations: 127.
 | aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
+| browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
+| cerebras_api_key | cerebras-api-key | provider | supported | not-applicable | none |
+| clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
 | composio_org_api_key | composio-api-key | provider | supported | not-applicable | none |
@@ -148,6 +157,7 @@ Coverage declarations: 127.
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
 | datadog_application_key_legacy | datadog-application-key-legacy | provider | supported | not-applicable | none |
+| daytona_api_key | daytona-api-key | provider | supported | not-applicable | none |
 | deepgram_api_key | deepgram-api-key | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
@@ -196,6 +206,7 @@ Coverage declarations: 127.
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
+| nvidia_api_key | nvidia-api-key | provider | supported | not-applicable | none |
 | okta_api_token | okta-api-token | provider | supported | not-applicable | none |
 | onepassword_service_account_token | onepassword-service-account-token | provider | supported | not-applicable | none |
 | openai_admin_api_key | openai-token | provider | supported | not-applicable | none |
@@ -213,6 +224,7 @@ Coverage declarations: 127.
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | resend_api_key | resend-api-key | provider | supported | not-applicable | none |
+| runpod_api_key | runpod-api-key | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
 | sentry_user_auth_token | sentry-user-auth-token | provider | supported | not-applicable | none |
@@ -263,15 +275,15 @@ Coverage declarations: 127.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 127 | 0 | 0 |
-| boundary | 116 | 0 | 0 |
-| host-context | 116 | 0 | 0 |
+| adversarial | 133 | 0 | 0 |
+| boundary | 122 | 0 | 0 |
+| host-context | 122 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 127 | 0 | 0 |
-| near-miss-negative | 116 | 0 | 0 |
-| overlap | 116 | 0 | 0 |
-| positive | 116 | 0 | 0 |
-| range | 127 | 0 | 0 |
+| malformed | 133 | 0 | 0 |
+| near-miss-negative | 122 | 0 | 0 |
+| overlap | 122 | 0 | 0 |
+| positive | 122 | 0 | 0 |
+| range | 133 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

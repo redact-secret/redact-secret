@@ -5,6 +5,29 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- New provider detectors from the #860 issuance-gated handoffs released by
+  rulings R9 and R10, each always redacted at provider specificity so it wins
+  overlap resolution over `contextual_secret`, `bearer_token` and
+  `authorization_credential`. None is a support-status claim; promotion stays
+  gated on core conformance and the benchmarks arrival and profile evidence:
+  - `daytona-api-key` (#970): Daytona `dtn_` + exactly 64 lowercase-hex API
+    keys (`daytona_api_key`), T1 as of provider code v0.190.0.
+  - `clickhouse-cloud-api-secret` (#971): ClickHouse Cloud `4b1d` + 38
+    alphanumeric API key secrets (`clickhouse_cloud_api_secret`), with an
+    uppercase guard that keeps hex digests and UUIDs out.
+  - `nvidia-api-key` (#972): NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API
+    keys (`nvidia_api_key`), the provider's own open-ended rule with a cap.
+  - `browserbase-api-key` (#973): Browserbase `bb_live_` + 20–128
+    alphanumeric API keys (`browserbase_api_key`), the provider's own
+    open-ended rule with a cap.
+  - `runpod-api-key` (#974): RunPod `rpa_` + 31–128 alphanumeric API keys
+    (`runpod_api_key`), with a policy floor above Redirect.pizza's width.
+  - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
+    `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
+    keys stay `pinecone_api_key` only.
+
 ## 0.1.0-beta.11 — 2026-09-29
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.11/README.md).

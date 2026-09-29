@@ -44,7 +44,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 99] = [
+const ALWAYS_REDACT_TYPES: [&str; 105] = [
     "anthropic_admin_api_key",
     "anthropic_api_key",
     "anthropic_enterprise_api_key",
@@ -56,6 +56,9 @@ const ALWAYS_REDACT_TYPES: [&str; 99] = [
     "aws_bedrock_short_term_api_key",
     "azure_devops_personal_access_token",
     "bearer_token",
+    "browserbase_api_key",
+    "cerebras_api_key",
+    "clickhouse_cloud_api_secret",
     "cloudflare_api_token",
     "composio_org_api_key",
     "composio_project_api_key",
@@ -65,6 +68,7 @@ const ALWAYS_REDACT_TYPES: [&str; 99] = [
     "convex_deployment_key",
     "databricks_personal_access_token",
     "datadog_application_key",
+    "daytona_api_key",
     "digitalocean_token",
     "discord_bot_token",
     "docker_token",
@@ -107,6 +111,7 @@ const ALWAYS_REDACT_TYPES: [&str; 99] = [
     "new_relic_user_api_key",
     "notion_integration_token",
     "npm_access_token",
+    "nvidia_api_key",
     "onepassword_service_account_token",
     "openai_admin_api_key",
     "openai_api_key",
@@ -122,6 +127,7 @@ const ALWAYS_REDACT_TYPES: [&str; 99] = [
     "pypi_api_token",
     "replicate_api_token",
     "resend_api_key",
+    "runpod_api_key",
     "sendgrid_api_key",
     "sentry_org_auth_token",
     "sentry_user_auth_token",

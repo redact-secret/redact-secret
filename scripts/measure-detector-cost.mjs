@@ -84,6 +84,12 @@ export const CANONICAL_IDS = [
   "resend-api-key",
   "apify-api-token",
   "wandb-api-key",
+  "daytona-api-key",
+  "clickhouse-cloud-api-secret",
+  "nvidia-api-key",
+  "browserbase-api-key",
+  "runpod-api-key",
+  "cerebras-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -102,6 +108,8 @@ export const GROUPS = {
     "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "langsmith-api-key",
     "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key", "e2b-api-key", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
     "wandb-api-key",
+    "nvidia-api-key",
+    "cerebras-api-key",
   ],
   cloud: [
     "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
@@ -113,6 +121,9 @@ export const GROUPS = {
     "heroku-api-key", "heroku-api-key-legacy", "doppler-token",
     "convex-deployment-key",
     "onepassword-service-account-token",
+    "daytona-api-key",
+    "clickhouse-cloud-api-secret",
+    "runpod-api-key",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
@@ -126,6 +137,7 @@ export const GROUPS = {
     "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token", "posthog-token",
     "resend-api-key",
     "apify-api-token",
+    "browserbase-api-key",
   ],
 };
 

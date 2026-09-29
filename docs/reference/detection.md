@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-92 built-in detectors emit 116 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+98 built-in detectors emit 122 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -285,6 +285,12 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `resend-api-key` | `resend_api_key` | `always-redact` | — |
 | `apify-api-token` | `apify_api_token` | `always-redact` | — |
 | `wandb-api-key` | `wandb_api_key` | `always-redact` | — |
+| `daytona-api-key` | `daytona_api_key` | `always-redact` | — |
+| `clickhouse-cloud-api-secret` | `clickhouse_cloud_api_secret` | `always-redact` | — |
+| `nvidia-api-key` | `nvidia_api_key` | `always-redact` | — |
+| `browserbase-api-key` | `browserbase_api_key` | `always-redact` | — |
+| `runpod-api-key` | `runpod_api_key` | `always-redact` | — |
+| `cerebras-api-key` | `cerebras_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

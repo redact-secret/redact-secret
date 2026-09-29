@@ -841,6 +841,48 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0077andb_v1_SyntheticRevokedWandbApiKeyFixtureSyntheticRevokedWandbApiKeyFixtureSynthetic",
       "schemes": null
+    },
+    {
+      "type": "daytona_api_key",
+      "detector": "daytona-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064tn_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "clickhouse_cloud_api_secret",
+      "detector": "clickhouse-cloud-api-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0034b1dSyntheticRevokedClickhouseSecret000000",
+      "schemes": null
+    },
+    {
+      "type": "nvidia_api_key",
+      "detector": "nvidia-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006evapi-SyntheticRevokedNvidiaApiKeyFixture_SyntheticRevokedNvidiaApiKeyFixture_End",
+      "schemes": null
+    },
+    {
+      "type": "browserbase_api_key",
+      "detector": "browserbase-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
+      "schemes": null
+    },
+    {
+      "type": "runpod_api_key",
+      "detector": "runpod-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0072pa_SyntheticRevokedRunpodApiKey00000000",
+      "schemes": null
+    },
+    {
+      "type": "cerebras_api_key",
+      "detector": "cerebras-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063sk-SyntheticRevokedCerebrasApiKey_SyntheticRevokedC",
+      "schemes": null
     }
   ],
   "consumers": [

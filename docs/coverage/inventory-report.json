@@ -5219,12 +5219,342 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "wandb_api_key"
+    },
+    {
+      "detector": "daytona-api-key",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terraform",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "daytona-api-key-positive-bare",
+        "daytona-api-key-positive-chat-sentence",
+        "daytona-api-key-positive-crlf-unicode-prefix",
+        "daytona-api-key-positive-curl-bearer",
+        "daytona-api-key-positive-dotenv",
+        "daytona-api-key-positive-js-client-option",
+        "daytona-api-key-positive-json-config",
+        "daytona-api-key-positive-json-token-key",
+        "daytona-api-key-positive-log",
+        "daytona-api-key-positive-punctuation-adjacent",
+        "daytona-api-key-positive-repeated-value",
+        "daytona-api-key-positive-sdk-call",
+        "daytona-api-key-positive-shell-export",
+        "daytona-api-key-positive-terraform-variable",
+        "daytona-api-key-positive-tool-call-arguments",
+        "daytona-api-key-positive-x-api-key-header",
+        "daytona-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "daytona_api_key"
+    },
+    {
+      "detector": "clickhouse-cloud-api-secret",
+      "evidence": {
+        "fixtureCount": 44,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terraform",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "clickhouse-cloud-api-secret-positive-bare",
+        "clickhouse-cloud-api-secret-positive-chat-sentence",
+        "clickhouse-cloud-api-secret-positive-crlf-unicode-prefix",
+        "clickhouse-cloud-api-secret-positive-curl-bearer",
+        "clickhouse-cloud-api-secret-positive-dotenv",
+        "clickhouse-cloud-api-secret-positive-json-config",
+        "clickhouse-cloud-api-secret-positive-json-token-key",
+        "clickhouse-cloud-api-secret-positive-log",
+        "clickhouse-cloud-api-secret-positive-punctuation-adjacent",
+        "clickhouse-cloud-api-secret-positive-python-requests-auth",
+        "clickhouse-cloud-api-secret-positive-repeated-value",
+        "clickhouse-cloud-api-secret-positive-sdk-call",
+        "clickhouse-cloud-api-secret-positive-shell-export",
+        "clickhouse-cloud-api-secret-positive-terraform-token-secret",
+        "clickhouse-cloud-api-secret-positive-tool-call-arguments",
+        "clickhouse-cloud-api-secret-positive-x-api-key-header",
+        "clickhouse-cloud-api-secret-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "clickhouse_cloud_api_secret"
+    },
+    {
+      "detector": "nvidia-api-key",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "nvidia-api-key-positive-bare",
+        "nvidia-api-key-positive-body-cap",
+        "nvidia-api-key-positive-body-cap-dotenv",
+        "nvidia-api-key-positive-body-floor",
+        "nvidia-api-key-positive-body-floor-dotenv",
+        "nvidia-api-key-positive-chat-sentence",
+        "nvidia-api-key-positive-crlf-unicode-prefix",
+        "nvidia-api-key-positive-curl-bearer",
+        "nvidia-api-key-positive-dotenv",
+        "nvidia-api-key-positive-js-client-option",
+        "nvidia-api-key-positive-json-config",
+        "nvidia-api-key-positive-json-token-key",
+        "nvidia-api-key-positive-log",
+        "nvidia-api-key-positive-ngc-api-key-dotenv",
+        "nvidia-api-key-positive-openai-compatible-client",
+        "nvidia-api-key-positive-punctuation-adjacent",
+        "nvidia-api-key-positive-repeated-value",
+        "nvidia-api-key-positive-sdk-call",
+        "nvidia-api-key-positive-shell-export",
+        "nvidia-api-key-positive-tool-call-arguments",
+        "nvidia-api-key-positive-x-api-key-header",
+        "nvidia-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "nvidia_api_key"
+    },
+    {
+      "detector": "browserbase-api-key",
+      "evidence": {
+        "fixtureCount": 42,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "browserbase-api-key-positive-bare",
+        "browserbase-api-key-positive-body-cap",
+        "browserbase-api-key-positive-body-cap-dotenv",
+        "browserbase-api-key-positive-body-floor",
+        "browserbase-api-key-positive-body-floor-dotenv",
+        "browserbase-api-key-positive-chat-sentence",
+        "browserbase-api-key-positive-crlf-unicode-prefix",
+        "browserbase-api-key-positive-curl-bearer",
+        "browserbase-api-key-positive-dotenv",
+        "browserbase-api-key-positive-json-config",
+        "browserbase-api-key-positive-json-token-key",
+        "browserbase-api-key-positive-log",
+        "browserbase-api-key-positive-mcp-env-block",
+        "browserbase-api-key-positive-punctuation-adjacent",
+        "browserbase-api-key-positive-repeated-value",
+        "browserbase-api-key-positive-sdk-call",
+        "browserbase-api-key-positive-shell-export",
+        "browserbase-api-key-positive-stagehand-option",
+        "browserbase-api-key-positive-tool-call-arguments",
+        "browserbase-api-key-positive-x-api-key-header",
+        "browserbase-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "browserbase_api_key"
+    },
+    {
+      "detector": "runpod-api-key",
+      "evidence": {
+        "fixtureCount": 45,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "runpod-api-key-positive-bare",
+        "runpod-api-key-positive-body-46-layout",
+        "runpod-api-key-positive-body-46-layout-dotenv",
+        "runpod-api-key-positive-body-cap",
+        "runpod-api-key-positive-body-cap-dotenv",
+        "runpod-api-key-positive-body-floor",
+        "runpod-api-key-positive-body-floor-dotenv",
+        "runpod-api-key-positive-chat-sentence",
+        "runpod-api-key-positive-crlf-unicode-prefix",
+        "runpod-api-key-positive-curl-bearer",
+        "runpod-api-key-positive-dotenv",
+        "runpod-api-key-positive-json-config",
+        "runpod-api-key-positive-json-token-key",
+        "runpod-api-key-positive-log",
+        "runpod-api-key-positive-mcp-env-block",
+        "runpod-api-key-positive-punctuation-adjacent",
+        "runpod-api-key-positive-repeated-value",
+        "runpod-api-key-positive-runpodctl-config",
+        "runpod-api-key-positive-sdk-call",
+        "runpod-api-key-positive-shell-export",
+        "runpod-api-key-positive-tool-call-arguments",
+        "runpod-api-key-positive-x-api-key-header",
+        "runpod-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "runpod_api_key"
+    },
+    {
+      "detector": "cerebras-api-key",
+      "evidence": {
+        "fixtureCount": 43,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "cerebras-api-key-positive-bare",
+        "cerebras-api-key-positive-chat-sentence",
+        "cerebras-api-key-positive-crlf-unicode-prefix",
+        "cerebras-api-key-positive-curl-bearer",
+        "cerebras-api-key-positive-dotenv",
+        "cerebras-api-key-positive-js-client-option",
+        "cerebras-api-key-positive-json-config",
+        "cerebras-api-key-positive-json-token-key",
+        "cerebras-api-key-positive-log",
+        "cerebras-api-key-positive-lowercase-alphanumeric-body",
+        "cerebras-api-key-positive-lowercase-alphanumeric-body-dotenv",
+        "cerebras-api-key-positive-openai-compatible-client",
+        "cerebras-api-key-positive-punctuation-adjacent",
+        "cerebras-api-key-positive-repeated-value",
+        "cerebras-api-key-positive-sdk-call",
+        "cerebras-api-key-positive-shell-export",
+        "cerebras-api-key-positive-tool-call-arguments",
+        "cerebras-api-key-positive-underscore-prefix",
+        "cerebras-api-key-positive-underscore-prefix-dotenv",
+        "cerebras-api-key-positive-x-api-key-header",
+        "cerebras-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "cerebras_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 116,
+    "supported": 122,
     "unresolved": 0
   }
 }

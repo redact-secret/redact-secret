@@ -271,7 +271,7 @@ one whole-input operation, under explicit limits that fail closed. See
 ## Detection coverage
 
 <!-- support-matrix:start -->
-**Support status** (76 providers, 152 credential families; stable: 105, provisional: 20, pending: 9, unsupported: 18; stable qualification: documented: 80, empirical: 25, policy-qualified: 0; evidence tiers: T1: 86, T2: 35, T3: 4, T0: 2) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
+**Support status** (76 providers, 152 credential families; stable: 105, provisional: 20, pending: 9, unsupported: 18; stable qualification: documented: 80, empirical: 25, policy-qualified: 0; evidence tiers: T1: 86, T2: 35, T3: 4, T0: 2) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md). 6 shipped detectors are not yet measured and carry no status: `browserbase-api-key`, `cerebras-api-key`, `clickhouse-cloud-api-secret`, `daytona-api-key`, `nvidia-api-key`, `runpod-api-key`.
 <!-- support-matrix:end -->
 
 Built-in detection covers private keys, provider-issued tokens, JWT and
