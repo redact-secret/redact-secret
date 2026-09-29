@@ -5601,12 +5601,114 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "bitwarden_secrets_manager_access_token"
+    },
+    {
+      "detector": "polar-token",
+      "evidence": {
+        "fixtureCount": 55,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "polar-token-positive-bare",
+        "polar-token-positive-chat-sentence",
+        "polar-token-positive-crlf-unicode-prefix",
+        "polar-token-positive-curl-bearer",
+        "polar-token-positive-dotenv",
+        "polar-token-positive-json-config",
+        "polar-token-positive-json-token-key",
+        "polar-token-positive-log",
+        "polar-token-positive-mcp-env-block",
+        "polar-token-positive-punctuation-adjacent",
+        "polar-token-positive-python-sdk",
+        "polar-token-positive-repeated-value",
+        "polar-token-positive-sdk-call",
+        "polar-token-positive-shell-export",
+        "polar-token-positive-tool-call-arguments",
+        "polar-token-positive-typescript-sdk",
+        "polar-token-positive-x-api-key-header",
+        "polar-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "polar_organization_access_token"
+    },
+    {
+      "detector": "polar-token",
+      "evidence": {
+        "fixtureCount": 55,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "polar-token-positive-client-registration-token",
+        "polar-token-positive-client-registration-token-json-token",
+        "polar-token-positive-oauth-client-secret",
+        "polar-token-positive-oauth-client-secret-json-token",
+        "polar-token-positive-oauth-org-access-token",
+        "polar-token-positive-oauth-org-access-token-json-token",
+        "polar-token-positive-oauth-org-refresh-token",
+        "polar-token-positive-oauth-org-refresh-token-json-token",
+        "polar-token-positive-oauth-user-access-token",
+        "polar-token-positive-oauth-user-access-token-json-token",
+        "polar-token-positive-oauth-user-refresh-token",
+        "polar-token-positive-oauth-user-refresh-token-json-token",
+        "polar-token-positive-pat-alnum-body",
+        "polar-token-positive-pat-alnum-body-json-token",
+        "polar-token-positive-pat-url-safe-body",
+        "polar-token-positive-pat-url-safe-body-json-token"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "polar_api_credential"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 123,
+    "supported": 125,
     "unresolved": 0
   }
 }

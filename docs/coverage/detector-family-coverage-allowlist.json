@@ -7,6 +7,7 @@
     "clickhouse-cloud-api-secret": "Shipped by #971 (ClickHouse Cloud API key secrets) before its benchmarks arrival evidence: the family joins the pinned support matrix with redact-secret-benchmarks#464 and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
     "daytona-api-key": "Shipped by #970 (Daytona API keys) before its benchmarks arrival evidence: the family joins the pinned support matrix with redact-secret-benchmarks#464 and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
     "nvidia-api-key": "Shipped by #972 (NVIDIA API keys) before its benchmarks arrival evidence: the family joins the pinned support matrix with redact-secret-benchmarks#464 and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
+    "polar-token": "Shipped by #1020 (Polar organization access tokens and API credentials) before its benchmarks arrival evidence: the family joins the pinned support matrix with its redact-secret-benchmarks arrival counterpart and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
     "runpod-api-key": "Shipped by #974 (RunPod API keys) before its benchmarks arrival evidence: the family joins the pinned support matrix with redact-secret-benchmarks#464 and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim."
   },
   "stale": {

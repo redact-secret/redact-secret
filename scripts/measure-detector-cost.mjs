@@ -91,6 +91,7 @@ export const CANONICAL_IDS = [
   "runpod-api-key",
   "cerebras-api-key",
   "bitwarden-secrets-manager-access-token",
+  "polar-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -140,6 +141,7 @@ export const GROUPS = {
     "resend-api-key",
     "apify-api-token",
     "browserbase-api-key",
+    "polar-token",
   ],
 };
 

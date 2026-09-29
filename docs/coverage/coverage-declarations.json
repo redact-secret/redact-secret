@@ -13483,6 +13483,236 @@
       "type": "bitwarden_secrets_manager_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "polar-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "polar-token-positive-bare",
+            "polar-token-positive-chat-sentence",
+            "polar-token-positive-crlf-unicode-prefix",
+            "polar-token-positive-curl-bearer",
+            "polar-token-positive-dotenv",
+            "polar-token-positive-json-config",
+            "polar-token-positive-json-token-key",
+            "polar-token-positive-log",
+            "polar-token-positive-mcp-env-block",
+            "polar-token-positive-punctuation-adjacent",
+            "polar-token-positive-python-sdk",
+            "polar-token-positive-repeated-value",
+            "polar-token-positive-sdk-call",
+            "polar-token-positive-shell-export",
+            "polar-token-positive-tool-call-arguments",
+            "polar-token-positive-typescript-sdk",
+            "polar-token-positive-x-api-key-header",
+            "polar-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "polar-token-overlap-bearer-header",
+            "polar-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "polar-token-adversarial-glued-tokens",
+            "polar-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "polar-token-boundary-api-body-44",
+            "polar-token-boundary-at-without-subtype",
+            "polar-token-boundary-body-42",
+            "polar-token-boundary-body-44",
+            "polar-token-boundary-glued-prefix",
+            "polar-token-boundary-glued-trailing",
+            "polar-token-boundary-oat-dash-body",
+            "polar-token-boundary-oat-underscore-body",
+            "polar-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "polar-token-negative-checkout-client-secret",
+            "polar-token-negative-env-reference",
+            "polar-token-negative-identifier",
+            "polar-token-negative-placeholder",
+            "polar-token-negative-public-client-id",
+            "polar-token-negative-session-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "polar-token-boundary-api-body-44",
+            "polar-token-boundary-at-without-subtype",
+            "polar-token-boundary-body-42",
+            "polar-token-boundary-body-44",
+            "polar-token-boundary-glued-prefix",
+            "polar-token-boundary-glued-trailing",
+            "polar-token-boundary-oat-dash-body",
+            "polar-token-boundary-oat-underscore-body",
+            "polar-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for polar_organization_access_token (polar-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "polar_organization_access_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "polar-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "polar-token-positive-client-registration-token",
+            "polar-token-positive-client-registration-token-json-token",
+            "polar-token-positive-oauth-client-secret",
+            "polar-token-positive-oauth-client-secret-json-token",
+            "polar-token-positive-oauth-org-access-token",
+            "polar-token-positive-oauth-org-access-token-json-token",
+            "polar-token-positive-oauth-org-refresh-token",
+            "polar-token-positive-oauth-org-refresh-token-json-token",
+            "polar-token-positive-oauth-user-access-token",
+            "polar-token-positive-oauth-user-access-token-json-token",
+            "polar-token-positive-oauth-user-refresh-token",
+            "polar-token-positive-oauth-user-refresh-token-json-token",
+            "polar-token-positive-pat-alnum-body",
+            "polar-token-positive-pat-alnum-body-json-token",
+            "polar-token-positive-pat-url-safe-body",
+            "polar-token-positive-pat-url-safe-body-json-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "polar-token-overlap-api-credential-bearer",
+            "polar-token-overlap-api-credential-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "polar-token-adversarial-glued-tokens",
+            "polar-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "polar-token-boundary-api-body-44",
+            "polar-token-boundary-at-without-subtype",
+            "polar-token-boundary-body-42",
+            "polar-token-boundary-body-44",
+            "polar-token-boundary-glued-prefix",
+            "polar-token-boundary-glued-trailing",
+            "polar-token-boundary-oat-dash-body",
+            "polar-token-boundary-oat-underscore-body",
+            "polar-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "polar-token-negative-checkout-client-secret",
+            "polar-token-negative-env-reference",
+            "polar-token-negative-identifier",
+            "polar-token-negative-placeholder",
+            "polar-token-negative-public-client-id",
+            "polar-token-negative-session-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "polar-token-boundary-api-body-44",
+            "polar-token-boundary-at-without-subtype",
+            "polar-token-boundary-body-42",
+            "polar-token-boundary-body-44",
+            "polar-token-boundary-glued-prefix",
+            "polar-token-boundary-glued-trailing",
+            "polar-token-boundary-oat-dash-body",
+            "polar-token-boundary-oat-underscore-body",
+            "polar-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for polar_api_credential (polar-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "polar_api_credential"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13711,6 +13941,8 @@
             "otpauth-adversarial-overlong-query",
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
+            "polar-token-adversarial-glued-tokens",
+            "polar-token-adversarial-prefix-run",
             "posthog-token-adversarial-long-suffix",
             "postman-api-key-adversarial-long-suffix",
             "postman-collection-access-key-adversarial-dense-findings",
@@ -14176,6 +14408,8 @@
             "otpauth-adversarial-overlong-query",
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
+            "polar-token-adversarial-glued-tokens",
+            "polar-token-adversarial-prefix-run",
             "posthog-token-adversarial-long-suffix",
             "postman-api-key-adversarial-long-suffix",
             "postman-collection-access-key-adversarial-dense-findings",

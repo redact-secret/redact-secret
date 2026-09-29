@@ -226,6 +226,115 @@ mod bitwarden {
     }
 }
 
+mod polar {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "polar-token";
+    const ORGANIZATION: &str = "polar_organization_access_token";
+    const API: &str = "polar_api_credential";
+    const URL_SAFE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    const API_PREFIXES: [&str; 7] = [
+        "polar_pat_",
+        "polar_at_u_",
+        "polar_at_o_",
+        "polar_rt_u_",
+        "polar_rt_o_",
+        "polar_cs_",
+        "polar_crt_",
+    ];
+
+    pub(super) fn oat(seed: usize) -> String {
+        format!("polar_oat_{}", filler(ALNUM, 43, seed))
+    }
+
+    #[test]
+    fn every_role_wins_every_context_as_the_sole_finding() {
+        let oat = oat(1);
+        assert_sole_provider_finding(DETECTOR, ORGANIZATION, &oat);
+        for input in [
+            format!("POLAR_ACCESS_TOKEN={oat}\n"),
+            format!("polar = Polar(access_token=\"{oat}\")\n"),
+            format!("const polar = new Polar({{ accessToken: \"{oat}\" }});\n"),
+            format!(
+                "{{\"mcpServers\":{{\"polar\":{{\"env\":{{\"POLAR_ACCESS_TOKEN\":\"{oat}\"}}}}}}}}"
+            ),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, ORGANIZATION, &oat);
+        }
+        for (seed, prefix) in API_PREFIXES.iter().enumerate() {
+            for body in [filler(URL_SAFE, 43, seed), filler(ALNUM, 43, seed)] {
+                assert_sole_provider_finding(DETECTOR, API, &format!("{prefix}{body}"));
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 43, 2);
+        let base = format!("polar_oat_{body}");
+        let mut dashed = body.clone();
+        dashed.replace_range(7..8, "-");
+        let mut underscored = body.clone();
+        underscored.replace_range(7..8, "_");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("polar_oat_{}", &body[..42]),
+                format!("{base}A"),
+                format!("polar_pat_{}", &body[..42]),
+                format!("polar_pat_{body}A"),
+                format!("polar_oat_{dashed}"),
+                format!("polar_oat_{underscored}"),
+                format!("polar_at_{body}"),
+                format!("POLAR_OAT_{body}"),
+                format!("xpolar_oat_{body}"),
+                format!("_{base}"),
+                format!("-{base}"),
+                format!("{base}_"),
+                format!("{base}-1"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let body = filler(ALNUM, 43, 3);
+        for input in [
+            format!("POLAR_CLIENT_ID=polar_ci_{body}\n"),
+            format!("client_secret: polar_c_{body}\n"),
+            format!("checkout link polar_cl_{body}\n"),
+            format!("session polar_us_{body}\n"),
+            format!("POLAR_WEBHOOK_SECRET=whsec_{body}\n"),
+            "POLAR_ACCESS_TOKEN=polar_oat_xxxxxxxx\n".to_owned(),
+            "POLAR_ACCESS_TOKEN=${{ secrets.POLAR_ACCESS_TOKEN }}\n".to_owned(),
+            "polar_access_token_id = 42\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_polar_webhook_secret_stays_with_stripe() {
+        let secret = format!("whsec_{}", filler(ALNUM, 43, 4));
+        let (_, findings) = whole_input(&format!("{secret}\n"));
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        assert_eq!(findings[0].detector(), "stripe-token");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"polar_oat_".repeat(20_000));
+        assert_unclaimed(DETECTOR, &oat(5).repeat(200));
+        assert_repetition_line(DETECTOR, &oat(5), 200);
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&oat(6));
+        assert_partition_parity(&format!("polar_at_u_{}", filler(URL_SAFE, 43, 6)));
+    }
+}
+
 /// Each #1014 family keeps its own finding on one line next to the others
 /// and an existing prefixed family, and no family claims another's key.
 mod isolation {
@@ -234,6 +343,7 @@ mod isolation {
     fn keys() -> Vec<(&'static str, String)> {
         vec![
             (bitwarden::DETECTOR, bitwarden::token(9)),
+            (polar::DETECTOR, polar::oat(9)),
             (
                 "e2b-api-key",
                 format!("e2b_{}", filler(b"0123456789abcdef", 40, 9)),

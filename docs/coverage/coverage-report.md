@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 123/123 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 125/125 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 123 |
+| supported | 125 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 134.
+Coverage declarations: 136.
 
 ## Coverage by detector
 
@@ -95,6 +95,7 @@ Coverage declarations: 134.
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| polar-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | posthog-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -217,6 +218,8 @@ Coverage declarations: 134.
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
+| polar_api_credential | polar-token | provider | supported | not-applicable | none |
+| polar_organization_access_token | polar-token | provider | supported | not-applicable | none |
 | posthog_personal_api_key | posthog-token | provider | supported | not-applicable | none |
 | posthog_project_secret_api_key | posthog-token | provider | supported | not-applicable | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
@@ -277,15 +280,15 @@ Coverage declarations: 134.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 134 | 0 | 0 |
-| boundary | 123 | 0 | 0 |
-| host-context | 123 | 0 | 0 |
+| adversarial | 136 | 0 | 0 |
+| boundary | 125 | 0 | 0 |
+| host-context | 125 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 134 | 0 | 0 |
-| near-miss-negative | 123 | 0 | 0 |
-| overlap | 123 | 0 | 0 |
-| positive | 123 | 0 | 0 |
-| range | 134 | 0 | 0 |
+| malformed | 136 | 0 | 0 |
+| near-miss-negative | 125 | 0 | 0 |
+| overlap | 125 | 0 | 0 |
+| positive | 125 | 0 | 0 |
+| range | 136 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

@@ -61,6 +61,7 @@ mod openai;
 mod otpauth;
 mod pattern;
 mod pinecone;
+mod polar;
 mod posthog;
 mod postman;
 mod prefilter;
@@ -240,6 +241,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(runpod::RUNPOD_API_KEY),
         Box::new(cerebras::CEREBRAS_API_KEY),
         Box::new(bitwarden::BitwardenSecretsManagerAccessTokenDetector),
+        Box::new(polar::POLAR),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -525,6 +527,7 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         "bitwarden-secrets-manager-access-token",
         bitwarden::REQUIRED_LITERALS,
     ),
+    ("polar-token", &[Literals::Shapes(polar::POLAR.shapes())]),
     (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
@@ -703,6 +706,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("runpod-api-key", Pack::Provider),
     ("cerebras-api-key", Pack::Provider),
     ("bitwarden-secrets-manager-access-token", Pack::Provider),
+    ("polar-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -837,6 +841,7 @@ mod tests {
                 "runpod-api-key",
                 "cerebras-api-key",
                 "bitwarden-secrets-manager-access-token",
+                "polar-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1224,6 +1229,10 @@ mod tests {
             "SyntheticRevokedBitwardenSecre",
             "SyntheticRevokedKey000"
         );
+        let polar_token_input = format!(
+            "polar_oat_{}",
+            "SyntheticRevokedPolarOrganizationToken00000"
+        );
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -1319,6 +1328,7 @@ mod tests {
                 "bitwarden-secrets-manager-access-token",
                 bitwarden_secrets_manager_access_token_input.as_str(),
             ),
+            ("polar-token", polar_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

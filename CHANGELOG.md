@@ -37,6 +37,12 @@ evidence is linked from each published version.
     Manager machine-account access tokens, `0.` + UUID + `.` + 30
     alphanumeric client secret + `:` + a padded 16-byte Base64 key
     (`bitwarden_secrets_manager_access_token`).
+  - `polar-token` (#1020): Polar `polar_oat_` + 43 alphanumeric organization
+    access tokens (`polar_organization_access_token`) and `polar_pat_`,
+    `polar_at_u_`/`polar_at_o_`, `polar_rt_u_`/`polar_rt_o_`, `polar_cs_` and
+    `polar_crt_` + 43 URL-safe API credentials (`polar_api_credential`); the
+    public `polar_ci_` client id is never claimed, and Polar `whsec_` webhook
+    secrets stay with `stripe-token`.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

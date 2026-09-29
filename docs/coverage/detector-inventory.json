@@ -890,6 +890,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0030.5e7c0ded-0000-4000-8000-5e7c0ded0000.SyntheticRevokedBitwardenSecre:SyntheticRevokedKey000==",
       "schemes": null
+    },
+    {
+      "type": "polar_organization_access_token",
+      "detector": "polar-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070olar_oat_SyntheticRevokedPolarOrganizationToken00000",
+      "schemes": null
+    },
+    {
+      "type": "polar_api_credential",
+      "detector": "polar-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070olar_pat_SyntheticRevoked-Polar_PersonalToken0000000",
+      "schemes": null
     }
   ],
   "consumers": [
