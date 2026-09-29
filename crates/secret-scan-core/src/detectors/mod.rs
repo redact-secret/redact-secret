@@ -57,6 +57,7 @@ mod pattern;
 mod pinecone;
 mod posthog;
 mod postman;
+mod prefilter;
 mod private_key;
 mod resend;
 mod ruleset_adapter;
@@ -79,6 +80,9 @@ use crate::types::Detector;
 use connection_string::ConnectionStringDetector;
 use private_key::PrivateKeyDetector;
 
+use prefilter::Literals;
+pub(crate) use prefilter::{PairSet, RequiredLiterals};
+
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{
@@ -89,6 +93,45 @@ pub(crate) use heroku::has_open_heroku_legacy_context;
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 pub(crate) use twilio::has_open_twilio_cli_table;
+
+/// `true` when appending `appended` to any input leaves both
+/// [`has_open_contextual_assignment`] and [`has_open_bearer_authorization`]
+/// unchanged. Each first skips trailing [`text::is_js_whitespace`] and then
+/// reads only what precedes it, so text made of nothing else is invisible to
+/// them. The incremental session relies on this to re-evaluate the two tail
+/// checks only when a line with other content closes (issue #986).
+pub(crate) fn is_open_tail_neutral(appended: &str) -> bool {
+    appended.chars().all(text::is_js_whitespace)
+}
+
+/// `true` when a detector can read `unit` (the scan copy of one closed
+/// incremental unit) as the continuation of text on an earlier line, so
+/// scanning it after that text can differ from scanning it alone. The
+/// incremental session never batches such a unit with the units before it
+/// (issue #985; the per-detector audit is in `docs/audits/evidence/985/`).
+///
+/// Two built-in grammars skip [`text::is_js_whitespace`], line terminators
+/// included, between their parts:
+///
+/// - `generic-token`'s assignment grammar between a name and its `=`/`:`
+///   operator (`parse_name_and_operator`), so a unit starting with an
+///   operator can bind to a name on an earlier line;
+/// - `bearer-token`'s header grammar around the `:` of `authorization:`
+///   and before `bearer` (`match_scheme_at`), so a unit starting with `:` or
+///   `bearer` can complete a header begun on an earlier line.
+///
+/// Their retention hints hold most of those layouts in one unit, but not
+/// every one the grammars accept (a backticked or glued name, a JWK member,
+/// `X-Authorization:`), and whole-input scanning already reads them
+/// together. Excluding the unit from the batch keeps each batch equal to
+/// per-unit processing without changing either grammar.
+pub(crate) fn continues_previous_line(unit: &str) -> bool {
+    let start = unit.trim_start_matches(text::is_js_whitespace);
+    start.starts_with(['=', ':'])
+        || start
+            .get(..6)
+            .is_some_and(|word| word.eq_ignore_ascii_case("bearer"))
+}
 
 /// Every built-in detector, in canonical registration order.
 #[must_use]
@@ -208,6 +251,295 @@ pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
         otpauth::otpauth_detector(),
         generic_token::generic_token_detector(),
     ]
+}
+
+/// A built-in detector and the literals it declares for the shared
+/// prefilter ([`prefilter`], issue #983).
+///
+/// Only [`built_in_entries`] and [`common_built_in_entries`] make one, from
+/// the detectors this crate constructs, and the registry keeps the
+/// declaration in a private field. It is never part of the public
+/// `Detector` trait, so a custom detector neither declares nor inherits
+/// one, even under a built-in id.
+pub(crate) struct BuiltIn {
+    pub(crate) detector: Box<dyn Detector>,
+    pub(crate) required: Option<RequiredLiterals>,
+}
+
+/// [`built_in_detectors`], each with its prefilter declaration.
+#[must_use]
+pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
+    built_in_detectors()
+        .into_iter()
+        .map(|detector| BuiltIn {
+            required: built_in_required_literals(detector.id()),
+            detector,
+        })
+        .collect()
+}
+
+/// [`common_built_in_detectors`], each with its prefilter declaration.
+#[must_use]
+pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
+    common_built_in_detectors()
+        .into_iter()
+        .map(|detector| BuiltIn {
+            required: common_required_literals(detector.id()),
+            detector,
+        })
+        .collect()
+}
+
+/// The prefilter declarations of the declared `full` built-ins (issue
+/// #983), keyed by detector id. Plain data, so the declarations add almost
+/// no code to a WebAssembly build.
+///
+/// Every declared detector names its literals from its own grammar
+/// constants: a table-driven detector's shape prefixes, or the module's
+/// `REQUIRED_LITERALS`. The 17 built-ins that cannot declare a
+/// case-sensitive literal every candidate needs are absent (pinned by
+/// `prefilter::tests::only_the_reviewed_built_ins_run_on_every_call`).
+const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
+    ("aws-access-key", aws::REQUIRED_LITERALS),
+    (
+        "aws-bedrock-long-term-api-key",
+        aws_bedrock::LONG_TERM_REQUIRED_LITERALS,
+    ),
+    (
+        "aws-bedrock-short-term-api-key",
+        aws_bedrock::SHORT_TERM_REQUIRED_LITERALS,
+    ),
+    ("github-token", github::REQUIRED_LITERALS),
+    ("gitlab-token", gitlab::REQUIRED_LITERALS),
+    ("openai-token", openai::REQUIRED_LITERALS),
+    ("anthropic-token", anthropic::REQUIRED_LITERALS),
+    ("shopify-token", shopify::REQUIRED_LITERALS),
+    ("vault-token", vault::REQUIRED_LITERALS),
+    ("stripe-token", stripe::REQUIRED_LITERALS),
+    ("slack-token", slack::REQUIRED_LITERALS),
+    ("sendgrid-token", sendgrid::REQUIRED_LITERALS),
+    (
+        "microsoft-entra-client-secret",
+        microsoft_entra::REQUIRED_LITERALS,
+    ),
+    (
+        "azure-devops-personal-access-token",
+        azure_devops::REQUIRED_LITERALS,
+    ),
+    ("notion-token", notion::REQUIRED_LITERALS),
+    ("atlassian-api-token", atlassian::REQUIRED_LITERALS),
+    ("telegram-bot-token", telegram::REQUIRED_LITERALS),
+    ("sentry-user-auth-token", sentry::USER_REQUIRED_LITERALS),
+    ("sentry-org-auth-token", sentry::ORG_REQUIRED_LITERALS),
+    ("grafana-service-account-token", grafana::REQUIRED_LITERALS),
+    ("new-relic-user-api-key", new_relic::USER_REQUIRED_LITERALS),
+    ("mailchimp-api-key", mailchimp::REQUIRED_LITERALS),
+    ("mailgun-api-key", mailgun::REQUIRED_LITERALS),
+    ("okta-api-token", okta::REQUIRED_LITERALS),
+    ("firebase-server-key", firebase::REQUIRED_LITERALS),
+    ("terraform-cloud-token", terraform::REQUIRED_LITERALS),
+    ("elevenlabs-api-key", elevenlabs::REQUIRED_LITERALS),
+    (
+        "gitlab-runner-authentication-token",
+        gitlab::RUNNER_REQUIRED_LITERALS,
+    ),
+    ("netlify-token", netlify::REQUIRED_LITERALS),
+    ("langsmith-api-key", langsmith::REQUIRED_LITERALS),
+    ("langfuse-secret-key", langfuse::REQUIRED_LITERALS),
+    ("doppler-token", doppler::REQUIRED_LITERALS),
+    (
+        "onepassword-service-account-token",
+        onepassword::REQUIRED_LITERALS,
+    ),
+    (
+        additional_providers::PYPI.detector_id(),
+        &[Literals::Shapes(additional_providers::PYPI.shapes())],
+    ),
+    (
+        additional_providers::DOCKER.detector_id(),
+        &[Literals::Shapes(additional_providers::DOCKER.shapes())],
+    ),
+    (
+        cloudflare::CLOUDFLARE.detector_id(),
+        &[Literals::Shapes(cloudflare::CLOUDFLARE.shapes())],
+    ),
+    (
+        linear::LINEAR.detector_id(),
+        &[Literals::Shapes(linear::LINEAR.shapes())],
+    ),
+    (
+        additional_providers::SUPABASE.detector_id(),
+        &[Literals::Shapes(additional_providers::SUPABASE.shapes())],
+    ),
+    (
+        additional_providers::VERCEL.detector_id(),
+        &[Literals::Shapes(additional_providers::VERCEL.shapes())],
+    ),
+    (
+        additional_providers::NPM.detector_id(),
+        &[Literals::Shapes(additional_providers::NPM.shapes())],
+    ),
+    (
+        additional_providers::GOOGLE.detector_id(),
+        &[Literals::Shapes(additional_providers::GOOGLE.shapes())],
+    ),
+    (
+        datadog::DATADOG_APPLICATION_KEY.detector_id(),
+        &[Literals::Shapes(datadog::DATADOG_APPLICATION_KEY.shapes())],
+    ),
+    (
+        additional_providers::PULUMI.detector_id(),
+        &[Literals::Shapes(additional_providers::PULUMI.shapes())],
+    ),
+    (
+        ai_inference::REPLICATE.detector_id(),
+        &[Literals::Shapes(ai_inference::REPLICATE.shapes())],
+    ),
+    (
+        ai_inference::GROQ.detector_id(),
+        &[Literals::Shapes(ai_inference::GROQ.shapes())],
+    ),
+    (
+        ai_inference::XAI.detector_id(),
+        &[Literals::Shapes(ai_inference::XAI.shapes())],
+    ),
+    (
+        ai_inference::OPENROUTER.detector_id(),
+        &[Literals::Shapes(ai_inference::OPENROUTER.shapes())],
+    ),
+    (
+        ai_inference::PERPLEXITY.detector_id(),
+        &[Literals::Shapes(ai_inference::PERPLEXITY.shapes())],
+    ),
+    (
+        ai_inference::FIREWORKS.detector_id(),
+        &[Literals::Shapes(ai_inference::FIREWORKS.shapes())],
+    ),
+    (
+        together_tavily::TOGETHER_AI.detector_id(),
+        &[Literals::Shapes(together_tavily::TOGETHER_AI.shapes())],
+    ),
+    (
+        together_tavily::TAVILY.detector_id(),
+        &[Literals::Shapes(together_tavily::TAVILY.shapes())],
+    ),
+    (
+        databricks::DATABRICKS.detector_id(),
+        &[Literals::Shapes(databricks::DATABRICKS.shapes())],
+    ),
+    (
+        neon::NEON.detector_id(),
+        &[Literals::Shapes(neon::NEON.shapes())],
+    ),
+    (
+        postman::POSTMAN.detector_id(),
+        &[Literals::Shapes(postman::POSTMAN.shapes())],
+    ),
+    (
+        heroku::HEROKU_API_KEY.detector_id(),
+        &[Literals::Shapes(heroku::HEROKU_API_KEY.shapes())],
+    ),
+    (
+        trigger_dev::TRIGGER_DEV.detector_id(),
+        &[Literals::Shapes(trigger_dev::TRIGGER_DEV.shapes())],
+    ),
+    (
+        e2b::E2B.detector_id(),
+        &[Literals::Shapes(e2b::E2B.shapes())],
+    ),
+    (
+        posthog::POSTHOG.detector_id(),
+        &[Literals::Shapes(posthog::POSTHOG.shapes())],
+    ),
+    (
+        helicone::HELICONE.detector_id(),
+        &[Literals::Shapes(helicone::HELICONE.shapes())],
+    ),
+    (
+        firecrawl::FIRECRAWL.detector_id(),
+        &[Literals::Shapes(firecrawl::FIRECRAWL.shapes())],
+    ),
+    (
+        composio::COMPOSIO.detector_id(),
+        &[Literals::Shapes(composio::COMPOSIO.shapes())],
+    ),
+    (
+        inngest::INNGEST_SIGNING_KEY.detector_id(),
+        &[Literals::Shapes(inngest::INNGEST_SIGNING_KEY.shapes())],
+    ),
+    (
+        resend::RESEND_API_KEY.detector_id(),
+        &[Literals::Shapes(resend::RESEND_API_KEY.shapes())],
+    ),
+    (
+        apify::APIFY_API_TOKEN.detector_id(),
+        &[Literals::Shapes(apify::APIFY_API_TOKEN.shapes())],
+    ),
+    (
+        wandb::WANDB_API_KEY.detector_id(),
+        &[Literals::Shapes(wandb::WANDB_API_KEY.shapes())],
+    ),
+    (
+        additional_providers::HUGGING_FACE.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::HUGGING_FACE.shapes(),
+        )],
+    ),
+    (
+        additional_providers::DIGITALOCEAN.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::DIGITALOCEAN.shapes(),
+        )],
+    ),
+    (
+        additional_providers::SUPABASE_PAT.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::SUPABASE_PAT.shapes(),
+        )],
+    ),
+    (
+        additional_providers::GRAFANA_CLOUD.detector_id(),
+        &[Literals::Shapes(
+            additional_providers::GRAFANA_CLOUD.shapes(),
+        )],
+    ),
+    (
+        confluent::CONFLUENT_CLOUD_API_SECRET.detector_id(),
+        &[Literals::Shapes(
+            confluent::CONFLUENT_CLOUD_API_SECRET.shapes(),
+        )],
+    ),
+    (
+        postman::POSTMAN_COLLECTION_ACCESS_KEY.detector_id(),
+        &[Literals::Shapes(
+            postman::POSTMAN_COLLECTION_ACCESS_KEY.shapes(),
+        )],
+    ),
+];
+
+/// The prefilter declaration of the built-in detector `id`, or `None` when
+/// it runs on every call.
+fn built_in_required_literals(id: &str) -> Option<RequiredLiterals> {
+    DECLARED_LITERALS
+        .iter()
+        .find(|(declared, _)| *declared == id)
+        .map_or_else(
+            || common_required_literals(id),
+            |(_, groups)| RequiredLiterals::any_of(groups),
+        )
+}
+
+/// The prefilter declaration of the `common` built-in detector `id`, or
+/// `None` when it runs on every call. Names only `common` modules, like
+/// [`common_built_in_detectors`].
+fn common_required_literals(id: &str) -> Option<RequiredLiterals> {
+    match id {
+        "private-key" => RequiredLiterals::any_of(private_key::REQUIRED_LITERALS),
+        "jwt" => RequiredLiterals::any_of(jwt::REQUIRED_LITERALS),
+        "connection-string" => RequiredLiterals::any_of(connection_string::REQUIRED_LITERALS),
+        "otpauth-uri" => RequiredLiterals::any_of(otpauth::REQUIRED_LITERALS),
+        _ => None,
+    }
 }
 
 /// Which profiles a built-in detector belongs to

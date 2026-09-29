@@ -538,6 +538,13 @@
       "path": "crates/secret-scan-core/examples/pii_identity_evaluation.rs",
       "rationale": "The maintainer-local PII identity evaluation example reads `env::args().skip(1)`, discarding argv[0], and accepts one option: --family, whose value must name one of the six closed production PII family ids or the example exits with an error. Arguments are never interpreted as a command, passed to a shell, used to launch a process, or used for an authorization decision, and the example is outside every published package, so neither the argv[0] nor the command-argument injection concern this generic rule targets applies.",
       "rule_id": "sast.rules.rust.lang.security.args"
+    },
+    "893a30af41bceb52": {
+      "classification": "false_positive",
+      "line": 190,
+      "path": "crates/secret-scan-core/benches/scan_cost.rs",
+      "rationale": "The maintainer-local scan_cost bench parses its own flags (--runs, --filter, --json, --no-detectors, --top, --list) from its arguments to choose which synthetic workloads to time and how to print them. They are never interpreted as a command, passed to a shell, or used to launch another process, and the bench is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
+      "rule_id": "sast.rules.rust.lang.security.args"
     }
   },
   "known_errors": {

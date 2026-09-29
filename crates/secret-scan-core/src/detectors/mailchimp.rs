@@ -166,6 +166,7 @@
 //!   bare-format detector in this registry already accepts.
 
 use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -281,14 +282,13 @@ impl Detector for MailchimpMarketingApiKeyDetector {
             let has_keyword = line_has_context_keyword(line);
 
             let bytes = line.as_bytes();
-            let ends = pattern::run_ends(bytes, is_key_hex);
             let mut start = 0usize;
             while start < bytes.len() {
                 if !is_key_hex(bytes[start]) {
                     start += 1;
                     continue;
                 }
-                let hex_end = ends[start];
+                let hex_end = pattern::run_end(bytes, start, is_key_hex);
                 if hex_end - start == KEY_HEX_LEN
                     && let Some(full_end) = match_datacenter_suffix(bytes, hex_end)
                     && pattern::boundary_ok(bytes, start, full_end, BOUNDARY)
@@ -320,6 +320,13 @@ impl Detector for MailchimpMarketingApiKeyDetector {
         Ok(candidates)
     }
 }
+
+/// The literals one of which every `mailchimp-api-key` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// The keyword gate is case-insensitive and cannot be declared; the
+/// datacenter suffix every candidate ends in can.
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[DATACENTER_LITERAL])];
 
 #[cfg(test)]
 mod tests {

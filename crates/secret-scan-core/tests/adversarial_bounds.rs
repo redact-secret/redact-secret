@@ -273,6 +273,63 @@ fn a_fragmented_adversarial_partition_stays_within_the_same_runtime_cap() {
     }
 }
 
+/// One 256 KiB line built by repeating `record`, closed with `suffix`.
+fn single_line(prefix: &str, record: impl Fn(usize) -> String, suffix: &str) -> String {
+    const TARGET_BYTES: usize = 256 * 1_024;
+    let mut input = String::from(prefix);
+    let mut index = 0;
+    while input.len() < TARGET_BYTES {
+        input.push_str(&record(index));
+        index += 1;
+    }
+    input.push_str(suffix);
+    input
+}
+
+#[test]
+fn a_long_single_line_of_assignments_scans_in_linear_time() {
+    // Minified JSON and single-line logs put thousands of `name: value`
+    // pairs on one line. A per-pair look back to the line start made that
+    // quadratic: 256 KiB took ~1.4 s optimized and over 50 s unoptimized
+    // (issue #989). Linear, it takes tens of milliseconds optimized and
+    // under a second unoptimized, so the budget below separates the two by
+    // a wide margin on either profile.
+    const DECLARED_MS: u128 = 500;
+    let _isolation = timed();
+
+    let minified_json = single_line(
+        "{\"items\":[",
+        |i| {
+            format!(
+                "{{\"id\":{i},\"status\":200,\"name\":\"item-{i}\",\"enabled\":true,\"tags\":[\"a\",\"b\"],\"url\":\"https://example.invalid/p/{i}\"}},"
+            )
+        },
+        "{}]}",
+    );
+    let dense_credential_names = single_line(
+        "{",
+        |i| format!("\"api_key\":\"SYNTHETICvalue{i:08}Xq9Zr7Lm\","),
+        "\"end\":1}",
+    );
+
+    for (id, input) in [
+        ("minified-json", minified_json),
+        ("dense-api-key-pairs", dense_credential_names),
+    ] {
+        assert!(!input.contains('\n'), "{id}: must be one line");
+        let started_at = Instant::now();
+        let (text, findings) = whole_input(&input);
+        let elapsed = started_at.elapsed().as_millis();
+        let budget = runtime_budget_ms(DECLARED_MS);
+        assert!(
+            elapsed <= budget,
+            "{id}: whole-input scan of {} bytes took {elapsed}ms, above the {budget}ms budget",
+            input.len(),
+        );
+        assert_eq!(whole_input(&input), (text, findings), "{id}: deterministic");
+    }
+}
+
 #[test]
 fn an_adversarial_input_above_a_session_limit_fails_safely_without_output() {
     let _isolation = untimed();
@@ -312,4 +369,66 @@ fn an_adversarial_input_above_a_session_limit_fails_safely_without_output() {
         "{}: a failed session must release nothing",
         fixture.id,
     );
+}
+
+/// Splits `input` into chunks of at least `bytes` bytes, each ending on a
+/// character boundary.
+fn chunked(input: &str, bytes: usize) -> Vec<&str> {
+    let mut chunks = Vec::new();
+    let mut cursor = 0;
+    while cursor < input.len() {
+        let mut end = (cursor + bytes).min(input.len());
+        while !input.is_char_boundary(end) {
+            end += 1;
+        }
+        chunks.push(&input[cursor..end]);
+        cursor = end;
+    }
+    chunks
+}
+
+#[test]
+fn whitespace_lines_after_an_open_assignment_stay_linear_in_a_session() {
+    // An open contextual assignment followed only by whitespace-only lines
+    // stays open, and every closed line asks again whether it is. Each ask
+    // used to renormalize the whole retained unit and scan back across every
+    // blank line, so the session cost grew with the square of the gap
+    // (issue #986: 40,000 eight-space lines took ~9s in a release build).
+    // Maintained incrementally it is a few tens of milliseconds, so the
+    // budget below is far above the linear cost and far below the quadratic.
+    const LINES: usize = 40_000;
+    const DECLARED_RUNTIME_MS: u128 = 500;
+    let _isolation = timed();
+
+    for (label, line) in [("blank", "\n"), ("eight-space", "        \n")] {
+        let mut input = String::from("API_KEY=\n");
+        input.push_str(&line.repeat(LINES));
+        let (expected_text, expected_findings) = whole_input(&input);
+        let limits = IncrementalLimits::new(
+            input.len(),
+            IncrementalLimits::minimum_buffered_bytes(input.len(), input.len()),
+            input.len(),
+            input.len(),
+        )
+        .unwrap();
+
+        for chunk_bytes in [64 * 1_024, 1_024] {
+            let chunks = chunked(&input, chunk_bytes);
+            let started_at = Instant::now();
+            let session = run_session(&chunks, limits);
+            let elapsed = started_at.elapsed().as_millis();
+
+            assert_eq!(session.text(), expected_text, "{label}/{chunk_bytes}: text");
+            assert_eq!(
+                session.findings(),
+                expected_findings,
+                "{label}/{chunk_bytes}: findings",
+            );
+            let budget = runtime_budget_ms(DECLARED_RUNTIME_MS);
+            assert!(
+                elapsed <= budget,
+                "{label} lines, {chunk_bytes}-byte chunks: session took {elapsed}ms, above the {budget}ms budget",
+            );
+        }
+    }
 }

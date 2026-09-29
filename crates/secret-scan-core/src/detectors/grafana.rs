@@ -46,6 +46,7 @@
 //! crate already makes.
 
 use crate::detectors::pattern::{self, is_alnum};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -76,10 +77,15 @@ impl Detector for GrafanaServiceAccountTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the prefix returns before the run-end tables are built
+        // (issue #982).
+        let Some(first) = pattern::find_literal(bytes, PREFIX, 0) else {
+            return Ok(Vec::new());
+        };
         let alnum_ends = pattern::run_ends(bytes, is_alnum);
         let hex_ends = pattern::run_ends(bytes, is_hex);
         let mut candidates = Vec::new();
-        let mut start = 0;
+        let mut start = first;
         while start < bytes.len() {
             if !bytes[start..].starts_with(PREFIX) {
                 start += 1;
@@ -132,6 +138,10 @@ fn match_at(bytes: &[u8], alnum_ends: &[usize], hex_ends: &[usize], start: usize
 
     Some(checksum_start + CHECKSUM_LEN)
 }
+
+/// The literals one of which every Grafana service-account candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Bytes(&[PREFIX])];
 
 #[cfg(test)]
 mod tests {

@@ -18,9 +18,12 @@
 //! (Supabase legacy-anon-JWT row) for the full rationale, including the accepted false-negative risk of
 //! trusting an unverified payload claim.
 
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
+/// The base64url encoding of `{"`, which every JWT header starts with.
+const HEADER_LEAD: &str = "eyJ";
 const MIN_SEGMENT_TAIL_LEN: usize = 5;
 const MIN_SIGNATURE_LEN: usize = 16;
 
@@ -183,8 +186,8 @@ impl Detector for JwtDetector {
         let mut candidates = Vec::new();
         let mut cursor = 0usize;
 
-        while cursor + 3 <= bytes.len() {
-            if &bytes[cursor..cursor + 3] != b"eyJ" {
+        while cursor + HEADER_LEAD.len() <= bytes.len() {
+            if &bytes[cursor..cursor + HEADER_LEAD.len()] != HEADER_LEAD.as_bytes() {
                 cursor += 1;
                 continue;
             }
@@ -222,6 +225,10 @@ impl Detector for JwtDetector {
 pub fn jwt_detector() -> Box<dyn Detector> {
     Box::new(JwtDetector)
 }
+
+/// The literals one of which every `jwt` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[HEADER_LEAD])];
 
 #[cfg(test)]
 mod tests {

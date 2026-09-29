@@ -15,6 +15,7 @@
 //! make a `ghs_` token far longer and JWT-shaped.
 
 use crate::detectors::pattern::{self, RunLength};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -165,6 +166,16 @@ fn exact_run(bytes: &[u8], start: usize, len: usize) -> bool {
         .get(start..start.saturating_add(len))
         .is_some_and(|run| run.iter().all(|&byte| pattern::is_alnum(byte)))
 }
+
+/// The literals one of which every `github-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// All three families: the classic `gh?_` prefixes, the installation
+/// prefix, and the fine-grained prefix.
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Prefixes(&CLASSIC_FAMILY_PREFIXES),
+    Literals::Strs(&[INSTALLATION_PREFIX, FINE_GRAINED_PREFIX]),
+];
 
 #[cfg(test)]
 mod tests {

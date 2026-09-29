@@ -412,16 +412,17 @@ pub(super) fn is_ruby_interpolation_reference(value: &str) -> bool {
     is_fully_delimited(value, "#{", "}")
 }
 
-/// opencode config substitution kinds resolved from the environment or a
-/// file at load time rather than containing a secret directly.
-pub(super) const OPENCODE_REFERENCE_KINDS: &[&str] = &["env", "file"];
+/// Openers of the opencode config substitutions, `{env:...}` and
+/// `{file:...}`, resolved from the environment or a file at load time rather
+/// than containing a secret directly. Static, so a check allocates nothing
+/// (issue #984).
+pub(super) const OPENCODE_REFERENCE_OPENERS: &[&str] = &["{env:", "{file:"];
 
 /// `true` for an opencode `{env:VAR}` or `{file:path}` substitution.
 pub(super) fn is_opencode_reference(value: &str) -> bool {
-    OPENCODE_REFERENCE_KINDS.iter().any(|kind| {
-        let open = format!("{{{kind}:");
-        is_fully_delimited(value, &open, "}")
-    })
+    OPENCODE_REFERENCE_OPENERS
+        .iter()
+        .any(|open| is_fully_delimited(value, open, "}"))
 }
 
 /// `true` for a bare shell or PowerShell environment-variable reference:

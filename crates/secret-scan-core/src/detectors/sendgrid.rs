@@ -9,6 +9,7 @@
 //! own multi-segment shape.
 
 use crate::detectors::pattern::{self, is_alnum_dash};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -32,9 +33,14 @@ impl Detector for SendgridTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the prefix returns before the run-end table is built
+        // (issue #982).
+        let Some(first) = pattern::find_literal(bytes, PREFIX, 0) else {
+            return Ok(Vec::new());
+        };
         let ends = pattern::run_ends(bytes, is_alnum_dash);
         let mut candidates = Vec::new();
-        let mut start = 0;
+        let mut start = first;
         while start < bytes.len() {
             if !bytes[start..].starts_with(PREFIX) {
                 start += 1;
@@ -86,6 +92,10 @@ fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
 
     Some(secret_start + SECRET_LEN)
 }
+
+/// The literals one of which every `sendgrid-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Bytes(&[PREFIX])];
 
 #[cfg(test)]
 mod tests {

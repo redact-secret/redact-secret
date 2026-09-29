@@ -140,6 +140,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` took quadratic time on long single-line input (#989), a
+  regression since 0.1.0-beta.10. The templated-lookup check added by #911
+  looked back to the start of the line for every `name: value` pair, so one
+  256 KiB line of minified JSON took about 2 s to scan (optimized, Apple M4)
+  and a line of dense `"api_key":"…"` pairs about 0.6 s. The check now runs
+  only for a pair that would otherwise be reported, and the open `{{ ... }}`
+  state is carried forward along the line, so the same inputs take about
+  20 ms and 29 ms. Findings and redacted output are unchanged.
 - The `common` WebAssembly profile linked every provider detector (#929).
   In the published 0.1.0-beta.10, `@redact-secret/wasm/common` (and so
   `@redact-secret/core/common` in a browser, and its Node fallback to
@@ -254,6 +262,15 @@ evidence is linked from each published version.
   part; a `|` right after a reviewed email label is now a field boundary.
   After any other text (`|emailx|…`, `|user|a|…`) the `|` stays part of the
   local part.
+- An incremental session took quadratic time on whitespace-only lines
+  after an open assignment or `Authorization` header (#986). Each closed
+  line renormalized the whole retained unit and scanned back across every
+  blank line to decide whether the construct was still open, so
+  `API_KEY=` followed by 40,000 lines of eight spaces took about 9 s in a
+  release build, and minutes fit inside the CLI's default 1 MiB token
+  limit. The session now keeps the scan copy as text arrives and re-checks
+  the open assignment only when a line with content closes; the same input
+  takes about 40 ms. Output is unchanged.
 
 ### Performance
 
@@ -283,6 +300,37 @@ evidence is linked from each published version.
   `latency/*/processing-ratio` rows are within budget (0.54-0.83 of beta.8;
   `browser-wasm` `scale-logs-small-whole` 1.23 against its 1.30 allowance).
   See `docs/audits/evidence/950/README.md`.
+- Detectors no longer allocate an 8-byte-per-input-byte run-length table on
+  every call (#982). Detectors anchored on a literal (`firebase`, `gitlab`
+  runner, `grafana`, `microsoft-entra`, `notion`, `openai`, `sendgrid`,
+  `sentry` org, `stripe` `whsec_`, `terraform`) build it only once the
+  literal occurs. Per-line run tokenizers (`confluent`, `datadog`, `heroku`,
+  `mailchimp`, `mailgun`, `new-relic`, `okta`, `pinecone`, `travisci`,
+  `twilio` and the keyword-gated keys) and `discord` and `telegram` measure
+  runs on demand without a table. A whole-input scan of 10 MiB of prose
+  allocated 1,952 MiB before and 32 MiB after. The #981 harness's 10 MiB
+  mixed workload runs about 22% faster whole-input and incremental.
+  Findings and output are unchanged. See `docs/audits/evidence/982/README.md`.
+- Built-in detectors that can only match text containing one of a few
+  literals (a provider prefix such as `ghp_`, a marker such as `.atlasv1.`)
+  are skipped when the scan copy cannot contain any of them (#983). The
+  pipeline builds one small set of the input's byte pairs per call. 75 of
+  the 92 `full` detectors and 4 of the 6 `common` ones declare their
+  literals. Custom detectors and the 17 built-ins that cannot declare one
+  (`generic-token`, `bearer-token`, the keyword-gated and bare-shape
+  detectors) always run. On the #981 harness the 64 KiB logs workload runs
+  43% faster whole-input and 48% faster incremental, on top of #982.
+  Findings and output are unchanged. See `docs/audits/evidence/983/README.md`.
+- An incremental session now detects all the lines that close in one
+  `append` call together, instead of running every detector once per line
+  (#985). Policy and redaction still run line by line, so text, findings,
+  ids, ranges, actions, errors, error order and callback calls are
+  unchanged. On the #981 harness the incremental path takes 35-41% less
+  time on logs and on a 10 MiB mixed workload (`scale-logs-256k` 31.7 ms to
+  19.8 ms). A line that a detector could read together with an earlier line
+  (after a lone `\r`, or one starting with `=`, `:` or `bearer`) starts a
+  new batch, and PII detection still runs per line. See
+  `docs/audits/evidence/985/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

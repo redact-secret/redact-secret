@@ -142,6 +142,7 @@
 //!   accepts.
 
 use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -154,6 +155,11 @@ const BODY_LEN: usize = 32;
 const TRIPLET_SEGMENTS: [usize; 3] = [32, 8, 8];
 /// `32 + 1 + 8 + 1 + 8`.
 const TRIPLET_LEN: usize = 50;
+/// A lowercase hex byte followed by `-`: the end of a triplet's first
+/// segment and its first separator, one per hex digit.
+const TRIPLET_SEPARATOR_PAIRS: [&str; 16] = [
+    "0-", "1-", "2-", "3-", "4-", "5-", "6-", "7-", "8-", "9-", "a-", "b-", "c-", "d-", "e-", "f-",
+];
 
 /// Mailgun's own product name, case-insensitively, the same substring
 /// gitleaks' independent `mailgun-private-api-token` and
@@ -262,7 +268,7 @@ impl Detector for MailgunApiKeyDetector {
 
             let bytes = line.as_bytes();
             let literal = KEY_LITERAL.as_bytes();
-            let ends = pattern::run_ends(bytes, pattern::is_lower_alnum);
+            let mut ends = pattern::RunCursor::new(bytes, pattern::is_lower_alnum);
             let mut pos = 0usize;
             while pos + literal.len() <= bytes.len() {
                 if &bytes[pos..pos + literal.len()] != literal {
@@ -270,7 +276,7 @@ impl Detector for MailgunApiKeyDetector {
                     continue;
                 }
                 let body_start = pos + literal.len();
-                let body_end = ends[body_start];
+                let body_end = ends.end(body_start);
                 if body_end - body_start == BODY_LEN
                     && pattern::boundary_ok(bytes, pos, body_end, BOUNDARY)
                     && !text::is_repeated_character_filler(&line[body_start..body_end])
@@ -286,14 +292,13 @@ impl Detector for MailgunApiKeyDetector {
                 pos += literal.len();
             }
 
-            let hex_or_dash = pattern::run_ends(bytes, pattern::is_hex_or_dash);
             let mut start = 0usize;
             while start < bytes.len() {
                 if !pattern::is_hex_or_dash(bytes[start]) {
                     start += 1;
                     continue;
                 }
-                let end = hex_or_dash[start];
+                let end = pattern::run_end(bytes, start, pattern::is_hex_or_dash);
                 if is_triplet(&bytes[start..end])
                     && pattern::boundary_ok(bytes, start, end, BOUNDARY)
                     && !text::is_non_credential_assignment(line, start)
@@ -312,6 +317,16 @@ impl Detector for MailgunApiKeyDetector {
         Ok(candidates)
     }
 }
+
+/// The literals one of which every `mailgun-api-key` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// The `key-` path, and for the hex-triplet path a lowercase hex byte
+/// followed by the `-` between its first two segments.
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Strs(&[KEY_LITERAL]),
+    Literals::Strs(&TRIPLET_SEPARATOR_PAIRS),
+];
 
 #[cfg(test)]
 mod tests {

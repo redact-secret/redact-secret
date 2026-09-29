@@ -26,6 +26,7 @@
 //! text without one.
 
 use crate::detectors::pattern;
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -85,9 +86,14 @@ impl Detector for MicrosoftEntraClientSecretDetector {
 /// namespace.
 fn scan(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
+    // Input without the anchor returns before the run-end table is built
+    // (issue #982).
+    let Some(first) = pattern::find_literal(bytes, ANCHOR.as_bytes(), 0) else {
+        return Vec::new();
+    };
     let ends = pattern::run_ends(bytes, is_secret_byte);
     let mut matches = Vec::new();
-    let mut anchor = 0;
+    let mut anchor = first;
     while anchor < bytes.len() {
         if !bytes[anchor..].starts_with(ANCHOR.as_bytes()) {
             anchor += 1;
@@ -131,6 +137,10 @@ fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize
     let end = suffix_start + available;
     pattern::boundary_ok(bytes, start, end, is_secret_byte).then_some((start, end))
 }
+
+/// The literals one of which every Entra client-secret candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[ANCHOR])];
 
 #[cfg(test)]
 mod tests {

@@ -168,14 +168,13 @@ fn legacy_candidates(input: &str) -> Vec<Candidate> {
     let mut line_start = 0usize;
     for line in input.split('\n') {
         let bytes = line.as_bytes();
-        let ends = pattern::run_ends(bytes, pattern::is_hex_or_dash);
         let mut start = 0usize;
         while start < bytes.len() {
             if !pattern::is_hex_or_dash(bytes[start]) {
                 start += 1;
                 continue;
             }
-            let end = ends[start];
+            let end = pattern::run_end(bytes, start, pattern::is_hex_or_dash);
             if is_legacy_uuid(&bytes[start..end])
                 && pattern::boundary_ok(bytes, start, end, is_token_char)
                 && assigned_key(bytes, start).is_some_and(|key| is_pinecone_key_name(key, line))
