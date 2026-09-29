@@ -77,6 +77,28 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `benchmarks/support-matrix.json` is regenerated in candidate mode for the
+  Beta.11 candidate: redact-secret-benchmarks develop `0ecd501` (#503),
+  classification `evidence/860/8b6a5fd/support-status-candidate-feed-safe.json`
+  of product `8b6a5fde` (the candidate artifacts of run `e795030e`, declared
+  0.1.0-beta.10), with trufflehog 3.97.4 and gitleaks 8.30.1. The matrix
+  covers 76 providers and 152 families: 105 stable (80 documented, 25
+  empirical, 0 policy-qualified), 20 provisional, 9 pending and 18
+  unsupported, and every shipped detector now has a status (22 had none).
+  Six families leave `stable` for `provisional`:
+  `anthropic:secret-api-key`, `azure-devops:personal-access-token`,
+  `confluent:cloud-api-secret-legacy`, `mailchimp:marketing-api-key`,
+  `slack:user-token` and `stripe:webhook-signing-secret`, on unresolved
+  peer-scanner disagreements and, for Slack, unreviewed mutation findings.
+  The same harness reads the published 0.1.0-beta.10 as provisional on all
+  six, so these are benchmark-side gates, not product regressions; each is
+  acknowledged in `benchmarks/support-matrix-drift-acknowledgements.json`.
+  The previous matrix was the 2026-09-25 measurement of 0.1.0-beta.7.
+  `benchmarks/support-matrix-schema.json` now pins benchmarks `main`
+  `7af585a` (the schema is unchanged at `0ecd501`), whose contract adds the
+  `policy-qualified` stable profile of T3 project-policy families; the docs
+  generator and drift gate read it, and the support matrix names the new
+  evaluator gates in plain words. The site feed is regenerated from it.
 - Opt-in PII support status (#901). Under `pii-v1`, the Beta.11
   qualification of candidate core `8b6a5fde` made `pii:global:network-address`,
   `pii:global:email`, `pii:global:payment-card`, `pii:global:iban`, and

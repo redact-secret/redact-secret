@@ -148,6 +148,11 @@ Complete for this product source:
 - The Beta.11 `pii-v1` qualification of core `8b6a5fde52ec`, byte-identical
   product source to this baseline
   ([final record](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/final-core-8b6a5fde.md)).
+- The support-matrix refresh: `benchmarks/support-matrix.json` is the
+  candidate-mode classification of `8b6a5fde` at redact-secret-benchmarks
+  `0ecd501fe661f5dd360e2c3c20f5cd97af6c1318`. Against `v0.1.0-beta.10` the
+  drift gate reports six regressions, each acknowledged because the same
+  harness reads published 0.1.0-beta.10 as provisional on those families too.
 
 Not complete, and required before release approval under
 [releasing](../releasing.md#qualify-without-publication):
@@ -158,11 +163,6 @@ Not complete, and required before release approval under
 - `Artifact qualification` and `Package Release Rehearsal` for the merged
   candidate SHA, including the artifact inventory that binds this document.
 - SAST as evidence for the frozen revision.
-- The support-matrix refresh. `benchmarks/support-matrix.json` is still the
-  2026-09-25 matrix measured on `0.1.0-beta.7`, identical to the copy in
-  `v0.1.0-beta.10`. The drift gate therefore reports no regression, but only
-  because nothing was re-measured; the 13 new detector families above have
-  no support status yet.
 
 Any source change after the reviewed baseline invalidates this compatibility
 review. Such a change needs a fresh review before release approval.
