@@ -96,12 +96,18 @@ const NON_CREDENTIAL_TOKEN_NAMES: &[&str] = &[
 /// `secretName` was never a credential name (it ends in `name`).
 const OBJECT_REFERENCE_SECRET_NAMES: &[&str] = &["existing_secret", "existing_secret_name"];
 
-/// Name segments that name a provider with its own built-in detector. A
-/// prefixed name carrying one (`MAILCHIMP_API_KEY`, `GITHUB_TOKEN`,
-/// `DD_API_KEY`) belongs to that detector's contract, which decides whether
-/// the value is a credential: a value it declines (a truncated or
-/// mis-delimited near miss) stays silent instead of being claimed by
-/// `generic-token` (issue #702).
+/// Name segments that name a provider with its own built-in detector
+/// (`MAILCHIMP_API_KEY`, `GITHUB_TOKEN`, `DD_API_KEY`).
+///
+/// Issue #702 made such a prefix disqualify every name, so the provider
+/// detector's contract alone decided and a value it declined got no finding.
+/// Since issue #948 a provider-prefixed *high-signal* name is claimed like a
+/// generic one ([`has_prefixed_credential_name`]): the provider detector
+/// still takes an on-grammar value through overlap resolution (provider
+/// specificity over contextual), and `generic-token` reports the value its
+/// grammar declines (format drift, a sibling key type, a truncated paste).
+/// A provider-prefixed *ambiguous* name (`GITHUB_CREDENTIALS`) still does
+/// not qualify.
 const DEDICATED_PROVIDER_SEGMENTS: &[&str] = &[
     "anthropic",
     "atlassian",
@@ -179,41 +185,64 @@ const NON_SECRET_NAME_LEADS: &[&str] = &[
     "publishable",
 ];
 
-/// `true` when a prefixed name's prefix may make it a generic contextual
-/// name: it names no provider with a dedicated detector and does not say the
-/// value is redacted, hashed or public.
-fn prefix_is_generic(normalized: &str) -> bool {
-    let mut segments = normalized.split('_');
-    let lead_is_non_secret = segments
+/// `true` when a prefixed name's first segment says the value is not the
+/// secret itself (`redacted_api_key`, `hashed_token`, `publishable_key`).
+fn prefix_says_not_secret(normalized: &str) -> bool {
+    normalized
+        .split('_')
         .next()
-        .is_some_and(|lead| NON_SECRET_NAME_LEADS.contains(&lead));
-    !lead_is_non_secret
-        && !normalized
-            .split('_')
-            .any(|segment| DEDICATED_PROVIDER_SEGMENTS.contains(&segment))
-        && !DEDICATED_PROVIDER_PHRASES
+        .is_some_and(|lead| NON_SECRET_NAME_LEADS.contains(&lead))
+}
+
+/// `true` when a name carries a provider with a dedicated detector
+/// ([`DEDICATED_PROVIDER_SEGMENTS`], [`DEDICATED_PROVIDER_PHRASES`]).
+fn names_dedicated_provider(normalized: &str) -> bool {
+    normalized
+        .split('_')
+        .any(|segment| DEDICATED_PROVIDER_SEGMENTS.contains(&segment))
+        || DEDICATED_PROVIDER_PHRASES
             .iter()
             .any(|phrase| normalized.contains(phrase))
 }
 
 /// `true` when `normalized` is `<prefix>_<name>` for one of `names`, with a
-/// non-empty [`prefix_is_generic`] prefix: `myapp_api_key`, `db_password`,
-/// `jwt_secret`.
-fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
+/// non-empty prefix. The prefix is not checked.
+fn ends_with_prefixed_name(normalized: &str, names: &[&str]) -> bool {
     names.iter().any(|name| {
         normalized.len() > name.len() + 1
             && normalized.ends_with(name)
             && normalized.as_bytes()[normalized.len() - name.len() - 1] == b'_'
-    }) && prefix_is_generic(normalized)
+    })
+}
+
+/// `true` when `normalized` is `<prefix>_<name>` for one of `names` and the
+/// prefix neither names a provider with a dedicated detector nor says the
+/// value is redacted, hashed or public: `app_credentials`. The ambiguous
+/// bucket's prefix rule.
+fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
+    ends_with_prefixed_name(normalized, names)
+        && !prefix_says_not_secret(normalized)
+        && !names_dedicated_provider(normalized)
+}
+
+/// `true` when `normalized` is `<prefix>_<name>` for one of `names` and the
+/// prefix does not say the value is redacted, hashed or public:
+/// `myapp_api_key`, `db_password`, `jwt_secret`, and since issue #948
+/// `openai_api_key` and `stripe_secret_key`. The high-signal bucket's prefix
+/// rule; see [`DEDICATED_PROVIDER_SEGMENTS`] for why a provider prefix
+/// qualifies here.
+fn has_prefixed_credential_name(normalized: &str, names: &[&str]) -> bool {
+    ends_with_prefixed_name(normalized, names) && !prefix_says_not_secret(normalized)
 }
 
 /// `true` for a high-signal name: one of [`HIGH_SIGNAL_NAMES`] or
 /// [`EXACT_HIGH_SIGNAL_NAMES`], the same
 /// name behind a generic prefix (`MYAPP_API_KEY`, `DB_PASSWORD`,
 /// `JWT_SECRET`), or a prefixed `_token` name outside
-/// [`NON_CREDENTIAL_TOKEN_NAMES`] (`CI_DEPLOY_TOKEN`). A prefix that names a
-/// provider with its own detector does not qualify; see
-/// [`prefix_is_generic`].
+/// [`NON_CREDENTIAL_TOKEN_NAMES`] (`CI_DEPLOY_TOKEN`). A prefix that says
+/// the value is not the secret does not qualify; a provider prefix does
+/// since issue #948 (`OPENAI_API_KEY`, `GITHUB_TOKEN`); see
+/// [`has_prefixed_credential_name`].
 ///
 /// Issue #702: before this, only the bare names matched, so a secret under a
 /// prefixed variable for a service with no dedicated detector got no finding
@@ -226,11 +255,11 @@ pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
     }
     HIGH_SIGNAL_NAMES.contains(&normalized)
         || EXACT_HIGH_SIGNAL_NAMES.contains(&normalized)
-        || has_prefixed_name(normalized, HIGH_SIGNAL_NAMES)
+        || has_prefixed_credential_name(normalized, HIGH_SIGNAL_NAMES)
         || (!AMBIGUOUS_NAMES.contains(&normalized)
-            && has_prefixed_name(normalized, &["token"])
+            && has_prefixed_credential_name(normalized, &["token"])
             && !NON_CREDENTIAL_TOKEN_NAMES.contains(&normalized)
-            && !has_prefixed_name(normalized, NON_CREDENTIAL_TOKEN_NAMES))
+            && !ends_with_prefixed_name(normalized, NON_CREDENTIAL_TOKEN_NAMES))
 }
 
 /// `true` for an [`OBJECT_REFERENCE_SECRET_NAMES`] name, bare or prefixed.
@@ -244,8 +273,8 @@ fn is_object_reference_secret_name(normalized: &str) -> bool {
 }
 
 /// `true` for an ambiguous name: one of [`AMBIGUOUS_NAMES`] or the same name
-/// behind a prefix (`GITHUB_CREDENTIALS`), when it is not already
-/// [`is_high_signal_name`].
+/// behind a generic prefix (`APP_CREDENTIALS`, not `GITHUB_CREDENTIALS`),
+/// when it is not already [`is_high_signal_name`].
 fn is_ambiguous_name(normalized: &str) -> bool {
     !is_high_signal_name(normalized) && is_ambiguous_vocabulary_name(normalized)
 }
@@ -3111,11 +3140,27 @@ mod tests {
         }
     }
 
-    // issue #702: a prefix that names a provider with its own detector hands
-    // the value to that detector's contract, and a lead that says the value
-    // is redacted, hashed or public is not a secret name.
+    // issue #702: a lead that says the value is redacted, hashed or public
+    // is not a secret name.
     #[test]
-    fn provider_named_and_non_secret_prefixes_are_not_generic_names() {
+    fn non_secret_prefixes_are_not_generic_names() {
+        for name in [
+            "redactedApiKey",
+            "hashed_token",
+            "publishable_key",
+            "masked_api_key",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    // issue #948: a provider prefix no longer hands a high-signal name to
+    // the provider detector alone. `generic-token` proposes the value like
+    // it does under `MYAPP_API_KEY`, and overlap resolution lets a provider
+    // finding on the same value win on specificity.
+    #[test]
+    fn provider_prefixed_high_signal_names_are_generic_names() {
         for name in [
             "POSTMAN_API_KEY",
             "GITHUB_TOKEN",
@@ -3124,11 +3169,82 @@ mod tests {
             "NEW_RELIC_API_KEY",
             "stripeSecretKey",
             "SLACK_BOT_TOKEN",
-            "redactedApiKey",
-            "hashed_token",
-            "publishable_key",
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "HUGGING_FACE_HUB_TOKEN",
+            "GITHUB_CLIENT_SECRET",
         ] {
             let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].type_name(), "contextual_secret", "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+            assert_eq!(
+                candidates[0].specificity(),
+                Some(Specificity::Contextual),
+                "{input}"
+            );
+        }
+    }
+
+    // issue #948: every prefix of the rule-2 list, one segment or a phrase,
+    // qualifies for the high-signal bucket and stays out of the ambiguous
+    // one; the retention hint and the ruleset reserved-name check follow.
+    #[test]
+    fn every_dedicated_provider_prefix_qualifies_for_high_signal_names() {
+        for prefix in DEDICATED_PROVIDER_SEGMENTS
+            .iter()
+            .chain(DEDICATED_PROVIDER_PHRASES)
+        {
+            for suffix in [
+                "api_key",
+                "token",
+                "secret_key",
+                "client_secret",
+                "password",
+            ] {
+                let name = format!("{prefix}_{suffix}");
+                assert!(is_high_signal_name(&name), "{name}");
+                assert!(is_reserved_name(&name), "{name}");
+                assert!(
+                    has_open_contextual_assignment(&format!("{name}=")),
+                    "{name}"
+                );
+            }
+            for suffix in [
+                "credentials",
+                "auth",
+                "signing_key",
+                "csrf_token",
+                "api_key_id",
+            ] {
+                let name = format!("{prefix}_{suffix}");
+                assert!(!is_high_signal_name(&name), "{name}");
+                assert!(!is_ambiguous_name(&name), "{name}");
+            }
+        }
+    }
+
+    // issue #948 keeps the provider exclusion for the ambiguous bucket and
+    // for the request-scoped `_token` names, and a provider-prefixed
+    // identifier sibling was never a credential name.
+    #[test]
+    fn provider_prefixed_ambiguous_request_scoped_and_identifier_names_stay_clean() {
+        for name in [
+            "GITHUB_CREDENTIALS",
+            "OKTA_AUTH",
+            "SLACK_SIGNING_KEY",
+            "GITHUB_CSRF_TOKEN",
+            "STRIPE_NEXT_PAGE_TOKEN",
+            "SLACK_DEVICE_TOKEN",
+            "OPENAI_API_KEY_ID",
+            "STRIPE_API_URL",
+            "TWILIO_ACCOUNT_SID",
+            "OPENAI_ORG_ID",
+            "redacted_openai_api_key",
+            "MASKED_STRIPE_SECRET_KEY",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE_9f3K");
             assert!(detect(&input).is_empty(), "{input}");
         }
     }

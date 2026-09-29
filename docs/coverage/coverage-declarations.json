@@ -1257,10 +1257,7 @@
             "openai-positive-namespace-separation-all-variants",
             "openai-positive-project",
             "openai-positive-punctuation-adjacent",
-            "openai-positive-repeated-value",
-            "openai-positive-shell-quoted",
-            "openai-positive-yaml",
-            "openai-positive-yaml-crlf"
+            "openai-positive-repeated-value"
           ],
           "state": "supported"
         },
@@ -1280,7 +1277,6 @@
             "openai-negative-marker-lowercase",
             "openai-negative-marker-markdown",
             "openai-negative-marker-near-prefix-underscore",
-            "openai-negative-marker-shell-quoted",
             "openai-negative-model-name",
             "openai-negative-near-prefix-underscore",
             "openai-negative-placeholder"
@@ -1319,10 +1315,7 @@
             "openai-positive-namespace-separation-all-variants",
             "openai-positive-project",
             "openai-positive-punctuation-adjacent",
-            "openai-positive-repeated-value",
-            "openai-positive-shell-quoted",
-            "openai-positive-yaml",
-            "openai-positive-yaml-crlf"
+            "openai-positive-repeated-value"
           ],
           "state": "supported"
         },
@@ -1414,10 +1407,7 @@
             "openai-positive-namespace-separation-all-variants",
             "openai-positive-project",
             "openai-positive-punctuation-adjacent",
-            "openai-positive-repeated-value",
-            "openai-positive-shell-quoted",
-            "openai-positive-yaml",
-            "openai-positive-yaml-crlf"
+            "openai-positive-repeated-value"
           ],
           "state": "supported"
         },
@@ -1437,7 +1427,6 @@
             "openai-negative-marker-lowercase",
             "openai-negative-marker-markdown",
             "openai-negative-marker-near-prefix-underscore",
-            "openai-negative-marker-shell-quoted",
             "openai-negative-model-name",
             "openai-negative-near-prefix-underscore",
             "openai-negative-placeholder"
@@ -1476,10 +1465,7 @@
             "openai-positive-namespace-separation-all-variants",
             "openai-positive-project",
             "openai-positive-punctuation-adjacent",
-            "openai-positive-repeated-value",
-            "openai-positive-shell-quoted",
-            "openai-positive-yaml",
-            "openai-positive-yaml-crlf"
+            "openai-positive-repeated-value"
           ],
           "state": "supported"
         },
@@ -2279,9 +2265,6 @@
             "slack-positive-punctuation-adjacent",
             "slack-positive-qualified",
             "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf",
             "slack-user-token-boundary-dash-in-secret",
             "slack-user-token-boundary-empty-secret",
             "slack-user-token-boundary-letter-in-numeric-section",
@@ -2295,8 +2278,6 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "slack-negative-app-level-embedded-in-wider-identifier",
-            "slack-negative-bot-grammar-dotenv",
-            "slack-negative-bot-grammar-toml",
             "slack-negative-embedded-in-wider-identifier",
             "slack-negative-lookalike",
             "slack-negative-ordinary-reference",
@@ -2348,9 +2329,6 @@
             "slack-positive-punctuation-adjacent",
             "slack-positive-qualified",
             "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf",
             "slack-user-token-boundary-dash-in-secret",
             "slack-user-token-boundary-empty-secret",
             "slack-user-token-boundary-letter-in-numeric-section",
@@ -2463,9 +2441,6 @@
             "slack-positive-punctuation-adjacent",
             "slack-positive-qualified",
             "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf",
             "slack-user-token-boundary-dash-in-secret",
             "slack-user-token-boundary-empty-secret",
             "slack-user-token-boundary-letter-in-numeric-section",
@@ -2479,8 +2454,6 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "slack-negative-app-level-embedded-in-wider-identifier",
-            "slack-negative-bot-grammar-dotenv",
-            "slack-negative-bot-grammar-toml",
             "slack-negative-embedded-in-wider-identifier",
             "slack-negative-lookalike",
             "slack-negative-ordinary-reference",
@@ -2532,9 +2505,6 @@
             "slack-positive-punctuation-adjacent",
             "slack-positive-qualified",
             "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf",
             "slack-user-token-boundary-dash-in-secret",
             "slack-user-token-boundary-empty-secret",
             "slack-user-token-boundary-letter-in-numeric-section",
@@ -2647,9 +2617,6 @@
             "slack-positive-punctuation-adjacent",
             "slack-positive-qualified",
             "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf",
             "slack-user-token-boundary-dash-in-secret",
             "slack-user-token-boundary-empty-secret",
             "slack-user-token-boundary-letter-in-numeric-section",
@@ -2663,8 +2630,6 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "slack-negative-app-level-embedded-in-wider-identifier",
-            "slack-negative-bot-grammar-dotenv",
-            "slack-negative-bot-grammar-toml",
             "slack-negative-embedded-in-wider-identifier",
             "slack-negative-lookalike",
             "slack-negative-ordinary-reference",
@@ -2716,9 +2681,6 @@
             "slack-positive-punctuation-adjacent",
             "slack-positive-qualified",
             "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf",
             "slack-user-token-boundary-dash-in-secret",
             "slack-user-token-boundary-empty-secret",
             "slack-user-token-boundary-letter-in-numeric-section",
@@ -2916,19 +2878,14 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "huggingface-negative-dotenv",
             "huggingface-negative-embedded-in-wider-identifier",
-            "huggingface-negative-json",
             "huggingface-negative-log",
             "huggingface-negative-lookalike",
             "huggingface-negative-markdown-delimiter",
             "huggingface-negative-model-repository-name",
             "huggingface-negative-ordinary-reference",
             "huggingface-negative-percent-encoded-lookalike",
-            "huggingface-negative-placeholder",
-            "huggingface-negative-shell-quoted",
-            "huggingface-negative-toml",
-            "huggingface-negative-yaml"
+            "huggingface-negative-placeholder"
           ],
           "state": "supported"
         },
@@ -3059,10 +3016,8 @@
             "docker-negative-interpolated-secret-prefix",
             "docker-negative-lookalike",
             "docker-negative-masked-secret-prefix",
-            "docker-negative-oat-one-short-json",
             "docker-negative-oat-one-short-unicode-crlf",
             "docker-negative-ordinary-reference",
-            "docker-negative-pat-one-short-dotenv",
             "docker-negative-pat-one-short-unicode-crlf",
             "docker-negative-placeholder",
             "docker-negative-registry-image-reference"
@@ -3191,14 +3146,9 @@
             "cloudflare-negative-masked-secret-prefix",
             "cloudflare-negative-ordinary-reference",
             "cloudflare-negative-placeholder",
-            "cloudflare-negative-shell-quoted",
-            "cloudflare-negative-toml",
             "cloudflare-negative-truncated-prefix",
             "cloudflare-negative-zone-resource-id",
-            "cloudflare-paired-dotenv-malformed-body-short",
-            "cloudflare-paired-json-malformed-checksum-nonhex",
-            "cloudflare-paired-log-malformed-body-long",
-            "cloudflare-paired-yaml-malformed-checksum-uppercase"
+            "cloudflare-paired-log-malformed-body-long"
           ],
           "state": "supported"
         },
@@ -3327,7 +3277,6 @@
           "evidenceFixtureIds": [
             "digitalocean-negative-dash-embedding",
             "digitalocean-negative-doc-style-placeholder",
-            "digitalocean-negative-dotenv-length-twin",
             "digitalocean-negative-embedded-in-wider-identifier",
             "digitalocean-negative-interpolated-secret-prefix",
             "digitalocean-negative-invalid-alphabet-json",
@@ -3460,18 +3409,14 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "linear-boundary-undocumented-segment-scim",
-            "linear-negative-dotenv",
             "linear-negative-embedded-in-wider-identifier",
             "linear-negative-issue-identifier",
             "linear-negative-lookalike",
             "linear-negative-ordinary-reference",
             "linear-negative-percent-encoded-lookalike",
             "linear-negative-placeholder",
-            "linear-negative-toml",
             "linear-paired-log-malformed-underscore-in-body",
-            "linear-paired-markdown-malformed-dash-in-body",
-            "linear-paired-shell-malformed-one-long",
-            "linear-paired-yaml-malformed-invalid-alphabet"
+            "linear-paired-markdown-malformed-dash-in-body"
           ],
           "state": "supported"
         },
@@ -3566,10 +3511,7 @@
             "supabase-boundary-case-sensitivity",
             "supabase-boundary-delimiter",
             "supabase-boundary-invalid-alphabet",
-            "supabase-boundary-short",
-            "supabase-token-negative-checksum-9",
-            "supabase-token-negative-dash-delimiter",
-            "supabase-token-negative-random-part-21"
+            "supabase-boundary-short"
           ],
           "state": "supported"
         },
@@ -4444,7 +4386,6 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "atlassian-api-token-negative-legacy-unprefixed",
             "atlassian-api-token-negative-masked",
             "atlassian-api-token-negative-placeholder",
             "atlassian-api-token-negative-public-cloud-id",
@@ -6099,8 +6040,8 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "datadog-api-key-boundary-key-record-id",
-            "datadog-api-key-boundary-wrong-length"
+            "datadog-api-key-boundary-key-record-id-keyword-context",
+            "datadog-api-key-boundary-wrong-length-keyword-context"
           ],
           "state": "supported"
         },
@@ -6119,8 +6060,8 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "datadog-api-key-boundary-key-record-id",
-            "datadog-api-key-boundary-wrong-length"
+            "datadog-api-key-boundary-key-record-id-keyword-context",
+            "datadog-api-key-boundary-wrong-length-keyword-context"
           ],
           "state": "supported"
         },
@@ -7949,7 +7890,6 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "fireworks-ai-api-key-negative-embedded-in-wider-identifier",
-            "fireworks-ai-api-key-negative-fire-pass-prefix",
             "fireworks-ai-api-key-negative-github-actions-secret-reference",
             "fireworks-ai-api-key-negative-identifier-names",
             "fireworks-ai-api-key-negative-keychain-reference",
@@ -8700,9 +8640,6 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "confluent-cloud-api-secret-negative-checksum-big-endian",
-            "confluent-cloud-api-secret-negative-checksum-mismatch",
-            "confluent-cloud-api-secret-negative-checksum-prefix-included",
             "confluent-cloud-api-secret-negative-cluster-and-host-context",
             "confluent-cloud-api-secret-negative-doc-style-placeholder",
             "confluent-cloud-api-secret-negative-embedded-identifier",
@@ -8881,7 +8818,6 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "netlify-negative-dotenv",
             "netlify-negative-embedded-in-wider-identifier",
             "netlify-negative-legacy-unprefixed",
             "netlify-negative-lookalike",
@@ -8969,9 +8905,7 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "neon-api-key-boundary-dash-in-body",
-            "neon-api-key-boundary-embedded-in-identifier",
-            "neon-api-key-boundary-one-short"
+            "neon-api-key-boundary-embedded-in-identifier"
           ],
           "state": "supported"
         },
@@ -8990,9 +8924,7 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "neon-api-key-boundary-dash-in-body",
-            "neon-api-key-boundary-embedded-in-identifier",
-            "neon-api-key-boundary-one-short"
+            "neon-api-key-boundary-embedded-in-identifier"
           ],
           "state": "supported"
         },
@@ -9481,8 +9413,6 @@
             "heroku-api-key-negative-embedded-in-wider-identifier",
             "heroku-api-key-negative-env-var-reference",
             "heroku-api-key-negative-github-actions-secret-reference",
-            "heroku-api-key-negative-hrku-underscore-separator",
-            "heroku-api-key-negative-hrku-uuid-one-short",
             "heroku-api-key-negative-masked"
           ],
           "state": "supported"
@@ -9652,8 +9582,6 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "travisci-api-token-boundary-one-long",
-            "travisci-api-token-boundary-one-short",
             "travisci-api-token-boundary-underscore-embedded"
           ],
           "state": "supported"
@@ -9673,8 +9601,6 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "travisci-api-token-boundary-one-long",
-            "travisci-api-token-boundary-one-short",
             "travisci-api-token-boundary-underscore-embedded"
           ],
           "state": "supported"

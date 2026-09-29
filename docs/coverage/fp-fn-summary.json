@@ -170,7 +170,7 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 15,
+        "count": 10,
         "fixtureIds": [
           "cloudflare-negative-embedded-in-wider-identifier",
           "cloudflare-negative-interpolated-secret-prefix",
@@ -179,14 +179,9 @@
           "cloudflare-negative-masked-secret-prefix",
           "cloudflare-negative-ordinary-reference",
           "cloudflare-negative-placeholder",
-          "cloudflare-negative-shell-quoted",
-          "cloudflare-negative-toml",
           "cloudflare-negative-truncated-prefix",
           "cloudflare-negative-zone-resource-id",
-          "cloudflare-paired-dotenv-malformed-body-short",
-          "cloudflare-paired-json-malformed-checksum-nonhex",
-          "cloudflare-paired-log-malformed-body-long",
-          "cloudflare-paired-yaml-malformed-checksum-uppercase"
+          "cloudflare-paired-log-malformed-body-long"
         ]
       },
       "hostContextsExercised": [
@@ -344,11 +339,10 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 22,
+        "count": 21,
         "fixtureIds": [
           "digitalocean-negative-dash-embedding",
           "digitalocean-negative-doc-style-placeholder",
-          "digitalocean-negative-dotenv-length-twin",
           "digitalocean-negative-embedded-in-wider-identifier",
           "digitalocean-negative-interpolated-secret-prefix",
           "digitalocean-negative-invalid-alphabet-json",
@@ -413,16 +407,14 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 11,
+        "count": 9,
         "fixtureIds": [
           "docker-negative-embedded-in-wider-identifier",
           "docker-negative-interpolated-secret-prefix",
           "docker-negative-lookalike",
           "docker-negative-masked-secret-prefix",
-          "docker-negative-oat-one-short-json",
           "docker-negative-oat-one-short-unicode-crlf",
           "docker-negative-ordinary-reference",
-          "docker-negative-pat-one-short-dotenv",
           "docker-negative-pat-one-short-unicode-crlf",
           "docker-negative-placeholder",
           "docker-negative-registry-image-reference"
@@ -514,7 +506,7 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 17,
+        "count": 16,
         "fixtureIds": [
           "openai-negative-368-proj-plain-twin",
           "openai-negative-368-proj-unicode-crlf-twin",
@@ -529,7 +521,6 @@
           "openai-negative-marker-lowercase",
           "openai-negative-marker-markdown",
           "openai-negative-marker-near-prefix-underscore",
-          "openai-negative-marker-shell-quoted",
           "openai-negative-model-name",
           "openai-negative-near-prefix-underscore",
           "openai-negative-placeholder"
