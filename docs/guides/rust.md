@@ -115,8 +115,10 @@ legacy credential-only registry byte for byte. `pii` or `pii:global` activates
 `pii:family:global:*` selector activates
 only its family. `pii:us` closes over those global families plus `pii:us:ssn`,
 while `pii:family:us:ssn` selects only SSNs. They share one
-`pii-domain` adapter, require reviewed high-signal context, and remain
-`pending` until exact-artifact benchmark evidence is reviewed. Known
+`pii-domain` adapter and require reviewed high-signal context.
+Under `pii-v1`, the five global families are `provisional` (not `stable`;
+phone covers `+1` / NANP only) and US SSN is `pending`; see
+[detection](../reference/detection.md#opt-in-pii-availability-is-not-support). Known
 unavailable families or jurisdictions fail closed; see the
 [email contract](../contracts/pii/email-v1.md) and
 [IBAN contract](../contracts/pii/iban-v1.md),

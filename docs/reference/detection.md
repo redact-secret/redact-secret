@@ -41,8 +41,32 @@ That is all activation means. Qualified support is a separate `pii-v1` status
 of `pending`, `provisional`, or `stable`, and only exact-artifact benchmark
 evidence under the
 [`pii-v1` qualification profile](../decisions/2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md)
-can move a family past `pending`. All six families below are `pending` today;
-none is `provisional` or `stable`. Each family's beta.11 disposition is recorded
+can move a family past `pending`.
+
+The Beta.11 qualification measured candidate core
+`8b6a5fde52ecb4dfce13f09c7a947062d21483c7`
+([final record](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/final-core-8b6a5fde.md),
+[protected disposition](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/core-8b6a5fde52ec/pii-beta11-protected-disposition-v2.json)):
+
+| Family | Selectors | Jurisdiction | `pii-v1` status |
+| --- | --- | --- | --- |
+| `pii:global:network-address` | `pii`, `pii:global`, `pii:us`, `pii:family:global:network-address` | global | `provisional` |
+| `pii:global:email` | `pii`, `pii:global`, `pii:us`, `pii:family:global:email` | global | `provisional` |
+| `pii:global:payment-card` | `pii`, `pii:global`, `pii:us`, `pii:family:global:payment-card` | global | `provisional` |
+| `pii:global:iban` | `pii`, `pii:global`, `pii:us`, `pii:family:global:iban` | global | `provisional` |
+| `pii:global:phone` | `pii`, `pii:global`, `pii:us`, `pii:family:global:phone` | global selector, `+1` / NANP numbers only | `provisional` |
+| `pii:us:ssn` | `pii:us`, `pii:family:us:ssn` | United States only | `pending` |
+
+`provisional` is not `stable`, and no family is `stable`. The five
+`provisional` families met every public gate and their one sealed
+protected-partition run. Their `profile-cost` gate counts as met only through
+a maintainer-accepted tradeoff for the PII-on cost cells
+([acceptance ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/benchmarks/accepted-pii-profile-cost.json)), accepted because PII is opt-in, and this
+qualification route never assigns `stable`. US SSN stays `pending`: its
+protected run missed the `identity-only-classification` gate (one of two
+identity-only comparisons disagreed on sensitivity), and its single attempt is
+spent. Each status covers only the family's frozen contract below, and PII
+stays off unless a selector activates it. Each family's disposition is tracked
 in
 [redact-secret-benchmarks#428](https://github.com/redact-secret/redact-secret-benchmarks/issues/428).
 
@@ -65,8 +89,8 @@ whole RFC-reserved/documentation domain or a named example/documentation
 context makes the occurrence non-sensitive. It does not implement quoted
 local parts, comments, folding, domain literals, ordinary single-label domains,
 or deliverability checks. Exact RFC 6761 single-label names are admitted only
-as non-sensitive controls. The family is `pending` until exact-artifact
-`pii-v1` benchmark evidence is reviewed.
+as non-sensitive controls. The family is `provisional` under `pii-v1`, not
+`stable`.
 
 ### Opt-in payment-card PII
 
@@ -78,8 +102,8 @@ limited to one separator kind in `4-4-4-4` or `4-6-5` layout. Exact published
 Visa Acceptance test-service numbers are whole-value non-sensitive controls.
 The [payment-card family contract](../contracts/pii/payment-card-v1.md) freezes
 the full ranges, context, exact spans, exclusions, and accepted false-positive
-and false-negative costs. The family is `pending` until exact-artifact `pii-v1`
-benchmark evidence is reviewed.
+and false-negative costs. The family is `provisional` under `pii-v1`, not
+`stable`.
 
 ### Opt-in phone PII
 
@@ -92,8 +116,8 @@ ambiguous `contact` / `연락처` labels do not produce findings. Exact
 whole-candidate `555-0100` through `555-0199` exchange/line controls are
 non-sensitive. Other country codes, including `+82`, URI/vanity forms, broad
 separator variants, allocation and activity checks, and locale guessing are
-unsupported. The family remains `pending` until exact-artifact `pii-v1`
-benchmark evidence is reviewed.
+unsupported. The family is `provisional` under `pii-v1`, not `stable`; the
+status covers only `+1` / NANP numbers.
 
 ### Opt-in US SSN PII
 
@@ -106,7 +130,9 @@ high-group allocation, or identity. Reviewed English or Korean SSN field
 context is required for sensitivity; generic identifier and number labels do
 not qualify. The [US SSN family contract](../contracts/pii/us-ssn-v1.md)
 freezes grammar, boundaries, sources, safe fixtures, and tradeoffs. The family
-remains `pending` until exact-artifact `pii-v1` benchmark evidence is reviewed.
+remains `pending` under `pii-v1`: its Beta.11 protected run did not meet
+`identity-only-classification`. It is available when selected but not
+qualified.
 
 ### Opt-in IBAN PII
 
@@ -118,8 +144,7 @@ no context stays identity-only. Lowercase, tabs, hyphens, repeated or
 non-breaking spaces, mixed grouping, and unknown or wrong country lengths are
 excluded. It does not look up banks, account ownership, or account status. The
 [IBAN family contract](../contracts/pii/iban-v1.md) freezes the rest. The
-family remains `pending` until exact-artifact `pii-v1` benchmark evidence is
-reviewed.
+family is `provisional` under `pii-v1`, not `stable`.
 
 ### Opt-in network-address PII
 
@@ -132,8 +157,7 @@ loopback, multicast, and broadcast) are non-sensitive; being private or
 special-purpose alone does not make an address non-sensitive. The frozen
 contract is the
 [network-address evidence record](../audits/evidence/875/README.md). The
-family remains `pending` until exact-artifact `pii-v1` benchmark evidence is
-reviewed.
+family is `provisional` under `pii-v1`, not `stable`.
 
 ### Policy-qualified generic credentials
 
