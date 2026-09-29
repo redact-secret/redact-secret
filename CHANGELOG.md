@@ -22,6 +22,8 @@ evidence is linked from each published version.
   - `browserbase-api-key` (#973): Browserbase `bb_live_` + 20–128
     alphanumeric API keys (`browserbase_api_key`), the provider's own
     open-ended rule with a cap.
+  - `runpod-api-key` (#974): RunPod `rpa_` + 31–128 alphanumeric API keys
+    (`runpod_api_key`), with a policy floor above Redirect.pizza's width.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

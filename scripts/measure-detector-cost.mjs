@@ -88,6 +88,7 @@ export const CANONICAL_IDS = [
   "clickhouse-cloud-api-secret",
   "nvidia-api-key",
   "browserbase-api-key",
+  "runpod-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -120,6 +121,7 @@ export const GROUPS = {
     "onepassword-service-account-token",
     "daytona-api-key",
     "clickhouse-cloud-api-secret",
+    "runpod-api-key",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",

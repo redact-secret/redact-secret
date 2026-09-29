@@ -869,6 +869,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0062b_live_SyntheticRevokedBrowserbaseKey0000",
       "schemes": null
+    },
+    {
+      "type": "runpod_api_key",
+      "detector": "runpod-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0072pa_SyntheticRevokedRunpodApiKey00000000",
+      "schemes": null
     }
   ],
   "consumers": [

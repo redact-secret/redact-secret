@@ -1147,3 +1147,116 @@ mod browserbase {
         assert_partition_parity(&key(32, 8));
     }
 }
+
+mod runpod {
+    use super::*;
+
+    const DETECTOR: &str = "runpod-api-key";
+    const TYPE: &str = "runpod_api_key";
+
+    fn key(len: usize, seed: usize) -> String {
+        format!("rpa_{}", filler(ALNUM, len, seed))
+    }
+
+    #[test]
+    fn every_width_wins_every_context_as_the_sole_finding() {
+        // The observed 40-uppercase plus 6-mixed layout is not part of the
+        // contract, and neither is its absence.
+        let layout = format!("rpa_{}{}", "ABCDEFGHIJ".repeat(4), filler(ALNUM, 6, 3));
+        for key in [key(31, 1), key(46, 2), key(128, 3), layout] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &key);
+            for input in [
+                format!("RUNPOD_API_KEY={key}\n"),
+                format!("runpod.api_key = \"{key}\"\n"),
+                format!("runpodctl config --apiKey {key}\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"runpod\":{{\"env\":{{\"RUNPOD_API_KEY\":\"{key}\"}}}}}}}}"
+                ),
+                format!("curl -H \"Authorization: Bearer {key}\" https://rest.runpod.io/v1/pods\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 46, 4);
+        let base = format!("rpa_{body}");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                // 30 is the Redirect.pizza width, below the policy floor.
+                key(30, 4),
+                key(129, 4),
+                format!("{base}_"),
+                format!("{base}-"),
+                format!("{base}_x"),
+                format!("{base}-1"),
+                format!("RPA_{body}"),
+                format!("rpa-{body}"),
+                format!("xrpa_{body}"),
+                format!("_{base}"),
+                format!("-{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            format!("REDIRECT_PIZZA_TOKEN={}\n", key(30, 5)),
+            "RUNPOD_API_KEY=rpa_...\n".to_owned(),
+            "RUNPOD_API_KEY=rpa_xxxx\n".to_owned(),
+            "RUNPOD_API_KEY=rpa_your_key\n".to_owned(),
+            "RUNPOD_API_KEY=rpa_your_runpod_api_key_goes_here_SyntheticRevoked\n".to_owned(),
+            format!("AWS_SECRET_ACCESS_KEY=rps_{}\n", filler(ALNUM, 40, 6)),
+            "RUNPOD_API_KEY=${{ secrets.RUNPOD_API_KEY }}\n".to_owned(),
+            "the prefix is rpa_\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_stays_unclaimed_and_each_family_keeps_its_own_finding() {
+        let jwt = "eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE";
+        assert_unclaimed(DETECTOR, &format!("RUNPOD_API_KEY={jwt}\n"));
+        let runpod = key(46, 6);
+        let browserbase = format!("bb_live_{}", filler(ALNUM, 32, 6));
+        let nvidia = format!("nvapi-{}", filler(ALNUM, 64, 6));
+        let (_, findings) = whole_input(&format!("{runpod} {browserbase} {nvidia}\n"));
+        for detector in [DETECTOR, "browserbase-api-key", "nvidia-api-key"] {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+        }
+        assert_eq!(findings.len(), 3, "{findings:?}");
+        for other in [&browserbase, &nvidia] {
+            assert_unclaimed(DETECTOR, &format!("{other}\n"));
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        for input in [
+            "rpa_".repeat(20_000),
+            format!("rpa_{}", "aB3".repeat(7_000)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+        let key = key(46, 7);
+        let line = format!("{key} ").repeat(200);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 200);
+        assert_eq!(findings.len(), 200, "{findings:?}");
+        assert!(!text.contains(&key));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&key(46, 8));
+    }
+}

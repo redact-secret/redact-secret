@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 120/120 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 121/121 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 120 |
+| supported | 121 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 131.
+Coverage declarations: 132.
 
 ## Coverage by detector
 
@@ -101,6 +101,7 @@ Coverage declarations: 131.
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| runpod-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -221,6 +222,7 @@ Coverage declarations: 131.
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | resend_api_key | resend-api-key | provider | supported | not-applicable | none |
+| runpod_api_key | runpod-api-key | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
 | sentry_user_auth_token | sentry-user-auth-token | provider | supported | not-applicable | none |
@@ -271,15 +273,15 @@ Coverage declarations: 131.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 131 | 0 | 0 |
-| boundary | 120 | 0 | 0 |
-| host-context | 120 | 0 | 0 |
+| adversarial | 132 | 0 | 0 |
+| boundary | 121 | 0 | 0 |
+| host-context | 121 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 131 | 0 | 0 |
-| near-miss-negative | 120 | 0 | 0 |
-| overlap | 120 | 0 | 0 |
-| positive | 120 | 0 | 0 |
-| range | 131 | 0 | 0 |
+| malformed | 132 | 0 | 0 |
+| near-miss-negative | 121 | 0 | 0 |
+| overlap | 121 | 0 | 0 |
+| positive | 121 | 0 | 0 |
+| range | 132 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

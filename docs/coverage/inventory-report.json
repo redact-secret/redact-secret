@@ -5436,12 +5436,69 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "browserbase_api_key"
+    },
+    {
+      "detector": "runpod-api-key",
+      "evidence": {
+        "fixtureCount": 45,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "runpod-api-key-positive-bare",
+        "runpod-api-key-positive-body-46-layout",
+        "runpod-api-key-positive-body-46-layout-dotenv",
+        "runpod-api-key-positive-body-cap",
+        "runpod-api-key-positive-body-cap-dotenv",
+        "runpod-api-key-positive-body-floor",
+        "runpod-api-key-positive-body-floor-dotenv",
+        "runpod-api-key-positive-chat-sentence",
+        "runpod-api-key-positive-crlf-unicode-prefix",
+        "runpod-api-key-positive-curl-bearer",
+        "runpod-api-key-positive-dotenv",
+        "runpod-api-key-positive-json-config",
+        "runpod-api-key-positive-json-token-key",
+        "runpod-api-key-positive-log",
+        "runpod-api-key-positive-mcp-env-block",
+        "runpod-api-key-positive-punctuation-adjacent",
+        "runpod-api-key-positive-repeated-value",
+        "runpod-api-key-positive-runpodctl-config",
+        "runpod-api-key-positive-sdk-call",
+        "runpod-api-key-positive-shell-export",
+        "runpod-api-key-positive-tool-call-arguments",
+        "runpod-api-key-positive-x-api-key-header",
+        "runpod-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "runpod_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 120,
+    "supported": 121,
     "unresolved": 0
   }
 }

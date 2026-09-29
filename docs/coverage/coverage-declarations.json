@@ -13112,6 +13112,130 @@
       "type": "browserbase_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "runpod-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "runpod-api-key-positive-bare",
+            "runpod-api-key-positive-body-46-layout",
+            "runpod-api-key-positive-body-46-layout-dotenv",
+            "runpod-api-key-positive-body-cap",
+            "runpod-api-key-positive-body-cap-dotenv",
+            "runpod-api-key-positive-body-floor",
+            "runpod-api-key-positive-body-floor-dotenv",
+            "runpod-api-key-positive-chat-sentence",
+            "runpod-api-key-positive-crlf-unicode-prefix",
+            "runpod-api-key-positive-curl-bearer",
+            "runpod-api-key-positive-dotenv",
+            "runpod-api-key-positive-json-config",
+            "runpod-api-key-positive-json-token-key",
+            "runpod-api-key-positive-log",
+            "runpod-api-key-positive-mcp-env-block",
+            "runpod-api-key-positive-punctuation-adjacent",
+            "runpod-api-key-positive-repeated-value",
+            "runpod-api-key-positive-runpodctl-config",
+            "runpod-api-key-positive-sdk-call",
+            "runpod-api-key-positive-shell-export",
+            "runpod-api-key-positive-tool-call-arguments",
+            "runpod-api-key-positive-x-api-key-header",
+            "runpod-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "runpod-api-key-overlap-bearer-header",
+            "runpod-api-key-overlap-body-46-layout-bearer",
+            "runpod-api-key-overlap-body-cap-bearer",
+            "runpod-api-key-overlap-body-floor-bearer",
+            "runpod-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "runpod-api-key-adversarial-long-body-run",
+            "runpod-api-key-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "runpod-api-key-boundary-body-129",
+            "runpod-api-key-boundary-body-30-redirect-pizza-width",
+            "runpod-api-key-boundary-dash-glued-prefix",
+            "runpod-api-key-boundary-dash-prefix",
+            "runpod-api-key-boundary-glued-dash",
+            "runpod-api-key-boundary-glued-prefix",
+            "runpod-api-key-boundary-glued-underscore",
+            "runpod-api-key-boundary-underscore-glued-prefix",
+            "runpod-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "runpod-api-key-negative-ci-secret-reference",
+            "runpod-api-key-negative-placeholders",
+            "runpod-api-key-negative-prefix-only",
+            "runpod-api-key-negative-redirect-pizza-token",
+            "runpod-api-key-negative-s3-secret",
+            "runpod-api-key-negative-word-fixture"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "runpod-api-key-boundary-body-129",
+            "runpod-api-key-boundary-body-30-redirect-pizza-width",
+            "runpod-api-key-boundary-dash-glued-prefix",
+            "runpod-api-key-boundary-dash-prefix",
+            "runpod-api-key-boundary-glued-dash",
+            "runpod-api-key-boundary-glued-prefix",
+            "runpod-api-key-boundary-glued-underscore",
+            "runpod-api-key-boundary-underscore-glued-prefix",
+            "runpod-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for runpod_api_key (runpod-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "runpod_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -13346,6 +13470,8 @@
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
             "resend-api-key-adversarial-long-run",
+            "runpod-api-key-adversarial-long-body-run",
+            "runpod-api-key-adversarial-long-run",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
             "sentry-user-auth-token-adversarial-long-run",
@@ -13805,6 +13931,8 @@
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
             "resend-api-key-adversarial-long-run",
+            "runpod-api-key-adversarial-long-body-run",
+            "runpod-api-key-adversarial-long-run",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
             "sentry-user-auth-token-adversarial-long-run",
