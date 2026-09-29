@@ -2186,6 +2186,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let mut cursor = 0usize;
     let otpauth_spans = otpauth_uri_spans(input);
     let jwk_lines = jwk_line_spans(input);
+    let mut templates = OpenTemplateTracker::default();
 
     while cursor < input.len() {
         let Some(AssignmentPrefix {
@@ -2226,12 +2227,12 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 // `private_key` name's high-signal bucket (issue #821).
                 normalized = String::from("private_key");
             }
-            // `is_templated_lookup_path` looks back along the line, so it runs
-            // only for a pair that would otherwise be reported (issue #989).
+            // The templated-lookup check runs only for a pair that would
+            // otherwise be reported (issue #989).
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
-                && !is_templated_lookup_path(input, name_start, value)
+                && !is_templated_lookup_path(&mut templates, input, name_start, value)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 let name_signal =
@@ -2278,15 +2279,22 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
 /// optional `:field` suffix. A literal term inside a lookup
 /// (`token=<value>` with no `/`) stays detected, and so does any assignment
 /// outside an open template.
-fn is_templated_lookup_path(input: &str, name_start: usize, value: &str) -> bool {
-    let line_start = input[..name_start].rfind(['\n', '\r']).map_or(0, |i| i + 1);
-    let before = &input[line_start..name_start];
-    let inside_template = before
-        .rfind("{{")
-        .is_some_and(|open| !before[open..].contains("}}"));
-    if !inside_template {
-        return false;
-    }
+///
+/// Whether a template is open comes from `templates`, which the assignment
+/// loop carries forward, so a long single line costs linear time rather than
+/// one look back to the line start per assignment (issue #989).
+fn is_templated_lookup_path(
+    templates: &mut OpenTemplateTracker,
+    input: &str,
+    name_start: usize,
+    value: &str,
+) -> bool {
+    is_secret_manager_path(value) && templates.is_open_at(input, name_start)
+}
+
+/// `true` for a two-or-more-segment `/`-joined path of `[A-Za-z0-9_.-]`
+/// segments with an optional non-empty `:[A-Za-z0-9_-]+` field suffix.
+fn is_secret_manager_path(value: &str) -> bool {
     let path = value.split_once(':').map_or(value, |(path, _)| path);
     let field_ok = value.split_once(':').is_none_or(|(_, field)| {
         !field.is_empty()
@@ -2302,6 +2310,58 @@ fn is_templated_lookup_path(input: &str, name_start: usize, value: &str) -> bool
                     .bytes()
                     .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-'))
         })
+}
+
+/// Forward state for "is a `{{` still open on this line": whether the text
+/// from the line start up to `position` contains a `{{` with no `}}` after
+/// the last one.
+///
+/// It answers exactly what a look back would: find the last `{{` between
+/// the line start (after the last `\n` or `\r`) and the query position, and
+/// report it open unless a `}}` follows it there. Overlapping runs such as
+/// `{{{` and `}}}` resolve the same way, because the last `{{` of a run
+/// starts on the run's second-to-last brace and a `}}` needs two closing
+/// braces after it. Each byte is visited once while queries move forward.
+#[derive(Default)]
+struct OpenTemplateTracker {
+    /// Bytes before this offset have been folded into the state.
+    position: usize,
+    /// The byte before `position`, or `0` at the start of the input.
+    previous: u8,
+    /// A `{{` occurs on the current line before `position`.
+    opened: bool,
+    /// A `}}` occurs after the last such `{{`.
+    closed: bool,
+}
+
+impl OpenTemplateTracker {
+    /// Whether a `{{` is still open on the line containing `position`, just
+    /// before `position`.
+    fn is_open_at(&mut self, input: &str, position: usize) -> bool {
+        let end = position.min(input.len());
+        if end < self.position {
+            // Queries only move forward; restart rather than answer wrongly.
+            *self = Self::default();
+        }
+        let bytes = input.as_bytes();
+        for &byte in &bytes[self.position..end] {
+            match byte {
+                b'\n' | b'\r' => {
+                    self.opened = false;
+                    self.closed = false;
+                }
+                b'{' if self.previous == b'{' => {
+                    self.opened = true;
+                    self.closed = false;
+                }
+                b'}' if self.previous == b'}' && self.opened => self.closed = true,
+                _ => {}
+            }
+            self.previous = byte;
+        }
+        self.position = end;
+        self.opened && !self.closed
+    }
 }
 
 // --- single-line call with one positional literal (issue #866) ---------------
@@ -2669,6 +2729,148 @@ mod tests {
         }
         .detect(input, &DetectorContext::new(input.len()))
         .unwrap()
+    }
+
+    // --- issue #989: forward templated-lookup state ------------------------
+
+    /// The #911 look-back check exactly as it shipped before #989: the
+    /// reference the forward tracker must agree with.
+    fn templated_lookup_path_reference(input: &str, name_start: usize, value: &str) -> bool {
+        let line_start = input[..name_start].rfind(['\n', '\r']).map_or(0, |i| i + 1);
+        let before = &input[line_start..name_start];
+        let inside_template = before
+            .rfind("{{")
+            .is_some_and(|open| !before[open..].contains("}}"));
+        if !inside_template {
+            return false;
+        }
+        let path = value.split_once(':').map_or(value, |(path, _)| path);
+        let field_ok = value.split_once(':').is_none_or(|(_, field)| {
+            !field.is_empty()
+                && field
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-'))
+        });
+        field_ok
+            && path.split('/').count() >= 2
+            && path.split('/').all(|segment| {
+                !segment.is_empty()
+                    && segment.bytes().all(|byte| {
+                        byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-')
+                    })
+            })
+    }
+
+    /// Only the "template still open" half of the reference.
+    fn template_open_reference(input: &str, position: usize) -> bool {
+        templated_lookup_path_reference(input, position, "kv/app")
+    }
+
+    /// Queries every char boundary of `input` in order through one tracker,
+    /// as the assignment loop does, and checks each answer.
+    fn assert_tracker_matches_reference(input: &str) {
+        let mut tracker = OpenTemplateTracker::default();
+        for position in (0..=input.len()).filter(|&p| input.is_char_boundary(p)) {
+            assert_eq!(
+                tracker.is_open_at(input, position),
+                template_open_reference(input, position),
+                "{input:?} at {position}"
+            );
+        }
+    }
+
+    #[test]
+    fn open_template_tracker_matches_the_look_back_on_every_short_brace_string() {
+        // Every string of up to seven symbols over braces, both line breaks
+        // and a filler byte: covers `{{{`, `}}}`, `{{}}`, `{}}{{`, a `}}`
+        // before the last `{{`, and a template split by `\r` or `\n`.
+        const ALPHABET: [char; 5] = ['{', '}', '\n', '\r', 'a'];
+        let mut checked = 0usize;
+        for len in 0..=7u32 {
+            for mut code in 0..ALPHABET.len().pow(len) {
+                let mut input = String::new();
+                for _ in 0..len {
+                    input.push(ALPHABET[code % ALPHABET.len()]);
+                    code /= ALPHABET.len();
+                }
+                assert_tracker_matches_reference(&input);
+                checked += 1;
+            }
+        }
+        assert_eq!(checked, 97_656);
+    }
+
+    #[test]
+    fn open_template_tracker_matches_the_look_back_on_named_overlap_cases() {
+        for input in [
+            "{{{ a",
+            "{{{}} a",
+            "{{{}}} a",
+            "{{ a }}} b {{{ c",
+            "}}{{ a",
+            "{{ a }} b {{ c",
+            "{{ a }}\n{{ b",
+            "{{ a\r b",
+            "{{ a\r\n}} b {{",
+            "{ { a } }",
+            "x: \"{{ lookup('hashi_vault', 'secret=kv/data/app:token') }}\" y=z",
+            "é{{ é }} é{{é",
+        ] {
+            assert_tracker_matches_reference(input);
+        }
+    }
+
+    #[test]
+    fn templated_lookup_path_matches_the_look_back_on_generated_lines() {
+        // A deterministic generator (64-bit LCG), not a random seed: the
+        // same inputs every run.
+        const PIECES: [&str; 12] = [
+            "{", "}", "{{", "}}", "\n", "\r\n", " ", "a=", "é", "{{{", "}}}", "'secret=",
+        ];
+        const VALUES: [&str; 6] = [
+            "kv/app",
+            "kv/data/app:token",
+            "plain",
+            "kv/",
+            "a/b:",
+            "x/y:z-1",
+        ];
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = |bound: usize| {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            usize::try_from(state >> 33).unwrap() % bound
+        };
+        for _ in 0..2_000 {
+            let mut input = String::new();
+            for _ in 0..next(40) {
+                input.push_str(PIECES[next(PIECES.len())]);
+            }
+            let mut tracker = OpenTemplateTracker::default();
+            for position in (0..=input.len()).filter(|&p| input.is_char_boundary(p)) {
+                // Skip some positions, as the loop skips non-assignments.
+                if next(3) == 0 {
+                    continue;
+                }
+                let value = VALUES[next(VALUES.len())];
+                assert_eq!(
+                    is_templated_lookup_path(&mut tracker, &input, position, value),
+                    templated_lookup_path_reference(&input, position, value),
+                    "{input:?} at {position} with {value:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn open_template_tracker_restarts_on_a_backward_query() {
+        let input = "{{ a\nb }} {{ c";
+        let mut tracker = OpenTemplateTracker::default();
+        assert!(tracker.is_open_at(input, input.len()));
+        assert!(tracker.is_open_at(input, 3));
+        assert!(!tracker.is_open_at(input, 6));
+        assert!(tracker.is_open_at(input, input.len()));
     }
 
     fn only_range(candidates: &[Candidate]) -> (usize, usize) {
