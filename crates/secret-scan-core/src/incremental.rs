@@ -68,8 +68,9 @@ use std::borrow::Cow;
 
 use crate::detectors::{
     PrivateKeyRetentionTracker, continues_previous_line, has_open_bearer_authorization,
-    has_open_confluent_properties, has_open_contextual_assignment, has_open_heroku_legacy_context,
-    has_open_list_item_pair, has_open_twilio_cli_table, is_open_tail_neutral,
+    has_open_confluent_properties, has_open_contextual_assignment, has_open_deepgram_request,
+    has_open_heroku_legacy_context, has_open_list_item_pair, has_open_provider_sibling,
+    has_open_twilio_cli_table, is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 #[cfg(test)]
@@ -377,6 +378,8 @@ struct LookbackHints {
     twilio_auth_token: bool,
     confluent_legacy: bool,
     list_item_pair: bool,
+    provider_sibling: bool,
+    deepgram_request: bool,
 }
 
 impl LookbackHints {
@@ -386,6 +389,8 @@ impl LookbackHints {
             twilio_auth_token: registry.contains(TWILIO_AUTH_TOKEN_DETECTOR_ID),
             confluent_legacy: registry.contains(CONFLUENT_LEGACY_DETECTOR_ID),
             list_item_pair: reads_list_item_pairs(registry),
+            provider_sibling: reads_provider_siblings(registry),
+            deepgram_request: registry.contains(DEEPGRAM_DETECTOR_ID),
         }
     }
 }
@@ -405,6 +410,18 @@ fn reads_list_item_pairs(registry: &DetectorRegistry) -> bool {
         .iter()
         .any(|id| registry.contains(id))
 }
+
+/// The keyword-gated detectors, which read a sibling `provider:` key above
+/// a credential key (issue #1017).
+fn reads_provider_siblings(registry: &DetectorRegistry) -> bool {
+    LIST_ITEM_PAIR_DETECTOR_IDS[1..]
+        .iter()
+        .any(|id| registry.contains(id))
+}
+
+/// `deepgram-api-key` also reads the request line or `Host:` header above
+/// a token header (issue #1017).
+const DEEPGRAM_DETECTOR_ID: &str = "deepgram-api-key";
 
 /// A bounded, side-effect-free incremental sanitizer session over built-in
 /// detectors. Custom detectors are not accepted: each has no retention
@@ -743,7 +760,9 @@ impl IncrementalSanitizer {
             || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
             || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
             || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
-            || (lookbacks.list_item_pair && has_open_list_item_pair(scanned));
+            || (lookbacks.list_item_pair && has_open_list_item_pair(scanned))
+            || (lookbacks.provider_sibling && has_open_provider_sibling(scanned))
+            || (lookbacks.deepgram_request && has_open_deepgram_request(scanned));
         #[cfg(test)]
         self.assert_open_construct_matches_the_rescan(open);
         open
@@ -772,7 +791,10 @@ impl IncrementalSanitizer {
                 && has_open_twilio_cli_table(&rescanned))
             || (self.registry.contains(CONFLUENT_LEGACY_DETECTOR_ID)
                 && has_open_confluent_properties(&rescanned))
-            || (reads_list_item_pairs(&self.registry) && has_open_list_item_pair(&rescanned));
+            || (reads_list_item_pairs(&self.registry) && has_open_list_item_pair(&rescanned))
+            || (reads_provider_siblings(&self.registry) && has_open_provider_sibling(&rescanned))
+            || (self.registry.contains(DEEPGRAM_DETECTOR_ID)
+                && has_open_deepgram_request(&rescanned));
         assert_eq!(open, reference, "open single-line construct");
     }
 

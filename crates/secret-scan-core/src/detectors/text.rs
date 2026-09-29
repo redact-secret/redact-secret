@@ -747,20 +747,20 @@ pub(super) fn is_provider_named_assignment(
 
 /// One `key:` line of a YAML block sequence or mapping, as
 /// [`list_item_paired_name`] reads it.
-struct ItemKeyLine<'a> {
+pub(super) struct ItemKeyLine<'a> {
     /// Byte column of the key within its line.
-    column: usize,
+    pub(super) column: usize,
     /// The key follows the `- ` that opens a sequence item.
-    item_start: bool,
-    key: &'a str,
+    pub(super) item_start: bool,
+    pub(super) key: &'a str,
     /// Where the text after the `:` starts, within the line.
-    rest: usize,
+    pub(super) rest: usize,
 }
 
 /// Parses `^ *(- +)?[A-Za-z_][A-Za-z0-9_]*:( |\t|$)`: spaces only for the
 /// indentation (YAML forbids tabs there), an optional sequence-item dash,
 /// a plain key and its `:` indicator. A trailing `\r` counts as the line end.
-fn item_key_line(line: &str) -> Option<ItemKeyLine<'_>> {
+pub(super) fn item_key_line(line: &str) -> Option<ItemKeyLine<'_>> {
     let bytes = line.as_bytes();
     let mut at = bytes.iter().take_while(|&&byte| byte == b' ').count();
     let mut item_start = false;
@@ -799,7 +799,7 @@ fn item_key_line(line: &str) -> Option<ItemKeyLine<'_>> {
 /// The plain or quoted scalar after `name:` when it is a whole environment-
 /// style name (`[A-Za-z_][A-Za-z0-9_.-]*`, at most 128 bytes), optionally
 /// followed by a `#` comment.
-fn item_name_scalar(line: &str, rest: usize) -> Option<&str> {
+pub(super) fn item_name_scalar(line: &str, rest: usize) -> Option<&str> {
     let bytes = line.as_bytes();
     let mut at = rest + ascii_run_len(bytes, rest, |byte| matches!(byte, b' ' | b'\t'));
     let quote = bytes
@@ -834,7 +834,7 @@ fn item_name_scalar(line: &str, rest: usize) -> Option<&str> {
 }
 
 /// The line ([`lines`]) before the one starting at `line_start`.
-fn previous_line(input: &str, line_start: usize) -> Option<(usize, usize)> {
+pub(super) fn previous_line(input: &str, line_start: usize) -> Option<(usize, usize)> {
     if line_start == 0 {
         return None;
     }

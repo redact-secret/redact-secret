@@ -70,6 +70,20 @@
 //!    show masking or hashing (a 40-hex run under `hashed_` is a digest),
 //!    and a `publishable_` key never does; the masked display
 //!    (`9ctA****...lwCk`) is never a run of the key's shape anyway.
+//! 6. **Deepgram forms of issue #1017** (High unless noted): the
+//!    `createClient` factory of `@deepgram/sdk` on a line that names
+//!    `deepgram`; the WebSocket `token` subprotocol
+//!    (`Sec-WebSocket-Protocol: token, <v>`, `["token", "<v>"]`) under the
+//!    token-header host rule (medium with `deepgram` only as a word); and a
+//!    token header or subprotocol whose request line or `Host:` header names
+//!    the API host up to [`MAX_HTTP_BLOCK_LINES`] header lines above.
+//! 7. **Provider field** (High, every family, issue #1017): a credential key
+//!    or `auth` beside a `provider: <keyword>` field on the same line, or up
+//!    to [`MAX_SIBLING_LINES`] keys above it in the same YAML mapping.
+//!
+//! The two multi-line windows are held open in a stream by
+//! [`has_open_deepgram_request`] and [`has_open_provider_sibling`], which
+//! read back exactly the lines the detector reads.
 //!
 //! A key ending in an identifier or location segment (`_id`, `_url`,
 //! `_org`, ...) never qualifies (`MISTRAL_KEY_ID=`, `DEEPGRAM_PROJECT_ID=`),
@@ -111,6 +125,21 @@ const CALL_WINDOW: usize = 256;
 /// Bytes of text before a value read for an `Authorization: Token` scheme.
 const HEADER_WINDOW: usize = 48;
 
+/// Most lines above a header line read for the request line or `Host:`
+/// header of the same HTTP request (issue #1017).
+const MAX_HTTP_BLOCK_LINES: usize = 8;
+
+/// Most sibling lines above a credential key read for a `provider:` key of
+/// the same YAML mapping (issue #1017).
+const MAX_SIBLING_LINES: usize = 6;
+
+/// Every provider keyword, for the incremental retention hints, which do not
+/// know which keyword-gated detector will read the lines they hold.
+const ALL_KEYWORDS: &[&str] = &["mistral", "cohere", "ai21", "deepgram"];
+
+/// The Deepgram API domain, for the request-block retention hint.
+const DEEPGRAM_API_DOMAIN: &str = "deepgram.com";
+
 /// Static description of one keyword-gated provider key.
 struct Spec {
     type_name: &'static str,
@@ -125,6 +154,10 @@ struct Spec {
     constructor_signal: &'static str,
     adjacent_signal: &'static str,
     route_signal: &'static str,
+    sibling_signal: &'static str,
+    /// Lowercase factory names that are the provider's constructor only when
+    /// the line names the provider (`createClient`, issue #1017).
+    factory_callees: &'static [&'static str],
     /// Accepts an `Authorization: Token <value>` header on a keyword line.
     token_header: bool,
     /// The provider's API host domain (lowercase). A token header on a line
@@ -143,6 +176,22 @@ enum HeaderContext {
     ProviderHost,
 }
 
+/// What a value's line (and, for bounded layouts, the lines above it) offers
+/// as provider context, computed once per line.
+#[derive(Clone, Copy)]
+struct LineContext<'a> {
+    header: HeaderContext,
+    /// A provider keyword appears on the line.
+    keyword_on_line: bool,
+    /// A `LiteLLM`-style `<keyword>/<model>` route on the line (#1018).
+    model_route: bool,
+    /// A sibling `provider: <keyword>` field on the line or above it in the
+    /// same YAML mapping (#1017).
+    provider_sibling: bool,
+    /// The name a Kubernetes-style `env` entry gives a `value:` key (#1016).
+    paired_name: Option<&'a str>,
+}
+
 const MISTRAL: Spec = Spec {
     type_name: "mistral_api_key",
     len: 32,
@@ -153,6 +202,8 @@ const MISTRAL: Spec = Spec {
     constructor_signal: "mistral-sdk-constructor",
     adjacent_signal: "mistral-keyword-adjacent",
     route_signal: "mistral-model-route",
+    sibling_signal: "mistral-provider-field",
+    factory_callees: &[],
     token_header: false,
     api_host_domain: None,
 };
@@ -167,6 +218,8 @@ const COHERE: Spec = Spec {
     constructor_signal: "cohere-sdk-constructor",
     adjacent_signal: "cohere-keyword-adjacent",
     route_signal: "cohere-model-route",
+    sibling_signal: "cohere-provider-field",
+    factory_callees: &[],
     token_header: false,
     api_host_domain: None,
 };
@@ -181,6 +234,8 @@ const AI21: Spec = Spec {
     constructor_signal: "ai21-sdk-constructor",
     adjacent_signal: "ai21-keyword-adjacent",
     route_signal: "ai21-model-route",
+    sibling_signal: "ai21-provider-field",
+    factory_callees: &[],
     token_header: false,
     api_host_domain: None,
 };
@@ -195,6 +250,8 @@ const DEEPGRAM: Spec = Spec {
     constructor_signal: "deepgram-sdk-constructor",
     adjacent_signal: "deepgram-keyword-adjacent",
     route_signal: "deepgram-model-route",
+    sibling_signal: "deepgram-provider-field",
+    factory_callees: &["createclient"],
     token_header: true,
     api_host_domain: Some("deepgram.com"),
 };
@@ -247,7 +304,7 @@ fn is_credential_name(normalized: &str) -> bool {
 
 /// `true` when an unclosed call opens before `end` whose callee name carries
 /// a provider keyword: `Mistral(`, `cohere.ClientV2(`, `new Exa({`.
-fn inside_provider_call(line: &str, spec: &Spec, end: usize) -> bool {
+fn inside_provider_call(line: &str, spec: &Spec, end: usize, keyword_on_line: bool) -> bool {
     let bytes = line.as_bytes();
     let end = end.min(bytes.len());
     let floor = end.saturating_sub(CALL_WINDOW);
@@ -266,6 +323,17 @@ fn inside_provider_call(line: &str, spec: &Spec, end: usize) -> bool {
                 }
                 let callee = line[start..cursor].to_ascii_lowercase();
                 if spec.keywords.iter().any(|keyword| callee.contains(keyword)) {
+                    return true;
+                }
+                // Issue #1017: a provider SDK factory with a generic name
+                // (`createClient` from `@deepgram/sdk`) on a line that names
+                // the provider, as its import or receiving variable does.
+                if keyword_on_line
+                    && callee
+                        .rsplit('.')
+                        .next()
+                        .is_some_and(|name| spec.factory_callees.contains(&name))
+                {
                     return true;
                 }
             }
@@ -393,6 +461,251 @@ fn names_model_route(line: &str, spec: &Spec) -> bool {
     })
 }
 
+/// `true` when the value at `start` is the key half of the WebSocket token
+/// subprotocol pair (issue #1017): the header form
+/// `Sec-WebSocket-Protocol: token, <value>` or the browser API's
+/// `["token", "<value>"]` protocols array. Browsers cannot set an
+/// `Authorization` header on a WebSocket, so Deepgram's streaming API takes
+/// the key there.
+fn is_token_subprotocol(bytes: &[u8], start: usize) -> bool {
+    let window = &bytes[start.saturating_sub(HEADER_WINDOW)..start];
+    let Ok(window) = std::str::from_utf8(window) else {
+        return false;
+    };
+    let before = window.to_ascii_lowercase();
+    let spaces: &[char] = &[' ', '\t'];
+    // `["token", "<value>"]`: the value's opening quote, `,`, the quoted
+    // `token`, and the `[` that opens the array.
+    if let Some(head) = before.strip_suffix(['"', '\''])
+        && let Some(head) = head.trim_end_matches(spaces).strip_suffix(',')
+    {
+        let head = head.trim_end_matches(spaces);
+        return ["\"token\"", "'token'"].iter().any(|quoted| {
+            head.strip_suffix(quoted)
+                .is_some_and(|open| open.trim_end_matches(spaces).ends_with('['))
+        });
+    }
+    // `Sec-WebSocket-Protocol: token, <value>`.
+    before
+        .trim_end_matches(spaces)
+        .strip_suffix(',')
+        .and_then(|head| head.trim_end_matches(spaces).strip_suffix("token"))
+        .and_then(|head| head.trim_end_matches(spaces).strip_suffix(':'))
+        .and_then(|head| head.strip_suffix("sec-websocket-protocol"))
+        .is_some_and(|lead| {
+            !lead
+                .bytes()
+                .last()
+                .is_some_and(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_'))
+        })
+}
+
+/// `true` when `line` holds a `provider` field whose value is one of the
+/// spec's keywords, in JSON, YAML flow or assignment form:
+/// `"provider":"deepgram"`, `provider: deepgram`, `provider='cohere'`
+/// (issue #1017). The field name must not continue a wider identifier on
+/// either side, and the keyword must be the whole value.
+fn names_provider_field(line: &str, keywords: &[&str]) -> bool {
+    let lowered = line.to_ascii_lowercase();
+    let bytes = lowered.as_bytes();
+    let is_ident = |byte: u8| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-');
+    lowered.match_indices("provider").any(|(at, field)| {
+        if at > 0 && is_ident(bytes[at - 1]) {
+            return false;
+        }
+        let mut cursor = at + field.len();
+        cursor += ascii_run(bytes, cursor, |byte| matches!(byte, b'"' | b'\'' | b'\\'));
+        cursor += ascii_run(bytes, cursor, |byte| matches!(byte, b' ' | b'\t'));
+        if !matches!(bytes.get(cursor), Some(b':' | b'=')) {
+            return false;
+        }
+        cursor += 1;
+        cursor += ascii_run(bytes, cursor, |byte| {
+            matches!(byte, b' ' | b'\t' | b'"' | b'\'' | b'\\')
+        });
+        keywords.iter().any(|keyword| {
+            lowered[cursor..].starts_with(keyword)
+                && !bytes
+                    .get(cursor + keyword.len())
+                    .is_some_and(|&byte| is_ident(byte))
+        })
+    })
+}
+
+fn ascii_run(bytes: &[u8], start: usize, pred: fn(u8) -> bool) -> usize {
+    bytes.get(start..).map_or(0, |rest| {
+        rest.iter().take_while(|&&byte| pred(byte)).count()
+    })
+}
+
+/// `true` when the YAML mapping key line at `line` (a `key:` at `column`,
+/// not opening a sequence item) has a sibling `provider: <keyword>` key
+/// above it in the same mapping: within [`MAX_SIBLING_LINES`] lines, every
+/// line between being another key of the same mapping at the same column
+/// (issue #1017). A line at another column, a new sequence item, a blank or
+/// any other line ends the mapping. A sequence item that opens with the
+/// `provider:` key itself (`- provider: deepgram`) counts.
+fn yaml_sibling_names_provider(
+    input: &str,
+    line_start: usize,
+    column: usize,
+    keywords: &[&str],
+) -> bool {
+    let mut start = line_start;
+    for _ in 0..MAX_SIBLING_LINES {
+        let Some((above_start, above_end)) = text::previous_line(input, start) else {
+            return false;
+        };
+        match sibling_line(&input[above_start..above_end], column, keywords) {
+            SiblingLine::Provider => return true,
+            SiblingLine::Sibling => start = above_start,
+            SiblingLine::End => return false,
+        }
+    }
+    false
+}
+
+/// How one line above a credential key reads for
+/// [`yaml_sibling_names_provider`].
+enum SiblingLine {
+    /// `provider: <keyword>` at the key's column.
+    Provider,
+    /// Another key of the same mapping.
+    Sibling,
+    /// Not part of the mapping.
+    End,
+}
+
+fn sibling_line(line: &str, column: usize, keywords: &[&str]) -> SiblingLine {
+    let Some(parsed) = text::item_key_line(line) else {
+        return SiblingLine::End;
+    };
+    if parsed.column != column {
+        return SiblingLine::End;
+    }
+    if parsed.key == "provider"
+        && text::item_name_scalar(line, parsed.rest).is_some_and(|value| {
+            keywords
+                .iter()
+                .any(|keyword| value.eq_ignore_ascii_case(keyword))
+        })
+    {
+        return SiblingLine::Provider;
+    }
+    if parsed.item_start {
+        SiblingLine::End
+    } else {
+        SiblingLine::Sibling
+    }
+}
+
+/// Internal retention hint for [`yaml_sibling_names_provider`] (issue
+/// #1017): `true` while the last complete lines of `input` are a
+/// `provider: <keyword>` key followed only by keys of the same mapping, at
+/// most [`MAX_SIBLING_LINES`] lines in all, so a credential key on the next
+/// line can still read it. Every provider keyword is accepted.
+pub(crate) fn has_open_provider_sibling(input: &str) -> bool {
+    let tail = text::last_lines(input, MAX_SIBLING_LINES);
+    let Some(column) = tail
+        .last()
+        .and_then(|line| text::item_key_line(line))
+        .map(|parsed| parsed.column)
+    else {
+        return false;
+    };
+    for line in tail.iter().rev() {
+        match sibling_line(line, column, ALL_KEYWORDS) {
+            SiblingLine::Provider => return true,
+            SiblingLine::Sibling => {}
+            SiblingLine::End => return false,
+        }
+    }
+    false
+}
+
+/// How one line of an HTTP request reads for [`http_block_names_host`].
+enum HttpLine {
+    /// The request line; whether its target names a host under the domain.
+    Request(bool),
+    /// A header line; whether it is a `Host:` header naming such a host.
+    Header(bool),
+    /// Anything else ends the request.
+    Other,
+}
+
+/// `METHOD <target> HTTP/<version>`, the target returned.
+fn request_line_target(line: &str) -> Option<&str> {
+    let (method, rest) = line.split_once(' ')?;
+    if method.is_empty() || !method.bytes().all(|byte| byte.is_ascii_uppercase()) {
+        return None;
+    }
+    let (target, version) = rest.split_once(' ')?;
+    (!target.is_empty() && version.starts_with("HTTP/")).then_some(target)
+}
+
+/// `^[A-Za-z0-9-]+:` the name of an HTTP header line.
+fn http_header_name(line: &str) -> Option<&str> {
+    let name_len = line
+        .bytes()
+        .take_while(|&byte| byte.is_ascii_alphanumeric() || byte == b'-')
+        .count();
+    (name_len > 0 && line.as_bytes().get(name_len) == Some(&b':')).then(|| &line[..name_len])
+}
+
+fn http_line(line: &str, domain: &str) -> HttpLine {
+    let line = line.strip_suffix('\r').unwrap_or(line);
+    if let Some(target) = request_line_target(line) {
+        return HttpLine::Request(names_host_under(target, domain));
+    }
+    match http_header_name(line) {
+        Some(name) => {
+            HttpLine::Header(name.eq_ignore_ascii_case("host") && names_host_under(line, domain))
+        }
+        None => HttpLine::Other,
+    }
+}
+
+/// `true` when the header line starting at `line_start` belongs to an HTTP
+/// request whose request line or `Host:` header names a host under
+/// `domain`: walking up at most [`MAX_HTTP_BLOCK_LINES`] lines over header
+/// lines only, to the request line (issue #1017). Any other line ends the
+/// request. This is the multi-line form of the #936 same-line host rule
+/// (`POST /v1/listen HTTP/1.1` / `Host: api.deepgram.com` /
+/// `Authorization: Token <key>`).
+fn http_block_names_host(input: &str, line_start: usize, domain: &str) -> bool {
+    let mut start = line_start;
+    for _ in 0..MAX_HTTP_BLOCK_LINES {
+        let Some((above_start, above_end)) = text::previous_line(input, start) else {
+            return false;
+        };
+        match http_line(&input[above_start..above_end], domain) {
+            HttpLine::Request(names_host) => return names_host,
+            HttpLine::Header(true) => return true,
+            HttpLine::Header(false) => start = above_start,
+            HttpLine::Other => return false,
+        }
+    }
+    false
+}
+
+/// Internal retention hint for [`http_block_names_host`] over the Deepgram
+/// API domain (issue #1017): `true` while the last complete lines of
+/// `input` are an HTTP request line or headers, at most
+/// [`MAX_HTTP_BLOCK_LINES`] of them, among which the request line or a
+/// `Host:` header names a host under `deepgram.com`, so a header on the next
+/// line can still read it.
+pub(crate) fn has_open_deepgram_request(input: &str) -> bool {
+    for line in text::last_lines(input, MAX_HTTP_BLOCK_LINES).iter().rev() {
+        match http_line(line, DEEPGRAM_API_DOMAIN) {
+            HttpLine::Request(names_host) => return names_host,
+            HttpLine::Header(true) => return true,
+            HttpLine::Header(false) => {}
+            HttpLine::Other => return false,
+        }
+    }
+    false
+}
+
 fn contains_keyword_ci(window: &str, spec: &Spec) -> Option<usize> {
     let lowered = window.to_ascii_lowercase();
     spec.keywords
@@ -407,31 +720,39 @@ fn context(
     spec: &Spec,
     start: usize,
     end: usize,
-    header_context: HeaderContext,
-    model_route: bool,
-    paired_name: Option<&str>,
+    line_context: &LineContext<'_>,
 ) -> Option<(Confidence, &'static str)> {
+    let header_context = line_context.header;
     let bytes = line.as_bytes();
     if let Some(key) = text::assignment_key(bytes, start) {
         let key_start = key.as_ptr() as usize - bytes.as_ptr() as usize;
         let key = std::str::from_utf8(key).ok()?;
         // Issue #1016: a Kubernetes-style `env` entry's `value:` is assigned
         // to the name of its sibling `name:` key.
-        let key = match paired_name {
+        let key = match line_context.paired_name {
             Some(paired) if key == "value" => paired,
             _ => key,
         };
         let normalized = normalize_name(key);
+        // Issue #1017: a sibling `provider: <keyword>` field names the
+        // record's provider, so its credential field is the key; `auth` is
+        // one (`{"provider":"deepgram","auth":"..."}`).
+        if line_context.provider_sibling
+            && (is_credential_name(&normalized) || normalized == "auth")
+            && !masking_lead_hides_value(&normalized, &line[start..end])
+        {
+            return Some((Confidence::High, spec.sibling_signal));
+        }
         if !is_credential_name(&normalized) {
             return None;
         }
         if name_has_provider(spec, &normalized) {
             return Some((Confidence::High, spec.named_signal));
         }
-        if inside_provider_call(line, spec, key_start) {
+        if inside_provider_call(line, spec, key_start, line_context.keyword_on_line) {
             return Some((Confidence::High, spec.constructor_signal));
         }
-        if model_route && !masking_lead_hides_value(&normalized, &line[start..end]) {
+        if line_context.model_route && !masking_lead_hides_value(&normalized, &line[start..end]) {
             return Some((Confidence::High, spec.route_signal));
         }
         let window =
@@ -454,7 +775,10 @@ fn context(
     while cursor > 0 && matches!(bytes[cursor - 1], b' ' | b'\t' | b'"' | b'\'') {
         cursor -= 1;
     }
-    if cursor > 0 && bytes[cursor - 1] == b'(' && inside_provider_call(line, spec, cursor) {
+    if cursor > 0
+        && bytes[cursor - 1] == b'('
+        && inside_provider_call(line, spec, cursor, line_context.keyword_on_line)
+    {
         return Some((Confidence::High, spec.constructor_signal));
     }
     if is_closed_string_argument(bytes, start, end) {
@@ -484,7 +808,37 @@ fn context(
             }
         }
     }
-    if spec.token_header && cursor < start {
+    if spec.token_header {
+        token_header_context(bytes, start, cursor, header_context)
+    } else {
+        None
+    }
+}
+
+/// The Deepgram token slots: the browser WebSocket token subprotocol
+/// (`Sec-WebSocket-Protocol: token, <key>` or `["token", "<key>"]`, issue
+/// #1017) and the `Authorization: Token <key>` header, each high on a
+/// request to the provider's API host and medium where the provider is only
+/// a word on the line. `cursor` is `start` less the quotes and blanks
+/// before the value.
+fn token_header_context(
+    bytes: &[u8],
+    start: usize,
+    cursor: usize,
+    header_context: HeaderContext,
+) -> Option<(Confidence, &'static str)> {
+    if is_token_subprotocol(bytes, start) {
+        match header_context {
+            HeaderContext::ProviderHost => {
+                return Some((Confidence::High, "deepgram-host-token-subprotocol"));
+            }
+            HeaderContext::Keyword => {
+                return Some((Confidence::Medium, "deepgram-token-subprotocol"));
+            }
+            HeaderContext::Absent => {}
+        }
+    }
+    if cursor < start {
         let before = String::from_utf8_lossy(&bytes[cursor.saturating_sub(HEADER_WINDOW)..cursor])
             .to_ascii_lowercase();
         let scheme = before.trim_end();
@@ -585,60 +939,89 @@ fn may_have_provider_context(text: &str, spec: &Spec) -> bool {
 
 fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    // The incremental sanitizer's per-unit `detect` call almost always
-    // supplies exactly one logical line (no `\n`): it closes and scans one
-    // line at a time, and this detector's adjacency contract is defined on
-    // that one line (see the module doc). For that single-line input,
-    // `lines(input)` below yields exactly that one line, so the per-line
-    // check inside the loop already is this same check; running it again
-    // here first would scan the identical bytes twice for the same answer.
-    // Gating this whole-input check on `input` actually holding more than
-    // one line keeps its short-circuit for a multi-line, whole-buffer scan
-    // (the non-incremental `scan` path) while dropping the duplicate work an
-    // incremental caller was paying on every closed line.
-    if input.contains('\n') && !may_have_provider_context(input, spec) {
+    // Every context this detector accepts needs a keyword or exact name
+    // somewhere in the input: on the value's line, or for the bounded
+    // multi-line layouts (#1016, #1017) on a line above it. Checking the
+    // input once also covers the incremental sanitizer's usual single-line
+    // unit, whose one line is then not checked again.
+    if !may_have_provider_context(input, spec) {
         return candidates;
     }
+    let multi_line = input.contains(['\n', '\r']);
+    let provider_word = multi_line && contains_ascii_ci(input.as_bytes(), b"provider");
     for (line_start, line_end) in lines(input) {
         let line = &input[line_start..line_end];
-        // Issue #1016: the provider may be named only by the sibling `name:`
-        // key of a Kubernetes-style `env` entry on the adjacent line.
-        let paired_name = text::list_item_paired_name(input, (line_start, line_end));
-        if !may_have_provider_context(line, spec)
-            && !paired_name.is_some_and(|name| may_have_provider_context(name, spec))
-        {
+        let on_line = !multi_line || may_have_provider_context(line, spec);
+        // The bounded multi-line layouts, gated by their line shape first.
+        let key_line = if multi_line {
+            text::item_key_line(line)
+        } else {
+            None
+        };
+        let pair_line = key_line
+            .as_ref()
+            .is_some_and(|parsed| parsed.key == "value");
+        let sibling_line =
+            provider_word && key_line.as_ref().is_some_and(|parsed| !parsed.item_start);
+        let header_line =
+            multi_line && spec.api_host_domain.is_some() && http_header_name(line).is_some();
+        if !on_line && !pair_line && !sibling_line && !header_line {
             continue;
         }
         let runs = scan_runs(line, spec);
         if runs.is_empty() {
             continue;
         }
-        let header_context = if !spec.token_header || contains_keyword_ci(line, spec).is_none() {
+        let paired_name = if pair_line {
+            text::list_item_paired_name(input, (line_start, line_end))
+        } else {
+            None
+        };
+        let provider_sibling = names_provider_field(line, spec.keywords)
+            || (sibling_line
+                && key_line.as_ref().is_some_and(|parsed| {
+                    yaml_sibling_names_provider(input, line_start, parsed.column, spec.keywords)
+                }));
+        let block_host = header_line
+            && spec
+                .api_host_domain
+                .is_some_and(|domain| http_block_names_host(input, line_start, domain));
+        if !on_line
+            && !block_host
+            && !provider_sibling
+            && !paired_name.is_some_and(|name| may_have_provider_context(name, spec))
+        {
+            continue;
+        }
+        let keyword_on_line = on_line && contains_keyword_ci(line, spec).is_some();
+        let header = if !spec.token_header {
             HeaderContext::Absent
-        } else if spec
-            .api_host_domain
-            .is_some_and(|domain| names_host_under(line, domain))
+        } else if block_host
+            || (keyword_on_line
+                && spec
+                    .api_host_domain
+                    .is_some_and(|domain| names_host_under(line, domain)))
         {
             HeaderContext::ProviderHost
-        } else {
+        } else if keyword_on_line {
             HeaderContext::Keyword
+        } else {
+            HeaderContext::Absent
         };
-        let model_route = names_model_route(line, spec);
+        let line_context = LineContext {
+            header,
+            keyword_on_line,
+            model_route: on_line && names_model_route(line, spec),
+            provider_sibling,
+            paired_name,
+        };
         for (start, end) in runs {
             if text::is_repeated_character_filler(&line[start..end])
                 || text::is_labelled_digest(line, start)
             {
                 continue;
             }
-            let Some((confidence, signal)) = context(
-                line,
-                spec,
-                start,
-                end,
-                header_context,
-                model_route,
-                paired_name,
-            ) else {
+            let Some((confidence, signal)) = context(line, spec, start, end, &line_context) else {
                 continue;
             };
             let Some(range) = ByteRange::new(line_start + start, line_start + end) else {
@@ -876,6 +1259,92 @@ mod tests {
             )
             .is_empty()
         );
+    }
+
+    #[test]
+    fn issue_1017_the_retention_hints_hold_exactly_the_windows_the_detector_reads() {
+        for open in [
+            "GET wss://api.deepgram.com/v1/listen HTTP/1.1\n",
+            "POST /v1/chat HTTP/1.1\nHost: api.deepgram.com\n",
+            "POST /v1/chat HTTP/1.1\r\nHost: api.deepgram.com\r\nAccept: */*\r\n",
+        ] {
+            assert!(has_open_deepgram_request(open), "{open:?}");
+        }
+        let long_request = format!(
+            "GET /v1/listen HTTP/1.1\nHost: api.deepgram.com\n{}",
+            "X-Pad: 1\n".repeat(MAX_HTTP_BLOCK_LINES)
+        );
+        for closed in [
+            "",
+            "GET wss://api.example.invalid/v1/listen HTTP/1.1\n",
+            "POST /v1/chat HTTP/1.1\nHost: api.example.invalid\n",
+            "POST /v1/chat HTTP/1.1\nHost: api.deepgram.com\n\n",
+            "Host: api.deepgram.com\nsome body text\n",
+            long_request.as_str(),
+        ] {
+            assert!(!has_open_deepgram_request(closed), "{closed:?}");
+        }
+        for open in [
+            "stt:\n  provider: deepgram\n",
+            "stt:\n  provider: cohere\n  model: x\n",
+            "- provider: mistral\n",
+        ] {
+            assert!(has_open_provider_sibling(open), "{open:?}");
+        }
+        let long_mapping = format!(
+            "stt:\n  provider: deepgram\n{}",
+            "  pad: 1\n".repeat(MAX_SIBLING_LINES)
+        );
+        for closed in [
+            "",
+            "stt:\n  provider: whisper\n",
+            "stt:\n  provider: deepgram\n\n",
+            "stt:\n  provider: deepgram\n    nested: 1\n",
+            "- provider: deepgram\n- other: 1\n",
+            long_mapping.as_str(),
+        ] {
+            assert!(!has_open_provider_sibling(closed), "{closed:?}");
+        }
+    }
+
+    #[test]
+    fn issue_1017_forms_are_recognized_and_their_twins_are_not() {
+        let d = lower40();
+        assert_exact(
+            &DEEPGRAM,
+            &format!("const deepgram = createClient(\"{d}\");"),
+            &d,
+            Confidence::High,
+        );
+        assert_exact(
+            &DEEPGRAM,
+            &format!(
+                "GET /v1/listen HTTP/1.1\nHost: api.deepgram.com\nSec-WebSocket-Protocol: token, {d}"
+            ),
+            &d,
+            Confidence::High,
+        );
+        assert_exact(
+            &DEEPGRAM,
+            &format!("{{\"provider\": \"deepgram\", \"api_key\": \"{d}\"}}"),
+            &d,
+            Confidence::High,
+        );
+        assert_exact(
+            &COHERE,
+            &format!("llm:\n  provider: cohere\n  api_key: {}", alnum40()),
+            &alnum40(),
+            Confidence::High,
+        );
+        for input in [
+            format!("const widget = createClient(\"{d}\");"),
+            format!("Sec-WebSocket-Protocol: token, {d}"),
+            format!("X-Sec-WebSocket-Protocol-Other: token, {d} deepgram"),
+            format!("{{\"provider\":\"deepgram\",\"request_id\":\"{d}\"}}"),
+            format!("stt:\n  provider: deepgram\n  project_id: {d}"),
+        ] {
+            assert!(run(&DEEPGRAM, &input).is_empty(), "{input}");
+        }
     }
 
     #[test]

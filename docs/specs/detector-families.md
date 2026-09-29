@@ -417,7 +417,7 @@ provider context is adjacent on the same line, never as a bare 32/40-byte run.
 | `mistral:studio-api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `mistral`; `Mistral(...)` call argument; `mistral` then a credential key within 32 bytes | landed, `mistral-api-key` |
 | `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional; a credential-named builder method, `Cohere.builder().token("...")` (#932); a credential-named key, unmasked `masked_api_key=` included, on a line naming a `cohere/<model>` route (#1018) | landed, `cohere-api-key` |
 | `ai21:api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `ai21`; `AI21Client(...)` argument | landed, `ai21-api-key` |
-| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; the last positional literal of a `deepgram.` call, `deepgram.NewRESTWithDefaults(ctx, "...")` (#932); `Authorization: Token <v>` or HTTPie `Authorization:Token <v>` on a line naming `deepgram` (`high` when the line names a host under the `deepgram.com` API domain, #936) | landed, `deepgram-api-key` |
+| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; the last positional literal of a `deepgram.` call, `deepgram.NewRESTWithDefaults(ctx, "...")` (#932); `Authorization: Token <v>` or HTTPie `Authorization:Token <v>` on a line naming `deepgram` (`high` when the line names a host under the `deepgram.com` API domain, #936); since #1017 the JS SDK v3 `createClient("...")` / `createClient({ key: "..." })` on a line naming `deepgram`, the WebSocket token subprotocol (`Sec-WebSocket-Protocol: token, <v>`, `["token", "<v>"]`) with the same host rule, a token header or subprotocol whose request line or `Host:` header names the API host up to 8 header lines above, and a sibling `provider: deepgram` field (same line, or up to 6 keys above in the same YAML mapping) under a credential key or `auth` | landed, `deepgram-api-key` |
 | `exa:api-key` | none: no source states any shape (only the key *id* is documented, as a UUID) | none | **not landed**; stays with `generic-token` (env, JSON, YAML, `x-api-key`, `Bearer`), its SDK-call keyword-argument form is read by `generic-token` since #866; a positional `Exa("...")` stays out (no credential name) |
 
 Confidence: a named assignment (`MISTRAL_API_KEY=`, `"deepgramApiKey":`) or an
@@ -431,6 +431,25 @@ value sits in the key's documented slot of a request to the provider, which is
 as specific as a provider-named key. A look-alike host
 (`api.deepgram.com.example.test`, `deepgram.company`) stays `medium`. The types are not in the always-redact
 list, like `twilio_auth_token`.
+
+Issue [#1017](https://github.com/redact-secret/redact-secret/issues/1017)
+applies the same structural rule (the #936 amendment of
+`decision-redact-provider-named-credential-assignments`) to more Deepgram
+forms, all `high`: the `createClient` factory of `@deepgram/sdk` when the line
+names `deepgram` (its import or its receiving variable); the browser WebSocket
+`token` subprotocol on a request to the API host (`medium` with `deepgram`
+only as a word); a token header or subprotocol whose request line or `Host:`
+header names the API host on an earlier line of the same request (at most 8
+header lines up, no blank or non-header line between); and a credential key
+(or `auth`) beside a `provider: <keyword>` field, on the same line
+(`{"provider":"deepgram","auth":"..."}`, which `generic-token` only warned on)
+or up to 6 keys above in the same YAML mapping. The sibling-field and
+multi-line rules apply to all four keyword-gated families. The incremental
+session holds the request block and the mapping open over exactly those
+windows. FN that remains: `createClient` with Deepgram named only on another
+line (an import far above), a nested key between `provider:` and the key,
+and a request split by a body. FP cost: a 40-byte `[0-9a-z]` value in one of
+those slots that is not a Deepgram key.
 
 Excluded on purpose: a key ending in an identifier or location segment
 (`MISTRAL_KEY_ID`, `DEEPGRAM_PROJECT_ID`, `COHERE_ORG_ID`, `AI21_TEAM_ID`), a

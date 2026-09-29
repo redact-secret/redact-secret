@@ -46,6 +46,12 @@ evidence is linked from each published version.
   any other credential name gives `generic-token` at its usual floors.
   `valueFrom:`, placeholders and non-credential names stay silent, and the
   incremental session holds the item's first line so chunked scans agree.
+- `deepgram-api-key` covers the JS SDK v3 `createClient(...)` factory, the
+  browser WebSocket `token` subprotocol, a token header whose request line
+  or `Host:` header names `api.deepgram.com` on an earlier line, and a
+  sibling `provider: deepgram` field (#1017). These were missed or typed
+  `generic-token`; the JSON `{"provider":"deepgram","auth":...}` form moves
+  from warn to redact. A bare 40-hex run stays unreported.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
