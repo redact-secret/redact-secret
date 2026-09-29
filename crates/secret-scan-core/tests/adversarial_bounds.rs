@@ -16,7 +16,10 @@ mod support;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use std::time::Instant;
 
-use redact_secret::{IncrementalLimits, IncrementalSanitizer, SecretScanErrorCode, SessionState};
+use redact_secret::{
+    DefaultPolicy, DetectorRegistry, IncrementalLimits, IncrementalSanitizer, PiiSelection,
+    SecretScanErrorCode, SessionState, default_placeholder_formatter, scan_and_redact,
+};
 use support::{CanonicalFixture, run_session, synchronous_corpus, whole_input};
 
 /// Keeps the wall-clock assertions from measuring their sibling tests.
@@ -430,5 +433,75 @@ fn whitespace_lines_after_an_open_assignment_stay_linear_in_a_session() {
                 "{label} lines, {chunk_bytes}-byte chunks: session took {elapsed}ms, above the {budget}ms budget",
             );
         }
+    }
+}
+
+#[test]
+fn many_pii_candidates_on_one_line_associate_context_in_linear_time() {
+    // PII context association used to scan from the input start for every
+    // candidate's logical line, compare every candidate with every other for
+    // its barriers, and renormalize the whole line for every candidate on it
+    // once per context occurrence. On one line that is worse than quadratic:
+    // 125 of the records below (11.6 KB) took ~21 s in a release build
+    // (issue #902). Grouped by line and indexed, 700 records (65 KB, one
+    // CLI read and one incremental unit) take a few milliseconds optimized,
+    // so the budget below is orders of magnitude from either side.
+    const RECORD: &str = "client_ip=192.0.2.1 email=test@example.com \
+                          iban=GB82WEST12345698765432 card 4111111111111111 ";
+    const RECORDS: usize = 700;
+    const DECLARED_MS: u128 = 500;
+    let _isolation = timed();
+
+    let input = RECORD.repeat(RECORDS);
+    assert!(!input.contains('\n'));
+    let limits = IncrementalLimits::new(
+        input.len(),
+        IncrementalLimits::minimum_buffered_bytes(input.len(), input.len()),
+        input.len(),
+        input.len(),
+    )
+    .unwrap();
+    for selector in ["pii:global", "pii:us"] {
+        let selection = PiiSelection::parse(&[selector]).unwrap();
+        let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+
+        let started_at = Instant::now();
+        let whole = scan_and_redact(
+            &input,
+            &registry,
+            &DefaultPolicy,
+            &default_placeholder_formatter,
+        )
+        .unwrap();
+        let elapsed = started_at.elapsed().as_millis();
+        let budget = runtime_budget_ms(DECLARED_MS);
+        assert!(
+            elapsed <= budget,
+            "{selector}: whole-input scan of {} bytes took {elapsed}ms, above the {budget}ms budget",
+            input.len(),
+        );
+        // The documentation address, reserved domain and published test card
+        // are suppressed; each record's IBAN is the one finding.
+        assert_eq!(whole.findings().len(), RECORDS, "{selector}: findings");
+
+        let started_at = Instant::now();
+        let mut session = IncrementalSanitizer::with_built_in_and_pii(limits, &selection).unwrap();
+        let mut text = String::new();
+        let mut findings = 0;
+        for chunk in chunked(&input, 64 * 1_024) {
+            let result = session.append(chunk).unwrap();
+            text.push_str(result.text());
+            findings += result.findings().len();
+        }
+        let result = session.finalize().unwrap();
+        text.push_str(result.text());
+        findings += result.findings().len();
+        let elapsed = started_at.elapsed().as_millis();
+        assert!(
+            elapsed <= budget,
+            "{selector}: incremental session took {elapsed}ms, above the {budget}ms budget",
+        );
+        assert_eq!(text, whole.text(), "{selector}: incremental text");
+        assert_eq!(findings, RECORDS, "{selector}: incremental findings");
     }
 }
