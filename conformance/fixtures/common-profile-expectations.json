@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 3269,
+  "fixtureCount": 3281,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -3273,6 +3273,18 @@
     {"expected":[],"id":"gitlab-routable-pat-boundary-glued-trailing-byte"},
     {"expected":[],"id":"gitlab-routable-pat-positive-legacy-twenty-byte-unchanged"},
     {"expected":[],"id":"gitlab-routable-pat-boundary-runner-routable-sibling"},
-    {"expected":[],"id":"gitlab-routable-pat-adversarial-repeated-dotted-prefix"}
+    {"expected":[],"id":"gitlab-routable-pat-adversarial-repeated-dotted-prefix"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":69,"start":33,"type":"contextual_secret"}],"id":"npmrc-authtoken-positive-registry-scoped-uuid"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":115,"start":75,"type":"contextual_secret"}],"id":"npmrc-authtoken-positive-private-registry"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":93,"start":61,"type":"contextual_secret"}],"id":"npmrc-auth-positive-base64-userinfo"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":83,"start":51,"type":"contextual_secret"}],"id":"npmrc-password-positive-quoted"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":49,"start":13,"type":"contextual_secret"}],"id":"npmrc-authtoken-positive-bare-line-start"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":79,"start":39,"type":"contextual_secret"}],"id":"npmrc-authtoken-positive-shell-echo"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":73,"start":33,"type":"contextual_secret"}],"id":"npmrc-authtoken-overlap-npm-token"},
+    {"expected":[],"id":"npmrc-authtoken-negative-env-reference"},
+    {"expected":[],"id":"npmrc-authtoken-negative-placeholder"},
+    {"expected":[],"id":"npmrc-negative-non-credential-keys"},
+    {"expected":[],"id":"npmrc-authtoken-boundary-glued-scope"},
+    {"expected":[],"id":"npmrc-auth-adversarial-repeated-keys"}
   ]
 }

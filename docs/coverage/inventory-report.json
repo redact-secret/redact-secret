@@ -2079,7 +2079,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 276,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2197,6 +2197,12 @@
         "generic-token-sdk-call-positive-python-kwarg-spaced",
         "generic-token-sdk-call-positive-rust-builder-positional",
         "generic-token-sdk-call-positive-typescript-named-argument",
+        "npmrc-auth-positive-base64-userinfo",
+        "npmrc-authtoken-positive-bare-line-start",
+        "npmrc-authtoken-positive-private-registry",
+        "npmrc-authtoken-positive-registry-scoped-uuid",
+        "npmrc-authtoken-positive-shell-echo",
+        "npmrc-password-positive-quoted",
         "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
@@ -2212,7 +2218,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 276,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2288,7 +2294,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 276,
         "hostContextsExercised": [
           "chat",
           "curl",

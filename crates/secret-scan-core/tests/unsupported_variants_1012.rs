@@ -261,3 +261,109 @@ mod gitlab_routable {
         assert_partition_parity(&format!("PRIVATE-TOKEN: {}\n", token(40, 10)));
     }
 }
+
+mod npmrc_credential_keys {
+    use super::*;
+
+    const DETECTOR: &str = "generic-token";
+    const TYPE: &str = "contextual_secret";
+    const LOWER_HEX: &[u8] = b"0123456789abcdef";
+    const BASE64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    /// A UUID-shaped legacy value built from filler.
+    fn uuid(seed: usize) -> String {
+        let hex = filler(LOWER_HEX, 32, seed);
+        format!(
+            "{}-{}-{}-{}-{}",
+            &hex[..8],
+            &hex[8..12],
+            &hex[12..16],
+            &hex[16..20],
+            &hex[20..]
+        )
+    }
+
+    fn values() -> Vec<String> {
+        vec![
+            uuid(1),
+            format!("{}==", filler(BASE64, 30, 2)),
+            filler(ALNUM, 40, 3),
+            format!("cmVmdGtu{}", filler(ALNUM, 56, 4)),
+        ]
+    }
+
+    #[test]
+    fn every_credential_key_is_one_redacted_finding() {
+        for value in values() {
+            for input in [
+                format!("//registry.npmjs.org/:_authToken={value}\n"),
+                format!(
+                    "registry=https://registry.npmjs.org/\n//registry.npmjs.org/:_authToken={value}\n"
+                ),
+                format!(
+                    "@acme:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken={value}\n"
+                ),
+                format!(
+                    "//artifactory.example.invalid/artifactory/api/npm/npm/:_auth={value}\nalways-auth=true\n"
+                ),
+                format!(
+                    "//nexus.example.invalid/repository/npm/:_password=\"{value}\"\n//nexus.example.invalid/repository/npm/:username=ci\n"
+                ),
+                format!("_authToken={value}\n"),
+                format!("_auth = {value}\r\n"),
+                format!("RUN echo \"//registry.npmjs.org/:_authToken={value}\" > .npmrc\n"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &value);
+            }
+        }
+    }
+
+    #[test]
+    fn a_current_npm_token_stays_the_provider_finding() {
+        let token = format!("npm_{}", filler(ALNUM, 36, 5));
+        assert_sole_finding_in(
+            &format!("//registry.npmjs.org/:_authToken={token}\n"),
+            "npm-token",
+            "npm_access_token",
+            &token,
+        );
+    }
+
+    #[test]
+    fn references_placeholders_and_other_keys_stay_silent() {
+        for input in [
+            "//registry.npmjs.org/:_authToken=${NPM_TOKEN}\n".to_owned(),
+            "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n".to_owned(),
+            "//registry.npmjs.org/:_authToken=<your-token>\n".to_owned(),
+            "//registry.npmjs.org/:_authToken=YOUR_NPM_TOKEN\n".to_owned(),
+            "//registry.npmjs.org/:_authToken=\n".to_owned(),
+            "//registry.npmjs.org/:username=synthetic-user\n".to_owned(),
+            "//registry.npmjs.org/:email=someone@example.invalid\n".to_owned(),
+            "registry=https://registry.npmjs.org/\nalways-auth=true\n".to_owned(),
+            format!("the _authToken={} in prose\n", uuid(6)),
+            format!("x:_authToken={}\n", uuid(6)),
+        ] {
+            let (_, findings) = whole_input(&input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        let (_, findings) = whole_input(&"//r/:_auth=".repeat(10_000));
+        assert!(findings.len() <= 1, "{}", findings.len());
+        let value = uuid(7);
+        let text = format!("//registry.npmjs.org/:_authToken={value}\n").repeat(300);
+        let (redacted, findings) = whole_input(&text);
+        assert_eq!(findings.len(), 300);
+        assert!(!redacted.contains(&value));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!(
+            "//npm.example.invalid/:_auth={}==\n",
+            filler(BASE64, 30, 8)
+        ));
+    }
+}

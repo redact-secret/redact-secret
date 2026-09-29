@@ -35,6 +35,11 @@ evidence is linked from each published version.
   when the length holder and CRC-32 verify (#1022). Before, the finding
   stopped at the first `.` and the version, length and CRC tail stayed in
   plaintext. A tail that does not verify keeps the unchanged legacy match.
+- `generic-token` redacts the value of the `.npmrc` credential keys
+  `_authToken`, `_auth` and `_password` (registry-scoped `//host/:_authToken=`
+  or at line start) as a high `contextual_secret` (#1024). The leading `_`
+  kept them outside the assignment grammar, so private-registry tokens and
+  legacy UUIDs on these lines had no finding.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
