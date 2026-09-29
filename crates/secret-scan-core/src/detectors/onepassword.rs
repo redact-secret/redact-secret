@@ -36,6 +36,7 @@
 //! the run and stays linear.
 
 use crate::detectors::pattern;
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -103,6 +104,10 @@ impl Detector for OnePasswordServiceAccountTokenDetector {
         Ok(candidates)
     }
 }
+
+/// The literals one of which every 1Password service-account candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[PREFIX])];
 
 #[cfg(test)]
 mod tests {

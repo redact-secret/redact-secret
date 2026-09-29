@@ -8,6 +8,7 @@
 
 use std::cmp::Ordering;
 
+use crate::detectors::PairSet;
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
 use crate::limits::WholeInputLimits;
@@ -142,6 +143,13 @@ fn validate_candidate<'a>(
 
 /// Runs every detector over the scan copy. The returned ranges index
 /// `scanned`, not the original input.
+///
+/// A built-in detector that declared literals (issue #983) is skipped when
+/// the scan copy's byte pairs rule out every one of them: it would have
+/// returned no candidates. It still gets its empty list, so the lists stay
+/// aligned with registration order. Debug builds run the skipped detector
+/// anyway and assert that it proposes nothing, so every test that scans
+/// also checks the declarations.
 fn collect_candidates(
     scanned: &str,
     registry: &DetectorRegistry,
@@ -151,7 +159,16 @@ fn collect_candidates(
     // size hint, so the list grew by doubling on every call, and an
     // incremental session makes one call per closed line (issue #950).
     let mut per_detector = Vec::with_capacity(registry.len());
+    let mut pairs = None;
     for registered in registry.detectors() {
+        if let Some(required) = registered.required_literals()
+            && !required.may_match(pairs.get_or_insert_with(|| PairSet::of(scanned.as_bytes())))
+        {
+            #[cfg(debug_assertions)]
+            assert_skip_is_exact(scanned, context, registered);
+            per_detector.push(Vec::new());
+            continue;
+        }
         per_detector.push(
             registered
                 .detector()
@@ -160,6 +177,21 @@ fn collect_candidates(
         );
     }
     Ok(per_detector)
+}
+
+/// Debug-build check for [`collect_candidates`]'s prefilter: a detector it
+/// skipped must return no candidates and no error on the same input. A
+/// failure means the detector's declared literals miss one of its
+/// emission paths.
+#[cfg(debug_assertions)]
+fn assert_skip_is_exact(scanned: &str, context: DetectorContext, registered: &RegisteredDetector) {
+    let skipped = registered.detector().detect(scanned, &context);
+    assert!(
+        skipped.as_ref().is_ok_and(Vec::is_empty),
+        "prefilter skipped `{}`, which proposes candidates on this input: \
+         its declared literals miss an emission path",
+        registered.id()
+    );
 }
 
 /// This candidate's rank within [`Specificity`], `0` for [`Specificity::Entropy`]

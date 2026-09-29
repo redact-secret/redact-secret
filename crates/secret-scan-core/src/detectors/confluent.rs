@@ -243,7 +243,6 @@ fn scan_bare_legacy_runs(
     boundary: Alphabet,
 ) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    let ends = pattern::run_ends(bytes, alphabet);
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
@@ -251,7 +250,7 @@ fn scan_bare_legacy_runs(
             start += 1;
             continue;
         }
-        let run_end = ends[start];
+        let run_end = pattern::run_end(bytes, start, alphabet);
         if run_end - start == LEGACY_SECRET_LEN
             && pattern::boundary_ok(bytes, start, run_end, boundary)
         {

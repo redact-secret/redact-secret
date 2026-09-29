@@ -291,6 +291,27 @@ evidence is linked from each published version.
   `latency/*/processing-ratio` rows are within budget (0.54-0.83 of beta.8;
   `browser-wasm` `scale-logs-small-whole` 1.23 against its 1.30 allowance).
   See `docs/audits/evidence/950/README.md`.
+- Detectors no longer allocate an 8-byte-per-input-byte run-length table on
+  every call (#982). Detectors anchored on a literal (`firebase`, `gitlab`
+  runner, `grafana`, `microsoft-entra`, `notion`, `openai`, `sendgrid`,
+  `sentry` org, `stripe` `whsec_`, `terraform`) build it only once the
+  literal occurs. Per-line run tokenizers (`confluent`, `datadog`, `heroku`,
+  `mailchimp`, `mailgun`, `new-relic`, `okta`, `pinecone`, `travisci`,
+  `twilio` and the keyword-gated keys) and `discord` and `telegram` measure
+  runs on demand without a table. A whole-input scan of 10 MiB of prose
+  allocated 1,952 MiB before and 32 MiB after. The #981 harness's 10 MiB
+  mixed workload runs about 22% faster whole-input and incremental.
+  Findings and output are unchanged. See `docs/audits/evidence/982/README.md`.
+- Built-in detectors that can only match text containing one of a few
+  literals (a provider prefix such as `ghp_`, a marker such as `.atlasv1.`)
+  are skipped when the scan copy cannot contain any of them (#983). The
+  pipeline builds one small set of the input's byte pairs per call. 75 of
+  the 92 `full` detectors and 4 of the 6 `common` ones declare their
+  literals. Custom detectors and the 17 built-ins that cannot declare one
+  (`generic-token`, `bearer-token`, the keyword-gated and bare-shape
+  detectors) always run. On the #981 harness the 64 KiB logs workload runs
+  43% faster whole-input and 48% faster incremental, on top of #982.
+  Findings and output are unchanged. See `docs/audits/evidence/983/README.md`.
 
 ## 0.1.0-beta.10 — 2026-09-28
 

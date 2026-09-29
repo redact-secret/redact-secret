@@ -115,6 +115,7 @@
 //!   accepts.
 
 use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -217,7 +218,7 @@ impl Detector for OktaApiTokenDetector {
 
             let bytes = line.as_bytes();
             let literal = TOKEN_PREFIX.as_bytes();
-            let ends = pattern::run_ends(bytes, is_body_byte);
+            let mut ends = pattern::RunCursor::new(bytes, is_body_byte);
             let mut pos = 0usize;
             while pos + literal.len() <= bytes.len() {
                 if &bytes[pos..pos + literal.len()] != literal {
@@ -225,7 +226,7 @@ impl Detector for OktaApiTokenDetector {
                     continue;
                 }
                 let body_start = pos + literal.len();
-                let body_end = ends[body_start];
+                let body_end = ends.end(body_start);
                 let shape_ok = body_end - body_start == BODY_LEN
                     && pattern::boundary_ok(bytes, pos, body_end, BOUNDARY)
                     && !text::is_repeated_character_filler(&line[body_start..body_end]);
@@ -257,6 +258,10 @@ impl Detector for OktaApiTokenDetector {
         Ok(candidates)
     }
 }
+
+/// The literals one of which every `okta-api-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[TOKEN_PREFIX])];
 
 #[cfg(test)]
 mod tests {

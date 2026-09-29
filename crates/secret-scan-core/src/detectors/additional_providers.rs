@@ -48,6 +48,18 @@ impl KnownFormatProviderDetector {
             boundary,
         }
     }
+
+    /// [`Detector::id`], usable in a `const`.
+    pub(super) const fn detector_id(&self) -> &'static str {
+        self.id
+    }
+
+    /// The shape table. Every candidate starts with one of its prefixes, so
+    /// they are this detector's literals for the shared prefilter
+    /// (`super::prefilter`, issue #983).
+    pub(super) const fn shapes(&self) -> &'static [PrefixShape<'static>] {
+        self.shapes
+    }
 }
 
 impl Detector for KnownFormatProviderDetector {
@@ -108,6 +120,16 @@ impl TypedKnownFormatProviderDetector {
             types,
             boundary,
         }
+    }
+
+    /// [`Detector::id`], usable in a `const`.
+    pub(super) const fn detector_id(&self) -> &'static str {
+        self.id
+    }
+
+    /// The shape table, as [`KnownFormatProviderDetector::shapes`].
+    pub(super) const fn shapes(&self) -> &'static [PrefixShape<'static>] {
+        self.shapes
     }
 
     /// The finding type of the shape the scan selected at `start`.

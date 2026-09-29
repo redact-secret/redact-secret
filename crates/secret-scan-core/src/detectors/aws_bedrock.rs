@@ -91,6 +91,7 @@
 //!   prefixed families.
 
 use crate::detectors::pattern;
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -283,6 +284,15 @@ impl Detector for AwsBedrockShortTermApiKeyDetector {
         ))
     }
 }
+
+/// The literals one of which every long-term Bedrock key candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const LONG_TERM_REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[LONG_TERM_PREFIX])];
+
+/// The literals one of which every short-term Bedrock key candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const SHORT_TERM_REQUIRED_LITERALS: &[Literals] =
+    &[Literals::Strs(&[SHORT_TERM_PREFIX])];
 
 #[cfg(test)]
 mod tests {

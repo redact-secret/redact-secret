@@ -245,6 +245,93 @@ pub(super) fn run_ends(bytes: &[u8], alphabet: Alphabet) -> Vec<usize> {
     ends
 }
 
+/// The exclusive end of the maximal run of `alphabet` bytes starting at
+/// `from`: `run_ends(bytes, alphabet)[from]`, without the table.
+///
+/// For a caller that walks the input as a sequence of runs and resumes at
+/// each run's end (a run tokenizer), every byte is visited once, so the scan
+/// stays linear without allocating a whole-input table (issue #982).
+pub(super) fn run_end(bytes: &[u8], from: usize, alphabet: Alphabet) -> usize {
+    from + bytes[from..]
+        .iter()
+        .position(|&byte| !alphabet(byte))
+        .unwrap_or(bytes.len() - from)
+}
+
+/// [`run_ends`] answered on demand: the same value for every query, in any
+/// query order, without the whole-input table (issue #982).
+///
+/// The cursor caches the last maximal run it measured. A query inside that
+/// run, or at its end, is answered from the cache. Any other query scans
+/// forward from the query offset, and a scan that reaches the start of the
+/// cached run joins it rather than rescanning it. Queries that move forward
+/// through the input therefore visit each byte once. A query that moves
+/// back rescans only up to the cached run, so the extra work is bounded by
+/// how far the caller steps back. This makes it correct, not merely
+/// linear, for callers that retry a shorter segment or step back after a
+/// failed attempt (`super::discord`).
+pub(super) struct RunCursor<'a> {
+    bytes: &'a [u8],
+    alphabet: Alphabet,
+    /// Start of the cached run. Every byte in `start..end` is in `alphabet`.
+    start: usize,
+    /// End of the cached run: `bytes.len()` or the offset of a byte outside
+    /// `alphabet`, so `end` is also the answer for a query at `end`.
+    end: usize,
+    /// Bytes the cursor has tested, for the linearity tests.
+    #[cfg(test)]
+    scanned: usize,
+}
+
+impl<'a> RunCursor<'a> {
+    /// A cursor over `bytes` with an empty cache (the empty run at the end
+    /// of the input, which is correct for a query there).
+    pub(super) fn new(bytes: &'a [u8], alphabet: Alphabet) -> Self {
+        Self {
+            bytes,
+            alphabet,
+            start: bytes.len(),
+            end: bytes.len(),
+            #[cfg(test)]
+            scanned: 0,
+        }
+    }
+
+    /// `run_ends(bytes, alphabet)[at]`. Panics when `at > bytes.len()`, as
+    /// indexing the table would.
+    pub(super) fn end(&mut self, at: usize) -> usize {
+        if self.start <= at && at <= self.end {
+            return self.end;
+        }
+        let rest = &self.bytes[at..];
+        let mut end = at;
+        for &byte in rest {
+            if end == self.start || !(self.alphabet)(byte) {
+                break;
+            }
+            end += 1;
+        }
+        #[cfg(test)]
+        {
+            self.scanned += end - at;
+        }
+        // Every byte from `at` to the cached run's start is in the
+        // alphabet, so the run continues through the cached run.
+        if end == self.start {
+            end = self.end;
+        }
+        self.start = at;
+        self.end = end;
+        end
+    }
+
+    /// How many bytes the cursor has tested so far.
+    #[cfg(test)]
+    pub(super) fn scanned(&self) -> usize {
+        self.scanned
+    }
+}
+
 /// The offset of the first occurrence of `needle` in `bytes` that starts at
 /// or after `from`, or `None` when there is none (or `needle` is empty).
 ///
@@ -597,6 +684,131 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// Every built-in alphabet, for the run-end equivalence tests.
+    const ALPHABETS: [Alphabet; 12] = [
+        is_alnum,
+        is_upper_alnum,
+        is_alnum_underscore,
+        is_alnum_dash,
+        is_digit,
+        is_alnum_dash_dot,
+        is_lower_hex,
+        is_hex,
+        is_hex_or_dash,
+        is_lower_alnum,
+        is_base64_body,
+        |byte| byte == b'0',
+    ];
+
+    /// A small deterministic xorshift generator, so the randomized tests
+    /// below replay the same cases on every run and every platform.
+    struct XorShift(u64);
+
+    impl XorShift {
+        fn next(&mut self) -> u64 {
+            self.0 ^= self.0 << 13;
+            self.0 ^= self.0 >> 7;
+            self.0 ^= self.0 << 17;
+            self.0
+        }
+
+        fn below(&mut self, bound: usize) -> usize {
+            usize::try_from(self.next() % bound as u64).unwrap()
+        }
+    }
+
+    /// Random inputs over bytes on both sides of every alphabet, with long
+    /// runs mixed in so cached runs and joins are exercised.
+    fn random_inputs(rng: &mut XorShift) -> Vec<Vec<u8>> {
+        const BYTES: &[u8] = b"0aF9zZ_-.+/= \n\x80";
+        let mut inputs = vec![Vec::new(), b"0".to_vec(), b"-".to_vec()];
+        for _ in 0..200 {
+            let len = rng.below(96);
+            let mut input = Vec::with_capacity(len);
+            while input.len() < len {
+                let byte = BYTES[rng.below(BYTES.len())];
+                let repeat = if rng.below(4) == 0 { rng.below(24) } else { 1 };
+                input.extend(std::iter::repeat_n(byte, repeat));
+            }
+            input.truncate(len);
+            inputs.push(input);
+        }
+        inputs
+    }
+
+    #[test]
+    fn run_end_matches_the_run_end_table_at_every_offset() {
+        let mut rng = XorShift(0x0982_0001_d1ce_f00d);
+        for input in random_inputs(&mut rng) {
+            for alphabet in ALPHABETS {
+                let table = run_ends(&input, alphabet);
+                for (from, &expected) in table.iter().enumerate() {
+                    assert_eq!(
+                        run_end(&input, from, alphabet),
+                        expected,
+                        "{input:?} {from}"
+                    );
+                }
+            }
+        }
+    }
+
+    /// The cursor must equal the table for any query order, not only a
+    /// non-decreasing one: callers retry shorter segments and step back
+    /// after a failed attempt (issue #982).
+    #[test]
+    fn run_cursor_matches_the_run_end_table_for_arbitrary_query_sequences() {
+        let mut rng = XorShift(0x0982_0002_5eed_cafe);
+        for input in random_inputs(&mut rng) {
+            for alphabet in ALPHABETS {
+                let table = run_ends(&input, alphabet);
+                for _ in 0..8 {
+                    let mut cursor = RunCursor::new(&input, alphabet);
+                    let mut at = rng.below(table.len());
+                    for _ in 0..64 {
+                        assert_eq!(cursor.end(at), table[at], "{input:?} {at}");
+                        // Mix small steps either way, jumps anywhere, and
+                        // repeats of the same offset.
+                        at = match rng.below(5) {
+                            0 => rng.below(table.len()),
+                            1 => at.saturating_sub(rng.below(30)),
+                            2 => at,
+                            _ => (at + rng.below(8)).min(input.len()),
+                        };
+                    }
+                }
+            }
+        }
+    }
+
+    /// Non-decreasing queries test each byte at most once, however many
+    /// queries land inside the same run.
+    #[test]
+    fn run_cursor_tests_each_byte_once_for_forward_queries() {
+        let input = "sk-".repeat(40_000);
+        let bytes = input.as_bytes();
+        let mut cursor = RunCursor::new(bytes, is_alnum_dash);
+        for at in 0..=bytes.len() {
+            assert_eq!(cursor.end(at), bytes.len());
+        }
+        assert!(cursor.scanned() <= bytes.len(), "{}", cursor.scanned());
+    }
+
+    /// A query that steps back into, or just before, the cached run rescans
+    /// only the step, not the run it joins.
+    #[test]
+    fn run_cursor_rescans_only_the_backward_step() {
+        let input = "a".repeat(100_000);
+        let bytes = input.as_bytes();
+        let mut cursor = RunCursor::new(bytes, is_alnum);
+        assert_eq!(cursor.end(50_000), bytes.len());
+        let first = cursor.scanned();
+        for at in (0..50_000).rev() {
+            assert_eq!(cursor.end(at), bytes.len());
+        }
+        assert_eq!(cursor.scanned() - first, 50_000);
     }
 
     #[test]

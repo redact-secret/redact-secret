@@ -26,6 +26,7 @@ use super::text::{
     is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
     matches_placeholder_vocabulary, starts_with_bare_dollar_reference,
 };
+use crate::detectors::prefilter::Literals;
 use crate::entropy::shannon_entropy;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -112,6 +113,9 @@ fn driver_suffix_end(bytes: &[u8], at: usize) -> Option<usize> {
 
 /// Finds the next `<scheme>://` occurrence at or after `from`, matching the
 /// scheme name case-insensitively.
+/// The separator every supported URI scheme is followed by.
+const SCHEME_SEPARATOR: &str = "://";
+
 fn find_next_scheme(input: &str, from: usize) -> Option<SchemeMatch> {
     let bytes = input.as_bytes();
     let mut position = from;
@@ -123,7 +127,11 @@ fn find_next_scheme(input: &str, from: usize) -> Option<SchemeMatch> {
     let mut separator = None;
     while position <= bytes.len() {
         if separator.is_none_or(|at| at < position) {
-            separator = Some(pattern::find_literal(bytes, b"://", position)?);
+            separator = Some(pattern::find_literal(
+                bytes,
+                SCHEME_SEPARATOR.as_bytes(),
+                position,
+            )?);
         }
         if let Some(at) = separator
             && at > position + MAX_SCHEME_SPAN
@@ -141,8 +149,8 @@ fn find_next_scheme(input: &str, from: usize) -> Option<SchemeMatch> {
                 Some(driver_end) if DRIVER_SUFFIX_DIALECTS.contains(&scheme) => (driver_end, true),
                 _ => (name_end, false),
             };
-            let end = separator + 3;
-            if end <= bytes.len() && bytes[separator..end] == *b"://" {
+            let end = separator + SCHEME_SEPARATOR.len();
+            if end <= bytes.len() && bytes[separator..end] == *SCHEME_SEPARATOR.as_bytes() {
                 return Some(SchemeMatch {
                     start: position,
                     end,
@@ -741,6 +749,16 @@ impl Detector for ConnectionStringDetector {
         Ok(candidates)
     }
 }
+
+/// The literals one of which every `connection-string` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// Every URI candidate follows a `://`, and every Azure Storage candidate
+/// follows an `AccountKey=` anchor.
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[
+    SCHEME_SEPARATOR,
+    AZURE_ACCOUNT_KEY_ANCHOR,
+])];
 
 #[cfg(test)]
 mod tests {

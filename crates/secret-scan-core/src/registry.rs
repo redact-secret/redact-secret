@@ -4,7 +4,9 @@
 //! breaker and it fixes the order in which detectors run. Built-in detectors
 //! are always registered before custom ones.
 
-use crate::detectors::{built_in_detectors, built_in_ids, common_built_in_detectors};
+use crate::detectors::{
+    BuiltIn, RequiredLiterals, built_in_entries, built_in_ids, common_built_in_entries,
+};
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::pii::{PiiSelection, adapter, is_reserved_detector_id};
 use crate::types::{Detector, is_identifier};
@@ -57,6 +59,11 @@ impl Profile {
 pub struct RegisteredDetector {
     id: String,
     detector: Box<dyn Detector>,
+    /// The literals a built-in detector declared for the shared prefilter
+    /// (issue #983). `None` for every custom detector and for built-ins
+    /// that run on every call. Private: the declaration is not part of the
+    /// public `Detector` contract.
+    required: Option<RequiredLiterals>,
 }
 
 impl RegisteredDetector {
@@ -70,6 +77,11 @@ impl RegisteredDetector {
     #[must_use]
     pub fn detector(&self) -> &dyn Detector {
         self.detector.as_ref()
+    }
+
+    /// The literals this detector declared for the shared prefilter, if any.
+    pub(crate) const fn required_literals(&self) -> Option<&RequiredLiterals> {
+        self.required.as_ref()
     }
 }
 
@@ -96,6 +108,7 @@ impl DetectorRegistry {
             detectors: vec![RegisteredDetector {
                 id: detector.id().to_owned(),
                 detector,
+                required: None,
             }],
             profile: None,
             activation_identity: String::new(),
@@ -149,11 +162,11 @@ impl DetectorRegistry {
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
         let mut registry = Self::new();
-        for detector in built_in_detectors() {
-            registry.push_validated(detector, false)?;
+        for BuiltIn { detector, required } in built_in_entries() {
+            registry.push_validated(detector, false, required)?;
         }
         for detector in custom {
-            registry.push_validated(detector, false)?;
+            registry.push_validated(detector, false, None)?;
         }
         registry.profile = Some(Profile::Full);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Full);
@@ -183,11 +196,11 @@ impl DetectorRegistry {
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
         let mut registry = Self::new();
-        for detector in common_built_in_detectors() {
-            registry.push_validated(detector, false)?;
+        for BuiltIn { detector, required } in common_built_in_entries() {
+            registry.push_validated(detector, false, required)?;
         }
         for detector in custom {
-            registry.push_validated(detector, true)?;
+            registry.push_validated(detector, true, None)?;
         }
         registry.profile = Some(Profile::Common);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Common);
@@ -273,10 +286,11 @@ impl DetectorRegistry {
             registry.detectors.push(RegisteredDetector {
                 id: "pii-domain".to_owned(),
                 detector: adapter(selection),
+                required: None,
             });
         }
         for detector in custom {
-            registry.push_validated(detector, true)?;
+            registry.push_validated(detector, true, None)?;
         }
         registry.profile = Some(profile);
         registry.activation_identity = selection.activation_identity(profile);
@@ -309,17 +323,20 @@ impl DetectorRegistry {
     /// not satisfy [`is_identifier`] or is already registered. The registry
     /// is unchanged on error.
     pub fn register(&mut self, detector: Box<dyn Detector>) -> Result<&mut Self, SecretScanError> {
-        self.push_validated(detector, false)?;
+        self.push_validated(detector, false, None)?;
         self.profile = None;
         Ok(self)
     }
 
     /// Reads the id once, validates it, and appends. `reject_built_in_ids`
-    /// additionally refuses any `full` built-in id.
+    /// additionally refuses any `full` built-in id. `required` is the
+    /// prefilter declaration, `Some` only for a built-in constructed by this
+    /// crate.
     fn push_validated(
         &mut self,
         detector: Box<dyn Detector>,
         reject_built_in_ids: bool,
+        required: Option<RequiredLiterals>,
     ) -> Result<(), SecretScanError> {
         let id = detector.id();
         if !is_identifier(id)
@@ -332,6 +349,7 @@ impl DetectorRegistry {
         self.detectors.push(RegisteredDetector {
             id: id.to_owned(),
             detector,
+            required,
         });
         Ok(())
     }
@@ -369,6 +387,7 @@ impl DetectorRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::detectors::{built_in_detectors, common_built_in_detectors};
     use crate::error::DetectorFailure;
     use crate::types::{Candidate, DetectorContext};
 
@@ -382,6 +401,37 @@ mod tests {
         fn detect(&self, _: &str, _: &DetectorContext) -> Result<Vec<Candidate>, DetectorFailure> {
             Ok(Vec::new())
         }
+    }
+
+    /// Only a built-in constructed by this crate carries a prefilter
+    /// declaration (issue #983). A custom detector never does, even one
+    /// that reuses a built-in id on the low-level path, so it always runs.
+    #[test]
+    fn only_crate_built_ins_carry_prefilter_declarations() {
+        let full =
+            DetectorRegistry::with_built_in([Box::new(Named("custom")) as Box<dyn Detector>])
+                .unwrap();
+        let declared = |registry: &DetectorRegistry, id: &str| {
+            registry
+                .detectors()
+                .iter()
+                .find(|registered| registered.id() == id)
+                .unwrap()
+                .required_literals()
+                .is_some()
+        };
+        assert!(declared(&full, "github-token"));
+        assert!(!declared(&full, "generic-token"));
+        assert!(!declared(&full, "custom"));
+
+        let mut low_level = DetectorRegistry::new();
+        low_level.register(Box::new(Named("github-token"))).unwrap();
+        assert!(!declared(&low_level, "github-token"));
+
+        let pii = DetectorRegistry::with_built_in_and_pii(&PiiSelection::default()).unwrap();
+        assert!(pii.detectors().iter().all(|registered| {
+            registered.id() != "pii-domain" || registered.required_literals().is_none()
+        }));
     }
 
     #[test]

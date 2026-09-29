@@ -88,6 +88,7 @@
 //! as beta.4.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -444,6 +445,17 @@ fn digit_section_end(
     let len = end - start;
     (digit_min..=digit_max).contains(&len).then_some(end)
 }
+
+/// The literals one of which every `slack-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// One per pass in [`scan`]: bot, user, each rotation prefix, app-level and
+/// the interim shapes.
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Strs(&[BOT_PREFIX, USER_PREFIX, APP_LEVEL_PREFIX]),
+    Literals::Strs(&ROTATION_PREFIXES),
+    Literals::Shapes(&INTERIM_SHAPES),
+];
 
 #[cfg(test)]
 mod tests {

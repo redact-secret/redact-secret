@@ -66,6 +66,7 @@
 //! as `vault_token`.
 
 use crate::detectors::pattern::{self, is_alnum};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -92,9 +93,14 @@ impl Detector for TerraformCloudTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the marker returns before the run-end table is built
+        // (issue #982).
+        let Some(first) = find_marker(bytes, 0) else {
+            return Ok(Vec::new());
+        };
         let alnum_ends = pattern::run_ends(bytes, is_alnum);
         let mut candidates = Vec::new();
-        let mut cursor = 0;
+        let mut cursor = first;
         while cursor < bytes.len() {
             let Some(marker_start) = find_marker(bytes, cursor) else {
                 break;
@@ -155,6 +161,10 @@ fn match_at(bytes: &[u8], alnum_ends: &[usize], marker_start: usize) -> Option<B
 
     ByteRange::new(prefix_start, end)
 }
+
+/// The literals one of which every `terraform-cloud-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[Literals::Bytes(&[MARKER])];
 
 #[cfg(test)]
 mod tests {

@@ -24,6 +24,7 @@
 
 use crate::detectors::additional_providers::STRIPE;
 use crate::detectors::pattern;
+use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -97,9 +98,14 @@ fn has_filler_body(value: &str) -> bool {
 /// embeds the prefix never yields a second, shorter reading.
 fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
+    // Input without the prefix returns before the run-end table is built
+    // (issue #982).
+    let Some(first) = pattern::find_literal(bytes, WEBHOOK_PREFIX.as_bytes(), 0) else {
+        return Vec::new();
+    };
     let body_ends = pattern::run_ends(bytes, is_base64_body);
     let mut matches = Vec::new();
-    let mut start = 0;
+    let mut start = first;
     while start < bytes.len() {
         if !bytes[start..].starts_with(WEBHOOK_PREFIX.as_bytes()) {
             start += 1;
@@ -124,6 +130,15 @@ fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
     }
     matches
 }
+
+/// The literals one of which every `stripe-token` candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+///
+/// The shared key table's prefixes and the separate `whsec_` scan.
+pub(super) const REQUIRED_LITERALS: &[Literals] = &[
+    Literals::Shapes(STRIPE.shapes()),
+    Literals::Strs(&[WEBHOOK_PREFIX]),
+];
 
 #[cfg(test)]
 mod tests {

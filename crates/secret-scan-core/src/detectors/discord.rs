@@ -26,7 +26,7 @@
 //! (Discord row) for the full rationale and what is deliberately out of scope (webhook URL
 //! tokens, `OAuth2` client secrets, `mfa.`-prefixed user/self-bot tokens).
 
-use crate::detectors::pattern::{self, is_alnum_dash};
+use crate::detectors::pattern::{self, RunCursor, is_alnum_dash};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -129,11 +129,15 @@ fn decodes_to_ascii_digits(segment: &[u8]) -> bool {
 }
 
 /// The exclusive end of an exact-length alphabet run starting at `start`,
-/// using the precomputed maximal-run table so the check is a single bounds
-/// comparison rather than a rescan.
-fn segment_end(ends: &[usize], start: usize, len: usize) -> Option<usize> {
+/// read from the shared run cursor so the check does not rescan a run the
+/// scan has already measured.
+fn segment_end(ends: &mut RunCursor<'_>, start: usize, len: usize) -> Option<usize> {
     let end = start.checked_add(len)?;
-    if ends[start] < end { None } else { Some(end) }
+    if ends.end(start) < end {
+        None
+    } else {
+        Some(end)
+    }
 }
 
 /// Attempts a three-segment match anchored exactly at `start`. Returns the
@@ -144,7 +148,7 @@ fn segment_end(ends: &[usize], start: usize, len: usize) -> Option<usize> {
 /// 24-byte (18-digit snowflake) first segment pairs with either third-segment
 /// length, since a legacy bot's token grows its third segment on reset
 /// without its ID gaining a digit.
-fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
+fn match_at(bytes: &[u8], ends: &mut RunCursor<'_>, start: usize) -> Option<usize> {
     for (seg1_len, seg3_lens) in [
         (
             SEGMENT_ONE_LEN_CURRENT,
@@ -188,13 +192,23 @@ fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
 /// advances past the whole match regardless of whether the boundary check
 /// below keeps it -- the same shape `pattern::scan_prefixed_runs` uses, but
 /// without a literal prefix to anchor on.
+///
+/// With no literal to gate on, run ends come from a [`RunCursor`] rather
+/// than a whole-input table (issue #982). [`match_at`] queries out of order
+/// (it retries a shorter first segment, then the scan steps back to
+/// `start + 1`), which the cursor answers exactly.
 fn scan(input: &str) -> Vec<(usize, usize)> {
+    scan_with(input, &mut RunCursor::new(input.as_bytes(), is_alnum_dash))
+}
+
+/// [`scan`] against a caller-supplied cursor, so the linearity test can
+/// read how many bytes the cursor tested.
+fn scan_with(input: &str, ends: &mut RunCursor<'_>) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    let ends = pattern::run_ends(bytes, is_alnum_dash);
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
-        let Some(end) = match_at(bytes, &ends, start) else {
+        let Some(end) = match_at(bytes, ends, start) else {
             start += 1;
             continue;
         };
@@ -515,5 +529,39 @@ mod tests {
             candidates[0].range(),
             ByteRange::new(0, value.len()).unwrap()
         );
+    }
+
+    /// The discord analogue of `pattern`'s
+    /// `repeated_embedded_prefixes_in_one_run_stay_linear` (issue #982). Each
+    /// near miss makes [`match_at`] query the second and third segments and
+    /// then the scan step back to `start + 1`, the out-of-order pattern the
+    /// run cursor must answer without rescanning whole runs. The bound is a
+    /// count of bytes the cursor tested, not a time, so load cannot flake it.
+    #[test]
+    fn out_of_order_segment_queries_stay_linear() {
+        let near_misses = [
+            // Third segment one byte short of the legacy width, glued to the
+            // next repetition so every run joins the next one.
+            format!("{SEGMENT_ONE}.{SEGMENT_TWO}.{}", &SEGMENT_THREE[..26]),
+            format!("{SEGMENT_ONE}.{SEGMENT_TWO}.-"),
+            // A 26-byte first segment whose next run is not a second segment.
+            format!("{SEGMENT_ONE_CURRENT}."),
+            // A 26-byte first segment with only a legacy-width third segment.
+            format!("{SEGMENT_ONE_CURRENT}.{SEGMENT_TWO}.{SEGMENT_THREE}!"),
+            // One maximal run with no separator at all.
+            "MDAw".to_owned(),
+        ];
+        for unit in near_misses {
+            let input = unit.repeat(4_000);
+            let mut cursor = RunCursor::new(input.as_bytes(), is_alnum_dash);
+            let matches = scan_with(&input, &mut cursor);
+            assert_eq!(matches, scan(&input), "{unit}");
+            assert!(
+                cursor.scanned() <= 3 * input.len(),
+                "{unit}: {} bytes tested for {} input bytes",
+                cursor.scanned(),
+                input.len()
+            );
+        }
     }
 }

@@ -70,6 +70,7 @@
 //! above and are not classified by either detector.
 
 use crate::detectors::pattern::{self, RunLength, is_alnum_underscore};
+use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -152,9 +153,14 @@ impl Detector for SentryOrgAuthTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the prefix returns before the run-end table is built
+        // (issue #982).
+        let Some(first) = pattern::find_literal(bytes, ORG_PREFIX.as_bytes(), 0) else {
+            return Ok(Vec::new());
+        };
         let base64_ends = pattern::run_ends(bytes, is_base64_std);
         let mut candidates = Vec::new();
-        let mut start = 0usize;
+        let mut start = first;
 
         while start < bytes.len() {
             if !bytes[start..].starts_with(ORG_PREFIX.as_bytes()) {
@@ -220,6 +226,14 @@ fn org_match_at(bytes: &[u8], base64_ends: &[usize], start: usize) -> Option<usi
 
     Some(signature_end)
 }
+
+/// The literals one of which every Sentry user-token candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const USER_REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[USER_PREFIX])];
+
+/// The literals one of which every Sentry org-token candidate contains, for the
+/// shared prefilter (`super::prefilter`, issue #983).
+pub(super) const ORG_REQUIRED_LITERALS: &[Literals] = &[Literals::Strs(&[ORG_PREFIX])];
 
 #[cfg(test)]
 mod tests {
