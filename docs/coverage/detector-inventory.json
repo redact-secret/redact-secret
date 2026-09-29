@@ -41,6 +41,13 @@
       "schemes": null
     },
     {
+      "type": "aws_secret_access_key",
+      "detector": "aws-secret-access-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "AWS_SECRET_ACCESS_KEY=SyntheticRevokedAwsSecretAccessKeyValue0",
+      "schemes": null
+    },
+    {
       "type": "github_token",
       "detector": "github-token",
       "policyClass": "always-redact",

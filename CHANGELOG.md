@@ -27,6 +27,11 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- `aws-secret-access-key` (#1028): the AWS secret access key, exactly 40
+  `[A-Za-z0-9/+]` with mixed case, as `aws_secret_access_key` (always
+  redacted), claimed only under an AWS secret key name or on or directly
+  below an `AKIA`/`ASIA` access key ID line. The incremental session holds an
+  ID line open for one more line.
 - The AWS temporary access key ID contract (`ASIA` + exactly 16 `[A-Z0-9]`,
   T2) is recorded beside `AKIA` with conformance fixtures and tests (#1027).
   Grammar, type and action are unchanged.

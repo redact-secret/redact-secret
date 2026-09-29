@@ -89,6 +89,7 @@ use private_key::PrivateKeyDetector;
 use prefilter::Literals;
 pub(crate) use prefilter::{PairSet, RequiredLiterals};
 
+pub(crate) use aws::has_open_aws_access_key_id_line;
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{
@@ -141,11 +142,16 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
 }
 
 /// Every built-in detector, in canonical registration order.
+///
+/// One entry per line by contract (`scripts/measure-detector-cost.mjs`
+/// comments entries out by line), so the list outgrows the line lint.
 #[must_use]
+#[allow(clippy::too_many_lines)]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(PrivateKeyDetector),
         Box::new(aws::AwsAccessKeyDetector),
+        Box::new(aws::AwsSecretAccessKeyDetector),
         Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
         Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
         Box::new(github::GitHubTokenDetector),
@@ -314,6 +320,7 @@ pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
 /// `prefilter::tests::only_the_reviewed_built_ins_run_on_every_call`).
 const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     ("aws-access-key", aws::REQUIRED_LITERALS),
+    ("aws-secret-access-key", aws::SECRET_REQUIRED_LITERALS),
     (
         "aws-bedrock-long-term-api-key",
         aws_bedrock::LONG_TERM_REQUIRED_LITERALS,
@@ -604,6 +611,7 @@ pub(crate) enum Pack {
 pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("private-key", Pack::Common),
     ("aws-access-key", Pack::Provider),
+    ("aws-secret-access-key", Pack::Provider),
     ("aws-bedrock-long-term-api-key", Pack::Provider),
     ("aws-bedrock-short-term-api-key", Pack::Provider),
     ("github-token", Pack::Provider),
@@ -737,6 +745,7 @@ mod tests {
             vec![
                 "private-key",
                 "aws-access-key",
+                "aws-secret-access-key",
                 "aws-bedrock-long-term-api-key",
                 "aws-bedrock-short-term-api-key",
                 "github-token",

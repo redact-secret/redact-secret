@@ -411,6 +411,89 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "aws-secret-access-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-positive-aws-configure-prompt",
+            "aws-secret-access-key-positive-console-csv",
+            "aws-secret-access-key-positive-credentials-file",
+            "aws-secret-access-key-positive-dotenv",
+            "aws-secret-access-key-positive-iam-create-access-key-json",
+            "aws-secret-access-key-positive-line-below-temporary-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-overlap-contextual-name"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-adversarial-long-line"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-boundary-below-unclaimed-identifier",
+            "aws-secret-access-key-boundary-dash-inside"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-negative-bare-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-boundary-below-unclaimed-identifier",
+            "aws-secret-access-key-boundary-dash-inside"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for aws_secret_access_key (aws-secret-access-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "aws_secret_access_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "github-token",
       "dimensions": [
         {
@@ -13554,6 +13637,7 @@
             "aws-adversarial-long-suffix",
             "aws-bedrock-long-term-api-key-adversarial-dense-findings",
             "aws-bedrock-short-term-api-key-adversarial-dense-findings",
+            "aws-secret-access-key-adversarial-long-line",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
@@ -14019,6 +14103,7 @@
             "aws-adversarial-long-suffix",
             "aws-bedrock-long-term-api-key-adversarial-dense-findings",
             "aws-bedrock-short-term-api-key-adversarial-dense-findings",
+            "aws-secret-access-key-adversarial-long-line",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",

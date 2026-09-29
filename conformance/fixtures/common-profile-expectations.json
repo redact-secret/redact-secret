@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 3296,
+  "fixtureCount": 3311,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -3300,6 +3300,21 @@
     {"expected":[],"id":"aws-asia-boundary-body-seventeen"},
     {"expected":[],"id":"aws-asia-boundary-lowercase-byte"},
     {"expected":[],"id":"aws-asia-boundary-asib-prefix"},
-    {"expected":[],"id":"aws-asia-negative-other-iam-identifiers"}
+    {"expected":[],"id":"aws-asia-negative-other-iam-identifiers"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":62,"start":22,"type":"contextual_secret"}],"id":"aws-secret-access-key-positive-dotenv"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":115,"start":75,"type":"contextual_secret"}],"id":"aws-secret-access-key-positive-credentials-file"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":114,"start":74,"type":"contextual_secret"}],"id":"aws-secret-access-key-positive-iam-create-access-key-json"},
+    {"expected":[],"id":"aws-secret-access-key-positive-aws-configure-prompt"},
+    {"expected":[],"id":"aws-secret-access-key-positive-console-csv"},
+    {"expected":[],"id":"aws-secret-access-key-positive-line-below-temporary-id"},
+    {"expected":[],"id":"aws-secret-access-key-negative-bare-run"},
+    {"expected":[],"id":"aws-secret-access-key-boundary-git-sha-below-id"},
+    {"expected":[],"id":"aws-secret-access-key-boundary-blank-line-gap"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":63,"start":22,"type":"contextual_secret"}],"id":"aws-secret-access-key-boundary-forty-one-under-name"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":63,"start":22,"type":"contextual_secret"}],"id":"aws-secret-access-key-boundary-padded"},
+    {"expected":[],"id":"aws-secret-access-key-adversarial-long-line"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":64,"start":24,"type":"contextual_secret"}],"id":"aws-secret-access-key-overlap-contextual-name"},
+    {"expected":[],"id":"aws-secret-access-key-boundary-below-unclaimed-identifier"},
+    {"expected":[],"id":"aws-secret-access-key-boundary-dash-inside"}
   ]
 }

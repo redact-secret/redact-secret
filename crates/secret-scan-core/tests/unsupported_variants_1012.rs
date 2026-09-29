@@ -497,3 +497,155 @@ mod aws_sts_temporary_access_key_id {
         assert_partition_parity(&format!("aws_access_key_id = {}\n", id("ASIA", 5)));
     }
 }
+
+mod aws_secret_access_key {
+    use super::*;
+
+    const DETECTOR: &str = "aws-secret-access-key";
+    const TYPE: &str = "aws_secret_access_key";
+    const B64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const UPPER_ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    fn secret(seed: usize) -> String {
+        filler(B64, 40, seed)
+    }
+
+    fn id(prefix: &str, seed: usize) -> String {
+        format!("{prefix}{}", filler(UPPER_ALNUM, 16, seed))
+    }
+
+    /// The one finding over `value` is `aws_secret_access_key`, redacted,
+    /// at exactly its span; every other finding is elsewhere.
+    fn assert_secret_finding(input: &str, value: &str) {
+        let (text, findings) = whole_input(input);
+        let start = input.find(value).unwrap();
+        let over: Vec<&Finding> = findings
+            .iter()
+            .filter(|f| f.range().start() < start + value.len() && f.range().end() > start)
+            .collect();
+        assert_eq!(over.len(), 1, "{input}: {findings:?}");
+        assert_eq!(over[0].detector(), DETECTOR, "{input}");
+        assert_eq!(over[0].type_name(), TYPE, "{input}");
+        assert_eq!(over[0].action(), Action::Redact, "{input}");
+        assert_eq!(
+            (over[0].range().start(), over[0].range().end()),
+            (start, start + value.len()),
+            "{input}"
+        );
+        assert!(!text.contains(value), "{input}");
+    }
+
+    #[test]
+    fn named_and_id_adjacent_forms_are_one_provider_finding() {
+        for seed in [1, 2, 3] {
+            let value = secret(seed);
+            let akia = id("AKIA", seed);
+            let temporary_id = id("ASIA", seed);
+            for input in [
+                format!("AWS_SECRET_ACCESS_KEY={value}\n"),
+                format!("export AWS_SECRET_ACCESS_KEY=\"{value}\"\n"),
+                format!("[default]\naws_access_key_id = {akia}\naws_secret_access_key = {value}\n"),
+                format!(
+                    "{{\"AccessKey\": {{\"AccessKeyId\": \"{akia}\", \"Status\": \"Active\", \"SecretAccessKey\": \"{value}\"}}}}"
+                ),
+                format!(
+                    "{{\"Credentials\": {{\"AccessKeyId\": \"{temporary_id}\", \"SecretAccessKey\": \"{value}\"}}}}"
+                ),
+                format!(
+                    "Outputs:\n  SecretAccessKey:\n    Value: !GetAtt Key.SecretAccessKey\n  Plain:\n    SecretAccessKey: {value}\n"
+                ),
+                format!(
+                    "AWS Access Key ID [None]: {akia}\nAWS Secret Access Key [None]: {value}\n"
+                ),
+                format!("Access key ID,Secret access key\n{akia},{value}\n"),
+                format!("here are my keys\n{akia}\n{value}\n"),
+                format!("Set-AWSCredential -AccessKey {akia} -SecretKey {value}\n"),
+                format!(
+                    "const s3 = new S3Client({{ credentials: {{ accessKeyId: \"{akia}\", secretAccessKey: \"{value}\" }} }});\n"
+                ),
+                format!("My AWS keys are {temporary_id} and {value}, what is wrong?"),
+            ] {
+                assert_secret_finding(&input, &value);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed_and_named_ones_stay_redacted_by_generic_token() {
+        let value = secret(4);
+        let mut twins = vec![
+            value[..39].to_owned(),
+            format!("{value}A"),
+            format!("{}={}", &value[..20], &value[21..]),
+            format!("{}-{}", &value[..20], &value[21..]),
+            format!("{}_{}", &value[..20], &value[21..]),
+            format!("{value}="),
+            value.to_ascii_uppercase(),
+            value.to_ascii_lowercase(),
+        ];
+        twins.push(format!("x{}", &value[1..]).replace('x', "\u{e9}"));
+        for twin in &twins {
+            let named = format!("AWS_SECRET_ACCESS_KEY={twin}\n");
+            assert_unclaimed(DETECTOR, &named);
+            let adjacent = format!("{}\n{twin}\n", id("AKIA", 4));
+            assert_unclaimed(DETECTOR, &adjacent);
+        }
+        // Security-first: the name still redacts the 41-byte twin.
+        let (text, _) = whole_input(&format!("AWS_SECRET_ACCESS_KEY={value}A\n"));
+        assert!(!text.contains(&value));
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        let sha = filler(b"0123456789abcdef", 40, 5);
+        let value = secret(5);
+        for input in [
+            format!("{value}\n"),
+            format!("commit {sha}\n{}\n", id("AKIA", 5)),
+            format!("{}\n{sha}\n", id("AKIA", 5)),
+            format!("etag: {value}\n"),
+            format!("sha256={value}\n"),
+            format!("{value}\n{}\n", id("AKIA", 5)),
+            format!("{}\n\n{value}\n", id("AKIA", 5)),
+            format!("{}\n{value}\n", id("AIDA", 5)),
+            "aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn neighbouring_aws_families_keep_their_own_findings() {
+        let akia = id("AKIA", 6);
+        let value = secret(6);
+        let bedrock = format!("ABSK{}", "U3ludGhldGljUmV2b2tlZA".repeat(6));
+        let input = format!("{akia},{value}\nAWS_BEARER_TOKEN_BEDROCK={bedrock}\n");
+        let (_, findings) = whole_input(&input);
+        for detector in [DETECTOR, "aws-access-key", "aws-bedrock-long-term-api-key"] {
+            assert_eq!(
+                detector_findings(&findings, detector).len(),
+                1,
+                "{detector}: {findings:?}"
+            );
+        }
+        assert_unclaimed(DETECTOR, &format!("{bedrock}\n"));
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &format!("{} ", secret(7)).repeat(10_000));
+        let line = format!("{},{} ", id("AKIA", 7), secret(7)).repeat(300);
+        let (text, findings) = whole_input(&line);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 300);
+        assert!(!text.contains(&secret(7)));
+        let ids = format!("{}\n", id("ASIA", 8)).repeat(500);
+        assert_eq!(whole_input(&ids).1.len(), 500);
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("aws_secret_access_key = {}\n", secret(9)));
+        assert_partition_parity(&format!("{}\n{}\n", id("AKIA", 9), secret(9)));
+        assert_partition_parity(&format!("{}\r\n{}\r\nnext\n", id("ASIA", 9), secret(9)));
+    }
+}

@@ -222,6 +222,43 @@
       "type": "aws_bedrock_short_term_api_key"
     },
     {
+      "detector": "aws-secret-access-key",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "json",
+          "plain-text",
+          "terminal",
+          "toml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "aws-secret-access-key-positive-aws-configure-prompt",
+        "aws-secret-access-key-positive-console-csv",
+        "aws-secret-access-key-positive-credentials-file",
+        "aws-secret-access-key-positive-dotenv",
+        "aws-secret-access-key-positive-iam-create-access-key-json",
+        "aws-secret-access-key-positive-line-below-temporary-id"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "aws_secret_access_key"
+    },
+    {
       "detector": "github-token",
       "evidence": {
         "fixtureCount": 71,
@@ -5585,7 +5622,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 122,
+    "supported": 123,
     "unresolved": 0
   }
 }

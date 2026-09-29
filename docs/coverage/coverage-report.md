@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 122/122 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 123/123 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 122 |
+| supported | 123 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 133.
+Coverage declarations: 134.
 
 ## Coverage by detector
 
@@ -32,6 +32,7 @@ Coverage declarations: 133.
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| aws-secret-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -138,6 +139,7 @@ Coverage declarations: 133.
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
 | aws_bedrock_long_term_api_key | aws-bedrock-long-term-api-key | provider | supported | not-applicable | none |
 | aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
+| aws_secret_access_key | aws-secret-access-key | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
@@ -275,15 +277,15 @@ Coverage declarations: 133.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 133 | 0 | 0 |
-| boundary | 122 | 0 | 0 |
-| host-context | 122 | 0 | 0 |
+| adversarial | 134 | 0 | 0 |
+| boundary | 123 | 0 | 0 |
+| host-context | 123 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 133 | 0 | 0 |
-| near-miss-negative | 122 | 0 | 0 |
-| overlap | 122 | 0 | 0 |
-| positive | 122 | 0 | 0 |
-| range | 133 | 0 | 0 |
+| malformed | 134 | 0 | 0 |
+| near-miss-negative | 123 | 0 | 0 |
+| overlap | 123 | 0 | 0 |
+| positive | 123 | 0 | 0 |
+| range | 134 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
