@@ -273,6 +273,63 @@ fn a_fragmented_adversarial_partition_stays_within_the_same_runtime_cap() {
     }
 }
 
+/// One 256 KiB line built by repeating `record`, closed with `suffix`.
+fn single_line(prefix: &str, record: impl Fn(usize) -> String, suffix: &str) -> String {
+    const TARGET_BYTES: usize = 256 * 1_024;
+    let mut input = String::from(prefix);
+    let mut index = 0;
+    while input.len() < TARGET_BYTES {
+        input.push_str(&record(index));
+        index += 1;
+    }
+    input.push_str(suffix);
+    input
+}
+
+#[test]
+fn a_long_single_line_of_assignments_scans_in_linear_time() {
+    // Minified JSON and single-line logs put thousands of `name: value`
+    // pairs on one line. A per-pair look back to the line start made that
+    // quadratic: 256 KiB took ~1.4 s optimized and over 50 s unoptimized
+    // (issue #989). Linear, it takes tens of milliseconds optimized and
+    // under a second unoptimized, so the budget below separates the two by
+    // a wide margin on either profile.
+    const DECLARED_MS: u128 = 500;
+    let _isolation = timed();
+
+    let minified_json = single_line(
+        "{\"items\":[",
+        |i| {
+            format!(
+                "{{\"id\":{i},\"status\":200,\"name\":\"item-{i}\",\"enabled\":true,\"tags\":[\"a\",\"b\"],\"url\":\"https://example.invalid/p/{i}\"}},"
+            )
+        },
+        "{}]}",
+    );
+    let dense_credential_names = single_line(
+        "{",
+        |i| format!("\"api_key\":\"SYNTHETICvalue{i:08}Xq9Zr7Lm\","),
+        "\"end\":1}",
+    );
+
+    for (id, input) in [
+        ("minified-json", minified_json),
+        ("dense-api-key-pairs", dense_credential_names),
+    ] {
+        assert!(!input.contains('\n'), "{id}: must be one line");
+        let started_at = Instant::now();
+        let (text, findings) = whole_input(&input);
+        let elapsed = started_at.elapsed().as_millis();
+        let budget = runtime_budget_ms(DECLARED_MS);
+        assert!(
+            elapsed <= budget,
+            "{id}: whole-input scan of {} bytes took {elapsed}ms, above the {budget}ms budget",
+            input.len(),
+        );
+        assert_eq!(whole_input(&input), (text, findings), "{id}: deterministic");
+    }
+}
+
 #[test]
 fn an_adversarial_input_above_a_session_limit_fails_safely_without_output() {
     let _isolation = untimed();
