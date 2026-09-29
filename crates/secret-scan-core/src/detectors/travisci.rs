@@ -136,14 +136,13 @@ impl Detector for TravisCiApiTokenDetector {
                 continue;
             }
             let bytes = line.as_bytes();
-            let ends = pattern::run_ends(bytes, pattern::is_alnum);
             let mut start = 0usize;
             while start < bytes.len() {
                 if !pattern::is_alnum(bytes[start]) {
                     start += 1;
                     continue;
                 }
-                let end = ends[start];
+                let end = pattern::run_end(bytes, start, pattern::is_alnum);
                 let run = &bytes[start..end];
                 if end - start == TOKEN_LEN
                     && pattern::boundary_ok(bytes, start, end, is_boundary_byte)

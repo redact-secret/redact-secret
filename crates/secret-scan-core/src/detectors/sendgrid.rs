@@ -32,9 +32,14 @@ impl Detector for SendgridTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the prefix returns before the run-end table is built
+        // (issue #982).
+        let Some(first) = pattern::find_literal(bytes, PREFIX, 0) else {
+            return Ok(Vec::new());
+        };
         let ends = pattern::run_ends(bytes, is_alnum_dash);
         let mut candidates = Vec::new();
-        let mut start = 0;
+        let mut start = first;
         while start < bytes.len() {
             if !bytes[start..].starts_with(PREFIX) {
                 start += 1;

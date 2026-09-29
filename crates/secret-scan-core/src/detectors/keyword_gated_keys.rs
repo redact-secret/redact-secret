@@ -210,7 +210,6 @@ fn lines(input: &str) -> impl Iterator<Item = (usize, usize)> + '_ {
 /// `spec.alphabet` bytes. A longer or shorter run is skipped whole.
 fn scan_runs(line: &str, spec: &Spec) -> Vec<(usize, usize)> {
     let bytes = line.as_bytes();
-    let ends = pattern::run_ends(bytes, spec.alphabet);
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
@@ -218,7 +217,7 @@ fn scan_runs(line: &str, spec: &Spec) -> Vec<(usize, usize)> {
             start += 1;
             continue;
         }
-        let run_end = ends[start];
+        let run_end = pattern::run_end(bytes, start, spec.alphabet);
         if run_end - start == spec.len
             && pattern::boundary_ok(bytes, start, run_end, is_boundary_byte)
         {

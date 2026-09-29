@@ -66,7 +66,7 @@
 //!   not a bot) are a distinct credential family with no `id:secret` shape
 //!   and are out of scope for this detector.
 
-use crate::detectors::pattern::{self, is_alnum_dash};
+use crate::detectors::pattern::{RunCursor, is_alnum_dash};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -89,7 +89,7 @@ const MIN_SECRET_LEN: usize = 34;
 /// for anything else.
 const URL_PATH_PREFIX: &[u8] = b"/bot";
 
-/// `true` for an ASCII digit, as a byte predicate for [`pattern::run_ends`].
+/// `true` for an ASCII digit, as a byte predicate for [`RunCursor`].
 fn is_ascii_digit(byte: u8) -> bool {
     byte.is_ascii_digit()
 }
@@ -109,8 +109,10 @@ impl Detector for TelegramBotTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        let digit_ends = pattern::run_ends(bytes, is_ascii_digit);
-        let secret_ends = pattern::run_ends(bytes, is_alnum_dash);
+        // No literal gates this shape, so run ends come from cursors rather
+        // than whole-input tables (issue #982).
+        let mut digit_ends = RunCursor::new(bytes, is_ascii_digit);
+        let mut secret_ends = RunCursor::new(bytes, is_alnum_dash);
         let mut candidates = Vec::new();
         let mut start = 0usize;
 
@@ -122,7 +124,7 @@ impl Detector for TelegramBotTokenDetector {
                 continue;
             }
 
-            let Some(end) = match_at(bytes, &digit_ends, &secret_ends, start) else {
+            let Some(end) = match_at(bytes, &mut digit_ends, &mut secret_ends, start) else {
                 start += 1;
                 continue;
             };
@@ -148,17 +150,16 @@ impl Detector for TelegramBotTokenDetector {
 /// exclusive end offset on success; the caller still applies the boundary
 /// check.
 ///
-/// `digit_ends` and `secret_ends` are the precomputed maximal-run-end tables
-/// from [`pattern::run_ends`], so each segment's length is a table lookup
-/// rather than a rescan, keeping the whole detector linear in the input
-/// length.
+/// `digit_ends` and `secret_ends` are [`RunCursor`]s over the two alphabets,
+/// so each segment's length is read without rescanning a run already
+/// measured, keeping the whole detector linear in the input length.
 fn match_at(
     bytes: &[u8],
-    digit_ends: &[usize],
-    secret_ends: &[usize],
+    digit_ends: &mut RunCursor<'_>,
+    secret_ends: &mut RunCursor<'_>,
     start: usize,
 ) -> Option<usize> {
-    let id_end = digit_ends[start];
+    let id_end = digit_ends.end(start);
     if id_end - start < MIN_ID_LEN {
         return None;
     }
@@ -167,7 +168,7 @@ fn match_at(
     }
 
     let secret_start = id_end + 1;
-    let secret_end = secret_ends[secret_start];
+    let secret_end = secret_ends.end(secret_start);
     if secret_end - secret_start < MIN_SECRET_LEN {
         return None;
     }

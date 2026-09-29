@@ -92,9 +92,14 @@ impl Detector for TerraformCloudTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the marker returns before the run-end table is built
+        // (issue #982).
+        let Some(first) = find_marker(bytes, 0) else {
+            return Ok(Vec::new());
+        };
         let alnum_ends = pattern::run_ends(bytes, is_alnum);
         let mut candidates = Vec::new();
-        let mut cursor = 0;
+        let mut cursor = first;
         while cursor < bytes.len() {
             let Some(marker_start) = find_marker(bytes, cursor) else {
                 break;

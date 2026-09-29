@@ -328,14 +328,13 @@ impl Detector for NewRelicLicenseKeyDetector {
             };
 
             let bytes = line.as_bytes();
-            let ends = pattern::run_ends(bytes, is_lower_hex);
             let mut start = 0usize;
             while start < bytes.len() {
                 if !is_lower_hex(bytes[start]) {
                     start += 1;
                     continue;
                 }
-                let run_end = ends[start];
+                let run_end = pattern::run_end(bytes, start, is_lower_hex);
                 // The legacy all-hex shape carries no marker of its own, so it
                 // still needs a same-line keyword; the marked shape does not.
                 let key_end = if has_keyword && run_end - start == LICENSE_KEY_LEN {
@@ -356,9 +355,10 @@ impl Detector for NewRelicLicenseKeyDetector {
                 start = run_end;
             }
 
+            let mut ends = pattern::RunCursor::new(bytes, is_lower_hex);
             for (prefix_at, _) in line.match_indices(LICENSE_KEY_EU_PREFIX) {
                 let body_start = prefix_at + LICENSE_KEY_EU_PREFIX.len();
-                let body_end = ends[body_start];
+                let body_end = ends.end(body_start);
                 let key_end = body_end + LICENSE_KEY_MARKER.len();
                 if body_end - body_start == LICENSE_KEY_EU_BODY_LEN
                     && line[body_end..].starts_with(LICENSE_KEY_MARKER)

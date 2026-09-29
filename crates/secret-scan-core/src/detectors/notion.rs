@@ -83,9 +83,14 @@ fn push(candidates: &mut Vec<Candidate>, ranges: Vec<(usize, usize)>, signals: [
 /// fixed-length segments.
 fn scan_ntn(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
+    // Input without the prefix returns before the run-end table is built
+    // (issue #982).
+    let Some(first) = pattern::find_literal(bytes, NTN_PREFIX.as_bytes(), 0) else {
+        return Vec::new();
+    };
     let ends = pattern::run_ends(bytes, is_alnum);
     let mut matches = Vec::new();
-    let mut start = 0;
+    let mut start = first;
     while start < bytes.len() {
         if !bytes[start..].starts_with(NTN_PREFIX.as_bytes()) {
             start += 1;

@@ -208,9 +208,14 @@ impl Detector for GitlabRunnerAuthenticationTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
+        // Input without the prefix returns before the run-end table is built
+        // (issue #982).
+        let Some(first) = pattern::find_literal(bytes, RUNNER_PREFIX.as_bytes(), 0) else {
+            return Ok(Vec::new());
+        };
         let run_ends = pattern::run_ends(bytes, is_token_char);
         let mut candidates = Vec::new();
-        let mut start = 0;
+        let mut start = first;
         while start < bytes.len() {
             if !bytes[start..].starts_with(RUNNER_PREFIX.as_bytes()) {
                 start += 1;

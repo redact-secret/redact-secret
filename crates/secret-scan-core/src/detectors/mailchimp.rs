@@ -281,14 +281,13 @@ impl Detector for MailchimpMarketingApiKeyDetector {
             let has_keyword = line_has_context_keyword(line);
 
             let bytes = line.as_bytes();
-            let ends = pattern::run_ends(bytes, is_key_hex);
             let mut start = 0usize;
             while start < bytes.len() {
                 if !is_key_hex(bytes[start]) {
                     start += 1;
                     continue;
                 }
-                let hex_end = ends[start];
+                let hex_end = pattern::run_end(bytes, start, is_key_hex);
                 if hex_end - start == KEY_HEX_LEN
                     && let Some(full_end) = match_datacenter_suffix(bytes, hex_end)
                     && pattern::boundary_ok(bytes, start, full_end, BOUNDARY)

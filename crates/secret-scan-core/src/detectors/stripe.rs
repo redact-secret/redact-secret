@@ -97,9 +97,14 @@ fn has_filler_body(value: &str) -> bool {
 /// embeds the prefix never yields a second, shorter reading.
 fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
+    // Input without the prefix returns before the run-end table is built
+    // (issue #982).
+    let Some(first) = pattern::find_literal(bytes, WEBHOOK_PREFIX.as_bytes(), 0) else {
+        return Vec::new();
+    };
     let body_ends = pattern::run_ends(bytes, is_base64_body);
     let mut matches = Vec::new();
-    let mut start = 0;
+    let mut start = first;
     while start < bytes.len() {
         if !bytes[start..].starts_with(WEBHOOK_PREFIX.as_bytes()) {
             start += 1;

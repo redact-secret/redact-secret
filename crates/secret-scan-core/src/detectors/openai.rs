@@ -115,10 +115,15 @@ fn finding_type(bytes: &[u8], start: usize) -> &'static str {
 /// key never yields a second, shorter reading of the same bytes.
 fn scan(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
+    // Input without the prefix returns before the run-end tables are built
+    // (issue #982).
+    let Some(first) = pattern::find_literal(bytes, PREFIX.as_bytes(), 0) else {
+        return Vec::new();
+    };
     let legacy_ends = pattern::run_ends(bytes, LEGACY_ALPHABET);
     let namespaced_ends = pattern::run_ends(bytes, NAMESPACED_ALPHABET);
     let mut matches = Vec::new();
-    let mut start = 0;
+    let mut start = first;
     while start < bytes.len() {
         if !bytes[start..].starts_with(PREFIX.as_bytes()) {
             start += 1;

@@ -85,9 +85,14 @@ impl Detector for MicrosoftEntraClientSecretDetector {
 /// namespace.
 fn scan(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
+    // Input without the anchor returns before the run-end table is built
+    // (issue #982).
+    let Some(first) = pattern::find_literal(bytes, ANCHOR.as_bytes(), 0) else {
+        return Vec::new();
+    };
     let ends = pattern::run_ends(bytes, is_secret_byte);
     let mut matches = Vec::new();
-    let mut anchor = 0;
+    let mut anchor = first;
     while anchor < bytes.len() {
         if !bytes[anchor..].starts_with(ANCHOR.as_bytes()) {
             anchor += 1;
