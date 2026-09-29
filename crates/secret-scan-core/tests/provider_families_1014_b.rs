@@ -1,0 +1,259 @@
+//! Issue #1014 broad-discovery families, ranks 6 to 10 (#1031–#1035),
+//! through the public API with the full default registry.
+//!
+//! Every value is built at run time from a literal prefix plus a seeded
+//! low-entropy synthetic filler, so no realistic credential literal is
+//! committed. The filler was never derived from an issued credential.
+//!
+//! Each family checks, against the whole built-in registry rather than its
+//! own detector alone:
+//!
+//! - every handoff context (bare in prose, env, `export`, Bearer,
+//!   `X-API-Key`, JSON `token`/`api_key`, SDK keyword argument, chat
+//!   sentence, YAML, fenced block) plus the family's own host forms yields
+//!   exactly one finding, of the provider type, at exactly the value's span,
+//!   redacted; the provider candidate wins the overlap with
+//!   `contextual_secret`, `bearer_token`, `authorization_credential` and any
+//!   other built-in;
+//! - one-property twins yield no finding of the provider's detector;
+//! - benign siblings stay unclaimed by the provider's detector;
+//! - the other families' values stay unclaimed by the provider's detector
+//!   (cross-family isolation);
+//! - an adversarial repetition line stays linear and claims nothing;
+//! - every two-chunk partition of a Bearer line matches the whole input.
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
+mod support;
+
+use std::time::{Duration, Instant};
+
+use redact_secret::{Action, Finding};
+use support::{as_chunks, run, utf8_byte_partitions, whole_input};
+
+/// Deterministic synthetic filler over `alphabet`.
+fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
+    (0..len)
+        .map(|i| char::from(alphabet[(i * 7 + seed * 13 + i / 5) % alphabet.len()]))
+        .collect()
+}
+
+const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+/// The #860 index contexts plus a few host forms.
+fn contexts(key: &str) -> Vec<String> {
+    vec![
+        key.to_owned(),
+        format!("PROVIDER_TOKEN={key}\n"),
+        format!("export PROVIDER_TOKEN=\"{key}\"\n"),
+        format!("Authorization: Bearer {key}\n"),
+        format!("X-API-Key: {key}\n"),
+        format!("{{\"token\": \"{key}\"}}"),
+        format!("{{\"api_key\": \"{key}\"}}"),
+        format!("client = Client(api_key=\"{key}\")\n"),
+        format!("Here is my key {key} can you debug why it fails?"),
+        format!("config:\n  token: {key}\n"),
+        format!("```\n{key}\n```"),
+        format!("The key is {key}."),
+    ]
+}
+
+fn detector_findings<'a>(findings: &'a [Finding], detector: &str) -> Vec<&'a Finding> {
+    findings
+        .iter()
+        .filter(|f| f.detector() == detector)
+        .collect()
+}
+
+/// Exactly one finding in `input`: `detector`/`type_name` at the key's span,
+/// redacted, and the key gone from the output.
+fn assert_sole_finding_in(input: &str, detector: &str, type_name: &str, key: &str) {
+    let (text, findings) = whole_input(input);
+    assert_eq!(findings.len(), 1, "{type_name}: {input}: {findings:?}");
+    let finding = &findings[0];
+    let start = input.find(key).unwrap();
+    assert_eq!(finding.detector(), detector, "{input}");
+    assert_eq!(finding.type_name(), type_name, "{input}");
+    assert_eq!(finding.action(), Action::Redact, "{input}");
+    assert_eq!(
+        (finding.range().start(), finding.range().end()),
+        (start, start + key.len()),
+        "{input}"
+    );
+    assert!(!text.contains(key), "{input}");
+}
+
+fn assert_sole_provider_finding(detector: &str, type_name: &str, key: &str) {
+    for input in contexts(key) {
+        assert_sole_finding_in(&input, detector, type_name, key);
+    }
+}
+
+fn assert_unclaimed(detector: &str, input: &str) {
+    let (_, findings) = whole_input(input);
+    assert!(
+        detector_findings(&findings, detector).is_empty(),
+        "{detector} claimed {input}: {findings:?}"
+    );
+}
+
+fn assert_twins_unclaimed(detector: &str, twins: &[String]) {
+    for twin in twins {
+        for input in contexts(twin) {
+            assert_unclaimed(detector, &input);
+        }
+    }
+}
+
+fn assert_partition_parity(key: &str) {
+    let input = format!("Authorization: Bearer {key}\n");
+    let (expected_text, expected) = whole_input(&input);
+    for pieces in utf8_byte_partitions(&input) {
+        let session = run(&as_chunks(&pieces));
+        assert_eq!(session.text(), expected_text, "{pieces:?}");
+        let findings = session.findings();
+        assert_eq!(findings.len(), expected.len(), "{pieces:?}");
+        for (got, want) in findings.iter().zip(&expected) {
+            assert_eq!(got.range(), want.range());
+            assert_eq!(got.detector(), want.detector());
+            assert_eq!(got.type_name(), want.type_name());
+        }
+    }
+}
+
+/// A glued repetition of `unit` is one wider identifier: `detector` claims
+/// nothing in it, and the whole scan stays well inside a linear budget.
+fn assert_repetition_line_is_unclaimed(detector: &str, unit: &str) {
+    let line = unit.repeat(4_096 / unit.len() + 1);
+    let started = Instant::now();
+    assert_unclaimed(detector, &line);
+    assert!(
+        started.elapsed() < Duration::from_secs(5),
+        "{detector}: repetition line took {:?}",
+        started.elapsed()
+    );
+}
+
+/// One synthetic value of every family in this file, for cross-family
+/// isolation: each detector must leave every other family's value alone.
+fn every_family_value() -> Vec<(&'static str, String)> {
+    vec![
+        ("crates-io-token", crates_io::api_token(1)),
+        ("crates-io-token", crates_io::trusted_publishing_token(2)),
+    ]
+}
+
+fn assert_isolated(detector: &str) {
+    for (owner, value) in every_family_value() {
+        if owner != detector {
+            for input in contexts(&value) {
+                assert_unclaimed(detector, &input);
+            }
+        }
+    }
+}
+
+mod crates_io {
+    use super::*;
+
+    const DETECTOR: &str = "crates-io-token";
+    const API: &str = "crates_io_api_token";
+    const TRUSTED: &str = "crates_io_trusted_publishing_token";
+
+    pub(super) fn api_token(seed: usize) -> String {
+        format!("cio{}", filler(ALNUM, 32, seed))
+    }
+
+    pub(super) fn trusted_publishing_token(seed: usize) -> String {
+        format!("cio_tp_{}", filler(ALNUM, 32, seed))
+    }
+
+    #[test]
+    fn both_shapes_win_every_context_as_the_sole_finding() {
+        for seed in [1, 5, 9] {
+            let api = api_token(seed);
+            let trusted = trusted_publishing_token(seed + 1);
+            assert_sole_provider_finding(DETECTOR, API, &api);
+            assert_sole_provider_finding(DETECTOR, TRUSTED, &trusted);
+            for (key, type_name) in [(&api, API), (&trusted, TRUSTED)] {
+                for input in [
+                    format!("CARGO_REGISTRY_TOKEN={key}\n"),
+                    format!("env:\n  CARGO_REGISTRY_TOKEN: {key}\n"),
+                    format!("[registry]\ntoken = \"{key}\"\n"),
+                    format!("cargo publish --token {key}\n"),
+                    format!(
+                        "2026-09-29T12:00:00Z ##[debug] exchanged OIDC token for {key} (expires in 30m)\n"
+                    ),
+                ] {
+                    assert_sole_finding_in(&input, DETECTOR, type_name, key);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_trusted_publishing_token_is_reported_whatever_its_check_character() {
+        for last in ["A", "q", "0", "9"] {
+            let key = format!("cio_tp_{}{last}", filler(ALNUM, 31, 3));
+            assert_sole_finding_in(&key, DETECTOR, TRUSTED, &key);
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(ALNUM, 32, 2);
+        let mut dashed = body.clone();
+        dashed.replace_range(10..11, "-");
+        let mut underscored = body.clone();
+        underscored.replace_range(10..11, "_");
+        let api = api_token(2);
+        let trusted = trusted_publishing_token(2);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("cio{}", filler(ALNUM, 31, 2)),
+                format!("cio{}", filler(ALNUM, 33, 2)),
+                format!("cio{dashed}"),
+                format!("cio{underscored}"),
+                format!("CIO{body}"),
+                format!("cio_tp_{}", filler(ALNUM, 31, 2)),
+                format!("cio_tp_{}", filler(ALNUM, 33, 2)),
+                format!("cio_tp-{body}"),
+                format!("x{api}"),
+                format!("_{api}"),
+                format!("{api}x"),
+                format!("x{trusted}"),
+                format!("{trusted}_x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "the ciound buffer drains\n".to_owned(),
+            "cio_config = load_config()\n".to_owned(),
+            "CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}\n".to_owned(),
+            "cargo publish --token cio...\n".to_owned(),
+            format!("sha={}\n", api_token(4) + &filler(ALNUM, 29, 4)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_are_isolated() {
+        assert_isolated(DETECTOR);
+    }
+
+    #[test]
+    fn a_repetition_line_is_unclaimed() {
+        assert_repetition_line_is_unclaimed(DETECTOR, &api_token(6));
+        assert_repetition_line_is_unclaimed(DETECTOR, "cio_tp_");
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&api_token(7));
+        assert_partition_parity(&trusted_publishing_token(8));
+    }
+}

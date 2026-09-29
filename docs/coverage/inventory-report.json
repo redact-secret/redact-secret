@@ -5549,12 +5549,108 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "cerebras_api_key"
+    },
+    {
+      "detector": "crates-io-token",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "crates-io-token-positive-bare",
+        "crates-io-token-positive-cargo-publish-flag",
+        "crates-io-token-positive-chat-sentence",
+        "crates-io-token-positive-credentials-toml",
+        "crates-io-token-positive-crlf-unicode-prefix",
+        "crates-io-token-positive-curl-bearer",
+        "crates-io-token-positive-dotenv",
+        "crates-io-token-positive-github-actions-env",
+        "crates-io-token-positive-json-config",
+        "crates-io-token-positive-json-token-key",
+        "crates-io-token-positive-log",
+        "crates-io-token-positive-punctuation-adjacent",
+        "crates-io-token-positive-python-sdk-call",
+        "crates-io-token-positive-repeated-value",
+        "crates-io-token-positive-shell-export",
+        "crates-io-token-positive-tool-call-arguments",
+        "crates-io-token-positive-x-api-key-header",
+        "crates-io-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "crates_io_api_token"
+    },
+    {
+      "detector": "crates-io-token",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "crates-io-token-positive-second-sample",
+        "crates-io-token-positive-second-sample-dotenv",
+        "crates-io-token-positive-trusted-publishing-log",
+        "crates-io-token-positive-trusted-publishing-other-check-char"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "crates_io_trusted_publishing_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 122,
+    "supported": 124,
     "unresolved": 0
   }
 }

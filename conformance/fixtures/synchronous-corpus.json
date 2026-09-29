@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3252,
+  "fixtureCount": 3293,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -77235,6 +77235,777 @@
         }
       ],
       "note": "Issue #919 follow-up (benchmarks #436): twin: the issuance-gated eyJ2 cloud body stays claimed by the exact name, whole value."
+    },
+    {
+      "id": "crates-io-token-positive-bare",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 35
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "crates-io-token-positive-dotenv",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CARGO_REGISTRY_TOKEN=\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 56
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-shell-export",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CARGO_REGISTRY_TOKEN=\"\u0063ioSyntheticRevokedCratesIoToken000\"\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 64
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-yaml",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  CARGO_REGISTRY_TOKEN: \u0063ioSyntheticRevokedCratesIoToken000\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 64
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-json-config",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"CARGO_REGISTRY_TOKEN\": \"\u0063ioSyntheticRevokedCratesIoToken000\"}",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 61
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-json-token-key",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0063ioSyntheticRevokedCratesIoToken000\"}",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 46
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-python-sdk-call",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0063ioSyntheticRevokedCratesIoToken000\")",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 60
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-x-api-key-header",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 46
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-curl-bearer",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0063ioSyntheticRevokedCratesIoToken000\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 66
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-tool-call-arguments",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0063ioSyntheticRevokedCratesIoToken000\"}}",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 73
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-chat-sentence",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is my key \u0063ioSyntheticRevokedCratesIoToken000 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 50
+        }
+      ],
+      "note": "A value pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-log",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO  calling API with credential \u0063ioSyntheticRevokedCratesIoToken000 for request 7",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 90
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-punctuation-adjacent",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0063ioSyntheticRevokedCratesIoToken000).",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 36
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "crates-io-token-positive-crlf-unicode-prefix",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0063ioSyntheticRevokedCratesIoToken000\n\r\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 59
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "crates-io-token-positive-repeated-value",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticRevokedCratesIoToken000 \u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 35
+        },
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 71
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "crates-io-token-positive-second-sample",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063io_tp_SyntheticRevokedTrustPubToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_trusted_publishing_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 39
+        }
+      ],
+      "note": "The second-sample shape is reported on its own."
+    },
+    {
+      "id": "crates-io-token-positive-second-sample-dotenv",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CARGO_REGISTRY_TOKEN=\u0063io_tp_SyntheticRevokedTrustPubToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_trusted_publishing_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 60
+        }
+      ],
+      "note": "The second-sample shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-overlap-bearer-header",
+      "detector": "crates-io-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0063ioSyntheticRevokedCratesIoToken000\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 57
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "crates-io-token-overlap-context",
+      "detector": "crates-io-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 48
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "crates-io-token-overlap-second-sample-bearer",
+      "detector": "crates-io-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0063io_tp_SyntheticRevokedTrustPubToken000\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_trusted_publishing_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 61
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "crates-io-token-positive-credentials-toml",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[registry]\ntoken = \"\u0063ioSyntheticRevokedCratesIoToken000\"\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 55
+        }
+      ],
+      "note": "A cargo credentials.toml registry token is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-cargo-publish-flag",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "cargo publish --token \u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 57
+        }
+      ],
+      "note": "A cargo publish --token argument is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-github-actions-env",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "    env:\n      CARGO_REGISTRY_TOKEN: \u0063ioSyntheticRevokedCratesIoToken000\n",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 72
+        }
+      ],
+      "note": "A CI env block value is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-trusted-publishing-log",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z ##[debug] exchanged OIDC token for \u0063io_tp_SyntheticRevokedTrustPubToken000 (expires in 30m)",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_trusted_publishing_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 56,
+          "end": 95
+        }
+      ],
+      "note": "A trusted-publishing token in a CI log line is reported at exactly the value."
+    },
+    {
+      "id": "crates-io-token-positive-trusted-publishing-other-check-char",
+      "detector": "crates-io-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063io_tp_SyntheticRevokedTrustPubToken00Z",
+      "expected": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_trusted_publishing_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 39
+        }
+      ],
+      "note": "The check character is not a rejection gate: any final alphanumeric byte is reported."
+    },
+    {
+      "id": "crates-io-token-boundary-short-body",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticRevokedCratesIoToken00",
+      "expected": [],
+      "note": "A 31-byte body is not the generator's 32."
+    },
+    {
+      "id": "crates-io-token-boundary-long-body",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticRevokedCratesIoToken000Z",
+      "expected": [],
+      "note": "A 33-byte body is rejected whole, never truncated."
+    },
+    {
+      "id": "crates-io-token-boundary-dash-in-body",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticR-vokedCratesIoToken000",
+      "expected": [],
+      "note": "The generator alphabet has no dash."
+    },
+    {
+      "id": "crates-io-token-boundary-underscore-in-body",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticR_vokedCratesIoToken000",
+      "expected": [],
+      "note": "The API-token body has no underscore."
+    },
+    {
+      "id": "crates-io-token-boundary-uppercase-prefix",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "CIOSyntheticRevokedCratesIoToken000",
+      "expected": [],
+      "note": "The prefix is lowercase cio."
+    },
+    {
+      "id": "crates-io-token-boundary-trusted-short-body",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063io_tp_SyntheticRevokedTrustPubToken00",
+      "expected": [],
+      "note": "A trusted-publishing body of 31 is not the parser's 32."
+    },
+    {
+      "id": "crates-io-token-boundary-trusted-long-body",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063io_tp_SyntheticRevokedTrustPubToken000Z",
+      "expected": [],
+      "note": "A trusted-publishing body of 33 is rejected whole."
+    },
+    {
+      "id": "crates-io-token-boundary-trusted-dash-prefix",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063io_tp-SyntheticRevokedCratesIoToken000",
+      "expected": [],
+      "note": "The trusted-publishing prefix is cio_tp_."
+    },
+    {
+      "id": "crates-io-token-boundary-identifier-glue",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [],
+      "note": "A glued leading byte makes it part of a wider identifier."
+    },
+    {
+      "id": "crates-io-token-boundary-underscore-glue",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [],
+      "note": "A glued underscore before the prefix makes it part of a wider identifier."
+    },
+    {
+      "id": "crates-io-token-boundary-glued-suffix",
+      "detector": "crates-io-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0063ioSyntheticRevokedCratesIoToken000_x",
+      "expected": [],
+      "note": "A byte glued after the value makes it part of a wider identifier."
+    },
+    {
+      "id": "crates-io-token-negative-cio-words",
+      "detector": "crates-io-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The \u0063iound buffer and \u0063io_config loader both start with \u0063io.",
+      "expected": [],
+      "note": "Words and identifiers that start with cio fail the exact body and the boundary."
+    },
+    {
+      "id": "crates-io-token-negative-secret-reference",
+      "detector": "crates-io-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}\n",
+      "expected": [],
+      "note": "A CI secret reference is not a token."
+    },
+    {
+      "id": "crates-io-token-negative-embedded-in-long-run",
+      "detector": "crates-io-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sha=\u0063ioSyntheticRevokedCratesIoToken000SyntheticRevokedPadding00000000",
+      "expected": [],
+      "note": "cio + 32 inside a longer alphanumeric run is never carved out."
+    },
+    {
+      "id": "crates-io-token-negative-placeholder",
+      "detector": "crates-io-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "cargo publish --token \u0063io...",
+      "expected": [],
+      "note": "A placeholder fails the 32-byte body."
+    },
+    {
+      "id": "crates-io-token-adversarial-long-run",
+      "detector": "crates-io-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000\u0063ioSyntheticRevokedCratesIoToken000",
+      "expected": [],
+      "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
     }
   ]
 }

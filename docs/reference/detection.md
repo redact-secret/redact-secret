@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-98 built-in detectors emit 122 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+99 built-in detectors emit 124 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -291,6 +291,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `browserbase-api-key` | `browserbase_api_key` | `always-redact` | — |
 | `runpod-api-key` | `runpod_api_key` | `always-redact` | — |
 | `cerebras-api-key` | `cerebras_api_key` | `always-redact` | — |
+| `crates-io-token` | `crates_io_api_token`, `crates_io_trusted_publishing_token` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

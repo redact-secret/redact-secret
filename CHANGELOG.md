@@ -27,6 +27,14 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- New provider detectors from the #1014 broad-discovery handoffs (ranks 6 to
+  10), each always redacted at provider specificity and each covering the
+  bare, chat-sentence and JSON `"token"` occurrences generic detection
+  missed:
+  - `crates-io-token` (#1031): crates.io `cio` + 32 alphanumeric API tokens
+    (`crates_io_api_token`) and `cio_tp_` + 32 trusted-publishing tokens
+    (`crates_io_trusted_publishing_token`); the check character is not a
+    rejection gate.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

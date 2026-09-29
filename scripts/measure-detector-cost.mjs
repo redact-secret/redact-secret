@@ -90,6 +90,7 @@ export const CANONICAL_IDS = [
   "browserbase-api-key",
   "runpod-api-key",
   "cerebras-api-key",
+  "crates-io-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -130,7 +131,7 @@ export const GROUPS = {
     "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
     "inngest-signing-key",
   ],
-  "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
+  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "crates-io-token"],
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",

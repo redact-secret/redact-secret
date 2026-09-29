@@ -25,6 +25,7 @@ mod composio;
 mod confluent;
 mod connection_string;
 mod convex;
+mod crates_io;
 mod databricks;
 mod datadog;
 mod daytona;
@@ -141,7 +142,11 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
 }
 
 /// Every built-in detector, in canonical registration order.
+///
+/// One entry per line, one line per detector (`scripts/measure-detector-cost.mjs`
+/// parses this list), so its length grows with the registry.
 #[must_use]
+#[allow(clippy::too_many_lines)]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(PrivateKeyDetector),
@@ -237,6 +242,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(browserbase::BROWSERBASE_API_KEY),
         Box::new(runpod::RUNPOD_API_KEY),
         Box::new(cerebras::CEREBRAS_API_KEY),
+        Box::new(crates_io::CRATES_IO),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -519,6 +525,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(cerebras::CEREBRAS_API_KEY.shapes())],
     ),
     (
+        crates_io::CRATES_IO.detector_id(),
+        &[Literals::Shapes(crates_io::CRATES_IO.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -695,6 +705,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("browserbase-api-key", Pack::Provider),
     ("runpod-api-key", Pack::Provider),
     ("cerebras-api-key", Pack::Provider),
+    ("crates-io-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -828,6 +839,7 @@ mod tests {
                 "browserbase-api-key",
                 "runpod-api-key",
                 "cerebras-api-key",
+                "crates-io-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1188,6 +1200,7 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let crates_io_token_input = format!("cio{}", "SyntheticRevokedCratesIoToken000");
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1300,6 +1313,7 @@ mod tests {
             ("browserbase-api-key", browserbase_api_key_input.as_str()),
             ("runpod-api-key", runpod_api_key_input.as_str()),
             ("cerebras-api-key", cerebras_api_key_input.as_str()),
+            ("crates-io-token", crates_io_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

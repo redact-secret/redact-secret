@@ -883,6 +883,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0063sk-SyntheticRevokedCerebrasApiKey_SyntheticRevokedC",
       "schemes": null
+    },
+    {
+      "type": "crates_io_api_token",
+      "detector": "crates-io-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063ioSyntheticRevokedCratesIoToken000",
+      "schemes": null
+    },
+    {
+      "type": "crates_io_trusted_publishing_token",
+      "detector": "crates-io-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063io_tp_SyntheticRevokedTrustPubToken000",
+      "schemes": null
     }
   ],
   "consumers": [

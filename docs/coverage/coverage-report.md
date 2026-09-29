@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 122/122 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 124/124 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 122 |
+| supported | 124 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 133.
+Coverage declarations: 135.
 
 ## Coverage by detector
 
@@ -44,6 +44,7 @@ Coverage declarations: 133.
 | confluent-cloud-api-secret-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | convex-deployment-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| crates-io-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | databricks-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -153,6 +154,8 @@ Coverage declarations: 133.
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
 | convex_deployment_key | convex-deployment-key | provider | supported | not-applicable | none |
+| crates_io_api_token | crates-io-token | provider | supported | not-applicable | none |
+| crates_io_trusted_publishing_token | crates-io-token | provider | supported | not-applicable | none |
 | databricks_personal_access_token | databricks-personal-access-token | provider | supported | not-applicable | none |
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
@@ -275,15 +278,15 @@ Coverage declarations: 133.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 133 | 0 | 0 |
-| boundary | 122 | 0 | 0 |
-| host-context | 122 | 0 | 0 |
+| adversarial | 135 | 0 | 0 |
+| boundary | 124 | 0 | 0 |
+| host-context | 124 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 133 | 0 | 0 |
-| near-miss-negative | 122 | 0 | 0 |
-| overlap | 122 | 0 | 0 |
-| positive | 122 | 0 | 0 |
-| range | 133 | 0 | 0 |
+| malformed | 135 | 0 | 0 |
+| near-miss-negative | 124 | 0 | 0 |
+| overlap | 124 | 0 | 0 |
+| positive | 124 | 0 | 0 |
+| range | 135 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
