@@ -20,6 +20,28 @@ stability.
   best-effort, with no response-time or long-term-support commitment.
 - Report suspected vulnerabilities privately as described in
   [SECURITY.md](SECURITY.md), not in a public issue.
+
+What to read and run depends on the change. A small change needs only its
+row below; `npm run check:changed` prints the scoped commands for your branch.
+
+| Change | Read first | Run locally |
+| --- | --- | --- |
+| Documentation or Markdown only | [CONVENTIONS.md](CONVENTIONS.md) | `npm run check:docs` |
+| Conformance fixture | [conformance corpus](conformance/README.md) | `npm run check:detector && npm run check:js && npm run check:rust` |
+| JavaScript wrapper or examples | [ARCHITECTURE.md](ARCHITECTURE.md) | `npm run check:js` |
+| Rust engine, CLI, or binding | [ARCHITECTURE.md](ARCHITECTURE.md), [workspace policy](docs/rust-workspace.md) | `npm run check:rust` |
+| Release, CI, packaging, or `scripts/` | [release runbook](docs/releasing.md) | `npm run check:release` |
+| Boundary change (below) | everything in the next list | the full suite: `npm run ci` and `npm run check:rust` |
+
+CI runs the full suite on every pull request whatever the scope, so you do
+not need to reproduce the platform matrix, the wheel build, or the artifact
+qualifiers locally to open one. [Developer onboarding](docs/onboarding.md#run-the-repository-checks)
+has the full table and the complete sequence.
+
+A boundary change -- a new or changed detector, PII context rule, policy,
+public API, evidence rule, or release gate -- also needs this reading, because
+the ADR and spec-file rules bind it:
+
 - Read [ARCHITECTURE.md](ARCHITECTURE.md), [CONVENTIONS.md](CONVENTIONS.md), and the
   [decision router](docs/decisions/DECISIONS.md). A material boundary change needs
   an ADR rather than an undocumented convention.
