@@ -243,7 +243,7 @@ fn scan_bare_legacy_runs(
 /// How many lines above a `basic.auth.user.info` property the Confluent
 /// context may sit (issue #933): the `schema.registry.url` line, the
 /// `basic.auth.credentials.source` line, and one more property.
-const PROPERTIES_LOOKBACK_LINES: usize = 3;
+pub(super) const PROPERTIES_LOOKBACK_LINES: usize = 3;
 
 /// `true` for a Java `.properties` (or `.conf`) line: a comment (`#`, `!`)
 /// or a `name=value` / `name: value` property whose name is `[A-Za-z0-9._-]+`.
@@ -302,9 +302,14 @@ fn is_basic_auth_user_info_secret(line: &str, value_start: usize) -> bool {
 /// open while a `basic.auth.user.info` line can still follow (issue #933).
 /// The window it holds is exactly the one
 /// [`ConfluentLegacyApiSecretDetector`] reads back.
+#[cfg(test)]
 pub(crate) fn has_open_confluent_properties(input: &str) -> bool {
-    let tail = text::last_lines(input, PROPERTIES_LOOKBACK_LINES);
-    ends_inside_confluent_properties(&tail)
+    has_open_confluent_properties_in(&super::lookback_tail(input))
+}
+
+/// [`has_open_confluent_properties`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_confluent_properties_in(tail: &[&str]) -> bool {
+    ends_inside_confluent_properties(text::tail_lines(tail, PROPERTIES_LOOKBACK_LINES))
 }
 
 /// Detects a legacy (pre-`cflt`) Confluent Cloud API secret: a bare 64-byte

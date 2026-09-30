@@ -127,11 +127,11 @@ const HEADER_WINDOW: usize = 48;
 
 /// Most lines above a header line read for the request line or `Host:`
 /// header of the same HTTP request (issue #1017).
-const MAX_HTTP_BLOCK_LINES: usize = 8;
+pub(super) const MAX_HTTP_BLOCK_LINES: usize = 8;
 
 /// Most sibling lines above a credential key read for a `provider:` key of
 /// the same YAML mapping (issue #1017).
-const MAX_SIBLING_LINES: usize = 6;
+pub(super) const MAX_SIBLING_LINES: usize = 6;
 
 /// Every provider keyword, for the incremental retention hints, which do not
 /// know which keyword-gated detector will read the lines they hold.
@@ -604,8 +604,14 @@ fn sibling_line(line: &str, column: usize, keywords: &[&str]) -> SiblingLine {
 /// `provider: <keyword>` key followed only by keys of the same mapping, at
 /// most [`MAX_SIBLING_LINES`] lines in all, so a credential key on the next
 /// line can still read it. Every provider keyword is accepted.
+#[cfg(test)]
 pub(crate) fn has_open_provider_sibling(input: &str) -> bool {
-    let tail = text::last_lines(input, MAX_SIBLING_LINES);
+    has_open_provider_sibling_in(&super::lookback_tail(input))
+}
+
+/// [`has_open_provider_sibling`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_provider_sibling_in(tail: &[&str]) -> bool {
+    let tail = text::tail_lines(tail, MAX_SIBLING_LINES);
     let Some(column) = tail
         .last()
         .and_then(|line| text::item_key_line(line))
@@ -702,8 +708,14 @@ fn http_block_names_host(input: &str, line_start: usize, domain: &str) -> bool {
 /// [`MAX_HTTP_BLOCK_LINES`] of them, among which the request line or a
 /// `Host:` header names a host under `deepgram.com`, so a header on the next
 /// line can still read it.
+#[cfg(test)]
 pub(crate) fn has_open_deepgram_request(input: &str) -> bool {
-    for line in text::last_lines(input, MAX_HTTP_BLOCK_LINES).iter().rev() {
+    has_open_deepgram_request_in(&super::lookback_tail(input))
+}
+
+/// [`has_open_deepgram_request`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_deepgram_request_in(tail: &[&str]) -> bool {
+    for line in text::tail_lines(tail, MAX_HTTP_BLOCK_LINES).iter().rev() {
         match http_line(line, DEEPGRAM_API_DOMAIN) {
             HttpLine::Request(names_host) => return names_host,
             HttpLine::Header(true) => return true,
