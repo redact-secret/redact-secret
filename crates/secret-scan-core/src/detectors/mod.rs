@@ -127,7 +127,7 @@ pub(crate) use {
 /// The most complete lines any lookback retention hint reads back: the
 /// `*_in` hints above each read their own last lines of one tail of this
 /// length (issue #1060).
-const MAX_LOOKBACK_LINES: usize = {
+pub(crate) const MAX_LOOKBACK_LINES: usize = {
     let counts = [
         heroku::LOOKBACK_LINES,
         twilio::CLI_TABLE_LOOKBACK_LINES,
@@ -152,8 +152,56 @@ const MAX_LOOKBACK_LINES: usize = {
 /// The last [`MAX_LOOKBACK_LINES`] complete lines of `input`, oldest first,
 /// that every `has_open_*_in` lookback hint reads: computed once per closed
 /// line instead of once per hint (issue #1060).
+#[cfg(test)]
 pub(crate) fn lookback_tail(input: &str) -> Vec<&str> {
     text::last_lines(input, MAX_LOOKBACK_LINES)
+}
+
+/// A [`lookback_tail`] held inline: no allocation per closed line (issue
+/// #1074). Lines are right-aligned in `lines`; `start` is the first used slot.
+pub(crate) struct LookbackTail<'a> {
+    lines: [&'a str; MAX_LOOKBACK_LINES],
+    start: usize,
+}
+
+impl<'a> LookbackTail<'a> {
+    /// A tail with no lines, which every hint reads as the empty input.
+    pub(crate) const fn empty() -> Self {
+        Self {
+            lines: [""; MAX_LOOKBACK_LINES],
+            start: MAX_LOOKBACK_LINES,
+        }
+    }
+
+    /// The lines, oldest first.
+    pub(crate) fn as_slice(&self) -> &[&'a str] {
+        &self.lines[self.start..]
+    }
+}
+
+/// The last `count` (at most [`MAX_LOOKBACK_LINES`]) complete lines of
+/// `input`: exactly `last_lines(input, count)`, and so a window of
+/// [`lookback_tail`] whenever `count` is at least the window a hint reads.
+pub(crate) fn lookback_tail_lines(input: &str, count: usize) -> LookbackTail<'_> {
+    let count = count.min(MAX_LOOKBACK_LINES);
+    let mut tail = LookbackTail::empty();
+    let complete = input.strip_suffix('\n').unwrap_or(input);
+    let bytes = complete.as_bytes();
+    let mut end = bytes.len();
+    while MAX_LOOKBACK_LINES - tail.start < count {
+        let start = text::line_start_before(complete, end);
+        tail.start -= 1;
+        tail.lines[tail.start] = &complete[start..end];
+        if start == 0 {
+            break;
+        }
+        end = if bytes[start - 1] == b'\n' {
+            start - 1
+        } else {
+            start
+        };
+    }
+    tail
 }
 
 /// `true` when appending `appended` to any input leaves both

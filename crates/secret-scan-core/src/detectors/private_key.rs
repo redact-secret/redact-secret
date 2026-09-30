@@ -46,7 +46,12 @@ const DELIMITER_END: &str = "-----END ";
 fn find_next_delimiter(input: &str, from: usize) -> Option<Delimiter> {
     let bytes = input.as_bytes();
     let mut position = from;
-    while position + 5 <= bytes.len() {
+    // Every delimiter starts with `-`: jump between dashes (issue #1074).
+    while let Some(offset) = bytes.get(position..)?.iter().position(|&byte| byte == b'-') {
+        position += offset;
+        if position + 5 > bytes.len() {
+            return None;
+        }
         if &bytes[position..position + 5] == b"-----" {
             for (kind, lead) in [
                 (DelimiterKind::Begin, DELIMITER_BEGIN),
@@ -285,6 +290,15 @@ impl PrivateKeyRetentionTracker {
     /// holds a bounded delimiter suffix, and its allocation is reused for the
     /// next one instead of reallocated (issue #1060).
     pub(crate) fn append(&mut self, piece: &str) -> (bool, bool) {
+        self.append_reporting(piece, |_| {})
+    }
+
+    /// [`append`](Self::append), also reporting every span it completes.
+    fn append_reporting(
+        &mut self,
+        piece: &str,
+        on_complete: impl FnMut(CompletedSpan),
+    ) -> (bool, bool) {
         let joined;
         let input = if self.lookbehind.is_empty() {
             piece
@@ -298,10 +312,14 @@ impl PrivateKeyRetentionTracker {
             &mut self.state,
             self.processed_bytes,
             input_offset,
-            |_| {},
+            on_complete,
         );
         self.processed_bytes += piece.len();
+        // Every delimiter starts with `-`, so nothing before the suffix's
+        // first dash can be part of one; `input_offset` above stays
+        // `processed_bytes - lookbehind.len()` (issue #1074).
         let suffix = byte_suffix(input, MAX_DELIMITER_LEN.saturating_sub(1));
+        let suffix = suffix.find('-').map_or("", |dash| &suffix[dash..]);
         self.lookbehind.clear();
         self.lookbehind.push_str(suffix);
         (self.state.has_begin, !self.state.stack.is_empty())
@@ -558,5 +576,146 @@ mod tests {
         assert_eq!(tracker.append("-----BEGIN PRIVATE KEY-----"), (true, true));
         assert_eq!(tracker.append("\nbody\n"), (true, true));
         assert_eq!(tracker.append("-----END PRIVATE KEY-----"), (true, false));
+    }
+
+    /// The scan-every-byte form of [`find_next_delimiter`] before #1074.
+    fn oracle_find_next_delimiter(input: &str, from: usize) -> Option<Delimiter> {
+        let bytes = input.as_bytes();
+        let mut position = from;
+        while position + 5 <= bytes.len() {
+            if &bytes[position..position + 5] == b"-----" {
+                for (kind, lead) in [
+                    (DelimiterKind::Begin, DELIMITER_BEGIN),
+                    (DelimiterKind::End, DELIMITER_END),
+                ] {
+                    if bytes[position..].starts_with(lead.as_bytes()) {
+                        let label_start = position + lead.len();
+                        for (label, name) in LABELS.iter().enumerate() {
+                            let label_end = label_start + name.len();
+                            let suffix_end = label_end + 5;
+                            if suffix_end <= bytes.len()
+                                && bytes[label_start..label_end] == *name.as_bytes()
+                                && bytes[label_end..suffix_end] == *b"-----"
+                            {
+                                return Some(Delimiter {
+                                    start: position,
+                                    end: suffix_end,
+                                    kind,
+                                    label,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            position += 1;
+        }
+        None
+    }
+
+    /// The tracker before #1074: lookbehind is the untrimmed byte suffix.
+    struct OracleTracker {
+        state: ParserState,
+        processed_bytes: usize,
+        lookbehind: String,
+    }
+
+    impl OracleTracker {
+        fn append(&mut self, piece: &str, spans: &mut Vec<(usize, usize)>) -> (bool, bool) {
+            let input = [self.lookbehind.as_str(), piece].concat();
+            let input_offset = self.processed_bytes - self.lookbehind.len();
+            let mut found = |span: CompletedSpan| spans.push((span.start, span.end));
+            let mut position = 0;
+            while let Some(delimiter) = oracle_find_next_delimiter(&input, position) {
+                position = delimiter.end;
+                let absolute_end = input_offset + delimiter.end;
+                if absolute_end <= self.processed_bytes {
+                    continue;
+                }
+                let absolute = Delimiter {
+                    start: input_offset + delimiter.start,
+                    end: absolute_end,
+                    kind: delimiter.kind,
+                    label: delimiter.label,
+                };
+                if let Some(span) = process_delimiter(&mut self.state, &absolute) {
+                    found(span);
+                }
+            }
+            self.processed_bytes += piece.len();
+            self.lookbehind = byte_suffix(&input, MAX_DELIMITER_LEN - 1).to_owned();
+            (self.state.has_begin, !self.state.stack.is_empty())
+        }
+    }
+
+    #[test]
+    fn dash_jumping_delimiter_search_and_trimmed_lookbehind_match_the_oracles() {
+        const PARTS: &[&str] = &[
+            "-----BEGIN PRIVATE KEY-----",
+            "-----END PRIVATE KEY-----",
+            "-----BEGIN RSA PRIVATE KEY-----",
+            "-----END RSA PRIVATE KEY-----",
+            "-----BEGIN ",
+            "-----END ",
+            "-----",
+            "----",
+            "-",
+            "--",
+            "PRIVATE KEY",
+            "ENCRYPTED PRIVATE KEY",
+            "\n",
+            "\r\n",
+            "body",
+            " ",
+            "\u{e9}",
+            "\u{1f511}",
+        ];
+        let mut state = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % u64::try_from(bound).unwrap()).unwrap()
+        };
+        for _ in 0..4_000 {
+            let mut text = String::new();
+            for _ in 0..next(14) {
+                text.push_str(PARTS[next(PARTS.len())]);
+            }
+            for from in 0..=text.len().min(40) {
+                if text.is_char_boundary(from) {
+                    let new = find_next_delimiter(&text, from);
+                    let old = oracle_find_next_delimiter(&text, from);
+                    assert_eq!(
+                        new.map(|d| (d.start, d.end, d.label)),
+                        old.map(|d| (d.start, d.end, d.label)),
+                        "{text:?} {from}"
+                    );
+                }
+            }
+            // Random chunking, per char boundary.
+            let mut tracker = PrivateKeyRetentionTracker::new();
+            let mut oracle = OracleTracker {
+                state: ParserState::new(),
+                processed_bytes: 0,
+                lookbehind: String::new(),
+            };
+            let (mut new_spans, mut old_spans) = (Vec::new(), Vec::new());
+            let mut rest = text.as_str();
+            while !rest.is_empty() {
+                let mut cut = (1 + next(30)).min(rest.len());
+                while !rest.is_char_boundary(cut) {
+                    cut += 1;
+                }
+                let (piece, tail) = rest.split_at(cut);
+                let got = tracker.append_reporting(piece, |span| {
+                    new_spans.push((span.start, span.end));
+                });
+                assert_eq!(got, oracle.append(piece, &mut old_spans), "{text:?}");
+                assert_eq!(new_spans, old_spans, "{text:?}");
+                assert!(tracker.lookbehind.is_empty() || tracker.lookbehind.starts_with('-'));
+                rest = tail;
+            }
+        }
     }
 }

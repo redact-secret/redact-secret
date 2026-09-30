@@ -156,7 +156,7 @@ pub(super) fn line_around(input: &str, start: usize, end: usize) -> (usize, usiz
 /// `end - 1` is not a break here: it is followed by `\n`, by the end of the
 /// input, or it is the break that ends this line's predecessor at `end`.
 /// Both searches are `memrchr` scans over this line alone.
-fn line_start_before(input: &str, end: usize) -> usize {
+pub(super) fn line_start_before(input: &str, end: usize) -> usize {
     let head = &input[..end];
     let after_newline = head.rfind('\n').map_or(0, |at| at + 1);
     // No `\n` lies between `after_newline` and `end`, so every `\r` there
@@ -171,6 +171,7 @@ fn line_start_before(input: &str, end: usize) -> usize {
 /// dropping one trailing `\n`: the complete lines a retention hint reads
 /// back over. Only the tail is read, so the cost is the length of those
 /// lines, not of `input`.
+#[cfg(test)]
 pub(super) fn last_lines(input: &str, count: usize) -> Vec<&str> {
     let complete = input.strip_suffix('\n').unwrap_or(input);
     let bytes = complete.as_bytes();
@@ -1335,6 +1336,24 @@ mod line_tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn the_inline_lookback_tail_is_last_lines_for_every_count() {
+        // Issue #1074: the session reads 2 lines while an open tail check
+        // holds the unit, and the full window otherwise.
+        for input in generated_inputs() {
+            for count in 0..=super::super::MAX_LOOKBACK_LINES + 1 {
+                let inline = crate::detectors::lookback_tail_lines(&input, count);
+                let expected = last_lines(&input, count.min(super::super::MAX_LOOKBACK_LINES));
+                assert_eq!(inline.as_slice(), expected, "{input:?} {count}");
+            }
+        }
+        assert!(
+            crate::detectors::LookbackTail::empty()
+                .as_slice()
+                .is_empty()
+        );
     }
 
     #[test]

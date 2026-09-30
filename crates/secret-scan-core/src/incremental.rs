@@ -67,11 +67,11 @@
 use std::borrow::Cow;
 
 use crate::detectors::{
-    PrivateKeyRetentionTracker, carries_aws_access_key_id, continues_previous_line,
-    has_open_aws_secret_candidate_line_in, has_open_bearer_authorization,
+    LookbackTail, MAX_LOOKBACK_LINES, PrivateKeyRetentionTracker, carries_aws_access_key_id,
+    continues_previous_line, has_open_aws_secret_candidate_line_in, has_open_bearer_authorization,
     has_open_confluent_properties_in, has_open_contextual_assignment, has_open_deepgram_request_in,
     has_open_heroku_legacy_context_in, has_open_list_item_pair_in, has_open_provider_sibling_in,
-    has_open_twilio_cli_table_in, is_open_tail_neutral, lookback_tail,
+    has_open_twilio_cli_table_in, is_open_tail_neutral, lookback_tail_lines,
 };
 #[cfg(test)]
 use crate::detectors::{
@@ -81,6 +81,7 @@ use crate::detectors::{
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
+use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
 use crate::pii::PiiSelection;
 #[cfg(test)]
@@ -860,22 +861,25 @@ impl IncrementalSanitizer {
         let lookbacks = self.lookbacks;
         // Every lookback hint reads its own last lines of one shared tail,
         // walked once per closed line (issue #1060).
-        let tail =
-            if (!self.open_tail.open && lookbacks.any_other()) || lookbacks.aws_secret_access_key {
-                lookback_tail(scanned)
-            } else {
-                Vec::new()
-            };
+        // While an open tail check already holds the unit, only the AWS hint
+        // reads it, and it reads two lines (issue #1074).
+        let others_read = !self.open_tail.open && lookbacks.any_other();
+        let tail = if others_read || lookbacks.aws_secret_access_key {
+            lookback_tail_lines(scanned, if others_read { MAX_LOOKBACK_LINES } else { 2 })
+        } else {
+            LookbackTail::empty()
+        };
+        let tail = tail.as_slice();
         let open = OpenConstructs {
             other: self.open_tail.open
-                || (lookbacks.heroku_legacy && has_open_heroku_legacy_context_in(&tail))
-                || (lookbacks.twilio_auth_token && has_open_twilio_cli_table_in(&tail))
-                || (lookbacks.confluent_legacy && has_open_confluent_properties_in(&tail))
-                || (lookbacks.list_item_pair && has_open_list_item_pair_in(&tail))
-                || (lookbacks.provider_sibling && has_open_provider_sibling_in(&tail))
-                || (lookbacks.deepgram_request && has_open_deepgram_request_in(&tail)),
+                || (lookbacks.heroku_legacy && has_open_heroku_legacy_context_in(tail))
+                || (lookbacks.twilio_auth_token && has_open_twilio_cli_table_in(tail))
+                || (lookbacks.confluent_legacy && has_open_confluent_properties_in(tail))
+                || (lookbacks.list_item_pair && has_open_list_item_pair_in(tail))
+                || (lookbacks.provider_sibling && has_open_provider_sibling_in(tail))
+                || (lookbacks.deepgram_request && has_open_deepgram_request_in(tail)),
             aws_secret_candidate: lookbacks.aws_secret_access_key
-                && has_open_aws_secret_candidate_line_in(&tail, || {
+                && has_open_aws_secret_candidate_line_in(tail, || {
                     self.line_above_unit_carries_aws_id()
                 }),
         };
@@ -1243,6 +1247,17 @@ impl IncrementalSanitizer {
             self.finding_count += 1;
         }
 
+        let base = self.lead_len;
+        if local_findings.is_empty() {
+            // Nothing to replace: `redact` would check the input limit, find
+            // no forbidden text to build, and return the unit unchanged, so
+            // skip the copy it makes (issue #1074).
+            let unit = &self.retained[base + begin..base + end];
+            WholeInputLimits::default().check_input(unit)?;
+            released.text.push_str(unit);
+            return Ok(());
+        }
+
         let placeholder_offset = self.placeholder_count;
         let formatter = self.formatter.as_ref();
         let wrapped = |local_finding: &Finding, local_context: &PlaceholderContext| {
@@ -1257,7 +1272,6 @@ impl IncrementalSanitizer {
                 PlaceholderContext::new(placeholder_offset + local_context.placeholder_index());
             formatter.format(&global_findings[index], &global_context)
         };
-        let base = self.lead_len;
         let text = redact(
             &self.retained[base + begin..base + end],
             &local_findings,
