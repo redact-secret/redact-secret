@@ -155,6 +155,18 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
             .is_some_and(|word| word.eq_ignore_ascii_case("bearer"))
 }
 
+/// Stable-sorts `candidates` by start offset, keeping emission order among
+/// equal starts: `candidates.sort_by_key(|c| c.range().start())`.
+///
+/// Every detector that merges candidate streams sorts through this one
+/// function, so the WebAssembly build carries a single instantiation of the
+/// standard stable sort for `Candidate`; a per-detector closure instantiates
+/// its own copy of about 6 KB (issue #1043).
+#[inline(never)]
+pub(super) fn sort_candidates_by_start(candidates: &mut [crate::types::Candidate]) {
+    candidates.sort_by_key(|candidate| candidate.range().start());
+}
+
 /// Every built-in detector, in canonical registration order.
 ///
 /// One entry per line by contract (`scripts/measure-detector-cost.mjs`
