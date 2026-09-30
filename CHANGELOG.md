@@ -49,6 +49,8 @@ evidence is linked from each published version.
     `sqb_` badge tokens are never claimed.
   - `rubygems-api-key` (#1023): RubyGems.org `rubygems_` + 48 lowercase hex
     API keys (`rubygems_api_key`).
+  - `clojars-deploy-token` (#1025): Clojars `CLOJARS_` + 60 lowercase hex
+    deploy tokens (`clojars_deploy_token`).
 
 ## 0.1.0-beta.11 — 2026-09-29
 

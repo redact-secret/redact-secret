@@ -34,6 +34,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `cerebras_api_key` | `cerebras-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 prefixes and width (provider validator, R1; staff statement, R3 as of 2025-10), alphabet by policy (R10), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `clickhouse_cloud_api_secret` | `clickhouse-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-04 (provider staff statement and staff-authored regex, R2 and R3; the older 39-byte example is set aside by R3 date order), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
+| `clojars_deploy_token` | `clojars-deploy-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator and server validator, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `composio_org_api_key` | `composio-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and a dated staff statement under R3; `uak_` width under R6), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
@@ -870,6 +871,7 @@ profile evidence.
 | `polar:organization-access-token` | `polar-token` | `polar_oat_` + exactly 43 `[A-Za-z0-9]`; `polar_pat_`, `polar_at_u_`, `polar_at_o_`, `polar_rt_u_`, `polar_rt_o_`, `polar_cs_` or `polar_crt_` + exactly 43 `[A-Za-z0-9_-]` | `polar_organization_access_token` (`polar_oat_`), `polar_api_credential` (the other API roles) | T1 (provider server generator and prefix constants, R1 and R9) |
 | `sonarqube:token` | `sonarqube-token` | `squ_`, `sqa_` or `sqp_` + exactly 40 `[0-9a-f]` (44 in total) | `sonarqube_user_token` (`squ_`), `sonarqube_analysis_token` (`sqa_`, `sqp_`) | T1 (provider server generator and token type enum, R1) |
 | `rubygems:api-key` | `rubygems-api-key` | `rubygems_` + exactly 48 `[0-9a-f]` (57 in total) | `rubygems_api_key` | T1 (provider server generator, R1) |
+| `clojars:deploy-token` | `clojars-deploy-token` | `CLOJARS_` (case-sensitive) + exactly 60 `[0-9a-f]` (68 in total) | `clojars_deploy_token` | T1 (provider generator and server validator, R1) |
 
 Bitwarden ([#1019](https://github.com/redact-secret/redact-secret/issues/1019),
 [handoff](../audits/evidence/1014/bitwarden.md)). The token carries the
@@ -929,6 +931,14 @@ legacy unprefixed keys outside named contexts and an uppercased copy. False
 positives: an unrelated `rubygems_` + exactly 48 lowercase hex; none is
 known. Cost: one prefix on the shared known-format scan.
 
+Clojars ([#1025](https://github.com/redact-secret/redact-secret/issues/1025),
+[handoff](../audits/evidence/1014/clojars.md)). The generator and the server's
+own validator `^CLOJARS_[0-9a-f]{60}$` agree, so the contract is exactly the
+validator. Environment names such as `CLOJARS_USERNAME` and
+`CLOJARS_PASSWORD` fail the body. False negatives: an uppercased copy and
+legacy account passwords. False positives: none known for `CLOJARS_` +
+exactly 60 lowercase hex. Cost: one prefix on the shared known-format scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -955,6 +965,7 @@ known. Cost: one prefix on the shared known-format scan.
 | Polar `polar_oat_` + 43 alphanumeric organization access tokens and `polar_pat_`/`polar_at_u_`/`polar_at_o_`/`polar_rt_u_`/`polar_rt_o_`/`polar_cs_`/`polar_crt_` + 43 `[A-Za-z0-9_-]` API credentials are reported as two finding types at provider specificity, bare or in any context; the checksum never rejects a match, `polar_ci_` and checkout secrets stay unclaimed, and `whsec_` stays with Stripe ([#1020](https://github.com/redact-secret/redact-secret/issues/1020), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent to one more family |
 | SonarQube `squ_` user tokens and `sqa_`/`sqp_` analysis tokens (+ 40 lowercase hex) are reported as two finding types at provider specificity, bare or in any context; `sqb_` badge tokens and unprefixed legacy tokens stay unclaimed ([#1021](https://github.com/redact-secret/redact-secret/issues/1021), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy and the public-key exclusion precedent to one more family |
 | RubyGems.org `rubygems_` + 48 lowercase hex API keys are reported as `rubygems_api_key` at provider specificity, bare or in any context; legacy unprefixed keys stay unclaimed ([#1023](https://github.com/redact-secret/redact-secret/issues/1023), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| Clojars `CLOJARS_` + 60 lowercase hex deploy tokens are reported as `clojars_deploy_token` at provider specificity, bare or in any context; `CLOJARS_*` environment names and legacy passwords stay unclaimed ([#1025](https://github.com/redact-secret/redact-secret/issues/1025), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API keys are reported as `nvidia_api_key` at provider specificity, bare or in any context; the legacy prefixless NGC key stays unclaimed ([#972](https://github.com/redact-secret/redact-secret/issues/972), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |

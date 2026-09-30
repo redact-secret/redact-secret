@@ -5845,12 +5845,63 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "rubygems_api_key"
+    },
+    {
+      "detector": "clojars-deploy-token",
+      "evidence": {
+        "fixtureCount": 31,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "clojars-deploy-token-positive-bare",
+        "clojars-deploy-token-positive-chat-sentence",
+        "clojars-deploy-token-positive-crlf-unicode-prefix",
+        "clojars-deploy-token-positive-curl-bearer",
+        "clojars-deploy-token-positive-dotenv",
+        "clojars-deploy-token-positive-github-actions-env",
+        "clojars-deploy-token-positive-json-config",
+        "clojars-deploy-token-positive-json-token-key",
+        "clojars-deploy-token-positive-log",
+        "clojars-deploy-token-positive-maven-settings-xml",
+        "clojars-deploy-token-positive-punctuation-adjacent",
+        "clojars-deploy-token-positive-repeated-value",
+        "clojars-deploy-token-positive-sdk-call",
+        "clojars-deploy-token-positive-shell-export",
+        "clojars-deploy-token-positive-tool-call-arguments",
+        "clojars-deploy-token-positive-x-api-key-header",
+        "clojars-deploy-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "clojars_deploy_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 128,
+    "supported": 129,
     "unresolved": 0
   }
 }

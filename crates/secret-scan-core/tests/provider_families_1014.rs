@@ -495,8 +495,83 @@ mod rubygems {
     }
 }
 
+mod clojars {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "clojars-deploy-token";
+    const TYPE: &str = "clojars_deploy_token";
+
+    pub(super) fn token(seed: usize) -> String {
+        format!("CLOJARS_{}", filler(LOWER_HEX, 60, seed))
+    }
+
+    #[test]
+    fn the_token_wins_every_context_as_the_sole_finding() {
+        let token = token(1);
+        assert_eq!(token.len(), 68);
+        assert_sole_provider_finding(DETECTOR, TYPE, &token);
+        for input in [
+            format!("CLOJARS_PASSWORD={token}\n"),
+            format!("env:\n  CLOJARS_USERNAME: alice\n  CLOJARS_PASSWORD: {token}\n"),
+            format!(
+                "{{#\"https://repo.clojars.org\" {{:username \"alice\" :password \"{token}\"}}}}\n"
+            ),
+            format!("<server>\n  <id>clojars</id>\n  <password>{token}</password>\n</server>\n"),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, TYPE, &token);
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = filler(LOWER_HEX, 60, 2);
+        let base = format!("CLOJARS_{body}");
+        let mut upper = body.clone();
+        upper.replace_range(5..6, "A");
+        let mut non_hex = body.clone();
+        non_hex.replace_range(5..6, "g");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("CLOJARS_{}", &body[..59]),
+                format!("{base}0"),
+                format!("CLOJARS_{upper}"),
+                format!("CLOJARS_{non_hex}"),
+                format!("clojars_{body}"),
+                format!("X{base}"),
+                format!("_{base}"),
+                format!("{base}_"),
+                format!("{base}-x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "CLOJARS_USERNAME=alice\nCLOJARS_ENVIRONMENT=production\n".to_owned(),
+            "CLOJARS_PASSWORD=${CLOJARS_PASSWORD}\n".to_owned(),
+            format!("digest {}\n", filler(LOWER_HEX, 60, 3)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"CLOJARS_".repeat(10_000));
+        assert_unclaimed(DETECTOR, &token(4).repeat(200));
+        assert_repetition_line(DETECTOR, &token(4), 200);
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&token(5));
+    }
+}
+
 /// Each #1014 family keeps its own finding on one line next to the others
-/// and an existing prefixed family, and no family claims another's key.
+/// and existing prefixed families (E2B, Daytona), and no family claims another's key.
 mod isolation {
     use super::*;
 
@@ -506,6 +581,11 @@ mod isolation {
             (polar::DETECTOR, polar::oat(9)),
             (sonarqube::DETECTOR, sonarqube::token("squ_", 9)),
             (rubygems::DETECTOR, rubygems::key(9)),
+            (clojars::DETECTOR, clojars::token(9)),
+            (
+                "daytona-api-key",
+                format!("dtn_{}", filler(LOWER_HEX, 64, 9)),
+            ),
             ("e2b-api-key", format!("e2b_{}", filler(LOWER_HEX, 40, 9))),
         ]
     }

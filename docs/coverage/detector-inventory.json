@@ -925,6 +925,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0072ubygems_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
       "schemes": null
+    },
+    {
+      "type": "clojars_deploy_token",
+      "detector": "clojars-deploy-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0043LOJARS_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c",
+      "schemes": null
     }
   ],
   "consumers": [

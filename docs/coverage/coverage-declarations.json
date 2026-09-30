@@ -14040,6 +14040,114 @@
       "type": "rubygems_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "clojars-deploy-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "clojars-deploy-token-positive-bare",
+            "clojars-deploy-token-positive-chat-sentence",
+            "clojars-deploy-token-positive-crlf-unicode-prefix",
+            "clojars-deploy-token-positive-curl-bearer",
+            "clojars-deploy-token-positive-dotenv",
+            "clojars-deploy-token-positive-github-actions-env",
+            "clojars-deploy-token-positive-json-config",
+            "clojars-deploy-token-positive-json-token-key",
+            "clojars-deploy-token-positive-log",
+            "clojars-deploy-token-positive-maven-settings-xml",
+            "clojars-deploy-token-positive-punctuation-adjacent",
+            "clojars-deploy-token-positive-repeated-value",
+            "clojars-deploy-token-positive-sdk-call",
+            "clojars-deploy-token-positive-shell-export",
+            "clojars-deploy-token-positive-tool-call-arguments",
+            "clojars-deploy-token-positive-x-api-key-header",
+            "clojars-deploy-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "clojars-deploy-token-overlap-bearer-header",
+            "clojars-deploy-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "clojars-deploy-token-adversarial-glued-tokens",
+            "clojars-deploy-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "clojars-deploy-token-boundary-body-59",
+            "clojars-deploy-token-boundary-body-61",
+            "clojars-deploy-token-boundary-glued-prefix",
+            "clojars-deploy-token-boundary-glued-trailing",
+            "clojars-deploy-token-boundary-lowercase-prefix",
+            "clojars-deploy-token-boundary-non-hex",
+            "clojars-deploy-token-boundary-uppercase-hex"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "clojars-deploy-token-negative-bare-60-hex",
+            "clojars-deploy-token-negative-env-names",
+            "clojars-deploy-token-negative-env-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "clojars-deploy-token-boundary-body-59",
+            "clojars-deploy-token-boundary-body-61",
+            "clojars-deploy-token-boundary-glued-prefix",
+            "clojars-deploy-token-boundary-glued-trailing",
+            "clojars-deploy-token-boundary-lowercase-prefix",
+            "clojars-deploy-token-boundary-non-hex",
+            "clojars-deploy-token-boundary-uppercase-hex"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for clojars_deploy_token (clojars-deploy-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "clojars_deploy_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -14192,6 +14300,8 @@
             "cerebras-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
             "clickhouse-cloud-api-secret-adversarial-long-run",
+            "clojars-deploy-token-adversarial-glued-tokens",
+            "clojars-deploy-token-adversarial-prefix-run",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
             "composio-api-key-adversarial-long-suffix",
@@ -14663,6 +14773,8 @@
             "cerebras-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
             "clickhouse-cloud-api-secret-adversarial-long-run",
+            "clojars-deploy-token-adversarial-glued-tokens",
+            "clojars-deploy-token-adversarial-prefix-run",
             "cloudflare-adversarial-long-suffix",
             "cohere-api-key-adversarial-dense-findings",
             "composio-api-key-adversarial-long-suffix",

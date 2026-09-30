@@ -21,6 +21,7 @@ mod bitwarden;
 mod browserbase;
 mod cerebras;
 mod clickhouse_cloud;
+mod clojars;
 mod cloudflare;
 mod composio;
 mod confluent;
@@ -246,6 +247,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(polar::POLAR),
         Box::new(sonarqube::SONARQUBE),
         Box::new(rubygems::RUBYGEMS_API_KEY),
+        Box::new(clojars::CLOJARS_DEPLOY_TOKEN),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -541,6 +543,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(rubygems::RUBYGEMS_API_KEY.shapes())],
     ),
     (
+        "clojars-deploy-token",
+        &[Literals::Shapes(clojars::CLOJARS_DEPLOY_TOKEN.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -721,6 +727,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("polar-token", Pack::Provider),
     ("sonarqube-token", Pack::Provider),
     ("rubygems-api-key", Pack::Provider),
+    ("clojars-deploy-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -858,6 +865,7 @@ mod tests {
                 "polar-token",
                 "sonarqube-token",
                 "rubygems-api-key",
+                "clojars-deploy-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1251,6 +1259,7 @@ mod tests {
         );
         let sonarqube_token_input = format!("squ_{}", "5e7c0ded".repeat(5));
         let rubygems_api_key_input = format!("rubygems_{}", "5e7c0ded".repeat(6));
+        let clojars_deploy_token_input = format!("CLOJARS_{}5e7c", "5e7c0ded".repeat(7));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -1349,6 +1358,7 @@ mod tests {
             ("polar-token", polar_token_input.as_str()),
             ("sonarqube-token", sonarqube_token_input.as_str()),
             ("rubygems-api-key", rubygems_api_key_input.as_str()),
+            ("clojars-deploy-token", clojars_deploy_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 128/128 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 129/129 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 128 |
+| supported | 129 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 139.
+Coverage declarations: 140.
 
 ## Coverage by detector
 
@@ -38,6 +38,7 @@ Coverage declarations: 139.
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cerebras-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| clojars-deploy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | composio-api-key | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
@@ -148,6 +149,7 @@ Coverage declarations: 139.
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
 | cerebras_api_key | cerebras-api-key | provider | supported | not-applicable | none |
 | clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
+| clojars_deploy_token | clojars-deploy-token | provider | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
 | composio_org_api_key | composio-api-key | provider | supported | not-applicable | none |
@@ -285,15 +287,15 @@ Coverage declarations: 139.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 139 | 0 | 0 |
-| boundary | 128 | 0 | 0 |
-| host-context | 128 | 0 | 0 |
+| adversarial | 140 | 0 | 0 |
+| boundary | 129 | 0 | 0 |
+| host-context | 129 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 139 | 0 | 0 |
-| near-miss-negative | 128 | 0 | 0 |
-| overlap | 128 | 0 | 0 |
-| positive | 128 | 0 | 0 |
-| range | 139 | 0 | 0 |
+| malformed | 140 | 0 | 0 |
+| near-miss-negative | 129 | 0 | 0 |
+| overlap | 129 | 0 | 0 |
+| positive | 129 | 0 | 0 |
+| range | 140 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
