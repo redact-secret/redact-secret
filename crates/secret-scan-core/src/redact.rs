@@ -8,6 +8,7 @@
 
 use crate::error::{FormatterFailure, SecretScanError, SecretScanErrorCode};
 use crate::limits::WholeInputLimits;
+use crate::pii::heap_sort;
 use crate::types::{ByteRange, Finding, PlaceholderContext, PlaceholderFormatter};
 
 /// Maximum length in bytes of a placeholder a [`PlaceholderFormatter`] may
@@ -78,7 +79,7 @@ impl<'a> ForbiddenMatchedText<'a> {
             .filter(|range| range.len() <= MAX_PLACEHOLDER_LENGTH)
             .map(|range| &input[range.start()..range.end()])
             .collect();
-        values.sort_unstable();
+        heap_sort(&mut values);
         values.dedup();
         let shortest = values.iter().map(|value| value.len()).min().unwrap_or(0);
         Self { values, shortest }
@@ -225,6 +226,22 @@ pub fn redact_with_limits(
     formatter: &dyn PlaceholderFormatter,
     limits: &WholeInputLimits,
 ) -> Result<String, SecretScanError> {
+    let mut output = String::new();
+    redact_into(input, findings, formatter, limits, &mut output)?;
+    Ok(output)
+}
+
+/// [`redact_with_limits`], appending the result to `output` instead of
+/// returning a new string. Every check and every formatter call happens
+/// before the first byte is appended, so on an error `output` is untouched
+/// (issue #1087).
+pub(crate) fn redact_into(
+    input: &str,
+    findings: &[Finding],
+    formatter: &dyn PlaceholderFormatter,
+    limits: &WholeInputLimits,
+    output: &mut String,
+) -> Result<(), SecretScanError> {
     limits.check_input(input)?;
     limits.check_findings(findings.len())?;
     let ordered = ordered_and_disjoint(findings, input)?;
@@ -253,8 +270,9 @@ pub fn redact_with_limits(
         placeholders.push(placeholder);
     }
 
-    // Phase 2: copy into a buffer of exactly the final size.
-    let mut output = String::with_capacity(output_len);
+    // Phase 2: copy into `output`, grown once to the final size (exactly, when empty).
+    let start_len = output.len();
+    output.reserve_exact(output_len);
     let mut cursor = 0;
     let replaced = ordered
         .into_iter()
@@ -266,8 +284,8 @@ pub fn redact_with_limits(
         cursor = range.end();
     }
     output.push_str(&input[cursor..]);
-    debug_assert_eq!(output.len(), output_len);
-    Ok(output)
+    debug_assert_eq!(output.len() - start_len, output_len);
+    Ok(())
 }
 
 #[cfg(test)]
@@ -649,6 +667,59 @@ mod tests {
             );
             if let Ok(output) = &new {
                 assert_eq!(output.capacity(), output.len(), "case {case}");
+            }
+        }
+    }
+
+    /// `redact_into` (issue #1087) appends exactly what the pre-#1087 path
+    /// returned and then copied into the released text, and leaves the
+    /// buffer untouched on an error.
+    #[test]
+    fn redact_into_appends_what_redact_returns_and_is_untouched_on_error() {
+        let mut rng = Rng(0xA5A5_1087_0000_0001);
+        for case in 0..6000 {
+            let input = random_text(&mut rng, if case % 50 == 0 { 400 } else { 24 });
+            let bounds = char_starts(&input);
+            let mut findings = Vec::new();
+            let mut at = 0;
+            while at < bounds.len() {
+                if at + 1 < bounds.len() && rng.below(3) == 0 {
+                    let end_index = (at + 1 + rng.below(5)).min(bounds.len() - 1);
+                    let action =
+                        [Action::Redact, Action::Block, Action::Warn, Action::Allow][rng.below(4)];
+                    findings.push(finding("finding-1", bounds[at], bounds[end_index], action));
+                    at = end_index;
+                }
+                at += 1;
+            }
+            let pool: Vec<String> = (0..3)
+                .map(|_| match rng.below(4) {
+                    0 => String::new(),
+                    1 | 2 => format!("<{}>", random_text(&mut rng, 6)),
+                    _ => format!("<R{}>", rng.below(100)),
+                })
+                .collect();
+            let formatter = |_: &Finding, context: &PlaceholderContext| {
+                Ok(pool[context.placeholder_index() % pool.len()].clone())
+            };
+            let prefix = random_text(&mut rng, 8);
+            let mut output = prefix.clone();
+            let into = redact_into(
+                &input,
+                &findings,
+                &formatter,
+                &WholeInputLimits::default(),
+                &mut output,
+            );
+            match redact(&input, &findings, &formatter) {
+                Ok(expected) => {
+                    assert!(into.is_ok(), "case {case}");
+                    assert_eq!(output, format!("{prefix}{expected}"), "case {case}");
+                }
+                Err(error) => {
+                    assert_eq!(into.unwrap_err().code(), error.code(), "case {case}");
+                    assert_eq!(output, prefix, "case {case}");
+                }
             }
         }
     }

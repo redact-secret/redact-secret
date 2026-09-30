@@ -88,7 +88,7 @@ use crate::pii::PiiSelection;
 use crate::pipeline::detect;
 use crate::pipeline::detect_units;
 use crate::policy::DefaultPolicy;
-use crate::redact::{default_placeholder_formatter, redact};
+use crate::redact::{default_placeholder_formatter, redact_into};
 use crate::registry::{DetectorRegistry, Profile};
 use crate::types::{
     Action, ByteRange, DetectedFinding, Finding, PlaceholderContext, PlaceholderFormatter, Policy,
@@ -1093,6 +1093,9 @@ impl IncrementalSanitizer {
         let lead_len = self.lead_len;
         let batch_end = self.unit_start;
         let batch_length = batch_end - lead_len;
+        // The released text is about as long as the batch: size it once
+        // instead of regrowing it unit by unit (issue #1087).
+        released.text.reserve(batch_length);
         #[cfg(test)]
         let (finding_offset, mut batch_shadow) =
             (self.finding_count, self.shadow.as_ref().map(|_| Vec::new()));
@@ -1272,17 +1275,18 @@ impl IncrementalSanitizer {
                 PlaceholderContext::new(placeholder_offset + local_context.placeholder_index());
             formatter.format(&global_findings[index], &global_context)
         };
-        let text = redact(
+        redact_into(
             &self.retained[base + begin..base + end],
             &local_findings,
             &wrapped,
+            &WholeInputLimits::default(),
+            &mut released.text,
         )?;
 
         self.placeholder_count += global_findings
             .iter()
             .filter(|finding| finding.action().replaces_text())
             .count();
-        released.text.push_str(&text);
         released.findings.extend(global_findings);
         Ok(())
     }

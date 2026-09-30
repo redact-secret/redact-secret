@@ -103,8 +103,9 @@ type WasmIncrementalPolicyCallback = (
 
 /** The result of one incremental `append`/`finalize` call. */
 export interface WasmIncrementalResult {
-  readonly text: string;
-  readonly findings: readonly WasmFinding[];
+  takeText(): string;
+  takeFindings(): readonly WasmFinding[];
+  free(): void;
 }
 
 /** The `IncrementalSanitizer` class `createIncrementalSanitizer` returns. */
@@ -288,10 +289,14 @@ function toWasmIncrementalPolicyCallback(
 function toNativeIncrementalResult(
   result: WasmIncrementalResult,
 ): NativeIncrementalResult {
-  return {
-    text: result.text,
-    findings: result.findings.map(toNativeFinding),
-  };
+  try {
+    return {
+      text: result.takeText(),
+      findings: result.takeFindings().map(toNativeFinding),
+    };
+  } finally {
+    result.free();
+  }
 }
 
 /**

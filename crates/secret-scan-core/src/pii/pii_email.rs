@@ -328,13 +328,22 @@ fn bounded_token_start(input: &str, start: usize) -> usize {
 }
 
 fn reserved_documentation_domain(domain: &str) -> bool {
-    let lowercase = domain.to_ascii_lowercase();
+    let bytes = domain.as_bytes();
+    // `reserved` itself, or a subdomain `<label>.<reserved>`, ASCII
+    // case-insensitively and without building a lowercased copy.
+    let is_reserved = |reserved: &str| {
+        let reserved = reserved.as_bytes();
+        bytes.eq_ignore_ascii_case(reserved)
+            || bytes.len() > reserved.len()
+                && bytes[bytes.len() - reserved.len() - 1] == b'.'
+                && bytes[bytes.len() - reserved.len()..].eq_ignore_ascii_case(reserved)
+    };
     ["example.com", "example.net", "example.org"]
         .iter()
-        .any(|reserved| lowercase == *reserved || lowercase.ends_with(&format!(".{reserved}")))
+        .any(|reserved| is_reserved(reserved))
         || ["example", "invalid", "localhost", "test"]
             .iter()
-            .any(|reserved| lowercase == *reserved || lowercase.ends_with(&format!(".{reserved}")))
+            .any(|reserved| is_reserved(reserved))
 }
 
 #[cfg(test)]
@@ -549,5 +558,68 @@ mod tests {
         let overlong_domain = format!("fixture876@{}.synthetic", "a".repeat(1_000_000));
         assert!(candidates(&overlong_local).is_empty());
         assert!(candidates(&overlong_domain).is_empty());
+    }
+}
+
+/// Differential test for #1086: `reserved_documentation_domain` compares the
+/// domain in place instead of a lowercased copy.
+#[cfg(test)]
+mod case_insensitive_differential_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    /// The implementation before #1086.
+    fn old_reserved_documentation_domain(domain: &str) -> bool {
+        let lowercase = domain.to_ascii_lowercase();
+        ["example.com", "example.net", "example.org"]
+            .iter()
+            .any(|reserved| lowercase == *reserved || lowercase.ends_with(&format!(".{reserved}")))
+            || ["example", "invalid", "localhost", "test"]
+                .iter()
+                .any(|reserved| {
+                    lowercase == *reserved || lowercase.ends_with(&format!(".{reserved}"))
+                })
+    }
+
+    #[test]
+    fn reserved_domain_matches_the_lowercasing_implementation() {
+        let words = [
+            "example",
+            "EXAMPLE",
+            "Example",
+            ".com",
+            ".COM",
+            ".net",
+            ".org",
+            ".Org",
+            "invalid",
+            "LOCALHOST",
+            "localhost",
+            "test",
+            "TEST",
+            "Test",
+            ".",
+            "mail",
+            "a",
+            "..",
+            "-",
+            "\u{212a}",
+            "\u{e9}xample",
+        ];
+        let mut pieces: Vec<&str> = BOUNDARY_PIECES.to_vec();
+        pieces.extend_from_slice(&words);
+        let mut rng = XorShift32::new(0x1086_0005);
+        let mut inputs: Vec<String> = vec![String::new(), ".".to_owned()];
+        inputs.extend(words.iter().map(|word| (*word).to_owned()));
+        for _ in 0..8000 {
+            inputs.push(rng.text(&pieces, 5));
+        }
+        let mut hits = 0;
+        for input in &inputs {
+            let old = old_reserved_documentation_domain(input);
+            assert_eq!(reserved_documentation_domain(input), old, "{input:?}");
+            hits += usize::from(old);
+        }
+        assert!(hits > 20, "the generator must reach the positive cases");
     }
 }

@@ -321,18 +321,23 @@ fn inside_provider_call(line: &str, spec: &Spec, end: usize, keyword_on_line: bo
                 {
                     start -= 1;
                 }
-                let callee = line[start..cursor].to_ascii_lowercase();
-                if spec.keywords.iter().any(|keyword| callee.contains(keyword)) {
+                let callee = &line[start..cursor];
+                if spec
+                    .keywords
+                    .iter()
+                    .any(|keyword| text::contains_ci(callee, keyword))
+                {
                     return true;
                 }
                 // Issue #1017: a provider SDK factory with a generic name
                 // (`createClient` from `@deepgram/sdk`) on a line that names
                 // the provider, as its import or receiving variable does.
                 if keyword_on_line
-                    && callee
-                        .rsplit('.')
-                        .next()
-                        .is_some_and(|name| spec.factory_callees.contains(&name))
+                    && callee.rsplit('.').next().is_some_and(|name| {
+                        spec.factory_callees
+                            .iter()
+                            .any(|listed| name.eq_ignore_ascii_case(listed))
+                    })
                 {
                     return true;
                 }
@@ -431,9 +436,8 @@ fn is_chain_byte(byte: u8) -> bool {
 /// that ends the hostname, so `api.deepgram.com.example.test` and
 /// `api.deepgram.company` do not count.
 fn names_host_under(line: &str, domain: &str) -> bool {
-    let lowered = line.to_ascii_lowercase();
-    let bytes = lowered.as_bytes();
-    lowered.match_indices(domain).any(|(at, _)| {
+    let bytes = line.as_bytes();
+    any_match_ci(bytes, domain, |at| {
         let end = at + domain.len();
         let after_ends_host = match bytes.get(end) {
             None => true,
@@ -449,10 +453,9 @@ fn names_host_under(line: &str, domain: &str) -> bool {
 /// alphanumeric model-name byte (`cohere/command-r-plus`,
 /// `mistral/mistral-large-latest`). Issue #1018.
 fn names_model_route(line: &str, spec: &Spec) -> bool {
-    let lowered = line.to_ascii_lowercase();
-    let bytes = lowered.as_bytes();
+    let bytes = line.as_bytes();
     spec.keywords.iter().any(|keyword| {
-        lowered.match_indices(keyword).any(|(at, _)| {
+        any_match_ci(bytes, keyword, |at| {
             let end = at + keyword.len();
             (at == 0 || !is_boundary_byte(bytes[at - 1]))
                 && bytes.get(end) == Some(&b'/')
@@ -472,32 +475,57 @@ fn is_token_subprotocol(bytes: &[u8], start: usize) -> bool {
     let Ok(window) = std::str::from_utf8(window) else {
         return false;
     };
-    let before = window.to_ascii_lowercase();
-    let spaces: &[char] = &[' ', '\t'];
+    let before = window.as_bytes();
+    let spaces: &[u8] = b" \t";
+    let trim = |bytes: &'_ [u8]| -> usize {
+        bytes
+            .iter()
+            .rposition(|byte| !spaces.contains(byte))
+            .map_or(0, |last| last + 1)
+    };
+    let strip = |bytes: &'_ [u8], suffix: &str| -> Option<usize> {
+        let suffix = suffix.as_bytes();
+        let start = bytes.len().checked_sub(suffix.len())?;
+        bytes[start..].eq_ignore_ascii_case(suffix).then_some(start)
+    };
     // `["token", "<value>"]`: the value's opening quote, `,`, the quoted
     // `token`, and the `[` that opens the array.
-    if let Some(head) = before.strip_suffix(['"', '\''])
-        && let Some(head) = head.trim_end_matches(spaces).strip_suffix(',')
-    {
-        let head = head.trim_end_matches(spaces);
-        return ["\"token\"", "'token'"].iter().any(|quoted| {
-            head.strip_suffix(quoted)
-                .is_some_and(|open| open.trim_end_matches(spaces).ends_with('['))
-        });
+    if matches!(before.last(), Some(b'"' | b'\'')) {
+        let head = &before[..before.len() - 1];
+        let head = &head[..trim(head)];
+        if head.last() == Some(&b',') {
+            let head = &head[..head.len() - 1];
+            let head = &head[..trim(head)];
+            return ["\"token\"", "'token'"].iter().any(|quoted| {
+                strip(head, quoted).is_some_and(|open| {
+                    let open = &head[..open];
+                    open[..trim(open)].ends_with(b"[")
+                })
+            });
+        }
     }
     // `Sec-WebSocket-Protocol: token, <value>`.
-    before
-        .trim_end_matches(spaces)
-        .strip_suffix(',')
-        .and_then(|head| head.trim_end_matches(spaces).strip_suffix("token"))
-        .and_then(|head| head.trim_end_matches(spaces).strip_suffix(':'))
-        .and_then(|head| head.strip_suffix("sec-websocket-protocol"))
-        .is_some_and(|lead| {
-            !lead
-                .bytes()
-                .last()
-                .is_some_and(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_'))
-        })
+    let head = &before[..trim(before)];
+    if head.last() != Some(&b',') {
+        return false;
+    }
+    let head = &head[..head.len() - 1];
+    let head = &head[..trim(head)];
+    let Some(at) = strip(head, "token") else {
+        return false;
+    };
+    let head = &head[..at];
+    let head = &head[..trim(head)];
+    if head.last() != Some(&b':') {
+        return false;
+    }
+    let head = &head[..head.len() - 1];
+    let Some(at) = strip(head, "sec-websocket-protocol") else {
+        return false;
+    };
+    !head[..at]
+        .last()
+        .is_some_and(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_'))
 }
 
 /// `true` when `line` holds a `provider` field whose value is one of the
@@ -506,14 +534,13 @@ fn is_token_subprotocol(bytes: &[u8], start: usize) -> bool {
 /// (issue #1017). The field name must not continue a wider identifier on
 /// either side, and the keyword must be the whole value.
 fn names_provider_field(line: &str, keywords: &[&str]) -> bool {
-    let lowered = line.to_ascii_lowercase();
-    let bytes = lowered.as_bytes();
+    let bytes = line.as_bytes();
     let is_ident = |byte: u8| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-');
-    lowered.match_indices("provider").any(|(at, field)| {
+    any_match_ci(bytes, "provider", |at| {
         if at > 0 && is_ident(bytes[at - 1]) {
             return false;
         }
-        let mut cursor = at + field.len();
+        let mut cursor = at + "provider".len();
         cursor += ascii_run(bytes, cursor, |byte| matches!(byte, b'"' | b'\'' | b'\\'));
         cursor += ascii_run(bytes, cursor, |byte| matches!(byte, b' ' | b'\t'));
         if !matches!(bytes.get(cursor), Some(b':' | b'=')) {
@@ -524,12 +551,28 @@ fn names_provider_field(line: &str, keywords: &[&str]) -> bool {
             matches!(byte, b' ' | b'\t' | b'"' | b'\'' | b'\\')
         });
         keywords.iter().any(|keyword| {
-            lowered[cursor..].starts_with(keyword)
+            text::starts_with_ci(line, cursor, keyword)
                 && !bytes
                     .get(cursor + keyword.len())
                     .is_some_and(|&byte| is_ident(byte))
         })
     })
+}
+
+/// `true` when `visit` accepts the start of any case-insensitive occurrence
+/// of the lowercase ASCII, non-empty `needle` in `bytes`. Occurrences are the
+/// non-overlapping, left-to-right ones, the ones `str::match_indices` yields
+/// over an ASCII-lowercased copy, without building that copy.
+fn any_match_ci(bytes: &[u8], needle: &str, mut visit: impl FnMut(usize) -> bool) -> bool {
+    debug_assert!(!needle.is_empty());
+    let mut from = 0;
+    while let Some(at) = text::find_ci(bytes, from, needle.as_bytes()) {
+        if visit(at) {
+            return true;
+        }
+        from = at + needle.len();
+    }
+    false
 }
 
 fn ascii_run(bytes: &[u8], start: usize, pred: fn(u8) -> bool) -> usize {
@@ -1584,5 +1627,306 @@ mod tests {
         assert!(run(&MISTRAL, &input).is_empty());
         let input = "Mistral(".repeat(20_000);
         assert!(run(&MISTRAL, &input).is_empty());
+    }
+}
+
+/// Differential tests for #1086: each check compares the line in place
+/// instead of a lowercased copy of it. The `old_*` functions are the
+/// implementations before that change.
+#[cfg(test)]
+mod case_insensitive_differential_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    const SPECS: [&Spec; 4] = [&MISTRAL, &COHERE, &AI21, &DEEPGRAM];
+
+    fn old_names_host_under(line: &str, domain: &str) -> bool {
+        let lowered = line.to_ascii_lowercase();
+        let bytes = lowered.as_bytes();
+        lowered.match_indices(domain).any(|(at, _)| {
+            let end = at + domain.len();
+            let after_ends_host = match bytes.get(end) {
+                None => true,
+                Some(b'.') => !bytes.get(end + 1).is_some_and(u8::is_ascii_alphanumeric),
+                Some(&byte) => !(byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_')),
+            };
+            at > 0 && bytes[at - 1] == b'.' && after_ends_host
+        })
+    }
+
+    fn old_names_model_route(line: &str, spec: &Spec) -> bool {
+        let lowered = line.to_ascii_lowercase();
+        let bytes = lowered.as_bytes();
+        spec.keywords.iter().any(|keyword| {
+            lowered.match_indices(keyword).any(|(at, _)| {
+                let end = at + keyword.len();
+                (at == 0 || !is_boundary_byte(bytes[at - 1]))
+                    && bytes.get(end) == Some(&b'/')
+                    && bytes.get(end + 1).is_some_and(u8::is_ascii_alphanumeric)
+            })
+        })
+    }
+
+    fn old_names_provider_field(line: &str, keywords: &[&str]) -> bool {
+        let lowered = line.to_ascii_lowercase();
+        let bytes = lowered.as_bytes();
+        let is_ident = |byte: u8| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-');
+        lowered.match_indices("provider").any(|(at, field)| {
+            if at > 0 && is_ident(bytes[at - 1]) {
+                return false;
+            }
+            let mut cursor = at + field.len();
+            cursor += ascii_run(bytes, cursor, |byte| matches!(byte, b'"' | b'\'' | b'\\'));
+            cursor += ascii_run(bytes, cursor, |byte| matches!(byte, b' ' | b'\t'));
+            if !matches!(bytes.get(cursor), Some(b':' | b'=')) {
+                return false;
+            }
+            cursor += 1;
+            cursor += ascii_run(bytes, cursor, |byte| {
+                matches!(byte, b' ' | b'\t' | b'"' | b'\'' | b'\\')
+            });
+            keywords.iter().any(|keyword| {
+                lowered[cursor..].starts_with(keyword)
+                    && !bytes
+                        .get(cursor + keyword.len())
+                        .is_some_and(|&byte| is_ident(byte))
+            })
+        })
+    }
+
+    fn old_is_token_subprotocol(bytes: &[u8], start: usize) -> bool {
+        let window = &bytes[start.saturating_sub(HEADER_WINDOW)..start];
+        let Ok(window) = std::str::from_utf8(window) else {
+            return false;
+        };
+        let before = window.to_ascii_lowercase();
+        let spaces: &[char] = &[' ', '\t'];
+        if let Some(head) = before.strip_suffix(['"', '\''])
+            && let Some(head) = head.trim_end_matches(spaces).strip_suffix(',')
+        {
+            let head = head.trim_end_matches(spaces);
+            return ["\"token\"", "'token'"].iter().any(|quoted| {
+                head.strip_suffix(quoted)
+                    .is_some_and(|open| open.trim_end_matches(spaces).ends_with('['))
+            });
+        }
+        before
+            .trim_end_matches(spaces)
+            .strip_suffix(',')
+            .and_then(|head| head.trim_end_matches(spaces).strip_suffix("token"))
+            .and_then(|head| head.trim_end_matches(spaces).strip_suffix(':'))
+            .and_then(|head| head.strip_suffix("sec-websocket-protocol"))
+            .is_some_and(|lead| {
+                !lead
+                    .bytes()
+                    .last()
+                    .is_some_and(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_'))
+            })
+    }
+
+    /// `inside_provider_call` before #1086.
+    fn old_inside_provider_call(
+        line: &str,
+        spec: &Spec,
+        end: usize,
+        keyword_on_line: bool,
+    ) -> bool {
+        let bytes = line.as_bytes();
+        let end = end.min(bytes.len());
+        let floor = end.saturating_sub(CALL_WINDOW);
+        let mut cursor = end;
+        while cursor > floor {
+            cursor -= 1;
+            match bytes[cursor] {
+                b')' => return false,
+                b'(' => {
+                    let mut start = cursor;
+                    while start > 0
+                        && (bytes[start - 1].is_ascii_alphanumeric()
+                            || matches!(bytes[start - 1], b'_' | b'.'))
+                    {
+                        start -= 1;
+                    }
+                    let callee = line[start..cursor].to_ascii_lowercase();
+                    if spec.keywords.iter().any(|keyword| callee.contains(keyword)) {
+                        return true;
+                    }
+                    if keyword_on_line
+                        && callee
+                            .rsplit('.')
+                            .next()
+                            .is_some_and(|name| spec.factory_callees.contains(&name))
+                    {
+                        return true;
+                    }
+                }
+                _ => {}
+            }
+        }
+        false
+    }
+
+    const WORDS: &[&str] = &[
+        "deepgram",
+        "DeepGram",
+        "DEEPGRAM",
+        "deepgram.com",
+        "API.DEEPGRAM.COM",
+        ".deepgram.com",
+        "mistral",
+        "Mistral",
+        "cohere",
+        "COHERE",
+        "ai21",
+        "AI21",
+        "provider",
+        "Provider",
+        "PROVIDER",
+        "\"provider\":",
+        "provider=",
+        "/",
+        "model",
+        "createClient",
+        "createclient",
+        "CREATECLIENT",
+        "(",
+        ")",
+        "new ",
+        "Sec-WebSocket-Protocol",
+        "sec-websocket-protocol",
+        "token",
+        "TOKEN",
+        "\"token\"",
+        "'Token'",
+        "HOST: ",
+        "GET ",
+        "https://",
+        "\u{212a}",
+    ];
+
+    fn lines() -> Vec<String> {
+        let mut rng = XorShift32::new(0x1086_0003);
+        let mut pieces: Vec<&str> = BOUNDARY_PIECES.to_vec();
+        pieces.extend_from_slice(WORDS);
+        let mut out = vec![String::new()];
+        out.extend(WORDS.iter().map(|word| (*word).to_owned()));
+        for _ in 0..5000 {
+            out.push(rng.text(&pieces, 9));
+        }
+        out
+    }
+
+    #[test]
+    fn host_route_and_provider_field_match_the_lowercasing_implementation() {
+        for line in lines() {
+            assert_eq!(
+                names_host_under(&line, DEEPGRAM_API_DOMAIN),
+                old_names_host_under(&line, DEEPGRAM_API_DOMAIN),
+                "{line:?}"
+            );
+            for spec in SPECS {
+                assert_eq!(
+                    names_model_route(&line, spec),
+                    old_names_model_route(&line, spec),
+                    "{line:?}"
+                );
+                assert_eq!(
+                    names_provider_field(&line, spec.keywords),
+                    old_names_provider_field(&line, spec.keywords),
+                    "{line:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn token_subprotocol_matches_the_lowercasing_implementation() {
+        for line in lines() {
+            let bytes = line.as_bytes();
+            // Every start offset, including ones inside a multi-byte
+            // character, where the window is not valid UTF-8.
+            for start in 0..=bytes.len() {
+                assert_eq!(
+                    is_token_subprotocol(bytes, start),
+                    old_is_token_subprotocol(bytes, start),
+                    "{line:?} at {start}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn provider_call_matches_the_lowercasing_implementation() {
+        for line in lines() {
+            let len = line.len();
+            for spec in SPECS {
+                for end in [0, len / 2, len, len + 3] {
+                    for keyword_on_line in [false, true] {
+                        assert_eq!(
+                            inside_provider_call(&line, spec, end, keyword_on_line),
+                            old_inside_provider_call(&line, spec, end, keyword_on_line),
+                            "{line:?} end {end}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn positive_shapes_in_any_case_match_the_lowercasing_implementation() {
+        let shapes: [(&str, usize, bool); 8] = [
+            ("Sec-WebSocket-Protocol: token, ", 0, true),
+            ("SEC-WEBSOCKET-PROTOCOL:\tTOKEN ,\t", 0, true),
+            ("x-Sec-WebSocket-Protocol: token, ", 0, false),
+            ("[\"token\", \"", 0, true),
+            ("[ 'TOKEN' ,  '", 0, true),
+            ("\u{e9}[\"Token\", \"", 0, true),
+            ("\"token\", \"", 0, false),
+            ("Sec-WebSocket-Protocol: token ", 0, false),
+        ];
+        for (text, _, expected) in shapes {
+            let bytes = text.as_bytes();
+            let start = bytes.len();
+            assert_eq!(old_is_token_subprotocol(bytes, start), expected, "{text:?}");
+            assert_eq!(is_token_subprotocol(bytes, start), expected, "{text:?}");
+        }
+        for (line, expected) in [
+            ("API.Deepgram.COM/v1", true),
+            ("api.deepgram.com.example.test", false),
+            ("Deepgram.com", false),
+        ] {
+            assert_eq!(old_names_host_under(line, DEEPGRAM_API_DOMAIN), expected);
+            assert_eq!(names_host_under(line, DEEPGRAM_API_DOMAIN), expected);
+        }
+        for (line, keywords, expected) in [
+            ("\"Provider\": \"DeepGram\"", DEEPGRAM.keywords, true),
+            ("PROVIDER = 'cohere'", COHERE.keywords, true),
+            ("provider: deepgramx", DEEPGRAM.keywords, false),
+        ] {
+            assert_eq!(old_names_provider_field(line, keywords), expected);
+            assert_eq!(names_provider_field(line, keywords), expected);
+        }
+        assert!(names_model_route("COHERE/command-r", &COHERE));
+        assert!(old_names_model_route("COHERE/command-r", &COHERE));
+    }
+
+    #[test]
+    fn the_needles_the_helpers_rely_on_are_lowercase_ascii() {
+        for spec in SPECS {
+            for needle in spec.keywords.iter().chain(spec.factory_callees) {
+                assert!(!needle.is_empty());
+                assert!(
+                    needle
+                        .bytes()
+                        .all(|b| !b.is_ascii_uppercase() && b.is_ascii())
+                );
+            }
+        }
+        assert!(
+            DEEPGRAM_API_DOMAIN
+                .bytes()
+                .all(|b| b.is_ascii() && !b.is_ascii_uppercase())
+        );
     }
 }

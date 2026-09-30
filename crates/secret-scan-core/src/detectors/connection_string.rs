@@ -295,18 +295,22 @@ fn is_interpolation_or_env_reference(value: &str) -> bool {
 /// `TODO_SET_PASSWORD`).
 fn is_fill_in_password_prose(value: &str) -> bool {
     const PREFIXES: [&str; 3] = ["insert", "replace", "todo"];
-    let lower = value.to_ascii_lowercase();
-    let tokens: Vec<&str> = lower
+    let tokens: Vec<&str> = value
         .split(['_', '-'])
         .filter(|token| !token.is_empty())
         .collect();
     if tokens.len() < 2 {
         return false;
     }
-    if tokens[tokens.len() - 1] == "here" {
+    if tokens[tokens.len() - 1].eq_ignore_ascii_case("here") {
         return true;
     }
-    PREFIXES.contains(&tokens[0]) && tokens.contains(&"password")
+    PREFIXES
+        .iter()
+        .any(|prefix| tokens[0].eq_ignore_ascii_case(prefix))
+        && tokens
+            .iter()
+            .any(|token| token.eq_ignore_ascii_case("password"))
 }
 
 fn is_userinfo_char(byte: u8) -> bool {
@@ -1592,5 +1596,67 @@ mod tests {
             ),
             Vec::new()
         );
+    }
+}
+
+/// Differential test for #1086: `is_fill_in_password_prose` compares the
+/// value's own tokens instead of tokens of a lowercased copy.
+#[cfg(test)]
+mod case_insensitive_differential_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    /// The implementation before #1086.
+    fn old_is_fill_in_password_prose(value: &str) -> bool {
+        const PREFIXES: [&str; 3] = ["insert", "replace", "todo"];
+        let lower = value.to_ascii_lowercase();
+        let tokens: Vec<&str> = lower
+            .split(['_', '-'])
+            .filter(|token| !token.is_empty())
+            .collect();
+        if tokens.len() < 2 {
+            return false;
+        }
+        if tokens[tokens.len() - 1] == "here" {
+            return true;
+        }
+        PREFIXES.contains(&tokens[0]) && tokens.contains(&"password")
+    }
+
+    #[test]
+    fn fill_in_password_prose_matches_the_lowercasing_implementation() {
+        let words = [
+            "here",
+            "HERE",
+            "Here",
+            "insert",
+            "REPLACE",
+            "Todo",
+            "password",
+            "PASSWORD",
+            "PassWord",
+            "your",
+            "root",
+            "me",
+            "_",
+            "-",
+            "__",
+            "\u{212a}",
+            "h\u{e9}re",
+        ];
+        let mut pieces: Vec<&str> = BOUNDARY_PIECES.to_vec();
+        pieces.extend_from_slice(&words);
+        let mut rng = XorShift32::new(0x1086_0002);
+        let mut inputs = vec![String::new(), "_".to_owned(), "a_here".to_owned()];
+        for _ in 0..6000 {
+            inputs.push(rng.text(&pieces, 7));
+        }
+        for value in inputs {
+            assert_eq!(
+                is_fill_in_password_prose(&value),
+                old_is_fill_in_password_prose(&value),
+                "{value:?}"
+            );
+        }
     }
 }

@@ -93,11 +93,20 @@ const MAX_QUALIFIER_WORDS: usize = 4;
 /// followed by `for` and one to [`MAX_QUALIFIER_WORDS`] words of ASCII
 /// letters, digits, `_` or `-` (issue #1044): `the secret access key for
 /// the staging user`, as a chat message or ticket writes it before `:`.
-fn ends_with_qualified_phrase(lower: &str) -> bool {
-    let Some(at) = lower.rfind("secret access key for ") else {
+fn ends_with_qualified_phrase(name: &str) -> bool {
+    const PHRASE: &str = "secret access key for ";
+    // The last case-insensitive occurrence. The phrase has no border (it
+    // starts with `s` and ends with a space), so occurrences never overlap.
+    let mut last = None;
+    let mut from = 0;
+    while let Some(at) = text::find_ci(name.as_bytes(), from, PHRASE.as_bytes()) {
+        last = Some(at);
+        from = at + 1;
+    }
+    let Some(at) = last else {
         return false;
     };
-    let qualifier = &lower[at + "secret access key for ".len()..];
+    let qualifier = &name[at + PHRASE.len()..];
     let words: Vec<&str> = qualifier.split(' ').collect();
     (1..=MAX_QUALIFIER_WORDS).contains(&words.len())
         && words.iter().all(|word| {
@@ -138,8 +147,7 @@ fn ends_with_secret_name(prefix: &str) -> bool {
     if !(name.contains("ecret") || name.contains("ECRET")) {
         return false;
     }
-    let lower = name.to_ascii_lowercase();
-    if lower.ends_with("secret access key") || ends_with_qualified_phrase(&lower) {
+    if text::ends_with_ci(name, "secret access key") || ends_with_qualified_phrase(name) {
         return true;
     }
     // `at + len_utf8()`, not `at + 1`: the separator may be multi-byte.
@@ -152,14 +160,22 @@ fn ends_with_secret_name(prefix: &str) -> bool {
     if !(identifier.contains("ecret") || identifier.contains("ECRET")) {
         return false;
     }
-    let compact: String = identifier
+    compact_ends_with_ci(identifier, "secretaccesskey")
+        || compact_ends_with_ci(identifier, "awssecretkey")
+        || compact_ends_with_ci(identifier, "awssecret")
+}
+
+/// `true` when `identifier`, with every `_`, `.` and `-` byte removed, ends
+/// with the lowercase ASCII `suffix`, case-insensitively.
+fn compact_ends_with_ci(identifier: &str, suffix: &str) -> bool {
+    let mut kept = identifier
         .bytes()
-        .filter(|byte| !matches!(byte, b'_' | b'.' | b'-'))
-        .map(|byte| char::from(byte.to_ascii_lowercase()))
-        .collect();
-    compact.ends_with("secretaccesskey")
-        || compact.ends_with("awssecretkey")
-        || compact.ends_with("awssecret")
+        .rev()
+        .filter(|byte| !matches!(byte, b'_' | b'.' | b'-'));
+    suffix.bytes().rev().all(|expected| {
+        kept.next()
+            .is_some_and(|byte| byte.to_ascii_lowercase() == expected)
+    })
 }
 
 /// Every run on `input[line_start..line_end]` shaped like a secret access
@@ -670,5 +686,135 @@ mod tests {
             candidates[0].range(),
             ByteRange::new(start, start + value.len()).unwrap()
         );
+    }
+}
+
+/// Differential test for #1086: `ends_with_secret_name` compares the name in
+/// place instead of a lowercased copy and a compacted lowercase copy.
+#[cfg(test)]
+mod case_insensitive_differential_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    /// The implementation before #1086.
+    fn old_ends_with_qualified_phrase(lower: &str) -> bool {
+        let Some(at) = lower.rfind("secret access key for ") else {
+            return false;
+        };
+        let qualifier = &lower[at + "secret access key for ".len()..];
+        let words: Vec<&str> = qualifier.split(' ').collect();
+        (1..=MAX_QUALIFIER_WORDS).contains(&words.len())
+            && words.iter().all(|word| {
+                !word.is_empty()
+                    && word
+                        .bytes()
+                        .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+            })
+    }
+
+    /// The implementation before #1086.
+    fn old_ends_with_secret_name(prefix: &str) -> bool {
+        let trim =
+            |text: &str| -> usize { text.trim_end_matches([' ', '\t', '"', '\'', '\\']).len() };
+        let mut end = trim(prefix);
+        let Some(operator) = prefix[..end].chars().next_back() else {
+            return false;
+        };
+        if operator != '=' && operator != ':' {
+            return false;
+        }
+        end -= 1;
+        if prefix[..end].ends_with(':') {
+            end -= 1;
+        }
+        end = trim(&prefix[..end]);
+        let mut name = &prefix[..end];
+        if name.ends_with(']')
+            && let Some(open) = name.rfind('[')
+        {
+            name = name[..open].trim_end_matches([' ', '\t']);
+        }
+        if !(name.contains("ecret") || name.contains("ECRET")) {
+            return false;
+        }
+        let lower = name.to_ascii_lowercase();
+        if lower.ends_with("secret access key") || old_ends_with_qualified_phrase(&lower) {
+            return true;
+        }
+        let identifier_start = name
+            .char_indices()
+            .rev()
+            .find(|&(_, ch)| !(ch.is_ascii_alphanumeric() || matches!(ch, '_' | '.' | '-')))
+            .map_or(0, |(at, ch)| at + ch.len_utf8());
+        let identifier = &name[identifier_start..];
+        if !(identifier.contains("ecret") || identifier.contains("ECRET")) {
+            return false;
+        }
+        let compact: String = identifier
+            .bytes()
+            .filter(|byte| !matches!(byte, b'_' | b'.' | b'-'))
+            .map(|byte| char::from(byte.to_ascii_lowercase()))
+            .collect();
+        compact.ends_with("secretaccesskey")
+            || compact.ends_with("awssecretkey")
+            || compact.ends_with("awssecret")
+    }
+
+    const WORDS: &[&str] = &[
+        "secret access key",
+        "Secret Access Key",
+        "SECRET ACCESS KEY FOR ",
+        "secret access key for ",
+        "Secret Access Key For the staging user",
+        "aws_secret_access_key",
+        "AWS_SECRET_ACCESS_KEY",
+        "AwsSecretKey",
+        "aws.secret.key",
+        "AWS-SECRET",
+        "awsSecret",
+        "SECRET",
+        "secret",
+        "ecret",
+        "ECRET",
+        "staging",
+        "user",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "[hint]",
+        "[",
+        "]",
+        " = ",
+        ": ",
+        ":=",
+        "=",
+        "\u{212a}",
+        "\u{e9}",
+        "\u{130}",
+    ];
+
+    #[test]
+    fn secret_name_matches_the_lowercasing_implementation() {
+        let mut pieces: Vec<&str> = BOUNDARY_PIECES.to_vec();
+        pieces.extend_from_slice(WORDS);
+        let mut rng = XorShift32::new(0x1086_0004);
+        let mut inputs: Vec<String> = vec![String::new(), "=".to_owned(), ":".to_owned()];
+        inputs.extend(WORDS.iter().map(|word| format!("{word}=")));
+        inputs.extend(WORDS.iter().map(|word| format!("\"{word}\" :")));
+        for _ in 0..8000 {
+            let body = rng.text(&pieces, 8);
+            let operator = ["=", ":", " = ", "\":", ":=", ""][rng.below(6)];
+            inputs.push(format!("{body}{operator}"));
+        }
+        let mut hits = 0;
+        for input in &inputs {
+            let old = old_ends_with_secret_name(input);
+            assert_eq!(ends_with_secret_name(input), old, "{input:?}");
+            hits += usize::from(old);
+        }
+        assert!(hits > 20, "the generator must reach the positive cases");
     }
 }

@@ -190,6 +190,9 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const RANGE_UNIT: &str = "utf8-bytes";
 
 #[cfg(test)]
+mod test_rng;
+
+#[cfg(test)]
 mod tests {
     use super::*;
 

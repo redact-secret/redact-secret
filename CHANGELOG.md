@@ -192,6 +192,22 @@ evidence is linked from each published version.
 
 ### Performance
 
+- Detectors no longer copy a matched value, line or name into a lowercased
+  `String` just to compare it case-insensitively: the generic-token and
+  connection-string placeholder checks, the keyword-gated provider checks
+  (call, host, model route, provider field, WebSocket token subprotocol),
+  the AWS secret-access-key name check and the reserved email-domain check
+  compare in place, and the payment-card digits are held on the stack. Fewer
+  owned plaintext copies (#1086, from #1079); no output change: findings,
+  ranges, ids and order are identical, and each site is tested against its
+  previous implementation.
+- Incremental sessions make fewer owned copies of input-derived text (#1087,
+  from #1079): the private-key tracker scans only the junction between its
+  lookbehind and a new piece instead of joining the whole piece, and a
+  redacted unit is written straight into the call's output, which is sized
+  once per batch, instead of being built and copied a second time. Findings,
+  ranges, ids, order, redacted text and error codes are unchanged, as is what
+  a session retains and for how long.
 - Per-scan and per-line work no longer repeats. Always-run detectors skip
   bytes that cannot start a match (discord, bearer, generic-token
   authorization, the shared case-insensitive keyword search) (#1073);
@@ -200,7 +216,9 @@ evidence is linked from each published version.
   hold a 32-byte token run (#1075); `redact` checks forbidden strings against
   a sorted borrowed index and allocates the output once at its exact size,
   which also removes the slack capacity (#1076); the Python and WASM result
-  getters no longer clone the text and findings on every read (#1077).
+  getters no longer clone the text and findings on every read (#1077);
+  the WASM incremental result is read once through `takeText()` and
+  `takeFindings()` and its handle is freed after each call (#1082).
   Findings, ranges, ids, order and redacted text are unchanged. Python
   `ScanResult.findings` still returns a list, now of the same `Finding`
   objects on every read (`res.findings[0] is res.findings[0]`).
@@ -241,6 +259,12 @@ evidence is linked from each published version.
   samples a side, `scale-logs-small-whole` initialization is 0.881 [0.807,
   0.938] of `4fb78827` and 1.187 [1.108, 1.265] of beta.8; processing is
   unchanged.
+
+- CLI streaming input (#1088): a chunk that completes no partial UTF-8
+  sequence is now handed to the scanner without being copied, and only an
+  incomplete trailing sequence (at most 3 bytes) is carried. Output, exit
+  codes, and error messages are unchanged, including for invalid UTF-8 and
+  a character split across reads.
 
 ## 0.1.0-beta.11 — 2026-09-29
 
