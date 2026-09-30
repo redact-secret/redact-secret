@@ -260,6 +260,23 @@ impl IncrementalResultJs {
     pub fn findings(&self) -> Vec<FindingJs> {
         self.findings.clone()
     }
+
+    /// Moves the sanitized text out of the result, leaving it empty. Unlike
+    /// [`text`](Self::text) this keeps no second copy in linear memory; the
+    /// JavaScript wrapper reads it once and then frees the result handle.
+    #[wasm_bindgen(js_name = "takeText")]
+    #[must_use]
+    pub fn take_text(&mut self) -> String {
+        std::mem::take(&mut self.text)
+    }
+
+    /// Moves the findings out of the result, leaving it with none. Unlike
+    /// [`findings`](Self::findings) this clones no [`FindingJs`].
+    #[wasm_bindgen(js_name = "takeFindings")]
+    #[must_use]
+    pub fn take_findings(&mut self) -> Vec<FindingJs> {
+        std::mem::take(&mut self.findings)
+    }
 }
 
 /// A bounded incremental sanitization session over the built-in detectors.
@@ -519,6 +536,36 @@ mod tests {
 
     fn default_session() -> CoreIncrementalSanitizer {
         CoreIncrementalSanitizer::new(generous_limits()).unwrap()
+    }
+
+    #[test]
+    fn incremental_result_take_accessors_move_what_the_getters_clone() {
+        let core_finding = redact_secret::Finding::new(
+            "finding-1",
+            "jwt",
+            "jwt",
+            redact_secret::Confidence::High,
+            redact_secret::Action::Redact,
+            redact_secret::ByteRange::new(0, 3).unwrap(),
+        )
+        .unwrap();
+        let mut result = IncrementalResultJs {
+            text: "<REDACTED>".to_owned(),
+            findings: vec![FindingJs::from_range(core_finding, 0, 3)],
+        };
+        let text = result.text();
+        let findings = result.findings();
+
+        assert_eq!(result.take_text(), text);
+        let taken = result.take_findings();
+        assert_eq!(taken.len(), findings.len());
+        assert_eq!(taken[0].id(), findings[0].id());
+        assert_eq!(
+            (taken[0].start(), taken[0].end()),
+            (findings[0].range().start(), findings[0].range().end())
+        );
+        assert_eq!(result.text(), "");
+        assert!(result.findings().is_empty());
     }
 
     // ---------------------------------------------------------------

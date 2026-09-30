@@ -216,7 +216,9 @@ evidence is linked from each published version.
   hold a 32-byte token run (#1075); `redact` checks forbidden strings against
   a sorted borrowed index and allocates the output once at its exact size,
   which also removes the slack capacity (#1076); the Python and WASM result
-  getters no longer clone the text and findings on every read (#1077).
+  getters no longer clone the text and findings on every read (#1077);
+  the WASM incremental result is read once through `takeText()` and
+  `takeFindings()` and its handle is freed after each call (#1082).
   Findings, ranges, ids, order and redacted text are unchanged. Python
   `ScanResult.findings` still returns a list, now of the same `Finding`
   objects on every read (`res.findings[0] is res.findings[0]`).
