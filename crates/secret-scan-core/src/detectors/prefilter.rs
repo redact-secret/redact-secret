@@ -488,18 +488,37 @@ pub(crate) fn ruleset_literal_may_occur(input: &str, literal: &[u8]) -> bool {
         .unwrap_or(true)
 }
 
+// Test hook (issue #1083): makes `long_run_lines` answer `None` on this
+// thread, so a scan walks every line as it does outside a scan copy.
+#[cfg(test)]
+thread_local! {
+    static FORCE_BYPASS_LONG_RUN_INDEX: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
 /// The lines of `input` that hold a run of 32 or more `[A-Za-z0-9+/=_-]`
 /// bytes ([`super::text::long_run_line_spans`]), when `input` is the scan
 /// copy of the innermost [`ScanScope`] on this thread; built once per scan
 /// copy and shared by every bare-shape detector. `None` in every other case
 /// (outside a scan, a different or partial input), where the caller walks
 /// every line as before.
+///
+/// There is deliberately no density guard that bypasses the index when every
+/// line holds a long run (issue #1083): measured on the current tree the
+/// index never costs instructions, even with a long run on every line
+/// (hex-heavy-log-256k 1.337 G with it, 1.345 G without; 256 KiB of dense
+/// lines 269 M vs 271 M), because building it reads each byte about once and
+/// iterating it is cheaper than walking the lines. A sampling guard measured
+/// +1% on those inputs, so it was dropped.
 pub(super) fn long_run_lines(input: &str) -> Option<Rc<[(usize, usize)]>> {
     ACTIVE_SCAN
         .try_with(|cell| {
             let mut current = cell.try_borrow_mut().ok()?;
             let active = current.as_mut()?;
             if active.start != input.as_ptr() as usize || active.len != input.len() {
+                return None;
+            }
+            #[cfg(test)]
+            if FORCE_BYPASS_LONG_RUN_INDEX.with(std::cell::Cell::get) {
                 return None;
             }
             let spans = active.long_run_lines.get_or_insert_with(|| {
@@ -935,6 +954,112 @@ mod tests {
             }
         }
         assert!(found > 500, "the inputs must exercise matches, saw {found}");
+    }
+
+    /// Issue #1083: inside a scan copy, with the line index used or forced
+    /// off, no bare-shape detector changes a result, on inputs where most
+    /// lines hold a long run and on inputs where few do.
+    /// Generators stay within 32-bit `usize`.
+    #[test]
+    fn bare_shape_detectors_agree_with_the_index_built_or_bypassed() {
+        struct Reset;
+        impl Drop for Reset {
+            fn drop(&mut self) {
+                FORCE_BYPASS_LONG_RUN_INDEX.with(|force| force.set(false));
+            }
+        }
+        use crate::types::{Detector, DetectorContext};
+        let detectors: Vec<Box<dyn Detector>> = vec![
+            Box::new(super::super::twilio::TwilioAuthTokenDetector),
+            Box::new(super::super::twilio::TwilioApiKeySecretDetector),
+            Box::new(super::super::datadog::DatadogApiKeyDetector),
+            Box::new(super::super::datadog::DatadogApplicationKeyLegacyDetector),
+            Box::new(super::super::new_relic::NewRelicLicenseKeyDetector),
+            Box::new(super::super::heroku::HerokuApiKeyLegacyDetector),
+            Box::new(super::super::confluent::ConfluentLegacyApiSecretDetector),
+            Box::new(super::super::pinecone::PineconeApiKeyDetector),
+            Box::new(super::super::mailchimp::MailchimpMarketingApiKeyDetector),
+        ];
+        let _reset = Reset;
+        let hex32 = "0123456789abcdef0123456789abcdef";
+        let hex40 = "0123456789abcdef0123456789abcdef01234567";
+        let uuid = "01234567-89ab-cdef-0123-456789abcdef";
+        let b64 = "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789+/AbCdEfGhIjKlMnOpQrStUvWxYz01";
+        let alnum32 = "AbCdEfGhIjKlMnOpQrStUvWxYz012345";
+        let dense: Vec<String> = vec![
+            format!("TWILIO_AUTH_TOKEN={hex32}"),
+            format!("AC{hex32} {hex32}"),
+            format!("SK{alnum32} {alnum32}"),
+            format!("DD_API_KEY={hex32}"),
+            format!("datadog {hex40}"),
+            format!("NEW_RELIC_LICENSE_KEY={hex40}"),
+            format!("{hex32}FFFFNRAL"),
+            format!("HEROKU_API_KEY={uuid}"),
+            format!("confluent.api.secret={b64}"),
+            format!("pinecone_api_key = {uuid}"),
+            format!("mailchimp {hex32}-us12"),
+            format!("{hex32}-us1.example.test"),
+            format!("{hex40}{hex40}"),
+        ];
+        let sparse: Vec<String> = vec![
+            "twilio profiles:list --properties authToken".to_owned(),
+            "ID     Auth Token".to_owned(),
+            "heroku auth:token".to_owned(),
+            "schema.registry.url=https://confluent.test".to_owned(),
+            "short line".to_owned(),
+            "0123456789abcdef".to_owned(),
+            String::new(),
+            "caf\u{e9} \u{597D} 0123".to_owned(),
+        ];
+        let mut state = 0x2545_f491_4f6c_dd1du64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state >> 33).unwrap()
+        };
+        let (mut mostly_indexed, mut mostly_skipped, mut found) = (0usize, 0usize, 0usize);
+        for round in 0..640 {
+            // From every line holding a long run to only a few doing so.
+            let lines = 1 + next() % 80;
+            let sparse_in_ten = [0, 0, 1, 10][round % 4];
+            let mut input = String::new();
+            for _ in 0..lines {
+                let pool = if next() % 10 < sparse_in_ten {
+                    &sparse
+                } else {
+                    &dense
+                };
+                input.push_str(&pool[next() % pool.len()]);
+                input.push_str(["\n", "\n", "\n", "\r\n", "\r"][next() % 5]);
+            }
+            if super::super::text::long_run_line_spans_by_line(&input).len() * 2
+                > input.lines().count()
+            {
+                mostly_indexed += 1;
+            } else {
+                mostly_skipped += 1;
+            }
+            let context = DetectorContext::new(input.len());
+            for detector in &detectors {
+                let outside = detector.detect(&input, &context).unwrap();
+                for forced in [false, true] {
+                    FORCE_BYPASS_LONG_RUN_INDEX.with(|force| force.set(forced));
+                    let _scope = ScanScope::enter(&input);
+                    let inside = detector.detect(&input, &context).unwrap();
+                    assert_eq!(inside, outside, "{} {forced:?} {input:?}", detector.id());
+                }
+                found += outside.len();
+            }
+        }
+        assert!(
+            mostly_indexed > 100 && mostly_skipped > 100,
+            "{mostly_indexed}/{mostly_skipped}"
+        );
+        assert!(
+            found > 5000,
+            "the inputs must exercise matches, saw {found}"
+        );
     }
 
     #[test]
