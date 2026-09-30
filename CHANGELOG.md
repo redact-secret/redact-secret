@@ -107,6 +107,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `aws-secret-access-key` no longer panics when a multi-byte character
+  (`é`, `日`, U+2028) sits right before a secret-name identifier such as
+  `secret` or `aws_secret_access_key`. The identifier start was computed as the
+  separator's byte index plus one, a char boundary only after a one-byte
+  separator; it now adds the separator's UTF-8 length. Such input scans like
+  the ASCII-separator case (#1063).
 - `deepgram-api-key` now reads an indented HTTP request line or header
   (spaces or tabs, as in an indented Markdown code block or a YAML block
   scalar) as the same line unindented, so a token header or WebSocket token
