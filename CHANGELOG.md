@@ -23,6 +23,16 @@ evidence is linked from each published version.
 
 ### Added
 
+- Rust golden-path API (#1078): `redact_secret::sanitize(input)` and
+  `sanitize_with_profile(input, Profile)` redact with the supported defaults
+  (`full` profile unless `Profile::Common` is passed, `DefaultPolicy`, the
+  default placeholder formatter, default `WholeInputLimits`) and return the
+  same `ScanResult`, findings, ranges, and errors as `scan_and_redact` over
+  `DetectorRegistry::with_built_in([])` or `with_common_built_in([])`. They are
+  plain functions that build the registry per call (about 18 microseconds) and
+  support no custom detectors. `scan_and_redact` and the registry API remain
+  the advanced path.
+
 - New provider detectors from the #860 issuance-gated handoffs released by
   rulings R9 and R10, each always redacted at provider specificity so it wins
   overlap resolution over `contextual_secret`, `bearer_token` and

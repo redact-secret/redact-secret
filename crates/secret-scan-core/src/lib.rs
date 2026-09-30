@@ -50,6 +50,7 @@
 //! | Scan | [`scan`], [`scan_with_limits`], [`run_detector_pipeline`] |
 //! | Redact | [`redact`], [`redact_with_limits`], [`MAX_PLACEHOLDER_LENGTH`] |
 //! | Scan and redact | [`scan_and_redact`], [`scan_and_redact_with_limits`] |
+//! | Golden path | [`sanitize`], [`sanitize_with_profile`] |
 //! | Whole-input limits | [`WholeInputLimits`], [`DEFAULT_MAX_INPUT_BYTES`], [`DEFAULT_MAX_FINDINGS`] |
 //! | Incremental | [`IncrementalSanitizer`], [`IncrementalLimits`], [`SessionState`], [`IncrementalPolicy`], [`IncrementalPolicyContext`] |
 //! | Policy | [`Policy`], [`PolicyContext`], [`DefaultPolicy`], [`Action`] |
@@ -77,6 +78,19 @@
 //! detectors each [`Profile`] holds and its compatibility class.
 //!
 //! # Examples
+//!
+//! The minimal path redacts with the supported defaults (`full` profile,
+//! [`DefaultPolicy`], [`default_placeholder_formatter`], default
+//! [`WholeInputLimits`]) in one call:
+//!
+//! ```
+//! let result = redact_secret::sanitize("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000")?;
+//! assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+//! # Ok::<(), redact_secret::SecretScanError>(())
+//! ```
+//!
+//! Custom detectors, PII activation, a custom policy or formatter, explicit
+//! limits, and registry reuse use the advanced path, [`scan_and_redact`]:
 //!
 //! ```
 //! use redact_secret::{
@@ -149,7 +163,8 @@ pub use incremental::{
 pub use limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, WholeInputLimits};
 pub use pii::PiiSelection;
 pub use pipeline::{
-    run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
+    run_detector_pipeline, sanitize, sanitize_with_profile, scan, scan_and_redact,
+    scan_and_redact_with_limits, scan_with_limits,
 };
 pub use policy::DefaultPolicy;
 pub use redact::{

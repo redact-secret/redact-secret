@@ -70,6 +70,17 @@ fn scan_reports_findings_and_redact_consumes_them() {
 }
 
 #[test]
+fn the_golden_path_functions_are_usable_from_the_crate_root() {
+    let result = redact_secret::sanitize(FIXTURE).unwrap();
+    assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+    assert_eq!(
+        result,
+        redact_secret::sanitize_with_profile(FIXTURE, redact_secret::Profile::Full).unwrap()
+    );
+    assert!(redact_secret::sanitize_with_profile(FIXTURE, redact_secret::Profile::Common).is_ok());
+}
+
+#[test]
 fn scan_and_redact_returns_the_text_and_the_findings_together() {
     let registry = registry();
 

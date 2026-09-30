@@ -140,6 +140,8 @@ core-public-api = [
   "redact",
   "redact_with_limits",
   "run_detector_pipeline",
+  "sanitize",
+  "sanitize_with_profile",
   "scan",
   "scan_and_redact",
   "scan_and_redact_with_limits",

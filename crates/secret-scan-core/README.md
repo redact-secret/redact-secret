@@ -45,6 +45,20 @@ boundary declared in the root `Cargo.toml`.
 
 ## Public API
 
+The minimal path redacts with the supported defaults (`full` profile, default
+policy, default placeholder formatter, default whole-input limits) in one call.
+It returns the evidence-preserving `ScanResult` and is exactly `scan_and_redact`
+over the built-in registry:
+
+```rust
+let result = redact_secret::sanitize("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000")?;
+assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+```
+
+`sanitize_with_profile(input, Profile::Common)` selects the `common` profile.
+Custom detectors, PII activation, a custom policy or formatter, explicit limits,
+and registry reuse use the advanced API below.
+
 ```rust
 use redact_secret::{
     DefaultPolicy, DetectorRegistry, default_placeholder_formatter, scan_and_redact,
@@ -69,6 +83,7 @@ documentation, inside a function that returns `Result`.)
 | Scan | `scan`, `scan_with_limits`, `run_detector_pipeline` |
 | Redact | `redact`, `redact_with_limits`, `MAX_PLACEHOLDER_LENGTH` |
 | Scan and redact | `scan_and_redact`, `scan_and_redact_with_limits` |
+| Golden path | `sanitize`, `sanitize_with_profile` |
 | Whole-input limits | `WholeInputLimits`, `DEFAULT_MAX_INPUT_BYTES`, `DEFAULT_MAX_FINDINGS` |
 | Incremental | `IncrementalSanitizer`, `IncrementalLimits`, `SessionState`, `IncrementalPolicy`, `IncrementalPolicyContext` |
 | Policy | `Policy`, `PolicyContext`, `DefaultPolicy`, `Action` |

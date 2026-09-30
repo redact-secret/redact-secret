@@ -5,6 +5,26 @@
 The `redact-secret` crate is imported as `redact_secret`. It has no normal
 runtime dependencies and performs no network or filesystem access.
 
+For the supported defaults, one call is enough. `sanitize` uses the `full`
+profile, `DefaultPolicy`, the default placeholder formatter, and the default
+`WholeInputLimits`, returns the same `ScanResult` as `scan_and_redact`, and
+reports the same errors. `sanitize_with_profile(input, Profile::Common)` selects
+the `common` profile. It builds the built-in registry on each call (about 18 µs)
+and supports no custom detectors.
+
+```rust
+use redact_secret::{SecretScanError, sanitize};
+
+fn main() -> Result<(), SecretScanError> {
+    let result = sanitize("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE")?;
+    assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+    Ok(())
+}
+```
+
+The advanced API follows. Use it for custom detectors, PII activation, a custom
+policy or formatter, explicit limits, or a registry reused across scans.
+
 ```rust
 use redact_secret::{
     DefaultPolicy, DetectorRegistry, SecretScanError,
