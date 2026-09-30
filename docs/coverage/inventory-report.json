@@ -1593,6 +1593,41 @@
       "type": "google_api_key"
     },
     {
+      "detector": "google-oauth-client-secret",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "google-oauth-client-secret-positive-bare",
+        "google-oauth-client-secret-positive-chat-sentence",
+        "google-oauth-client-secret-positive-client-secret-json",
+        "google-oauth-client-secret-positive-dash-underscore-body",
+        "google-oauth-client-secret-positive-dotenv",
+        "google-oauth-client-secret-positive-form-body"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "google_oauth_client_secret"
+    },
+    {
       "detector": "sendgrid-token",
       "evidence": {
         "fixtureCount": 27,
@@ -5622,7 +5657,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 123,
+    "supported": 124,
     "unresolved": 0
   }
 }

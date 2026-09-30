@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 3311,
+  "fixtureCount": 3326,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -3315,6 +3315,21 @@
     {"expected":[],"id":"aws-secret-access-key-adversarial-long-line"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":64,"start":24,"type":"contextual_secret"}],"id":"aws-secret-access-key-overlap-contextual-name"},
     {"expected":[],"id":"aws-secret-access-key-boundary-below-unclaimed-identifier"},
-    {"expected":[],"id":"aws-secret-access-key-boundary-dash-inside"}
+    {"expected":[],"id":"aws-secret-access-key-boundary-dash-inside"},
+    {"expected":[],"id":"google-oauth-client-secret-positive-bare"},
+    {"expected":[],"id":"google-oauth-client-secret-positive-dash-underscore-body"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":56,"start":21,"type":"contextual_secret"}],"id":"google-oauth-client-secret-positive-dotenv"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":130,"start":95,"type":"contextual_secret"}],"id":"google-oauth-client-secret-positive-client-secret-json"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":109,"start":74,"type":"contextual_secret"}],"id":"google-oauth-client-secret-positive-form-body"},
+    {"expected":[],"id":"google-oauth-client-secret-positive-chat-sentence"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":57,"start":22,"type":"bearer_token"}],"id":"google-oauth-client-secret-overlap-bearer"},
+    {"expected":[],"id":"google-oauth-client-secret-boundary-body-27"},
+    {"expected":[],"id":"google-oauth-client-secret-boundary-body-29"},
+    {"expected":[],"id":"google-oauth-client-secret-boundary-lowercase-prefix"},
+    {"expected":[],"id":"google-oauth-client-secret-boundary-underscore-separator"},
+    {"expected":[],"id":"google-oauth-client-secret-boundary-glued-before"},
+    {"expected":[],"id":"google-oauth-client-secret-negative-placeholder"},
+    {"expected":[],"id":"google-oauth-client-secret-negative-client-id"},
+    {"expected":[],"id":"google-oauth-client-secret-adversarial-repeated-prefix"}
   ]
 }

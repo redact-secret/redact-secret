@@ -37,6 +37,7 @@ mod firecrawl;
 mod generic_token;
 mod github;
 mod gitlab;
+mod google_oauth;
 mod grafana;
 mod helicone;
 mod heroku;
@@ -173,6 +174,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::VERCEL),
         Box::new(additional_providers::NPM),
         Box::new(additional_providers::GOOGLE),
+        Box::new(google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
@@ -404,6 +406,12 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(additional_providers::GOOGLE.shapes())],
     ),
     (
+        google_oauth::GOOGLE_OAUTH_CLIENT_SECRET.detector_id(),
+        &[Literals::Shapes(
+            google_oauth::GOOGLE_OAUTH_CLIENT_SECRET.shapes(),
+        )],
+    ),
+    (
         datadog::DATADOG_APPLICATION_KEY.detector_id(),
         &[Literals::Shapes(datadog::DATADOG_APPLICATION_KEY.shapes())],
     ),
@@ -633,6 +641,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("vercel-token", Pack::Provider),
     ("npm-token", Pack::Provider),
     ("google-api-key", Pack::Provider),
+    ("google-oauth-client-secret", Pack::Provider),
     ("sendgrid-token", Pack::Provider),
     ("microsoft-entra-client-secret", Pack::Provider),
     ("azure-devops-personal-access-token", Pack::Provider),
@@ -767,6 +776,7 @@ mod tests {
                 "vercel-token",
                 "npm-token",
                 "google-api-key",
+                "google-oauth-client-secret",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
                 "azure-devops-personal-access-token",

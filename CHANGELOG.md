@@ -27,6 +27,9 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- `google-oauth-client-secret` (#1029): Google OAuth client secrets,
+  `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]`, as `google_oauth_client_secret`
+  (always redacted), bare or in any context.
 - `aws-secret-access-key` (#1028): the AWS secret access key, exactly 40
   `[A-Za-z0-9/+]` with mixed case, as `aws_secret_access_key` (always
   redacted), claimed only under an AWS secret key name or on or directly

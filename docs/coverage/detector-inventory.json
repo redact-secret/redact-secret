@@ -258,6 +258,13 @@
       "schemes": null
     },
     {
+      "type": "google_oauth_client_secret",
+      "detector": "google-oauth-client-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0047OCSPX-SyntheticRevokedGoogleClient",
+      "schemes": null
+    },
+    {
       "type": "sendgrid_api_key",
       "detector": "sendgrid-token",
       "policyClass": "always-redact",

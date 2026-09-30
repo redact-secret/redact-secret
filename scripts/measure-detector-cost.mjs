@@ -66,7 +66,7 @@ export const CANONICAL_IDS = [
   "private-key", "aws-access-key", "aws-secret-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "github-token", "gitlab-token", "openai-token",
   "anthropic-token", "shopify-token", "vault-token", "stripe-token", "slack-token",
   "pypi-token", "huggingface-token", "docker-token", "cloudflare-token", "digitalocean-token",
-  "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key",
+  "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key", "google-oauth-client-secret",
   "sendgrid-token", "microsoft-entra-client-secret", "azure-devops-personal-access-token",
   "notion-token", "atlassian-api-token", "twilio-auth-token", "twilio-api-key-secret",
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
@@ -113,7 +113,7 @@ export const GROUPS = {
   ],
   cloud: [
     "aws-access-key", "aws-secret-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
-    "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
+    "supabase-management-token", "vercel-token", "google-api-key", "google-oauth-client-secret", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "pinecone-api-key", "databricks-personal-access-token",

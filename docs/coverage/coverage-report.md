@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 123/123 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 124/124 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 123 |
+| supported | 124 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 134.
+Coverage declarations: 135.
 
 ## Coverage by detector
 
@@ -65,6 +65,7 @@ Coverage declarations: 134.
 | gitlab-runner-authentication-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| google-oauth-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | groq-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -185,6 +186,7 @@ Coverage declarations: 134.
 | gitlab_runner_authentication_token | gitlab-runner-authentication-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
+| google_oauth_client_secret | google-oauth-client-secret | provider | supported | not-applicable | none |
 | grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
 | grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
 | groq_api_key | groq-api-key | provider | supported | not-applicable | none |
@@ -277,15 +279,15 @@ Coverage declarations: 134.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 134 | 0 | 0 |
-| boundary | 123 | 0 | 0 |
-| host-context | 123 | 0 | 0 |
+| adversarial | 135 | 0 | 0 |
+| boundary | 124 | 0 | 0 |
+| host-context | 124 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 134 | 0 | 0 |
-| near-miss-negative | 123 | 0 | 0 |
-| overlap | 123 | 0 | 0 |
-| positive | 123 | 0 | 0 |
-| range | 134 | 0 | 0 |
+| malformed | 135 | 0 | 0 |
+| near-miss-negative | 124 | 0 | 0 |
+| overlap | 124 | 0 | 0 |
+| positive | 124 | 0 | 0 |
+| range | 135 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

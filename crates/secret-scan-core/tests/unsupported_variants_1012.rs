@@ -649,3 +649,97 @@ mod aws_secret_access_key {
         assert_partition_parity(&format!("{}\r\n{}\r\nnext\n", id("ASIA", 9), secret(9)));
     }
 }
+
+mod google_oauth_client_secret {
+    use super::*;
+
+    const DETECTOR: &str = "google-oauth-client-secret";
+    const TYPE: &str = "google_oauth_client_secret";
+
+    fn secret(len: usize, seed: usize) -> String {
+        format!("GOCSPX-{}", filler(BASE64URL, len, seed))
+    }
+
+    #[test]
+    fn the_secret_is_the_sole_finding_in_every_context() {
+        for seed in [1, 2, 3] {
+            let value = secret(28, seed);
+            for input in [
+                value.clone(),
+                format!("GOOGLE_CLIENT_SECRET={value}\n"),
+                format!("export GOOGLE_CLIENT_SECRET=\"{value}\"\n"),
+                format!(
+                    "{{\"installed\":{{\"client_id\":\"000000000000-synthetic.apps.googleusercontent.com\",\"client_secret\":\"{value}\"}}}}"
+                ),
+                format!("client_secret={value}&grant_type=authorization_code"),
+                format!("flow = Flow.from_client_config(cfg, client_secret=\"{value}\")\n"),
+                format!("Authorization: Bearer {value}\n"),
+                format!("{{\"token\": \"{value}\"}}"),
+                format!("Here is my OAuth secret {value} can you check it?"),
+                format!("The secret is {value}."),
+                format!("```\n{value}\n```"),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, &value);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let value = secret(28, 4);
+        let body = &value["GOCSPX-".len()..];
+        for twin in [
+            secret(27, 4),
+            secret(29, 4),
+            format!("gocspx-{body}"),
+            format!("GOCSPX_{body}"),
+            format!("GOCSPX-{}.{}", &body[..10], &body[11..]),
+            format!("x{value}"),
+            format!("{value}_"),
+            format!("{value}-"),
+        ] {
+            for input in [twin.clone(), format!("GOOGLE_CLIENT_SECRET={twin}\n")] {
+                assert_unclaimed(DETECTOR, &input);
+            }
+        }
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "\"client_id\": \"000000000000-syntheticrevokedclient.apps.googleusercontent.com\"\n",
+            "\"client_secret\": \"GOCSPX-...\"\n",
+            "Client secrets start with GOCSPX- today.\n",
+            "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}\n",
+        ] {
+            let (_, findings) = whole_input(input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+    }
+
+    #[test]
+    fn neighbouring_google_families_keep_their_own_findings() {
+        let value = secret(28, 5);
+        let api_key = format!("AIza{}", filler(BASE64URL, 35, 5));
+        let (_, findings) = whole_input(&format!("{value} {api_key}\n"));
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 1);
+        assert_eq!(detector_findings(&findings, "google-api-key").len(), 1);
+        assert_eq!(findings.len(), 2, "{findings:?}");
+        assert_unclaimed(DETECTOR, &format!("{api_key}\n"));
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"GOCSPX-".repeat(20_000));
+        let value = secret(28, 6);
+        let (text, findings) = whole_input(&format!("{value} ").repeat(300));
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 300);
+        assert_eq!(findings.len(), 300);
+        assert!(!text.contains(&value));
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&format!("GOOGLE_CLIENT_SECRET={}\n", secret(28, 7)));
+    }
+}
