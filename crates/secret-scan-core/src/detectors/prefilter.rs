@@ -450,6 +450,9 @@ struct ActiveScan {
     /// The lines holding a long alphabet run, as byte ranges, once a
     /// bare-shape detector has asked (issue #1075). Never text.
     long_run_lines: Option<Rc<[(usize, usize)]>>,
+    /// Which provider words occur in the scan copy, once a keyword-gated
+    /// detector has asked (issue #1092). A bit set, never text.
+    provider_words: Option<u8>,
 }
 
 thread_local! {
@@ -472,6 +475,7 @@ impl ScanScope {
             len: scanned.len(),
             pairs: None,
             long_run_lines: None,
+            provider_words: None,
         };
         let previous = ACTIVE_SCAN
             .try_with(|cell| {
@@ -571,6 +575,28 @@ pub(super) fn long_run_lines(input: &str) -> Option<Rc<[(usize, usize)]>> {
                 spans.into()
             });
             Some(Rc::clone(spans))
+        })
+        .ok()
+        .flatten()
+}
+
+/// The provider-word bit set of `input` (`build` over its bytes), when
+/// `input` is the scan copy of the innermost [`ScanScope`] on this thread;
+/// built once per scan copy and shared by the keyword-gated detectors.
+/// `None` in every other case, where the caller scans for itself.
+pub(super) fn provider_word_mask(input: &str, build: fn(&[u8]) -> u8) -> Option<u8> {
+    ACTIVE_SCAN
+        .try_with(|cell| {
+            let mut current = cell.try_borrow_mut().ok()?;
+            let active = current.as_mut()?;
+            if active.start != input.as_ptr() as usize || active.len != input.len() {
+                return None;
+            }
+            Some(
+                *active
+                    .provider_words
+                    .get_or_insert_with(|| build(input.as_bytes())),
+            )
         })
         .ok()
         .flatten()

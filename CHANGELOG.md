@@ -208,6 +208,12 @@ evidence is linked from each published version.
   once per batch, instead of being built and copied a second time. Findings,
   ranges, ids, order, redacted text and error codes are unchanged, as is what
   a session retains and for how long.
+- The four keyword-gated AI detectors (mistral, cohere, ai21, deepgram) share
+  one case-insensitive pass per scan copy for their provider words instead of
+  each searching the whole input on its own (#1092); a spec that names another
+  word, and any input that is not the active scan copy, keep the per-spec
+  search. Findings, ranges, ids and order are unchanged, and the shared pass
+  is tested against the per-spec search.
 - Per-scan and per-line work no longer repeats. Always-run detectors skip
   bytes that cannot start a match (discord, bearer, generic-token
   authorization, the shared case-insensitive keyword search) (#1073);
