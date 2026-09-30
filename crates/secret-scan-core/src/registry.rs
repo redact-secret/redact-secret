@@ -4,8 +4,10 @@
 //! breaker and it fixes the order in which detectors run. Built-in detectors
 //! are always registered before custom ones.
 
+use std::sync::OnceLock;
+
 use crate::detectors::{
-    BuiltIn, BuiltInDetector, RequiredLiterals, built_in_entries, built_in_ids,
+    BuiltIn, BuiltInDetector, LiteralMatcher, RequiredLiterals, built_in_entries, built_in_ids,
     common_built_in_entries,
 };
 use crate::error::{SecretScanError, SecretScanErrorCode};
@@ -112,6 +114,12 @@ pub struct DetectorRegistry {
     detectors: Vec<RegisteredDetector>,
     profile: Option<Profile>,
     activation_identity: String,
+    /// Every built-in's prefilter declaration compiled into one matcher
+    /// (issue #1057), indexed by registry position. Set by the profile
+    /// constructors, which register the built-ins first; detectors
+    /// appended later declare nothing, so it never goes stale. `None` for a
+    /// registry with no built-ins, where nothing is declared.
+    prefilter: Option<&'static LiteralMatcher>,
 }
 
 impl DetectorRegistry {
@@ -125,6 +133,7 @@ impl DetectorRegistry {
             }],
             profile: None,
             activation_identity: String::new(),
+            prefilter: None,
         }
     }
 
@@ -138,6 +147,7 @@ impl DetectorRegistry {
             detectors: Vec::new(),
             profile: None,
             activation_identity: String::new(),
+            prefilter: None,
         }
     }
 
@@ -174,6 +184,7 @@ impl DetectorRegistry {
     where
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
+        static FULL_PREFILTER: OnceLock<Option<LiteralMatcher>> = OnceLock::new();
         let mut registry = Self::new();
         for BuiltIn {
             id,
@@ -183,6 +194,7 @@ impl DetectorRegistry {
         {
             registry.push_validated_built_in(id, detector, required)?;
         }
+        registry.prefilter = registry.compile_prefilter(&FULL_PREFILTER);
         for detector in custom {
             registry.push_validated_custom(detector, false)?;
         }
@@ -213,6 +225,7 @@ impl DetectorRegistry {
     where
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
+        static COMMON_PREFILTER: OnceLock<Option<LiteralMatcher>> = OnceLock::new();
         let mut registry = Self::new();
         for BuiltIn {
             id,
@@ -222,6 +235,7 @@ impl DetectorRegistry {
         {
             registry.push_validated_built_in(id, detector, required)?;
         }
+        registry.prefilter = registry.compile_prefilter(&COMMON_PREFILTER);
         for detector in custom {
             registry.push_validated_custom(detector, true)?;
         }
@@ -318,6 +332,32 @@ impl DetectorRegistry {
         registry.profile = Some(profile);
         registry.activation_identity = selection.activation_identity(profile);
         Ok(registry)
+    }
+
+    /// The matcher compiled from the declarations of the built-ins just
+    /// registered, cached in `cache` (issue #1057). A profile constructor
+    /// registers the same built-ins in the same order on every call, so the
+    /// first registry of each profile compiles it and every later one
+    /// reuses it.
+    fn compile_prefilter(
+        &self,
+        cache: &'static OnceLock<Option<LiteralMatcher>>,
+    ) -> Option<&'static LiteralMatcher> {
+        cache
+            .get_or_init(|| {
+                LiteralMatcher::compile(
+                    self.detectors
+                        .iter()
+                        .map(RegisteredDetector::required_literals),
+                )
+            })
+            .as_ref()
+    }
+
+    /// The compiled prefilter declarations of this registry's built-ins,
+    /// indexed by registry position; `None` when it has none.
+    pub(crate) const fn prefilter(&self) -> Option<&'static LiteralMatcher> {
+        self.prefilter
     }
 
     /// Which profile this registry was built from, when it carries one.

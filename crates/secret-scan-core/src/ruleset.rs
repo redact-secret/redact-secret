@@ -586,6 +586,12 @@ pub fn load_ruleset(bytes: &[u8]) -> Result<Vec<Box<dyn Detector>>, RulesetError
         .into_iter()
         .map(|spec| Box::new(RulesetDetector::new(spec)) as Box<dyn Detector>)
         .collect();
+    // Each value-section detector rules its own prefix out through the
+    // shared prefilter (`crate::detectors::prefilter`, issue #1057). The
+    // names detector cannot: a name is compared after `normalize_name`,
+    // which folds case and separators, so no case-sensitive literal of the
+    // scan copy is required, and it runs on every call like the built-in
+    // `generic-token`.
     if !parsed.ambiguous_names.is_empty() {
         detectors.push(generic_token_ruleset_names_detector(parsed.ambiguous_names));
     }

@@ -99,7 +99,7 @@ use connection_string::ConnectionStringDetector;
 use private_key::PrivateKeyDetector;
 
 use prefilter::Literals;
-pub(crate) use prefilter::{PairSet, RequiredLiterals};
+pub(crate) use prefilter::{LiteralMatcher, RequiredLiterals, ScanScope};
 
 pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line};
 pub(crate) use bearer_token::has_open_bearer_authorization;
