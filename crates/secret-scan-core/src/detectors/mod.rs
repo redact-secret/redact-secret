@@ -15,6 +15,7 @@ mod apify;
 mod atlassian;
 mod aws;
 mod aws_bedrock;
+mod axiom;
 mod azure_devops;
 mod bearer_token;
 mod bitwarden;
@@ -27,11 +28,13 @@ mod composio;
 mod confluent;
 mod connection_string;
 mod convex;
+mod crates_io;
 mod databricks;
 mod datadog;
 mod daytona;
 mod discord;
 mod doppler;
+mod dynatrace;
 mod e2b;
 mod elevenlabs;
 mod firebase;
@@ -43,6 +46,7 @@ mod google_oauth;
 mod grafana;
 mod helicone;
 mod heroku;
+mod honeycomb;
 mod inngest;
 mod jwt;
 mod keyword_gated_keys;
@@ -61,6 +65,7 @@ mod okta;
 mod onepassword;
 mod openai;
 mod otpauth;
+mod paddle;
 mod pattern;
 mod pinecone;
 mod polar;
@@ -258,6 +263,11 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(sonarqube::SONARQUBE),
         Box::new(rubygems::RUBYGEMS_API_KEY),
         Box::new(clojars::CLOJARS_DEPLOY_TOKEN),
+        Box::new(crates_io::CRATES_IO),
+        Box::new(dynatrace::DynatraceTokenDetector),
+        Box::new(paddle::PADDLE_API_KEY),
+        Box::new(honeycomb::HONEYCOMB_INGEST_KEY),
+        Box::new(axiom::AXIOM),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -564,6 +574,26 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(clojars::CLOJARS_DEPLOY_TOKEN.shapes())],
     ),
     (
+        crates_io::CRATES_IO.detector_id(),
+        &[Literals::Shapes(crates_io::CRATES_IO.shapes())],
+    ),
+    (
+        dynatrace::ID,
+        &[Literals::Strs(dynatrace::REQUIRED_LITERALS)],
+    ),
+    (
+        paddle::PADDLE_API_KEY.detector_id(),
+        &[Literals::Shapes(paddle::PADDLE_API_KEY.shapes())],
+    ),
+    (
+        honeycomb::HONEYCOMB_INGEST_KEY.detector_id(),
+        &[Literals::Shapes(honeycomb::HONEYCOMB_INGEST_KEY.shapes())],
+    ),
+    (
+        axiom::AXIOM.detector_id(),
+        &[Literals::Shapes(axiom::AXIOM.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -747,6 +777,11 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("sonarqube-token", Pack::Provider),
     ("rubygems-api-key", Pack::Provider),
     ("clojars-deploy-token", Pack::Provider),
+    ("crates-io-token", Pack::Provider),
+    ("dynatrace-token", Pack::Provider),
+    ("paddle-api-key", Pack::Provider),
+    ("honeycomb-api-key", Pack::Provider),
+    ("axiom-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -887,6 +922,11 @@ mod tests {
                 "sonarqube-token",
                 "rubygems-api-key",
                 "clojars-deploy-token",
+                "crates-io-token",
+                "dynatrace-token",
+                "paddle-api-key",
+                "honeycomb-api-key",
+                "axiom-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1247,6 +1287,21 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let crates_io_token_input = format!("cio{}", "SyntheticRevokedCratesIoToken000");
+        let dynatrace_token_input = format!(
+            "dt0c01.{}.{}",
+            "SYNTHETICREVOKEDDYNATRCE",
+            "SYNTHETICREVOKED".repeat(4)
+        );
+        let paddle_api_key_input = format!(
+            "pdl_sdbx_apikey_{}_{}_{}",
+            "syntheticrevokedpaddle0000", "SyntheticRevokedSecret", "X9z"
+        );
+        let honeycomb_api_key_input = format!(
+            "hcxik_{}{}",
+            "syntheticrevokedhoneycombingestkey", "0123456789abcdefghijklmn"
+        );
+        let axiom_token_input = format!("xaat-{}", "5e7c0ded-0000-4000-8000-deadbeef0001");
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1380,6 +1435,11 @@ mod tests {
             ("sonarqube-token", sonarqube_token_input.as_str()),
             ("rubygems-api-key", rubygems_api_key_input.as_str()),
             ("clojars-deploy-token", clojars_deploy_token_input.as_str()),
+            ("crates-io-token", crates_io_token_input.as_str()),
+            ("dynatrace-token", dynatrace_token_input.as_str()),
+            ("paddle-api-key", paddle_api_key_input.as_str()),
+            ("honeycomb-api-key", honeycomb_api_key_input.as_str()),
+            ("axiom-token", axiom_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

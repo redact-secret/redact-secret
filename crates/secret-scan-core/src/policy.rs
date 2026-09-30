@@ -44,7 +44,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 117] = [
+const ALWAYS_REDACT_TYPES: [&str; 124] = [
     "anthropic_admin_api_key",
     "anthropic_api_key",
     "anthropic_enterprise_api_key",
@@ -55,6 +55,8 @@ const ALWAYS_REDACT_TYPES: [&str; 117] = [
     "aws_bedrock_long_term_api_key",
     "aws_bedrock_short_term_api_key",
     "aws_secret_access_key",
+    "axiom_api_token",
+    "axiom_personal_token",
     "azure_devops_personal_access_token",
     "bearer_token",
     "bitwarden_secrets_manager_access_token",
@@ -69,6 +71,8 @@ const ALWAYS_REDACT_TYPES: [&str; 117] = [
     "confluent_cloud_api_secret",
     "connection_string_password",
     "convex_deployment_key",
+    "crates_io_api_token",
+    "crates_io_trusted_publishing_token",
     "databricks_personal_access_token",
     "datadog_application_key",
     "daytona_api_key",
@@ -82,6 +86,7 @@ const ALWAYS_REDACT_TYPES: [&str; 117] = [
     "doppler_service_account_identity_token",
     "doppler_service_account_token",
     "doppler_service_token",
+    "dynatrace_token",
     "e2b_api_key",
     "elevenlabs_api_key",
     "firebase_server_key",
@@ -103,6 +108,7 @@ const ALWAYS_REDACT_TYPES: [&str; 117] = [
     "helicone_api_key",
     "helicone_write_api_key",
     "heroku_api_key",
+    "honeycomb_ingest_key",
     "huggingface_token",
     "inngest_signing_key",
     "jwt",
@@ -121,6 +127,7 @@ const ALWAYS_REDACT_TYPES: [&str; 117] = [
     "openai_api_key",
     "openrouter_api_key",
     "otpauth_secret",
+    "paddle_api_key",
     "perplexity_api_key",
     "pinecone_api_key",
     "polar_api_credential",

@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-105 built-in detectors emit 134 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+110 built-in detectors emit 141 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -298,6 +298,11 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `sonarqube-token` | `sonarqube_user_token`, `sonarqube_analysis_token` | `always-redact` | — |
 | `rubygems-api-key` | `rubygems_api_key` | `always-redact` | — |
 | `clojars-deploy-token` | `clojars_deploy_token` | `always-redact` | — |
+| `crates-io-token` | `crates_io_api_token`, `crates_io_trusted_publishing_token` | `always-redact` | — |
+| `dynatrace-token` | `dynatrace_token` | `always-redact` | — |
+| `paddle-api-key` | `paddle_api_key` | `always-redact` | — |
+| `honeycomb-api-key` | `honeycomb_ingest_key` | `always-redact` | — |
+| `axiom-token` | `axiom_api_token`, `axiom_personal_token` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

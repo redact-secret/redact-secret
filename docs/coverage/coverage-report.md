@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 134/134 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 141/141 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 134 |
+| supported | 141 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 145.
+Coverage declarations: 152.
 
 ## Coverage by detector
 
@@ -33,6 +33,7 @@ Coverage declarations: 145.
 | aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-secret-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| axiom-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bitwarden-secrets-manager-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -47,6 +48,7 @@ Coverage declarations: 145.
 | confluent-cloud-api-secret-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | convex-deployment-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| crates-io-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | databricks-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -57,6 +59,7 @@ Coverage declarations: 145.
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | doppler-token | 7 | supported: 7, intentionally-unsupported: 0, unresolved: 0 |
+| dynatrace-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | e2b-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | elevenlabs-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -74,6 +77,7 @@ Coverage declarations: 145.
 | helicone-api-key | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| honeycomb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | inngest-signing-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -96,6 +100,7 @@ Coverage declarations: 145.
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| paddle-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | polar-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
@@ -146,6 +151,8 @@ Coverage declarations: 145.
 | aws_bedrock_long_term_api_key | aws-bedrock-long-term-api-key | provider | supported | not-applicable | none |
 | aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
 | aws_secret_access_key | aws-secret-access-key | provider | supported | not-applicable | none |
+| axiom_api_token | axiom-token | provider | supported | not-applicable | none |
+| axiom_personal_token | axiom-token | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | bitwarden_secrets_manager_access_token | bitwarden-secrets-manager-access-token | provider | supported | not-applicable | none |
@@ -163,6 +170,8 @@ Coverage declarations: 145.
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
 | convex_deployment_key | convex-deployment-key | provider | supported | not-applicable | none |
+| crates_io_api_token | crates-io-token | provider | supported | not-applicable | none |
+| crates_io_trusted_publishing_token | crates-io-token | provider | supported | not-applicable | none |
 | databricks_personal_access_token | databricks-personal-access-token | provider | supported | not-applicable | none |
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
@@ -179,6 +188,7 @@ Coverage declarations: 145.
 | doppler_service_account_identity_token | doppler-token | provider | supported | not-applicable | none |
 | doppler_service_account_token | doppler-token | provider | supported | not-applicable | none |
 | doppler_service_token | doppler-token | provider | supported | not-applicable | none |
+| dynatrace_token | dynatrace-token | provider | supported | not-applicable | none |
 | e2b_api_key | e2b-api-key | provider | supported | not-applicable | none |
 | elevenlabs_api_key | elevenlabs-api-key | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
@@ -201,6 +211,7 @@ Coverage declarations: 145.
 | helicone_write_api_key | helicone-api-key | provider | supported | not-applicable | none |
 | heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
+| honeycomb_ingest_key | honeycomb-api-key | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | inngest_signing_key | inngest-signing-key | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
@@ -224,6 +235,7 @@ Coverage declarations: 145.
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
+| paddle_api_key | paddle-api-key | provider | supported | not-applicable | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
 | polar_api_credential | polar-token | provider | supported | not-applicable | none |
@@ -294,15 +306,15 @@ Coverage declarations: 145.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 145 | 0 | 0 |
-| boundary | 134 | 0 | 0 |
-| host-context | 134 | 0 | 0 |
+| adversarial | 152 | 0 | 0 |
+| boundary | 141 | 0 | 0 |
+| host-context | 141 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 145 | 0 | 0 |
-| near-miss-negative | 134 | 0 | 0 |
-| overlap | 134 | 0 | 0 |
-| positive | 134 | 0 | 0 |
-| range | 145 | 0 | 0 |
+| malformed | 152 | 0 | 0 |
+| near-miss-negative | 141 | 0 | 0 |
+| overlap | 141 | 0 | 0 |
+| positive | 141 | 0 | 0 |
+| range | 152 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

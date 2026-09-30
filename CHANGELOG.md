@@ -67,6 +67,26 @@ evidence is linked from each published version.
     API keys (`rubygems_api_key`).
   - `clojars-deploy-token` (#1025): Clojars `CLOJARS_` + 60 lowercase hex
     deploy tokens (`clojars_deploy_token`).
+- New provider detectors from the #1014 broad-discovery handoffs (ranks 6 to
+  10), each always redacted at provider specificity and each covering the
+  bare, chat-sentence and JSON `"token"` occurrences generic detection
+  missed:
+  - `crates-io-token` (#1031): crates.io `cio` + 32 alphanumeric API tokens
+    (`crates_io_api_token`) and `cio_tp_` + 32 trusted-publishing tokens
+    (`crates_io_trusted_publishing_token`); the check character is not a
+    rejection gate.
+  - `dynatrace-token` (#1032): Dynatrace `dt0c01`/`dt0sNN` access and
+    platform tokens, `<prefix>.<24>.<64>` uppercase base32, reported whole as
+    `dynatrace_token`; the token identifier alone stays unclaimed.
+  - `paddle-api-key` (#1033): Paddle Billing `pdl_live_apikey_` and
+    `pdl_sdbx_apikey_` API keys in the documented 69-character layout
+    (`paddle_api_key`); the `apikey_` key id alone stays unclaimed.
+  - `honeycomb-api-key` (#1034): Honeycomb `hc?ik_`/`hc?ic_` + 58 ingest
+    keys (`honeycomb_ingest_key`). Management keys stay unclaimed until a
+    maintainer issuance check settles their alphabet.
+  - `axiom-token` (#1035): Axiom `xaat-` API tokens (`axiom_api_token`)
+    and `xapt-` personal access tokens (`axiom_personal_token`), each
+    `-` + a lowercase-hex UUID; bare UUIDs and placeholders stay unclaimed.
 - `google-oauth-client-secret` (#1029): Google OAuth client secrets,
   `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]`, as `google_oauth_client_secret`
   (always redacted), bare or in any context.

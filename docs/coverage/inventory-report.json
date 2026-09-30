@@ -6139,12 +6139,366 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "clojars_deploy_token"
+    },
+    {
+      "detector": "crates-io-token",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "crates-io-token-positive-bare",
+        "crates-io-token-positive-cargo-publish-flag",
+        "crates-io-token-positive-chat-sentence",
+        "crates-io-token-positive-credentials-toml",
+        "crates-io-token-positive-crlf-unicode-prefix",
+        "crates-io-token-positive-curl-bearer",
+        "crates-io-token-positive-dotenv",
+        "crates-io-token-positive-github-actions-env",
+        "crates-io-token-positive-json-config",
+        "crates-io-token-positive-json-token-key",
+        "crates-io-token-positive-log",
+        "crates-io-token-positive-punctuation-adjacent",
+        "crates-io-token-positive-python-sdk-call",
+        "crates-io-token-positive-repeated-value",
+        "crates-io-token-positive-shell-export",
+        "crates-io-token-positive-tool-call-arguments",
+        "crates-io-token-positive-x-api-key-header",
+        "crates-io-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "crates_io_api_token"
+    },
+    {
+      "detector": "crates-io-token",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "crates-io-token-positive-second-sample",
+        "crates-io-token-positive-second-sample-dotenv",
+        "crates-io-token-positive-trusted-publishing-log",
+        "crates-io-token-positive-trusted-publishing-other-check-char"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "crates_io_trusted_publishing_token"
+    },
+    {
+      "detector": "dynatrace-token",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "kubernetes",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "dynatrace-token-positive-api-token-header",
+        "dynatrace-token-positive-bare",
+        "dynatrace-token-positive-chat-sentence",
+        "dynatrace-token-positive-crlf-unicode-prefix",
+        "dynatrace-token-positive-curl-api-token",
+        "dynatrace-token-positive-curl-bearer",
+        "dynatrace-token-positive-dotenv",
+        "dynatrace-token-positive-json-config",
+        "dynatrace-token-positive-json-token-key",
+        "dynatrace-token-positive-kubernetes-secret",
+        "dynatrace-token-positive-log",
+        "dynatrace-token-positive-otel-percent-encoded-header",
+        "dynatrace-token-positive-punctuation-adjacent",
+        "dynatrace-token-positive-python-sdk-call",
+        "dynatrace-token-positive-repeated-value",
+        "dynatrace-token-positive-second-sample",
+        "dynatrace-token-positive-second-sample-dotenv",
+        "dynatrace-token-positive-sentence-period",
+        "dynatrace-token-positive-shell-export",
+        "dynatrace-token-positive-tool-call-arguments",
+        "dynatrace-token-positive-x-api-key-header",
+        "dynatrace-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "dynatrace_token"
+    },
+    {
+      "detector": "paddle-api-key",
+      "evidence": {
+        "fixtureCount": 39,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "paddle-api-key-positive-bare",
+        "paddle-api-key-positive-chat-sentence",
+        "paddle-api-key-positive-crlf-unicode-prefix",
+        "paddle-api-key-positive-curl-bearer",
+        "paddle-api-key-positive-dotenv",
+        "paddle-api-key-positive-json-config",
+        "paddle-api-key-positive-json-token-key",
+        "paddle-api-key-positive-log",
+        "paddle-api-key-positive-punctuation-adjacent",
+        "paddle-api-key-positive-python-client",
+        "paddle-api-key-positive-python-sdk-call",
+        "paddle-api-key-positive-repeated-value",
+        "paddle-api-key-positive-sdk-constructor",
+        "paddle-api-key-positive-second-sample",
+        "paddle-api-key-positive-second-sample-dotenv",
+        "paddle-api-key-positive-shell-export",
+        "paddle-api-key-positive-tool-call-arguments",
+        "paddle-api-key-positive-x-api-key-header",
+        "paddle-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "paddle_api_key"
+    },
+    {
+      "detector": "honeycomb-api-key",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "honeycomb-api-key-positive-bare",
+        "honeycomb-api-key-positive-chat-sentence",
+        "honeycomb-api-key-positive-crlf-unicode-prefix",
+        "honeycomb-api-key-positive-curl-bearer",
+        "honeycomb-api-key-positive-dotenv",
+        "honeycomb-api-key-positive-json-config",
+        "honeycomb-api-key-positive-json-token-key",
+        "honeycomb-api-key-positive-libhoney-config",
+        "honeycomb-api-key-positive-log",
+        "honeycomb-api-key-positive-otel-collector-yaml",
+        "honeycomb-api-key-positive-otel-headers-env",
+        "honeycomb-api-key-positive-punctuation-adjacent",
+        "honeycomb-api-key-positive-python-sdk-call",
+        "honeycomb-api-key-positive-repeated-value",
+        "honeycomb-api-key-positive-second-sample",
+        "honeycomb-api-key-positive-second-sample-dotenv",
+        "honeycomb-api-key-positive-shell-export",
+        "honeycomb-api-key-positive-team-header",
+        "honeycomb-api-key-positive-tool-call-arguments",
+        "honeycomb-api-key-positive-x-api-key-header",
+        "honeycomb-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "honeycomb_ingest_key"
+    },
+    {
+      "detector": "axiom-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "axiom-token-positive-bare",
+        "axiom-token-positive-chat-sentence",
+        "axiom-token-positive-crlf-unicode-prefix",
+        "axiom-token-positive-curl-bearer",
+        "axiom-token-positive-dotenv",
+        "axiom-token-positive-grafana-password",
+        "axiom-token-positive-json-config",
+        "axiom-token-positive-json-token-key",
+        "axiom-token-positive-log",
+        "axiom-token-positive-otel-bearer-header",
+        "axiom-token-positive-punctuation-adjacent",
+        "axiom-token-positive-python-sdk-call",
+        "axiom-token-positive-repeated-value",
+        "axiom-token-positive-shell-export",
+        "axiom-token-positive-tool-call-arguments",
+        "axiom-token-positive-vector-sink",
+        "axiom-token-positive-x-api-key-header",
+        "axiom-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "axiom_api_token"
+    },
+    {
+      "detector": "axiom-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "axiom-token-positive-personal-token-chat",
+        "axiom-token-positive-second-sample",
+        "axiom-token-positive-second-sample-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "axiom_personal_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 134,
+    "supported": 141,
     "unresolved": 0
   }
 }

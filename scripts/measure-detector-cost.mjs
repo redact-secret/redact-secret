@@ -95,6 +95,11 @@ export const CANONICAL_IDS = [
   "sonarqube-token",
   "rubygems-api-key",
   "clojars-deploy-token",
+  "crates-io-token",
+  "dynatrace-token",
+  "paddle-api-key",
+  "honeycomb-api-key",
+  "axiom-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -130,6 +135,9 @@ export const GROUPS = {
     "clickhouse-cloud-api-secret",
     "runpod-api-key",
     "bitwarden-secrets-manager-access-token",
+    "dynatrace-token",
+    "honeycomb-api-key",
+    "axiom-token",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
@@ -137,7 +145,7 @@ export const GROUPS = {
     "inngest-signing-key",
     "sonarqube-token",
   ],
-  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "rubygems-api-key", "clojars-deploy-token"],
+  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "rubygems-api-key", "clojars-deploy-token", "crates-io-token"],
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
@@ -146,6 +154,7 @@ export const GROUPS = {
     "apify-api-token",
     "browserbase-api-key",
     "polar-token",
+    "paddle-api-key",
   ],
 };
 
