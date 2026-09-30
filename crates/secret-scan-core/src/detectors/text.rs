@@ -408,6 +408,13 @@ const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
     "xai",
 ];
 
+/// `true` for a [`PLACEHOLDER_CREDENTIAL_WORDS`] entry, case-insensitively.
+pub(super) fn is_placeholder_credential_word(word: &str) -> bool {
+    PLACEHOLDER_CREDENTIAL_WORDS
+        .iter()
+        .any(|listed| word.eq_ignore_ascii_case(listed))
+}
+
 /// Credential nouns a placeholder must name at least once, so a lead word
 /// followed only by qualifiers (`YOUR_PERSONAL_ACCESS`) is not enough.
 const PLACEHOLDER_CREDENTIAL_NOUNS: &[&str] = &["jwt", "key", "secret", "token"];

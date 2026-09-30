@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3769,
+  "fixtureCount": 3771,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16336,6 +16336,32 @@
       "input": "resend.api_key = \"re_yourkey\"\n",
       "expected": [],
       "note": "Issue #949: an instructional placeholder glued into one word (your + key) behind a vendor prefix is not a secret. Applied only behind a vendor prefix; a leftover letter or digit keeps the value detected."
+    },
+    {
+      "id": "contextual-negative-placeholder-led-phrase",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[object_store]\nsecret_access_key = \"placeholder-not-a-key\"\n",
+      "expected": [],
+      "note": "Issue #1041: a hyphenated phrase led by a distinctive placeholder word (placeholder, example, sample, redacted, changeme, replaceme) and made only of listed credential, negation and filler words is a placeholder, like the single word, under every credential name; the bare secret_access_key name (#1026) reached it."
+    },
+    {
+      "id": "contextual-negative-placeholder-led-phrase-value",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "API_KEY=\"placeholder-value\"\n",
+      "expected": [],
+      "note": "Issue #1041: placeholder-value is a placeholder phrase; a digit, an unlisted word, or a secret/password lead keeps a phrase reported."
     },
     {
       "id": "contextual-negative-993-qualified-placeholder",

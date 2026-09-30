@@ -2299,7 +2299,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 281,
+        "fixtureCount": 283,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2317,6 +2317,7 @@
           "shell",
           "terminal",
           "terraform",
+          "toml",
           "typescript",
           "yaml"
         ],
@@ -2441,7 +2442,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 281,
+        "fixtureCount": 283,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2459,6 +2460,7 @@
           "shell",
           "terminal",
           "terraform",
+          "toml",
           "typescript",
           "yaml"
         ],
@@ -2517,7 +2519,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 281,
+        "fixtureCount": 283,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2535,6 +2537,7 @@
           "shell",
           "terminal",
           "terraform",
+          "toml",
           "typescript",
           "yaml"
         ],

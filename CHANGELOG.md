@@ -140,6 +140,12 @@ evidence is linked from each published version.
   sibling `provider: deepgram` field (#1017). These were missed or typed
   `generic-token`; the JSON `{"provider":"deepgram","auth":...}` form moves
   from warn to redact. A bare 40-hex run stays unreported.
+- `generic-token` no longer redacts a placeholder phrase led by a
+  distinctive placeholder word (`placeholder-not-a-key`, `placeholder-value`,
+  `example-token`) under a credential name (#1041). The single word was
+  already silent; since #1026 the bare `secret_access_key` name reached the
+  phrase in Rust test configs. A digit, an unlisted word, or a `secret` or
+  `password` lead keeps the value reported.
 - A keyed environment store is read as an assignment (#1038):
   `os.environ["NAME"] = "<v>"` (single quotes too), `process.env["NAME"] =`,
   Ruby `ENV["NAME"] =`, `settings["api_key"] =`,

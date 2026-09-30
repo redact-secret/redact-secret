@@ -564,6 +564,50 @@ const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] = &[
 
 fn is_generic_placeholder_word(value: &str) -> bool {
     matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
+        || is_placeholder_led_phrase(value)
+}
+
+/// Words a placeholder phrase may carry after its lead word, besides the
+/// credential words (`text::PLACEHOLDER_CREDENTIAL_WORDS`): the negation and
+/// filler of `placeholder-not-a-key` and `placeholder-value` (issue #1041).
+const PLACEHOLDER_PHRASE_WORDS: &[&str] = &["not", "a", "an", "real", "value", "only"];
+
+/// `true` for a placeholder phrase led by a distinctive placeholder word
+/// (issue #1041): `placeholder-not-a-key`, `placeholder-value`,
+/// `example_api_token`. The value splits on `-`, `_` and `.` into two or
+/// more words of ASCII letters only; the first is a
+/// [`DIGIT_SUFFIX_PLACEHOLDER_WORDS`] entry (never `secret` or `password`,
+/// which lead real weak passwords), and every later word is a
+/// `text::PLACEHOLDER_CREDENTIAL_WORDS` or [`PLACEHOLDER_PHRASE_WORDS`] entry,
+/// all case-insensitively.
+///
+/// A single placeholder word was already silent; a hyphenated phrase that
+/// starts with one was redacted at full confidence. FN cost: a real secret
+/// spelled exactly as such a phrase, which no provider issues. A digit, any
+/// other byte, or one unlisted word (`placeholder-9f2c`, `sample-hunter`)
+/// keeps the value reported.
+fn is_placeholder_led_phrase(value: &str) -> bool {
+    let is_listed =
+        |word: &str, words: &[&str]| words.iter().any(|listed| word.eq_ignore_ascii_case(listed));
+    let mut words = value.split(['-', '_', '.']);
+    let Some(lead) = words.next() else {
+        return false;
+    };
+    if !is_listed(lead, DIGIT_SUFFIX_PLACEHOLDER_WORDS) {
+        return false;
+    }
+    let mut count = 0usize;
+    for word in words {
+        if word.is_empty()
+            || !word.bytes().all(|byte| byte.is_ascii_alphabetic())
+            || !(is_listed(word, PLACEHOLDER_PHRASE_WORDS)
+                || super::text::is_placeholder_credential_word(word))
+        {
+            return false;
+        }
+        count += 1;
+    }
+    count > 0
 }
 
 fn is_boolean_null_or_digits(lower: &str) -> bool {
@@ -3812,6 +3856,34 @@ mod tests {
         assert!(!is_vendor_prefixed_placeholder(
             "sk-ant-admin01-Ab3Cd4Ef5Gh6"
         ));
+    }
+
+    #[test]
+    fn a_phrase_led_by_a_distinctive_placeholder_word_is_a_placeholder() {
+        for value in [
+            "placeholder-not-a-key",
+            "placeholder-value",
+            "PLACEHOLDER_API_KEY",
+            "example-token",
+            "sample.secret.value",
+            "changeme-only",
+        ] {
+            assert!(is_placeholder_led_phrase(value), "{value}");
+            assert!(is_generic_placeholder_word(&value.to_ascii_lowercase()), "{value}");
+        }
+        for value in [
+            "placeholder",
+            "placeholder-",
+            "placeholder--key",
+            "placeholder-key9",
+            "placeholder-hunter",
+            "secret-not-a-key",
+            "password-value",
+            "not-a-real-key",
+            "key-placeholder",
+        ] {
+            assert!(!is_placeholder_led_phrase(value), "{value}");
+        }
     }
 
     #[test]

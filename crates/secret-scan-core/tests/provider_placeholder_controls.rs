@@ -170,3 +170,36 @@ fn a_real_shaped_or_off_grammar_admin_value_is_still_reported() {
         assert_eq!(findings(&input), ["generic-token"], "{input}");
     }
 }
+
+/// Issue #1041: a hyphenated phrase led by a distinctive placeholder word is
+/// a placeholder like the single word, under every credential name,
+/// including the bare `secret_access_key` that #1026 made high-signal.
+#[test]
+fn a_placeholder_led_phrase_is_benign_under_every_credential_name() {
+    for input in [
+        "[object_store]\nsecret_access_key = \"placeholder-not-a-key\"\n",
+        "api_key = \"placeholder-not-a-key\"\n",
+        "api_key = \"placeholder-value\"\n",
+        "password: 'example-token'\n",
+        "AWS_SECRET_ACCESS_KEY=sample_secret_access_key\n",
+        "client_secret = \"REDACTED-NOT-A-REAL-SECRET\"\n",
+    ] {
+        assert!(findings(input).is_empty(), "{input}: {:?}", findings(input));
+    }
+}
+
+/// Issue #1041's twins: a phrase with a digit, an unlisted word, or a lead
+/// word that also opens real weak passwords (`secret`, `password`) is still
+/// reported, and so is a real-shaped value behind a placeholder word.
+#[test]
+fn placeholder_phrases_with_material_or_an_unlisted_word_stay_detected() {
+    for input in [
+        "secret_access_key = \"placeholder-not-a-key7\"\n",
+        "api_key = \"placeholder-hunter-horse\"\n",
+        "api_key = \"secret-not-a-key\"\n",
+        "api_key = \"password-value\"\n",
+        "api_key = \"placeholder-Zq3Lm9PzAb7Cd2Ef4Gh6\"\n",
+    ] {
+        assert!(!findings(input).is_empty(), "{input}");
+    }
+}
