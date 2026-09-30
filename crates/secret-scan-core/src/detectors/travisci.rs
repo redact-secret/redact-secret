@@ -137,7 +137,7 @@ impl Detector for TravisCiApiTokenDetector {
                             (Confidence::Medium, "travisci-keyword-cooccurrence")
                         };
                     candidates.push(
-                        Candidate::new("travisci_api_token", confidence, range)
+                        Candidate::built_in("travisci_api_token", confidence, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals([signal, "tool-corroborated-length"]),
                     );

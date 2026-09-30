@@ -109,7 +109,7 @@ impl Detector for TerraformCloudTokenDetector {
 
             if let Some(range) = match_at(bytes, &mut alnum_ends, marker_start) {
                 candidates.push(
-                    Candidate::new("terraform_cloud_token", Confidence::High, range)
+                    Candidate::built_in("terraform_cloud_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(["terraform-atlasv1-marker", "documented-exact-length"]),
                 );

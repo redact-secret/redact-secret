@@ -376,7 +376,7 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                     (Confidence::Medium, "confluent-keyword-cooccurrence")
                 };
                 candidates.push(
-                    Candidate::new("confluent_cloud_api_secret_legacy", confidence, range)
+                    Candidate::built_in("confluent_cloud_api_secret_legacy", confidence, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals([signal]),
                 );

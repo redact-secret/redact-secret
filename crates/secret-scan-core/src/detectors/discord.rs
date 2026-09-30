@@ -59,7 +59,7 @@ impl Detector for DiscordBotTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("discord_bot_token", Confidence::High, range)
+                Candidate::built_in("discord_bot_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(["three-segment-shape", "digit-decoding-snowflake"]),
             );

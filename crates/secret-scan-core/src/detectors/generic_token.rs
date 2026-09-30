@@ -2884,7 +2884,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                     "context-only"
                 };
                 candidates.push(
-                    Candidate::new("contextual_secret", confidence, range)
+                    Candidate::built_in("contextual_secret", confidence, range)
                         .with_specificity(Specificity::Contextual)
                         .with_signals([name_signal, entropy_signal]),
                 );
@@ -3113,7 +3113,7 @@ fn call_argument_candidates(input: &str) -> Vec<Candidate> {
         }
         if let Some(range) = ByteRange::new(value_start, value_end) {
             candidates.push(
-                Candidate::new("contextual_secret", Confidence::High, range)
+                Candidate::built_in("contextual_secret", Confidence::High, range)
                     .with_specificity(Specificity::Contextual)
                     .with_signals(["high-signal-name", "bounded-entropy", "sdk-call-argument"]),
             );
@@ -3305,7 +3305,7 @@ fn authorization_candidate(m: &AuthorizationMatch, input: &str) -> Option<Candid
         Confidence::Medium
     };
     Some(
-        Candidate::new("authorization_credential", confidence, range)
+        Candidate::built_in("authorization_credential", confidence, range)
             .with_specificity(Specificity::Structural)
             .with_signals([format!("authorization-{}-scheme", m.scheme)]),
     )
@@ -3367,7 +3367,7 @@ fn bare_vendor_prefix_candidates(input: &str) -> Vec<Candidate> {
         .filter_map(|(start, end, _signals)| {
             let range = ByteRange::new(start, end)?;
             Some(
-                Candidate::new("vendor_prefixed_credential", Confidence::Medium, range)
+                Candidate::built_in("vendor_prefixed_credential", Confidence::Medium, range)
                     .with_specificity(Specificity::Entropy)
                     .with_signals(["vendor-prefix-policy"]),
             )
@@ -3484,7 +3484,7 @@ fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
         }
         if let Some(range) = ByteRange::new(value_start, value_end) {
             candidates.push(
-                Candidate::new("contextual_secret", Confidence::High, range)
+                Candidate::built_in("contextual_secret", Confidence::High, range)
                     .with_specificity(Specificity::Contextual)
                     .with_signals(["npmrc-credential-key", "credential-by-construction"]),
             );

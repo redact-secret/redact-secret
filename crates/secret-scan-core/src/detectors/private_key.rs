@@ -187,7 +187,7 @@ fn candidate(start: usize, end: usize, malformed: bool) -> Option<Candidate> {
         ["pem-boundaries", "encoded-body"]
     };
     Some(
-        Candidate::new("private_key", Confidence::High, range)
+        Candidate::built_in("private_key", Confidence::High, range)
             .with_specificity(Specificity::PrivateKey)
             .with_signals(signals),
     )

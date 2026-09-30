@@ -73,7 +73,7 @@ impl Detector for GitlabTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("gitlab_token", Confidence::High, range)
+                Candidate::built_in("gitlab_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(signals.iter().copied()),
             );
@@ -285,7 +285,7 @@ impl Detector for GitlabRunnerAuthenticationTokenDetector {
                 .filter(|_| pattern::boundary_ok(bytes, start, end, is_token_char))
             {
                 candidates.push(
-                    Candidate::new(RUNNER_TYPE, Confidence::High, range)
+                    Candidate::built_in(RUNNER_TYPE, Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(signals.iter().copied()),
                 );

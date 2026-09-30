@@ -225,7 +225,7 @@ impl Detector for NewRelicUserApiKeyDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("new_relic_user_api_key", Confidence::High, range)
+                Candidate::built_in("new_relic_user_api_key", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals([
                         "new-relic-documented-prefix",
@@ -291,7 +291,7 @@ impl Detector for NewRelicLicenseKeyDetector {
                     Confidence::Medium
                 };
                 candidates.push(
-                    Candidate::new("new_relic_license_key", confidence, range)
+                    Candidate::built_in("new_relic_license_key", confidence, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(
                             signals

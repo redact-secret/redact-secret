@@ -1095,7 +1095,7 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
                 continue;
             };
             candidates.push(
-                Candidate::new(spec.type_name, confidence, range)
+                Candidate::built_in(spec.type_name, confidence, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals([signal]),
             );

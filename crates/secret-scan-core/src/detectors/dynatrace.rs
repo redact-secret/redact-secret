@@ -101,7 +101,7 @@ impl Detector for DynatraceTokenDetector {
                 && trailing_ok(bytes, end);
             if let (true, Some(range)) = (matched, ByteRange::new(start, end)) {
                 candidates.push(
-                    Candidate::new(TYPE, Confidence::High, range)
+                    Candidate::built_in(TYPE, Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(SIGNALS.iter().copied()),
                 );

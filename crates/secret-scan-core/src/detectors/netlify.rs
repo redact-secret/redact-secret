@@ -126,7 +126,7 @@ impl Detector for NetlifyPersonalAccessTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("netlify_personal_access_token", Confidence::High, range)
+                Candidate::built_in("netlify_personal_access_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals([
                         "netlify-documented-prefix",

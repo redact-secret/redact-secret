@@ -69,7 +69,7 @@ fn push(candidates: &mut Vec<Candidate>, ranges: Vec<(usize, usize)>, signals: [
             continue;
         };
         candidates.push(
-            Candidate::new("notion_integration_token", Confidence::High, range)
+            Candidate::built_in("notion_integration_token", Confidence::High, range)
                 .with_specificity(Specificity::Provider)
                 .with_signals(signals),
         );

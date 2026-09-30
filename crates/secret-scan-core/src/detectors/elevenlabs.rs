@@ -149,7 +149,7 @@ impl Detector for ElevenLabsApiKeyDetector {
                 &BASE_SIGNALS
             };
             candidates.push(
-                Candidate::new("elevenlabs_api_key", Confidence::High, range)
+                Candidate::built_in("elevenlabs_api_key", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(signals.iter().copied()),
             );

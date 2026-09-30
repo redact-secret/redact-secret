@@ -68,7 +68,7 @@ impl Detector for MicrosoftEntraClientSecretDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("microsoft_entra_client_secret", Confidence::High, range)
+                Candidate::built_in("microsoft_entra_client_secret", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(["entra-digit-q-tilde-marker", "bounded-opaque-suffix"]),
             );

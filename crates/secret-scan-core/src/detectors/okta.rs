@@ -221,7 +221,7 @@ impl Detector for OktaApiTokenDetector {
                     && let Some(range) = ByteRange::new(line_start + pos, line_start + body_end)
                 {
                     candidates.push(
-                        Candidate::new("okta_api_token", confidence, range)
+                        Candidate::built_in("okta_api_token", confidence, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals([signal]),
                     );
