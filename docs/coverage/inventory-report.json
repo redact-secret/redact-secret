@@ -1474,17 +1474,23 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 70,
         "hostContextsExercised": [
+          "chat",
+          "curl",
           "dotenv",
+          "github-actions",
+          "http",
           "json",
           "log",
           "plain-text",
           "shell",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1496,6 +1502,7 @@
       },
       "evidenceFixtureIds": [
         "vercel-positive-all-prefixes",
+        "vercel-positive-class-isolation",
         "vercel-positive-crlf-unicode-prefix",
         "vercel-positive-doc-style-placeholder",
         "vercel-positive-dotenv",
@@ -1511,6 +1518,139 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "vercel_token"
+    },
+    {
+      "detector": "vercel-token",
+      "evidence": {
+        "fixtureCount": 70,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "vercel-pat-positive-bare",
+        "vercel-pat-positive-chat-sentence",
+        "vercel-pat-positive-cli-flag",
+        "vercel-pat-positive-crlf-unicode-prefix",
+        "vercel-pat-positive-curl-bearer",
+        "vercel-pat-positive-dotenv",
+        "vercel-pat-positive-github-actions",
+        "vercel-pat-positive-json-token-key",
+        "vercel-pat-positive-log",
+        "vercel-pat-positive-punctuation-adjacent",
+        "vercel-pat-positive-repeated-value",
+        "vercel-pat-positive-shell-export",
+        "vercel-pat-positive-typescript-sdk",
+        "vercel-pat-positive-yaml",
+        "vercel-positive-class-isolation"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vercel_personal_access_token"
+    },
+    {
+      "detector": "vercel-token",
+      "evidence": {
+        "fixtureCount": 70,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "vercel-app-access-positive-bare",
+        "vercel-app-access-positive-dotenv",
+        "vercel-app-access-positive-json-token-key",
+        "vercel-positive-class-isolation",
+        "vercel-positive-oauth-token-response"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vercel_app_access_token"
+    },
+    {
+      "detector": "vercel-token",
+      "evidence": {
+        "fixtureCount": 70,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "vercel-app-refresh-positive-bare",
+        "vercel-app-refresh-positive-dotenv",
+        "vercel-app-refresh-positive-json-token-key",
+        "vercel-positive-class-isolation",
+        "vercel-positive-oauth-token-response"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vercel_app_refresh_token"
     },
     {
       "detector": "npm-token",
@@ -5657,7 +5797,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 124,
+    "supported": 127,
     "unresolved": 0
   }
 }

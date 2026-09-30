@@ -366,6 +366,45 @@
         "a body length, alphabet, checksum, or universal API-key grammar"
       ]
     }
+ ,
+    "vercel-docs-cli-global-options": {
+      "url": "https://vercel.com/docs/cli/global-options",
+      "kind": "provider",
+      "revision": "last_updated 2026-05-28; value first seen 2026-05-10",
+      "observedAt": "2026-09-29",
+      "establishes": [
+        "one `vcp_` example for `--token` and `VERCEL_TOKEN`: the marker plus 56 `[A-Za-z0-9]` (60 in total), as an example shape (#1013 evidence P3)"
+      ],
+      "doesNotEstablish": [
+        "an issued value: the body ends in a literal English word and fails the CRC-32/base62 check, so it is hand-written",
+        "a checksum requirement for `vcp_`"
+      ]
+    },
+    "kingfisher-vercel-rule": {
+      "url": "https://github.com/mongodb/kingfisher/blob/88d3f780fad83960aaddfcf732a690049853ccc9/crates/kingfisher-rules/data/rules/vercel.yml#L46-L299",
+      "kind": "tool",
+      "revision": "88d3f780fad83960aaddfcf732a690049853ccc9 (2026-02-11)",
+      "observedAt": "2026-09-29",
+      "establishes": [
+        "`vc[pikar]_` + 50 `[A-Za-z0-9_-]` + 6 `[A-Za-z0-9]` (56 in total) with a Base62(CRC-32) tail (#1013 evidence S1)"
+      ],
+      "doesNotEstablish": [
+        "independent `vca_`/`vcr_` observations: its examples copy the provider docs value",
+        "that `_` or `-` occur in issued bodies: no provider value shows one"
+      ]
+    },
+    "credsweeper-vercel-rule": {
+      "url": "https://github.com/Samsung/CredSweeper/blob/1aa60465c4ec064357ead06f5b4da7c3adbce7a8/credsweeper/rules/config.yaml#L1995-L2007",
+      "kind": "tool",
+      "revision": "1aa60465c4ec064357ead06f5b4da7c3adbce7a8 (2026-02-17)",
+      "observedAt": "2026-09-29",
+      "establishes": [
+        "`vcp_` + exactly 56 `[0-9A-Za-z]`; its samples fail the Kingfisher checksum, so it is independent of Kingfisher (#1013 evidence S3)"
+      ],
+      "doesNotEstablish": [
+        "any grammar for `vci_`, `vca_`, `vcr_` or `vck_`"
+      ]
+    }
   },
   "families": [
     {
@@ -774,58 +813,173 @@
     {
       "detector": "vercel-token",
       "findingType": "vercel_token",
-      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (VERCEL)",
+      "implementation": "crates/secret-scan-core/src/detectors/vercel.rs (VERCEL)",
       "beta4Rule": "Implementation only, not a reviewed positive contract: five `PrefixShape::at_least(_, 20, is_alnum_dash, ...)` shapes (`vcp_`, `vci_`, `vca_`, `vcr_`, `vck_`) report the aggregate compatibility finding `vercel_token`. Issue #858 leaves behavior unchanged but rejects the suffix floor/alphabet as provider-documented grammar.",
+      "splitNote": "Issue #1036 (research #1013) implements `vcp_`/`vca_`/`vcr_` + exactly 56 `[A-Za-z0-9]` as three variants, each on its own finding type under the same detector id. Matching is unchanged: all five prefixes keep the pre-split `PrefixShape::at_least(_, 20, is_alnum_dash, ...)` table, so every span equals `beta4Rule`'s. The family-level `findingType`, `vercel_token`, is the unqualified compatibility type for every other match: all `vci_`/`vck_` values (pending below) and, as a security-first fallback, every `vcp_`/`vca_`/`vcr_` match off the exact-56 contract.",
       "toolRules": {
         "gitleaks-8.30.1": "no Vercel rule of any kind; the full 3209-line pinned config was searched directly for `vercel` with zero matches.",
         "trufflehog-3.97.4": "vercel: `PrefixRegex([\"vercel\"]) + \\b([a-zA-Z0-9]{24})\\b` — keyword-gated (the literal word `vercel` must appear nearby), matching a bare, exactly-24-character alphanumeric body with no fixed prefix. Registers no rule for any of the five `vc*_`-prefixed shapes. Fetched directly and diffed byte-for-byte against the latest tag `v3.97.5`: identical, unchanged.",
         "flare-redact-1.6.1": "no Vercel-related detector entries of any kind."
       },
-      "variants": [],
-      "pending": [
+      "variants": [
         {
-          "id": "vercel:personal-access-token",
-          "marker": "vcp_",
-          "tier": "T0",
-          "reason": "Issue #858. The class and literal marker are provider-documented, but no source establishes a body length, alphabet, checksum, or complete boundary. The Create an Auth Token response additionally renders an unprefixed bearer example beside `prefix: vcp_`; its issuance status is unresolved. Unblocks only with a reviewed complete positive grammar for this class.",
-          "sources": ["vercel-changelog-token-formats", "vercel-docs-access-tokens", "vercel-rest-create-auth-token"]
+          "id": "personal-access-token",
+          "support": "supported",
+          "tier": "T2",
+          "findingType": "vercel_personal_access_token",
+          "findingTypeNote": "Issue #1036 split this class onto its own finding type, `vercel_personal_access_token`, distinct from the family-level `findingType` (`vercel_token`, still reported for `vci_` and `vck_`).",
+          "grammar": "vcp_[A-Za-z0-9]{56}",
+          "segments": [
+            {
+              "name": "prefix",
+              "literal": "vcp_",
+              "basis": "provider prose (`vercel-docs-access-tokens`)"
+            },
+            {
+              "name": "body",
+              "alphabet": "[A-Za-z0-9]",
+              "length": 56,
+              "basis": "provider example width plus peer-rule agreement (#1013); `_` and `-` left out: every provider value and CredSweeper exclude them, and the maskers and Kingfisher that admit them carry no provider value"
+            }
+          ],
+          "sources": [
+            "vercel-docs-access-tokens",
+            "vercel-docs-cli-global-options",
+            "kingfisher-vercel-rule",
+            "credsweeper-vercel-rule"
+          ],
+          "evidenceGaps": [
+            "no Vercel code generates or validates a length, alphabet or checksum; tier T2, not T1 (#1013)",
+            "the only provider value is hand-written and fails the CRC-32/base62 check, so no checksum is required",
+            "a body that is not exactly 56 alphanumerics is outside this variant but is still reported, whole, as the family-level `vercel_token` (security-first fallback, #1036), so no pre-split redaction is lost"
+          ]
         },
+        {
+          "id": "app-access-token",
+          "support": "supported",
+          "tier": "T2",
+          "findingType": "vercel_app_access_token",
+          "findingTypeNote": "Issue #1036 split this class onto its own finding type, `vercel_app_access_token`, distinct from the family-level `findingType` (`vercel_token`, still reported for `vci_` and `vck_`).",
+          "grammar": "vca_[A-Za-z0-9]{56}",
+          "segments": [
+            {
+              "name": "prefix",
+              "literal": "vca_",
+              "basis": "provider example (`vercel-docs-sign-in-tokens`)"
+            },
+            {
+              "name": "body",
+              "alphabet": "[A-Za-z0-9]",
+              "length": 56,
+              "basis": "provider example width plus peer-rule agreement (#1013); `_` and `-` left out: every provider value and CredSweeper exclude them, and the maskers and Kingfisher that admit them carry no provider value"
+            }
+          ],
+          "sources": [
+            "vercel-docs-sign-in-tokens",
+            "kingfisher-vercel-rule"
+          ],
+          "evidenceGaps": [
+            "thin: one checksum-valid provider value; Kingfisher and betterleaks copy it, so the peer count overstates independence (#1013)",
+            "the checksum is backed on that one value only and is not required"
+          ]
+        },
+        {
+          "id": "app-refresh-token",
+          "support": "supported",
+          "tier": "T2",
+          "findingType": "vercel_app_refresh_token",
+          "findingTypeNote": "Issue #1036 split this class onto its own finding type, `vercel_app_refresh_token`, distinct from the family-level `findingType` (`vercel_token`, still reported for `vci_` and `vck_`).",
+          "grammar": "vcr_[A-Za-z0-9]{56}",
+          "segments": [
+            {
+              "name": "prefix",
+              "literal": "vcr_",
+              "basis": "provider example (`vercel-docs-sign-in-tokens`)"
+            },
+            {
+              "name": "body",
+              "alphabet": "[A-Za-z0-9]",
+              "length": 56,
+              "basis": "provider example width plus peer-rule agreement (#1013); `_` and `-` left out: every provider value and CredSweeper exclude them, and the maskers and Kingfisher that admit them carry no provider value"
+            }
+          ],
+          "sources": [
+            "vercel-docs-sign-in-tokens",
+            "kingfisher-vercel-rule"
+          ],
+          "evidenceGaps": [
+            "thin: the provider example reuses the `vca_` body, so there is no independent `vcr_` body observation (#1013)"
+          ]
+        }
+      ],
+      "pending": [
         {
           "id": "vercel:integration-token",
           "markerStem": "vci",
           "tier": "T0",
-          "reason": "Issue #858. The provider changelog establishes the integration-token class and `vci` stem, but no provider-controlled source reviewed here prints `vci_` or states any body grammar. The detector's underscore and suffix rule are implementation hypotheses. Unblocks first on literal-marker evidence, then on a reviewed complete positive grammar for this class.",
-          "sources": ["vercel-changelog-token-formats", "github-secret-scanning-patterns", "vercel-docs-api-integrations"]
-        },
-        {
-          "id": "vercel:app-access-token",
-          "marker": "vca_",
-          "tier": "T0",
-          "reason": "Issue #858. Provider documentation establishes the class and literal marker, but its one opaque example does not establish a universal body rule. Unblocks only with a reviewed complete positive grammar for this class.",
-          "sources": ["vercel-changelog-token-formats", "vercel-docs-sign-in-tokens", "github-secret-scanning-patterns"]
-        },
-        {
-          "id": "vercel:app-refresh-token",
-          "marker": "vcr_",
-          "tier": "T0",
-          "reason": "Issue #858. Provider documentation establishes the class and literal marker, but the refresh example reuses the app-access example body and establishes no universal body rule. Unblocks only with a reviewed complete positive grammar for this class.",
-          "sources": ["vercel-changelog-token-formats", "vercel-docs-sign-in-tokens", "github-secret-scanning-patterns"]
+          "reason": "Issues #858 and #1013. The provider changelog establishes the integration-token class and `vci` stem, but no provider source writes `vci_` with the underscore, and the 56-byte length rests on the peer class only (3 references, 3 owners, 1 class). The detector keeps the pre-split `>= 20` `[A-Za-z0-9_-]` shape under the unqualified `vercel_token` type, unchanged by #1036, so its redaction is not reduced; that type claims no grammar. Unblocks on maintainer ruling Q-VC (one generator family) or one issued value.",
+          "sources": [
+            "vercel-changelog-token-formats",
+            "github-secret-scanning-patterns",
+            "vercel-docs-api-integrations",
+            "kingfisher-vercel-rule"
+          ]
         },
         {
           "id": "vercel:api-key",
           "marker": "vck_",
           "tier": "T0",
-          "reason": "Issue #858. Provider documentation/code establishes the API-key class and literal marker, but no provider source states a body length, alphabet, checksum, or complete boundary. Unblocks only with a reviewed complete positive grammar for this class.",
-          "sources": ["vercel-changelog-token-formats", "vercel-docs-ai-gateway-api-keys", "vercel-cli-vck-marker", "github-secret-scanning-patterns"]
+          "reason": "Issues #858 and #1013. The `vck_` marker is provider-backed (docs, CLI, AI SDK, Terraform tests), but no full-length provider value exists; the 56-byte length rests on the peer class only. The detector keeps the interim `>= 20` `[A-Za-z0-9_-]` shape under the unqualified `vercel_token` type, unchanged by #1036, so its redaction is not reduced; that type claims no grammar. Unblocks on maintainer ruling Q-VC or one issued AI Gateway key.",
+          "sources": [
+            "vercel-changelog-token-formats",
+            "vercel-docs-ai-gateway-api-keys",
+            "vercel-cli-vck-marker",
+            "github-secret-scanning-patterns",
+            "kingfisher-vercel-rule"
+          ]
         }
       ],
       "excluded": [
-        {"id": "support-access-token", "basis": "existence-only", "reason": "GitHub's partner-pattern listing names this credential, but no provider-controlled source reviewed in #858 publishes a marker or body grammar. It remains opaque and unsupported by a dedicated Vercel rule."},
-        {"id": "opaque-unprefixed-values", "basis": "provider-example-conflict", "reason": "The Create an Auth Token schema renders an unprefixed 24-character bearer example and `prefix: vcp_` metadata together, while the current Access tokens guide says personal tokens begin with `vcp_`; OAuth integration documentation also contains unprefixed examples. The sources do not decide legacy versus current issuance, example freshness, or a common class. Example width alone cannot distinguish a credential from an ordinary identifier, so opaque/unprefixed values stay outside the modern Vercel positive contract and unsupported by a dedicated lexical rule."}
+        {
+          "id": "support-access-token",
+          "basis": "existence-only",
+          "reason": "GitHub's partner-pattern listing names this credential, but no provider-controlled source reviewed in #858 publishes a marker or body grammar. It remains opaque and unsupported by a dedicated Vercel rule."
+        },
+        {
+          "id": "opaque-unprefixed-values",
+          "basis": "provider-example-conflict",
+          "reason": "The Create an Auth Token schema renders an unprefixed 24-character bearer example and `prefix: vcp_` metadata together, while the current Access tokens guide says personal tokens begin with `vcp_`; OAuth integration documentation also contains unprefixed examples. The sources do not decide legacy versus current issuance, example freshness, or a common class. Example width alone cannot distinguish a credential from an ordinary identifier, so opaque/unprefixed values stay outside the modern Vercel positive contract and unsupported by a dedicated lexical rule."
+        }
       ],
       "conflicts": [
-        {"property": "whether the Create an Auth Token bearer value is prefixed", "positions": {"vercel-rest-create-auth-token.bearerToken": "renders an unprefixed 24-character example", "vercel-rest-create-auth-token.token.prefix": "renders `vcp_` metadata in the same response object", "vercel-docs-access-tokens": "states that personal access tokens begin with `vcp_`"}, "resolution": "Unresolved. Do not classify the bearer example as legacy, stale, current, or a separate universal class without provider clarification; keep it outside the modern positive contract."},
-        {"property": "literal marker for the integration-token class", "positions": {"vercel-changelog-token-formats": "names the `vci` prefix stem", "current-detector": "matches `vci_`", "provider-controlled-example": "none found"}, "resolution": "Only `vci` is evidence-backed. The underscore remains unresolved and cannot seed a positive fixture."}
+        {
+          "property": "whether the Create an Auth Token bearer value is prefixed",
+          "positions": {
+            "vercel-rest-create-auth-token.bearerToken": "renders an unprefixed 24-character example",
+            "vercel-rest-create-auth-token.token.prefix": "renders `vcp_` metadata in the same response object",
+            "vercel-docs-access-tokens": "states that personal access tokens begin with `vcp_`"
+          },
+          "resolution": "Unresolved. Do not classify the bearer example as legacy, stale, current, or a separate universal class without provider clarification; keep it outside the modern positive contract."
+        },
+        {
+          "property": "literal marker for the integration-token class",
+          "positions": {
+            "vercel-changelog-token-formats": "names the `vci` prefix stem",
+            "current-detector": "matches `vci_`",
+            "provider-controlled-example": "none found"
+          },
+          "resolution": "Only `vci` is evidence-backed. The underscore remains unresolved and cannot seed a positive fixture."
+        },
+        {
+          "property": "whether `_` and `-` occur in the body",
+          "positions": {
+            "kingfisher-vercel-rule": "admits `[A-Za-z0-9_-]` in the first 50 body bytes",
+            "vercel-azure-devops-extension masker": "`vcp_[A-Za-z0-9_-]+`, `vca_[A-Za-z0-9_-]+` (maskers, no length)",
+            "credsweeper-vercel-rule": "`[0-9A-Za-z]` only",
+            "provider examples": "alphanumeric only"
+          },
+          "resolution": "Bounded (#1013, #1036): the typed bodies exclude `_` and `-`. Maskers are not validators and no provider value shows either byte. A body with either byte is still reported as `vercel_token`, so the bound costs no redaction."
+        }
       ],
       "mutations": []
     }

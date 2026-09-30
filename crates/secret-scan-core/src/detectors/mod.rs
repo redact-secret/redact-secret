@@ -81,6 +81,7 @@ mod travisci;
 mod trigger_dev;
 mod twilio;
 mod vault;
+mod vercel;
 mod wandb;
 
 use crate::types::Detector;
@@ -173,7 +174,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(linear::LINEAR),
         Box::new(additional_providers::SUPABASE),
         Box::new(additional_providers::SUPABASE_PAT),
-        Box::new(additional_providers::VERCEL),
+        Box::new(vercel::VERCEL),
         Box::new(additional_providers::NPM),
         Box::new(additional_providers::GOOGLE),
         Box::new(google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
@@ -396,8 +397,8 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(additional_providers::SUPABASE.shapes())],
     ),
     (
-        additional_providers::VERCEL.detector_id(),
-        &[Literals::Shapes(additional_providers::VERCEL.shapes())],
+        vercel::VERCEL.detector_id(),
+        &[Literals::Shapes(vercel::VERCEL.shapes())],
     ),
     (
         additional_providers::NPM.detector_id(),

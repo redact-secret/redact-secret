@@ -244,6 +244,27 @@
       "schemes": null
     },
     {
+      "type": "vercel_personal_access_token",
+      "detector": "vercel-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "vercel_app_access_token",
+      "detector": "vercel-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "vercel_app_refresh_token",
+      "detector": "vercel-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "schemes": null
+    },
+    {
       "type": "npm_access_token",
       "detector": "npm-token",
       "policyClass": "always-redact",

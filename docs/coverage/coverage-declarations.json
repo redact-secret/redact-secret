@@ -3789,6 +3789,7 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "vercel-positive-all-prefixes",
+            "vercel-positive-class-isolation",
             "vercel-positive-crlf-unicode-prefix",
             "vercel-positive-doc-style-placeholder",
             "vercel-positive-dotenv",
@@ -3812,18 +3813,35 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "vercel-adversarial-long-suffix"
+            "vercel-adversarial-long-suffix",
+            "vercel-pat-adversarial-long-suffix"
           ],
           "state": "supported"
         },
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "vercel-app-access-fallback-body-55",
+            "vercel-app-access-fallback-body-57",
+            "vercel-app-access-fallback-underscore-in-body",
+            "vercel-app-refresh-fallback-body-55",
+            "vercel-app-refresh-fallback-body-57",
+            "vercel-app-refresh-fallback-underscore-in-body",
             "vercel-boundary-below-min",
             "vercel-boundary-case-sensitivity",
             "vercel-boundary-delimiter",
             "vercel-boundary-invalid-alphabet",
-            "vercel-boundary-short"
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix",
+            "vercel-pat-fallback-body-55",
+            "vercel-pat-fallback-body-55-chat",
+            "vercel-pat-fallback-body-57",
+            "vercel-pat-fallback-dash-in-body",
+            "vercel-pat-fallback-glued-suffix",
+            "vercel-pat-fallback-underscore-in-body",
+            "vercel-pat-fallback-underscore-prose"
           ],
           "state": "supported"
         },
@@ -3836,18 +3854,36 @@
             "vercel-negative-lookalike",
             "vercel-negative-masked-secret-prefix",
             "vercel-negative-ordinary-reference",
-            "vercel-negative-placeholder"
+            "vercel-negative-placeholder",
+            "vercel-pat-negative-embedded-in-wider-identifier",
+            "vercel-pat-negative-masked"
           ],
           "state": "supported"
         },
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "vercel-app-access-fallback-body-55",
+            "vercel-app-access-fallback-body-57",
+            "vercel-app-access-fallback-underscore-in-body",
+            "vercel-app-refresh-fallback-body-55",
+            "vercel-app-refresh-fallback-body-57",
+            "vercel-app-refresh-fallback-underscore-in-body",
             "vercel-boundary-below-min",
             "vercel-boundary-case-sensitivity",
             "vercel-boundary-delimiter",
             "vercel-boundary-invalid-alphabet",
-            "vercel-boundary-short"
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix",
+            "vercel-pat-fallback-body-55",
+            "vercel-pat-fallback-body-55-chat",
+            "vercel-pat-fallback-body-57",
+            "vercel-pat-fallback-dash-in-body",
+            "vercel-pat-fallback-glued-suffix",
+            "vercel-pat-fallback-underscore-in-body",
+            "vercel-pat-fallback-underscore-prose"
           ],
           "state": "supported"
         },
@@ -3880,6 +3916,329 @@
       ],
       "note": "Coverage declaration for vercel_token (vercel-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "vercel_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "vercel-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "vercel-pat-positive-bare",
+            "vercel-pat-positive-chat-sentence",
+            "vercel-pat-positive-cli-flag",
+            "vercel-pat-positive-crlf-unicode-prefix",
+            "vercel-pat-positive-curl-bearer",
+            "vercel-pat-positive-dotenv",
+            "vercel-pat-positive-github-actions",
+            "vercel-pat-positive-json-token-key",
+            "vercel-pat-positive-log",
+            "vercel-pat-positive-punctuation-adjacent",
+            "vercel-pat-positive-repeated-value",
+            "vercel-pat-positive-shell-export",
+            "vercel-pat-positive-typescript-sdk",
+            "vercel-pat-positive-yaml",
+            "vercel-positive-class-isolation"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "vercel-pat-overlap-bearer",
+            "vercel-pat-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "vercel_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "vercel-boundary-below-min",
+            "vercel-boundary-case-sensitivity",
+            "vercel-boundary-delimiter",
+            "vercel-boundary-invalid-alphabet",
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "vercel-negative-deployment-id",
+            "vercel-negative-embedded-in-wider-identifier",
+            "vercel-negative-interpolated-secret-prefix",
+            "vercel-negative-lookalike",
+            "vercel-negative-masked-secret-prefix",
+            "vercel-negative-ordinary-reference",
+            "vercel-negative-placeholder",
+            "vercel-pat-negative-embedded-in-wider-identifier",
+            "vercel-pat-negative-masked"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "vercel-boundary-below-min",
+            "vercel-boundary-case-sensitivity",
+            "vercel-boundary-delimiter",
+            "vercel-boundary-invalid-alphabet",
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for vercel_personal_access_token (vercel-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "vercel_personal_access_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "vercel-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "vercel-app-access-positive-bare",
+            "vercel-app-access-positive-dotenv",
+            "vercel-app-access-positive-json-token-key",
+            "vercel-positive-class-isolation",
+            "vercel-positive-oauth-token-response"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "vercel-app-access-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "vercel_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "vercel-boundary-below-min",
+            "vercel-boundary-case-sensitivity",
+            "vercel-boundary-delimiter",
+            "vercel-boundary-invalid-alphabet",
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "vercel-negative-deployment-id",
+            "vercel-negative-embedded-in-wider-identifier",
+            "vercel-negative-interpolated-secret-prefix",
+            "vercel-negative-lookalike",
+            "vercel-negative-masked-secret-prefix",
+            "vercel-negative-ordinary-reference",
+            "vercel-negative-placeholder",
+            "vercel-pat-negative-embedded-in-wider-identifier",
+            "vercel-pat-negative-masked"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "vercel-boundary-below-min",
+            "vercel-boundary-case-sensitivity",
+            "vercel-boundary-delimiter",
+            "vercel-boundary-invalid-alphabet",
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for vercel_app_access_token (vercel-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "vercel_app_access_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "vercel-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "vercel-app-refresh-positive-bare",
+            "vercel-app-refresh-positive-dotenv",
+            "vercel-app-refresh-positive-json-token-key",
+            "vercel-positive-class-isolation",
+            "vercel-positive-oauth-token-response"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "vercel-app-refresh-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "vercel_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "vercel-boundary-below-min",
+            "vercel-boundary-case-sensitivity",
+            "vercel-boundary-delimiter",
+            "vercel-boundary-invalid-alphabet",
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "vercel-negative-deployment-id",
+            "vercel-negative-embedded-in-wider-identifier",
+            "vercel-negative-interpolated-secret-prefix",
+            "vercel-negative-lookalike",
+            "vercel-negative-masked-secret-prefix",
+            "vercel-negative-ordinary-reference",
+            "vercel-negative-placeholder",
+            "vercel-pat-negative-embedded-in-wider-identifier",
+            "vercel-pat-negative-masked"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "vercel-boundary-below-min",
+            "vercel-boundary-case-sensitivity",
+            "vercel-boundary-delimiter",
+            "vercel-boundary-invalid-alphabet",
+            "vercel-boundary-short",
+            "vercel-pat-boundary-dash-marker",
+            "vercel-pat-boundary-glued-prefix",
+            "vercel-pat-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for vercel_app_refresh_token (vercel-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "vercel_app_refresh_token"
     },
     {
       "behaviorClass": "provider",
@@ -13847,6 +14206,7 @@
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix",
+            "vercel-pat-adversarial-long-suffix",
             "wandb-api-key-adversarial-long-run",
             "xai-api-key-adversarial-long-suffix"
           ],
@@ -14314,6 +14674,7 @@
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix",
+            "vercel-pat-adversarial-long-suffix",
             "wandb-api-key-adversarial-long-run",
             "xai-api-key-adversarial-long-suffix"
           ],

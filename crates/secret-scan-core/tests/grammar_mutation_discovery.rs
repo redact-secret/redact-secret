@@ -224,17 +224,55 @@ const STRIPE: Grammar = Grammar {
     boundary: is_alnum_dash,
 };
 
+/// `vercel-token` reports one finding type per credential class (issue
+/// #1036), so each class is its own grammar here; the interim `vci_`/`vck_`
+/// shape keeps the aggregate `vercel_token` type.
 const VERCEL: Grammar = Grammar {
     id: "vercel-token",
     type_name: "vercel_token",
-    prefixes: &["vcp_", "vci_", "vca_", "vcr_", "vck_"],
+    prefixes: &["vci_", "vck_"],
     run: Run::AtLeast(20),
     alphabet: is_alnum_dash,
     boundary: is_alnum_dash,
 };
 
+const VERCEL_PERSONAL_ACCESS_TOKEN: Grammar = Grammar {
+    id: "vercel-token",
+    type_name: "vercel_personal_access_token",
+    prefixes: &["vcp_"],
+    run: Run::Exact(56),
+    alphabet: is_alnum,
+    boundary: is_alnum_dash,
+};
+
+const VERCEL_APP_ACCESS_TOKEN: Grammar = Grammar {
+    id: "vercel-token",
+    type_name: "vercel_app_access_token",
+    prefixes: &["vca_"],
+    run: Run::Exact(56),
+    alphabet: is_alnum,
+    boundary: is_alnum_dash,
+};
+
+const VERCEL_APP_REFRESH_TOKEN: Grammar = Grammar {
+    id: "vercel-token",
+    type_name: "vercel_app_refresh_token",
+    prefixes: &["vcr_"],
+    run: Run::Exact(56),
+    alphabet: is_alnum,
+    boundary: is_alnum_dash,
+};
+
 /// `openai-token` is deliberately absent: see the module docs.
-const GRAMMARS: &[Grammar] = &[AWS_ACCESS_KEY, HUGGING_FACE, STRIPE, VERCEL];
+const GRAMMARS: &[Grammar] = &[
+    AWS_ACCESS_KEY,
+    HUGGING_FACE,
+    STRIPE,
+    VERCEL,
+    VERCEL_PERSONAL_ACCESS_TOKEN,
+    VERCEL_APP_ACCESS_TOKEN,
+    VERCEL_APP_REFRESH_TOKEN,
+];
 
 /// The independent, dependency-free reimplementation of
 /// `scan_prefixed_runs`: the documented grammar's own prediction of the

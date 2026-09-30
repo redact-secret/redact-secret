@@ -1,5 +1,5 @@
-//! Stripe, `PyPI`, Hugging Face, Docker, `DigitalOcean`, Supabase, Vercel,
-//! npm, Google, Grafana Cloud, and Pulumi access token detection.
+//! Stripe, `PyPI`, Hugging Face, Docker, `DigitalOcean`, Supabase, npm,
+//! Google, Grafana Cloud, and Pulumi access token detection.
 //!
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
@@ -501,23 +501,6 @@ pub(super) const SUPABASE_PAT: KnownFormatProviderDetector = KnownFormatProvider
     boundary: pattern::is_alnum_dash,
 };
 
-/// Vercel personal, integration, app, refresh, and API-key credentials. An
-/// undocumented prefix letter is an intentional false negative.
-const VERCEL_SIGNALS: [&str; 2] = ["vercel-documented-prefix", "opaque-suffix"];
-
-pub(super) const VERCEL: KnownFormatProviderDetector = KnownFormatProviderDetector {
-    id: "vercel-token",
-    type_name: "vercel_token",
-    shapes: &[
-        PrefixShape::at_least("vcp_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
-        PrefixShape::at_least("vci_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
-        PrefixShape::at_least("vca_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
-        PrefixShape::at_least("vcr_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
-        PrefixShape::at_least("vck_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
-    ],
-    boundary: pattern::is_alnum_dash,
-};
-
 /// npm access tokens. Granular, automation, and legacy read-only tokens all
 /// share the same `npm_`-prefixed shape: a fixed 36-byte base62
 /// (`[A-Za-z0-9]`) body, the last six bytes of which encode a base62-encoded
@@ -780,7 +763,6 @@ mod tests {
                 SUPABASE_PAT_BODY,
                 "sbp_synthetic0short",
             ),
-            family(VERCEL, "vcp_", BODY, "vcp_SYNTHETIC_SHORT"),
             family(NPM, "npm_", NPM_BODY, "npm_SYNTHETICSHORT"),
             family(GOOGLE, "AIza", GOOGLE_BODY, "AIzaSYNTHETICSHORT"),
             family(
@@ -844,7 +826,7 @@ mod tests {
         // instead of against the shared minimum-length `BODY`. Slack moved
         // out to `super::slack` (issue #371) and Linear to `super::linear`
         // (issue #374); each is covered by its own tests there.
-        let cases: [(&KnownFormatProviderDetector, &str); 13] = [
+        let cases: [(&KnownFormatProviderDetector, &str); 8] = [
             (&STRIPE, "sk_test_"),
             (&STRIPE, "sk_live_"),
             (&STRIPE, "rk_test_"),
@@ -853,11 +835,6 @@ mod tests {
             (&DIGITALOCEAN, "dop_v1_"),
             (&DIGITALOCEAN, "doo_v1_"),
             (&DIGITALOCEAN, "dor_v1_"),
-            (&VERCEL, "vcp_"),
-            (&VERCEL, "vci_"),
-            (&VERCEL, "vca_"),
-            (&VERCEL, "vcr_"),
-            (&VERCEL, "vck_"),
         ];
         for (detector, prefix) in cases {
             // DigitalOcean's contracted body is exactly 64 lowercase hex
@@ -1027,7 +1004,8 @@ mod tests {
     }
 
     /// Issue #320: the four infrastructure-provider detectors (Docker,
-    /// Cloudflare, `DigitalOcean`, Vercel) each get the same false-positive
+    /// Cloudflare, `DigitalOcean`, Vercel; Vercel moved to `super::vercel`
+    /// in issue #1036 and repeats these dimensions there) each get the same false-positive
     /// assurance the earlier prefix-family issues (#316/#317) established
     /// for Stripe/Shopify/Supabase/`OpenAI`/Anthropic, across every
     /// documented prefix variant.
@@ -1048,18 +1026,6 @@ mod tests {
         prefix: &'static str,
         body: &'static str,
         placeholder: String,
-    }
-
-    fn opaque_variant(
-        detector: &'static KnownFormatProviderDetector,
-        prefix: &'static str,
-    ) -> InfraVariant {
-        InfraVariant {
-            detector,
-            prefix,
-            body: INFRA_SUFFIX,
-            placeholder: "x".repeat(20),
-        }
     }
 
     /// `DigitalOcean`'s contract is exactly 64 lowercase hex bytes (issue
@@ -1093,11 +1059,6 @@ mod tests {
             digitalocean_variant("dop_v1_", DIGITALOCEAN_BODY),
             digitalocean_variant("doo_v1_", DIGITALOCEAN_OAUTH_BODY),
             digitalocean_variant("dor_v1_", DIGITALOCEAN_REFRESH_BODY),
-            opaque_variant(&VERCEL, "vcp_"),
-            opaque_variant(&VERCEL, "vci_"),
-            opaque_variant(&VERCEL, "vca_"),
-            opaque_variant(&VERCEL, "vcr_"),
-            opaque_variant(&VERCEL, "vck_"),
         ]
     }
 
@@ -1133,21 +1094,12 @@ mod tests {
     /// Issue #551: the shared boundary/delimiter regression set, mirrored
     /// from `digitalocean-token`'s existing leading/trailing/dash
     /// identifier-embedding fixtures, for every `docker-token` and
-    /// `digitalocean-token` shape here. `vercel-token` is deliberately
-    /// excluded: it is not one of the seven families this issue covers, and
-    /// unlike these two it is still an open-floor `RunLength::AtLeast` shape
-    /// (opaque suffix, no documented maximum) matched against its own
-    /// boundary alphabet, so it carries the same live defect `lin_oauth_`
-    /// and Slack's remaining interim guards had (see `super::linear` and
-    /// `super::slack`) -- out of scope for a family this issue does not
-    /// name.
+    /// `digitalocean-token` shape here. `vercel-token`'s interim `vci_`/`vck_`
+    /// shapes keep the open-floor defect; see `super::vercel`.
     #[test]
     fn infra_providers_reject_every_shape_embedded_in_a_wider_identifier_leading_trailing_or_dash_joined()
      {
-        for variant in infra_provider_variants()
-            .into_iter()
-            .filter(|variant| variant.detector.id() != "vercel-token")
-        {
+        for variant in infra_provider_variants() {
             let value = format!("{}{}", variant.prefix, variant.body);
             assert!(
                 detect(variant.detector, &format!("legacy{value}")).is_empty(),
@@ -1372,14 +1324,6 @@ mod tests {
     fn digitalocean_rejects_an_ordinary_deployment_resource_id() {
         let input = "resource: do:app:3f900b88-8eb1-4de4-b7a3-93c1fb2f8b1d";
         assert_eq!(detect(&DIGITALOCEAN, input).len(), 0);
-    }
-
-    /// A Vercel deployment identifier uses its own `dpl_` namespace,
-    /// distinct from every documented Vercel token prefix.
-    #[test]
-    fn vercel_rejects_an_ordinary_deployment_id() {
-        let input = "deployment: dpl_8sFjq2K3nQeR7xYtLmWzAbCdEfGh";
-        assert_eq!(detect(&VERCEL, input).len(), 0);
     }
 
     /// Issue #320 follow-up: an identical value repeated in the same input
