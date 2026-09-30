@@ -1453,10 +1453,23 @@ mod tests {
     fn assert_nothing_retained(sanitizer: &IncrementalSanitizer) {
         assert_eq!(sanitizer.retained, "");
         assert_eq!(sanitizer.retained.capacity(), 0);
+        assert_eq!(sanitizer.lead_len, 0);
+        assert_eq!(sanitizer.unit_start, 0);
+        assert!(sanitizer.unit_ends.is_empty());
         assert!(sanitizer.scanned.is_none());
+        assert!(sanitizer.aws_held_line.is_none());
         assert_eq!(sanitizer.open_tail, OpenTailCache::default());
         assert!(!sanitizer.multiline_open);
         assert!(!sanitizer.multiline_detected);
+    }
+
+    /// [`assert_nothing_retained`], and no allocation behind the unit list
+    /// either: what every terminal transition leaves. A mid-session flush
+    /// clears the list but keeps its allocation, which holds offsets, never
+    /// text. Structural only: no claim is made about the freed bytes.
+    fn assert_terminal_state_holds_nothing(sanitizer: &IncrementalSanitizer) {
+        assert_nothing_retained(sanitizer);
+        assert_eq!(sanitizer.unit_ends.capacity(), 0);
     }
 
     #[test]
@@ -1561,6 +1574,97 @@ mod tests {
         assert_eq!(error.code(), SecretScanErrorCode::InvalidState);
         assert_eq!(sanitizer.state, SessionState::Aborted);
         assert_nothing_retained(&sanitizer);
+    }
+
+    #[test]
+    fn finalize_discards_what_it_resolves_and_what_was_derived_from_it() {
+        let mut sanitizer = default_session();
+        sanitizer
+            .append(&format!("-----BEGIN PRIVATE KEY-----\n{MARKER}-"))
+            .unwrap();
+        assert!(sanitizer.multiline_open);
+        assert!(sanitizer.retained.contains(MARKER));
+
+        sanitizer.finalize().unwrap();
+
+        assert_eq!(sanitizer.state, SessionState::Finalized);
+        assert_terminal_state_holds_nothing(&sanitizer);
+        // The tracker's fields are private to the detector module, so its
+        // reset is observed through what it reports: no block, no `BEGIN`.
+        assert_eq!(sanitizer.private_key.append(""), (false, false));
+    }
+
+    #[test]
+    fn a_failure_while_finalizing_discards_the_last_unit() {
+        let failing = |_: &DetectedFinding, _: &IncrementalPolicyContext| Err(PolicyFailure);
+        let mut sanitizer =
+            session_with(Box::new(failing), Box::new(default_placeholder_formatter));
+        // No line end: the unit stays retained until `finalize` judges it.
+        sanitizer.append(&format!("api_key={MARKER}")).unwrap();
+        assert!(sanitizer.retained.contains(MARKER));
+
+        let error = sanitizer.finalize().unwrap_err();
+
+        assert_eq!(error.code(), SecretScanErrorCode::PolicyFailure);
+        assert_eq!(sanitizer.state, SessionState::Failed);
+        assert_terminal_state_holds_nothing(&sanitizer);
+    }
+
+    #[test]
+    fn a_terminal_transition_discards_the_normalized_scan_copy() {
+        // A zero-width space inside the name: the unit's scan copy differs
+        // from the unit, so the session holds a second, owned copy of it.
+        let unit = format!("api\u{200b}_key={MARKER}");
+        for finalize in [false, true] {
+            let mut sanitizer = default_session();
+            sanitizer.append(&unit).unwrap();
+            assert!(sanitizer.scanned.is_some(), "precondition: owned scan copy");
+
+            if finalize {
+                sanitizer.finalize().unwrap();
+            } else {
+                sanitizer.abort().unwrap();
+            }
+
+            assert_terminal_state_holds_nothing(&sanitizer);
+        }
+    }
+
+    #[test]
+    fn the_released_line_kept_as_a_lead_is_discarded_on_every_terminal_transition() {
+        // A line carrying an AWS access key ID is released at once, but a
+        // copy stays in front of the retained text while the next unit may
+        // read it (issue #1040). It is retained past its release.
+        let line = "AKIAIOSFODNN7EXAMPLE\n";
+        for finalize in [false, true] {
+            let mut sanitizer = default_session();
+            sanitizer.append(line).unwrap();
+            assert_eq!(sanitizer.lead_len, line.len(), "precondition: a lead");
+            assert_eq!(sanitizer.retained, line);
+
+            if finalize {
+                sanitizer.finalize().unwrap();
+            } else {
+                sanitizer.abort().unwrap();
+            }
+
+            assert_terminal_state_holds_nothing(&sanitizer);
+        }
+    }
+
+    #[test]
+    fn a_flush_keeps_only_the_open_tail_of_the_buffer() {
+        let mut sanitizer = default_session();
+
+        let released = sanitizer
+            .append(&format!("api_key={MARKER}\nopen_tail"))
+            .unwrap();
+
+        assert!(!released.text().contains(MARKER));
+        assert_eq!(sanitizer.retained, "open_tail");
+        assert_eq!(sanitizer.lead_len, 0);
+        assert_eq!(sanitizer.unit_start, 0);
+        assert!(sanitizer.unit_ends.is_empty());
     }
 
     #[test]
