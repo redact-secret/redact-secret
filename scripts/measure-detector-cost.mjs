@@ -6,7 +6,7 @@
  *
  * Mechanism: `built_in_detectors()` in
  * `crates/secret-scan-core/src/detectors/mod.rs` lists exactly one
- * `&detector` entry per detector in its static `DETECTORS` table, one per
+ * `row("id", &detector)` entry per detector in its static `DETECTORS` table, one per
  * line, in the same order as the canonical id list asserted by
  * `built_in_order_matches_the_typescript_oracle` in the same file. To build
  * a variant, this tool comments out (`// `) the table entries at the
@@ -178,7 +178,7 @@ function fail(message) {
 export function parseVecBlock(source) {
   const fnStart = source.indexOf("fn built_in_detectors()");
   if (fnStart === -1) throw new Error("built_in_detectors() not found");
-  const opener = "static DETECTORS: &[BuiltInDetector] = &[";
+  const opener = "static DETECTORS: &[BuiltInRow] = &[";
   const tableStart = source.indexOf(opener, fnStart);
   if (tableStart === -1) throw new Error("the static DETECTORS table was not found in built_in_detectors()");
   const bodyStart = tableStart + opener.length;

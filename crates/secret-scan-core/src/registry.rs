@@ -5,7 +5,8 @@
 //! are always registered before custom ones.
 
 use crate::detectors::{
-    BuiltIn, BuiltInDetector, RequiredLiterals, built_in_entries, built_in_ids, common_built_in_entries,
+    BuiltIn, BuiltInDetector, RequiredLiterals, built_in_entries, built_in_ids,
+    common_built_in_entries,
 };
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::pii::{PiiSelection, adapter, is_reserved_detector_id};
@@ -174,11 +175,16 @@ impl DetectorRegistry {
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
         let mut registry = Self::new();
-        for BuiltIn { detector, required } in built_in_entries() {
-            registry.push_validated(Held::BuiltIn(detector), false, required)?;
+        for BuiltIn {
+            id,
+            detector,
+            required,
+        } in built_in_entries()
+        {
+            registry.push_validated_built_in(id, detector, required)?;
         }
         for detector in custom {
-            registry.push_validated(Held::Custom(detector), false, None)?;
+            registry.push_validated_custom(detector, false)?;
         }
         registry.profile = Some(Profile::Full);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Full);
@@ -208,11 +214,16 @@ impl DetectorRegistry {
         I: IntoIterator<Item = Box<dyn Detector>>,
     {
         let mut registry = Self::new();
-        for BuiltIn { detector, required } in common_built_in_entries() {
-            registry.push_validated(Held::BuiltIn(detector), false, required)?;
+        for BuiltIn {
+            id,
+            detector,
+            required,
+        } in common_built_in_entries()
+        {
+            registry.push_validated_built_in(id, detector, required)?;
         }
         for detector in custom {
-            registry.push_validated(Held::Custom(detector), true, None)?;
+            registry.push_validated_custom(detector, true)?;
         }
         registry.profile = Some(Profile::Common);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Common);
@@ -302,7 +313,7 @@ impl DetectorRegistry {
             });
         }
         for detector in custom {
-            registry.push_validated(Held::Custom(detector), true, None)?;
+            registry.push_validated_custom(detector, true)?;
         }
         registry.profile = Some(profile);
         registry.activation_identity = selection.activation_identity(profile);
@@ -335,25 +346,51 @@ impl DetectorRegistry {
     /// not satisfy [`is_identifier`] or is already registered. The registry
     /// is unchanged on error.
     pub fn register(&mut self, detector: Box<dyn Detector>) -> Result<&mut Self, SecretScanError> {
-        self.push_validated(Held::Custom(detector), false, None)?;
+        self.push_validated_custom(detector, false)?;
         self.profile = None;
         Ok(self)
     }
 
-    /// Reads the id once, validates it, and appends. `reject_built_in_ids`
-    /// additionally refuses any `full` built-in id. `required` is the
-    /// prefilter declaration, `Some` only for a built-in constructed by this
-    /// crate.
-    fn push_validated(
+    /// Reads a custom detector's id once, validates it, and appends.
+    /// `reject_built_in_ids` additionally refuses any `full` built-in id.
+    fn push_validated_custom(
         &mut self,
-        detector: Held,
+        detector: Box<dyn Detector>,
         reject_built_in_ids: bool,
+    ) -> Result<(), SecretScanError> {
+        let id = detector.id();
+        self.validate_id(id, reject_built_in_ids)?;
+        self.detectors.push(RegisteredDetector {
+            id: id.to_owned(),
+            detector: Held::Custom(detector),
+            required: None,
+        });
+        Ok(())
+    }
+
+    /// Validates a built-in table row's `id` (pinned to the detector's own
+    /// `id()` by the detector tests) and appends `detector` under it with
+    /// its prefilter declaration `required`. The row supplies the id, so
+    /// building a built-in registry calls no detector's `id()` (issue
+    /// #1043).
+    fn push_validated_built_in(
+        &mut self,
+        id: &str,
+        detector: BuiltInDetector,
         required: Option<RequiredLiterals>,
     ) -> Result<(), SecretScanError> {
-        let id = match &detector {
-            Held::BuiltIn(detector) => detector.id(),
-            Held::Custom(detector) => detector.id(),
-        };
+        self.validate_id(id, false)?;
+        self.detectors.push(RegisteredDetector {
+            id: id.to_owned(),
+            detector: Held::BuiltIn(detector),
+            required,
+        });
+        Ok(())
+    }
+
+    /// Refuses a malformed, reserved, or already registered id, and with
+    /// `reject_built_in_ids` any `full` built-in id.
+    fn validate_id(&self, id: &str, reject_built_in_ids: bool) -> Result<(), SecretScanError> {
         if !is_identifier(id)
             || is_reserved_detector_id(id)
             || self.contains(id)
@@ -361,11 +398,6 @@ impl DetectorRegistry {
         {
             return Err(SecretScanErrorCode::InvalidDetector.into());
         }
-        self.detectors.push(RegisteredDetector {
-            id: id.to_owned(),
-            detector,
-            required,
-        });
         Ok(())
     }
 

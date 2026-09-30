@@ -172,6 +172,30 @@ pub(super) fn sort_candidates_by_start(candidates: &mut [crate::types::Candidate
 /// and makes no per-detector allocation (issue #1043).
 pub(crate) type BuiltInDetector = &'static (dyn Detector + Sync);
 
+/// One row of a built-in table: the detector's id, written out, and the
+/// detector. The registry takes the id from the row, so building a built-in
+/// registry calls no detector's `id()`; under a lazily compiling
+/// WebAssembly engine each such call compiled one more function inside
+/// `initialize()` (issue #1043). Tests pin every row's id to its detector's
+/// `id()`. A row dereferences to its detector.
+pub(crate) struct BuiltInRow {
+    pub(crate) id: &'static str,
+    pub(crate) detector: BuiltInDetector,
+}
+
+impl std::ops::Deref for BuiltInRow {
+    type Target = dyn Detector + Sync;
+
+    fn deref(&self) -> &Self::Target {
+        self.detector
+    }
+}
+
+/// A [`BuiltInRow`] for `detector` under `id`.
+const fn row(id: &'static str, detector: BuiltInDetector) -> BuiltInRow {
+    BuiltInRow { id, detector }
+}
+
 /// Every built-in detector, in canonical registration order.
 ///
 /// One static table rather than a `Vec` of boxes built per call: building
@@ -179,121 +203,122 @@ pub(crate) type BuiltInDetector = &'static (dyn Detector + Sync);
 /// engine had to compile inside `initialize()` (issue #1043).
 ///
 /// One entry per line by contract (`scripts/measure-detector-cost.mjs`
-/// comments entries out by line).
+/// comments entries out by line), so the table is kept out of rustfmt.
 #[must_use]
 #[allow(clippy::too_many_lines)] // one line per built-in detector
-pub(crate) fn built_in_detectors() -> &'static [BuiltInDetector] {
-    static DETECTORS: &[BuiltInDetector] = &[
-        &PrivateKeyDetector,
-        &aws::AwsAccessKeyDetector,
-        &aws::AwsSecretAccessKeyDetector,
-        &aws_bedrock::AwsBedrockLongTermApiKeyDetector,
-        &aws_bedrock::AwsBedrockShortTermApiKeyDetector,
-        &github::GitHubTokenDetector,
-        &gitlab::GitlabTokenDetector,
-        &openai::OpenAiTokenDetector,
-        &anthropic::AnthropicTokenDetector,
-        &shopify::ShopifyTokenDetector,
-        &vault::VaultTokenDetector,
-        &stripe::StripeTokenDetector,
-        &slack::SlackTokenDetector,
-        &additional_providers::PYPI,
-        &additional_providers::HUGGING_FACE,
-        &additional_providers::DOCKER,
-        &cloudflare::CLOUDFLARE,
-        &additional_providers::DIGITALOCEAN,
-        &linear::LINEAR,
-        &additional_providers::SUPABASE,
-        &additional_providers::SUPABASE_PAT,
-        &vercel::VERCEL,
-        &additional_providers::NPM,
-        &additional_providers::GOOGLE,
-        &google_oauth::GOOGLE_OAUTH_CLIENT_SECRET,
-        &sendgrid::SendgridTokenDetector,
-        &microsoft_entra::MicrosoftEntraClientSecretDetector,
-        &azure_devops::AzureDevOpsPersonalAccessTokenDetector,
-        &notion::NotionTokenDetector,
-        &atlassian::AtlassianApiTokenDetector,
-        &twilio::TwilioAuthTokenDetector,
-        &twilio::TwilioApiKeySecretDetector,
-        &telegram::TelegramBotTokenDetector,
-        &discord::DiscordBotTokenDetector,
-        &sentry::SentryUserAuthTokenDetector,
-        &sentry::SentryOrgAuthTokenDetector,
-        &datadog::DatadogApiKeyDetector,
-        &datadog::DATADOG_APPLICATION_KEY,
-        &datadog::DatadogApplicationKeyLegacyDetector,
-        &grafana::GrafanaServiceAccountTokenDetector,
-        &additional_providers::GRAFANA_CLOUD,
-        &new_relic::NewRelicUserApiKeyDetector,
-        &new_relic::NewRelicLicenseKeyDetector,
-        &mailchimp::MailchimpMarketingApiKeyDetector,
-        &mailgun::MailgunApiKeyDetector,
-        &okta::OktaApiTokenDetector,
-        &firebase::FirebaseServerKeyDetector,
-        &terraform::TerraformCloudTokenDetector,
-        &additional_providers::PULUMI,
-        &ai_inference::REPLICATE,
-        &ai_inference::GROQ,
-        &ai_inference::XAI,
-        &ai_inference::OPENROUTER,
-        &ai_inference::PERPLEXITY,
-        &ai_inference::FIREWORKS,
-        &elevenlabs::ElevenLabsApiKeyDetector,
-        &together_tavily::TOGETHER_AI,
-        &together_tavily::TAVILY,
-        &pinecone::PineconeApiKeyDetector,
-        &gitlab::GitlabRunnerAuthenticationTokenDetector,
-        &databricks::DATABRICKS,
-        &confluent::CONFLUENT_CLOUD_API_SECRET,
-        &confluent::ConfluentLegacyApiSecretDetector,
-        &netlify::NetlifyPersonalAccessTokenDetector,
-        &neon::NEON,
-        &langsmith::LangsmithApiKeyDetector,
-        &langfuse::LangfuseSecretKeyDetector,
-        &postman::POSTMAN,
-        &postman::POSTMAN_COLLECTION_ACCESS_KEY,
-        &heroku::HEROKU_API_KEY,
-        &heroku::HerokuApiKeyLegacyDetector,
-        &travisci::TravisCiApiTokenDetector,
-        &keyword_gated_keys::MistralApiKeyDetector,
-        &keyword_gated_keys::CohereApiKeyDetector,
-        &keyword_gated_keys::Ai21ApiKeyDetector,
-        &keyword_gated_keys::DeepgramApiKeyDetector,
-        &doppler::DopplerTokenDetector,
-        &trigger_dev::TRIGGER_DEV,
-        &e2b::E2B,
-        &posthog::POSTHOG,
-        &helicone::HELICONE,
-        &firecrawl::FIRECRAWL,
-        &composio::COMPOSIO,
-        &convex::ConvexDeploymentKeyDetector,
-        &onepassword::OnePasswordServiceAccountTokenDetector,
-        &inngest::INNGEST_SIGNING_KEY,
-        &resend::RESEND_API_KEY,
-        &apify::APIFY_API_TOKEN,
-        &wandb::WANDB_API_KEY,
-        &daytona::DAYTONA_API_KEY,
-        &clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET,
-        &nvidia::NVIDIA_API_KEY,
-        &browserbase::BROWSERBASE_API_KEY,
-        &runpod::RUNPOD_API_KEY,
-        &cerebras::CEREBRAS_API_KEY,
-        &bitwarden::BitwardenSecretsManagerAccessTokenDetector,
-        &polar::POLAR,
-        &sonarqube::SONARQUBE,
-        &rubygems::RUBYGEMS_API_KEY,
-        &clojars::CLOJARS_DEPLOY_TOKEN,
-        &crates_io::CRATES_IO,
-        &dynatrace::DynatraceTokenDetector,
-        &paddle::PADDLE_API_KEY,
-        &honeycomb::HONEYCOMB_INGEST_KEY,
-        &axiom::AXIOM,
-        &jwt::JwtDetector,
-        &bearer_token::BearerTokenDetector,
-        &ConnectionStringDetector,
-        &otpauth::OtpauthDetector,
-        &generic_token::GENERIC_TOKEN,
+pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
+    #[rustfmt::skip]
+    static DETECTORS: &[BuiltInRow] = &[
+        row("private-key", &PrivateKeyDetector),
+        row("aws-access-key", &aws::AwsAccessKeyDetector),
+        row("aws-secret-access-key", &aws::AwsSecretAccessKeyDetector),
+        row("aws-bedrock-long-term-api-key", &aws_bedrock::AwsBedrockLongTermApiKeyDetector),
+        row("aws-bedrock-short-term-api-key", &aws_bedrock::AwsBedrockShortTermApiKeyDetector),
+        row("github-token", &github::GitHubTokenDetector),
+        row("gitlab-token", &gitlab::GitlabTokenDetector),
+        row("openai-token", &openai::OpenAiTokenDetector),
+        row("anthropic-token", &anthropic::AnthropicTokenDetector),
+        row("shopify-token", &shopify::ShopifyTokenDetector),
+        row("vault-token", &vault::VaultTokenDetector),
+        row("stripe-token", &stripe::StripeTokenDetector),
+        row("slack-token", &slack::SlackTokenDetector),
+        row("pypi-token", &additional_providers::PYPI),
+        row("huggingface-token", &additional_providers::HUGGING_FACE),
+        row("docker-token", &additional_providers::DOCKER),
+        row("cloudflare-token", &cloudflare::CLOUDFLARE),
+        row("digitalocean-token", &additional_providers::DIGITALOCEAN),
+        row("linear-token", &linear::LINEAR),
+        row("supabase-token", &additional_providers::SUPABASE),
+        row("supabase-management-token", &additional_providers::SUPABASE_PAT),
+        row("vercel-token", &vercel::VERCEL),
+        row("npm-token", &additional_providers::NPM),
+        row("google-api-key", &additional_providers::GOOGLE),
+        row("google-oauth-client-secret", &google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
+        row("sendgrid-token", &sendgrid::SendgridTokenDetector),
+        row("microsoft-entra-client-secret", &microsoft_entra::MicrosoftEntraClientSecretDetector),
+        row("azure-devops-personal-access-token", &azure_devops::AzureDevOpsPersonalAccessTokenDetector),
+        row("notion-token", &notion::NotionTokenDetector),
+        row("atlassian-api-token", &atlassian::AtlassianApiTokenDetector),
+        row("twilio-auth-token", &twilio::TwilioAuthTokenDetector),
+        row("twilio-api-key-secret", &twilio::TwilioApiKeySecretDetector),
+        row("telegram-bot-token", &telegram::TelegramBotTokenDetector),
+        row("discord-bot-token", &discord::DiscordBotTokenDetector),
+        row("sentry-user-auth-token", &sentry::SentryUserAuthTokenDetector),
+        row("sentry-org-auth-token", &sentry::SentryOrgAuthTokenDetector),
+        row("datadog-api-key", &datadog::DatadogApiKeyDetector),
+        row("datadog-application-key", &datadog::DATADOG_APPLICATION_KEY),
+        row("datadog-application-key-legacy", &datadog::DatadogApplicationKeyLegacyDetector),
+        row("grafana-service-account-token", &grafana::GrafanaServiceAccountTokenDetector),
+        row("grafana-cloud-access-policy-token", &additional_providers::GRAFANA_CLOUD),
+        row("new-relic-user-api-key", &new_relic::NewRelicUserApiKeyDetector),
+        row("new-relic-license-key", &new_relic::NewRelicLicenseKeyDetector),
+        row("mailchimp-api-key", &mailchimp::MailchimpMarketingApiKeyDetector),
+        row("mailgun-api-key", &mailgun::MailgunApiKeyDetector),
+        row("okta-api-token", &okta::OktaApiTokenDetector),
+        row("firebase-server-key", &firebase::FirebaseServerKeyDetector),
+        row("terraform-cloud-token", &terraform::TerraformCloudTokenDetector),
+        row("pulumi-access-token", &additional_providers::PULUMI),
+        row("replicate-api-token", &ai_inference::REPLICATE),
+        row("groq-api-key", &ai_inference::GROQ),
+        row("xai-api-key", &ai_inference::XAI),
+        row("openrouter-api-key", &ai_inference::OPENROUTER),
+        row("perplexity-api-key", &ai_inference::PERPLEXITY),
+        row("fireworks-ai-api-key", &ai_inference::FIREWORKS),
+        row("elevenlabs-api-key", &elevenlabs::ElevenLabsApiKeyDetector),
+        row("together-ai-api-key", &together_tavily::TOGETHER_AI),
+        row("tavily-api-key", &together_tavily::TAVILY),
+        row("pinecone-api-key", &pinecone::PineconeApiKeyDetector),
+        row("gitlab-runner-authentication-token", &gitlab::GitlabRunnerAuthenticationTokenDetector),
+        row("databricks-personal-access-token", &databricks::DATABRICKS),
+        row("confluent-cloud-api-secret", &confluent::CONFLUENT_CLOUD_API_SECRET),
+        row("confluent-cloud-api-secret-legacy", &confluent::ConfluentLegacyApiSecretDetector),
+        row("netlify-token", &netlify::NetlifyPersonalAccessTokenDetector),
+        row("neon-api-key", &neon::NEON),
+        row("langsmith-api-key", &langsmith::LangsmithApiKeyDetector),
+        row("langfuse-secret-key", &langfuse::LangfuseSecretKeyDetector),
+        row("postman-api-key", &postman::POSTMAN),
+        row("postman-collection-access-key", &postman::POSTMAN_COLLECTION_ACCESS_KEY),
+        row("heroku-api-key", &heroku::HEROKU_API_KEY),
+        row("heroku-api-key-legacy", &heroku::HerokuApiKeyLegacyDetector),
+        row("travisci-api-token", &travisci::TravisCiApiTokenDetector),
+        row("mistral-api-key", &keyword_gated_keys::MistralApiKeyDetector),
+        row("cohere-api-key", &keyword_gated_keys::CohereApiKeyDetector),
+        row("ai21-api-key", &keyword_gated_keys::Ai21ApiKeyDetector),
+        row("deepgram-api-key", &keyword_gated_keys::DeepgramApiKeyDetector),
+        row("doppler-token", &doppler::DopplerTokenDetector),
+        row("trigger-dev-token", &trigger_dev::TRIGGER_DEV),
+        row("e2b-api-key", &e2b::E2B),
+        row("posthog-token", &posthog::POSTHOG),
+        row("helicone-api-key", &helicone::HELICONE),
+        row("firecrawl-api-key", &firecrawl::FIRECRAWL),
+        row("composio-api-key", &composio::COMPOSIO),
+        row("convex-deployment-key", &convex::ConvexDeploymentKeyDetector),
+        row("onepassword-service-account-token", &onepassword::OnePasswordServiceAccountTokenDetector),
+        row("inngest-signing-key", &inngest::INNGEST_SIGNING_KEY),
+        row("resend-api-key", &resend::RESEND_API_KEY),
+        row("apify-api-token", &apify::APIFY_API_TOKEN),
+        row("wandb-api-key", &wandb::WANDB_API_KEY),
+        row("daytona-api-key", &daytona::DAYTONA_API_KEY),
+        row("clickhouse-cloud-api-secret", &clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET),
+        row("nvidia-api-key", &nvidia::NVIDIA_API_KEY),
+        row("browserbase-api-key", &browserbase::BROWSERBASE_API_KEY),
+        row("runpod-api-key", &runpod::RUNPOD_API_KEY),
+        row("cerebras-api-key", &cerebras::CEREBRAS_API_KEY),
+        row("bitwarden-secrets-manager-access-token", &bitwarden::BitwardenSecretsManagerAccessTokenDetector),
+        row("polar-token", &polar::POLAR),
+        row("sonarqube-token", &sonarqube::SONARQUBE),
+        row("rubygems-api-key", &rubygems::RUBYGEMS_API_KEY),
+        row("clojars-deploy-token", &clojars::CLOJARS_DEPLOY_TOKEN),
+        row("crates-io-token", &crates_io::CRATES_IO),
+        row("dynatrace-token", &dynatrace::DynatraceTokenDetector),
+        row("paddle-api-key", &paddle::PADDLE_API_KEY),
+        row("honeycomb-api-key", &honeycomb::HONEYCOMB_INGEST_KEY),
+        row("axiom-token", &axiom::AXIOM),
+        row("jwt", &jwt::JwtDetector),
+        row("bearer-token", &bearer_token::BearerTokenDetector),
+        row("connection-string", &ConnectionStringDetector),
+        row("otpauth-uri", &otpauth::OtpauthDetector),
+        row("generic-token", &generic_token::GENERIC_TOKEN),
     ];
     DETECTORS
 }
@@ -308,14 +333,15 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInDetector] {
 /// rule. [`BUILT_IN_PACKS`] pins, in tests, that this list is exactly the
 /// `Pack::Common` members of the canonical order.
 #[must_use]
-pub(crate) fn common_built_in_detectors() -> &'static [BuiltInDetector] {
-    static DETECTORS: &[BuiltInDetector] = &[
-        &PrivateKeyDetector,
-        &jwt::JwtDetector,
-        &bearer_token::BearerTokenDetector,
-        &ConnectionStringDetector,
-        &otpauth::OtpauthDetector,
-        &generic_token::GENERIC_TOKEN,
+pub(crate) fn common_built_in_detectors() -> &'static [BuiltInRow] {
+    #[rustfmt::skip]
+    static DETECTORS: &[BuiltInRow] = &[
+        row("private-key", &PrivateKeyDetector),
+        row("jwt", &jwt::JwtDetector),
+        row("bearer-token", &bearer_token::BearerTokenDetector),
+        row("connection-string", &ConnectionStringDetector),
+        row("otpauth-uri", &otpauth::OtpauthDetector),
+        row("generic-token", &generic_token::GENERIC_TOKEN),
     ];
     DETECTORS
 }
@@ -329,6 +355,7 @@ pub(crate) fn common_built_in_detectors() -> &'static [BuiltInDetector] {
 /// `Detector` trait, so a custom detector neither declares nor inherits
 /// one, even under a built-in id.
 pub(crate) struct BuiltIn {
+    pub(crate) id: &'static str,
     pub(crate) detector: BuiltInDetector,
     pub(crate) required: Option<RequiredLiterals>,
 }
@@ -338,9 +365,10 @@ pub(crate) struct BuiltIn {
 pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
     built_in_detectors()
         .iter()
-        .map(|&detector| BuiltIn {
-            required: built_in_required_literals(detector.id()),
-            detector,
+        .map(|row| BuiltIn {
+            id: row.id,
+            detector: row.detector,
+            required: built_in_required_literals(row.id),
         })
         .collect()
 }
@@ -350,9 +378,10 @@ pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
 pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
     common_built_in_detectors()
         .iter()
-        .map(|&detector| BuiltIn {
-            required: common_required_literals(detector.id()),
-            detector,
+        .map(|row| BuiltIn {
+            id: row.id,
+            detector: row.detector,
+            required: common_required_literals(row.id),
         })
         .collect()
 }
@@ -827,6 +856,18 @@ mod tests {
     use crate::types::{Candidate, Confidence, DetectorContext, Specificity};
 
     #[test]
+    fn every_built_in_row_names_its_detectors_own_id() {
+        // The registry takes a built-in's id from its table row (issue
+        // #1043), so each row's id must be exactly what the detector says.
+        for row in built_in_detectors()
+            .iter()
+            .chain(common_built_in_detectors())
+        {
+            assert_eq!(row.id, row.detector.id());
+        }
+    }
+
+    #[test]
     fn built_in_ids_are_valid_and_unique() {
         let detectors = built_in_detectors();
         let mut ids: Vec<&str> = detectors.iter().map(|d| d.id()).collect();
@@ -959,7 +1000,7 @@ mod tests {
         );
     }
 
-    fn ids_of(detectors: &[BuiltInDetector]) -> Vec<&str> {
+    fn ids_of(detectors: &[BuiltInRow]) -> Vec<&str> {
         detectors.iter().map(|d| d.id()).collect()
     }
 
