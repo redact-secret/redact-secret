@@ -5,7 +5,7 @@
 //! are always registered before custom ones.
 
 use crate::detectors::{
-    BuiltIn, RequiredLiterals, built_in_entries, built_in_ids, common_built_in_entries,
+    BuiltIn, BuiltInDetector, RequiredLiterals, built_in_entries, built_in_ids, common_built_in_entries,
 };
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::pii::{PiiSelection, adapter, is_reserved_detector_id};
@@ -58,7 +58,7 @@ impl Profile {
 /// cannot change the public `detector` field of findings after validation.
 pub struct RegisteredDetector {
     id: String,
-    detector: Box<dyn Detector>,
+    detector: Held,
     /// The literals a built-in detector declared for the shared prefilter
     /// (issue #983). `None` for every custom detector and for built-ins
     /// that run on every call. Private: the declaration is not part of the
@@ -76,13 +76,25 @@ impl RegisteredDetector {
     /// The registered detector.
     #[must_use]
     pub fn detector(&self) -> &dyn Detector {
-        self.detector.as_ref()
+        match &self.detector {
+            Held::BuiltIn(detector) => *detector,
+            Held::Custom(detector) => detector.as_ref(),
+        }
     }
 
     /// The literals this detector declared for the shared prefilter, if any.
     pub(crate) const fn required_literals(&self) -> Option<&RequiredLiterals> {
         self.required.as_ref()
     }
+}
+
+/// How a [`RegisteredDetector`] holds its detector: a built-in is a
+/// reference into the crate's static table of built-ins, so building a
+/// built-in registry constructs and allocates nothing per detector
+/// (issue #1043); a custom detector, and the PII-domain adapter, are owned.
+enum Held {
+    BuiltIn(BuiltInDetector),
+    Custom(Box<dyn Detector>),
 }
 
 impl std::fmt::Debug for RegisteredDetector {
@@ -107,7 +119,7 @@ impl DetectorRegistry {
         Self {
             detectors: vec![RegisteredDetector {
                 id: detector.id().to_owned(),
-                detector,
+                detector: Held::Custom(detector),
                 required: None,
             }],
             profile: None,
@@ -163,10 +175,10 @@ impl DetectorRegistry {
     {
         let mut registry = Self::new();
         for BuiltIn { detector, required } in built_in_entries() {
-            registry.push_validated(detector, false, required)?;
+            registry.push_validated(Held::BuiltIn(detector), false, required)?;
         }
         for detector in custom {
-            registry.push_validated(detector, false, None)?;
+            registry.push_validated(Held::Custom(detector), false, None)?;
         }
         registry.profile = Some(Profile::Full);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Full);
@@ -197,10 +209,10 @@ impl DetectorRegistry {
     {
         let mut registry = Self::new();
         for BuiltIn { detector, required } in common_built_in_entries() {
-            registry.push_validated(detector, false, required)?;
+            registry.push_validated(Held::BuiltIn(detector), false, required)?;
         }
         for detector in custom {
-            registry.push_validated(detector, true, None)?;
+            registry.push_validated(Held::Custom(detector), true, None)?;
         }
         registry.profile = Some(Profile::Common);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Common);
@@ -285,12 +297,12 @@ impl DetectorRegistry {
         if !selection.is_off() {
             registry.detectors.push(RegisteredDetector {
                 id: "pii-domain".to_owned(),
-                detector: adapter(selection),
+                detector: Held::Custom(adapter(selection)),
                 required: None,
             });
         }
         for detector in custom {
-            registry.push_validated(detector, true, None)?;
+            registry.push_validated(Held::Custom(detector), true, None)?;
         }
         registry.profile = Some(profile);
         registry.activation_identity = selection.activation_identity(profile);
@@ -323,7 +335,7 @@ impl DetectorRegistry {
     /// not satisfy [`is_identifier`] or is already registered. The registry
     /// is unchanged on error.
     pub fn register(&mut self, detector: Box<dyn Detector>) -> Result<&mut Self, SecretScanError> {
-        self.push_validated(detector, false, None)?;
+        self.push_validated(Held::Custom(detector), false, None)?;
         self.profile = None;
         Ok(self)
     }
@@ -334,11 +346,14 @@ impl DetectorRegistry {
     /// crate.
     fn push_validated(
         &mut self,
-        detector: Box<dyn Detector>,
+        detector: Held,
         reject_built_in_ids: bool,
         required: Option<RequiredLiterals>,
     ) -> Result<(), SecretScanError> {
-        let id = detector.id();
+        let id = match &detector {
+            Held::BuiltIn(detector) => detector.id(),
+            Held::Custom(detector) => detector.id(),
+        };
         if !is_identifier(id)
             || is_reserved_detector_id(id)
             || self.contains(id)

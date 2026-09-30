@@ -3184,9 +3184,16 @@ fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-struct GenericTokenDetector {
+/// The contextual assignment and `Basic`/`Token` authorization detector.
+pub(super) struct GenericTokenDetector {
     names: NameSource,
 }
+
+/// The built-in `generic-token` detector, as the registry's static table of
+/// built-ins holds it (issue #1043).
+pub(super) static GENERIC_TOKEN: GenericTokenDetector = GenericTokenDetector {
+    names: NameSource::BuiltIn,
+};
 
 impl Detector for GenericTokenDetector {
     fn id(&self) -> &'static str {
@@ -3215,14 +3222,6 @@ impl Detector for GenericTokenDetector {
         }
         Ok(candidates)
     }
-}
-
-/// The contextual assignment and `Basic`/`Token` authorization detector.
-#[must_use]
-pub fn generic_token_detector() -> Box<dyn Detector> {
-    Box::new(GenericTokenDetector {
-        names: NameSource::BuiltIn,
-    })
 }
 
 /// The declarative ruleset names-section detector (issue #484): matches

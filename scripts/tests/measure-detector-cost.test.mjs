@@ -23,10 +23,11 @@ test("parseVecBlock finds exactly one vec entry per canonical id in the real reg
 
 test("buildPatchedSource rejects a vec/id count mismatch instead of trusting positions", () => {
   const fabricated = [
-    "fn built_in_detectors() -> Vec<Box<dyn Detector>> {",
-    "    vec![",
-    "        Box::new(OnlyOneDetector),",
-    "    ]",
+    "fn built_in_detectors() -> &'static [BuiltInDetector] {",
+    "    static DETECTORS: &[BuiltInDetector] = &[",
+    "        &OnlyOneDetector,",
+    "    ];",
+    "    DETECTORS",
     "}",
   ].join("\n");
   assert.throws(() => buildPatchedSource(fabricated, []), /vec! has 1 entries but \d+ canonical ids/);

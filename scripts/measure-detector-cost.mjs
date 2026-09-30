@@ -6,10 +6,10 @@
  *
  * Mechanism: `built_in_detectors()` in
  * `crates/secret-scan-core/src/detectors/mod.rs` lists exactly one
- * `Box::new(...)` (or bare call) entry per detector, one per line, in the
- * same order as the canonical id list asserted by
+ * `&detector` entry per detector in its static `DETECTORS` table, one per
+ * line, in the same order as the canonical id list asserted by
  * `built_in_order_matches_the_typescript_oracle` in the same file. To build
- * a variant, this tool comments out (`// `) the vec entries at the
+ * a variant, this tool comments out (`// `) the table entries at the
  * positions of the ids to exclude, runs a real `cargo`/`wasm-bindgen`
  * build, measures the result, and always restores the file with
  * `git checkout --` -- even on failure -- so the shipped registry never
@@ -174,15 +174,16 @@ function fail(message) {
   process.exit(1);
 }
 
-/** Locates the `vec![ ... ]` block inside `built_in_detectors()` and splits it into one non-blank line per entry. */
+/** Locates the static table inside `built_in_detectors()` and splits it into one non-blank line per entry. */
 export function parseVecBlock(source) {
   const fnStart = source.indexOf("fn built_in_detectors()");
   if (fnStart === -1) throw new Error("built_in_detectors() not found");
-  const vecStart = source.indexOf("vec![", fnStart);
-  if (vecStart === -1) throw new Error("vec![ not found in built_in_detectors()");
-  const bodyStart = vecStart + "vec![".length;
-  const vecEnd = source.indexOf("\n    ]", bodyStart);
-  if (vecEnd === -1) throw new Error("closing ] of vec![ not found");
+  const opener = "static DETECTORS: &[BuiltInDetector] = &[";
+  const tableStart = source.indexOf(opener, fnStart);
+  if (tableStart === -1) throw new Error("the static DETECTORS table was not found in built_in_detectors()");
+  const bodyStart = tableStart + opener.length;
+  const vecEnd = source.indexOf("\n    ];", bodyStart);
+  if (vecEnd === -1) throw new Error("closing ]; of the DETECTORS table not found");
   const body = source.slice(bodyStart, vecEnd);
   const lines = body.split("\n").filter((line) => line.trim().length > 0);
   return { lines, bodyStart, vecEnd };

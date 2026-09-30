@@ -99,14 +99,14 @@ export function modulePacks(source) {
   const imported = Object.fromEntries(
     [...source.matchAll(/^use ([a-z0-9_]+)::([A-Za-z0-9_]+);$/gm)].map((match) => [match[2], match[1]]),
   );
-  const list = source.match(/fn built_in_detectors\(\) -> Vec<Box<dyn Detector>> \{\s*vec!\[([\s\S]*?)\n\s*\]\n\}/);
+  const list = source.match(/fn built_in_detectors\(\) -> &'static \[BuiltInDetector\] \{\s*static DETECTORS: &\[BuiltInDetector\] = &\[([\s\S]*?)\n\s*\];\n\s*DETECTORS\n\}/);
   const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
   if (list === null || table === null) throw new Error("detectors/mod.rs: built_in_detectors() or BUILT_IN_PACKS not found");
   const entries = list[1].split("\n").map((line) => line.trim()).filter((line) => line && !line.startsWith("//"));
   const modules = entries.map((entry) => {
     const path = entry.match(/\b([a-z_][a-z0-9_]*)::/);
     if (path !== null) return path[1];
-    const bare = entry.match(/Box::new\(([A-Za-z0-9_]+)\)/);
+    const bare = entry.match(/^&([A-Za-z0-9_]+),?$/);
     if (bare !== null && imported[bare[1]] !== undefined) return imported[bare[1]];
     throw new Error(`detectors/mod.rs: cannot tell the module of built-in entry ${entry}`);
   });
