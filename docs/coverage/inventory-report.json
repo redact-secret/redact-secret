@@ -224,7 +224,7 @@
     {
       "detector": "aws-secret-access-key",
       "evidence": {
-        "fixtureCount": 15,
+        "fixtureCount": 18,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -251,7 +251,9 @@
         "aws-secret-access-key-positive-credentials-file",
         "aws-secret-access-key-positive-dotenv",
         "aws-secret-access-key-positive-iam-create-access-key-json",
-        "aws-secret-access-key-positive-line-below-temporary-id"
+        "aws-secret-access-key-positive-line-above-id",
+        "aws-secret-access-key-positive-line-below-temporary-id",
+        "aws-secret-access-key-positive-phrase-for-qualifier"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1474,7 +1476,7 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 70,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -1504,7 +1506,6 @@
         "vercel-positive-all-prefixes",
         "vercel-positive-class-isolation",
         "vercel-positive-crlf-unicode-prefix",
-        "vercel-positive-doc-style-placeholder",
         "vercel-positive-dotenv",
         "vercel-positive-json",
         "vercel-positive-log",
@@ -1522,7 +1523,7 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 70,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -1573,7 +1574,7 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 70,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -1614,7 +1615,7 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 70,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2299,7 +2300,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 281,
+        "fixtureCount": 288,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2317,6 +2318,7 @@
           "shell",
           "terminal",
           "terraform",
+          "toml",
           "typescript",
           "yaml"
         ],
@@ -2441,7 +2443,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 281,
+        "fixtureCount": 288,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2459,6 +2461,7 @@
           "shell",
           "terminal",
           "terraform",
+          "toml",
           "typescript",
           "yaml"
         ],
@@ -2517,7 +2520,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 281,
+        "fixtureCount": 288,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2535,6 +2538,7 @@
           "shell",
           "terminal",
           "terraform",
+          "toml",
           "typescript",
           "yaml"
         ],
@@ -4199,10 +4203,11 @@
     {
       "detector": "mistral-api-key",
       "evidence": {
-        "fixtureCount": 20,
+        "fixtureCount": 22,
         "hostContextsExercised": [
           "dotenv",
           "json",
+          "kubernetes",
           "log",
           "plain-text",
           "python",
@@ -4228,7 +4233,9 @@
         "mistral-api-key-positive-python-constructor",
         "mistral-api-key-positive-shell-export",
         "mistral-api-key-positive-yaml-named",
-        "mistral-api-key-regression-crlf-and-unicode-prefix"
+        "mistral-api-key-regression-crlf-and-unicode-prefix",
+        "regression-1016-mistral-k8s-env-value",
+        "regression-1038-mistral-python-environ-assign"
       ],
       "policyClass": "confidence-gated",
       "schemeRows": "not-applicable",
@@ -4238,10 +4245,11 @@
     {
       "detector": "cohere-api-key",
       "evidence": {
-        "fixtureCount": 21,
+        "fixtureCount": 23,
         "hostContextsExercised": [
           "dotenv",
           "json",
+          "kubernetes",
           "log",
           "plain-text",
           "python",
@@ -4268,7 +4276,9 @@
         "cohere-api-key-positive-python-constructor",
         "cohere-api-key-positive-shell-export",
         "cohere-api-key-positive-yaml-named",
-        "cohere-api-key-regression-crlf-and-unicode-prefix"
+        "cohere-api-key-regression-crlf-and-unicode-prefix",
+        "regression-1016-cohere-k8s-env-value",
+        "regression-1018-cohere-litellm-masked-name"
       ],
       "policyClass": "confidence-gated",
       "schemeRows": "not-applicable",
@@ -4317,16 +4327,18 @@
     {
       "detector": "deepgram-api-key",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 28,
         "hostContextsExercised": [
           "curl",
           "dotenv",
           "http",
           "json",
+          "kubernetes",
           "log",
           "plain-text",
           "python",
           "shell",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -4352,7 +4364,10 @@
         "deepgram-api-key-positive-token-header",
         "deepgram-api-key-positive-token-header-keyword-only",
         "deepgram-api-key-positive-yaml-named",
-        "deepgram-api-key-regression-crlf-and-unicode-prefix"
+        "deepgram-api-key-regression-crlf-and-unicode-prefix",
+        "regression-1016-deepgram-k8s-env-value",
+        "regression-1017-deepgram-create-client",
+        "regression-1017-deepgram-websocket-subprotocol"
       ],
       "policyClass": "confidence-gated",
       "schemeRows": "not-applicable",

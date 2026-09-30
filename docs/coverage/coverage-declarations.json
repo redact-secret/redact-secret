@@ -421,7 +421,9 @@
             "aws-secret-access-key-positive-credentials-file",
             "aws-secret-access-key-positive-dotenv",
             "aws-secret-access-key-positive-iam-create-access-key-json",
-            "aws-secret-access-key-positive-line-below-temporary-id"
+            "aws-secret-access-key-positive-line-above-id",
+            "aws-secret-access-key-positive-line-below-temporary-id",
+            "aws-secret-access-key-positive-phrase-for-qualifier"
           ],
           "state": "supported"
         },
@@ -3791,7 +3793,6 @@
             "vercel-positive-all-prefixes",
             "vercel-positive-class-isolation",
             "vercel-positive-crlf-unicode-prefix",
-            "vercel-positive-doc-style-placeholder",
             "vercel-positive-dotenv",
             "vercel-positive-json",
             "vercel-positive-log",
@@ -3848,6 +3849,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "vercel-negative-app-x-run-placeholder",
             "vercel-negative-deployment-id",
             "vercel-negative-embedded-in-wider-identifier",
             "vercel-negative-interpolated-secret-prefix",
@@ -3855,6 +3857,8 @@
             "vercel-negative-masked-secret-prefix",
             "vercel-negative-ordinary-reference",
             "vercel-negative-placeholder",
+            "vercel-negative-repeated-filler-placeholder",
+            "vercel-negative-x-run-placeholder",
             "vercel-pat-negative-embedded-in-wider-identifier",
             "vercel-pat-negative-masked"
           ],
@@ -3976,6 +3980,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "vercel-negative-app-x-run-placeholder",
             "vercel-negative-deployment-id",
             "vercel-negative-embedded-in-wider-identifier",
             "vercel-negative-interpolated-secret-prefix",
@@ -3983,6 +3988,8 @@
             "vercel-negative-masked-secret-prefix",
             "vercel-negative-ordinary-reference",
             "vercel-negative-placeholder",
+            "vercel-negative-repeated-filler-placeholder",
+            "vercel-negative-x-run-placeholder",
             "vercel-pat-negative-embedded-in-wider-identifier",
             "vercel-pat-negative-masked"
           ],
@@ -4080,6 +4087,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "vercel-negative-app-x-run-placeholder",
             "vercel-negative-deployment-id",
             "vercel-negative-embedded-in-wider-identifier",
             "vercel-negative-interpolated-secret-prefix",
@@ -4087,6 +4095,8 @@
             "vercel-negative-masked-secret-prefix",
             "vercel-negative-ordinary-reference",
             "vercel-negative-placeholder",
+            "vercel-negative-repeated-filler-placeholder",
+            "vercel-negative-x-run-placeholder",
             "vercel-pat-negative-embedded-in-wider-identifier",
             "vercel-pat-negative-masked"
           ],
@@ -4184,6 +4194,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "vercel-negative-app-x-run-placeholder",
             "vercel-negative-deployment-id",
             "vercel-negative-embedded-in-wider-identifier",
             "vercel-negative-interpolated-secret-prefix",
@@ -4191,6 +4202,8 @@
             "vercel-negative-masked-secret-prefix",
             "vercel-negative-ordinary-reference",
             "vercel-negative-placeholder",
+            "vercel-negative-repeated-filler-placeholder",
+            "vercel-negative-x-run-placeholder",
             "vercel-pat-negative-embedded-in-wider-identifier",
             "vercel-pat-negative-masked"
           ],
@@ -5906,12 +5919,14 @@
             "contextual-negative-gcp-secret-reference-no-version",
             "contextual-negative-gcp-secret-reference-with-version",
             "contextual-negative-generic-name-high-entropy",
+            "contextual-negative-glued-my-credential-words",
             "contextual-negative-go-config-struct-field-reference",
             "contextual-negative-hash-non-credential-name",
             "contextual-negative-identifier-non-credential-name",
             "contextual-negative-json-env-reference",
             "contextual-negative-json-template-reference",
             "contextual-negative-keyword-argument-call-expression",
+            "contextual-negative-layout-filler-with-padding",
             "contextual-negative-litellm-os-environ-reference",
             "contextual-negative-nested-no-separator-masked-value",
             "contextual-negative-nested-no-separator-template-reference",
@@ -5920,6 +5935,8 @@
             "contextual-negative-placeholder-appended-digit",
             "contextual-negative-placeholder-hyphenated-compound",
             "contextual-negative-placeholder-leading-separator",
+            "contextual-negative-placeholder-led-phrase",
+            "contextual-negative-placeholder-led-phrase-value",
             "contextual-negative-placeholder-redacted",
             "contextual-negative-placeholder-replaceme",
             "contextual-negative-prose-colon-unrecognized-name",
@@ -5940,7 +5957,9 @@
             "contextual-negative-unqualified-random-text",
             "contextual-negative-vals-vault-reference",
             "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-ellipsis",
             "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-lead-word-phrase",
             "contextual-negative-vendor-prefix-sdk-counting-digits",
             "contextual-negative-windows-env-reference-excluded",
             "regression-yaml-nested-key-no-crossing-newline"
@@ -5991,12 +6010,14 @@
             "contextual-negative-gcp-secret-reference-no-version",
             "contextual-negative-gcp-secret-reference-with-version",
             "contextual-negative-generic-name-high-entropy",
+            "contextual-negative-glued-my-credential-words",
             "contextual-negative-go-config-struct-field-reference",
             "contextual-negative-hash-non-credential-name",
             "contextual-negative-identifier-non-credential-name",
             "contextual-negative-json-env-reference",
             "contextual-negative-json-template-reference",
             "contextual-negative-keyword-argument-call-expression",
+            "contextual-negative-layout-filler-with-padding",
             "contextual-negative-litellm-os-environ-reference",
             "contextual-negative-nested-no-separator-masked-value",
             "contextual-negative-nested-no-separator-template-reference",
@@ -6005,6 +6026,8 @@
             "contextual-negative-placeholder-appended-digit",
             "contextual-negative-placeholder-hyphenated-compound",
             "contextual-negative-placeholder-leading-separator",
+            "contextual-negative-placeholder-led-phrase",
+            "contextual-negative-placeholder-led-phrase-value",
             "contextual-negative-placeholder-redacted",
             "contextual-negative-placeholder-replaceme",
             "contextual-negative-prose-colon-unrecognized-name",
@@ -6025,7 +6048,9 @@
             "contextual-negative-unqualified-random-text",
             "contextual-negative-vals-vault-reference",
             "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-ellipsis",
             "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-lead-word-phrase",
             "contextual-negative-vendor-prefix-sdk-counting-digits",
             "contextual-negative-windows-env-reference-excluded",
             "contextual-overlap-nested-assignment",
@@ -6306,7 +6331,9 @@
           "evidenceFixtureIds": [
             "contextual-negative-993-counting-run-body",
             "contextual-negative-vendor-prefix-counting-digits",
+            "contextual-negative-vendor-prefix-ellipsis",
             "contextual-negative-vendor-prefix-glued-your-word",
+            "contextual-negative-vendor-prefix-lead-word-phrase",
             "contextual-negative-vendor-prefix-sdk-counting-digits",
             "generic-token-vendor-prefix-low-entropy-control"
           ],
@@ -10253,7 +10280,9 @@
             "mistral-api-key-positive-python-constructor",
             "mistral-api-key-positive-shell-export",
             "mistral-api-key-positive-yaml-named",
-            "mistral-api-key-regression-crlf-and-unicode-prefix"
+            "mistral-api-key-regression-crlf-and-unicode-prefix",
+            "regression-1016-mistral-k8s-env-value",
+            "regression-1038-mistral-python-environ-assign"
           ],
           "state": "supported"
         },
@@ -10347,7 +10376,9 @@
             "cohere-api-key-positive-python-constructor",
             "cohere-api-key-positive-shell-export",
             "cohere-api-key-positive-yaml-named",
-            "cohere-api-key-regression-crlf-and-unicode-prefix"
+            "cohere-api-key-regression-crlf-and-unicode-prefix",
+            "regression-1016-cohere-k8s-env-value",
+            "regression-1018-cohere-litellm-masked-name"
           ],
           "state": "supported"
         },
@@ -10537,7 +10568,10 @@
             "deepgram-api-key-positive-token-header",
             "deepgram-api-key-positive-token-header-keyword-only",
             "deepgram-api-key-positive-yaml-named",
-            "deepgram-api-key-regression-crlf-and-unicode-prefix"
+            "deepgram-api-key-regression-crlf-and-unicode-prefix",
+            "regression-1016-deepgram-k8s-env-value",
+            "regression-1017-deepgram-create-client",
+            "regression-1017-deepgram-websocket-subprotocol"
           ],
           "state": "supported"
         },
@@ -15559,6 +15593,7 @@
             "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "aws-secret-access-key-incremental-adjacent-lines",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -15981,6 +16016,7 @@
             "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "aws-secret-access-key-incremental-adjacent-lines",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -16525,6 +16561,7 @@
             "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "aws-secret-access-key-incremental-adjacent-lines",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",

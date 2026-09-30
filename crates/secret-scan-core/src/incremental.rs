@@ -67,21 +67,19 @@
 use std::borrow::Cow;
 
 use crate::detectors::{
-    PrivateKeyRetentionTracker, continues_previous_line, has_open_aws_access_key_id_line,
-    has_open_bearer_authorization, has_open_confluent_properties, has_open_contextual_assignment,
-    has_open_deepgram_request, has_open_heroku_legacy_context, has_open_list_item_pair,
-    has_open_provider_sibling, has_open_twilio_cli_table, is_open_tail_neutral,
+    PrivateKeyRetentionTracker, carries_aws_access_key_id, continues_previous_line,
+    has_open_aws_secret_candidate_line, has_open_bearer_authorization,
+    has_open_confluent_properties, has_open_contextual_assignment, has_open_deepgram_request,
+    has_open_heroku_legacy_context, has_open_list_item_pair, has_open_provider_sibling,
+    has_open_twilio_cli_table, is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
-#[cfg(test)]
 use crate::evidence::shadow::ShadowComparison;
 use crate::normalize::NormalizedInput;
 use crate::pii::PiiSelection;
 #[cfg(test)]
 use crate::pipeline::detect;
 use crate::pipeline::detect_units;
-#[cfg(not(test))]
-use crate::pipeline::run_detector_pipeline;
 use crate::policy::DefaultPolicy;
 use crate::redact::{default_placeholder_formatter, redact};
 use crate::registry::{DetectorRegistry, Profile};
@@ -113,8 +111,9 @@ const TWILIO_AUTH_TOKEN_DETECTOR_ID: &str = "twilio-auth-token";
 const CONFLUENT_LEGACY_DETECTOR_ID: &str = "confluent-cloud-api-secret-legacy";
 
 /// The built-in detector that reads an AWS access key ID on the line above a
-/// secret access key (issue #1028): a session holds a line carrying an ID
-/// open for exactly one more line.
+/// secret access key (issue #1028). A line carrying an ID is released when
+/// it closes; the session keeps a copy of it to scan the next unit below it
+/// ([`IncrementalSanitizer::lead_after`], issue #1040).
 const AWS_SECRET_ACCESS_KEY_DETECTOR_ID: &str = "aws-secret-access-key";
 
 /// Explicit, positive byte limits every incremental session requires. There
@@ -351,6 +350,82 @@ fn offset_by(found: &DetectedFinding, by: usize) -> Result<DetectedFinding, Secr
     .with_obfuscation(found.obfuscation()))
 }
 
+/// Detects `unit` alone, as [`detect`](crate::pipeline::detect) does, but
+/// with the released line above it, `lead`, scanned as a read-only unit
+/// (issue #1040). When a candidate would cross from the lead into the unit,
+/// the unit is scanned without it, as it was before the lead existed.
+fn detect_after(
+    lead: Option<&str>,
+    unit: &str,
+    registry: &DetectorRegistry,
+    mut shadow: Option<&mut Vec<ShadowComparison>>,
+) -> Result<Vec<DetectedFinding>, SecretScanError> {
+    if let Some(lead) = lead {
+        let input = format!("{lead}{unit}");
+        if let Some(detected) = detect_units(
+            &input,
+            lead.len(),
+            registry,
+            &[lead.len()],
+            shadow.as_deref_mut(),
+        )? {
+            return Ok(detected);
+        }
+    }
+    detect_units(unit, 0, registry, &[], shadow).map(Option::unwrap_or_default)
+}
+
+/// Detects the closed units of `batch` together ([`detect_units`]), with the
+/// released line above it, `lead`, scanned as a read-only unit (issue
+/// #1040). `None` when the units are not separable or detection fails; the
+/// caller then scans unit by unit.
+fn detect_batch(
+    lead: Option<&str>,
+    batch: &str,
+    unit_ends: &[usize],
+    registry: &DetectorRegistry,
+    shadow: Option<&mut Vec<ShadowComparison>>,
+) -> Option<Vec<DetectedFinding>> {
+    let detected = match lead {
+        Some(lead) => {
+            let mut ends = Vec::with_capacity(unit_ends.len() + 1);
+            ends.push(lead.len());
+            ends.extend(unit_ends.iter().map(|end| end + lead.len()));
+            detect_units(
+                &format!("{lead}{batch}"),
+                lead.len(),
+                registry,
+                &ends,
+                shadow,
+            )
+        }
+        None => detect_units(batch, 0, registry, unit_ends, shadow),
+    };
+    detected.ok().flatten()
+}
+
+/// Which open-construct checks hold the current unit open: the AWS
+/// secret-candidate hold (issue #1044) is kept apart, because a unit held
+/// only by it may be split before its last line.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct OpenConstructs {
+    other: bool,
+    aws_secret_candidate: bool,
+}
+
+/// Where the last line of `text` starts: after the line terminator before
+/// its own (`\n`, `\r\n` or a lone `\r`), or 0.
+fn last_line_start(text: &str) -> usize {
+    let body = text.strip_suffix('\n').unwrap_or(text);
+    let body = body.strip_suffix('\r').unwrap_or(body);
+    body.rfind(['\n', '\r']).map_or(0, |at| at + 1)
+}
+
+/// The last line of `text`, with its terminator.
+fn last_line(text: &str) -> &str {
+    &text[last_line_start(text)..]
+}
+
 /// Finds the byte offset of the next `\n` or `\r` at or after `from`, or
 /// `None` when `chunk` has no more line terminators.
 fn find_next_newline(chunk: &str, from: usize) -> Option<usize> {
@@ -479,6 +554,13 @@ pub struct IncrementalSanitizer {
     scanned: Option<String>,
     open_tail: OpenTailCache,
     lookbacks: LookbackHints,
+    /// A copy of the released line directly above the retained text, kept
+    /// only while a detector reads it from the next unit ([`Self::lead_after`]).
+    lead: Option<String>,
+    /// When the current unit is open only because its last line holds an
+    /// unclaimed AWS secret-shaped run (issue #1044): where that line starts,
+    /// relative to `unit_start`.
+    aws_held_line: Option<usize>,
     finalized_bytes: usize,
     total_input_bytes: usize,
     finding_count: usize,
@@ -651,6 +733,8 @@ impl IncrementalSanitizer {
             scanned: None,
             open_tail: OpenTailCache::default(),
             lookbacks,
+            lead: None,
+            aws_held_line: None,
             finalized_bytes: 0,
             total_input_bytes: 0,
             finding_count: 0,
@@ -715,6 +799,7 @@ impl IncrementalSanitizer {
     /// contract is to drop them.
     fn discard_retained(&mut self) {
         self.retained = String::new();
+        self.lead = None;
         self.unit_start = 0;
         self.unit_ends = Vec::new();
         self.reset_unit_state();
@@ -724,6 +809,7 @@ impl IncrementalSanitizer {
     /// boundary, and with the plaintext it was derived from.
     fn reset_unit_state(&mut self) {
         self.scanned = None;
+        self.aws_held_line = None;
         self.open_tail = OpenTailCache::default();
         self.private_key.reset();
         self.multiline_open = false;
@@ -751,7 +837,7 @@ impl IncrementalSanitizer {
     /// (issue #986). The four lookback checks read a bounded number of lines
     /// and run as before. Only the current unit is judged: closed units
     /// waiting in the batch are never part of it (issue #985).
-    fn has_open_single_line_construct(&mut self) -> bool {
+    fn has_open_single_line_construct(&mut self) -> OpenConstructs {
         let scanned = self
             .scanned
             .as_deref()
@@ -762,18 +848,63 @@ impl IncrementalSanitizer {
         }
         self.open_tail.checked_len = scanned.len();
 
+        let scanned = self
+            .scanned
+            .as_deref()
+            .unwrap_or(&self.retained[self.unit_start..]);
         let lookbacks = self.lookbacks;
-        let open = self.open_tail.open
-            || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
-            || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
-            || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
-            || (lookbacks.list_item_pair && has_open_list_item_pair(scanned))
-            || (lookbacks.provider_sibling && has_open_provider_sibling(scanned))
-            || (lookbacks.deepgram_request && has_open_deepgram_request(scanned))
-            || (lookbacks.aws_secret_access_key && has_open_aws_access_key_id_line(scanned));
+        let open = OpenConstructs {
+            other: self.open_tail.open
+                || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
+                || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
+                || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
+                || (lookbacks.list_item_pair && has_open_list_item_pair(scanned))
+                || (lookbacks.provider_sibling && has_open_provider_sibling(scanned))
+                || (lookbacks.deepgram_request && has_open_deepgram_request(scanned)),
+            aws_secret_candidate: lookbacks.aws_secret_access_key
+                && has_open_aws_secret_candidate_line(scanned, || {
+                    self.line_above_unit_carries_aws_id()
+                }),
+        };
         #[cfg(test)]
         self.assert_open_construct_matches_the_rescan(open);
         open
+    }
+
+    /// Whether the line directly above the current unit carries an AWS access
+    /// key ID: the last line of the closed units waiting in the batch, or the
+    /// released lead ([`Self::lead_after`]), which is kept exactly when its
+    /// line carries one.
+    fn line_above_unit_carries_aws_id(&self) -> bool {
+        let above = &self.retained[..self.unit_start];
+        // Only the `\n` of a CRLF pair whose `\r` closed the lead's unit:
+        // the line above is still the lead's.
+        if above.is_empty()
+            || (above == "\n" && self.lead.as_ref().is_some_and(|lead| lead.ends_with('\r')))
+        {
+            self.lead.is_some()
+        } else {
+            carries_aws_access_key_id(&NormalizedInput::new(last_line(above)).into_text())
+        }
+    }
+
+    /// Ends the current unit before its last line and starts the next unit
+    /// with that line (issue #1044). Called when the line above it was held
+    /// only for an AWS secret-shaped run ([`has_open_aws_secret_candidate_line`])
+    /// and the new last line, which carries no access key ID, holds another
+    /// one: the earlier line's run is settled, so a run of such lines never
+    /// accumulates. The earlier unit closes exactly where it would have closed
+    /// without that hold.
+    fn split_before_last_line(&mut self, released: &mut Released) -> Result<(), SecretScanError> {
+        let line_start = self.unit_start + last_line_start(&self.retained[self.unit_start..]);
+        let line = self.retained.split_off(line_start);
+        if let Some(scanned) = self.scanned.as_mut() {
+            let line_scanned = NormalizedInput::new(&line).into_text();
+            scanned.truncate(scanned.len() - line_scanned.len());
+        }
+        self.close_unit(released)
+            .map_err(|error| self.fail_with(error))?;
+        self.append_retained(&line, true, released)
     }
 
     /// Differential check (issue #986): the maintained scan copy and the
@@ -781,7 +912,7 @@ impl IncrementalSanitizer {
     /// whole current unit report, after every closed line of every test that
     /// drives a session.
     #[cfg(test)]
-    fn assert_open_construct_matches_the_rescan(&self, open: bool) {
+    fn assert_open_construct_matches_the_rescan(&self, open: OpenConstructs) {
         let unit = &self.retained[self.unit_start..];
         let rescanned = NormalizedInput::new(unit).into_text();
         assert_eq!(
@@ -802,10 +933,16 @@ impl IncrementalSanitizer {
             || (reads_list_item_pairs(&self.registry) && has_open_list_item_pair(&rescanned))
             || (reads_provider_siblings(&self.registry) && has_open_provider_sibling(&rescanned))
             || (self.registry.contains(DEEPGRAM_DETECTOR_ID)
-                && has_open_deepgram_request(&rescanned))
-            || (self.registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID)
-                && has_open_aws_access_key_id_line(&rescanned));
-        assert_eq!(open, reference, "open single-line construct");
+                && has_open_deepgram_request(&rescanned));
+        assert_eq!(open.other, reference, "open single-line construct");
+        let aws_reference = self.registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID)
+            && has_open_aws_secret_candidate_line(&rescanned, || {
+                self.line_above_unit_carries_aws_id()
+            });
+        assert_eq!(
+            open.aws_secret_candidate, aws_reference,
+            "open AWS secret candidate line"
+        );
     }
 
     /// Adds `piece` to the current unit and enforces the limits on it.
@@ -939,67 +1076,82 @@ impl IncrementalSanitizer {
         let (finding_offset, mut batch_shadow) =
             (self.finding_count, self.shadow.as_ref().map(|_| Vec::new()));
 
-        let batched = if self.unit_ends.len() > 1 {
+        // The line above the batch, already released, when a detector reads
+        // it (issue #1040): it is scanned again as a read-only lead instead
+        // of being held back.
+        let lead = self.lead.take();
+        let batched = if self.unit_ends.len() > 1 || lead.is_some() {
             let batch = &self.retained[..batch_length];
             #[cfg(test)]
-            let detected = detect_units(
-                batch,
-                &self.registry,
-                &self.unit_ends,
-                batch_shadow.as_mut(),
-            );
+            let shadow = batch_shadow.as_mut();
             #[cfg(not(test))]
-            let detected = detect_units(batch, &self.registry, &self.unit_ends, None);
-            detected.ok().flatten()
+            let shadow = None;
+            detect_batch(
+                lead.as_deref(),
+                batch,
+                &self.unit_ends,
+                &self.registry,
+                shadow,
+            )
         } else {
             None
+        };
+        // A batch that is only the `\n` of a CRLF pair whose `\r` closed the
+        // lead's unit completes that same line, which stays the lead.
+        let next_lead = match lead {
+            Some(ref lead) if lead.ends_with('\r') && &self.retained[..batch_length] == "\n" => {
+                Some(format!("{lead}\n"))
+            }
+            _ => self.lead_after(&self.retained[..batch_length]),
         };
 
         let unit_ends = std::mem::take(&mut self.unit_ends);
         let mut unit_begin = 0;
-        match batched {
-            Some(detected) => {
-                #[cfg(test)]
-                {
-                    self.batched_units += unit_ends.len();
-                }
-                let mut detected = detected.into_iter().peekable();
-                for &unit_end in &unit_ends {
-                    let mut unit_findings = Vec::new();
-                    while let Some(found) =
-                        detected.next_if(|found| found.range().start() < unit_end)
-                    {
-                        unit_findings.push(found);
-                    }
-                    self.finalize_unit(unit_begin, unit_end, &unit_findings, released)?;
-                    unit_begin = unit_end;
-                }
-                #[cfg(test)]
-                self.record_unit_shadow(batch_shadow, finding_offset, self.finalized_bytes)?;
+        if let Some(detected) = batched {
+            #[cfg(test)]
+            {
+                self.batched_units += unit_ends.len();
             }
-            None => {
-                for &unit_end in &unit_ends {
-                    let unit = &self.retained[unit_begin..unit_end];
-                    #[cfg(test)]
-                    let (finding_offset, mut unit_shadow) =
-                        (self.finding_count, self.shadow.as_ref().map(|_| Vec::new()));
-                    #[cfg(test)]
-                    let detected = detect(unit, &self.registry, unit_shadow.as_mut())?;
-                    #[cfg(not(test))]
-                    let detected = run_detector_pipeline(unit, &self.registry)?;
-                    let detected = detected
-                        .iter()
-                        .map(|found| offset_by(found, unit_begin))
-                        .collect::<Result<Vec<_>, _>>()?;
-                    self.finalize_unit(unit_begin, unit_end, &detected, released)?;
-                    #[cfg(test)]
-                    self.record_unit_shadow(
-                        unit_shadow,
-                        finding_offset,
-                        self.finalized_bytes + unit_begin,
-                    )?;
-                    unit_begin = unit_end;
+            let mut detected = detected.into_iter().peekable();
+            for &unit_end in &unit_ends {
+                let mut unit_findings = Vec::new();
+                while let Some(found) = detected.next_if(|found| found.range().start() < unit_end) {
+                    unit_findings.push(found);
                 }
+                self.finalize_unit(unit_begin, unit_end, &unit_findings, released)?;
+                unit_begin = unit_end;
+            }
+            #[cfg(test)]
+            self.record_unit_shadow(batch_shadow, finding_offset, self.finalized_bytes)?;
+        } else {
+            let mut unit_lead = lead;
+            for &unit_end in &unit_ends {
+                let unit = &self.retained[unit_begin..unit_end];
+                #[cfg(test)]
+                let (finding_offset, mut unit_shadow) =
+                    (self.finding_count, self.shadow.as_ref().map(|_| Vec::new()));
+                #[cfg(test)]
+                let detected = detect_after(
+                    unit_lead.as_deref(),
+                    unit,
+                    &self.registry,
+                    unit_shadow.as_mut(),
+                )?;
+                #[cfg(not(test))]
+                let detected = detect_after(unit_lead.as_deref(), unit, &self.registry, None)?;
+                let detected = detected
+                    .iter()
+                    .map(|found| offset_by(found, unit_begin))
+                    .collect::<Result<Vec<_>, _>>()?;
+                unit_lead = self.lead_after(unit);
+                self.finalize_unit(unit_begin, unit_end, &detected, released)?;
+                #[cfg(test)]
+                self.record_unit_shadow(
+                    unit_shadow,
+                    finding_offset,
+                    self.finalized_bytes + unit_begin,
+                )?;
+                unit_begin = unit_end;
             }
         }
 
@@ -1012,7 +1164,21 @@ impl IncrementalSanitizer {
         self.unit_start = 0;
         self.unit_ends = unit_ends;
         self.unit_ends.clear();
+        self.lead = next_lead;
         Ok(())
+    }
+
+    /// The last line of `text` when a later unit must be scanned below it:
+    /// it carries an AWS access key ID and the session runs
+    /// `aws-secret-access-key`, which claims a secret on the line directly
+    /// below an ID (issue #1028). The line is released as soon as it closes
+    /// and only a copy is kept, for the next unit's scan (issue #1040).
+    fn lead_after(&self, text: &str) -> Option<String> {
+        if !self.lookbacks.aws_secret_access_key {
+            return None;
+        }
+        let line = last_line(text);
+        carries_aws_access_key_id(&NormalizedInput::new(line).into_text()).then(|| line.to_owned())
     }
 
     /// Applies policy to and redacts the closed unit `retained[begin..end]`,
@@ -1161,9 +1327,21 @@ impl IncrementalSanitizer {
             };
             self.append_retained(&chunk[cursor..=newline], true, &mut released)?;
 
-            if !self.multiline_open && !self.has_open_single_line_construct() {
-                self.close_unit(&mut released)
-                    .map_err(|error| self.fail_with(error))?;
+            if self.multiline_open {
+                self.aws_held_line = None;
+            } else {
+                let open = self.has_open_single_line_construct();
+                let line_start = last_line_start(&self.retained[self.unit_start..]);
+                if !open.other && !open.aws_secret_candidate {
+                    self.close_unit(&mut released)
+                        .map_err(|error| self.fail_with(error))?;
+                } else if !open.other && self.aws_held_line.is_some_and(|held| held != line_start) {
+                    // A new line after the held one (not the `\n` that
+                    // completes its CRLF) holds another run.
+                    self.split_before_last_line(&mut released)?;
+                }
+                self.aws_held_line = (!open.other && open.aws_secret_candidate)
+                    .then(|| last_line_start(&self.retained[self.unit_start..]));
             }
             cursor = newline + 1;
         }

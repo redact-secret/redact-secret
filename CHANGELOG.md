@@ -92,9 +92,15 @@ evidence is linked from each published version.
   (always redacted), bare or in any context.
 - `aws-secret-access-key` (#1028): the AWS secret access key, exactly 40
   `[A-Za-z0-9/+]` with mixed case, as `aws_secret_access_key` (always
-  redacted), claimed only under an AWS secret key name or on or directly
-  below an `AKIA`/`ASIA` access key ID line. The incremental session holds an
-  ID line open for one more line.
+  redacted), claimed only under an AWS secret key name (including the chat
+  phrase `secret access key for <who>:`, #1044) or on, directly below or
+  directly above an `AKIA`/`ASIA` access key ID line (the line above since
+  #1044). The incremental session releases an ID line, and its
+  `aws-access-key` finding, as soon as the line closes, and scans the line
+  below against a copy of it, so a per-chunk caller decides on the ID when
+  its line arrives (#1040). A line holding an unclaimed 40-character run
+  waits for exactly one more line, and consecutive such lines never
+  accumulate.
 - The AWS temporary access key ID contract (`ASIA` + exactly 16 `[A-Z0-9]`,
   T2) is recorded beside `AKIA` with conformance fixtures and tests (#1027).
   Grammar, type and action are unchanged.
@@ -138,6 +144,21 @@ evidence is linked from each published version.
   sibling `provider: deepgram` field (#1017). These were missed or typed
   `generic-token`; the JSON `{"provider":"deepgram","auth":...}` form moves
   from warn to redact. A bare 40-hex run stays unreported.
+- `generic-token` no longer redacts a placeholder phrase led by a
+  distinctive placeholder word (`placeholder-not-a-key`, `placeholder-value`,
+  `example-token`) under a credential name (#1041). The single word was
+  already silent; since #1026 the bare `secret_access_key` name reached the
+  phrase in Rust test configs. A digit, an unlisted word, or a `secret` or
+  `password` lead keeps the value reported.
+- Documentation placeholders the #860/#1013 evidence and the benchmarks'
+  placeholder controls list are no longer reported (#1042): `vercel-token`
+  skips a body of one repeated character (`vcp_` + a run of `x`), and
+  `generic-token` skips a lead-word phrase behind a vendor prefix
+  (`rpa_your_key_for_ci_pipeline_test_fixture_only`), an ellipsis after a
+  bare vendor prefix (`pdl_sdbx_apikey_...`), a filler layout with `:` and
+  `=` padding (the Bitwarden `0.xxxx...:xxxx==` template) and `my` glued to
+  two or more credential words (`mykeysecret`). One leftover character, a
+  digit, a mixed-case word or visible key material keeps a value reported.
 - A keyed environment store is read as an assignment (#1038):
   `os.environ["NAME"] = "<v>"` (single quotes too), `process.env["NAME"] =`,
   Ruby `ENV["NAME"] =`, `settings["api_key"] =`,
@@ -145,6 +166,29 @@ evidence is linked from each published version.
   `MISTRAL_API_KEY`, `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed
   provider findings and other credential names give `generic-token`; reads,
   references, placeholders and non-credential names stay silent.
+
+### Performance
+
+- Reduced WebAssembly initialization time and artifact size (#1043).
+  Findings, ranges, actions and output are unchanged, and no dependency was
+  added. Chromium compiles WebAssembly lazily, so every function
+  `initialize()` touches is compiled inside it; initialization now compiles
+  38 functions (16 KB of body) instead of 100 (31.5 KB):
+  - The built-in detectors are static tables the registry borrows, with each
+    row carrying the detector's id, instead of a `Vec` of boxes built per
+    call whose ids were read through `id()`.
+  - A PII-off `initialize()` returns the off selection without walking the
+    PII family catalog, and the catalog is read as slices rather than
+    collected into sets.
+  - Stripe and New Relic share one stable candidate sort, and the `.npmrc`
+    key scan merges two ordered index runs instead of sorting them.
+
+  The `full` artifact is 568,229 bytes raw / 198,292 gzip (was 594,038 /
+  205,213) and `common` 365,741 / 130,954 (was 380,855 / 136,253). Measured
+  locally with core's own browser performance runner, 200 interleaved
+  samples a side, `scale-logs-small-whole` initialization is 0.881 [0.807,
+  0.938] of `4fb78827` and 1.187 [1.108, 1.265] of beta.8; processing is
+  unchanged.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

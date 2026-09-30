@@ -170,3 +170,92 @@ fn a_real_shaped_or_off_grammar_admin_value_is_still_reported() {
         assert_eq!(findings(&input), ["generic-token"], "{input}");
     }
 }
+
+/// Issue #1041: a hyphenated phrase led by a distinctive placeholder word is
+/// a placeholder like the single word, under every credential name,
+/// including the bare `secret_access_key` that #1026 made high-signal.
+#[test]
+fn a_placeholder_led_phrase_is_benign_under_every_credential_name() {
+    for input in [
+        "[object_store]\nsecret_access_key = \"placeholder-not-a-key\"\n",
+        "api_key = \"placeholder-not-a-key\"\n",
+        "api_key = \"placeholder-value\"\n",
+        "password: 'example-token'\n",
+        "AWS_SECRET_ACCESS_KEY=sample_secret_access_key\n",
+        "client_secret = \"REDACTED-NOT-A-REAL-SECRET\"\n",
+    ] {
+        assert!(findings(input).is_empty(), "{input}: {:?}", findings(input));
+    }
+}
+
+/// Issue #1041's twins: a phrase with a digit, an unlisted word, or a lead
+/// word that also opens real weak passwords (`secret`, `password`) is still
+/// reported, and so is a real-shaped value behind a placeholder word.
+#[test]
+fn placeholder_phrases_with_material_or_an_unlisted_word_stay_detected() {
+    for input in [
+        "secret_access_key = \"placeholder-not-a-key7\"\n",
+        "api_key = \"placeholder-hunter-horse\"\n",
+        "api_key = \"secret-not-a-key\"\n",
+        "api_key = \"password-value\"\n",
+        "api_key = \"placeholder-Zq3Lm9PzAb7Cd2Ef4Gh6\"\n",
+    ] {
+        assert!(!findings(input).is_empty(), "{input}");
+    }
+}
+
+/// Issue #1042: the placeholder controls the #860/#1013 evidence and the
+/// benchmarks' T3 policy list as placeholders, each built at run time.
+#[test]
+fn listed_provider_placeholders_are_benign() {
+    let x = |n: usize| "x".repeat(n);
+    let bitwarden = format!(
+        "0.{}-{}-{}-{}-{}.{}:{}==",
+        x(8),
+        x(4),
+        x(4),
+        x(4),
+        x(12),
+        x(30),
+        x(22)
+    );
+    for input in [
+        format!("VERCEL_TOKEN=vcp_{}\n", x(24)),
+        format!("VERCEL_TOKEN=vca_{}\n", x(24)),
+        format!("VERCEL_TOKEN=vcr_{}\n", x(24)),
+        format!("Paste vcp_{} into the dashboard.\n", x(56)),
+        "RUNPOD_API_KEY=rpa_your_key_for_ci_pipeline_test_fixture_only\n".to_owned(),
+        "PADDLE_API_KEY=pdl_sdbx_apikey_...\n".to_owned(),
+        "PADDLE_API_KEY=pdl_live_apikey_\u{2026}\n".to_owned(),
+        format!("export BWS_ACCESS_TOKEN=\"{bitwarden}\"\n"),
+        "KEY_ID=mykeyid\nKEY_SECRET=mykeysecret\ncurl --user $KEY_ID:$KEY_SECRET https://api.clickhouse.cloud/v1/organizations\n".to_owned(),
+    ] {
+        assert!(findings(&input).is_empty(), "{input}: {:?}", findings(&input));
+    }
+}
+
+/// Issue #1042's twins: one leftover character, a digit, a mixed-case word,
+/// a head that shows key material, and a single glued word stay reported.
+#[test]
+fn near_placeholder_twins_stay_detected() {
+    let x = |n: usize| "x".repeat(n);
+    for input in [
+        format!("VERCEL_TOKEN=vcp_{}y\n", x(23)),
+        format!("VERCEL_TOKEN=vcp_{}\n", "Zq3Lm9PzAb7Cd2Ef4Gh6Jk8M"),
+        "RUNPOD_API_KEY=rpa_your_key_for_ci_pipeline_7\n".to_owned(),
+        "RUNPOD_API_KEY=rpa_yourKey_for_ci_pipeline\n".to_owned(),
+        "RUNPOD_API_KEY=rpa_Zq3Lm9Pz_Ab7Cd2Ef4Gh6Jk8Mn1Pq5Rs\n".to_owned(),
+        "PADDLE_API_KEY=pdl_sdbx_apikey_01hq7zyx9...\n".to_owned(),
+        "PADDLE_API_KEY=pdl_sdbx_apikey_Zq3Lm9PzAb...\n".to_owned(),
+        format!(
+            "export BWS_ACCESS_TOKEN=\"0.{}-{}:{}y==\"\n",
+            x(8),
+            x(4),
+            x(21)
+        ),
+        "KEY_SECRET=mykeysecret7q\n".to_owned(),
+        "KEY_SECRET=mysecretkeyZ\n".to_owned(),
+    ] {
+        assert!(!findings(&input).is_empty(), "{input}");
+    }
+}

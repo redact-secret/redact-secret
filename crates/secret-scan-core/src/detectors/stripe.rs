@@ -74,7 +74,7 @@ impl Detector for StripeTokenDetector {
                     .with_signals(WEBHOOK_SIGNALS),
             );
         }
-        candidates.sort_by_key(|candidate| candidate.range().start());
+        super::sort_candidates_by_start(&mut candidates);
         Ok(candidates)
     }
 }

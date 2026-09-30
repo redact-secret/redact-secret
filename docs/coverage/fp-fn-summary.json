@@ -765,7 +765,7 @@
       "detector": "vercel-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 33,
+        "count": 32,
         "fixtureIds": [
           "vercel-app-access-positive-bare",
           "vercel-app-access-positive-dotenv",
@@ -790,7 +790,6 @@
           "vercel-positive-all-prefixes",
           "vercel-positive-class-isolation",
           "vercel-positive-crlf-unicode-prefix",
-          "vercel-positive-doc-style-placeholder",
           "vercel-positive-dotenv",
           "vercel-positive-json",
           "vercel-positive-log",
@@ -804,8 +803,9 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 9,
+        "count": 12,
         "fixtureIds": [
+          "vercel-negative-app-x-run-placeholder",
           "vercel-negative-deployment-id",
           "vercel-negative-embedded-in-wider-identifier",
           "vercel-negative-interpolated-secret-prefix",
@@ -813,6 +813,8 @@
           "vercel-negative-masked-secret-prefix",
           "vercel-negative-ordinary-reference",
           "vercel-negative-placeholder",
+          "vercel-negative-repeated-filler-placeholder",
+          "vercel-negative-x-run-placeholder",
           "vercel-pat-negative-embedded-in-wider-identifier",
           "vercel-pat-negative-masked"
         ]

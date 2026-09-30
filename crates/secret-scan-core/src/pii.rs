@@ -66,9 +66,20 @@ impl PiiSelection {
     /// Returns one of the fixed `PII_SELECTOR_*` errors. No error contains a
     /// selector or any caller input.
     pub fn parse(selectors: &[&str]) -> Result<Self, SecretScanError> {
+        // The `off` selection every PII-off `initialize()` passes: the same
+        // value the catalog walk below yields for no selectors, without
+        // building its sets. Initialization then neither runs nor, under a
+        // lazily compiling WebAssembly engine, compiles that code
+        // (issue #1043).
+        if selectors.is_empty() {
+            return Ok(Self::default());
+        }
         Self::parse_with_catalog(selectors, KNOWN_FAMILIES, AVAILABLE_FAMILIES)
     }
 
+    // Kept out of line so the empty-selection path in `parse` stays a small
+    // function (issue #1043).
+    #[inline(never)]
     fn parse_with_catalog(
         selectors: &[&str],
         known_families: &[&str],
@@ -79,8 +90,12 @@ impl PiiSelection {
             canonical.insert(canonicalize_selector(selector)?);
         }
 
-        let known: BTreeSet<&str> = known_families.iter().copied().collect();
-        let available: BTreeSet<&str> = available_families.iter().copied().collect();
+        // The catalogs are read only by membership and by filtering into the
+        // `closure` set, so the slices serve as they are; collecting them
+        // into sets linked a `&str` slice sort into the WebAssembly build
+        // for nothing (issue #1043).
+        let known = known_families;
+        let available = available_families;
         let mut closure = BTreeSet::new();
         for selector in &canonical {
             if selector == "pii:global" {
@@ -117,10 +132,10 @@ impl PiiSelection {
             }
             let family =
                 selector_to_family(selector).ok_or(SecretScanErrorCode::PiiSelectorInvalid)?;
-            if !known.contains(family.as_str()) {
+            if !known.contains(&family.as_str()) {
                 return Err(SecretScanErrorCode::PiiSelectorUnsupported.into());
             }
-            if !available.contains(family.as_str()) {
+            if !available.contains(&family.as_str()) {
                 return Err(SecretScanErrorCode::PiiSelectorUnavailable.into());
             }
             closure.insert(family);

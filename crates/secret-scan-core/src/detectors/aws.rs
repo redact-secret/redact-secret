@@ -86,6 +86,28 @@ fn access_key_id_starts(input: &str) -> Vec<usize> {
     .collect()
 }
 
+/// The most words a `for <qualifier>` after the phrase may carry.
+const MAX_QUALIFIER_WORDS: usize = 4;
+
+/// `true` when lowercase `name` ends with the phrase `secret access key`
+/// followed by `for` and one to [`MAX_QUALIFIER_WORDS`] words of ASCII
+/// letters, digits, `_` or `-` (issue #1044): `the secret access key for
+/// the staging user`, as a chat message or ticket writes it before `:`.
+fn ends_with_qualified_phrase(lower: &str) -> bool {
+    let Some(at) = lower.rfind("secret access key for ") else {
+        return false;
+    };
+    let qualifier = &lower[at + "secret access key for ".len()..];
+    let words: Vec<&str> = qualifier.split(' ').collect();
+    (1..=MAX_QUALIFIER_WORDS).contains(&words.len())
+        && words.iter().all(|word| {
+            !word.is_empty()
+                && word
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+        })
+}
+
 /// `true` when `name` (the text before a value, already cut to the name
 /// window) ends in an AWS secret access key name and an `=`/`:` operator:
 /// an identifier whose compact form (lowercase, `_.-` removed) ends in
@@ -117,7 +139,7 @@ fn ends_with_secret_name(prefix: &str) -> bool {
         return false;
     }
     let lower = name.to_ascii_lowercase();
-    if lower.ends_with("secret access key") {
+    if lower.ends_with("secret access key") || ends_with_qualified_phrase(&lower) {
         return true;
     }
     let identifier_start = name
@@ -137,6 +159,51 @@ fn ends_with_secret_name(prefix: &str) -> bool {
         || compact.ends_with("awssecret")
 }
 
+/// Every run on `input[line_start..line_end]` shaped like a secret access
+/// key: exactly [`SECRET_LEN`] `[A-Za-z0-9/+]` (runs are maximal, so no such
+/// byte is before or after it), not followed by `=` (Base64 padding: not a
+/// 30-byte secret), with at least one uppercase and one lowercase letter.
+fn secret_runs(
+    input: &str,
+    line_start: usize,
+    line_end: usize,
+) -> impl Iterator<Item = (usize, usize)> + '_ {
+    let bytes = input.as_bytes();
+    let mut at = line_start;
+    std::iter::from_fn(move || {
+        while at < line_end {
+            if !is_secret_byte(bytes[at]) {
+                at += 1;
+                continue;
+            }
+            let run_start = at;
+            while at < line_end && is_secret_byte(bytes[at]) {
+                at += 1;
+            }
+            let value = &bytes[run_start..at];
+            if value.len() == SECRET_LEN
+                && bytes.get(at) != Some(&b'=')
+                && value.iter().any(u8::is_ascii_uppercase)
+                && value.iter().any(u8::is_ascii_lowercase)
+            {
+                return Some((run_start, at));
+            }
+        }
+        None
+    })
+}
+
+/// `true` when an AWS secret access key name ([`ends_with_secret_name`]),
+/// read back over at most [`NAME_WINDOW`] bytes of its line, is directly
+/// before the run at `run_start`.
+fn is_named(input: &str, line_start: usize, run_start: usize) -> bool {
+    let mut window = run_start.saturating_sub(NAME_WINDOW).max(line_start);
+    while !input.is_char_boundary(window) {
+        window += 1;
+    }
+    ends_with_secret_name(&input[window..run_start])
+}
+
 /// The secret half of an AWS access key (issue #1028, #1012 READY-T2,
 /// context-constrained; `docs/audits/evidence/1012/`
 /// `aws-iam-user-secret-access-key.md`): exactly 40 `[A-Za-z0-9/+]` with no
@@ -147,17 +214,19 @@ fn ends_with_secret_name(prefix: &str) -> bool {
 /// - under an AWS secret access key name ([`ends_with_secret_name`]) read
 ///   back over at most [`NAME_WINDOW`] bytes on the value's line, or
 /// - on the line of an `AKIA`/`ASIA` access key ID, or on the line directly
-///   below one (the incremental session holds such a line open through
-///   [`has_open_aws_access_key_id_line`], so streamed and whole-input scans
-///   agree).
+///   below or above one (issue #1044). The incremental session scans the
+///   next unit below a copy of an ID line ([`carries_aws_access_key_id`],
+///   issue #1040) and holds a line with an unclaimed run for one more line
+///   ([`has_open_aws_secret_candidate_line`]), so streamed and whole-input
+///   scans agree.
 ///
 /// A bare 40-character run is not attributable: AWS's own detectors (Macie,
 /// git-secrets, ferret-scan) require the same context. The mixed-case guard
 /// keeps a 40-hex Git SHA and case-folded identifiers out; a random 30-byte
 /// Base64 value lacks either case with probability about 1e-9. A 41-byte
-/// temporary secret, a value with `=`, and an ID on the line below the
-/// secret are intentional false negatives here; `generic-token` still
-/// redacts every width under a secret access key name.
+/// temporary secret, a value with `=`, and an ID two lines away are
+/// intentional false negatives here; `generic-token` still redacts every
+/// width under a secret access key name.
 pub(super) struct AwsSecretAccessKeyDetector;
 
 impl Detector for AwsSecretAccessKeyDetector {
@@ -176,51 +245,34 @@ impl Detector for AwsSecretAccessKeyDetector {
         {
             return Ok(Vec::new());
         }
-        let bytes = input.as_bytes();
         let ids = access_key_id_starts(input);
+        let lines: Vec<(usize, usize)> = text::lines(input).collect();
         let mut next_id = 0usize;
-        let mut previous_line_has_id = false;
+        let line_has_id: Vec<bool> = lines
+            .iter()
+            .map(|&(line_start, line_end)| {
+                while next_id < ids.len() && ids[next_id] < line_start {
+                    next_id += 1;
+                }
+                ids.get(next_id).is_some_and(|&id| id < line_end)
+            })
+            .collect();
         let mut candidates = Vec::new();
-        for (line_start, line_end) in text::lines(input) {
-            while next_id < ids.len() && ids[next_id] < line_start {
-                next_id += 1;
-            }
-            let line_has_id = ids.get(next_id).is_some_and(|&id| id < line_end);
-            let adjacent = line_has_id || previous_line_has_id;
-            previous_line_has_id = line_has_id;
-            let mut at = line_start;
-            while at < line_end {
-                if !is_secret_byte(bytes[at]) {
-                    at += 1;
-                    continue;
-                }
-                let run_start = at;
-                while at < line_end && is_secret_byte(bytes[at]) {
-                    at += 1;
-                }
-                let value = &bytes[run_start..at];
-                // A `=` after the run is Base64 padding: not a 30-byte
-                // secret. Before the run it is an assignment operator.
-                if value.len() != SECRET_LEN
-                    || bytes.get(at) == Some(&b'=')
-                    || !value.iter().any(u8::is_ascii_uppercase)
-                    || !value.iter().any(u8::is_ascii_lowercase)
-                {
-                    continue;
-                }
+        for (index, &(line_start, line_end)) in lines.iter().enumerate() {
+            // Issue #1044: the line directly above or below counts, as the
+            // #1028 contract's "same or adjacent line" says.
+            let adjacent = line_has_id[index]
+                || (index > 0 && line_has_id[index - 1])
+                || line_has_id.get(index + 1).copied().unwrap_or(false);
+            for (run_start, run_end) in secret_runs(input, line_start, line_end) {
                 let signal = if adjacent {
                     "aws-access-key-id-adjacent"
-                } else {
-                    let mut window = run_start.saturating_sub(NAME_WINDOW).max(line_start);
-                    while !input.is_char_boundary(window) {
-                        window += 1;
-                    }
-                    if !ends_with_secret_name(&input[window..run_start]) {
-                        continue;
-                    }
+                } else if is_named(input, line_start, run_start) {
                     "aws-secret-access-key-name"
+                } else {
+                    continue;
                 };
-                if let Some(range) = ByteRange::new(run_start, at) {
+                if let Some(range) = ByteRange::new(run_start, run_end) {
                     candidates.push(
                         Candidate::new(SECRET_TYPE, Confidence::High, range)
                             .with_specificity(Specificity::Provider)
@@ -233,14 +285,44 @@ impl Detector for AwsSecretAccessKeyDetector {
     }
 }
 
-/// Internal retention hint for the built-in incremental scanner: `true`
-/// when the last complete line of `input` carries an AWS access key ID, so
-/// the session keeps the unit open for the one line below it that
-/// [`AwsSecretAccessKeyDetector`] reads as adjacent (issue #1028).
-pub(crate) fn has_open_aws_access_key_id_line(input: &str) -> bool {
-    text::last_lines(input, 1)
-        .last()
-        .is_some_and(|line| !access_key_id_starts(line).is_empty())
+/// Internal lookbehind check for the built-in incremental scanner: `true`
+/// when `line` carries an AWS access key ID, so the session scans the next
+/// unit below a copy of it, which [`AwsSecretAccessKeyDetector`] reads as
+/// adjacent (issue #1028). The line itself is released when it closes: a
+/// line is never held for the sake of the line below it (issue #1040).
+pub(crate) fn carries_aws_access_key_id(line: &str) -> bool {
+    !access_key_id_starts(line).is_empty()
+}
+
+/// Internal retention hint for the built-in incremental scanner (issue
+/// #1044): `true` when the last complete line of `unit` holds a secret-shaped
+/// run that nothing on its own line or the line above claims, so an access
+/// key ID on the next line would claim it. That line must wait for exactly
+/// one more line. `above_has_id` answers for the line above when `unit` is a
+/// single line; it is asked only when needed.
+///
+/// A line that carries an ID is never held (issue #1040): a run on it is
+/// already claimed, and the line below reads it through the session's copy.
+/// A run claimed by a name on its line holds nothing either.
+pub(crate) fn has_open_aws_secret_candidate_line(
+    unit: &str,
+    above_has_id: impl FnOnce() -> bool,
+) -> bool {
+    let tail = text::last_lines(unit, 2);
+    let Some(&last) = tail.last() else {
+        return false;
+    };
+    if last.len() < SECRET_LEN || carries_aws_access_key_id(last) {
+        return false;
+    }
+    if !secret_runs(last, 0, last.len()).any(|(run_start, _)| !is_named(last, 0, run_start)) {
+        return false;
+    }
+    let above = match tail.as_slice() {
+        [above, _] => carries_aws_access_key_id(above),
+        _ => above_has_id(),
+    };
+    !above
 }
 
 /// The literals one of which every `aws-secret-access-key` candidate's
@@ -300,6 +382,8 @@ mod tests {
             format!("AWS Secret Access Key [****abcd]: {SECRET}"),
             format!("Secret access key: {SECRET}"),
             format!("--aws-secret-access-key={SECRET}"),
+            format!("Here is the secret access key for the staging user: {SECRET} please rotate"),
+            format!("Secret access key for ci-deployer = {SECRET}"),
             format!("{{\\\"SecretAccessKey\\\":\\\"{SECRET}\\\"}}"),
         ] {
             assert_eq!(secrets(&input), span_of(&input), "{input}");
@@ -315,6 +399,8 @@ mod tests {
             format!("Access key ID,Secret access key\n{id},{SECRET}\n"),
             format!("{id}\n{SECRET}\n"),
             format!("{temporary}\r\n{SECRET}"),
+            format!("{SECRET}\n{id}\n"),
+            format!("value, then key id:\n{SECRET}\r\n{temporary}\r\n"),
             format!("Set-AWSCredential -AccessKey {id} -SecretKey {SECRET}"),
         ] {
             assert_eq!(secrets(&input), span_of(&input), "{input}");
@@ -329,8 +415,10 @@ mod tests {
             format!("token={SECRET}"),
             format!("secret={SECRET}"),
             format!("aws_access_key_id={SECRET}"),
-            format!("{SECRET}\n{id}\n"),
             format!("{id}\n\n{SECRET}\n"),
+            format!("{SECRET}\n\n{id}\n"),
+            format!("Here is the secret access key for the staging user of the team: {SECRET}"),
+            format!("the secret access key for: {SECRET}"),
             format!("secret access key is below\n{SECRET}"),
             format!("SeCrEtAccessKey={SECRET}"),
         ] {
@@ -359,16 +447,69 @@ mod tests {
     }
 
     #[test]
-    fn the_hint_holds_exactly_one_line_below_an_access_key_id() {
+    fn the_hint_holds_only_a_line_whose_run_the_next_line_could_claim() {
+        let id = format!("AKIA{}", "SYNTHETICEXAMPLE");
+        let no = || false;
+        let yes = || true;
+        assert!(has_open_aws_secret_candidate_line(
+            &format!("{SECRET}\n"),
+            no
+        ));
+        assert!(has_open_aws_secret_candidate_line(
+            &format!("x\nnote {SECRET} end\r\n"),
+            yes
+        ));
+        assert!(has_open_aws_secret_candidate_line(
+            &format!("x\r{SECRET}\r"),
+            yes
+        ));
+        // Claimed already: an ID on the line or above it, or a name.
+        assert!(!has_open_aws_secret_candidate_line(
+            &format!("{SECRET}\n"),
+            yes
+        ));
+        assert!(!has_open_aws_secret_candidate_line(
+            &format!("{id}\n{SECRET}\n"),
+            no
+        ));
+        assert!(!has_open_aws_secret_candidate_line(
+            &format!("{id} {SECRET}\n"),
+            no
+        ));
+        assert!(!has_open_aws_secret_candidate_line(
+            &format!("aws_secret_access_key = {SECRET}\n"),
+            no
+        ));
+        // Not a run: the ID line itself, a SHA, a short or padded value.
+        assert!(!has_open_aws_secret_candidate_line(&format!("{id}\n"), no));
+        assert!(!has_open_aws_secret_candidate_line(
+            "0123456789abcdef0123456789abcdef01234567\n",
+            no
+        ));
+        assert!(!has_open_aws_secret_candidate_line(
+            &format!("{}\n", &SECRET[..39]),
+            no
+        ));
+        assert!(!has_open_aws_secret_candidate_line(
+            &format!("{SECRET}=\n"),
+            no
+        ));
+        assert!(!has_open_aws_secret_candidate_line("plain line\n", no));
+    }
+
+    #[test]
+    fn the_lookbehind_check_reads_an_access_key_id_on_its_line() {
         let id = format!("ASIA{}", "SYNTHETIC0189TMP");
-        assert!(has_open_aws_access_key_id_line(&format!("{id}\n")));
-        assert!(has_open_aws_access_key_id_line(&format!(
-            "x\naws_access_key_id = {id}\n"
+        assert!(carries_aws_access_key_id(&format!("{id}\n")));
+        assert!(carries_aws_access_key_id(&format!(
+            "aws_access_key_id = {id}\r\n"
         )));
-        assert!(!has_open_aws_access_key_id_line(&format!(
-            "{id}\n{SECRET}\n"
+        assert!(!carries_aws_access_key_id(&format!("{SECRET}\n")));
+        assert!(!carries_aws_access_key_id(&format!(
+            "AIDA{}\n",
+            "SYNTHETIC0189TMP"
         )));
-        assert!(!has_open_aws_access_key_id_line("plain line\n"));
+        assert!(!carries_aws_access_key_id("plain line\n"));
     }
 
     #[test]

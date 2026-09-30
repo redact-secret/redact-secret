@@ -9,11 +9,12 @@ use super::pattern::{self, PrefixShape};
 use super::text::{
     OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, ends_with_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
-    is_glued_instructional_placeholder, is_horizontal_js_whitespace,
-    is_instructional_token_placeholder, is_js_whitespace, is_line_start, is_opencode_reference,
-    is_repeated_character_filler, is_ruby_interpolation_reference, is_template_reference,
-    is_windows_env_reference, matches_placeholder_vocabulary, prev_char, rskip_while_chars,
-    skip_while_chars, starts_with_bare_dollar_reference, starts_with_ci, starts_with_digest_label,
+    is_glued_instructional_placeholder, is_glued_my_placeholder, is_horizontal_js_whitespace,
+    is_instructional_token_placeholder, is_js_whitespace, is_lead_word_phrase_placeholder,
+    is_line_start, is_opencode_reference, is_repeated_character_filler,
+    is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
+    matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars,
+    starts_with_bare_dollar_reference, starts_with_ci, starts_with_digest_label,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -564,6 +565,50 @@ const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] = &[
 
 fn is_generic_placeholder_word(value: &str) -> bool {
     matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
+        || is_placeholder_led_phrase(value)
+}
+
+/// Words a placeholder phrase may carry after its lead word, besides the
+/// credential words (`text::PLACEHOLDER_CREDENTIAL_WORDS`): the negation and
+/// filler of `placeholder-not-a-key` and `placeholder-value` (issue #1041).
+const PLACEHOLDER_PHRASE_WORDS: &[&str] = &["not", "a", "an", "real", "value", "only"];
+
+/// `true` for a placeholder phrase led by a distinctive placeholder word
+/// (issue #1041): `placeholder-not-a-key`, `placeholder-value`,
+/// `example_api_token`. The value splits on `-`, `_` and `.` into two or
+/// more words of ASCII letters only; the first is a
+/// [`DIGIT_SUFFIX_PLACEHOLDER_WORDS`] entry (never `secret` or `password`,
+/// which lead real weak passwords), and every later word is a
+/// `text::PLACEHOLDER_CREDENTIAL_WORDS` or [`PLACEHOLDER_PHRASE_WORDS`] entry,
+/// all case-insensitively.
+///
+/// A single placeholder word was already silent; a hyphenated phrase that
+/// starts with one was redacted at full confidence. FN cost: a real secret
+/// spelled exactly as such a phrase, which no provider issues. A digit, any
+/// other byte, or one unlisted word (`placeholder-9f2c`, `sample-hunter`)
+/// keeps the value reported.
+fn is_placeholder_led_phrase(value: &str) -> bool {
+    let is_listed =
+        |word: &str, words: &[&str]| words.iter().any(|listed| word.eq_ignore_ascii_case(listed));
+    let mut words = value.split(['-', '_', '.']);
+    let Some(lead) = words.next() else {
+        return false;
+    };
+    if !is_listed(lead, DIGIT_SUFFIX_PLACEHOLDER_WORDS) {
+        return false;
+    }
+    let mut count = 0usize;
+    for word in words {
+        if word.is_empty()
+            || !word.bytes().all(|byte| byte.is_ascii_alphabetic())
+            || !(is_listed(word, PLACEHOLDER_PHRASE_WORDS)
+                || super::text::is_placeholder_credential_word(word))
+        {
+            return false;
+        }
+        count += 1;
+    }
+    count > 0
 }
 
 fn is_boolean_null_or_digits(lower: &str) -> bool {
@@ -1078,10 +1123,36 @@ fn is_ellipsis_truncated_display(value: &str) -> bool {
     let ellipsis = &value[head.len()..];
     let elided = ellipsis.contains('\u{2026}') || ellipsis.len() >= 3;
     elided
-        && (1..=MAX_MASK_VISIBLE_SIDE).contains(&head.len())
+        && ((1..=MAX_MASK_VISIBLE_SIDE).contains(&head.len()) || is_elided_vendor_prefix(head))
         && head
             .bytes()
             .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+}
+
+/// The longest vendor prefix [`is_elided_vendor_prefix`] reads as the whole
+/// visible head of an ellipsis display.
+const MAX_ELIDED_PREFIX_LEN: usize = 24;
+/// The longest segment of such a prefix: vendor prefix segments are short
+/// words (`pdl`, `sdbx`, `apikey`), random key material is not.
+const MAX_ELIDED_PREFIX_SEGMENT_LEN: usize = 8;
+
+/// `true` when an ellipsis display's visible head longer than
+/// [`MAX_MASK_VISIBLE_SIDE`] is only a vendor prefix (issue #1042):
+/// `pdl_sdbx_apikey_...`, `pdl_live_apikey_…`. The head ends in its `_` or `-`
+/// separator, is at most [`MAX_ELIDED_PREFIX_LEN`] bytes of lowercase ASCII
+/// letters, digits and separators, and every segment is at most
+/// [`MAX_ELIDED_PREFIX_SEGMENT_LEN`] bytes. No key material is shown; a head
+/// that ends inside a segment, or carries a longer or uppercase segment,
+/// keeps the display reported.
+fn is_elided_vendor_prefix(head: &str) -> bool {
+    head.len() <= MAX_ELIDED_PREFIX_LEN
+        && head.ends_with(['_', '-'])
+        && head.bytes().all(|byte| {
+            byte.is_ascii_lowercase() || byte.is_ascii_digit() || matches!(byte, b'_' | b'-')
+        })
+        && head[..head.len() - 1]
+            .split(['_', '-'])
+            .all(|segment| (1..=MAX_ELIDED_PREFIX_SEGMENT_LEN).contains(&segment.len()))
 }
 
 /// `true` for a value that opens a Make-escaped reference (issue #993):
@@ -1450,6 +1521,7 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
         || is_instructional_token_placeholder(value)
+        || is_glued_my_placeholder(value)
         || is_boolean_null_or_digits(&lower)
         || starts_with_env_reference(value)
         || starts_with_path_like(value)
@@ -1722,10 +1794,16 @@ fn is_prefixed_filler(value: &str) -> bool {
 }
 
 /// [`is_prefixed_filler`] without the label rule.
+///
+/// Issue #1042: a `:` between layout segments and trailing `=` Base64
+/// padding are layout too, so a multi-part filler template
+/// (`0.xxxxxxxx-xxxx-....xxxx:xxxx==`, a Bitwarden Secrets Manager access
+/// token) reads as filler. Padding counts only at the end.
 fn is_prefixed_filler_body(value: &str) -> bool {
     let body: Vec<u8> = value
+        .trim_end_matches('=')
         .bytes()
-        .filter(|byte| !matches!(byte, b'-' | b'_' | b'.'))
+        .filter(|byte| !matches!(byte, b'-' | b'_' | b'.' | b':'))
         .collect();
     if !body.iter().all(u8::is_ascii_alphanumeric) {
         return false;
@@ -1798,6 +1876,7 @@ pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
                     }))
                 && (is_instructional_token_placeholder(rest)
                     || is_glued_instructional_placeholder(rest)
+                    || is_lead_word_phrase_placeholder(rest)
                     || is_ascending_digit_run(rest)
                     || is_counting_run_body(rest)
                     || starts_with_angle_bracket_reference(rest)
@@ -3101,13 +3180,23 @@ const NPMRC_CREDENTIAL_KEYS: [&str; 3] = ["_authToken", "_auth", "_password"];
 fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     // Key starts in input order, so a value run measured once can be
-    // reused by every later key inside it.
-    let mut key_starts: Vec<usize> = input
+    // reused by every later key inside it. Each `match_indices` already
+    // yields ascending starts, and no start begins both needles, so merging
+    // the two runs gives the sorted order without instantiating a slice sort
+    // for `usize`, which cost the WebAssembly build about 4 KB (issue #1043).
+    let mut auth = input
         .match_indices("_auth")
-        .chain(input.match_indices("_password"))
         .map(|(start, _)| start)
-        .collect();
-    key_starts.sort_unstable();
+        .peekable();
+    let mut password = input
+        .match_indices("_password")
+        .map(|(start, _)| start)
+        .peekable();
+    let key_starts = std::iter::from_fn(|| match (auth.peek(), password.peek()) {
+        (Some(&a), Some(&p)) if p < a => password.next(),
+        (Some(_), _) => auth.next(),
+        (None, _) => password.next(),
+    });
     let mut run_end = 0usize;
     for key_start in key_starts {
         let Some(key) = NPMRC_CREDENTIAL_KEYS
@@ -3174,9 +3263,16 @@ fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-struct GenericTokenDetector {
+/// The contextual assignment and `Basic`/`Token` authorization detector.
+pub(super) struct GenericTokenDetector {
     names: NameSource,
 }
+
+/// The built-in `generic-token` detector, as the registry's static table of
+/// built-ins holds it (issue #1043).
+pub(super) static GENERIC_TOKEN: GenericTokenDetector = GenericTokenDetector {
+    names: NameSource::BuiltIn,
+};
 
 impl Detector for GenericTokenDetector {
     fn id(&self) -> &'static str {
@@ -3205,14 +3301,6 @@ impl Detector for GenericTokenDetector {
         }
         Ok(candidates)
     }
-}
-
-/// The contextual assignment and `Basic`/`Token` authorization detector.
-#[must_use]
-pub fn generic_token_detector() -> Box<dyn Detector> {
-    Box::new(GenericTokenDetector {
-        names: NameSource::BuiltIn,
-    })
 }
 
 /// The declarative ruleset names-section detector (issue #484): matches
@@ -3812,6 +3900,92 @@ mod tests {
         assert!(!is_vendor_prefixed_placeholder(
             "sk-ant-admin01-Ab3Cd4Ef5Gh6"
         ));
+    }
+
+    #[test]
+    fn issue_1042_placeholder_shapes_are_excluded_and_their_twins_are_not() {
+        // A lead-word phrase behind a vendor prefix, never bare.
+        assert!(is_vendor_prefixed_placeholder(
+            "rpa_your_key_for_ci_pipeline_test_fixture_only"
+        ));
+        assert!(is_lead_word_phrase_placeholder("YOUR_TOKEN_FOR_STAGING"));
+        for twin in [
+            "your_key_for_ci_7",
+            "your_Key_for_ci",
+            "my_key_for_ci",
+            "your_for_ci",
+            "your",
+        ] {
+            assert!(!is_lead_word_phrase_placeholder(twin), "{twin}");
+        }
+        // A vendor prefix shown before an ellipsis.
+        for value in [
+            "pdl_sdbx_apikey_...",
+            "pdl_live_apikey_\u{2026}",
+            "wandb_v1_...",
+        ] {
+            assert!(is_ellipsis_truncated_display(value), "{value}");
+        }
+        for twin in [
+            "pdl_sdbx_apikey_01hq7zyx9...",
+            "pdl_sdbx_apikeyzz...",
+            "pdl_sdbx_verylongsegment_...",
+            "PDL_SDBX_APIKEY_...",
+            "pdl_sdbx_apikey_",
+        ] {
+            assert!(!is_ellipsis_truncated_display(twin), "{twin}");
+        }
+        // A multi-part filler layout with `:` and trailing padding.
+        let x = |n: usize| "x".repeat(n);
+        let bitwarden = format!("0.{}-{}.{}:{}==", x(8), x(4), x(30), x(22));
+        assert!(is_prefixed_filler(&bitwarden));
+        assert!(!is_prefixed_filler(&format!("0.{}:{}y==", x(8), x(22))));
+        assert!(!is_prefixed_filler(&format!("0.{}=={}", x(8), x(22))));
+        // `my` + two or more credential words, bare.
+        for value in ["mykeysecret", "mykeyid", "myapikey", "mysecretaccesskey"] {
+            assert!(is_glued_my_placeholder(value), "{value}");
+        }
+        for twin in [
+            "mysecret",
+            "mykey",
+            "mykeysecret7",
+            "myKeySecret",
+            "mykeysecretq",
+            "keysecret",
+        ] {
+            assert!(!is_glued_my_placeholder(twin), "{twin}");
+        }
+    }
+
+    #[test]
+    fn a_phrase_led_by_a_distinctive_placeholder_word_is_a_placeholder() {
+        for value in [
+            "placeholder-not-a-key",
+            "placeholder-value",
+            "PLACEHOLDER_API_KEY",
+            "example-token",
+            "sample.secret.value",
+            "changeme-only",
+        ] {
+            assert!(is_placeholder_led_phrase(value), "{value}");
+            assert!(
+                is_generic_placeholder_word(&value.to_ascii_lowercase()),
+                "{value}"
+            );
+        }
+        for value in [
+            "placeholder",
+            "placeholder-",
+            "placeholder--key",
+            "placeholder-key9",
+            "placeholder-hunter",
+            "secret-not-a-key",
+            "password-value",
+            "not-a-real-key",
+            "key-placeholder",
+        ] {
+            assert!(!is_placeholder_led_phrase(value), "{value}");
+        }
     }
 
     #[test]

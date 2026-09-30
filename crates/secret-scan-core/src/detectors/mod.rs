@@ -101,7 +101,7 @@ use private_key::PrivateKeyDetector;
 use prefilter::Literals;
 pub(crate) use prefilter::{PairSet, RequiredLiterals};
 
-pub(crate) use aws::has_open_aws_access_key_id_line;
+pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line};
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{
@@ -155,146 +155,195 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
             .is_some_and(|word| word.eq_ignore_ascii_case("bearer"))
 }
 
+/// Stable-sorts `candidates` by start offset, keeping emission order among
+/// equal starts: `candidates.sort_by_key(|c| c.range().start())`.
+///
+/// Every detector that merges candidate streams sorts through this one
+/// function, so the WebAssembly build carries a single instantiation of the
+/// standard stable sort for `Candidate`; a per-detector closure instantiates
+/// its own copy of about 6 KB (issue #1043).
+#[inline(never)]
+pub(super) fn sort_candidates_by_start(candidates: &mut [crate::types::Candidate]) {
+    candidates.sort_by_key(|candidate| candidate.range().start());
+}
+
+/// A built-in detector as the registry holds it: a reference to a `static`
+/// value, so building a built-in registry runs no per-detector constructor
+/// and makes no per-detector allocation (issue #1043).
+pub(crate) type BuiltInDetector = &'static (dyn Detector + Sync);
+
+/// One row of a built-in table: the detector's id, written out, and the
+/// detector. The registry takes the id from the row, so building a built-in
+/// registry calls no detector's `id()`; under a lazily compiling
+/// WebAssembly engine each such call compiled one more function inside
+/// `initialize()` (issue #1043). Tests pin every row's id to its detector's
+/// `id()`. A row dereferences to its detector.
+pub(crate) struct BuiltInRow {
+    pub(crate) id: &'static str,
+    pub(crate) detector: BuiltInDetector,
+}
+
+impl std::ops::Deref for BuiltInRow {
+    type Target = dyn Detector + Sync;
+
+    fn deref(&self) -> &Self::Target {
+        self.detector
+    }
+}
+
+/// A [`BuiltInRow`] for `detector` under `id`.
+const fn row(id: &'static str, detector: BuiltInDetector) -> BuiltInRow {
+    BuiltInRow { id, detector }
+}
+
 /// Every built-in detector, in canonical registration order.
 ///
+/// One static table rather than a `Vec` of boxes built per call: building
+/// that `Vec` compiled to about 6 KB of WebAssembly that a lazily compiling
+/// engine had to compile inside `initialize()` (issue #1043).
+///
 /// One entry per line by contract (`scripts/measure-detector-cost.mjs`
-/// comments entries out by line), so the list outgrows the line lint.
+/// comments entries out by line), so the table is kept out of rustfmt.
 #[must_use]
 #[allow(clippy::too_many_lines)] // one line per built-in detector
-pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
-    vec![
-        Box::new(PrivateKeyDetector),
-        Box::new(aws::AwsAccessKeyDetector),
-        Box::new(aws::AwsSecretAccessKeyDetector),
-        Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
-        Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
-        Box::new(github::GitHubTokenDetector),
-        Box::new(gitlab::GitlabTokenDetector),
-        Box::new(openai::OpenAiTokenDetector),
-        Box::new(anthropic::AnthropicTokenDetector),
-        Box::new(shopify::ShopifyTokenDetector),
-        Box::new(vault::VaultTokenDetector),
-        Box::new(stripe::StripeTokenDetector),
-        Box::new(slack::SlackTokenDetector),
-        Box::new(additional_providers::PYPI),
-        Box::new(additional_providers::HUGGING_FACE),
-        Box::new(additional_providers::DOCKER),
-        Box::new(cloudflare::CLOUDFLARE),
-        Box::new(additional_providers::DIGITALOCEAN),
-        Box::new(linear::LINEAR),
-        Box::new(additional_providers::SUPABASE),
-        Box::new(additional_providers::SUPABASE_PAT),
-        Box::new(vercel::VERCEL),
-        Box::new(additional_providers::NPM),
-        Box::new(additional_providers::GOOGLE),
-        Box::new(google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
-        Box::new(sendgrid::SendgridTokenDetector),
-        Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
-        Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
-        Box::new(notion::NotionTokenDetector),
-        Box::new(atlassian::AtlassianApiTokenDetector),
-        Box::new(twilio::TwilioAuthTokenDetector),
-        Box::new(twilio::TwilioApiKeySecretDetector),
-        telegram::telegram_bot_token_detector(),
-        Box::new(discord::DiscordBotTokenDetector),
-        Box::new(sentry::SentryUserAuthTokenDetector),
-        Box::new(sentry::SentryOrgAuthTokenDetector),
-        Box::new(datadog::DatadogApiKeyDetector),
-        Box::new(datadog::DATADOG_APPLICATION_KEY),
-        Box::new(datadog::DatadogApplicationKeyLegacyDetector),
-        Box::new(grafana::GrafanaServiceAccountTokenDetector),
-        Box::new(additional_providers::GRAFANA_CLOUD),
-        Box::new(new_relic::NewRelicUserApiKeyDetector),
-        Box::new(new_relic::NewRelicLicenseKeyDetector),
-        Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
-        Box::new(mailgun::MailgunApiKeyDetector),
-        Box::new(okta::OktaApiTokenDetector),
-        Box::new(firebase::FirebaseServerKeyDetector),
-        Box::new(terraform::TerraformCloudTokenDetector),
-        Box::new(additional_providers::PULUMI),
-        Box::new(ai_inference::REPLICATE),
-        Box::new(ai_inference::GROQ),
-        Box::new(ai_inference::XAI),
-        Box::new(ai_inference::OPENROUTER),
-        Box::new(ai_inference::PERPLEXITY),
-        Box::new(ai_inference::FIREWORKS),
-        Box::new(elevenlabs::ElevenLabsApiKeyDetector),
-        Box::new(together_tavily::TOGETHER_AI),
-        Box::new(together_tavily::TAVILY),
-        Box::new(pinecone::PineconeApiKeyDetector),
-        Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
-        Box::new(databricks::DATABRICKS),
-        Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
-        Box::new(confluent::ConfluentLegacyApiSecretDetector),
-        Box::new(netlify::NetlifyPersonalAccessTokenDetector),
-        Box::new(neon::NEON),
-        Box::new(langsmith::LangsmithApiKeyDetector),
-        Box::new(langfuse::LangfuseSecretKeyDetector),
-        Box::new(postman::POSTMAN),
-        Box::new(postman::POSTMAN_COLLECTION_ACCESS_KEY),
-        Box::new(heroku::HEROKU_API_KEY),
-        Box::new(heroku::HerokuApiKeyLegacyDetector),
-        Box::new(travisci::TravisCiApiTokenDetector),
-        Box::new(keyword_gated_keys::MistralApiKeyDetector),
-        Box::new(keyword_gated_keys::CohereApiKeyDetector),
-        Box::new(keyword_gated_keys::Ai21ApiKeyDetector),
-        Box::new(keyword_gated_keys::DeepgramApiKeyDetector),
-        Box::new(doppler::DopplerTokenDetector),
-        Box::new(trigger_dev::TRIGGER_DEV),
-        Box::new(e2b::E2B),
-        Box::new(posthog::POSTHOG),
-        Box::new(helicone::HELICONE),
-        Box::new(firecrawl::FIRECRAWL),
-        Box::new(composio::COMPOSIO),
-        Box::new(convex::ConvexDeploymentKeyDetector),
-        Box::new(onepassword::OnePasswordServiceAccountTokenDetector),
-        Box::new(inngest::INNGEST_SIGNING_KEY),
-        Box::new(resend::RESEND_API_KEY),
-        Box::new(apify::APIFY_API_TOKEN),
-        Box::new(wandb::WANDB_API_KEY),
-        Box::new(daytona::DAYTONA_API_KEY),
-        Box::new(clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET),
-        Box::new(nvidia::NVIDIA_API_KEY),
-        Box::new(browserbase::BROWSERBASE_API_KEY),
-        Box::new(runpod::RUNPOD_API_KEY),
-        Box::new(cerebras::CEREBRAS_API_KEY),
-        Box::new(bitwarden::BitwardenSecretsManagerAccessTokenDetector),
-        Box::new(polar::POLAR),
-        Box::new(sonarqube::SONARQUBE),
-        Box::new(rubygems::RUBYGEMS_API_KEY),
-        Box::new(clojars::CLOJARS_DEPLOY_TOKEN),
-        Box::new(crates_io::CRATES_IO),
-        Box::new(dynatrace::DynatraceTokenDetector),
-        Box::new(paddle::PADDLE_API_KEY),
-        Box::new(honeycomb::HONEYCOMB_INGEST_KEY),
-        Box::new(axiom::AXIOM),
-        jwt::jwt_detector(),
-        bearer_token::bearer_token_detector(),
-        Box::new(ConnectionStringDetector),
-        otpauth::otpauth_detector(),
-        generic_token::generic_token_detector(),
-    ]
+pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
+    #[rustfmt::skip]
+    static DETECTORS: &[BuiltInRow] = &[
+        row("private-key", &PrivateKeyDetector),
+        row("aws-access-key", &aws::AwsAccessKeyDetector),
+        row("aws-secret-access-key", &aws::AwsSecretAccessKeyDetector),
+        row("aws-bedrock-long-term-api-key", &aws_bedrock::AwsBedrockLongTermApiKeyDetector),
+        row("aws-bedrock-short-term-api-key", &aws_bedrock::AwsBedrockShortTermApiKeyDetector),
+        row("github-token", &github::GitHubTokenDetector),
+        row("gitlab-token", &gitlab::GitlabTokenDetector),
+        row("openai-token", &openai::OpenAiTokenDetector),
+        row("anthropic-token", &anthropic::AnthropicTokenDetector),
+        row("shopify-token", &shopify::ShopifyTokenDetector),
+        row("vault-token", &vault::VaultTokenDetector),
+        row("stripe-token", &stripe::StripeTokenDetector),
+        row("slack-token", &slack::SlackTokenDetector),
+        row("pypi-token", &additional_providers::PYPI),
+        row("huggingface-token", &additional_providers::HUGGING_FACE),
+        row("docker-token", &additional_providers::DOCKER),
+        row("cloudflare-token", &cloudflare::CLOUDFLARE),
+        row("digitalocean-token", &additional_providers::DIGITALOCEAN),
+        row("linear-token", &linear::LINEAR),
+        row("supabase-token", &additional_providers::SUPABASE),
+        row("supabase-management-token", &additional_providers::SUPABASE_PAT),
+        row("vercel-token", &vercel::VERCEL),
+        row("npm-token", &additional_providers::NPM),
+        row("google-api-key", &additional_providers::GOOGLE),
+        row("google-oauth-client-secret", &google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
+        row("sendgrid-token", &sendgrid::SendgridTokenDetector),
+        row("microsoft-entra-client-secret", &microsoft_entra::MicrosoftEntraClientSecretDetector),
+        row("azure-devops-personal-access-token", &azure_devops::AzureDevOpsPersonalAccessTokenDetector),
+        row("notion-token", &notion::NotionTokenDetector),
+        row("atlassian-api-token", &atlassian::AtlassianApiTokenDetector),
+        row("twilio-auth-token", &twilio::TwilioAuthTokenDetector),
+        row("twilio-api-key-secret", &twilio::TwilioApiKeySecretDetector),
+        row("telegram-bot-token", &telegram::TelegramBotTokenDetector),
+        row("discord-bot-token", &discord::DiscordBotTokenDetector),
+        row("sentry-user-auth-token", &sentry::SentryUserAuthTokenDetector),
+        row("sentry-org-auth-token", &sentry::SentryOrgAuthTokenDetector),
+        row("datadog-api-key", &datadog::DatadogApiKeyDetector),
+        row("datadog-application-key", &datadog::DATADOG_APPLICATION_KEY),
+        row("datadog-application-key-legacy", &datadog::DatadogApplicationKeyLegacyDetector),
+        row("grafana-service-account-token", &grafana::GrafanaServiceAccountTokenDetector),
+        row("grafana-cloud-access-policy-token", &additional_providers::GRAFANA_CLOUD),
+        row("new-relic-user-api-key", &new_relic::NewRelicUserApiKeyDetector),
+        row("new-relic-license-key", &new_relic::NewRelicLicenseKeyDetector),
+        row("mailchimp-api-key", &mailchimp::MailchimpMarketingApiKeyDetector),
+        row("mailgun-api-key", &mailgun::MailgunApiKeyDetector),
+        row("okta-api-token", &okta::OktaApiTokenDetector),
+        row("firebase-server-key", &firebase::FirebaseServerKeyDetector),
+        row("terraform-cloud-token", &terraform::TerraformCloudTokenDetector),
+        row("pulumi-access-token", &additional_providers::PULUMI),
+        row("replicate-api-token", &ai_inference::REPLICATE),
+        row("groq-api-key", &ai_inference::GROQ),
+        row("xai-api-key", &ai_inference::XAI),
+        row("openrouter-api-key", &ai_inference::OPENROUTER),
+        row("perplexity-api-key", &ai_inference::PERPLEXITY),
+        row("fireworks-ai-api-key", &ai_inference::FIREWORKS),
+        row("elevenlabs-api-key", &elevenlabs::ElevenLabsApiKeyDetector),
+        row("together-ai-api-key", &together_tavily::TOGETHER_AI),
+        row("tavily-api-key", &together_tavily::TAVILY),
+        row("pinecone-api-key", &pinecone::PineconeApiKeyDetector),
+        row("gitlab-runner-authentication-token", &gitlab::GitlabRunnerAuthenticationTokenDetector),
+        row("databricks-personal-access-token", &databricks::DATABRICKS),
+        row("confluent-cloud-api-secret", &confluent::CONFLUENT_CLOUD_API_SECRET),
+        row("confluent-cloud-api-secret-legacy", &confluent::ConfluentLegacyApiSecretDetector),
+        row("netlify-token", &netlify::NetlifyPersonalAccessTokenDetector),
+        row("neon-api-key", &neon::NEON),
+        row("langsmith-api-key", &langsmith::LangsmithApiKeyDetector),
+        row("langfuse-secret-key", &langfuse::LangfuseSecretKeyDetector),
+        row("postman-api-key", &postman::POSTMAN),
+        row("postman-collection-access-key", &postman::POSTMAN_COLLECTION_ACCESS_KEY),
+        row("heroku-api-key", &heroku::HEROKU_API_KEY),
+        row("heroku-api-key-legacy", &heroku::HerokuApiKeyLegacyDetector),
+        row("travisci-api-token", &travisci::TravisCiApiTokenDetector),
+        row("mistral-api-key", &keyword_gated_keys::MistralApiKeyDetector),
+        row("cohere-api-key", &keyword_gated_keys::CohereApiKeyDetector),
+        row("ai21-api-key", &keyword_gated_keys::Ai21ApiKeyDetector),
+        row("deepgram-api-key", &keyword_gated_keys::DeepgramApiKeyDetector),
+        row("doppler-token", &doppler::DopplerTokenDetector),
+        row("trigger-dev-token", &trigger_dev::TRIGGER_DEV),
+        row("e2b-api-key", &e2b::E2B),
+        row("posthog-token", &posthog::POSTHOG),
+        row("helicone-api-key", &helicone::HELICONE),
+        row("firecrawl-api-key", &firecrawl::FIRECRAWL),
+        row("composio-api-key", &composio::COMPOSIO),
+        row("convex-deployment-key", &convex::ConvexDeploymentKeyDetector),
+        row("onepassword-service-account-token", &onepassword::OnePasswordServiceAccountTokenDetector),
+        row("inngest-signing-key", &inngest::INNGEST_SIGNING_KEY),
+        row("resend-api-key", &resend::RESEND_API_KEY),
+        row("apify-api-token", &apify::APIFY_API_TOKEN),
+        row("wandb-api-key", &wandb::WANDB_API_KEY),
+        row("daytona-api-key", &daytona::DAYTONA_API_KEY),
+        row("clickhouse-cloud-api-secret", &clickhouse_cloud::CLICKHOUSE_CLOUD_API_SECRET),
+        row("nvidia-api-key", &nvidia::NVIDIA_API_KEY),
+        row("browserbase-api-key", &browserbase::BROWSERBASE_API_KEY),
+        row("runpod-api-key", &runpod::RUNPOD_API_KEY),
+        row("cerebras-api-key", &cerebras::CEREBRAS_API_KEY),
+        row("bitwarden-secrets-manager-access-token", &bitwarden::BitwardenSecretsManagerAccessTokenDetector),
+        row("polar-token", &polar::POLAR),
+        row("sonarqube-token", &sonarqube::SONARQUBE),
+        row("rubygems-api-key", &rubygems::RUBYGEMS_API_KEY),
+        row("clojars-deploy-token", &clojars::CLOJARS_DEPLOY_TOKEN),
+        row("crates-io-token", &crates_io::CRATES_IO),
+        row("dynatrace-token", &dynatrace::DynatraceTokenDetector),
+        row("paddle-api-key", &paddle::PADDLE_API_KEY),
+        row("honeycomb-api-key", &honeycomb::HONEYCOMB_INGEST_KEY),
+        row("axiom-token", &axiom::AXIOM),
+        row("jwt", &jwt::JwtDetector),
+        row("bearer-token", &bearer_token::BearerTokenDetector),
+        row("connection-string", &ConnectionStringDetector),
+        row("otpauth-uri", &otpauth::OtpauthDetector),
+        row("generic-token", &generic_token::GENERIC_TOKEN),
+    ];
+    DETECTORS
 }
 
 /// Every built-in detector the `common` profile registers, in the same
 /// relative order [`built_in_detectors`] gives them.
 ///
-/// This function is written to reference only these six constructors. A
+/// This function is written to reference only these six detectors. A
 /// `common`-only artifact links no `provider` detector's code, because
 /// nothing here calls into `built_in_detectors` or any `provider` module —
 /// see `decision-define-detector-profile-and-pack-contract`'s reachability
 /// rule. [`BUILT_IN_PACKS`] pins, in tests, that this list is exactly the
 /// `Pack::Common` members of the canonical order.
 #[must_use]
-pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
-    vec![
-        Box::new(PrivateKeyDetector),
-        jwt::jwt_detector(),
-        bearer_token::bearer_token_detector(),
-        Box::new(ConnectionStringDetector),
-        otpauth::otpauth_detector(),
-        generic_token::generic_token_detector(),
-    ]
+pub(crate) fn common_built_in_detectors() -> &'static [BuiltInRow] {
+    #[rustfmt::skip]
+    static DETECTORS: &[BuiltInRow] = &[
+        row("private-key", &PrivateKeyDetector),
+        row("jwt", &jwt::JwtDetector),
+        row("bearer-token", &bearer_token::BearerTokenDetector),
+        row("connection-string", &ConnectionStringDetector),
+        row("otpauth-uri", &otpauth::OtpauthDetector),
+        row("generic-token", &generic_token::GENERIC_TOKEN),
+    ];
+    DETECTORS
 }
 
 /// A built-in detector and the literals it declares for the shared
@@ -306,7 +355,8 @@ pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
 /// `Detector` trait, so a custom detector neither declares nor inherits
 /// one, even under a built-in id.
 pub(crate) struct BuiltIn {
-    pub(crate) detector: Box<dyn Detector>,
+    pub(crate) id: &'static str,
+    pub(crate) detector: BuiltInDetector,
     pub(crate) required: Option<RequiredLiterals>,
 }
 
@@ -314,10 +364,11 @@ pub(crate) struct BuiltIn {
 #[must_use]
 pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
     built_in_detectors()
-        .into_iter()
-        .map(|detector| BuiltIn {
-            required: built_in_required_literals(detector.id()),
-            detector,
+        .iter()
+        .map(|row| BuiltIn {
+            id: row.id,
+            detector: row.detector,
+            required: built_in_required_literals(row.id),
         })
         .collect()
 }
@@ -326,10 +377,11 @@ pub(crate) fn built_in_entries() -> Vec<BuiltIn> {
 #[must_use]
 pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
     common_built_in_detectors()
-        .into_iter()
-        .map(|detector| BuiltIn {
-            required: common_required_literals(detector.id()),
-            detector,
+        .iter()
+        .map(|row| BuiltIn {
+            id: row.id,
+            detector: row.detector,
+            required: common_required_literals(row.id),
         })
         .collect()
 }
@@ -804,6 +856,18 @@ mod tests {
     use crate::types::{Candidate, Confidence, DetectorContext, Specificity};
 
     #[test]
+    fn every_built_in_row_names_its_detectors_own_id() {
+        // The registry takes a built-in's id from its table row (issue
+        // #1043), so each row's id must be exactly what the detector says.
+        for row in built_in_detectors()
+            .iter()
+            .chain(common_built_in_detectors())
+        {
+            assert_eq!(row.id, row.detector.id());
+        }
+    }
+
+    #[test]
     fn built_in_ids_are_valid_and_unique() {
         let detectors = built_in_detectors();
         let mut ids: Vec<&str> = detectors.iter().map(|d| d.id()).collect();
@@ -936,14 +1000,14 @@ mod tests {
         );
     }
 
-    fn ids_of(detectors: &[Box<dyn Detector>]) -> Vec<&str> {
+    fn ids_of(detectors: &[BuiltInRow]) -> Vec<&str> {
         detectors.iter().map(|d| d.id()).collect()
     }
 
     #[test]
     fn built_in_packs_table_matches_the_real_full_registry() {
         let full = built_in_detectors();
-        let full_ids = ids_of(&full);
+        let full_ids = ids_of(full);
         let table_ids: Vec<&str> = built_in_ids().collect();
         assert_eq!(
             table_ids, full_ids,
@@ -955,7 +1019,7 @@ mod tests {
     #[test]
     fn common_built_in_detectors_are_exactly_the_common_pack_in_canonical_order() {
         let common = common_built_in_detectors();
-        let common_ids = ids_of(&common);
+        let common_ids = ids_of(common);
         let table_common_ids: Vec<&str> = BUILT_IN_PACKS
             .iter()
             .filter(|(_, pack)| *pack == Pack::Common)
@@ -976,7 +1040,7 @@ mod tests {
 
         // `common` is an order-preserving subsequence of `full`.
         let full = built_in_detectors();
-        let full_ids = ids_of(&full);
+        let full_ids = ids_of(full);
         let mut cursor = 0;
         for id in &common_ids {
             let found = full_ids[cursor..]
@@ -1000,10 +1064,10 @@ mod tests {
     fn bearer_and_contextual_detectors_emit_competing_candidates() {
         let input = "auth = \"Bearer SYNTHETIC_REVOKED_BEARER_OVERLAP_1234\"";
         let context = DetectorContext::new(input.len());
-        let bearer = bearer_token::bearer_token_detector()
+        let bearer = bearer_token::BearerTokenDetector
             .detect(input, &context)
             .unwrap();
-        let contextual = generic_token::generic_token_detector()
+        let contextual = generic_token::GENERIC_TOKEN
             .detect(input, &context)
             .unwrap();
 
@@ -1025,10 +1089,10 @@ mod tests {
     fn basic_scheme_is_excluded_from_bearer_token_but_generic_token_still_claims_it() {
         let input = "Authorization: Basic ZGVtb3VzZXI6ZGVtb3Bhc3N3b3Jk";
         let context = DetectorContext::new(input.len());
-        let bearer = bearer_token::bearer_token_detector()
+        let bearer = bearer_token::BearerTokenDetector
             .detect(input, &context)
             .unwrap();
-        let contextual = generic_token::generic_token_detector()
+        let contextual = generic_token::GENERIC_TOKEN
             .detect(input, &context)
             .unwrap();
 
@@ -1054,7 +1118,7 @@ mod tests {
         let input = "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";
         let context = DetectorContext::new(input.len());
         let provider = openai::OpenAiTokenDetector.detect(input, &context).unwrap();
-        let policy = generic_token::generic_token_detector()
+        let policy = generic_token::GENERIC_TOKEN
             .detect(input, &context)
             .unwrap();
 

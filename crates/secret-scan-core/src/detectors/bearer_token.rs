@@ -411,7 +411,8 @@ fn secret_token_uri_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-struct BearerTokenDetector;
+/// The structural Bearer authorization detector.
+pub(super) struct BearerTokenDetector;
 
 impl Detector for BearerTokenDetector {
     fn id(&self) -> &'static str {
@@ -499,12 +500,6 @@ impl Detector for BearerTokenDetector {
         candidates.extend(secret_token_uri_candidates(input));
         Ok(candidates)
     }
-}
-
-/// The structural Bearer authorization detector.
-#[must_use]
-pub fn bearer_token_detector() -> Box<dyn Detector> {
-    Box::new(BearerTokenDetector)
 }
 
 #[cfg(test)]

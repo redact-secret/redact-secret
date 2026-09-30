@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3769,
+  "fixtureCount": 3788,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -7858,26 +7858,17 @@
       "note": "A long delimited provider match remains deterministic and bounded."
     },
     {
-      "id": "vercel-positive-doc-style-placeholder",
+      "id": "vercel-negative-repeated-filler-placeholder",
       "detector": "vercel-token",
-      "kind": "positive",
+      "kind": "negative",
       "support": "supported",
-      "tier": "canonical",
+      "tier": "negative",
       "contexts": [
         "plain-text"
       ],
       "input": "vcp_xxxxxxxxxxxxxxxxxxxx",
-      "expected": [
-        {
-          "detector": "vercel-token",
-          "type": "vercel_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 24
-        }
-      ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+      "expected": [],
+      "note": "Issue #1042 reverses the earlier accepted tradeoff: a documentation placeholder whose body is one repeated character is not reported, as for stripe-token and heroku-api-key-legacy (#934). A random body is never one character; a body with any second character is still classified."
     },
     {
       "id": "vercel-negative-embedded-in-wider-identifier",
@@ -16336,6 +16327,251 @@
       "input": "resend.api_key = \"re_yourkey\"\n",
       "expected": [],
       "note": "Issue #949: an instructional placeholder glued into one word (your + key) behind a vendor prefix is not a secret. Applied only behind a vendor prefix; a leftover letter or digit keeps the value detected."
+    },
+    {
+      "id": "contextual-negative-placeholder-led-phrase",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[object_store]\nsecret_access_key = \"placeholder-not-a-key\"\n",
+      "expected": [],
+      "note": "Issue #1041: a hyphenated phrase led by a distinctive placeholder word (placeholder, example, sample, redacted, changeme, replaceme) and made only of listed credential, negation and filler words is a placeholder, like the single word, under every credential name; the bare secret_access_key name (#1026) reached it."
+    },
+    {
+      "id": "contextual-negative-placeholder-led-phrase-value",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "API_KEY=\"placeholder-value\"\n",
+      "expected": [],
+      "note": "Issue #1041: placeholder-value is a placeholder phrase; a digit, an unlisted word, or a secret/password lead keeps a phrase reported."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-lead-word-phrase",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RUNPOD_API_KEY=rpa_your_key_for_ci_pipeline_test_fixture_only\n",
+      "expected": [],
+      "note": "Issue #1042: behind a vendor prefix, an instructional phrase (a lead word, a credential noun, plain one-case words) is the word fixture the #860 RunPod evidence excludes; a digit or a mixed-case word keeps it reported."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-ellipsis",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PADDLE_API_KEY=pdl_sdbx_apikey_...\n",
+      "expected": [],
+      "note": "Issue #1042: an ellipsis display whose visible head is only a vendor prefix (short lowercase segments ending in a separator) shows no key material."
+    },
+    {
+      "id": "contextual-negative-layout-filler-with-padding",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export BWS_ACCESS_TOKEN=\"0.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxx==\"\n",
+      "expected": [],
+      "note": "Issue #1042: a multi-part filler template (a short lead, then one repeated character across -, ., : separated segments and trailing = padding) is a placeholder, like the all-zero UUID."
+    },
+    {
+      "id": "contextual-negative-glued-my-credential-words",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "KEY_ID=mykeyid\nKEY_SECRET=mykeysecret\n",
+      "expected": [],
+      "note": "Issue #1042: my + two or more credential words glued into one lowercase word are the ClickHouse Cloud docs' placeholders the #860 evidence lists; one word after my (mysecret) stays reported."
+    },
+    {
+      "id": "regression-1015-anthropic-admin-angle-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -s https://api.anthropic.com/v1/organizations/users -H \"x-api-key: sk-ant-admin01-<your-key>\"\n",
+      "expected": [],
+      "note": "Issue #1015 (benchmark-gap-1015): the Anthropic Admin documentation placeholder sk-ant-admin01-<your-key> is silent, like its sk-ant-api01-/sk-ant-api03- siblings."
+    },
+    {
+      "id": "regression-1016-deepgram-k8s-env-value",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "env:\n  - name: DEEPGRAM_API_KEY\n    value: \"syntheticrevokedsyntheticrevokedsyntheti\"\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 84
+        }
+      ],
+      "note": "Issue #1016 (benchmark-gap-1016): a Kubernetes env name:/value: pair is one assignment, so the value under DEEPGRAM_API_KEY is the typed Deepgram key."
+    },
+    {
+      "id": "regression-1016-cohere-k8s-env-value",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "env:\n  - name: CO_API_KEY\n    value: \"SyntheticRevokedSyntheticRevokedSyntheti\"\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 78
+        }
+      ],
+      "note": "Issue #1016 (benchmark-gap-1016): the value under CO_API_KEY in a name:/value: pair is the typed Cohere key."
+    },
+    {
+      "id": "regression-1016-mistral-k8s-env-value",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "env:\n  - name: MISTRAL_API_KEY\n    value: \"SyntheticRevokedSyntheticRevoked\"\n",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 75
+        }
+      ],
+      "note": "Issue #1016 (benchmark-gap-1016): the value under MISTRAL_API_KEY in a name:/value: pair is the typed Mistral key."
+    },
+    {
+      "id": "regression-1017-deepgram-create-client",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "import { createClient } from '@deepgram/sdk';\n\nconst deepgram = createClient(\"syntheticrevokedsyntheticrevokedsyntheti\");\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 78,
+          "end": 118
+        }
+      ],
+      "note": "Issue #1017 (benchmark-gap-1017): the Deepgram JS SDK v3 createClient(...) argument is the typed Deepgram key."
+    },
+    {
+      "id": "regression-1017-deepgram-websocket-subprotocol",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET wss://api.deepgram.com/v1/listen HTTP/1.1\nSec-WebSocket-Protocol: token, syntheticrevokedsyntheticrevokedsyntheti\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 77,
+          "end": 117
+        }
+      ],
+      "note": "Issue #1017 (benchmark-gap-1017): the browser WebSocket token subprotocol under an api.deepgram.com request line carries the typed Deepgram key."
+    },
+    {
+      "id": "regression-1018-cohere-litellm-masked-name",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "18:22:04 - LiteLLM Proxy:DEBUG: router.py:1841 - cohere/command-r-plus call failed; masked_api_key=SyntheticRevokedSyntheticRevokedSyntheti reason=AuthenticationError\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 99,
+          "end": 139
+        }
+      ],
+      "note": "Issue #1018 (benchmark-gap-1018): a complete, unmasked Cohere key under a masked_-led name on a LiteLLM cohere/ route line is reported; only a value that shows masking stays silent."
+    },
+    {
+      "id": "regression-1038-mistral-python-environ-assign",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "import os\n\nos.environ[\"MISTRAL_API_KEY\"] = \"SyntheticRevokedSyntheticRevoked\"\n",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 76
+        }
+      ],
+      "note": "Issue #1038 (benchmark-gap-1038): a keyed environment store os.environ[\"NAME\"] = \"<v>\" is an assignment, so the literal under MISTRAL_API_KEY is the typed Mistral key."
     },
     {
       "id": "contextual-negative-993-qualified-placeholder",
@@ -32951,6 +33187,32 @@
       "input": "legacy\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
       "expected": [],
       "note": "An embedded marker is never carved out of a wider identifier."
+    },
+    {
+      "id": "vercel-negative-x-run-placeholder",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=vcp_xxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #1042: vcp_ + a run of one repeated character is the documentation placeholder the #1013 evidence names (P4); a random body is never one character (#934 precedent)."
+    },
+    {
+      "id": "vercel-negative-app-x-run-placeholder",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=vca_xxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #1042: the vca_ app access token marker with a one-character filler body is a placeholder."
     },
     {
       "id": "vercel-pat-adversarial-long-suffix",
@@ -79268,7 +79530,81 @@
           "end": 79
         }
       ],
-      "note": "Issue #1028: a secret on the line directly below an \u0041SIA ID; the incremental session holds the ID line open for it."
+      "note": "Issue #1028: a secret on the line directly below an \u0041SIA ID; the incremental session releases the ID line when it closes and scans the next line below a copy of it (#1040)."
+    },
+    {
+      "id": "aws-secret-access-key-positive-line-above-id",
+      "detector": "aws-secret-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "New credentials (value, then key id):\nSynthetic/Revoked+Aws/Secret+Access/Key1\n\u0041KIASYNTHETICEXAMPLE\n",
+      "expected": [
+        {
+          "detector": "aws-secret-access-key",
+          "type": "aws_secret_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 78
+        },
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 79,
+          "end": 99
+        }
+      ],
+      "note": "Issue #1044: a secret on the line directly above an AKIA ID is adjacent too (the #1028 contract's same or adjacent line); the incremental session holds the secret's line for exactly one line."
+    },
+    {
+      "id": "aws-secret-access-key-positive-phrase-for-qualifier",
+      "detector": "aws-secret-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is the secret access key for the staging user: SyntheticRevokedAwsSecretAccessKeyValue0 please rotate it.\n",
+      "expected": [
+        {
+          "detector": "aws-secret-access-key",
+          "type": "aws_secret_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 92
+        }
+      ],
+      "note": "Issue #1044: the phrase secret access key followed by for and up to four words, then ':', names the value, as a chat message writes it."
+    },
+    {
+      "id": "aws-secret-access-key-boundary-blank-line-above-id",
+      "detector": "aws-secret-access-key",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SyntheticRevokedAwsSecretAccessKeyValue0\n\n\u0041KIASYNTHETICEXAMPLE\n",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 62
+        }
+      ],
+      "note": "Only the line directly above an ID is adjacent; a blank line between ends the window."
     },
     {
       "id": "aws-secret-access-key-negative-bare-run",
