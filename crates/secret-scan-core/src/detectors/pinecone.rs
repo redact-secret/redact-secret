@@ -164,7 +164,7 @@ fn is_pinecone_key_name(key: &[u8], line: &str) -> bool {
 /// Legacy UUID keys assigned to a Pinecone API-key name; see the module doc.
 fn legacy_candidates(input: &str) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    for (line_start, line_end) in text::lines(input) {
+    text::for_each_long_run_line(input, |line_start, line_end| {
         let line = &input[line_start..line_end];
         let bytes = line.as_bytes();
         let mut start = 0usize;
@@ -187,7 +187,7 @@ fn legacy_candidates(input: &str) -> Vec<Candidate> {
             }
             start = end;
         }
-    }
+    });
     candidates
 }
 

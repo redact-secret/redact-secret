@@ -139,7 +139,6 @@
 //! never by the current-format detector regardless of context, since it
 //! carries no `HRKU-` prefix.
 
-use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -539,18 +538,14 @@ impl Detector for HerokuApiKeyLegacyDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        let all_lines: Vec<(usize, usize)> = lines(input).collect();
-        for (index, &(line_start, line_end)) in all_lines.iter().enumerate() {
+        text::for_each_long_run_line(input, |line_start, line_end| {
             let line = &input[line_start..line_end];
             let raw_matches = scan_bare_legacy_runs(line, pattern::is_hex_or_dash, LEGACY_BOUNDARY);
             if raw_matches.is_empty() {
-                continue;
+                return;
             }
             let same_line = line_contains_ci(line, CONTEXT_KEYWORD);
-            let previous: Vec<&str> = all_lines[index.saturating_sub(LOOKBACK_LINES)..index]
-                .iter()
-                .map(|&(start, end)| &input[start..end])
-                .collect();
+            let previous = text::preceding_lines(input, line_start, LOOKBACK_LINES);
             let bytes = line.as_bytes();
             for (relative_start, relative_end) in raw_matches {
                 // A documented multi-line layout names the credential slot
@@ -594,7 +589,7 @@ impl Detector for HerokuApiKeyLegacyDetector {
                         .with_signals([signal]),
                 );
             }
-        }
+        });
         Ok(candidates)
     }
 }

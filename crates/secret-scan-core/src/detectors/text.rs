@@ -1127,6 +1127,126 @@ pub(super) fn previous_line(input: &str, line_start: usize) -> Option<(usize, us
     Some((line_start_before(input, end), end))
 }
 
+/// The shortest run of [`is_long_run_byte`] bytes any bare-shape detector can
+/// match: twilio and datadog need 32, new-relic 32 to 40, heroku, pinecone 36,
+/// confluent 64, mailchimp 32 plus a datacenter suffix (issue #1075).
+const LONG_RUN_MIN: usize = 32;
+
+/// `[A-Za-z0-9+/=_-]`: the union of every alphabet a bare-shape detector
+/// matches its body in (hex, alphanumeric, base64 body, hex-or-dash).
+const fn long_run_table() -> [bool; 256] {
+    let mut table = [false; 256];
+    let mut byte = 0u8;
+    loop {
+        table[byte as usize] =
+            byte.is_ascii_alphanumeric() || matches!(byte, b'+' | b'/' | b'=' | b'_' | b'-');
+        if byte == u8::MAX {
+            break;
+        }
+        byte += 1;
+    }
+    table
+}
+
+static LONG_RUN_BYTES: [bool; 256] = long_run_table();
+
+/// The [`lines`] of `input` that hold a run of at least [`LONG_RUN_MIN`]
+/// `[A-Za-z0-9+/=_-]` bytes, in order, as byte ranges only (issue #1075).
+///
+/// A line with no such run cannot hold a bare-shape match, so a detector
+/// whose every match is one may skip it. Any run of `LONG_RUN_MIN` bytes
+/// covers a position that is `LONG_RUN_MIN - 1` modulo `LONG_RUN_MIN`, so
+/// only those are probed; a probe inside the alphabet is grown to the run's
+/// ends, and a line already recorded is jumped past. Every byte is read at
+/// most once when growing, so the cost stays linear and, on prose whose
+/// words are short, reads about one byte in 32.
+pub(super) fn long_run_line_spans(input: &str) -> Vec<(usize, usize)> {
+    let bytes = input.as_bytes();
+    let mut spans = Vec::new();
+    // Bytes before `floor` were already examined: a run never crosses it,
+    // because it is a byte outside the alphabet or the end of a line.
+    let mut floor = 0usize;
+    let mut probe = LONG_RUN_MIN - 1;
+    while probe < bytes.len() {
+        if probe < floor {
+            probe += LONG_RUN_MIN * (floor - probe).div_ceil(LONG_RUN_MIN);
+            continue;
+        }
+        if !LONG_RUN_BYTES[usize::from(bytes[probe])] {
+            probe += LONG_RUN_MIN;
+            continue;
+        }
+        let mut start = probe;
+        while start > floor && LONG_RUN_BYTES[usize::from(bytes[start - 1])] {
+            start -= 1;
+        }
+        let mut end = probe + 1;
+        while end < bytes.len() && LONG_RUN_BYTES[usize::from(bytes[end])] {
+            end += 1;
+        }
+        floor = end;
+        if end - start >= LONG_RUN_MIN {
+            let (line_end, next) = line_end_from(bytes, end);
+            spans.push((line_start_before(input, line_end), line_end));
+            // The next line starts at `next` (or is a lone `\r`'s successor).
+            floor = next.min(bytes.len());
+        }
+    }
+    spans
+}
+
+/// The old, line-by-line answer of [`long_run_line_spans`]: every line whose
+/// longest run of [`LONG_RUN_BYTES`] bytes reaches [`LONG_RUN_MIN`]. Debug
+/// builds and tests check the fast walk against it.
+#[cfg(any(debug_assertions, test))]
+pub(super) fn long_run_line_spans_by_line(input: &str) -> Vec<(usize, usize)> {
+    lines(input)
+        .filter(|&(start, end)| {
+            let mut run = 0usize;
+            input.as_bytes()[start..end].iter().any(|&byte| {
+                run = if LONG_RUN_BYTES[usize::from(byte)] {
+                    run + 1
+                } else {
+                    0
+                };
+                run >= LONG_RUN_MIN
+            })
+        })
+        .collect()
+}
+
+/// The up to `count` [`lines`] before the one starting at `line_start`,
+/// oldest first, as the same text `lines(input)` yields for them.
+pub(super) fn preceding_lines(input: &str, line_start: usize, count: usize) -> Vec<&str> {
+    let mut previous = Vec::with_capacity(count);
+    let mut at = line_start;
+    while previous.len() < count {
+        let Some((start, end)) = previous_line(input, at) else {
+            break;
+        };
+        previous.push(&input[start..end]);
+        at = start;
+    }
+    previous.reverse();
+    previous
+}
+
+/// Calls `visit` with the byte range of each [`lines`] line that may hold a
+/// bare-shape match, in order: every line of `input`, or, when `input` is the
+/// scan copy being scanned, only those [`long_run_line_spans`] lists, built
+/// once for all detectors that ask (issue #1075).
+pub(super) fn for_each_long_run_line(input: &str, mut visit: impl FnMut(usize, usize)) {
+    if let Some(spans) = super::prefilter::long_run_lines(input) {
+        for &(start, end) in spans.iter() {
+            visit(start, end);
+        }
+    } else {
+        for (start, end) in lines(input) {
+            visit(start, end);
+        }
+    }
+}
+
 /// The line ([`lines`]) after the one ending at `line_end`.
 fn next_line(input: &str, line_end: usize) -> Option<(usize, usize)> {
     let bytes = input.as_bytes();
@@ -1307,6 +1427,78 @@ mod line_tests {
                 start = next;
             }
             assert_eq!(lines(&input).collect::<Vec<_>>(), expected, "{input:?}");
+        }
+    }
+
+    /// The oracle for a skipped line: its longest run is under the minimum.
+    fn long_run_inputs() -> Vec<String> {
+        let mut inputs = generated_inputs();
+        let pieces = [
+            "a",
+            "-",
+            "=",
+            "+",
+            "/",
+            "_",
+            " ",
+            "\r",
+            "\n",
+            "\r\n",
+            "\u{e9}",
+            "\u{597D}",
+            "0123456789abcdef",
+            "Z",
+        ];
+        let mut state = 0x2545_f491_4f6c_dd1du64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state >> 8).unwrap()
+        };
+        for _ in 0..3000 {
+            let mut input = String::new();
+            for _ in 0..(next() % 24) {
+                let piece = pieces[next() % pieces.len()];
+                let repeat = if next() % 4 == 0 { 1 + next() % 40 } else { 1 };
+                for _ in 0..repeat {
+                    input.push_str(piece);
+                }
+            }
+            inputs.push(input);
+        }
+        inputs
+    }
+
+    #[test]
+    fn long_run_line_spans_agree_with_the_line_by_line_walk() {
+        for input in long_run_inputs() {
+            assert_eq!(
+                super::long_run_line_spans(&input),
+                super::long_run_line_spans_by_line(&input),
+                "{input:?}"
+            );
+        }
+        assert!(super::long_run_line_spans("").is_empty());
+    }
+
+    #[test]
+    fn preceding_lines_are_the_lines_before_the_line_start() {
+        for input in long_run_inputs().iter().take(4000) {
+            let all: Vec<(usize, usize)> = lines(input).collect();
+            for (index, &(start, _)) in all.iter().enumerate() {
+                for count in [0, 1, 3, 5] {
+                    let expected: Vec<&str> = all[index.saturating_sub(count)..index]
+                        .iter()
+                        .map(|&(from, to)| &input[from..to])
+                        .collect();
+                    assert_eq!(
+                        super::preceding_lines(input, start, count),
+                        expected,
+                        "{input:?} {index} {count}"
+                    );
+                }
+            }
         }
     }
 
