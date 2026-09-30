@@ -176,6 +176,15 @@ evidence is linked from each published version.
 
 ### Performance
 
+- Scan cost is now linear on inputs that were quadratic or repeated work:
+  generic-token `value` names and repeated `?a=`, `{a=x`, `(a=` prefixes on
+  one long line (#1054, #1055), direct-calling provider detectors (#1056),
+  the prefilter on large inputs (#1057), PII context on long lines (#1058),
+  binding offset conversion (#1053) and incremental rebuilds (#1060).
+  Findings, ranges, ids and order are unchanged. The Python binding now
+  releases the GIL during detection and caches its registry per thread, and
+  the CLI check mode builds its registry once (#1059).
+
 - Reduced WebAssembly initialization time and artifact size (#1043).
   Findings, ranges, actions and output are unchanged, and no dependency was
   added. Chromium compiles WebAssembly lazily, so every function
