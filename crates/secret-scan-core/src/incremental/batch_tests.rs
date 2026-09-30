@@ -170,7 +170,7 @@ fn an_exact_overlap_tie_resolves_as_in_its_own_unit_when_batched() {
         let unit_ends = [earlier.len(), input.len()];
 
         // Batched: the tie line's findings are exactly its own.
-        let batched = detect_units(&input, &registry, &unit_ends, None)
+        let batched = detect_units(&input, 0, &registry, &unit_ends, None)
             .unwrap()
             .expect("every candidate is inside one unit");
         let tie_findings: Vec<_> = batched
@@ -390,7 +390,7 @@ fn closed_lines_in_one_append_are_detected_together() {
     let registry = DetectorRegistry::with_built_in([]).unwrap();
     let input = "first line\napi_key=SYNTHETICq8vN3xR7tLm2Kp9Wd\nlast line\n";
     let unit_ends = [11, 46, input.len()];
-    let batched = detect_units(input, &registry, &unit_ends, None).unwrap();
+    let batched = detect_units(input, 0, &registry, &unit_ends, None).unwrap();
     assert_eq!(batched.map(|found| found.len()), Some(1));
 
     let mut sanitizer = full();

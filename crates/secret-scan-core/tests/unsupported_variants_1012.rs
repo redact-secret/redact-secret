@@ -648,6 +648,62 @@ mod aws_secret_access_key {
         assert_partition_parity(&format!("{}\n{}\n", id("AKIA", 9), secret(9)));
         assert_partition_parity(&format!("{}\r\n{}\r\nnext\n", id("ASIA", 9), secret(9)));
     }
+
+    /// Issue #1040: a closed line carrying an access key ID is released, with
+    /// its `aws-access-key` finding, by the `append` that closes it; the
+    /// line below it is still scanned with the ID line above it.
+    #[test]
+    fn an_access_key_id_line_is_released_when_it_closes() {
+        let akia = id("AKIA", 10);
+        let value = secret(10);
+        let line = format!("deploy log: AWS_ACCESS_KEY_ID={akia} region=us-east-1\n");
+        let split = line.find(&akia).unwrap() + 7;
+        let mut session =
+            redact_secret::IncrementalSanitizer::new(support::generous_limits()).unwrap();
+        assert_eq!(session.append(&line[..split]).unwrap().text(), "");
+        let closed = session.append(&line[split..]).unwrap();
+        assert_eq!(
+            closed.text().len(),
+            line.len() - akia.len() + "<SECRET_1>".len()
+        );
+        assert!(!closed.text().contains(&akia));
+        assert_eq!(closed.findings().len(), 1);
+        assert_eq!(closed.findings()[0].detector(), "aws-access-key");
+
+        // The secret on the next line is claimed through the released ID line.
+        let below = session.append(&format!("{value}\n")).unwrap();
+        assert_eq!(below.findings().len(), 1);
+        assert_eq!(below.findings()[0].detector(), DETECTOR);
+        assert_eq!(below.findings()[0].range().start(), line.len());
+        assert!(!below.text().contains(&value));
+        assert!(session.finalize().unwrap().text().is_empty());
+    }
+
+    /// Issue #1040: consecutive ID lines never accumulate; each is released
+    /// by its own `append`, and every line below one still reads it.
+    #[test]
+    fn consecutive_access_key_id_lines_are_each_released() {
+        let ids: Vec<String> = (0..50)
+            .map(|seed| format!("{}\n", id("ASIA", seed)))
+            .collect();
+        let mut session =
+            redact_secret::IncrementalSanitizer::new(support::generous_limits()).unwrap();
+        for line in &ids {
+            let released = session.append(line).unwrap();
+            assert_eq!(
+                released.text(),
+                format!(
+                    "<SECRET_{}>\n",
+                    released.findings()[0].id().trim_start_matches("finding-")
+                )
+            );
+            assert_eq!(released.findings().len(), 1);
+        }
+        let input = format!("{}{}\n", ids.concat(), secret(11));
+        assert_partition_parity(&input);
+        let (_, findings) = whole_input(&input);
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 1);
+    }
 }
 
 mod google_oauth_client_secret {

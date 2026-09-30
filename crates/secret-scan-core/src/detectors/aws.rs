@@ -147,9 +147,9 @@ fn ends_with_secret_name(prefix: &str) -> bool {
 /// - under an AWS secret access key name ([`ends_with_secret_name`]) read
 ///   back over at most [`NAME_WINDOW`] bytes on the value's line, or
 /// - on the line of an `AKIA`/`ASIA` access key ID, or on the line directly
-///   below one (the incremental session holds such a line open through
-///   [`has_open_aws_access_key_id_line`], so streamed and whole-input scans
-///   agree).
+///   below one (the incremental session scans the next unit below a copy of
+///   an ID line, [`carries_aws_access_key_id`], so streamed and whole-input
+///   scans agree without holding the ID line back, issue #1040).
 ///
 /// A bare 40-character run is not attributable: AWS's own detectors (Macie,
 /// git-secrets, ferret-scan) require the same context. The mixed-case guard
@@ -233,14 +233,13 @@ impl Detector for AwsSecretAccessKeyDetector {
     }
 }
 
-/// Internal retention hint for the built-in incremental scanner: `true`
-/// when the last complete line of `input` carries an AWS access key ID, so
-/// the session keeps the unit open for the one line below it that
-/// [`AwsSecretAccessKeyDetector`] reads as adjacent (issue #1028).
-pub(crate) fn has_open_aws_access_key_id_line(input: &str) -> bool {
-    text::last_lines(input, 1)
-        .last()
-        .is_some_and(|line| !access_key_id_starts(line).is_empty())
+/// Internal lookbehind check for the built-in incremental scanner: `true`
+/// when `line` carries an AWS access key ID, so the session scans the next
+/// unit below a copy of it, which [`AwsSecretAccessKeyDetector`] reads as
+/// adjacent (issue #1028). The line itself is released when it closes: a
+/// line is never held for the sake of the line below it (issue #1040).
+pub(crate) fn carries_aws_access_key_id(line: &str) -> bool {
+    !access_key_id_starts(line).is_empty()
 }
 
 /// The literals one of which every `aws-secret-access-key` candidate's
@@ -359,16 +358,18 @@ mod tests {
     }
 
     #[test]
-    fn the_hint_holds_exactly_one_line_below_an_access_key_id() {
+    fn the_lookbehind_check_reads_an_access_key_id_on_its_line() {
         let id = format!("ASIA{}", "SYNTHETIC0189TMP");
-        assert!(has_open_aws_access_key_id_line(&format!("{id}\n")));
-        assert!(has_open_aws_access_key_id_line(&format!(
-            "x\naws_access_key_id = {id}\n"
+        assert!(carries_aws_access_key_id(&format!("{id}\n")));
+        assert!(carries_aws_access_key_id(&format!(
+            "aws_access_key_id = {id}\r\n"
         )));
-        assert!(!has_open_aws_access_key_id_line(&format!(
-            "{id}\n{SECRET}\n"
+        assert!(!carries_aws_access_key_id(&format!("{SECRET}\n")));
+        assert!(!carries_aws_access_key_id(&format!(
+            "AIDA{}\n",
+            "SYNTHETIC0189TMP"
         )));
-        assert!(!has_open_aws_access_key_id_line("plain line\n"));
+        assert!(!carries_aws_access_key_id("plain line\n"));
     }
 
     #[test]

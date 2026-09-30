@@ -79268,7 +79268,7 @@
           "end": 79
         }
       ],
-      "note": "Issue #1028: a secret on the line directly below an \u0041SIA ID; the incremental session holds the ID line open for it."
+      "note": "Issue #1028: a secret on the line directly below an \u0041SIA ID; the incremental session releases the ID line when it closes and scans the next line below a copy of it (#1040)."
     },
     {
       "id": "aws-secret-access-key-negative-bare-run",

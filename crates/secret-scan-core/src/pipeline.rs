@@ -481,7 +481,7 @@ pub(crate) fn detect(
     registry: &DetectorRegistry,
     shadow: Option<&mut Vec<ShadowComparison>>,
 ) -> Result<Vec<DetectedFinding>, SecretScanError> {
-    detect_units(input, registry, &[], shadow).map(Option::unwrap_or_default)
+    detect_units(input, 0, registry, &[], shadow).map(Option::unwrap_or_default)
 }
 
 /// [`detect`] over `input` made of consecutive incremental units, each
@@ -510,8 +510,16 @@ pub(crate) fn detect(
 /// different units never overlap, the evidence weight's tiers compare the
 /// same way for any base above the unit's candidate count, and every
 /// earlier unit's total is a common addend.
+///
+/// A nonzero `lead` makes `input[..lead]`, which must end at the first of
+/// `unit_ends`, a read-only unit (issue #1040): its text is scanned so a
+/// detector that reads the line above a unit sees it, but none of its
+/// findings are returned, and every returned range and shadow comparison is
+/// relative to `input[lead..]`. The incremental session passes the already
+/// released line above a batch this way instead of holding it.
 pub(crate) fn detect_units(
     input: &str,
+    lead: usize,
     registry: &DetectorRegistry,
     unit_ends: &[usize],
     shadow: Option<&mut Vec<ShadowComparison>>,
@@ -583,6 +591,14 @@ pub(crate) fn detect_units(
 
     // Accepted spans are disjoint, so start offsets are unique.
     accepted.sort_unstable_by_key(|candidate| candidate.range.start());
+    if lead > 0 {
+        accepted.retain(|candidate| candidate.range.start() >= lead);
+        for candidate in &mut accepted {
+            candidate.range =
+                ByteRange::new(candidate.range.start() - lead, candidate.range.end() - lead)
+                    .ok_or(SecretScanErrorCode::InvalidCandidate)?;
+        }
+    }
 
     if let Some(shadow) = shadow {
         for (index, selected) in accepted.iter().enumerate() {

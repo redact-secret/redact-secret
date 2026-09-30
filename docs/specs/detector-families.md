@@ -969,9 +969,11 @@ detectors (Macie, git-secrets, ferret-scan) are. A new detector,
 specificity, high and always redacted, so it wins the overlap with the
 `contextual_secret` that `generic-token` reports under the same names. The
 name is read back over at most 96 bytes of the value's line. The adjacency
-rule reads the value's own line and the line directly above it; the
-incremental session holds a line that carries an access key ID open for one
-more line, so streamed and whole-input scans agree. The mixed-case guard
+rule reads the value's own line and the line directly above it. The
+incremental session releases a line that carries an access key ID, with its
+findings, as soon as the line closes, and scans the next unit below a copy
+of it ([#1040](https://github.com/redact-secret/redact-secret/issues/1040)),
+so streamed and whole-input scans agree without delaying the ID line. The mixed-case guard
 keeps a 40-hex Git SHA out. False negatives: a bare secret with no name or
 ID, an ID on the line below the secret or two lines away, a 41-byte
 temporary secret and a padded value (both still redacted by `generic-token`

@@ -93,8 +93,10 @@ evidence is linked from each published version.
 - `aws-secret-access-key` (#1028): the AWS secret access key, exactly 40
   `[A-Za-z0-9/+]` with mixed case, as `aws_secret_access_key` (always
   redacted), claimed only under an AWS secret key name or on or directly
-  below an `AKIA`/`ASIA` access key ID line. The incremental session holds an
-  ID line open for one more line.
+  below an `AKIA`/`ASIA` access key ID line. The incremental session
+  releases an ID line, and its `aws-access-key` finding, as soon as the line
+  closes, and scans the line below against a copy of it, so a per-chunk
+  caller decides on the ID when its line arrives (#1040).
 - The AWS temporary access key ID contract (`ASIA` + exactly 16 `[A-Z0-9]`,
   T2) is recorded beside `AKIA` with conformance fixtures and tests (#1027).
   Grammar, type and action are unchanged.
