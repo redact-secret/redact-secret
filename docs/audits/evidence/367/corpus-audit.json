@@ -11350,6 +11350,22 @@
     },
     {
       "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-app-x-run-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
         "plain-text"
       ],
       "contractOnlyMatches": [],
@@ -11454,6 +11470,38 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "vercel-negative-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-repeated-filler-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-x-run-placeholder",
       "kind": "negative",
       "lostRanges": [],
       "retainedRanges": [],
@@ -12347,33 +12395,6 @@
     },
     {
       "contexts": [
-        "plain-text"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "vercel-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 24,
-          "start": 0
-        }
-      ],
-      "id": "vercel-positive-doc-style-placeholder",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 24,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
-    },
-    {
-      "contexts": [
         "dotenv"
       ],
       "contractOnlyMatches": [],
@@ -13072,10 +13093,10 @@
       "silent": 62
     },
     "vercel-token": {
-      "broad-shape": 32,
+      "broad-shape": 31,
       "retained": 28,
       "review": 0,
-      "silent": 17
+      "silent": 20
     }
   }
 }

@@ -479,6 +479,74 @@ pub(super) fn is_glued_instructional_placeholder(value: &str) -> bool {
     len > 0 && reachable[len] && with_noun[len]
 }
 
+/// `true` for an instructional placeholder written as a phrase of plain
+/// words (issue #1042): `your_key_for_ci_pipeline_test_fixture_only`, the
+/// word fixture the #860 evidence lists behind the `rpa_` prefix. Two or more
+/// words split on `_` or `-`, each ASCII letters only and in one case, the
+/// first a [`PLACEHOLDER_LEAD_WORDS`] entry and at least one a
+/// [`PLACEHOLDER_CREDENTIAL_NOUNS`] entry; the other words may be any
+/// letters. Unlike [`is_instructional_token_placeholder`] the later words are
+/// not listed, so this is applied only behind a vendor prefix, never to a
+/// bare value. A digit, a mixed-case word, or a missing lead word or noun
+/// keeps the value detected.
+pub(super) fn is_lead_word_phrase_placeholder(value: &str) -> bool {
+    let words: Vec<&str> = value.split(['_', '-']).collect();
+    let one_case = |word: &str| {
+        !word.is_empty()
+            && (word.bytes().all(|byte| byte.is_ascii_lowercase())
+                || word.bytes().all(|byte| byte.is_ascii_uppercase()))
+    };
+    let listed =
+        |word: &str, words: &[&str]| words.iter().any(|listed| word.eq_ignore_ascii_case(listed));
+    words.len() >= 2
+        && words.iter().all(|word| one_case(word))
+        && listed(words[0], PLACEHOLDER_LEAD_WORDS)
+        && words[1..]
+            .iter()
+            .any(|word| listed(word, PLACEHOLDER_CREDENTIAL_NOUNS))
+}
+
+/// `true` for a documentation placeholder glued as `my` + credential words
+/// (issue #1042): `mykeysecret` and `mykeyid`, the `ClickHouse` Cloud docs'
+/// `KEY_SECRET`/`KEY_ID` examples the #860 evidence lists. Lowercase ASCII
+/// letters only, `my`, then an exact split into two or more
+/// [`PLACEHOLDER_CREDENTIAL_WORDS`] with at least one
+/// [`PLACEHOLDER_CREDENTIAL_NOUNS`] entry. One word after `my` (`mysecret`,
+/// `mykey`) is a common weak real password and stays reported, as does any
+/// leftover letter, digit or uppercase letter.
+pub(super) fn is_glued_my_placeholder(value: &str) -> bool {
+    let Some(rest) = value.strip_prefix("my") else {
+        return false;
+    };
+    if rest.is_empty() || !rest.bytes().all(|byte| byte.is_ascii_lowercase()) {
+        return false;
+    }
+    // reached[i][many][noun]: rest[..i] splits into listed words, `many`
+    // when two or more, `noun` when one is a credential noun. Bounded by the
+    // value's length times the fixed word list.
+    let len = rest.len();
+    let mut reached = vec![[[false; 2]; 2]; len + 1];
+    reached[0][0][0] = true;
+    for start in 0..len {
+        for word in PLACEHOLDER_CREDENTIAL_WORDS {
+            if !rest[start..].starts_with(word) {
+                continue;
+            }
+            let end = start + word.len();
+            let is_noun = PLACEHOLDER_CREDENTIAL_NOUNS.contains(word);
+            for many in 0..2 {
+                for noun in 0..2 {
+                    if reached[start][many][noun] {
+                        let next_many = usize::from(many == 1 || start > 0);
+                        reached[end][next_many][usize::from(noun == 1 || is_noun)] = true;
+                    }
+                }
+            }
+        }
+    }
+    reached[len][1][1]
+}
+
 /// `true` for an instructional placeholder such as `YOUR_ACCESS_TOKEN`,
 /// `INSERT_ACCESS_TOKEN`, `YOUR_API_KEY`, or `your-oauth-token-here`: the
 /// value splits on `_`, `-`, and `.` into two or more words, the first is a

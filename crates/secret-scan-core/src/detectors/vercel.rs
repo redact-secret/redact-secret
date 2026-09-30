@@ -46,6 +46,8 @@ pub(super) const TYPED_BODY_LEN: usize = 56;
 
 /// The pre-#1036 floor every prefix keeps.
 const FLOOR: usize = 20;
+/// Every marker (`vcp_`, `vci_`, `vca_`, `vcr_`, `vck_`) is four bytes.
+const PREFIX_LEN: usize = 4;
 
 const TYPED_SIGNALS: [&str; 2] = ["vercel-documented-prefix", "corroborated-exact-length"];
 
@@ -118,6 +120,12 @@ impl Detector for VercelDetector {
         for (start, end, signals) in
             pattern::scan_prefixed_shapes(input, &SHAPES, pattern::is_alnum_dash)
         {
+            // Issue #1042: a body that is one repeated character
+            // (`vcp_` + a run of `x`) is a documentation placeholder, as the
+            // #1013 evidence records; a random body never is (#934).
+            if super::text::is_repeated_character_filler(&input[start + PREFIX_LEN..end]) {
+                continue;
+            }
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
@@ -326,6 +334,18 @@ mod tests {
     }
 
     #[test]
+    fn a_one_character_filler_body_is_a_placeholder() {
+        for prefix in ["vcp_", "vci_", "vca_", "vcr_", "vck_"] {
+            for len in [FLOOR, 24, TYPED_BODY_LEN] {
+                assert!(detect(&format!("{prefix}{}", "x".repeat(len))).is_empty());
+                assert!(detect(&format!("{prefix}{}", "0".repeat(len))).is_empty());
+            }
+            let twin = format!("{prefix}{}y", "x".repeat(FLOOR));
+            assert_eq!(detect(&twin).len(), 1, "{twin}");
+        }
+    }
+
+    #[test]
     fn a_repeated_value_is_reported_once_per_occurrence() {
         for (prefix, type_name) in TYPED {
             let token = format!("{prefix}{}", body(TYPED_BODY_LEN));
@@ -339,7 +359,8 @@ mod tests {
     /// before #1036, and the scan stays linear.
     #[test]
     fn a_long_run_is_one_aggregate_match() {
-        for input in ["vcp_".repeat(4096), format!("vcp_{}", "A".repeat(100_000))] {
+        // A two-character body: a one-character one is a placeholder (#1042).
+        for input in ["vcp_".repeat(4096), format!("vcp_{}", "AB".repeat(50_000))] {
             assert_sole(&input, &input, "vercel_token");
         }
     }

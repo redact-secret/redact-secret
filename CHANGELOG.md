@@ -146,6 +146,15 @@ evidence is linked from each published version.
   already silent; since #1026 the bare `secret_access_key` name reached the
   phrase in Rust test configs. A digit, an unlisted word, or a `secret` or
   `password` lead keeps the value reported.
+- Documentation placeholders the #860/#1013 evidence and the benchmarks'
+  placeholder controls list are no longer reported (#1042): `vercel-token`
+  skips a body of one repeated character (`vcp_` + a run of `x`), and
+  `generic-token` skips a lead-word phrase behind a vendor prefix
+  (`rpa_your_key_for_ci_pipeline_test_fixture_only`), an ellipsis after a
+  bare vendor prefix (`pdl_sdbx_apikey_...`), a filler layout with `:` and
+  `=` padding (the Bitwarden `0.xxxx...:xxxx==` template) and `my` glued to
+  two or more credential words (`mykeysecret`). One leftover character, a
+  digit, a mixed-case word or visible key material keeps a value reported.
 - A keyed environment store is read as an assignment (#1038):
   `os.environ["NAME"] = "<v>"` (single quotes too), `process.env["NAME"] =`,
   Ruby `ENV["NAME"] =`, `settings["api_key"] =`,

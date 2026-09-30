@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3771,
+  "fixtureCount": 3777,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -7858,26 +7858,17 @@
       "note": "A long delimited provider match remains deterministic and bounded."
     },
     {
-      "id": "vercel-positive-doc-style-placeholder",
+      "id": "vercel-negative-repeated-filler-placeholder",
       "detector": "vercel-token",
-      "kind": "positive",
+      "kind": "negative",
       "support": "supported",
-      "tier": "canonical",
+      "tier": "negative",
       "contexts": [
         "plain-text"
       ],
       "input": "vcp_xxxxxxxxxxxxxxxxxxxx",
-      "expected": [
-        {
-          "detector": "vercel-token",
-          "type": "vercel_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 24
-        }
-      ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+      "expected": [],
+      "note": "Issue #1042 reverses the earlier accepted tradeoff: a documentation placeholder whose body is one repeated character is not reported, as for stripe-token and heroku-api-key-legacy (#934). A random body is never one character; a body with any second character is still classified."
     },
     {
       "id": "vercel-negative-embedded-in-wider-identifier",
@@ -16362,6 +16353,58 @@
       "input": "API_KEY=\"placeholder-value\"\n",
       "expected": [],
       "note": "Issue #1041: placeholder-value is a placeholder phrase; a digit, an unlisted word, or a secret/password lead keeps a phrase reported."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-lead-word-phrase",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "RUNPOD_API_KEY=rpa_your_key_for_ci_pipeline_test_fixture_only\n",
+      "expected": [],
+      "note": "Issue #1042: behind a vendor prefix, an instructional phrase (a lead word, a credential noun, plain one-case words) is the word fixture the #860 RunPod evidence excludes; a digit or a mixed-case word keeps it reported."
+    },
+    {
+      "id": "contextual-negative-vendor-prefix-ellipsis",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PADDLE_API_KEY=pdl_sdbx_apikey_...\n",
+      "expected": [],
+      "note": "Issue #1042: an ellipsis display whose visible head is only a vendor prefix (short lowercase segments ending in a separator) shows no key material."
+    },
+    {
+      "id": "contextual-negative-layout-filler-with-padding",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export BWS_ACCESS_TOKEN=\"0.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxx==\"\n",
+      "expected": [],
+      "note": "Issue #1042: a multi-part filler template (a short lead, then one repeated character across -, ., : separated segments and trailing = padding) is a placeholder, like the all-zero UUID."
+    },
+    {
+      "id": "contextual-negative-glued-my-credential-words",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "KEY_ID=mykeyid\nKEY_SECRET=mykeysecret\n",
+      "expected": [],
+      "note": "Issue #1042: my + two or more credential words glued into one lowercase word are the ClickHouse Cloud docs' placeholders the #860 evidence lists; one word after my (mysecret) stays reported."
     },
     {
       "id": "contextual-negative-993-qualified-placeholder",
@@ -32977,6 +33020,32 @@
       "input": "legacy\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
       "expected": [],
       "note": "An embedded marker is never carved out of a wider identifier."
+    },
+    {
+      "id": "vercel-negative-x-run-placeholder",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=vcp_xxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #1042: vcp_ + a run of one repeated character is the documentation placeholder the #1013 evidence names (P4); a random body is never one character (#934 precedent)."
+    },
+    {
+      "id": "vercel-negative-app-x-run-placeholder",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=vca_xxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #1042: the vca_ app access token marker with a one-character filler body is a placeholder."
     },
     {
       "id": "vercel-pat-adversarial-long-suffix",

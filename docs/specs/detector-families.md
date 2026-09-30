@@ -368,6 +368,14 @@ bodies after any marker) stay, now under `vercel_token`. Cost: one byte-class
 check of each matched span; prefixes, lead bytes and prefilter literals are
 unchanged.
 
+Since [#1042](https://github.com/redact-secret/redact-secret/issues/1042) a
+body that is one repeated character (`vcp_` + a run of `x`, the masked filler
+[#1013](../audits/evidence/1013/vercel.md) P4 names a placeholder) is not
+reported under any marker, as for `stripe-token` and
+`heroku-api-key-legacy` (#934), so the `vcp_` + 56 `x` false positive above
+is gone. A random body is never one character; a body with any second
+character is still reported.
+
 ## Beta.8 arrival contracts
 
 Issue #726 freezes these 15 contracts and their wave order before detector
