@@ -1332,12 +1332,13 @@ fn context_matches(
     ContextVocabulary::new().matches(input, candidates)
 }
 
-/// Sorts `items` ascending in O(n log n) with no allocation. The association
-/// sorts only small `Copy` keys; a heap sort keeps that to a few hundred
-/// bytes of code per key type in the WebAssembly build, where each
-/// `sort_unstable` instantiation costs several kilobytes (issue #902).
+/// Sorts `items` ascending in O(n log n) with no allocation. Callers sort only
+/// small `Copy` keys (association keys here, borrowed string slices in
+/// `redact`); a heap sort keeps that to a few hundred bytes of code per key
+/// type in the WebAssembly build, where each `sort_unstable` instantiation
+/// costs several kilobytes (issues #902, #1084).
 #[inline(never)]
-fn heap_sort<T: Ord + Copy>(items: &mut [T]) {
+pub(crate) fn heap_sort<T: Ord + Copy>(items: &mut [T]) {
     fn sift_down<T: Ord + Copy>(items: &mut [T], mut root: usize) {
         loop {
             let mut child = 2 * root + 1;

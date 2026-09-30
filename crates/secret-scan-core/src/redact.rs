@@ -8,6 +8,7 @@
 
 use crate::error::{FormatterFailure, SecretScanError, SecretScanErrorCode};
 use crate::limits::WholeInputLimits;
+use crate::pii::heap_sort;
 use crate::types::{ByteRange, Finding, PlaceholderContext, PlaceholderFormatter};
 
 /// Maximum length in bytes of a placeholder a [`PlaceholderFormatter`] may
@@ -78,7 +79,7 @@ impl<'a> ForbiddenMatchedText<'a> {
             .filter(|range| range.len() <= MAX_PLACEHOLDER_LENGTH)
             .map(|range| &input[range.start()..range.end()])
             .collect();
-        values.sort_unstable();
+        heap_sort(&mut values);
         values.dedup();
         let shortest = values.iter().map(|value| value.len()).min().unwrap_or(0);
         Self { values, shortest }
