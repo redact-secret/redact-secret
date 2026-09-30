@@ -2665,6 +2665,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let otpauth_spans = otpauth_uri_spans(input);
     let jwk_lines = jwk_line_spans(input);
     let mut templates = OpenTemplateTracker::default();
+    let mut value_lines = ValueLinePairing::default();
     // One buffer for every assignment's normalized name (issue #984).
     let mut normalized = String::new();
 
@@ -2718,10 +2719,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 normalized.push_str(&rest);
             } else if matches!(names, NameSource::BuiltIn)
                 && &input[name_start..name_end] == "value"
-                && let Some(paired) = super::text::list_item_paired_name(
-                    input,
-                    super::text::line_around(input, name_start, name_end),
-                )
+                && let Some(paired) = value_lines.paired_name(input, name_start, name_end)
             {
                 // Issue #1016: a Kubernetes-style `env` entry's `value:` is
                 // assigned to the name its sibling `name:` key gives.
@@ -2862,6 +2860,51 @@ impl OpenTemplateTracker {
         self.position = end;
         self.opened && !self.closed
     }
+}
+
+/// The name a Kubernetes-style `env` item pairs with a `value` assignment
+/// ([`super::text::list_item_paired_name`], issue #1016), remembered for
+/// the line it was read on (issue #1054).
+///
+/// That answer depends only on the line, and a line holds no line break, so
+/// every `value` name inside it has the same line. The assignment loop asks
+/// once per line instead of walking back to the line start for every
+/// `value=` on it, which made `k` of them on one line of length `L` cost
+/// `O(k * L)`.
+#[derive(Default)]
+struct ValueLinePairing<'a> {
+    /// The last line read and the name it pairs with, if any.
+    last: Option<((usize, usize), Option<&'a str>)>,
+}
+
+impl<'a> ValueLinePairing<'a> {
+    /// [`super::text::list_item_paired_name`] for the line around
+    /// `name_start..name_end`, a span with no line break inside it.
+    fn paired_name(
+        &mut self,
+        input: &'a str,
+        name_start: usize,
+        name_end: usize,
+    ) -> Option<&'a str> {
+        if let Some(((line_start, line_end), paired)) = self.last
+            && line_start <= name_start
+            && name_end <= line_end
+        {
+            return paired;
+        }
+        #[cfg(test)]
+        VALUE_LINE_READS.with(|reads| reads.set(reads.get() + 1));
+        let line = super::text::line_around(input, name_start, name_end);
+        let paired = super::text::list_item_paired_name(input, line);
+        self.last = Some((line, paired));
+        paired
+    }
+}
+
+#[cfg(test)]
+thread_local! {
+    /// How many lines [`ValueLinePairing`] has read on this thread.
+    static VALUE_LINE_READS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
 }
 
 // --- single-line call with one positional literal (issue #866) ---------------
@@ -6015,5 +6058,99 @@ mod tests {
         ] {
             assert!(npmrc_spans(input).is_empty(), "{input}");
         }
+    }
+
+    // --- issue #1054: one line read per line of `value` names ---------------
+
+    fn value_line_reads() -> usize {
+        VALUE_LINE_READS.with(std::cell::Cell::get)
+    }
+
+    #[test]
+    fn value_names_on_one_long_line_read_that_line_once() {
+        let input = " value=x".repeat(8192);
+        let before = value_line_reads();
+        detect(&input);
+        assert_eq!(value_line_reads() - before, 1);
+
+        let lines = format!("{input}\n{input}\r\n{input}\r{input}");
+        let before = value_line_reads();
+        detect(&lines);
+        assert_eq!(value_line_reads() - before, 4);
+    }
+
+    #[test]
+    fn value_line_pairing_matches_reading_each_line_afresh() {
+        const PIECES: &[&str] = &[
+            "value",
+            "value",
+            "name",
+            ":",
+            ": ",
+            "=",
+            " ",
+            "  ",
+            "- ",
+            "-",
+            "\t",
+            "\r",
+            "\n",
+            "\r\n",
+            "DEEPGRAM_API_KEY",
+            "x",
+            "\u{e9}",
+            "\u{200b}",
+            "# c",
+            "{",
+            "valueFrom",
+            "\"",
+            "'",
+        ];
+        let mut state = 0x2545_f491_4f6c_dd1du64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % bound as u64).unwrap()
+        };
+        let mut inputs: Vec<String> = vec![
+            "env:\n  - name: DEEPGRAM_API_KEY\n    value: x\n".into(),
+            "env:\n  - value: x value: y\n    name: A_KEY\n".into(),
+            "value: x value=y\r\n- name: A\r".into(),
+        ];
+        for _ in 0..20_000 {
+            let len = 1 + next(14);
+            inputs.push((0..len).map(|_| PIECES[next(PIECES.len())]).collect());
+        }
+        let mut paired = 0usize;
+        for input in &inputs {
+            let spans: Vec<(usize, usize)> = input
+                .match_indices("value")
+                .map(|(at, name)| (at, at + name.len()))
+                .collect();
+            // Forward, as the assignment loop asks, then in a scrambled order.
+            let mut orders = vec![spans.clone()];
+            let mut scrambled = spans.clone();
+            for index in (1..scrambled.len()).rev() {
+                scrambled.swap(index, next(index + 1));
+            }
+            orders.push(scrambled);
+            for order in orders {
+                let mut memo = ValueLinePairing::default();
+                for (start, end) in order {
+                    let expected = super::super::text::list_item_paired_name(
+                        input,
+                        super::super::text::line_around(input, start, end),
+                    );
+                    assert_eq!(
+                        memo.paired_name(input, start, end),
+                        expected,
+                        "{input:?} at {start}"
+                    );
+                    paired += usize::from(expected.is_some());
+                }
+            }
+        }
+        assert!(paired > 0, "the generated inputs never pair a name");
     }
 }
