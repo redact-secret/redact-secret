@@ -524,7 +524,9 @@ names `deepgram` (its import or its receiving variable); the browser WebSocket
 `token` subprotocol on a request to the API host (`medium` with `deepgram`
 only as a word); a token header or subprotocol whose request line or `Host:`
 header names the API host on an earlier line of the same request (at most 8
-header lines up, no blank or non-header line between); and a credential key
+header lines up, no blank or non-header line between; since
+[#1046](https://github.com/redact-secret/redact-secret/issues/1046) a request
+line or header indented by spaces or tabs reads as the same line unindented); and a credential key
 (or `auth`) beside a `provider: <keyword>` field, on the same line
 (`{"provider":"deepgram","auth":"..."}`, which `generic-token` only warned on)
 or up to 6 keys above in the same YAML mapping. The sibling-field and

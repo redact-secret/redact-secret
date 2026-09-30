@@ -107,6 +107,13 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `deepgram-api-key` now reads an indented HTTP request line or header
+  (spaces or tabs, as in an indented Markdown code block or a YAML block
+  scalar) as the same line unindented, so a token header or WebSocket token
+  subprotocol below an indented request to the Deepgram API host is redacted
+  as `deepgram_api_key` like the unindented request (#1046). Detection only
+  widens; the host rule and the token slot are unchanged.
+
 - `gitlab-token` reports a routable GitLab personal access token
   (`glpat-<payload>.<version>.<length><crc>`, every PAT GitLab.com issues
   since 2025-07-24) as one `gitlab_token` finding through its last CRC byte

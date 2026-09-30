@@ -643,8 +643,16 @@ fn request_line_target(line: &str) -> Option<&str> {
     (!target.is_empty() && version.starts_with("HTTP/")).then_some(target)
 }
 
-/// `^[A-Za-z0-9-]+:` the name of an HTTP header line.
+/// A request line or header indented by spaces or tabs, as in an indented
+/// Markdown code block, a YAML block scalar or a nested log dump, reads as
+/// the same line unindented (issue #1046).
+fn strip_indent(line: &str) -> &str {
+    line.trim_start_matches([' ', '\t'])
+}
+
+/// `^[ \t]*[A-Za-z0-9-]+:` the name of an HTTP header line.
 fn http_header_name(line: &str) -> Option<&str> {
+    let line = strip_indent(line);
     let name_len = line
         .bytes()
         .take_while(|&byte| byte.is_ascii_alphanumeric() || byte == b'-')
@@ -653,7 +661,7 @@ fn http_header_name(line: &str) -> Option<&str> {
 }
 
 fn http_line(line: &str, domain: &str) -> HttpLine {
-    let line = line.strip_suffix('\r').unwrap_or(line);
+    let line = strip_indent(line.strip_suffix('\r').unwrap_or(line));
     if let Some(target) = request_line_target(line) {
         return HttpLine::Request(names_host_under(target, domain));
     }
