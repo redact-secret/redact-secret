@@ -510,6 +510,25 @@ impl DetectedFinding {
         self
     }
 
+    /// This finding with its range replaced. Every other field is moved, not
+    /// revalidated: they were validated when this finding was built (issue
+    /// #1060).
+    #[must_use]
+    pub(crate) const fn with_range(mut self, range: ByteRange) -> Self {
+        self.range = range;
+        self
+    }
+
+    /// This finding with its id replaced by `id`, which must be an
+    /// [identifier](is_identifier); the incremental session passes only
+    /// `finding-<n>` (issue #1060).
+    #[must_use]
+    pub(crate) fn with_id(mut self, id: String) -> Self {
+        debug_assert!(is_identifier(&id));
+        self.id = id;
+        self
+    }
+
     /// Deterministic finding id (`finding-1`, `finding-2`, ...).
     #[must_use]
     pub fn id(&self) -> &str {

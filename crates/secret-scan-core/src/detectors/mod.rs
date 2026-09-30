@@ -101,19 +101,60 @@ use private_key::PrivateKeyDetector;
 use prefilter::Literals;
 pub(crate) use prefilter::{LiteralMatcher, RequiredLiterals, ScanScope};
 
-pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line};
+pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line_in};
 pub(crate) use bearer_token::has_open_bearer_authorization;
-pub(crate) use confluent::has_open_confluent_properties;
+pub(crate) use confluent::has_open_confluent_properties_in;
 pub(crate) use generic_token::{
     RULESET_NAMES_DETECTOR_ID, generic_token_ruleset_names_detector,
     has_open_contextual_assignment, is_reserved_name, normalize_name,
 };
-pub(crate) use heroku::has_open_heroku_legacy_context;
-pub(crate) use keyword_gated_keys::{has_open_deepgram_request, has_open_provider_sibling};
+pub(crate) use heroku::has_open_heroku_legacy_context_in;
+pub(crate) use keyword_gated_keys::{has_open_deepgram_request_in, has_open_provider_sibling_in};
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
-pub(crate) use text::has_open_list_item_pair;
-pub(crate) use twilio::has_open_twilio_cli_table;
+pub(crate) use text::has_open_list_item_pair_in;
+pub(crate) use twilio::has_open_twilio_cli_table_in;
+#[cfg(test)]
+pub(crate) use {
+    aws::has_open_aws_secret_candidate_line,
+    confluent::has_open_confluent_properties,
+    heroku::has_open_heroku_legacy_context,
+    keyword_gated_keys::{has_open_deepgram_request, has_open_provider_sibling},
+    text::has_open_list_item_pair,
+    twilio::has_open_twilio_cli_table,
+};
+
+/// The most complete lines any lookback retention hint reads back: the
+/// `*_in` hints above each read their own last lines of one tail of this
+/// length (issue #1060).
+const MAX_LOOKBACK_LINES: usize = {
+    let counts = [
+        heroku::LOOKBACK_LINES,
+        twilio::CLI_TABLE_LOOKBACK_LINES,
+        confluent::PROPERTIES_LOOKBACK_LINES,
+        keyword_gated_keys::MAX_HTTP_BLOCK_LINES,
+        keyword_gated_keys::MAX_SIBLING_LINES,
+        // `has_open_list_item_pair_in` and `has_open_aws_secret_candidate_line_in`.
+        1,
+        2,
+    ];
+    let mut max = 0;
+    let mut index = 0;
+    while index < counts.len() {
+        if counts[index] > max {
+            max = counts[index];
+        }
+        index += 1;
+    }
+    max
+};
+
+/// The last [`MAX_LOOKBACK_LINES`] complete lines of `input`, oldest first,
+/// that every `has_open_*_in` lookback hint reads: computed once per closed
+/// line instead of once per hint (issue #1060).
+pub(crate) fn lookback_tail(input: &str) -> Vec<&str> {
+    text::last_lines(input, MAX_LOOKBACK_LINES)
+}
 
 /// `true` when appending `appended` to any input leaves both
 /// [`has_open_contextual_assignment`] and [`has_open_bearer_authorization`]

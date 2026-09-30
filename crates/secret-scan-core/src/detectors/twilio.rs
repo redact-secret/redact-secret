@@ -182,7 +182,7 @@ const CLI_TABLE_MAX_DATA_ROWS: usize = 4;
 /// How many lines before the value's line the CLI-table layout reads: the
 /// command line, the header row and up to [`CLI_TABLE_MAX_DATA_ROWS`] - 1
 /// earlier data rows.
-const CLI_TABLE_LOOKBACK_LINES: usize = CLI_TABLE_MAX_DATA_ROWS + 1;
+pub(super) const CLI_TABLE_LOOKBACK_LINES: usize = CLI_TABLE_MAX_DATA_ROWS + 1;
 
 /// The column header of the Auth Token in `twilio profiles:list --properties
 /// authToken` output (`ID     Auth Token`).
@@ -258,10 +258,16 @@ fn open_cli_table_column(previous: &[&str]) -> Option<usize> {
 /// so the session keeps the unit open until the row that can carry the token
 /// arrives (issue #933). The window it holds is exactly the one
 /// [`TwilioAuthTokenDetector`] reads back.
+#[cfg(test)]
 pub(crate) fn has_open_twilio_cli_table(input: &str) -> bool {
-    let tail = text::last_lines(input, CLI_TABLE_LOOKBACK_LINES);
+    has_open_twilio_cli_table_in(&super::lookback_tail(input))
+}
+
+/// [`has_open_twilio_cli_table`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_twilio_cli_table_in(tail: &[&str]) -> bool {
+    let tail = text::tail_lines(tail, CLI_TABLE_LOOKBACK_LINES);
     tail.last().is_some_and(|last| is_twilio_cli_command(last))
-        || open_cli_table_column(&tail).is_some()
+        || open_cli_table_column(tail).is_some()
 }
 
 /// `true` when the value `line[start..end]` is the whole cell under the Auth

@@ -399,6 +399,72 @@ fn closed_lines_in_one_append_are_detected_together() {
 }
 
 #[test]
+fn the_lead_is_kept_in_front_of_the_batch_and_dropped_with_it() {
+    // Issue #1060: the released line above the next unit is kept as the
+    // first `lead_len` bytes of `retained`, so lead and batch scan as one
+    // slice. It is dropped with the rest of the buffer on abort, and a CRLF
+    // pair split across appends keeps the same line as the lead.
+    let mut state: u64 = 0x1060;
+    let mut filler = |alphabet: &[u8], length: usize| -> String {
+        (0..length)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6_364_136_223_846_793_005)
+                    .wrapping_add(1_442_695_040_888_963_407);
+                char::from(alphabet[usize::try_from(state >> 33).unwrap() % alphabet.len()])
+            })
+            .collect()
+    };
+    let id = format!("AKIA{}", filler(b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567", 16));
+    let secret = filler(
+        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+        40,
+    );
+    let whole = crate::scan_and_redact(
+        &format!("{id}\r\n{secret}\n"),
+        &DetectorRegistry::with_built_in([]).unwrap(),
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+    )
+    .unwrap();
+    assert_eq!(whole.findings().len(), 2, "the ID and the secret below it");
+
+    for chunks in [
+        vec![format!("{id}\r"), "\n".to_string(), format!("{secret}\n")],
+        vec![format!("{id}\r\n"), format!("{secret}\n")],
+        vec![format!("{id}\r\n{secret}\n")],
+    ] {
+        let mut sanitizer = full();
+        let mut text = String::new();
+        let mut findings = Vec::new();
+        for (index, chunk) in chunks.iter().enumerate() {
+            let result = sanitizer.append(chunk).unwrap();
+            text.push_str(result.text());
+            findings.extend_from_slice(result.findings());
+            if index + 1 < chunks.len() {
+                assert!(sanitizer.lead_len > 0, "{chunks:?}");
+                assert!(sanitizer.retained[..sanitizer.lead_len].starts_with(&id));
+                assert_eq!(sanitizer.unit_start, sanitizer.lead_len);
+            }
+        }
+        let result = sanitizer.finalize().unwrap();
+        text.push_str(result.text());
+        findings.extend_from_slice(result.findings());
+        assert_eq!(
+            (text.as_str(), findings.as_slice()),
+            (whole.text(), whole.findings())
+        );
+    }
+
+    let mut sanitizer = full();
+    sanitizer.append(&format!("{id}\npartial")).unwrap();
+    assert!(sanitizer.lead_len > 0);
+    sanitizer.abort().unwrap();
+    assert_eq!(sanitizer.retained.capacity(), 0);
+    assert_eq!(sanitizer.lead_len, 0);
+}
+
+#[test]
 fn closed_units_waiting_in_a_batch_never_outgrow_the_buffer_limit() {
     let limits = IncrementalLimits::new(1 << 20, 256, 64, 64).unwrap();
     let mut input = String::new();

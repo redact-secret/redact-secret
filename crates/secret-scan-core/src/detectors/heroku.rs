@@ -421,7 +421,7 @@ fn is_whole_line(line: &[u8], start: usize, end: usize) -> bool {
 const AUTHORIZATIONS_MAX_ROWS: usize = 6;
 
 /// How many lines before the value's line any multi-line layout reads.
-const LOOKBACK_LINES: usize = AUTHORIZATIONS_MAX_ROWS + 1;
+pub(super) const LOOKBACK_LINES: usize = AUTHORIZATIONS_MAX_ROWS + 1;
 
 /// `true` when `line` runs a `heroku authorizations:<verb>` command, after
 /// any shell prompt (`$ heroku authorizations:info $AUTH_ID`).
@@ -493,12 +493,18 @@ fn is_token_table_row_value(line: &str, value_start: usize, value_end: usize) ->
 /// exactly the one [`HerokuApiKeyLegacyDetector`] reads back, so the unit
 /// always contains the context line whenever the whole-input scan would use
 /// it.
+#[cfg(test)]
 pub(crate) fn has_open_heroku_legacy_context(input: &str) -> bool {
-    let tail = text::last_lines(input, LOOKBACK_LINES);
+    has_open_heroku_legacy_context_in(&super::lookback_tail(input))
+}
+
+/// [`has_open_heroku_legacy_context`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_heroku_legacy_context_in(tail: &[&str]) -> bool {
+    let tail = text::tail_lines(tail, LOOKBACK_LINES);
     tail.last()
         .is_some_and(|last| is_heroku_auth_token_command(last))
-        || ends_inside_heroku_netrc_entry(&tail)
-        || ends_inside_heroku_authorizations_table(&tail)
+        || ends_inside_heroku_netrc_entry(tail)
+        || ends_inside_heroku_authorizations_table(tail)
 }
 
 /// Detects a legacy (pre-`HRKU-`) Heroku API token: a bare UUID-shaped run
