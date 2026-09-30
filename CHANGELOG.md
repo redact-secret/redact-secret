@@ -107,6 +107,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `aws-secret-access-key` no longer panics when a multi-byte character
+  (`é`, `日`, U+2028) sits right before a secret-name identifier such as
+  `secret` or `aws_secret_access_key`. The identifier start was computed as the
+  separator's byte index plus one, a char boundary only after a one-byte
+  separator; it now adds the separator's UTF-8 length. Such input scans like
+  the ASCII-separator case (#1063).
 - `deepgram-api-key` now reads an indented HTTP request line or header
   (spaces or tabs, as in an indented Markdown code block or a YAML block
   scalar) as the same line unindented, so a token header or WebSocket token
@@ -184,6 +190,13 @@ evidence is linked from each published version.
   Findings, ranges, ids and order are unchanged. The Python binding now
   releases the GIL during detection and caches its registry per thread, and
   the CLI check mode builds its registry once (#1059).
+
+- The WebAssembly binding keeps the registry built from the last `ruleset`
+  passed to `scan`/`scanAndRedact` and reuses it while the same ruleset bytes
+  repeat, instead of parsing the ruleset and building a registry per call
+  (#1059). A different ruleset replaces the entry and a rejected one is never
+  kept. Findings and errors are unchanged. A short scan with a ruleset takes
+  about 3 us instead of 68 us (Node 22, release `full` artifact, single run).
 
 - Reduced WebAssembly initialization time and artifact size (#1043).
   Findings, ranges, actions and output are unchanged, and no dependency was
