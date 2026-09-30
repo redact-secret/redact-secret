@@ -580,6 +580,23 @@ impl DetectedFinding {
         self
     }
 
+    /// This finding at `range`, with an empty id: for the unit-local view the
+    /// incremental session hands to `redact_into`, whose wrapping formatter
+    /// reads only the range and formats the global finding instead, so the
+    /// local view never allocates or clones an id (issue #1095). Its id is not
+    /// an [identifier](is_identifier): it must never leave the crate.
+    #[must_use]
+    pub(crate) fn relocated_without_id(&self, range: ByteRange) -> Self {
+        Self {
+            id: String::new(),
+            type_name: self.type_name.clone(),
+            detector: self.detector.clone(),
+            confidence: self.confidence,
+            range,
+            obfuscation: self.obfuscation,
+        }
+    }
+
     /// Deterministic finding id (`finding-1`, `finding-2`, ...).
     #[must_use]
     pub fn id(&self) -> &str {

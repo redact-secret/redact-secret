@@ -1138,11 +1138,13 @@ impl IncrementalSanitizer {
             let mut detected = detected.into_iter().peekable();
             for &unit_end in &unit_ends {
                 let unit_end = unit_end - lead_len;
-                let mut unit_findings = Vec::new();
-                while let Some(found) = detected.next_if(|found| found.range().start() < unit_end) {
-                    unit_findings.push(found);
-                }
-                self.finalize_unit(unit_begin, unit_end, unit_findings, released)?;
+                // The unit takes the leading findings that start before its
+                // end straight from the batch's iterator: no vector per unit
+                // (issue #1095).
+                let mut unit_findings = std::iter::from_fn(|| {
+                    detected.next_if(|found| found.range().start() < unit_end)
+                });
+                self.finalize_unit(unit_begin, unit_end, &mut unit_findings, released)?;
                 unit_begin = unit_end;
             }
             #[cfg(test)]
@@ -1172,7 +1174,7 @@ impl IncrementalSanitizer {
                     .lead_after(&self.retained[unit_start..unit_end])
                     .map(|length| unit_end - length);
                 let unit_end = unit_end - lead_len;
-                self.finalize_unit(unit_begin, unit_end, detected, released)?;
+                self.finalize_unit(unit_begin, unit_end, &mut detected.into_iter(), released)?;
                 #[cfg(test)]
                 self.record_unit_shadow(
                     unit_shadow,
@@ -1224,12 +1226,14 @@ impl IncrementalSanitizer {
         &mut self,
         begin: usize,
         end: usize,
-        detected: Vec<DetectedFinding>,
+        detected: &mut dyn Iterator<Item = DetectedFinding>,
         released: &mut Released,
     ) -> Result<(), SecretScanError> {
         let input_offset = self.finalized_bytes;
-        let mut global_findings: Vec<Finding> = Vec::with_capacity(detected.len());
-        let mut local_findings: Vec<Finding> = Vec::with_capacity(detected.len());
+        // Global findings go straight into `released`: they are the unit's
+        // tail there (issue #1095).
+        let first_global = released.findings.len();
+        let mut local_findings: Vec<Finding> = Vec::new();
         for found in detected {
             let range = found.range();
             let global_range =
@@ -1244,9 +1248,9 @@ impl IncrementalSanitizer {
                 .map_err(|_| SecretScanError::from(SecretScanErrorCode::PolicyFailure))?;
             let local_range = ByteRange::new(range.start() - begin, range.end() - begin)
                 .ok_or(SecretScanErrorCode::InvalidCandidate)?;
-            let local_detected = global_detected.clone().with_range(local_range);
+            let local_detected = global_detected.relocated_without_id(local_range);
             local_findings.push(local_detected.with_action(action));
-            global_findings.push(global_detected.with_action(action));
+            released.findings.push(global_detected.with_action(action));
             self.finding_count += 1;
         }
 
@@ -1263,6 +1267,7 @@ impl IncrementalSanitizer {
 
         let placeholder_offset = self.placeholder_count;
         let formatter = self.formatter.as_ref();
+        let global_findings = &released.findings[first_global..];
         let wrapped = |local_finding: &Finding, local_context: &PlaceholderContext| {
             let Ok(index) = local_findings
                 .binary_search_by_key(&local_finding.range().start(), |finding| {
@@ -1283,11 +1288,10 @@ impl IncrementalSanitizer {
             &mut released.text,
         )?;
 
-        self.placeholder_count += global_findings
+        self.placeholder_count += released.findings[first_global..]
             .iter()
             .filter(|finding| finding.action().replaces_text())
             .count();
-        released.findings.extend(global_findings);
         Ok(())
     }
 
@@ -1552,6 +1556,45 @@ mod tests {
 
         assert_eq!(error.code(), SecretScanErrorCode::PlaceholderFailure);
         assert_nothing_retained(&sanitizer);
+    }
+
+    #[test]
+    fn the_formatter_sees_global_ids_and_ranges_in_every_unit() {
+        // The unit-local view handed to `redact_into` carries no id (issue
+        // #1095): the formatter must still see each finding's global form.
+        use std::sync::{Arc, Mutex};
+        let seen = Arc::new(Mutex::new(Vec::new()));
+        let log = Arc::clone(&seen);
+        let formatter = move |finding: &Finding, context: &PlaceholderContext| {
+            log.lock().unwrap().push((
+                finding.id().to_string(),
+                finding.range().start(),
+                finding.range().end(),
+                context.placeholder_index(),
+            ));
+            Ok(format!("[R{}]", context.placeholder_index()))
+        };
+        let mut sanitizer = session_with(Box::new(DefaultPolicy), Box::new(formatter));
+        let lines = format!("x=1\napi_key={MARKER}\nplain é\npassword={MARKER}\n");
+        let result = sanitizer.append(&lines).unwrap();
+        let tail = sanitizer.finalize().unwrap();
+        let mut findings: Vec<Finding> = result.findings().to_vec();
+        findings.extend(tail.findings().iter().cloned());
+
+        let seen = seen.lock().unwrap();
+        assert!(!seen.is_empty());
+        assert_eq!(seen.len(), findings.len());
+        for (n, (finding, (id, start, end, index))) in findings.iter().zip(seen.iter()).enumerate()
+        {
+            assert_eq!(finding.id(), format!("finding-{}", n + 1));
+            assert_eq!(id, finding.id());
+            assert_eq!(
+                (*start, *end),
+                (finding.range().start(), finding.range().end())
+            );
+            assert_eq!(*index, n + 1);
+            assert!(finding.range().start() > 0);
+        }
     }
 
     #[test]
