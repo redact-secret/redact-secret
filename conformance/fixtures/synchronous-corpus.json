@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3777,
+  "fixtureCount": 3780,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -79364,6 +79364,80 @@
         }
       ],
       "note": "Issue #1028: a secret on the line directly below an \u0041SIA ID; the incremental session releases the ID line when it closes and scans the next line below a copy of it (#1040)."
+    },
+    {
+      "id": "aws-secret-access-key-positive-line-above-id",
+      "detector": "aws-secret-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "New credentials (value, then key id):\nSynthetic/Revoked+Aws/Secret+Access/Key1\n\u0041KIASYNTHETICEXAMPLE\n",
+      "expected": [
+        {
+          "detector": "aws-secret-access-key",
+          "type": "aws_secret_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 78
+        },
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 79,
+          "end": 99
+        }
+      ],
+      "note": "Issue #1044: a secret on the line directly above an AKIA ID is adjacent too (the #1028 contract's same or adjacent line); the incremental session holds the secret's line for exactly one line."
+    },
+    {
+      "id": "aws-secret-access-key-positive-phrase-for-qualifier",
+      "detector": "aws-secret-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is the secret access key for the staging user: SyntheticRevokedAwsSecretAccessKeyValue0 please rotate it.\n",
+      "expected": [
+        {
+          "detector": "aws-secret-access-key",
+          "type": "aws_secret_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 92
+        }
+      ],
+      "note": "Issue #1044: the phrase secret access key followed by for and up to four words, then ':', names the value, as a chat message writes it."
+    },
+    {
+      "id": "aws-secret-access-key-boundary-blank-line-above-id",
+      "detector": "aws-secret-access-key",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SyntheticRevokedAwsSecretAccessKeyValue0\n\n\u0041KIASYNTHETICEXAMPLE\n",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 62
+        }
+      ],
+      "note": "Only the line directly above an ID is adjacent; a blank line between ends the window."
     },
     {
       "id": "aws-secret-access-key-negative-bare-run",

@@ -224,7 +224,7 @@
     {
       "detector": "aws-secret-access-key",
       "evidence": {
-        "fixtureCount": 15,
+        "fixtureCount": 18,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -251,7 +251,9 @@
         "aws-secret-access-key-positive-credentials-file",
         "aws-secret-access-key-positive-dotenv",
         "aws-secret-access-key-positive-iam-create-access-key-json",
-        "aws-secret-access-key-positive-line-below-temporary-id"
+        "aws-secret-access-key-positive-line-above-id",
+        "aws-secret-access-key-positive-line-below-temporary-id",
+        "aws-secret-access-key-positive-phrase-for-qualifier"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

@@ -68,9 +68,10 @@ use std::borrow::Cow;
 
 use crate::detectors::{
     PrivateKeyRetentionTracker, carries_aws_access_key_id, continues_previous_line,
-    has_open_bearer_authorization, has_open_confluent_properties, has_open_contextual_assignment,
-    has_open_deepgram_request, has_open_heroku_legacy_context, has_open_list_item_pair,
-    has_open_provider_sibling, has_open_twilio_cli_table, is_open_tail_neutral,
+    has_open_aws_secret_candidate_line, has_open_bearer_authorization,
+    has_open_confluent_properties, has_open_contextual_assignment, has_open_deepgram_request,
+    has_open_heroku_legacy_context, has_open_list_item_pair, has_open_provider_sibling,
+    has_open_twilio_cli_table, is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
@@ -403,6 +404,28 @@ fn detect_batch(
     detected.ok().flatten()
 }
 
+/// Which open-construct checks hold the current unit open: the AWS
+/// secret-candidate hold (issue #1044) is kept apart, because a unit held
+/// only by it may be split before its last line.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct OpenConstructs {
+    other: bool,
+    aws_secret_candidate: bool,
+}
+
+/// Where the last line of `text` starts: after the line terminator before
+/// its own (`\n`, `\r\n` or a lone `\r`), or 0.
+fn last_line_start(text: &str) -> usize {
+    let body = text.strip_suffix('\n').unwrap_or(text);
+    let body = body.strip_suffix('\r').unwrap_or(body);
+    body.rfind(['\n', '\r']).map_or(0, |at| at + 1)
+}
+
+/// The last line of `text`, with its terminator.
+fn last_line(text: &str) -> &str {
+    &text[last_line_start(text)..]
+}
+
 /// Finds the byte offset of the next `\n` or `\r` at or after `from`, or
 /// `None` when `chunk` has no more line terminators.
 fn find_next_newline(chunk: &str, from: usize) -> Option<usize> {
@@ -534,6 +557,10 @@ pub struct IncrementalSanitizer {
     /// A copy of the released line directly above the retained text, kept
     /// only while a detector reads it from the next unit ([`Self::lead_after`]).
     lead: Option<String>,
+    /// When the current unit is open only because its last line holds an
+    /// unclaimed AWS secret-shaped run (issue #1044): where that line starts,
+    /// relative to `unit_start`.
+    aws_held_line: Option<usize>,
     finalized_bytes: usize,
     total_input_bytes: usize,
     finding_count: usize,
@@ -707,6 +734,7 @@ impl IncrementalSanitizer {
             open_tail: OpenTailCache::default(),
             lookbacks,
             lead: None,
+            aws_held_line: None,
             finalized_bytes: 0,
             total_input_bytes: 0,
             finding_count: 0,
@@ -781,6 +809,7 @@ impl IncrementalSanitizer {
     /// boundary, and with the plaintext it was derived from.
     fn reset_unit_state(&mut self) {
         self.scanned = None;
+        self.aws_held_line = None;
         self.open_tail = OpenTailCache::default();
         self.private_key.reset();
         self.multiline_open = false;
@@ -808,7 +837,7 @@ impl IncrementalSanitizer {
     /// (issue #986). The four lookback checks read a bounded number of lines
     /// and run as before. Only the current unit is judged: closed units
     /// waiting in the batch are never part of it (issue #985).
-    fn has_open_single_line_construct(&mut self) -> bool {
+    fn has_open_single_line_construct(&mut self) -> OpenConstructs {
         let scanned = self
             .scanned
             .as_deref()
@@ -819,17 +848,63 @@ impl IncrementalSanitizer {
         }
         self.open_tail.checked_len = scanned.len();
 
+        let scanned = self
+            .scanned
+            .as_deref()
+            .unwrap_or(&self.retained[self.unit_start..]);
         let lookbacks = self.lookbacks;
-        let open = self.open_tail.open
-            || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
-            || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
-            || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
-            || (lookbacks.list_item_pair && has_open_list_item_pair(scanned))
-            || (lookbacks.provider_sibling && has_open_provider_sibling(scanned))
-            || (lookbacks.deepgram_request && has_open_deepgram_request(scanned));
+        let open = OpenConstructs {
+            other: self.open_tail.open
+                || (lookbacks.heroku_legacy && has_open_heroku_legacy_context(scanned))
+                || (lookbacks.twilio_auth_token && has_open_twilio_cli_table(scanned))
+                || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
+                || (lookbacks.list_item_pair && has_open_list_item_pair(scanned))
+                || (lookbacks.provider_sibling && has_open_provider_sibling(scanned))
+                || (lookbacks.deepgram_request && has_open_deepgram_request(scanned)),
+            aws_secret_candidate: lookbacks.aws_secret_access_key
+                && has_open_aws_secret_candidate_line(scanned, || {
+                    self.line_above_unit_carries_aws_id()
+                }),
+        };
         #[cfg(test)]
         self.assert_open_construct_matches_the_rescan(open);
         open
+    }
+
+    /// Whether the line directly above the current unit carries an AWS access
+    /// key ID: the last line of the closed units waiting in the batch, or the
+    /// released lead ([`Self::lead_after`]), which is kept exactly when its
+    /// line carries one.
+    fn line_above_unit_carries_aws_id(&self) -> bool {
+        let above = &self.retained[..self.unit_start];
+        // Only the `\n` of a CRLF pair whose `\r` closed the lead's unit:
+        // the line above is still the lead's.
+        if above.is_empty()
+            || (above == "\n" && self.lead.as_ref().is_some_and(|lead| lead.ends_with('\r')))
+        {
+            self.lead.is_some()
+        } else {
+            carries_aws_access_key_id(&NormalizedInput::new(last_line(above)).into_text())
+        }
+    }
+
+    /// Ends the current unit before its last line and starts the next unit
+    /// with that line (issue #1044). Called when the line above it was held
+    /// only for an AWS secret-shaped run ([`has_open_aws_secret_candidate_line`])
+    /// and the new last line, which carries no access key ID, holds another
+    /// one: the earlier line's run is settled, so a run of such lines never
+    /// accumulates. The earlier unit closes exactly where it would have closed
+    /// without that hold.
+    fn split_before_last_line(&mut self, released: &mut Released) -> Result<(), SecretScanError> {
+        let line_start = self.unit_start + last_line_start(&self.retained[self.unit_start..]);
+        let line = self.retained.split_off(line_start);
+        if let Some(scanned) = self.scanned.as_mut() {
+            let line_scanned = NormalizedInput::new(&line).into_text();
+            scanned.truncate(scanned.len() - line_scanned.len());
+        }
+        self.close_unit(released)
+            .map_err(|error| self.fail_with(error))?;
+        self.append_retained(&line, true, released)
     }
 
     /// Differential check (issue #986): the maintained scan copy and the
@@ -837,7 +912,7 @@ impl IncrementalSanitizer {
     /// whole current unit report, after every closed line of every test that
     /// drives a session.
     #[cfg(test)]
-    fn assert_open_construct_matches_the_rescan(&self, open: bool) {
+    fn assert_open_construct_matches_the_rescan(&self, open: OpenConstructs) {
         let unit = &self.retained[self.unit_start..];
         let rescanned = NormalizedInput::new(unit).into_text();
         assert_eq!(
@@ -859,7 +934,15 @@ impl IncrementalSanitizer {
             || (reads_provider_siblings(&self.registry) && has_open_provider_sibling(&rescanned))
             || (self.registry.contains(DEEPGRAM_DETECTOR_ID)
                 && has_open_deepgram_request(&rescanned));
-        assert_eq!(open, reference, "open single-line construct");
+        assert_eq!(open.other, reference, "open single-line construct");
+        let aws_reference = self.registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID)
+            && has_open_aws_secret_candidate_line(&rescanned, || {
+                self.line_above_unit_carries_aws_id()
+            });
+        assert_eq!(
+            open.aws_secret_candidate, aws_reference,
+            "open AWS secret candidate line"
+        );
     }
 
     /// Adds `piece` to the current unit and enforces the limits on it.
@@ -1013,7 +1096,14 @@ impl IncrementalSanitizer {
         } else {
             None
         };
-        let next_lead = self.lead_after(&self.retained[..batch_length]);
+        // A batch that is only the `\n` of a CRLF pair whose `\r` closed the
+        // lead's unit completes that same line, which stays the lead.
+        let next_lead = match lead {
+            Some(ref lead) if lead.ends_with('\r') && &self.retained[..batch_length] == "\n" => {
+                Some(format!("{lead}\n"))
+            }
+            _ => self.lead_after(&self.retained[..batch_length]),
+        };
 
         let unit_ends = std::mem::take(&mut self.unit_ends);
         let mut unit_begin = 0;
@@ -1087,10 +1177,7 @@ impl IncrementalSanitizer {
         if !self.lookbacks.aws_secret_access_key {
             return None;
         }
-        let body = text.strip_suffix('\n').unwrap_or(text);
-        let body = body.strip_suffix('\r').unwrap_or(body);
-        let start = body.rfind(['\n', '\r']).map_or(0, |at| at + 1);
-        let line = &text[start..];
+        let line = last_line(text);
         carries_aws_access_key_id(&NormalizedInput::new(line).into_text()).then(|| line.to_owned())
     }
 
@@ -1240,9 +1327,21 @@ impl IncrementalSanitizer {
             };
             self.append_retained(&chunk[cursor..=newline], true, &mut released)?;
 
-            if !self.multiline_open && !self.has_open_single_line_construct() {
-                self.close_unit(&mut released)
-                    .map_err(|error| self.fail_with(error))?;
+            if self.multiline_open {
+                self.aws_held_line = None;
+            } else {
+                let open = self.has_open_single_line_construct();
+                let line_start = last_line_start(&self.retained[self.unit_start..]);
+                if !open.other && !open.aws_secret_candidate {
+                    self.close_unit(&mut released)
+                        .map_err(|error| self.fail_with(error))?;
+                } else if !open.other && self.aws_held_line.is_some_and(|held| held != line_start) {
+                    // A new line after the held one (not the `\n` that
+                    // completes its CRLF) holds another run.
+                    self.split_before_last_line(&mut released)?;
+                }
+                self.aws_held_line = (!open.other && open.aws_secret_candidate)
+                    .then(|| last_line_start(&self.retained[self.unit_start..]));
             }
             cursor = newline + 1;
         }

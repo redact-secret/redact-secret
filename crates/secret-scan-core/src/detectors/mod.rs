@@ -101,7 +101,7 @@ use private_key::PrivateKeyDetector;
 use prefilter::Literals;
 pub(crate) use prefilter::{PairSet, RequiredLiterals};
 
-pub(crate) use aws::carries_aws_access_key_id;
+pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line};
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{

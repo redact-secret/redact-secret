@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 98,
+  "fixtureCount": 99,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1542,6 +1542,46 @@
         }
       ],
       "note": "Issue #865: a `sk_` + 48 lowercase hex key with its `_residency_eu` suffix stays one whole finding, suffix included, at every UTF-8 byte and char partition, including splits inside the prefix, the hex body and the suffix; the residency twin one hex byte short on the next line never emits one, and a bare-marker key on the last line stays one finding, matching elevenlabs-api-key-positive-residency-dotenv and elevenlabs-api-key-boundary-one-short."
+    },
+    {
+      "id": "aws-secret-access-key-incremental-adjacent-lines",
+      "input": "\u0041KIASYNTHETICEXAMPLE\nSynthetic/Revoked+Aws/Secret+Access/Key1\nSyntheticRevokedAwsSecretAccessKeyValue0\n\u0041SIASYNTHETIC0189TMP\n",
+      "text": "<SECRET_1>\n<SECRET_2>\n<SECRET_3>\n<SECRET_4>\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "aws-access-key",
+          "end": 20,
+          "specificity": "provider",
+          "start": 0,
+          "type": "aws_access_key_id"
+        },
+        {
+          "confidence": "high",
+          "detector": "aws-secret-access-key",
+          "end": 61,
+          "specificity": "provider",
+          "start": 21,
+          "type": "aws_secret_access_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "aws-secret-access-key",
+          "end": 102,
+          "specificity": "provider",
+          "start": 62,
+          "type": "aws_secret_access_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "aws-access-key",
+          "end": 123,
+          "specificity": "provider",
+          "start": 103,
+          "type": "aws_access_key_id"
+        }
+      ],
+      "note": "Issues #1040 and #1044: an AKIA line is released when it closes and the secret below it is still claimed through the session's copy of it; the next secret, directly above an ASIA line, is held for exactly one line. Whole-input results at every partition."
     }
   ]
 }

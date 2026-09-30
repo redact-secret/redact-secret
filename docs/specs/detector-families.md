@@ -952,7 +952,7 @@ benchmarks arrival and profile evidence.
 | --- | --- | --- | --- | --- |
 | `gitlab:routable-personal-access-token` | `gitlab-token` | `glpat-` + unpadded base64url `[A-Za-z0-9_-]{27,300}` + `.` + 2 base36 version + `.` + 2 base36 payload length (equal to the payload length) + 7 base36 CRC-32 of every byte from `g` through the length holder; the whole value is the span, and a `[A-Za-z0-9_-]` byte glued after the CRC rejects the routable form | `gitlab_token` (unchanged) | T1 (GitLab generator, decoder, PAT model and design document; provider-authored rules, R2) |
 | `aws:sts-temporary-access-key` | `aws-access-key` | `ASIA` + exactly 16 `[A-Z0-9]` (20 in total); a `[A-Za-z0-9]` byte before or after rejects the match; typed, actioned and bounded exactly like `AKIA` | `aws_access_key_id` (unchanged) | prefix T1 (AWS IAM identifiers docs); body T2 (AWS docs example, AWS-owned git-secrets and ferret-scan rules, four peer scanners); T1 if R2 is applied to ferret-scan |
-| `aws:iam-user-secret-access-key` | `aws-secret-access-key` | exactly 40 `[A-Za-z0-9/+]` with at least one uppercase and one lowercase letter; no `[A-Za-z0-9/+]` byte before and no `[A-Za-z0-9/+=]` byte after; claimed only under an AWS secret access key name (compact name ending `secretaccesskey`, `awssecretkey` or `awssecret`, or the phrase `secret access key`, then `=` or `:`) or on the line of, or directly below, an `AKIA`/`ASIA` access key ID | `aws_secret_access_key` | T2, context-constrained (AWS docs example, AWS-owned git-secrets and ferret-scan rules, peer scanners); T1 if R2 is applied; AWS Macie makes context T1; the name list, adjacency window and mixed-case guard are policy |
+| `aws:iam-user-secret-access-key` | `aws-secret-access-key` | exactly 40 `[A-Za-z0-9/+]` with at least one uppercase and one lowercase letter; no `[A-Za-z0-9/+]` byte before and no `[A-Za-z0-9/+=]` byte after; claimed only under an AWS secret access key name (compact name ending `secretaccesskey`, `awssecretkey` or `awssecret`, or the phrase `secret access key`, optionally followed by `for` and one to four words, then `=` or `:`) or on the line of, or directly below or above, an `AKIA`/`ASIA` access key ID | `aws_secret_access_key` | T2, context-constrained (AWS docs example, AWS-owned git-secrets and ferret-scan rules, peer scanners); T1 if R2 is applied; AWS Macie makes context T1; the name list, adjacency window and mixed-case guard are policy |
 | `google:oauth2-credential` (client secret) | `google-oauth-client-secret` | `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]` (35 in total); a `[A-Za-z0-9_-]` byte before or after rejects the match, and any other width is rejected whole | `google_oauth_client_secret` | T2 (Google's osv-scalibr rule, noseyparker, CredSweeper); T1 if R2 is applied to osv-scalibr |
 
 AWS temporary access key IDs
@@ -977,16 +977,23 @@ detectors (Macie, git-secrets, ferret-scan) are. A new detector,
 specificity, high and always redacted, so it wins the overlap with the
 `contextual_secret` that `generic-token` reports under the same names. The
 name is read back over at most 96 bytes of the value's line. The adjacency
-rule reads the value's own line and the line directly above it. The
+rule reads the value's own line and the lines directly above and below it
+([#1044](https://github.com/redact-secret/redact-secret/issues/1044) added
+the line below the secret, and the phrase form `secret access key for <up to
+four words>:` of a chat message). The
 incremental session releases a line that carries an access key ID, with its
 findings, as soon as the line closes, and scans the next unit below a copy
 of it ([#1040](https://github.com/redact-secret/redact-secret/issues/1040)),
-so streamed and whole-input scans agree without delaying the ID line. The mixed-case guard
+so streamed and whole-input scans agree without delaying the ID line. A
+line whose 40-character run nothing on it or above it claims is held for
+exactly one more line, since an ID there would claim it; when that next line
+holds another such run and no ID, the earlier line is released, so a list of
+such values never accumulates past two lines. The mixed-case guard
 keeps a 40-hex Git SHA out. False negatives: a bare secret with no name or
-ID, an ID on the line below the secret or two lines away, a 41-byte
+ID, an ID two lines away, a 41-byte
 temporary secret and a padded value (both still redacted by `generic-token`
 under a name). False positives: a 40-character mixed-case Base64-alphabet
-value under an AWS secret name, or on or below an access key ID line, that
+value under an AWS secret name, or on, below or above an access key ID line, that
 is not a secret. The AWS documentation example secret stays exempt by exact
 equality (the pipeline's vendor placeholder literals). Cost: a literal check,
 one access-key-ID scan and one pass over each line's Base64 runs.
@@ -1288,7 +1295,7 @@ check.
 | The Hugging Face organization-token prefix is adopted under `hf_`'s frozen body grammar, tiered as T2. | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack credential family is completed: the user-token grammar and the rotation family's version section are frozen. | [Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | Google OAuth client secrets `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]` are reported as `google_oauth_client_secret` at provider specificity, bare or in any context; `ya29.` access tokens and `1//` refresh tokens stay unclaimed (T2, [#1029](https://github.com/redact-secret/redact-secret/issues/1029), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
-| AWS secret access keys, exactly 40 `[A-Za-z0-9/+]` with mixed case, are reported as `aws_secret_access_key` at provider specificity only under an AWS secret access key name or on or directly below an `AKIA`/`ASIA` ID line (T2, context-constrained, [#1028](https://github.com/redact-secret/redact-secret/issues/1028), section above). | generic policy default, no dedicated ADR; applies the existing context-gated provider policy (the Twilio and Confluent paired-identifier precedent) to one more family |
+| AWS secret access keys, exactly 40 `[A-Za-z0-9/+]` with mixed case, are reported as `aws_secret_access_key` at provider specificity only under an AWS secret access key name or on or directly below or above an `AKIA`/`ASIA` ID line (T2, context-constrained, [#1028](https://github.com/redact-secret/redact-secret/issues/1028), section above). | generic policy default, no dedicated ADR; applies the existing context-gated provider policy (the Twilio and Confluent paired-identifier precedent) to one more family |
 | AWS `ASIA` + exactly 16 `[A-Z0-9]` temporary access key IDs are reported as `aws_access_key_id`, typed and actioned exactly like `AKIA` (T2, [#1027](https://github.com/redact-secret/redact-secret/issues/1027), section above). | generic policy default, no dedicated ADR; records the existing `aws-access-key` claim as a contract |
 | A routable GitLab `glpat-` personal access token whose length holder and CRC-32 verify is reported as one `gitlab_token` finding through its last CRC byte; a non-verifying dotted tail keeps the legacy payload match ([#1022](https://github.com/redact-secret/redact-secret/issues/1022), section above). This closes the routable-PAT gap the GitLab inventory ADR tracked. | generic policy default, no dedicated ADR; applies the existing routable `glrt-` grammar (#730) to one more GitLab prefix |
 | The GitLab token-prefix table is inventoried, and its two undeclared prefixes are given a contract. | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

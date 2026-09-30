@@ -421,7 +421,9 @@
             "aws-secret-access-key-positive-credentials-file",
             "aws-secret-access-key-positive-dotenv",
             "aws-secret-access-key-positive-iam-create-access-key-json",
-            "aws-secret-access-key-positive-line-below-temporary-id"
+            "aws-secret-access-key-positive-line-above-id",
+            "aws-secret-access-key-positive-line-below-temporary-id",
+            "aws-secret-access-key-positive-phrase-for-qualifier"
           ],
           "state": "supported"
         },
@@ -15584,6 +15586,7 @@
             "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "aws-secret-access-key-incremental-adjacent-lines",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -16006,6 +16009,7 @@
             "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "aws-secret-access-key-incremental-adjacent-lines",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -16550,6 +16554,7 @@
             "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "aws-secret-access-key-incremental-adjacent-lines",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",

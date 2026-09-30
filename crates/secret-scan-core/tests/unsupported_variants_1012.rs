@@ -564,6 +564,12 @@ mod aws_secret_access_key {
                     "const s3 = new S3Client({{ credentials: {{ accessKeyId: \"{akia}\", secretAccessKey: \"{value}\" }} }});\n"
                 ),
                 format!("My AWS keys are {temporary_id} and {value}, what is wrong?"),
+                // Issue #1044: the ID on the line directly below.
+                format!("New credentials (value, then key id):\n{value}\n{akia}\n"),
+                format!("{value}\r\n{temporary_id}\r\n"),
+                format!(
+                    "Here is the secret access key for the staging user: {value} please rotate it.\n"
+                ),
             ] {
                 assert_secret_finding(&input, &value);
             }
@@ -605,8 +611,10 @@ mod aws_secret_access_key {
             format!("{}\n{sha}\n", id("AKIA", 5)),
             format!("etag: {value}\n"),
             format!("sha256={value}\n"),
-            format!("{value}\n{}\n", id("AKIA", 5)),
+            format!("{value}\n\n{}\n", id("AKIA", 5)),
             format!("{}\n\n{value}\n", id("AKIA", 5)),
+            format!("{value}\n{}\n", id("AIDA", 5)),
+            format!("Here is the build digest for the staging user: {value}\n"),
             format!("{}\n{value}\n", id("AIDA", 5)),
             "aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\n".to_owned(),
         ] {
@@ -647,6 +655,82 @@ mod aws_secret_access_key {
         assert_partition_parity(&format!("aws_secret_access_key = {}\n", secret(9)));
         assert_partition_parity(&format!("{}\n{}\n", id("AKIA", 9), secret(9)));
         assert_partition_parity(&format!("{}\r\n{}\r\nnext\n", id("ASIA", 9), secret(9)));
+    }
+
+    #[test]
+    fn a_secret_above_an_access_key_id_keeps_partition_parity() {
+        assert_partition_parity(&format!("{}\n{}\n", secret(12), id("AKIA", 12)));
+        assert_partition_parity(&format!("{}\r\n{}\r\nnext\n", secret(12), id("ASIA", 12)));
+        assert_partition_parity(&format!(
+            "{}\n{}\n{}\n{}\n",
+            secret(13),
+            secret(14),
+            id("AKIA", 13),
+            secret(15)
+        ));
+        assert_partition_parity(&format!("{}\n{}\n", secret(16), secret(17)));
+        let (_, findings) = whole_input(&format!(
+            "{}\n{}\n{}\n{}\n",
+            secret(13),
+            secret(14),
+            id("AKIA", 13),
+            secret(15)
+        ));
+        // The ID claims the runs directly above and below it only.
+        assert_eq!(
+            detector_findings(&findings, DETECTOR).len(),
+            2,
+            "{findings:?}"
+        );
+    }
+
+    /// Issue #1044's hold: a line with an unclaimed run waits for exactly one
+    /// more line, and a run of such lines never accumulates, so a long list
+    /// of secret-shaped values stays within a small token limit.
+    #[test]
+    fn a_secret_shaped_line_waits_for_exactly_one_line() {
+        let limits = redact_secret::IncrementalLimits::new(1 << 20, 1_024, 256, 512).unwrap();
+        let mut session = redact_secret::IncrementalSanitizer::new(limits).unwrap();
+        let lines: Vec<String> = (0..400).map(|seed| format!("{}\n", secret(seed))).collect();
+        let mut emitted = String::new();
+        for (index, line) in lines.iter().enumerate() {
+            emitted.push_str(session.append(line).unwrap().text());
+            // Every line but the last one appended is released.
+            assert_eq!(emitted, lines[..index].concat(), "line {index}");
+        }
+        emitted.push_str(session.finalize().unwrap().text());
+        assert_eq!(emitted, lines.concat());
+
+        // An ID line releases itself and the line above it at once.
+        let mut session =
+            redact_secret::IncrementalSanitizer::new(support::generous_limits()).unwrap();
+        assert_eq!(
+            session.append(&format!("{}\n", secret(20))).unwrap().text(),
+            ""
+        );
+        let released = session.append(&format!("{}\n", id("AKIA", 20))).unwrap();
+        assert_eq!(released.findings().len(), 2);
+        assert!(released.findings().iter().any(|f| f.detector() == DETECTOR));
+    }
+
+    /// Issue #1044: the `\n` of a CRLF pair arriving on its own is not a new
+    /// line, so a held line is never split from the construct above it (a
+    /// Kubernetes `name:`/`value:` pair whose value is secret-shaped).
+    #[test]
+    fn a_crlf_completed_held_line_stays_with_its_construct() {
+        let value = secret(21);
+        for input in [
+            format!("env:\r\n  - name: CO_API_KEY\r\n    value: \"{value}\"\r\n\r\nenv:\r\n"),
+            format!("{value}\r\n{}\r\n{value}\r\n\r\n", id("ASIA", 21)),
+            format!("{value}\r\n{value}\r\n{value}\r\n"),
+        ] {
+            let (text, findings) = whole_input(&input);
+            let lines: Vec<&str> = input.split_inclusive(['\n', '\r']).collect();
+            let session = run(&lines);
+            assert_eq!(session.text(), text, "{input:?}");
+            assert_eq!(session.findings().len(), findings.len(), "{input:?}");
+            assert_partition_parity(&input);
+        }
     }
 
     /// Issue #1040: a closed line carrying an access key ID is released, with
