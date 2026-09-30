@@ -146,7 +146,13 @@ export function createWasmShapedBinding(
           formatter(finding, { placeholderIndex: index + 1 });
         });
       }
-      return { text: redacted, findings };
+      return {
+        takeText: () => redacted,
+        takeFindings: () => findings,
+        free: () => {
+          calls.push("free");
+        },
+      };
     },
     createIncrementalSanitizer: (
       maxInputCodeUnits,
@@ -209,4 +215,6 @@ export const sampleWasmFinding: WasmFinding = Object.freeze({
   action: "redact",
   obfuscation: "none",
   range: Object.freeze({ start: 8, end: 39 }),
+  start: 8,
+  end: 39,
 });
