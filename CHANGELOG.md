@@ -242,6 +242,12 @@ evidence is linked from each published version.
   0.938] of `4fb78827` and 1.187 [1.108, 1.265] of beta.8; processing is
   unchanged.
 
+- CLI streaming input (#1088): a chunk that completes no partial UTF-8
+  sequence is now handed to the scanner without being copied, and only an
+  incomplete trailing sequence (at most 3 bytes) is carried. Output, exit
+  codes, and error messages are unchanged, including for invalid UTF-8 and
+  a character split across reads.
+
 ## 0.1.0-beta.11 — 2026-09-29
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.11/README.md).
