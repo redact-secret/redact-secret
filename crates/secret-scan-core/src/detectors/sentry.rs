@@ -69,7 +69,7 @@
 //! bare organization slug or project ID share no shape with either grammar
 //! above and are not classified by either detector.
 
-use crate::detectors::pattern::{self, RunLength, is_alnum_underscore};
+use crate::detectors::pattern::{self, RunCursor, RunLength, is_alnum_underscore};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -153,12 +153,14 @@ impl Detector for SentryOrgAuthTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        // Input without the prefix returns before the run-end table is built
-        // (issue #982).
+        // Input without the prefix returns before any run is measured
+        // (issue #982). One cursor per segment keeps each one's queries
+        // non-decreasing, so each measures a byte at most once (issue #1056).
         let Some(first) = pattern::find_literal(bytes, ORG_PREFIX.as_bytes(), 0) else {
             return Ok(Vec::new());
         };
-        let base64_ends = pattern::run_ends(bytes, is_base64_std);
+        let mut payload_ends = RunCursor::new(bytes, is_base64_std);
+        let mut signature_ends = RunCursor::new(bytes, is_base64_std);
         let mut candidates = Vec::new();
         let mut start = first;
 
@@ -168,7 +170,8 @@ impl Detector for SentryOrgAuthTokenDetector {
                 continue;
             }
 
-            let Some(end) = org_match_at(bytes, &base64_ends, start) else {
+            let Some(end) = org_match_at(bytes, &mut payload_ends, &mut signature_ends, start)
+            else {
                 start += 1;
                 continue;
             };
@@ -193,16 +196,23 @@ impl Detector for SentryOrgAuthTokenDetector {
 /// after [`ORG_PREFIX`] at `start`. Returns the exclusive end offset on
 /// success; the caller still applies the boundary check.
 ///
-/// `base64_ends` is the precomputed maximal-run-end table from
-/// [`pattern::run_ends`], so each segment's length is a table lookup rather
-/// than a rescan, keeping the whole detector linear in the input length.
-fn org_match_at(bytes: &[u8], base64_ends: &[usize], start: usize) -> Option<usize> {
+/// `payload_ends` and `signature_ends` are [`RunCursor`]s over the base64
+/// alphabet, one per segment. Both segments' starts only move forward as
+/// `start` does (a later payload run ends no earlier), so each cursor
+/// measures a byte at most once, keeping the whole detector linear in the
+/// input length without a whole-input table (issue #1056).
+fn org_match_at(
+    bytes: &[u8],
+    payload_ends: &mut RunCursor<'_>,
+    signature_ends: &mut RunCursor<'_>,
+    start: usize,
+) -> Option<usize> {
     let payload_start = start + ORG_PREFIX.len();
     if !bytes[payload_start..].starts_with(ORG_JSON_MARKER.as_bytes()) {
         return None;
     }
 
-    let core_end = base64_ends[payload_start];
+    let core_end = payload_ends.end(payload_start);
     if core_end - payload_start < ORG_MIN_PAYLOAD_LEN {
         return None;
     }
@@ -219,7 +229,7 @@ fn org_match_at(bytes: &[u8], base64_ends: &[usize], start: usize) -> Option<usi
     }
 
     let signature_start = separator + 1;
-    let signature_end = base64_ends[signature_start];
+    let signature_end = signature_ends.end(signature_start);
     if signature_end - signature_start != ORG_SIGNATURE_LEN {
         return None;
     }

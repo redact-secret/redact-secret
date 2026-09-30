@@ -39,7 +39,7 @@
 //! `regex` crate cannot be used here — this crate is dependency-free — so
 //! [`scan`] composes the shape from the shared `pattern` primitives.
 
-use crate::detectors::pattern::{self, Alphabet};
+use crate::detectors::pattern::{self, Alphabet, RunCursor};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -116,13 +116,16 @@ fn finding_type(bytes: &[u8], start: usize) -> &'static str {
 /// key never yields a second, shorter reading of the same bytes.
 fn scan(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    // Input without the prefix returns before the run-end tables are built
-    // (issue #982).
+    // Input without the prefix returns before any run is measured (issue
+    // #982); the cursors measure only the runs asked about (issue #1056).
+    // Namespaced queries start after namespaces of different lengths, so a
+    // later attempt can ask a few bytes behind an earlier one; the cursor
+    // answers that exactly and re-measures only what it steps back over.
     let Some(first) = pattern::find_literal(bytes, PREFIX.as_bytes(), 0) else {
         return Vec::new();
     };
-    let legacy_ends = pattern::run_ends(bytes, LEGACY_ALPHABET);
-    let namespaced_ends = pattern::run_ends(bytes, NAMESPACED_ALPHABET);
+    let mut legacy_ends = RunCursor::new(bytes, LEGACY_ALPHABET);
+    let mut namespaced_ends = RunCursor::new(bytes, NAMESPACED_ALPHABET);
     let mut matches = Vec::new();
     let mut start = first;
     while start < bytes.len() {
@@ -131,7 +134,8 @@ fn scan(input: &str) -> Vec<(usize, usize)> {
             continue;
         }
         let body_start = start + PREFIX.len();
-        let Some(end) = variant_end(bytes, &legacy_ends, &namespaced_ends, body_start) else {
+        let Some(end) = variant_end(bytes, &mut legacy_ends, &mut namespaced_ends, body_start)
+        else {
             start += 1;
             continue;
         };
@@ -148,8 +152,8 @@ fn scan(input: &str) -> Vec<(usize, usize)> {
 /// present, otherwise the legacy form. There is no fallback between them.
 fn variant_end(
     bytes: &[u8],
-    legacy_ends: &[usize],
-    namespaced_ends: &[usize],
+    legacy_ends: &mut RunCursor<'_>,
+    namespaced_ends: &mut RunCursor<'_>,
     body_start: usize,
 ) -> Option<usize> {
     for literal in NAMESPACED_PREFIXES {
@@ -175,8 +179,13 @@ fn variant_end(
 /// marker is also one of `lens`. Because the run is maximal, a body whose
 /// right segment is followed by more alphabet bytes has the wrong right
 /// length and is rejected, never truncated to fit.
-fn segmented_end(bytes: &[u8], ends: &[usize], body_start: usize, lens: &[usize]) -> Option<usize> {
-    let body_end = ends[body_start];
+fn segmented_end(
+    bytes: &[u8],
+    ends: &mut RunCursor<'_>,
+    body_start: usize,
+    lens: &[usize],
+) -> Option<usize> {
+    let body_end = ends.end(body_start);
     for &left in lens {
         let marker_start = body_start + left;
         let marker_end = marker_start + MARKER.len();

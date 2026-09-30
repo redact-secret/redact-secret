@@ -86,12 +86,12 @@ impl Detector for MicrosoftEntraClientSecretDetector {
 /// namespace.
 fn scan(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    // Input without the anchor returns before the run-end table is built
-    // (issue #982).
+    // Input without the anchor returns before any run is measured (issue
+    // #982); the cursor measures only the runs asked about (issue #1056).
     let Some(first) = pattern::find_literal(bytes, ANCHOR.as_bytes(), 0) else {
         return Vec::new();
     };
-    let ends = pattern::run_ends(bytes, is_secret_byte);
+    let mut ends = pattern::RunCursor::new(bytes, is_secret_byte);
     let mut matches = Vec::new();
     let mut anchor = first;
     while anchor < bytes.len() {
@@ -99,7 +99,7 @@ fn scan(input: &str) -> Vec<(usize, usize)> {
             anchor += 1;
             continue;
         }
-        let Some((start, end)) = match_at(bytes, &ends, anchor) else {
+        let Some((start, end)) = match_at(bytes, &mut ends, anchor) else {
             anchor += 1;
             continue;
         };
@@ -118,7 +118,11 @@ fn scan(input: &str) -> Vec<(usize, usize)> {
 /// `31..=34` reproduces what a backtracking `{31,34}` regex quantifier does
 /// at a boundary it cannot satisfy at any length in range -- it never
 /// silently truncates a 40-byte run down to 34.
-fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize)> {
+fn match_at(
+    bytes: &[u8],
+    ends: &mut pattern::RunCursor<'_>,
+    anchor: usize,
+) -> Option<(usize, usize)> {
     let digit_at = anchor.checked_sub(1)?;
     let start = anchor.checked_sub(PREFIX_LEN + 1)?;
     if !bytes[digit_at].is_ascii_digit() {
@@ -129,7 +133,7 @@ fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize
     }
 
     let suffix_start = anchor + ANCHOR.len();
-    let available = ends[suffix_start] - suffix_start;
+    let available = ends.end(suffix_start) - suffix_start;
     if !(MIN_SUFFIX_LEN..=MAX_SUFFIX_LEN).contains(&available) {
         return None;
     }
