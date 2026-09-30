@@ -25,7 +25,7 @@ use std::sync::{Mutex, OnceLock};
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::types::PyString;
+use pyo3::types::{PyList, PyString};
 use pyo3::{create_exception, wrap_pyfunction};
 
 use redact_secret::{
@@ -666,42 +666,20 @@ impl PyPolicyContext {
 )]
 #[derive(Clone)]
 pub(crate) struct PyFinding {
-    /// Deterministic finding id (`finding-1`, `finding-2`, ...).
-    #[pyo3(get)]
-    id: String,
-    /// Finding type.
-    #[pyo3(get, name = "type")]
-    type_name: String,
-    /// Id of the detector that produced the finding.
-    #[pyo3(get)]
-    detector: String,
-    /// `"high"`, `"medium"`, or `"low"`.
-    #[pyo3(get)]
-    confidence: String,
-    /// `"redact"`, `"block"`, `"warn"`, or `"allow"`.
-    #[pyo3(get)]
-    action: String,
-    /// `"none"` or `"invisible-characters"`.
-    #[pyo3(get)]
-    obfuscation: String,
     /// Inclusive start offset, in Unicode code points.
     #[pyo3(get)]
     start: usize,
     /// Exclusive end offset, in Unicode code points.
     #[pyo3(get)]
     end: usize,
+    /// The core finding: the single owner of the id, type, detector, and the
+    /// three enum values, which the getters below read from it.
     inner: CoreFinding,
 }
 
 impl PyFinding {
-    pub(crate) fn from_core(finding: CoreFinding, start: usize, end: usize) -> Self {
+    pub(crate) const fn from_core(finding: CoreFinding, start: usize, end: usize) -> Self {
         Self {
-            id: finding.id().to_owned(),
-            type_name: finding.type_name().to_owned(),
-            detector: finding.detector().to_owned(),
-            confidence: finding.confidence().as_str().to_owned(),
-            action: finding.action().as_str().to_owned(),
-            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
             inner: finding,
@@ -711,15 +689,51 @@ impl PyFinding {
 
 #[pymethods]
 impl PyFinding {
+    /// Deterministic finding id (`finding-1`, `finding-2`, ...).
+    #[getter]
+    fn id(&self) -> &str {
+        self.inner.id()
+    }
+
+    /// Finding type.
+    #[getter(r#type)]
+    fn type_name(&self) -> &str {
+        self.inner.type_name()
+    }
+
+    /// Id of the detector that produced the finding.
+    #[getter]
+    fn detector(&self) -> &str {
+        self.inner.detector()
+    }
+
+    /// `"high"`, `"medium"`, or `"low"`.
+    #[getter]
+    fn confidence(&self) -> &'static str {
+        self.inner.confidence().as_str()
+    }
+
+    /// `"redact"`, `"block"`, `"warn"`, or `"allow"`.
+    #[getter]
+    fn action(&self) -> &'static str {
+        self.inner.action().as_str()
+    }
+
+    /// `"none"` or `"invisible-characters"`.
+    #[getter]
+    fn obfuscation(&self) -> &'static str {
+        self.inner.obfuscation().as_str()
+    }
+
     fn __repr__(&self) -> String {
         format!(
             "Finding(id={:?}, type={:?}, detector={:?}, confidence={:?}, action={:?}, obfuscation={:?}, start={}, end={})",
-            self.id,
-            self.type_name,
-            self.detector,
-            self.confidence,
-            self.action,
-            self.obfuscation,
+            self.inner.id(),
+            self.inner.type_name(),
+            self.inner.detector(),
+            self.inner.confidence().as_str(),
+            self.inner.action().as_str(),
+            self.inner.obfuscation().as_str(),
             self.start,
             self.end
         )
@@ -754,21 +768,35 @@ impl PyPlaceholderContext {
 /// Never constructed from Python; only produced by `scan_and_redact`.
 #[pyclass(module = "redact_secret._native", name = "ScanResult")]
 struct PyScanResult {
-    /// `text` with every `redact`/`block` finding replaced by a placeholder.
-    #[pyo3(get)]
-    text: String,
-    /// The findings `text` was scanned into, in input order.
-    #[pyo3(get)]
-    findings: Vec<PyFinding>,
+    /// `text` with every `redact`/`block` finding replaced by a placeholder,
+    /// built once as a Python `str` (no Rust-side copy is retained).
+    text: Py<PyString>,
+    /// The findings `text` was scanned into, in input order. Built once; the
+    /// `findings` getter returns a shallow copy of this list.
+    findings: Py<PyList>,
 }
 
 #[pymethods]
 impl PyScanResult {
-    fn __repr__(&self) -> String {
+    /// The redacted text: the same `str` object on every access.
+    #[getter]
+    fn text(&self, py: Python<'_>) -> Py<PyString> {
+        self.text.clone_ref(py)
+    }
+
+    /// The findings in input order: a new `list` on every access, holding the
+    /// same `Finding` objects each time (a shallow copy of the cached list).
+    #[getter]
+    fn findings<'py>(&self, py: Python<'py>) -> Bound<'py, PyList> {
+        let cached = self.findings.bind(py);
+        cached.get_slice(0, cached.len())
+    }
+
+    fn __repr__(&self, py: Python<'_>) -> String {
         format!(
             "ScanResult(text={:?}, findings=<{} finding(s)>)",
-            self.text,
-            self.findings.len()
+            self.text.bind(py).to_string_lossy(),
+            self.findings.bind(py).len()
         )
     }
 }
@@ -1273,10 +1301,17 @@ fn scan_and_redact<'py>(
     let offsets = RefCell::new(CharOffsets::new(text_owned));
     let findings = apply_policy(&offsets, detected, policy.as_ref())?;
     let redacted_text = redact_core(text_owned, &findings, formatter.as_ref(), &limits, &offsets)?;
+    let py = text.py();
     let py_findings = findings_to_py(&offsets, findings)?;
+    let findings = PyList::empty(py);
+    for finding in py_findings {
+        findings.append(Bound::new(py, finding)?)?;
+    }
+    // `redacted_text` is dropped when this function returns, leaving the
+    // `str` as the only copy of the output.
     Ok(PyScanResult {
-        text: redacted_text,
-        findings: py_findings,
+        text: PyString::new(py, &redacted_text).unbind(),
+        findings: findings.unbind(),
     })
 }
 

@@ -104,3 +104,48 @@ def test_findings_are_returned_in_input_order() -> None:
     findings = redact_secret.scan(text)
     starts = [f.start for f in findings]
     assert starts == sorted(starts)
+
+
+def test_scan_result_findings_returns_a_fresh_list_of_the_same_findings() -> None:
+    result = redact_secret.scan_and_redact(SYNTHETIC_INPUT)
+
+    first = result.findings
+    second = result.findings
+
+    assert type(first) is list
+    assert first is not second
+    assert [id(f) for f in first] == [id(f) for f in second]
+
+    # Mutating a returned list never changes the result or a later read.
+    count = len(first)
+    first.clear()
+    assert len(result.findings) == count
+    assert count > 0
+
+
+def test_scan_result_text_is_stable_across_reads() -> None:
+    result = redact_secret.scan_and_redact(SYNTHETIC_INPUT)
+
+    assert result.text == result.text
+    assert result.text == redact_secret.redact(
+        SYNTHETIC_INPUT, redact_secret.scan(SYNTHETIC_INPUT)
+    )
+    with pytest.raises(AttributeError):
+        result.text = "x"  # type: ignore[misc]
+    with pytest.raises(AttributeError):
+        result.findings = []  # type: ignore[misc]
+
+
+def test_scan_result_findings_feed_redact_and_repr() -> None:
+    result = redact_secret.scan_and_redact(SYNTHETIC_INPUT)
+
+    assert redact_secret.redact(SYNTHETIC_INPUT, result.findings) == result.text
+    assert "finding(s)" in repr(result)
+    finding = result.findings[0]
+    assert finding.type in repr(finding)
+    assert isinstance(finding.id, str) and isinstance(finding.detector, str)
+    assert (finding.confidence, finding.action, finding.obfuscation) == (
+        finding.confidence,
+        "redact",
+        "none",
+    )
