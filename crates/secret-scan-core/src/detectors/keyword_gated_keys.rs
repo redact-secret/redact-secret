@@ -1004,6 +1004,103 @@ fn may_have_provider_context(text: &str, spec: &Spec) -> bool {
         })
 }
 
+/// Bit of each provider word the four specs gate on, in
+/// [`provider_word_mask`]: the keywords and the segments of `co_api_key`.
+/// `None` for a word outside the set, so a spec that names a new word falls
+/// back to its own scans.
+fn provider_word_bit(word: &str) -> Option<u8> {
+    Some(match word {
+        "mistral" => 1,
+        "cohere" => 2,
+        "ai21" => 4,
+        "deepgram" => 8,
+        "co" => 16,
+        "api" => 32,
+        "key" => 64,
+        _ => return None,
+    })
+}
+
+/// Every provider word of [`provider_word_bit`], one bit each.
+const PROVIDER_WORDS: [(&[u8], u8); 7] = [
+    (b"mistral", 1),
+    (b"cohere", 2),
+    (b"ai21", 4),
+    (b"deepgram", 8),
+    (b"co", 16),
+    (b"api", 32),
+    (b"key", 64),
+];
+
+/// Which [`PROVIDER_WORDS`] occur in `bytes` under ASCII case folding, in
+/// one pass shared by every spec: a byte that cannot begin any word costs a
+/// table lookup, and the pass stops once every word has been seen.
+fn provider_word_mask(bytes: &[u8]) -> u8 {
+    const FIRST: [u8; 256] = {
+        let mut first = [0u8; 256];
+        let mut word = 0;
+        while word < PROVIDER_WORDS.len() {
+            let (text, bit) = PROVIDER_WORDS[word];
+            first[text[0] as usize] |= bit;
+            first[text[0].to_ascii_uppercase() as usize] |= bit;
+            word += 1;
+        }
+        first
+    };
+    const ALL: u8 = 127;
+    let mut found = 0u8;
+    for (at, &byte) in bytes.iter().enumerate() {
+        let candidates = FIRST[usize::from(byte)] & !found;
+        if candidates == 0 {
+            continue;
+        }
+        for (word, bit) in PROVIDER_WORDS {
+            if candidates & bit != 0
+                && bytes
+                    .get(at..at + word.len())
+                    .is_some_and(|window| window.eq_ignore_ascii_case(word))
+            {
+                found |= bit;
+            }
+        }
+        if found == ALL {
+            break;
+        }
+    }
+    found
+}
+
+/// [`may_have_provider_context`] for the whole `input` of [`detect_spec`],
+/// answered from the provider-word mask built once per scan copy and shared
+/// by the four specs (issue #1092); the spec's own scans when `input` is not
+/// the active scan copy or the spec names a word the mask does not hold.
+fn may_have_provider_context_whole(input: &str, spec: &Spec) -> bool {
+    let Some(mask) = super::prefilter::provider_word_mask(input, provider_word_mask) else {
+        return may_have_provider_context(input, spec);
+    };
+    let bit = |word: &str| provider_word_bit(word).map(|bit| mask & bit != 0);
+    let mut answer = false;
+    for keyword in spec.keywords {
+        match bit(keyword) {
+            Some(found) => answer |= found,
+            None => return may_have_provider_context(input, spec),
+        }
+    }
+    for name in spec.exact_names {
+        let mut all = true;
+        for segment in name.rsplit('_') {
+            match bit(segment) {
+                Some(found) => all &= found,
+                None => return may_have_provider_context(input, spec),
+            }
+        }
+        answer |= all;
+    }
+    #[cfg(debug_assertions)]
+    assert_eq!(answer, may_have_provider_context(input, spec));
+    answer
+}
+
 fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     // Every context this detector accepts needs a keyword or exact name
@@ -1011,7 +1108,7 @@ fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
     // multi-line layouts (#1016, #1017) on a line above it. Checking the
     // input once also covers the incremental sanitizer's usual single-line
     // unit, whose one line is then not checked again.
-    if !may_have_provider_context(input, spec) {
+    if !may_have_provider_context_whole(input, spec) {
         return candidates;
     }
     let multi_line = input.contains(['\n', '\r']);
@@ -1928,5 +2025,91 @@ mod case_insensitive_differential_tests {
                 .bytes()
                 .all(|b| b.is_ascii() && !b.is_ascii_uppercase())
         );
+    }
+
+    /// The shared provider-word mask and the whole-input gate built on it
+    /// agree with each spec's own scans (issue #1092), inside and outside a
+    /// scan copy, on random text of provider words in every case spelling,
+    /// truncated words, non-ASCII and invisible pieces.
+    #[test]
+    fn the_shared_provider_word_mask_matches_the_per_spec_gates() {
+        use crate::detectors::prefilter::ScanScope;
+        let pieces: Vec<&str> = [
+            "mistral",
+            "MISTRAL",
+            "Mistra",
+            "cohere",
+            "Cohere",
+            "COHERE",
+            "coher",
+            "co",
+            "Co",
+            "api",
+            "API",
+            "ap",
+            "key",
+            "KEY",
+            "ke",
+            "ai21",
+            "AI21",
+            "ai2",
+            "deepgram",
+            "DeepGram",
+            "deepgra",
+            "co_api_key",
+            "CO_API_KEY",
+            "coApiKey",
+            "co.api.key",
+            "co-api-key",
+            "\u{212a}ey",
+            "\u{200b}",
+            "é",
+            " ",
+            "\n",
+            "=",
+            "x",
+        ]
+        .into_iter()
+        .chain(BOUNDARY_PIECES.iter().copied())
+        .collect();
+        let mut rng = XorShift32::new(0x1092);
+        for _ in 0..6000 {
+            let text = rng.text(&pieces, 8);
+            let bytes = text.as_bytes();
+            let oracle = PROVIDER_WORDS.iter().fold(0u8, |mask, (word, bit)| {
+                if contains_ascii_ci(bytes, word) {
+                    mask | bit
+                } else {
+                    mask
+                }
+            });
+            assert_eq!(provider_word_mask(bytes), oracle, "{text:?}");
+            let _scope = ScanScope::enter(&text);
+            for spec in SPECS {
+                assert_eq!(
+                    may_have_provider_context_whole(&text, spec),
+                    may_have_provider_context(&text, spec),
+                    "{text:?}"
+                );
+            }
+            // A different slice of the same bytes is not the scan copy.
+            let other = text.clone();
+            for spec in SPECS {
+                assert_eq!(
+                    may_have_provider_context_whole(&other, spec),
+                    may_have_provider_context(&other, spec)
+                );
+            }
+        }
+        for spec in SPECS {
+            for word in spec
+                .keywords
+                .iter()
+                .copied()
+                .chain(spec.exact_names.iter().flat_map(|name| name.rsplit('_')))
+            {
+                assert!(provider_word_bit(word).is_some(), "{word}");
+            }
+        }
     }
 }
