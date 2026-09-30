@@ -96,9 +96,6 @@ evidence is linked from each published version.
   (#1026), so the AWS API member `"SecretAccessKey": "..."` (STS, IAM and
   CloudFormation JSON, SDK `secretAccessKey`) is redacted at any width. Before,
   only `aws_secret_access_key` was a name and the JSON form had no finding.
-
-### Fixed
-
 - `generic-token` no longer redacts Anthropic Admin documentation placeholders
   (`sk-ant-admin01-<your-key>`, `-YOUR_KEY`, `-...`), matching the
   `sk-ant-api01-`/`sk-ant-api03-` siblings (#1015). A well-formed Admin key is
