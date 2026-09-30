@@ -13,6 +13,7 @@ mod incremental;
 mod offsets;
 
 use std::cell::{OnceCell, RefCell};
+use std::rc::Rc;
 
 use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
@@ -24,7 +25,7 @@ use redact_secret::{
     run_detector_pipeline,
 };
 
-use crate::error::{JsError, to_js_error, to_js_ruleset_error};
+use crate::error::{to_js_error, to_js_ruleset_error};
 use crate::offsets::{Utf16Offsets, utf16_offsets_to_bytes};
 // Re-exported so the incremental N-API surface (a public export like `scan`
 // or `redact`, just organized in its own module) is part of this crate's
@@ -561,26 +562,70 @@ fn run_redact(
     }
 }
 
-/// Builds a registry over `ruleset`'s declared detectors, on top of
-/// `profile`'s built-in set. Unlike [`with_profile_registry`], this registry
-/// is built fresh for the call and never cached: a ruleset's content can
-/// differ on every call, where the built-in-only registry is the same value
-/// every time.
-fn registry_with_ruleset(profile: Profile, ruleset: &[u8]) -> Result<DetectorRegistry, JsError> {
-    let detectors = load_ruleset(ruleset).map_err(to_js_ruleset_error)?;
+/// One ruleset registry and what it was built from (issue #1059).
+struct RulesetEntry {
+    profile: Profile,
+    selection: PiiSelection,
+    ruleset: Vec<u8>,
+    registry: DetectorRegistry,
+}
+
+thread_local! {
+    /// The registry for the last `(profile, PII selection, ruleset bytes)`
+    /// seen, so a caller repeating one ruleset parses it and builds the
+    /// registry once rather than per call. One entry, thread-local for the
+    /// same `!Sync` reason as [`REGISTRY`]; a changed ruleset replaces it, and
+    /// a rejected ruleset is never stored.
+    static RULESET_REGISTRY: RefCell<Option<Rc<RulesetEntry>>> = const { RefCell::new(None) };
+    /// Ruleset registries built on this thread, for the cache-reuse test.
+    #[cfg(test)]
+    static RULESET_BUILDS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+/// Runs `f` against the registry over `ruleset`'s declared detectors, on top
+/// of `profile`'s built-in set, building it only when it is not the one this
+/// thread last built (see [`RULESET_REGISTRY`]).
+fn with_ruleset_registry<T>(
+    profile: Profile,
+    ruleset: &[u8],
+    f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
+) -> napi::Result<T, String> {
     let selection = pii_selection(profile);
-    match profile {
-        Profile::Full => DetectorRegistry::with_built_in_and_pii_custom(&selection, detectors),
-        Profile::Common => {
-            DetectorRegistry::with_common_built_in_and_pii_custom(&selection, detectors)
+    // The entry is cloned out so the cache is not borrowed while `f` runs: a
+    // JavaScript policy or formatter callback inside `f` may itself call back
+    // into a ruleset export on this thread.
+    let entry = RULESET_REGISTRY.with(|cache| -> napi::Result<Rc<RulesetEntry>, String> {
+        let mut cache = cache.borrow_mut();
+        if let Some(entry) = cache.as_ref().filter(|entry| {
+            entry.profile == profile && entry.selection == selection && entry.ruleset == ruleset
+        }) {
+            return Ok(Rc::clone(entry));
         }
-    }
-    .map_err(to_js_error)
+        let detectors = load_ruleset(ruleset).map_err(to_js_ruleset_error)?;
+        let registry = match profile {
+            Profile::Full => DetectorRegistry::with_built_in_and_pii_custom(&selection, detectors),
+            Profile::Common => {
+                DetectorRegistry::with_common_built_in_and_pii_custom(&selection, detectors)
+            }
+        }
+        .map_err(to_js_error)?;
+        #[cfg(test)]
+        RULESET_BUILDS.with(|builds| builds.set(builds.get() + 1));
+        let entry = Rc::new(RulesetEntry {
+            profile,
+            selection,
+            ruleset: ruleset.to_vec(),
+            registry,
+        });
+        *cache = Some(Rc::clone(&entry));
+        Ok(entry)
+    })?;
+    f(&entry.registry).map_err(to_js_error)
 }
 
 /// Runs [`run_scan`] against `profile`'s registry: the shared cached
-/// built-in-only registry when `ruleset` is omitted, or a fresh registry
-/// built over `ruleset`'s declared detectors otherwise
+/// built-in-only registry when `ruleset` is omitted, or the registry
+/// over `ruleset`'s declared detectors otherwise (cached for repeats)
 /// (`decision-define-declarative-detector-ruleset-contract`'s "Surface
 /// exposure": "a `Uint8Array`/`string` ruleset argument alongside the
 /// existing registry construction path"). A registry built either way still
@@ -599,10 +644,9 @@ fn run_scan_for_profile(
             run_scan(input, registry, policy, limits, offsets)
         })
         .map_err(to_js_error),
-        Some(bytes) => {
-            let registry = registry_with_ruleset(profile, bytes)?;
-            run_scan(input, &registry, policy, limits, offsets).map_err(to_js_error)
-        }
+        Some(bytes) => with_ruleset_registry(profile, bytes, |registry| {
+            run_scan(input, registry, policy, limits, offsets)
+        }),
     }
 }
 
@@ -1147,6 +1191,54 @@ prefix: \"ACME_\"\n\
 alphabet: alnum-dash\n\
 run: at-least 20\n\
 validator: none\n";
+
+    fn ruleset_builds() -> usize {
+        RULESET_BUILDS.with(std::cell::Cell::get)
+    }
+
+    fn ruleset_count(profile: Profile, ruleset: &[u8], input: &str) -> usize {
+        with_ruleset_registry(profile, ruleset, |registry| {
+            Ok(run_detector_pipeline(input, registry)?.len())
+        })
+        .unwrap()
+    }
+
+    /// Issue #1059: a repeated ruleset is parsed and built once per thread,
+    /// a change of bytes or profile rebuilds, a rejected ruleset is not
+    /// cached, and a callback re-entering a ruleset export while one is
+    /// running does not hit a held borrow.
+    #[test]
+    fn a_repeated_ruleset_builds_its_registry_once() {
+        std::thread::spawn(|| {
+            let input = "x ACME_aaaaaaaaaaaaaaaaaaaaaaaa y";
+            let start = ruleset_builds();
+            for _ in 0..5 {
+                assert_eq!(ruleset_count(Profile::Full, RULESET_FIXTURE, input), 1);
+            }
+            assert_eq!(ruleset_builds() - start, 1);
+
+            assert_eq!(ruleset_count(Profile::Common, RULESET_FIXTURE, input), 1);
+            assert_eq!(ruleset_builds() - start, 2);
+
+            let other: Vec<u8> = RULESET_FIXTURE.iter().copied().chain(*b"\n").collect();
+            assert_eq!(ruleset_count(Profile::Common, &other, input), 1);
+            assert_eq!(ruleset_builds() - start, 3);
+
+            assert!(with_ruleset_registry(Profile::Common, b"not a ruleset", |_| Ok(())).is_err());
+            assert!(with_ruleset_registry(Profile::Common, b"not a ruleset", |_| Ok(())).is_err());
+            assert_eq!(ruleset_builds() - start, 3);
+            assert_eq!(ruleset_count(Profile::Common, &other, input), 1);
+            assert_eq!(ruleset_builds() - start, 3);
+
+            let nested = with_ruleset_registry(Profile::Common, &other, |_| {
+                Ok(ruleset_count(Profile::Common, RULESET_FIXTURE, input))
+            })
+            .unwrap();
+            assert_eq!(nested, 1);
+        })
+        .join()
+        .unwrap();
+    }
 
     #[test]
     fn scan_accepts_a_ruleset_buffer_and_registers_it_after_the_built_ins() {

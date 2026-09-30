@@ -20,6 +20,7 @@
 mod incremental;
 
 use std::cell::RefCell;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 use pyo3::exceptions::PyValueError;
@@ -39,6 +40,9 @@ use redact_secret::{
 /// The Unicode string-index unit every range this module reports uses.
 const RANGE_UNIT: &str = "unicode-code-points";
 static PII_SELECTION: OnceLock<Mutex<Option<PiiSelection>>> = OnceLock::new();
+/// Bumped whenever [`PII_SELECTION`] changes, so a cached registry built under
+/// an earlier selection is rebuilt (issue #1059).
+static PII_EPOCH: AtomicU64 = AtomicU64::new(0);
 
 pub(crate) fn active_pii_selection() -> PiiSelection {
     PII_SELECTION
@@ -524,18 +528,19 @@ fn byte_offset_to_char_offset(text: &str, byte_offset: usize) -> PyResult<usize>
         .ok_or_else(|| PyValueError::new_err("byte_offset is out of bounds or splits a character."))
 }
 
-/// Extracts owned `text` from an argument that must be a Python string.
+/// Borrows `text` from an argument that must be a Python string, without
+/// copying it (issue #1059): a Python `str` is immutable, and the borrow is
+/// tied to `value`, which keeps the object alive.
 ///
 /// Rejects a non-string argument with the sanitized `InvalidInputError`
 /// instead of a generic `TypeError`, matching the cross-language contract:
 /// `SecretScanErrorCode::InvalidInput` is "produced by bindings" for this
 /// exact case.
-pub(crate) fn extract_text(value: &Bound<'_, PyAny>) -> PyResult<String> {
+pub(crate) fn extract_text<'a>(value: &'a Bound<'_, PyAny>) -> PyResult<&'a str> {
     let text = value
         .cast::<PyString>()
         .map_err(|_| map_error_code(SecretScanErrorCode::InvalidInput))?;
     text.to_str()
-        .map(str::to_owned)
         .map_err(|_| map_error_code(SecretScanErrorCode::InvalidInput))
 }
 
@@ -831,26 +836,115 @@ impl PyWholeInputLimits {
 // Detection and policy
 // ---------------------------------------------------------------------
 
-/// Builds a registry of every built-in detector, plus every detector
-/// `ruleset` declares when given (issue #495,
-/// `decision-define-declarative-detector-ruleset-contract`). There is no
-/// custom detector *callback* surface (`decision-define-runtime-bindings`);
-/// a declarative ruleset is data the core parses and matches itself, never
-/// host code.
+/// Why [`with_registry`] could not produce a registry.
+#[derive(Debug)]
+enum RegistryError {
+    Core(CoreError),
+    Ruleset(RulesetError),
+}
+
+impl RegistryError {
+    fn into_py(self) -> PyErr {
+        match self {
+            Self::Core(error) => map_core_error(error),
+            Self::Ruleset(error) => map_ruleset_error(error),
+        }
+    }
+}
+
+/// One thread's cached registries (issue #1059): the built-in registry, and
+/// the registry for the last ruleset seen. Each is tagged with the
+/// [`PII_EPOCH`] it was built under, so `initialize(pii)` invalidates both.
 ///
-/// # Errors
+/// `DetectorRegistry` holds `Box<dyn Detector>` objects that are not required
+/// to be `Sync`, so the cache is thread-local, as in the Node and WASM
+/// bindings.
+#[derive(Default)]
+struct RegistryCache {
+    built_in: Option<(u64, DetectorRegistry)>,
+    with_ruleset: Option<(u64, Vec<u8>, DetectorRegistry)>,
+}
+
+thread_local! {
+    static REGISTRY_CACHE: RefCell<RegistryCache> = RefCell::new(RegistryCache::default());
+    /// Registries built on this thread, for the cache-reuse tests.
+    #[cfg(test)]
+    static REGISTRY_BUILDS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+/// The error for a cache slot that was just filled yet is empty: unreachable,
+/// reported as a sanitized detector failure rather than panicking.
+fn unreachable_cache_miss() -> RegistryError {
+    RegistryError::Core(SecretScanErrorCode::DetectorFailure.into())
+}
+
+/// Counts one registry build (test builds only).
+fn note_registry_build() {
+    #[cfg(test)]
+    REGISTRY_BUILDS.with(|builds| builds.set(builds.get() + 1));
+}
+
+/// Runs `f` against the registry of every built-in detector, plus every
+/// detector `ruleset` declares when given (issue #495,
+/// `decision-define-declarative-detector-ruleset-contract`), building it only
+/// when this thread has none cached for the current PII selection and the
+/// same ruleset bytes. There is no custom detector *callback* surface
+/// (`decision-define-runtime-bindings`); a declarative ruleset is data the
+/// core parses and matches itself, never host code.
 ///
-/// `InvalidOptionsError` when `ruleset` is neither `bytes`/`bytearray` nor
-/// `str`, and `InvalidRulesetError` when it does not parse.
-fn registry_with_ruleset(ruleset: Option<&Bound<'_, PyAny>>) -> PyResult<DetectorRegistry> {
-    let selection = active_pii_selection();
-    let custom = if let Some(value) = ruleset {
-        let bytes = extract_ruleset_bytes(value)?;
-        load_ruleset(&bytes).map_err(map_ruleset_error)?
-    } else {
-        Vec::new()
-    };
-    DetectorRegistry::with_built_in_and_pii_custom(&selection, custom).map_err(map_core_error)
+/// Errors are never cached: a rejected ruleset is re-parsed, and rejected
+/// again, on the next call.
+fn with_registry<T>(
+    ruleset: Option<&[u8]>,
+    f: impl FnOnce(&DetectorRegistry) -> T,
+) -> Result<T, RegistryError> {
+    // Read before building: an `initialize` racing this call can only make
+    // the stored epoch stale (a rebuild next call), never a stale registry
+    // look current.
+    let epoch = PII_EPOCH.load(Ordering::SeqCst);
+    REGISTRY_CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        match ruleset {
+            None => {
+                if cache
+                    .built_in
+                    .as_ref()
+                    .is_none_or(|(built, _)| *built != epoch)
+                {
+                    let registry = DetectorRegistry::with_built_in_and_pii_custom(
+                        &active_pii_selection(),
+                        Vec::new(),
+                    )
+                    .map_err(RegistryError::Core)?;
+                    note_registry_build();
+                    cache.built_in = Some((epoch, registry));
+                }
+                let (_, registry) = cache.built_in.as_ref().ok_or_else(unreachable_cache_miss)?;
+                Ok(f(registry))
+            }
+            Some(bytes) => {
+                let hit = cache
+                    .with_ruleset
+                    .as_ref()
+                    .is_some_and(|(built, cached, _)| *built == epoch && cached == bytes);
+                if !hit {
+                    let custom = load_ruleset(bytes).map_err(RegistryError::Ruleset)?;
+                    let registry = DetectorRegistry::with_built_in_and_pii_custom(
+                        &active_pii_selection(),
+                        custom,
+                    )
+                    .map_err(RegistryError::Core)?;
+                    note_registry_build();
+                    cache.with_ruleset = Some((epoch, bytes.to_vec(), registry));
+                }
+                let (_, _, registry) = cache
+                    .with_ruleset
+                    .as_ref()
+                    .ok_or_else(unreachable_cache_miss)?;
+                Ok(f(registry))
+            }
+        }
+    })
 }
 
 /// Extracts ruleset bytes from a `bytes`/`bytearray` or `str` argument
@@ -874,13 +968,24 @@ fn extract_ruleset_bytes(value: &Bound<'_, PyAny>) -> PyResult<Vec<u8>> {
 /// it does not inherit the default whole-input bound for free
 /// (`decision-bound-whole-input-operations-by-default`).
 fn detect(
+    py: Python<'_>,
     text: &str,
     limits: &WholeInputLimits,
     ruleset: Option<&Bound<'_, PyAny>>,
 ) -> PyResult<Vec<DetectedFinding>> {
     limits.check_input(text).map_err(map_core_error)?;
-    let registry = registry_with_ruleset(ruleset)?;
-    let detected = run_detector_pipeline(text, &registry).map_err(map_core_error)?;
+    let ruleset_bytes = ruleset.map(extract_ruleset_bytes).transpose()?;
+    // No Python object is touched while detecting, so other Python threads
+    // run meanwhile. The registry is `!Sync`, so it is looked up on this
+    // thread inside the closure rather than passed in.
+    let detected = py
+        .detach(|| {
+            with_registry(ruleset_bytes.as_deref(), |registry| {
+                run_detector_pipeline(text, registry)
+            })
+        })
+        .map_err(RegistryError::into_py)?
+        .map_err(map_core_error)?;
     limits
         .check_findings(detected.len())
         .map_err(map_core_error)?;
@@ -1089,8 +1194,8 @@ fn scan<'py>(
 ) -> PyResult<Vec<PyFinding>> {
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
-    let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
-    let offsets = RefCell::new(CharOffsets::new(&text_owned));
+    let detected = detect(text.py(), text_owned, &limits, ruleset.as_ref())?;
+    let offsets = RefCell::new(CharOffsets::new(text_owned));
     let findings = apply_policy(&offsets, detected, policy.as_ref())?;
     findings_to_py(&offsets, findings)
 }
@@ -1134,9 +1239,9 @@ fn redact<'py>(
         .iter()
         .map(|finding| finding.inner.clone())
         .collect();
-    let offsets = RefCell::new(CharOffsets::new(&text_owned));
+    let offsets = RefCell::new(CharOffsets::new(text_owned));
     redact_core(
-        &text_owned,
+        text_owned,
         &core_findings,
         formatter.as_ref(),
         &limits,
@@ -1162,18 +1267,12 @@ fn scan_and_redact<'py>(
 ) -> PyResult<PyScanResult> {
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
-    let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
+    let detected = detect(text.py(), text_owned, &limits, ruleset.as_ref())?;
     // One converter for the whole call: the policy callback, the formatter
     // callback, and the returned findings all convert through it.
-    let offsets = RefCell::new(CharOffsets::new(&text_owned));
+    let offsets = RefCell::new(CharOffsets::new(text_owned));
     let findings = apply_policy(&offsets, detected, policy.as_ref())?;
-    let redacted_text = redact_core(
-        &text_owned,
-        &findings,
-        formatter.as_ref(),
-        &limits,
-        &offsets,
-    )?;
+    let redacted_text = redact_core(text_owned, &findings, formatter.as_ref(), &limits, &offsets)?;
     let py_findings = findings_to_py(&offsets, findings)?;
     Ok(PyScanResult {
         text: redacted_text,
@@ -1252,6 +1351,7 @@ fn initialize(pii: Vec<String>) -> PyResult<()> {
         }
     } else {
         *guard = Some(selection);
+        PII_EPOCH.fetch_add(1, Ordering::SeqCst);
     }
     Ok(())
 }
@@ -1300,7 +1400,77 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::{ByteRange, CharOffsets, byte_offset_to_char_offset, char_offset, char_range};
+    use std::sync::atomic::Ordering;
+
+    use super::{
+        ByteRange, CharOffsets, PII_EPOCH, REGISTRY_BUILDS, RegistryError,
+        byte_offset_to_char_offset, char_offset, char_range, run_detector_pipeline, with_registry,
+    };
+
+    /// A minimal, valid declarative ruleset.
+    const RULESET: &[u8] = b"ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+    fn builds() -> usize {
+        REGISTRY_BUILDS.with(std::cell::Cell::get)
+    }
+
+    fn detect_count(ruleset: Option<&[u8]>, text: &str) -> usize {
+        with_registry(ruleset, |registry| {
+            run_detector_pipeline(text, registry).unwrap().len()
+        })
+        .unwrap()
+    }
+
+    /// Issue #1059: repeated calls reuse one registry per thread, a changed
+    /// ruleset or a PII selection change rebuilds, and the ruleset's detector
+    /// still applies after the built-in registry was cached.
+    #[test]
+    fn the_registry_is_built_once_until_the_ruleset_or_pii_epoch_changes() {
+        // A fresh thread: the cache is thread-local, so other tests cannot
+        // have filled it.
+        std::thread::spawn(|| {
+            let acme = "x ACME_aaaaaaaaaaaaaaaaaaaaaaaa y";
+            let start = builds();
+            for _ in 0..5 {
+                assert_eq!(detect_count(None, "nothing here"), 0);
+            }
+            assert_eq!(builds() - start, 1);
+
+            // The ruleset registry is separate from the built-in one, reused
+            // for identical bytes, and its detector applies.
+            for _ in 0..5 {
+                assert_eq!(detect_count(Some(RULESET), acme), 1);
+            }
+            assert_eq!(builds() - start, 2);
+            assert_eq!(detect_count(None, acme), 0);
+            assert_eq!(builds() - start, 2);
+
+            // Different ruleset bytes rebuild.
+            let other: Vec<u8> = RULESET.iter().copied().chain(*b"\n").collect();
+            detect_count(Some(&other), acme);
+            assert_eq!(builds() - start, 3);
+
+            // A new PII epoch invalidates both caches.
+            PII_EPOCH.fetch_add(1, Ordering::SeqCst);
+            detect_count(None, acme);
+            detect_count(Some(&other), acme);
+            assert_eq!(builds() - start, 5);
+
+            // A rejected ruleset is never cached.
+            let rejected = with_registry(Some(b"not a ruleset"), |_| ());
+            assert!(matches!(rejected, Err(RegistryError::Ruleset(_))));
+            assert!(with_registry(Some(b"not a ruleset"), |_| ()).is_err());
+            assert_eq!(detect_count(Some(&other), acme), 1);
+        })
+        .join()
+        .unwrap();
+    }
 
     /// Mirrors `conformance/fixtures/unicode-conversion-corpus.json`
     /// (`decision-govern-cross-language-conformance`): an astral
