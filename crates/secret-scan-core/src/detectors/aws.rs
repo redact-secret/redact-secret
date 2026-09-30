@@ -142,9 +142,12 @@ fn ends_with_secret_name(prefix: &str) -> bool {
     if lower.ends_with("secret access key") || ends_with_qualified_phrase(&lower) {
         return true;
     }
+    // `at + len_utf8()`, not `at + 1`: the separator may be multi-byte.
     let identifier_start = name
-        .rfind(|ch: char| !(ch.is_ascii_alphanumeric() || matches!(ch, '_' | '.' | '-')))
-        .map_or(0, |at| at + 1);
+        .char_indices()
+        .rev()
+        .find(|&(_, ch)| !(ch.is_ascii_alphanumeric() || matches!(ch, '_' | '.' | '-')))
+        .map_or(0, |(at, ch)| at + ch.len_utf8());
     let identifier = &name[identifier_start..];
     if !(identifier.contains("ecret") || identifier.contains("ECRET")) {
         return false;
