@@ -126,6 +126,18 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
 });
 
 describe("WebAssembly-shaped binding: finding normalization", () => {
+  it("frees the scanAndRedact result handle once its parts are read", async () => {
+    const wasm = createWasmShapedBinding({ findings: [sampleWasmFinding] });
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
+    await runtime.initialize();
+
+    const result = runtime.scanAndRedact("SYNTHETIC_REVOKED_VALUE");
+
+    expect(result.findings).toHaveLength(1);
+    expect(result.findings[0]).toMatchObject({ start: 8, end: 39 });
+    expect(wasm.calls.filter((call) => call === "free")).toHaveLength(1);
+  });
+
   it("flattens the opaque, nested-range finding scan returns", async () => {
     const wasm = createWasmShapedBinding({ findings: [sampleWasmFinding] });
     const runtime = createRedactSecretRuntime(wasm.load, "full");
