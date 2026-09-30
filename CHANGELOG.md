@@ -192,6 +192,14 @@ evidence is linked from each published version.
 
 ### Performance
 
+- Incremental sessions make fewer owned copies of input-derived text (#1087,
+  from #1079): the private-key tracker scans only the junction between its
+  lookbehind and a new piece instead of joining the whole piece, and a
+  redacted unit is written straight into the call's output, which is sized
+  once per batch, instead of being built and copied a second time. Findings,
+  ranges, ids, order, redacted text and error codes are unchanged, as is what
+  a session retains and for how long.
+
 - Per-scan and per-line work no longer repeats. Always-run detectors skip
   bytes that cannot start a match (discord, bearer, generic-token
   authorization, the shared case-insensitive keyword search) (#1073);

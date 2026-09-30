@@ -226,19 +226,32 @@ fn byte_suffix(input: &str, max_bytes: usize) -> &str {
     &input[start..]
 }
 
-/// Scans `input` for delimiters, advancing `state` and reporting completed
-/// spans, while skipping any delimiter already accounted for by
+/// How many leading bytes of `piece` a delimiter that starts in the
+/// lookbehind can reach into, rounded up to a character boundary.
+fn junction_head_len(piece: &str) -> usize {
+    let mut head = piece.len().min(MAX_DELIMITER_LEN - 1);
+    while !piece.is_char_boundary(head) {
+        head += 1;
+    }
+    head
+}
+
+/// Scans `input` from `from` for delimiters, advancing `state` and reporting
+/// completed spans, while skipping any delimiter already accounted for by
 /// `processed_bytes` (one already scanned in an earlier call whose text was
 /// carried forward only as lookbehind). `input_offset` converts positions
 /// local to `input` to positions absolute in the logical session input.
+/// Returns where the search ended: the end of the last delimiter found
+/// (skipped ones included), or `from` when it found none.
 fn scan_delimiters(
     input: &str,
+    from: usize,
     state: &mut ParserState,
     processed_bytes: usize,
     input_offset: usize,
     mut on_complete: impl FnMut(CompletedSpan),
-) {
-    let mut position = 0;
+) -> usize {
+    let mut position = from;
     while let Some(delimiter) = find_next_delimiter(input, position) {
         position = delimiter.end;
         let absolute_end = input_offset + delimiter.end;
@@ -255,6 +268,7 @@ fn scan_delimiters(
             on_complete(span);
         }
     }
+    position
 }
 
 /// Tracks the supported PEM delimiter grammar incrementally for the
@@ -297,32 +311,75 @@ impl PrivateKeyRetentionTracker {
     fn append_reporting(
         &mut self,
         piece: &str,
-        on_complete: impl FnMut(CompletedSpan),
+        mut on_complete: impl FnMut(CompletedSpan),
     ) -> (bool, bool) {
-        let joined;
-        let input = if self.lookbehind.is_empty() {
-            piece
-        } else {
-            joined = [self.lookbehind.as_str(), piece].concat();
-            joined.as_str()
-        };
-        let input_offset = self.processed_bytes - self.lookbehind.len();
-        scan_delimiters(
-            input,
+        let lookbehind_len = self.lookbehind.len();
+        if lookbehind_len == 0 {
+            // Nothing to join the piece to: scan it in place.
+            scan_delimiters(
+                piece,
+                0,
+                &mut self.state,
+                self.processed_bytes,
+                self.processed_bytes,
+                on_complete,
+            );
+            self.processed_bytes += piece.len();
+            self.set_lookbehind_from(piece);
+            return (self.state.has_begin, !self.state.stack.is_empty());
+        }
+
+        // Only a delimiter that starts in the lookbehind can cross into the
+        // piece, and it is at most `MAX_DELIMITER_LEN - 1` bytes into it. So
+        // the junction, the lookbehind and that head of the piece, is
+        // scanned joined, in the lookbehind's own allocation, and the rest
+        // of the piece in place, from where the junction scan stopped.
+        // A delimiter is matched by its own bytes alone, so this finds
+        // exactly the delimiters, in the order, of scanning the whole join
+        // (issue #1087).
+        let head = junction_head_len(piece);
+        self.lookbehind.push_str(&piece[..head]);
+        let resume = scan_delimiters(
+            &self.lookbehind,
+            0,
             &mut self.state,
             self.processed_bytes,
-            input_offset,
-            on_complete,
+            self.processed_bytes - lookbehind_len,
+            &mut on_complete,
         );
-        self.processed_bytes += piece.len();
-        // Every delimiter starts with `-`, so nothing before the suffix's
-        // first dash can be part of one; `input_offset` above stays
-        // `processed_bytes - lookbehind.len()` (issue #1074).
+        if head < piece.len() {
+            scan_delimiters(
+                piece,
+                resume.saturating_sub(lookbehind_len),
+                &mut self.state,
+                self.processed_bytes,
+                self.processed_bytes,
+                on_complete,
+            );
+            self.lookbehind.clear();
+            self.processed_bytes += piece.len();
+            self.set_lookbehind_from(piece);
+        } else {
+            // The join is the whole input: its delimiter-bearing suffix is
+            // the next lookbehind, trimmed in place.
+            self.processed_bytes += piece.len();
+            let keep = byte_suffix(&self.lookbehind, MAX_DELIMITER_LEN.saturating_sub(1));
+            let from = self.lookbehind.len() - keep.len();
+            let from = from + keep.find('-').unwrap_or(keep.len());
+            self.lookbehind.drain(..from);
+        }
+        (self.state.has_begin, !self.state.stack.is_empty())
+    }
+
+    /// Replaces the lookbehind with the delimiter-bearing suffix of `input`,
+    /// reusing its allocation. Every delimiter starts with `-`, so nothing
+    /// before the suffix's first dash can be part of one; `input_offset`
+    /// stays `processed_bytes - lookbehind.len()` (issue #1074).
+    fn set_lookbehind_from(&mut self, input: &str) {
         let suffix = byte_suffix(input, MAX_DELIMITER_LEN.saturating_sub(1));
         let suffix = suffix.find('-').map_or("", |dash| &suffix[dash..]);
         self.lookbehind.clear();
         self.lookbehind.push_str(suffix);
-        (self.state.has_begin, !self.state.stack.is_empty())
     }
 
     /// Discards all retained parser state.
@@ -716,6 +773,147 @@ mod tests {
                 assert!(tracker.lookbehind.is_empty() || tracker.lookbehind.starts_with('-'));
                 rest = tail;
             }
+        }
+    }
+
+    /// The tracker before #1087: the whole piece is joined to the lookbehind
+    /// and the join scanned, then trimmed the same way.
+    struct JoinTracker {
+        state: ParserState,
+        processed_bytes: usize,
+        lookbehind: String,
+    }
+
+    impl JoinTracker {
+        fn new() -> Self {
+            Self {
+                state: ParserState::new(),
+                processed_bytes: 0,
+                lookbehind: String::new(),
+            }
+        }
+
+        fn append(&mut self, piece: &str, spans: &mut Vec<(usize, usize)>) -> (bool, bool) {
+            let joined = [self.lookbehind.as_str(), piece].concat();
+            let input_offset = self.processed_bytes - self.lookbehind.len();
+            scan_delimiters(
+                &joined,
+                0,
+                &mut self.state,
+                self.processed_bytes,
+                input_offset,
+                |span| spans.push((span.start, span.end)),
+            );
+            self.processed_bytes += piece.len();
+            let suffix = byte_suffix(&joined, MAX_DELIMITER_LEN.saturating_sub(1));
+            let suffix = suffix.find('-').map_or("", |dash| &suffix[dash..]);
+            self.lookbehind = suffix.to_owned();
+            (self.state.has_begin, !self.state.stack.is_empty())
+        }
+    }
+
+    fn assert_chunks_match_the_join_oracle(pieces: &[&str]) {
+        let mut tracker = PrivateKeyRetentionTracker::new();
+        let mut oracle = JoinTracker::new();
+        let (mut new_spans, mut old_spans) = (Vec::new(), Vec::new());
+        for piece in pieces {
+            let got = tracker.append_reporting(piece, |span| {
+                new_spans.push((span.start, span.end));
+            });
+            assert_eq!(got, oracle.append(piece, &mut old_spans), "{pieces:?}");
+            assert_eq!(new_spans, old_spans, "{pieces:?}");
+            assert_eq!(tracker.lookbehind, oracle.lookbehind, "{pieces:?}");
+            assert_eq!(tracker.processed_bytes, oracle.processed_bytes);
+        }
+    }
+
+    #[test]
+    fn junction_scan_matches_the_whole_join_at_every_split_of_delimiters() {
+        let texts = [
+            "-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n",
+            "x-----BEGIN ENCRYPTED PRIVATE KEY-----\r\nAAAA\r\n-----END ENCRYPTED PRIVATE KEY-----",
+            "\u{e9}-----BEGIN RSA PRIVATE KEY-----\u{1f511}-----END RSA PRIVATE KEY-----\u{e9}",
+            "-----BEGIN PRIVATE KEY-----BEGIN PRIVATE KEY-----END PRIVATE KEY-----END PRIVATE KEY-----",
+            "------BEGIN PRIVATE KEY------END PRIVATE KEY-----\n-----BEGIN EC PRIVATE KEY-----",
+        ];
+        for text in texts {
+            let cuts: Vec<usize> = (0..=text.len())
+                .filter(|&at| text.is_char_boundary(at))
+                .collect();
+            for &first in &cuts {
+                assert_chunks_match_the_join_oracle(&[&text[..first], &text[first..]]);
+                for &second in cuts.iter().filter(|&&at| at >= first) {
+                    // A long middle piece crosses the junction head bound.
+                    assert_chunks_match_the_join_oracle(&[
+                        &text[..first],
+                        &text[first..second],
+                        &text[second..],
+                    ]);
+                }
+            }
+            // Pieces of one byte up to beyond the junction head.
+            for size in [1, 2, 7, 35, 36, 37, 38, 40, 90] {
+                let mut pieces = Vec::new();
+                let mut rest = text;
+                while !rest.is_empty() {
+                    let mut cut = size.min(rest.len());
+                    while !rest.is_char_boundary(cut) {
+                        cut += 1;
+                    }
+                    let (piece, tail) = rest.split_at(cut);
+                    pieces.push(piece);
+                    rest = tail;
+                }
+                assert_chunks_match_the_join_oracle(&pieces);
+            }
+        }
+    }
+
+    #[test]
+    fn junction_scan_matches_the_whole_join_on_random_chunks() {
+        const PARTS: &[&str] = &[
+            "-----BEGIN PRIVATE KEY-----",
+            "-----END PRIVATE KEY-----",
+            "-----BEGIN ENCRYPTED PRIVATE KEY-----",
+            "-----END ENCRYPTED PRIVATE KEY-----",
+            "-----BEGIN ",
+            "-----END ",
+            "-----",
+            "----",
+            "-",
+            "PRIVATE KEY",
+            "\n",
+            "\r\n",
+            "body",
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            " ",
+            "\u{e9}",
+            "\u{1f511}",
+        ];
+        let mut state = 0x2545_F491_4F6C_DD1Du64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % u64::try_from(bound).unwrap()).unwrap()
+        };
+        for _ in 0..4_000 {
+            let mut text = String::new();
+            for _ in 0..next(16) {
+                text.push_str(PARTS[next(PARTS.len())]);
+            }
+            let mut pieces = Vec::new();
+            let mut rest = text.as_str();
+            while !rest.is_empty() {
+                let mut cut = (1 + next(120)).min(rest.len());
+                while !rest.is_char_boundary(cut) {
+                    cut += 1;
+                }
+                let (piece, tail) = rest.split_at(cut);
+                pieces.push(piece);
+                rest = tail;
+            }
+            assert_chunks_match_the_join_oracle(&pieces);
         }
     }
 }
