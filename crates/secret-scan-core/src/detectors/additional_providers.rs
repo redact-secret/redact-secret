@@ -203,17 +203,16 @@ impl Detector for TypedKnownFormatProviderDetector {
 ///   `rk_org_` counterpart: "All organization API keys have the same
 ///   `sk_org` prefix, regardless of their permission levels. (There's no
 ///   `rk_org` prefix.)" That page also states organization keys "support
-///   sandboxes and live mode", but shows no literal example distinguishing
-///   the two the way `sk_live_`/`sk_test_` are shown elsewhere on
-///   `docs.stripe.com/keys`; without a documented literal for that segment,
-///   this shape stays flat (`sk_org_` plus one opaque run), the same
-///   evidence-bar reasoning `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
-///   applies elsewhere in this crate ("select the reviewed source ordering,
-///   never guess a literal"). A value with a `_`-delimited environment
-///   segment embedded after `sk_org_` (for example a hypothetical
-///   `sk_org_live_...`) is therefore an intentional false negative today:
-///   the embedded `_` ends the alnum run before this shape's 20-byte floor,
-///   the same way any other undocumented internal separator would.
+///   sandboxes and live mode", but shows no literal example. Issue #1030
+///   (research #1012, verdict BLOCKED, no issuance evidence) records that
+///   two independent implementations branch on `sk_org_live_` and
+///   `sk_org_test_`, so the shape also claims those two mode-segment
+///   prefixes with the same 20-byte `[A-Za-z0-9]` floor, at the same
+///   docs-plus-independent-implementation support-policy evidence level and
+///   never above it. The body length and alphabet after the mode segment are
+///   unverified, and a mode segment shorter or longer than `live`/`test` is
+///   not claimed. `sk_org_` + one opaque run stays as before. Longest prefix
+///   wins, so `sk_org_live_` is never read as `sk_org_` plus a short run.
 ///   gitleaks' own environment enumeration additionally includes `prod`
 ///   (`sk_prod_`/`rk_prod_`), which no Stripe page documents for any key
 ///   type; adopting it is out of this issue's scope and is left unadded.
@@ -234,6 +233,8 @@ pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetect
         PrefixShape::at_least("rk_test_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
         PrefixShape::at_least("rk_live_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
         PrefixShape::at_least("sk_org_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("sk_org_live_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("sk_org_test_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
     ],
     boundary: pattern::is_alnum_dash,
 };
@@ -826,12 +827,14 @@ mod tests {
         // instead of against the shared minimum-length `BODY`. Slack moved
         // out to `super::slack` (issue #371) and Linear to `super::linear`
         // (issue #374); each is covered by its own tests there.
-        let cases: [(&KnownFormatProviderDetector, &str); 8] = [
+        let cases: [(&KnownFormatProviderDetector, &str); 10] = [
             (&STRIPE, "sk_test_"),
             (&STRIPE, "sk_live_"),
             (&STRIPE, "rk_test_"),
             (&STRIPE, "rk_live_"),
             (&STRIPE, "sk_org_"),
+            (&STRIPE, "sk_org_live_"),
+            (&STRIPE, "sk_org_test_"),
             (&DIGITALOCEAN, "dop_v1_"),
             (&DIGITALOCEAN, "doo_v1_"),
             (&DIGITALOCEAN, "dor_v1_"),
@@ -948,6 +951,74 @@ mod tests {
         ] {
             assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
         }
+    }
+
+    /// Issue #1030: `sk_org_` with a `live_`/`test_` mode segment, floor at
+    /// exactly 20 and above, boundaries, and the near misses. Values are built
+    /// at runtime from repeated filler, never written as a key-shaped literal.
+    #[test]
+    fn claims_organization_mode_segment_with_the_same_floor_as_sk_org() {
+        for mode in ["live", "test"] {
+            let prefix = format!("sk_org_{mode}_");
+            for len in [20usize, 21, 32, 64, 120] {
+                let body = "A".repeat(len);
+                let value = format!("{prefix}{body}");
+                for input in [
+                    value.clone(),
+                    format!("KEY={value}\n"),
+                    format!("\"{value}\""),
+                    format!("\u{ac00}{value}\u{ac00}"),
+                    format!("x {value}."),
+                ] {
+                    let c = detect(&STRIPE, &input);
+                    assert_eq!(c.len(), 1, "{mode} {len}");
+                    let start = input.find("sk_org_").unwrap();
+                    assert_eq!(
+                        c[0].range(),
+                        ByteRange::new(start, start + value.len()).unwrap(),
+                        "{mode} {len}"
+                    );
+                }
+            }
+            // Mixed-case and digit body within the alphabet.
+            let mixed = format!("{prefix}{}", "aZ09".repeat(6));
+            assert_eq!(detect(&STRIPE, &mixed).len(), 1, "{mixed}");
+            // Below the floor, no body, non-alphanumeric inside the body.
+            for input in [
+                prefix.clone(),
+                format!("{prefix}{}", "A".repeat(19)),
+                format!("{prefix}{}_{}", "A".repeat(10), "A".repeat(10)),
+                format!("{prefix}{}-{}", "A".repeat(10), "A".repeat(10)),
+                format!("{prefix}{}", "A".repeat(10)),
+            ] {
+                let c = detect(&STRIPE, &input);
+                assert!(c.iter().all(|x| x.range().end() <= input.len()), "{input}");
+                assert_eq!(c.len(), 0, "{input}");
+            }
+            // Embedded in a wider identifier (leading alnum/underscore/dash).
+            for lead in ["a", "9", "_", "-"] {
+                let input = format!("{lead}{prefix}{}", "A".repeat(24));
+                assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
+            }
+            // A trailing glued `_` or `-` rejects, like the sk_org_ rule.
+            for tail in ["_", "-"] {
+                let input = format!("{prefix}{}{tail}", "A".repeat(24));
+                assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
+            }
+        }
+        // Other mode words and cases are not claimed.
+        for mode in ["prod", "Live", "LIVE", "lives", "li", ""] {
+            let input = format!("sk_org_{mode}_{}", "A".repeat(24));
+            assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
+        }
+        // Regression: flat sk_org_ and sk_live_ unchanged.
+        for prefix in ["sk_org_", "sk_live_", "sk_test_"] {
+            let input = format!("{prefix}{}", "A".repeat(24));
+            assert_eq!(detect(&STRIPE, &input).len(), 1, "{input}");
+        }
+        // `sk_org_live_` is one finding, not two.
+        let two = format!("sk_org_live_{0} sk_org_test_{0}", "A".repeat(24));
+        assert_eq!(detect(&STRIPE, &two).len(), 2);
     }
 
     /// A public-prefix identifier surrounded by punctuation or Unicode/CRLF

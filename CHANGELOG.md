@@ -117,6 +117,20 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `stripe-token` now also detects a Stripe organization key with a mode
+  segment, `sk_org_live_` or `sk_org_test_` followed by at least 20
+  `[A-Za-z0-9]` bytes, as `stripe_credential` with the same always-redact
+  action as `sk_org_` (#1030, research #1012). Before, only `sk_org_` plus a
+  flat run matched, so a mode-segment organization key produced no finding
+  outside named contexts. Stripe documents only the `sk_org` prefix and that
+  organization keys support sandbox and live mode; the segment rests on two
+  independent implementations that branch on it, and no issued key has been
+  observed, so the body length and alphabet after the segment are unverified
+  and the floor stays the lexical 20-byte one. An intentional false negative:
+  a shorter body, a body containing `_` or `-`, another mode word, and
+  `rk_org_`. `sk_org_`, `sk_live_`, `sk_test_` findings and the Clerk label
+  ambiguity are unchanged. Not a support-status claim.
+
 - `aws-secret-access-key` no longer panics when a multi-byte character
   (`é`, `日`, U+2028) sits right before a secret-name identifier such as
   `secret` or `aws_secret_access_key`. The identifier start was computed as the
