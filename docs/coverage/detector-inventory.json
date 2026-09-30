@@ -918,6 +918,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
       "schemes": null
+    },
+    {
+      "type": "axiom_api_token",
+      "detector": "axiom-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "schemes": null
+    },
+    {
+      "type": "axiom_personal_token",
+      "detector": "axiom-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078apt-deadbeef-5e7c-4ded-9000-000000000002",
+      "schemes": null
     }
   ],
   "consumers": [

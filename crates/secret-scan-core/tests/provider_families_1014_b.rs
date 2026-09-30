@@ -40,6 +40,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const BASE32: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 const LOWER_ALNUM: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
+const LOWER_HEX: &[u8] = b"0123456789abcdef";
 
 /// The #860 index contexts plus a few host forms.
 fn contexts(key: &str) -> Vec<String> {
@@ -147,6 +148,8 @@ fn every_family_value() -> Vec<(&'static str, String)> {
         ("paddle-api-key", paddle::key("sdbx", 26, 22, 3, 2)),
         ("honeycomb-api-key", honeycomb::key('x', "ik", 58, 1)),
         ("honeycomb-api-key", honeycomb::key('a', "ic", 58, 2)),
+        ("axiom-token", axiom::token("xaat-", 1)),
+        ("axiom-token", axiom::token("xapt-", 2)),
     ]
 }
 
@@ -548,5 +551,109 @@ mod honeycomb {
     #[test]
     fn every_two_chunk_partition_matches_the_whole_input() {
         assert_partition_parity(&key('x', "ic", 58, 6));
+    }
+}
+
+mod axiom {
+    use super::*;
+
+    const DETECTOR: &str = "axiom-token";
+    const API: &str = "axiom_api_token";
+    const PERSONAL: &str = "axiom_personal_token";
+
+    fn uuid_with(groups: [usize; 5], seed: usize) -> String {
+        groups
+            .iter()
+            .enumerate()
+            .map(|(i, &len)| filler(LOWER_HEX, len, seed + i))
+            .collect::<Vec<_>>()
+            .join("-")
+    }
+
+    pub(super) fn token(prefix: &str, seed: usize) -> String {
+        format!("{prefix}{}", uuid_with([8, 4, 4, 4, 12], seed))
+    }
+
+    #[test]
+    fn api_and_personal_tokens_win_every_context_as_the_sole_finding() {
+        for seed in [1, 5, 9] {
+            for (key, type_name) in [
+                (token("xaat-", seed), API),
+                (token("xapt-", seed + 1), PERSONAL),
+            ] {
+                assert_eq!(key.len(), 41);
+                assert_sole_provider_finding(DETECTOR, type_name, &key);
+                for input in [
+                    format!("AXIOM_TOKEN={key}\n"),
+                    format!(
+                        "[sinks.axiom]\ntype = \"axiom\"\ndataset = \"logs\"\ntoken = \"{key}\"\n"
+                    ),
+                    format!("[OUTPUT]\n    Name  http\n    Header Authorization Bearer {key}\n"),
+                    format!(
+                        "OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer {key},X-Axiom-Dataset=logs\n"
+                    ),
+                    format!(
+                        "datasources:\n  - name: axiom\n    secureJsonData:\n      password: {key}\n"
+                    ),
+                ] {
+                    assert_sole_finding_in(&input, DETECTOR, type_name, &key);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = uuid_with([8, 4, 4, 4, 12], 3);
+        let good = format!("xaat-{body}");
+        let mut upper = good.clone();
+        upper.replace_range(10..11, "A");
+        let mut non_hex = good.clone();
+        non_hex.replace_range(10..11, "g");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("xaat-{}", uuid_with([7, 4, 4, 4, 12], 3)),
+                format!("xaat-{}", uuid_with([8, 4, 4, 4, 13], 3)),
+                format!("xaat-{}", uuid_with([8, 5, 4, 4, 11], 3)),
+                upper,
+                non_hex,
+                format!("xaat_{body}"),
+                format!("xabt-{body}"),
+                format!("x{good}"),
+                format!("_{good}"),
+                format!("{good}x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "AXIOM_TOKEN=xaat-your-api-token\n".to_owned(),
+            "AXIOM_TOKEN=xaat-xxxxxxxxxx-xxxxxxxxx-xxxxxxx\n".to_owned(),
+            format!("request id {}\n", uuid_with([8, 4, 4, 4, 12], 4)),
+            "AXIOM_TOKEN=${AXIOM_TOKEN}\n".to_owned(),
+            "AXIOM_ORG_ID=acme-corp-a1b2\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn other_families_are_isolated() {
+        assert_isolated(DETECTOR);
+    }
+
+    #[test]
+    fn a_repetition_line_is_unclaimed() {
+        assert_repetition_line_is_unclaimed(DETECTOR, &token("xapt-", 5));
+        assert_repetition_line_is_unclaimed(DETECTOR, "xaat-");
+    }
+
+    #[test]
+    fn every_two_chunk_partition_matches_the_whole_input() {
+        assert_partition_parity(&token("xaat-", 6));
+        assert_partition_parity(&token("xapt-", 7));
     }
 }

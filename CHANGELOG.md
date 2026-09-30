@@ -44,6 +44,9 @@ evidence is linked from each published version.
   - `honeycomb-api-key` (#1034): Honeycomb `hc?ik_`/`hc?ic_` + 58 ingest
     keys (`honeycomb_ingest_key`). Management keys stay unclaimed until a
     maintainer issuance check settles their alphabet.
+  - `axiom-token` (#1035): Axiom `xaat-` API tokens (`axiom_api_token`)
+    and `xapt-` personal access tokens (`axiom_personal_token`), each
+    `-` + a lowercase-hex UUID; bare UUIDs and placeholders stay unclaimed.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

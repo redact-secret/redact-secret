@@ -15,6 +15,7 @@ mod apify;
 mod atlassian;
 mod aws;
 mod aws_bedrock;
+mod axiom;
 mod azure_devops;
 mod bearer_token;
 mod browserbase;
@@ -249,6 +250,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(dynatrace::DynatraceTokenDetector),
         Box::new(paddle::PADDLE_API_KEY),
         Box::new(honeycomb::HONEYCOMB_INGEST_KEY),
+        Box::new(axiom::AXIOM),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -547,6 +549,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(honeycomb::HONEYCOMB_INGEST_KEY.shapes())],
     ),
     (
+        axiom::AXIOM.detector_id(),
+        &[Literals::Shapes(axiom::AXIOM.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -727,6 +733,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("dynatrace-token", Pack::Provider),
     ("paddle-api-key", Pack::Provider),
     ("honeycomb-api-key", Pack::Provider),
+    ("axiom-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -864,6 +871,7 @@ mod tests {
                 "dynatrace-token",
                 "paddle-api-key",
                 "honeycomb-api-key",
+                "axiom-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1238,6 +1246,7 @@ mod tests {
             "hcxik_{}{}",
             "syntheticrevokedhoneycombingestkey", "0123456789abcdefghijklmn"
         );
+        let axiom_token_input = format!("xaat-{}", "5e7c0ded-0000-4000-8000-deadbeef0001");
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1354,6 +1363,7 @@ mod tests {
             ("dynatrace-token", dynatrace_token_input.as_str()),
             ("paddle-api-key", paddle_api_key_input.as_str()),
             ("honeycomb-api-key", honeycomb_api_key_input.as_str()),
+            ("axiom-token", axiom_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

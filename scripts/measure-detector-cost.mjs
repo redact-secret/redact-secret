@@ -94,6 +94,7 @@ export const CANONICAL_IDS = [
   "dynatrace-token",
   "paddle-api-key",
   "honeycomb-api-key",
+  "axiom-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -130,6 +131,7 @@ export const GROUPS = {
     "runpod-api-key",
     "dynatrace-token",
     "honeycomb-api-key",
+    "axiom-token",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",

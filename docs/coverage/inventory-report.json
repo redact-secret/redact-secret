@@ -5812,12 +5812,103 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "honeycomb_ingest_key"
+    },
+    {
+      "detector": "axiom-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "axiom-token-positive-bare",
+        "axiom-token-positive-chat-sentence",
+        "axiom-token-positive-crlf-unicode-prefix",
+        "axiom-token-positive-curl-bearer",
+        "axiom-token-positive-dotenv",
+        "axiom-token-positive-grafana-password",
+        "axiom-token-positive-json-config",
+        "axiom-token-positive-json-token-key",
+        "axiom-token-positive-log",
+        "axiom-token-positive-otel-bearer-header",
+        "axiom-token-positive-punctuation-adjacent",
+        "axiom-token-positive-python-sdk-call",
+        "axiom-token-positive-repeated-value",
+        "axiom-token-positive-shell-export",
+        "axiom-token-positive-tool-call-arguments",
+        "axiom-token-positive-vector-sink",
+        "axiom-token-positive-x-api-key-header",
+        "axiom-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "axiom_api_token"
+    },
+    {
+      "detector": "axiom-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "axiom-token-positive-personal-token-chat",
+        "axiom-token-positive-second-sample",
+        "axiom-token-positive-second-sample-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "axiom_personal_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 127,
+    "supported": 129,
     "unresolved": 0
   }
 }

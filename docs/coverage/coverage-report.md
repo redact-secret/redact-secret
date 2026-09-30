@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 127/127 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 129/129 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 127 |
+| supported | 129 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 138.
+Coverage declarations: 140.
 
 ## Coverage by detector
 
@@ -32,6 +32,7 @@ Coverage declarations: 138.
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| axiom-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -142,6 +143,8 @@ Coverage declarations: 138.
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
 | aws_bedrock_long_term_api_key | aws-bedrock-long-term-api-key | provider | supported | not-applicable | none |
 | aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
+| axiom_api_token | axiom-token | provider | supported | not-applicable | none |
+| axiom_personal_token | axiom-token | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
@@ -284,15 +287,15 @@ Coverage declarations: 138.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 138 | 0 | 0 |
-| boundary | 127 | 0 | 0 |
-| host-context | 127 | 0 | 0 |
+| adversarial | 140 | 0 | 0 |
+| boundary | 129 | 0 | 0 |
+| host-context | 129 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 138 | 0 | 0 |
-| near-miss-negative | 127 | 0 | 0 |
-| overlap | 127 | 0 | 0 |
-| positive | 127 | 0 | 0 |
-| range | 138 | 0 | 0 |
+| malformed | 140 | 0 | 0 |
+| near-miss-negative | 129 | 0 | 0 |
+| overlap | 129 | 0 | 0 |
+| positive | 129 | 0 | 0 |
+| range | 140 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

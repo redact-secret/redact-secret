@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3410,
+  "fixtureCount": 3448,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -80203,6 +80203,729 @@
         "maxRuntimeMs": 250
       },
       "input": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "expected": [],
+      "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "axiom-token-positive-bare",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "axiom-token-positive-dotenv",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AXIOM_TOKEN=\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 53
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-shell-export",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export AXIOM_TOKEN=\"\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\"\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 61
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-yaml",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  AXIOM_TOKEN: \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 61
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-json-config",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"AXIOM_TOKEN\": \"\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\"}",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 58
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-json-token-key",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\"}",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 52
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-python-sdk-call",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\")",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 66
+        }
+      ],
+      "note": "An SDK keyword argument is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-x-api-key-header",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 52
+        }
+      ],
+      "note": "An API-key header value is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-curl-bearer",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\" https://example.invalid/v1",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 72
+        }
+      ],
+      "note": "A quoted curl Bearer header is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-tool-call-arguments",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"run\",\"arguments\":{\"api_key\":\"\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\"}}",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 79
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-chat-sentence",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "chat"
+      ],
+      "input": "Here is my key \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001 can you debug why the request fails?",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 56
+        }
+      ],
+      "note": "A value pasted into a chat sentence, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-log",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-29T12:00:00Z INFO  calling API with credential \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001 for request 7",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 96
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-positive-punctuation-adjacent",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001).",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 42
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "axiom-token-positive-crlf-unicode-prefix",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\n\r\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 65
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "axiom-token-positive-repeated-value",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001 \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        },
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 83
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "axiom-token-positive-second-sample",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078apt-deadbeef-5e7c-4ded-9000-000000000002",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        }
+      ],
+      "note": "The second-sample shape is reported on its own."
+    },
+    {
+      "id": "axiom-token-positive-second-sample-dotenv",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AXIOM_TOKEN=\u0078apt-deadbeef-5e7c-4ded-9000-000000000002",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 53
+        }
+      ],
+      "note": "The second-sample shape in a dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "axiom-token-overlap-bearer-header",
+      "detector": "axiom-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 63
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "axiom-token-overlap-context",
+      "detector": "axiom-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 54
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "axiom-token-overlap-second-sample-bearer",
+      "detector": "axiom-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0078apt-deadbeef-5e7c-4ded-9000-000000000002\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 63
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "axiom-token-positive-vector-sink",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[sinks.axiom]\ntype = \"axiom\"\ndataset = \"logs\"\ntoken = \"\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\"\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 96
+        }
+      ],
+      "note": "A Vector sink token field is reported at exactly the token."
+    },
+    {
+      "id": "axiom-token-positive-otel-bearer-header",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001,X-Axiom-Dataset=logs",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 89
+        }
+      ],
+      "note": "An OpenTelemetry exporter Bearer header is reported at exactly the token."
+    },
+    {
+      "id": "axiom-token-positive-grafana-password",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "datasources:\n  - name: axiom\n    secureJsonData:\n      password: \u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\n",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 106
+        }
+      ],
+      "note": "A service-account password field is reported at exactly the token."
+    },
+    {
+      "id": "axiom-token-positive-personal-token-chat",
+      "detector": "axiom-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "chat"
+      ],
+      "input": "my personal token is \u0078apt-deadbeef-5e7c-4ded-9000-000000000002, why does the org id header fail?",
+      "expected": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_personal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 62
+        }
+      ],
+      "note": "A personal access token pasted into chat is reported at exactly the token."
+    },
+    {
+      "id": "axiom-token-boundary-short-first-group",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0de-0000-4000-8000-deadbeef0001",
+      "expected": [],
+      "note": "A 7-byte first group breaks the UUID layout."
+    },
+    {
+      "id": "axiom-token-boundary-long-last-group",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef00012",
+      "expected": [],
+      "note": "A 13-byte last group is rejected whole."
+    },
+    {
+      "id": "axiom-token-boundary-shifted-dash",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0ded-00004-000-8000-deadbeef0001",
+      "expected": [],
+      "note": "A dash off the UUID positions breaks the layout."
+    },
+    {
+      "id": "axiom-token-boundary-uppercase-hex",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5E7C0DED-0000-4000-8000-DEADBEEF0001",
+      "expected": [],
+      "note": "The body is lowercase hex."
+    },
+    {
+      "id": "axiom-token-boundary-non-hex-letter",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0deg-0000-4000-8000-deadbeef0001",
+      "expected": [],
+      "note": "A g is not hex."
+    },
+    {
+      "id": "axiom-token-boundary-underscore-prefix",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xaat_5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [],
+      "note": "The prefix ends with a dash."
+    },
+    {
+      "id": "axiom-token-boundary-unknown-prefix",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078abt-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [],
+      "note": "Only xaat- and xapt- are token prefixes."
+    },
+    {
+      "id": "axiom-token-boundary-uppercase-prefix",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0058AAT-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [],
+      "note": "The prefix is lowercase."
+    },
+    {
+      "id": "axiom-token-boundary-identifier-glue",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "expected": [],
+      "note": "A glued leading byte makes it part of a wider identifier."
+    },
+    {
+      "id": "axiom-token-boundary-glued-suffix",
+      "detector": "axiom-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001-1",
+      "expected": [],
+      "note": "A byte glued after the token makes it part of a wider identifier."
+    },
+    {
+      "id": "axiom-token-negative-placeholders",
+      "detector": "axiom-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Use \u0078aat-your-api-token or \u0078aat-xxxxxxxxxx-xxxxxxxxx-xxxxxxx from the docs.",
+      "expected": [],
+      "note": "Placeholders fail the UUID layout."
+    },
+    {
+      "id": "axiom-token-negative-bare-uuid",
+      "detector": "axiom-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "request id 5e7c0ded-0000-4000-8000-deadbeef0001 completed",
+      "expected": [],
+      "note": "A bare UUID is not an Axiom token."
+    },
+    {
+      "id": "axiom-token-negative-shell-reference",
+      "detector": "axiom-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AXIOM_TOKEN=${AXIOM_TOKEN}\n",
+      "expected": [],
+      "note": "A shell reference is not a token."
+    },
+    {
+      "id": "axiom-token-adversarial-long-run",
+      "detector": "axiom-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
       "expected": [],
       "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
     }
