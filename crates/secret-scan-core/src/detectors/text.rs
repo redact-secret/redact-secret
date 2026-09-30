@@ -1454,7 +1454,7 @@ mod line_tests {
             state ^= state << 13;
             state ^= state >> 7;
             state ^= state << 17;
-            usize::try_from(state >> 8).unwrap()
+            usize::try_from(state >> 33).unwrap()
         };
         for _ in 0..3000 {
             let mut input = String::new();

@@ -914,7 +914,7 @@ mod tests {
             state ^= state << 13;
             state ^= state >> 7;
             state ^= state << 17;
-            usize::try_from(state >> 8).unwrap()
+            usize::try_from(state >> 33).unwrap()
         };
         let mut found = 0usize;
         for _ in 0..600 {
