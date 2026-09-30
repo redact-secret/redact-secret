@@ -121,3 +121,52 @@ fn non_counting_digits_and_glued_words_with_leftovers_stay_detected() {
     let input = format!("RESEND_API_KEY=re_{body}_{tail}\n");
     assert_eq!(findings(&input), ["resend-api-key"], "{input}");
 }
+
+/// Issue #1015: the Anthropic Admin prefix `sk-ant-admin01-` is 15 bytes, and
+/// the vendor-placeholder rule used to strip only 12-byte prefixes, so its
+/// documentation placeholders were redacted while the same bodies behind the
+/// `sk-ant-api01-` / `sk-ant-api03-` siblings were silent. Parity only: a
+/// well-formed admin key keeps its typed finding and an off-grammar,
+/// non-placeholder body keeps the `generic-token` finding.
+#[test]
+fn anthropic_admin_placeholders_match_their_sibling_prefixes() {
+    for prefix in ["sk-ant-admin01-", "sk-ant-api01-", "sk-ant-api03-"] {
+        for body in ["<your-key>", "YOUR_KEY", "..."] {
+            for input in [
+                format!("curl -H \"x-api-key: {prefix}{body}\""),
+                format!(
+                    "curl -s https://api.anthropic.com/v1/organizations/api_keys -H \"x-api-key: {prefix}{body}\""
+                ),
+                format!("ANTHROPIC_ADMIN_KEY={prefix}{body}"),
+                format!("api_key={prefix}{body}"),
+            ] {
+                assert!(
+                    findings(&input).is_empty(),
+                    "{input}: {:?}",
+                    findings(&input)
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn a_real_shaped_or_off_grammar_admin_value_is_still_reported() {
+    // 93 body bytes plus the `AA` tail, built from low-entropy filler.
+    let body = format!("{}AA", "Ab3".repeat(31));
+    let input = format!("curl -H \"x-api-key: sk-ant-admin01-{body}\"");
+    let registry = DetectorRegistry::with_built_in([]).unwrap();
+    let found = scan(&input, &registry, &DefaultPolicy).unwrap();
+    assert_eq!(found.len(), 1, "{found:?}");
+    assert_eq!(found[0].type_name(), "anthropic_admin_api_key");
+    assert_eq!(found[0].action(), redact_secret::Action::Redact);
+
+    // Not a placeholder and not the admin grammar: `generic-token` keeps it.
+    let off_grammar = format!("sk-ant-admin01-{}", "Ab3Cd4".repeat(3));
+    for input in [
+        format!("curl -H \"x-api-key: {off_grammar}\""),
+        format!("api_key={off_grammar}"),
+    ] {
+        assert_eq!(findings(&input), ["generic-token"], "{input}");
+    }
+}

@@ -28,6 +28,38 @@ evidence is linked from each published version.
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
 
+### Fixed
+
+- `generic-token` no longer redacts Anthropic Admin documentation placeholders
+  (`sk-ant-admin01-<your-key>`, `-YOUR_KEY`, `-...`), matching the
+  `sk-ant-api01-`/`sk-ant-api03-` siblings (#1015). A well-formed Admin key is
+  still `anthropic_admin_api_key`, and an off-grammar body is still reported.
+- A complete, unmasked value under a `masked_`/`redacted_`/`hashed_`-led
+  credential name is reported again (#1018): the lead excludes only a value
+  that shows masking or hashing, and the keyword-gated providers read a
+  `LiteLLM` model route (`cohere/command-r-plus`), so an unmasked Cohere key
+  under `masked_api_key=` is `cohere_api_key` / redact. Masked displays stay
+  silent; `publishable_` names are unchanged.
+- A Kubernetes-style `env` entry (`- name: <NAME>` / `value: "<v>"` on two
+  lines, either order) is read as the assignment `<NAME>=<v>` (#1016):
+  `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed provider findings, and
+  any other credential name gives `generic-token` at its usual floors.
+  `valueFrom:`, placeholders and non-credential names stay silent, and the
+  incremental session holds the item's first line so chunked scans agree.
+- `deepgram-api-key` covers the JS SDK v3 `createClient(...)` factory, the
+  browser WebSocket `token` subprotocol, a token header whose request line
+  or `Host:` header names `api.deepgram.com` on an earlier line, and a
+  sibling `provider: deepgram` field (#1017). These were missed or typed
+  `generic-token`; the JSON `{"provider":"deepgram","auth":...}` form moves
+  from warn to redact. A bare 40-hex run stays unreported.
+- A keyed environment store is read as an assignment (#1038):
+  `os.environ["NAME"] = "<v>"` (single quotes too), `process.env["NAME"] =`,
+  Ruby `ENV["NAME"] =`, `settings["api_key"] =`,
+  `os.environ.setdefault("NAME", "<v>")` and `os.putenv("NAME", "<v>")`.
+  `MISTRAL_API_KEY`, `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed
+  provider findings and other credential names give `generic-token`; reads,
+  references, placeholders and non-credential names stay silent.
+
 ## 0.1.0-beta.11 — 2026-09-29
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.11/README.md).
