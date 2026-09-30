@@ -165,7 +165,6 @@
 //!   positive; this is the same class of risk every other keyword-gated
 //!   bare-format detector in this registry already accepts.
 
-use super::text::lines;
 use crate::detectors::pattern::{self, Alphabet};
 use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
@@ -195,11 +194,7 @@ fn is_key_hex(byte: u8) -> bool {
 /// `true` when [`CONTEXT_KEYWORD`] occurs (case-insensitively) anywhere in
 /// `line`.
 fn line_has_context_keyword(line: &str) -> bool {
-    let bytes = line.as_bytes();
-    let needle_len = CONTEXT_KEYWORD.len();
-    needle_len <= bytes.len()
-        && (0..=bytes.len() - needle_len)
-            .any(|pos| text::starts_with_ci(line, pos, CONTEXT_KEYWORD))
+    text::contains_ci(line, CONTEXT_KEYWORD)
 }
 
 /// Returns the end offset (relative to `bytes`) of a valid
@@ -255,7 +250,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (line_start, line_end) in lines(input) {
+        text::for_each_long_run_line(input, |line_start, line_end| {
             let line = &input[line_start..line_end];
             let has_keyword = line_has_context_keyword(line);
 
@@ -294,7 +289,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
                 }
                 start = hex_end;
             }
-        }
+        });
         Ok(candidates)
     }
 }

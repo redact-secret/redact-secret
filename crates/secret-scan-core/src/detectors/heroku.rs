@@ -139,7 +139,6 @@
 //! never by the current-format detector regardless of context, since it
 //! carries no `HRKU-` prefix.
 
-use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -211,9 +210,7 @@ const LEGACY_BOUNDARY: Alphabet = pattern::is_alnum_dash;
 
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
-    let bytes = line.as_bytes();
-    needle.len() <= bytes.len()
-        && (0..=bytes.len() - needle.len()).any(|pos| text::starts_with_ci(line, pos, needle))
+    text::contains_ci(line, needle)
 }
 
 /// Every non-overlapping, boundary-checked bare run of exactly
@@ -403,8 +400,18 @@ fn follows_netrc_password_token(line: &[u8], value_start: usize) -> bool {
 /// `true` when `line` ends with the `heroku auth:token` command, after any
 /// shell prompt (`$ heroku auth:token`).
 fn is_heroku_auth_token_command(line: &str) -> bool {
-    let words: Vec<&str> = tokens(line).collect();
-    words.ends_with(&["heroku", "auth:token"])
+    // Both tokens are compared whole, so the line must contain the second.
+    if !line.contains("auth:token") {
+        return false;
+    }
+    // The last two tokens are `heroku`, `auth:token`.
+    let mut before_last = None;
+    let mut last = None;
+    for word in tokens(line) {
+        before_last = last;
+        last = Some(word);
+    }
+    before_last == Some("heroku") && last == Some("auth:token")
 }
 
 /// `true` when the matched run is the whole of `line`, surrounding
@@ -426,12 +433,17 @@ pub(super) const LOOKBACK_LINES: usize = AUTHORIZATIONS_MAX_ROWS + 1;
 /// `true` when `line` runs a `heroku authorizations:<verb>` command, after
 /// any shell prompt (`$ heroku authorizations:info $AUTH_ID`).
 fn is_heroku_authorizations_command(line: &str) -> bool {
-    let words: Vec<&str> = tokens(line).collect();
-    words.windows(2).any(|pair| {
-        pair[0] == "heroku"
-            && pair[1]
+    if !line.contains("authorizations:") {
+        return false;
+    }
+    let mut previous = "";
+    tokens(line).any(|word| {
+        let hit = previous == "heroku"
+            && word
                 .strip_prefix("authorizations:")
-                .is_some_and(|verb| !verb.is_empty())
+                .is_some_and(|verb| !verb.is_empty());
+        previous = word;
+        hit
     })
 }
 
@@ -440,12 +452,11 @@ fn is_heroku_authorizations_command(line: &str) -> bool {
 /// whitespace or the end of the line. `None` for any other line.
 fn cli_table_label(line: &str) -> Option<&str> {
     let (label, rest) = line.split_once(':')?;
-    let words: Vec<&str> = label.split(' ').collect();
     let well_formed = !label.is_empty()
         && label.len() <= 24
-        && words.len() <= 3
-        && words
-            .iter()
+        && label.split(' ').count() <= 3
+        && label
+            .split(' ')
             .all(|word| !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_alphabetic()));
     (well_formed && rest.bytes().next().is_none_or(is_token_space)).then_some(label)
 }
@@ -527,18 +538,14 @@ impl Detector for HerokuApiKeyLegacyDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        let all_lines: Vec<(usize, usize)> = lines(input).collect();
-        for (index, &(line_start, line_end)) in all_lines.iter().enumerate() {
+        text::for_each_long_run_line(input, |line_start, line_end| {
             let line = &input[line_start..line_end];
             let raw_matches = scan_bare_legacy_runs(line, pattern::is_hex_or_dash, LEGACY_BOUNDARY);
             if raw_matches.is_empty() {
-                continue;
+                return;
             }
             let same_line = line_contains_ci(line, CONTEXT_KEYWORD);
-            let previous: Vec<&str> = all_lines[index.saturating_sub(LOOKBACK_LINES)..index]
-                .iter()
-                .map(|&(start, end)| &input[start..end])
-                .collect();
+            let previous = text::preceding_lines(input, line_start, LOOKBACK_LINES);
             let bytes = line.as_bytes();
             for (relative_start, relative_end) in raw_matches {
                 // A documented multi-line layout names the credential slot
@@ -582,7 +589,7 @@ impl Detector for HerokuApiKeyLegacyDetector {
                         .with_signals([signal]),
                 );
             }
-        }
+        });
         Ok(candidates)
     }
 }
@@ -1175,5 +1182,89 @@ mod tests {
         // One digit off the filler is a UUID again.
         let near = "00000000-0000-0000-0000-000000000001";
         assert_eq!(detect_legacy(&format!("HEROKU_API_KEY={near}")).len(), 1);
+    }
+
+    /// The pre-#1074 forms, kept as oracles.
+    fn oracle_auth_token_command(line: &str) -> bool {
+        let words: Vec<&str> = tokens(line).collect();
+        words.ends_with(&["heroku", "auth:token"])
+    }
+
+    fn oracle_authorizations_command(line: &str) -> bool {
+        let words: Vec<&str> = tokens(line).collect();
+        words.windows(2).any(|pair| {
+            pair[0] == "heroku"
+                && pair[1]
+                    .strip_prefix("authorizations:")
+                    .is_some_and(|verb| !verb.is_empty())
+        })
+    }
+
+    fn oracle_cli_table_label(line: &str) -> Option<&str> {
+        let (label, rest) = line.split_once(':')?;
+        let words: Vec<&str> = label.split(' ').collect();
+        let well_formed = !label.is_empty()
+            && label.len() <= 24
+            && words.len() <= 3
+            && words.iter().all(|word| {
+                !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_alphabetic())
+            });
+        (well_formed && rest.bytes().next().is_none_or(is_token_space)).then_some(label)
+    }
+
+    #[test]
+    fn command_and_label_judgments_match_the_collecting_oracles() {
+        const PARTS: &[&str] = &[
+            "heroku",
+            "auth:token",
+            "authorizations:",
+            "authorizations:info",
+            "authorizations:create",
+            "$",
+            "Client",
+            "Updated at",
+            "Token",
+            "Description",
+            "a",
+            "\u{e9}",
+            "1",
+            ":",
+            " ",
+            "  ",
+            "\t",
+            "\r",
+            "",
+        ];
+        let mut state = 0x2545_F491_4F6C_DD1Du64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % u64::try_from(bound).unwrap()).unwrap()
+        };
+        for _ in 0..30_000 {
+            let mut line = String::new();
+            for _ in 0..next(9) {
+                line.push_str(PARTS[next(PARTS.len())]);
+                if next(3) > 0 {
+                    line.push(' ');
+                }
+            }
+            assert_eq!(
+                is_heroku_auth_token_command(&line),
+                oracle_auth_token_command(&line),
+                "{line:?}"
+            );
+            assert_eq!(
+                is_heroku_authorizations_command(&line),
+                oracle_authorizations_command(&line),
+                "{line:?}"
+            );
+            assert_eq!(
+                cli_table_label(&line),
+                oracle_cli_table_label(&line),
+                "{line:?}"
+            );
+        }
     }
 }

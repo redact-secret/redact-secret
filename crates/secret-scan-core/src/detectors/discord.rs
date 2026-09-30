@@ -187,6 +187,27 @@ fn match_at(bytes: &[u8], ends: &mut RunCursor<'_>, start: usize) -> Option<usiz
     None
 }
 
+/// The next offset after a failed attempt at `start` that can still match.
+///
+/// Every match has a `.` at `start + 24` or `start + 26` (the end of the
+/// first segment), so no start below `p - 26` can match, where `p` is the
+/// first `.` at or after `start + 25` (the earliest dot a start of
+/// `start + 1` can use). Without such a dot no later start matches either.
+/// The result is never below `start + 1`, and `p - 26` is computed with
+/// `saturating_sub`.
+fn next_start(bytes: &[u8], start: usize) -> usize {
+    let from = start.saturating_add(SEGMENT_ONE_LEN_LEGACY + 1);
+    let Some(rest) = bytes.get(from..) else {
+        return bytes.len();
+    };
+    match rest.iter().position(|&byte| byte == b'.') {
+        Some(offset) => (from + offset)
+            .saturating_sub(SEGMENT_ONE_LEN_CURRENT)
+            .max(start + 1),
+        None => bytes.len(),
+    }
+}
+
 /// Finds every non-overlapping match, left to right, the way a global regex
 /// would: a failed attempt advances by one byte, and a successful one
 /// advances past the whole match regardless of whether the boundary check
@@ -209,7 +230,7 @@ fn scan_with(input: &str, ends: &mut RunCursor<'_>) -> Vec<(usize, usize)> {
     let mut start = 0;
     while start < bytes.len() {
         let Some(end) = match_at(bytes, ends, start) else {
-            start += 1;
+            start = next_start(bytes, start);
             continue;
         };
         if pattern::boundary_ok(bytes, start, end, is_alnum_dash) {
@@ -562,6 +583,59 @@ mod tests {
                 cursor.scanned(),
                 input.len()
             );
+        }
+    }
+
+    /// The pre-#1073 scan loop: an attempt at every byte.
+    fn scan_oracle(input: &str) -> Vec<(usize, usize)> {
+        let bytes = input.as_bytes();
+        let mut ends = RunCursor::new(bytes, is_alnum_dash);
+        let mut matches = Vec::new();
+        let mut start = 0;
+        while start < bytes.len() {
+            let Some(end) = match_at(bytes, &mut ends, start) else {
+                start += 1;
+                continue;
+            };
+            if pattern::boundary_ok(bytes, start, end, is_alnum_dash) {
+                matches.push((start, end));
+            }
+            start = end;
+        }
+        matches
+    }
+
+    #[test]
+    fn dot_jump_scan_equals_the_per_byte_oracle() {
+        let pieces: [&str; 12] = [
+            SEGMENT_ONE,
+            SEGMENT_ONE_CURRENT,
+            SEGMENT_TWO,
+            SEGMENT_THREE,
+            SEGMENT_THREE_CURRENT,
+            ".",
+            ".",
+            "-",
+            " ",
+            "\u{e9}",
+            "ab",
+            "\n",
+        ];
+        let mut state: u64 = 0x9E37_79B9_7F4A_7C15;
+        let mut next = move || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (state >> 33) as usize
+        };
+        assert_eq!(scan(""), scan_oracle(""));
+        for _ in 0..3000 {
+            let count = next() % 12;
+            let mut input = String::new();
+            for _ in 0..count {
+                input.push_str(pieces[next() % pieces.len()]);
+            }
+            assert_eq!(scan(&input), scan_oracle(&input), "{input:?}");
         }
     }
 }

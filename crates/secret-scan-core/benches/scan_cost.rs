@@ -29,6 +29,12 @@
 //!   `--top K`         detector rows per table (default 12; JSON lists all)
 //!   `--list`          print the workload names and exit
 //!
+//! `dense-findings-redact` (#1076) is a different shape: it times
+//! `redact()` alone over ~49k findings of mixed match length 3-40 (found by a
+//! bench-local detector, so the length mix is controlled) with three
+//! formatters (default, a 42-byte and a 256-byte user placeholder), and prints
+//! the returned `String`'s capacity and length.
+//!
 //! The session constructor (a registry build) is outside the timed
 //! incremental closure; `registry-build` times the constructors on their own
 //! (#1059). Each path also reports throughput in MB/s (10^6 bytes/s).
@@ -47,9 +53,10 @@ use std::hint::black_box;
 use std::time::Instant;
 
 use redact_secret::{
-    DEFAULT_MAX_INPUT_BYTES, DefaultPolicy, DetectorContext, DetectorRegistry, IncrementalLimits,
-    IncrementalSanitizer, PiiSelection, default_placeholder_formatter, load_ruleset,
-    scan_and_redact,
+    ByteRange, Candidate, Confidence, DEFAULT_MAX_INPUT_BYTES, DefaultPolicy, Detector,
+    DetectorContext, DetectorFailure, DetectorRegistry, Finding, FormatterFailure,
+    IncrementalLimits, IncrementalSanitizer, PiiSelection, PlaceholderContext,
+    default_placeholder_formatter, load_ruleset, redact, scan, scan_and_redact,
 };
 use serde_json::{Value, json};
 
@@ -58,11 +65,16 @@ mod workloads;
 
 use workloads::{
     CLI_MAX_MULTILINE_BYTES, CLI_MAX_TOKEN_BYTES, RegistryKind, ScanPath, WORKLOADS, Workload,
-    partition,
+    dense_findings_input, partition,
 };
 
 /// The pseudo-workload name that selects the registry-construction timings.
 const REGISTRY_BUILD: &str = "registry-build";
+/// The finding-dense redaction workload (#1076).
+const DENSE_REDACT: &str = "dense-findings-redact";
+/// Timed repetitions cap for the 256-byte-placeholder variant (pre-#1076 it
+/// is ~45 s per call).
+const DENSE_SLOW_RUNS: usize = 3;
 /// Constructions per timed sample, so one sample is well above timer
 /// resolution.
 const REGISTRY_BUILDS_PER_SAMPLE: usize = 50;
@@ -133,6 +145,9 @@ fn run() -> Result<(), String> {
             println!("{:<32} {}", workload.name, workload.description);
         }
         println!(
+            "{DENSE_REDACT:<32} redact() over ~49k findings, match length 3-40: default, 42-byte and 256-byte placeholders (#1076)"
+        );
+        println!(
             "{REGISTRY_BUILD:<32} DetectorRegistry construction: built-in, built-in + PII, built-in + ruleset (#1059)"
         );
         return Ok(());
@@ -150,7 +165,11 @@ fn run() -> Result<(), String> {
         .filter
         .as_deref()
         .is_none_or(|filter| REGISTRY_BUILD.contains(filter));
-    if selected.is_empty() && !registry_build {
+    let dense_redact = options
+        .filter
+        .as_deref()
+        .is_none_or(|filter| DENSE_REDACT.contains(filter));
+    if selected.is_empty() && !registry_build && !dense_redact {
         return Err("no workload matches the filter; see --list".to_owned());
     }
     let selection = PiiSelection::parse(&["pii"]).map_err(|error| error.to_string())?;
@@ -165,6 +184,14 @@ fn run() -> Result<(), String> {
     for workload in selected {
         eprintln!("scan_cost: {} ...", workload.name);
         let result = measure_workload(workload, &registries, &options)?;
+        if !options.json {
+            print!("{}", result.1);
+        }
+        results.push(result.0);
+    }
+    if dense_redact {
+        eprintln!("scan_cost: {DENSE_REDACT} ...");
+        let result = measure_dense_redact(options.runs)?;
         if !options.json {
             print!("{}", result.1);
         }
@@ -347,6 +374,153 @@ fn measure_workload(
         "paths": paths,
         "detector_sum_of_medians": sums,
         "detectors": detectors_json,
+    });
+    Ok((value, table))
+}
+
+/// Reports every maximal run of `[A-Z0-9]` of 3 to 40 bytes as a
+/// high-confidence finding. Bench-local: it gives `dense-findings-redact` an
+/// exact, controlled length mix that no built-in detector produces.
+struct UpperRunDetector;
+
+#[allow(clippy::unnecessary_literal_bound)]
+impl Detector for UpperRunDetector {
+    fn id(&self) -> &str {
+        "bench-upper-run"
+    }
+
+    fn detect(
+        &self,
+        input: &str,
+        _context: &DetectorContext,
+    ) -> Result<Vec<Candidate>, DetectorFailure> {
+        let bytes = input.as_bytes();
+        let mut candidates = Vec::new();
+        let mut index = 0;
+        while index < bytes.len() {
+            if bytes[index].is_ascii_uppercase() || bytes[index].is_ascii_digit() {
+                let start = index;
+                while index < bytes.len()
+                    && (bytes[index].is_ascii_uppercase() || bytes[index].is_ascii_digit())
+                {
+                    index += 1;
+                }
+                if (3..=40).contains(&(index - start))
+                    && let Some(range) = ByteRange::new(start, index)
+                {
+                    candidates.push(Candidate::new("bench-token", Confidence::High, range));
+                }
+            } else {
+                index += 1;
+            }
+        }
+        Ok(candidates)
+    }
+}
+
+/// A `len`-byte placeholder: `[R<index>-` padded with lowercase `x`. It has no
+/// `Q` and no upper-case run a workload token could equal.
+fn padded_placeholder(context: PlaceholderContext, len: usize) -> String {
+    let mut placeholder = format!("[r{}-", context.placeholder_index());
+    while placeholder.len() + 1 < len {
+        placeholder.push('x');
+    }
+    placeholder.push(']');
+    placeholder
+}
+
+/// #1076: `redact()` alone over a finding-dense input, three formatters.
+/// Reports the output `String`'s capacity next to its length.
+fn measure_dense_redact(runs: usize) -> Result<(Value, String), String> {
+    let input = dense_findings_input();
+    let registry = {
+        let mut registry = DetectorRegistry::new();
+        registry
+            .register(Box::new(UpperRunDetector))
+            .map_err(|error| error.to_string())?;
+        registry
+    };
+    let findings: Vec<Finding> =
+        scan(&input, &registry, &DefaultPolicy).map_err(|error| error.to_string())?;
+    let (min_len, max_len) = findings
+        .iter()
+        .fold((usize::MAX, 0), |(low, high), finding| {
+            (
+                low.min(finding.range().len()),
+                high.max(finding.range().len()),
+            )
+        });
+    let mut table = String::new();
+    let _ = writeln!(
+        table,
+        "\n## {DENSE_REDACT} — {} bytes, {} findings (match length {min_len}-{max_len}), {runs} runs\nredact() only; findings computed once outside the timed part",
+        input.len(),
+        findings.len(),
+    );
+    let variants: [(
+        &str,
+        Box<dyn Fn(&Finding, &PlaceholderContext) -> Result<String, FormatterFailure>>,
+    ); 3] = [
+        (
+            "redact-default-formatter",
+            Box::new(default_placeholder_formatter),
+        ),
+        (
+            "redact-placeholder-42",
+            Box::new(|_, context| Ok(padded_placeholder(*context, 42))),
+        ),
+        (
+            "redact-placeholder-256",
+            Box::new(|_, context| Ok(padded_placeholder(*context, 256))),
+        ),
+    ];
+    let mut paths = serde_json::Map::new();
+    for (label, formatter) in &variants {
+        // The 256-byte variant costs tens of seconds per call on the
+        // pre-#1076 index, so its repetitions are capped (`runs` in the
+        // output says how many were used).
+        let variant_runs = if label.ends_with("-256") {
+            runs.min(DENSE_SLOW_RUNS)
+        } else {
+            runs
+        };
+        let shape = std::cell::Cell::new((0usize, 0usize));
+        let stats = time(variant_runs, || {
+            redact(&input, &findings, formatter)
+                .map(|output| {
+                    shape.set((output.capacity(), output.len()));
+                    black_box(output).len()
+                })
+                .map_err(|error| error.to_string())
+        })?;
+        let (capacity, len) = shape.get();
+        let mb_per_s = mb_per_s(input.len(), stats.median_ms);
+        let _ = writeln!(
+            table,
+            "  {label:<28} median {:>10.3} ms  (min {:.3}, max {:.3})  {mb_per_s:>9.2} MB/s  runs {variant_runs}  output len {len} capacity {capacity} (capacity/len {:.3}, slack {} bytes)",
+            stats.median_ms,
+            stats.min_ms,
+            stats.max_ms,
+            capacity as f64 / len as f64,
+            capacity - len,
+        );
+        let mut value = stats.to_json();
+        value["mb_per_s"] = json!(round4(mb_per_s));
+        value["runs"] = json!(variant_runs);
+        value["output_len"] = json!(len);
+        value["output_capacity"] = json!(capacity);
+        paths.insert((*label).to_owned(), value);
+    }
+    let value = json!({
+        "name": DENSE_REDACT,
+        "description": "redact() over ~49k findings, match length 3-40; default, 42-byte and 256-byte placeholders",
+        "bytes": input.len(),
+        "lines": input.lines().count(),
+        "registry": "bench-local UpperRunDetector",
+        "findings_whole": findings.len(),
+        "paths": paths,
+        "detector_sum_of_medians": Value::Null,
+        "detectors": Value::Null,
     });
     Ok((value, table))
 }

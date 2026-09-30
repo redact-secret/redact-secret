@@ -402,6 +402,11 @@ It is a `harness = false` binary with no benchmarking dependency. It uses only
 the public API, and it keeps `std::time::Instant` in the bench, outside
 `src/`.
 
+The `hex-heavy-log` workloads (#1073, #1075) are dense in long hex and
+base64 tokens, and `dense-findings-redact` (#1076) times `redact()` alone over
+about 49,000 findings with the default formatter and 42- and 256-byte user
+placeholders, printing the output `String` length and capacity.
+
 ```bash
 cargo bench -p redact-secret --bench scan_cost -- --list
 cargo bench -p redact-secret --bench scan_cost -- scale-logs-64k

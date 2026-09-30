@@ -103,7 +103,6 @@
 //! reflects it -- collapsing a keyword-only `Medium` match to an
 //! unconditional redact would overstate the weaker heuristic's reliability.
 
-use super::text::lines;
 use crate::detectors::pattern::{self, Alphabet, RunLength};
 use crate::detectors::text;
 use crate::error::DetectorFailure;
@@ -119,9 +118,7 @@ const CONTEXT_KEYWORD: &str = "twilio";
 
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
-    let bytes = line.as_bytes();
-    needle.len() <= bytes.len()
-        && (0..=bytes.len() - needle.len()).any(|pos| text::starts_with_ci(line, pos, needle))
+    text::contains_ci(line, needle)
 }
 
 /// `true` when `line` carries a boundary-checked `prefix` + exactly
@@ -307,12 +304,11 @@ fn detect_context_gated(
     cli_table: bool,
 ) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    let all_lines: Vec<(usize, usize)> = lines(input).collect();
-    for (index, &(line_start, line_end)) in all_lines.iter().enumerate() {
+    text::for_each_long_run_line(input, |line_start, line_end| {
         let line = &input[line_start..line_end];
         let raw_matches = scan_bare_secret_runs(line, alphabet, boundary);
         if raw_matches.is_empty() {
-            continue;
+            return;
         }
 
         let line_context =
@@ -324,17 +320,13 @@ fn detect_context_gated(
                 None
             };
         let table_column = if line_context.is_none() && cli_table {
-            let previous: Vec<&str> = all_lines
-                [index.saturating_sub(CLI_TABLE_LOOKBACK_LINES)..index]
-                .iter()
-                .map(|&(start, end)| &input[start..end])
-                .collect();
+            let previous = text::preceding_lines(input, line_start, CLI_TABLE_LOOKBACK_LINES);
             open_cli_table_column(&previous)
         } else {
             None
         };
         if line_context.is_none() && table_column.is_none() {
-            continue;
+            return;
         }
 
         for (relative_start, relative_end) in raw_matches {
@@ -373,7 +365,7 @@ fn detect_context_gated(
                     .with_signals([signal]),
             );
         }
-    }
+    });
     candidates
 }
 

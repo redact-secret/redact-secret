@@ -148,8 +148,7 @@ fn assigned_key(line: &[u8], value_start: usize) -> Option<&[u8]> {
 
 /// `true` when `line` contains `needle` (ASCII, case-insensitive).
 fn line_contains_ci(line: &str, needle: &str) -> bool {
-    line.len() >= needle.len()
-        && (0..=line.len() - needle.len()).any(|pos| text::starts_with_ci(line, pos, needle))
+    text::contains_ci(line, needle)
 }
 
 /// `true` when `key` names the Pinecone API key on `line`.
@@ -165,7 +164,7 @@ fn is_pinecone_key_name(key: &[u8], line: &str) -> bool {
 /// Legacy UUID keys assigned to a Pinecone API-key name; see the module doc.
 fn legacy_candidates(input: &str) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    for (line_start, line_end) in text::lines(input) {
+    text::for_each_long_run_line(input, |line_start, line_end| {
         let line = &input[line_start..line_end];
         let bytes = line.as_bytes();
         let mut start = 0usize;
@@ -188,7 +187,7 @@ fn legacy_candidates(input: &str) -> Vec<Candidate> {
             }
             start = end;
         }
-    }
+    });
     candidates
 }
 

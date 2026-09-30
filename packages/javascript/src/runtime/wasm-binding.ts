@@ -42,6 +42,19 @@ export interface WasmFinding {
   readonly action: string;
   readonly obfuscation: string;
   readonly range: { readonly start: number; readonly end: number };
+  /** Flat twins of `range`: plain numbers, so no `Range` handle is allocated. */
+  readonly start: number;
+  readonly end: number;
+}
+
+/**
+ * What `scanAndRedact` returns. The wrapper reads each part once through a
+ * consuming accessor (no clone in linear memory) and then frees the handle.
+ */
+export interface WasmScanAndRedactResult {
+  takeText(): string;
+  takeFindings(): readonly WasmFinding[];
+  free(): void;
 }
 
 /**
@@ -146,7 +159,7 @@ export interface WasmModule {
     maxInputBytes?: number,
     maxFindings?: number,
     ruleset?: Uint8Array,
-  ): { readonly text: string; readonly findings: readonly WasmFinding[] };
+  ): WasmScanAndRedactResult;
   createIncrementalSanitizer(
     maxInputCodeUnits: number,
     maxBufferedCodeUnits: number,
@@ -191,7 +204,6 @@ export function assertWasmModuleShape(
  * `scan` returned.
  */
 function toNativeFinding(finding: WasmFinding): NativeFinding {
-  const { start, end } = finding.range;
   return {
     id: finding.id,
     type: finding.type,
@@ -199,8 +211,8 @@ function toNativeFinding(finding: WasmFinding): NativeFinding {
     confidence: finding.confidence,
     action: finding.action,
     obfuscation: finding.obfuscation,
-    start,
-    end,
+    start: finding.start,
+    end: finding.end,
     [NATIVE_HANDLE]: finding,
   };
 }
@@ -327,10 +339,14 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         limits?.maxFindings,
         ruleset,
       );
-      return {
-        text: result.text,
-        findings: result.findings.map(toNativeFinding),
-      };
+      try {
+        return {
+          text: result.takeText(),
+          findings: result.takeFindings().map(toNativeFinding),
+        };
+      } finally {
+        result.free();
+      }
     },
     createIncrementalSanitizer: (options) => {
       const session = wasm.createIncrementalSanitizer(

@@ -87,9 +87,7 @@ fn is_boundary_byte(byte: u8) -> bool {
 
 /// `true` when [`CONTEXT_KEYWORD`] occurs anywhere in `line`.
 fn line_has_context_keyword(line: &str) -> bool {
-    line.len() >= CONTEXT_KEYWORD.len()
-        && (0..=line.len() - CONTEXT_KEYWORD.len())
-            .any(|pos| text::starts_with_ci(line, pos, CONTEXT_KEYWORD))
+    text::contains_ci(line, CONTEXT_KEYWORD)
 }
 
 /// `true` when `run` contains at least one ASCII letter and one digit.

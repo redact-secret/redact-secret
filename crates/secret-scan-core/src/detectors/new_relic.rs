@@ -159,7 +159,6 @@
 //!   positive; this is the same class of risk every other keyword-gated
 //!   bare-format detector in this registry already accepts.
 
-use super::text::lines;
 use crate::detectors::pattern::{self, RunLength};
 use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
@@ -241,12 +240,9 @@ impl Detector for NewRelicUserApiKeyDetector {
 /// `true` when any of [`CONTEXT_KEYWORDS`] occurs (case-insensitively)
 /// anywhere in `line`.
 fn line_has_context_keyword(line: &str) -> bool {
-    let bytes = line.as_bytes();
-    CONTEXT_KEYWORDS.iter().any(|needle| {
-        let needle_len = needle.len();
-        needle_len <= bytes.len()
-            && (0..=bytes.len() - needle_len).any(|pos| text::starts_with_ci(line, pos, needle))
-    })
+    CONTEXT_KEYWORDS
+        .iter()
+        .any(|needle| text::contains_ci(line, needle))
 }
 
 /// Detects a New Relic License Key: a marked current-generation key
@@ -265,13 +261,13 @@ impl Detector for NewRelicLicenseKeyDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (line_start, line_end) in lines(input) {
+        text::for_each_long_run_line(input, |line_start, line_end| {
             let line = &input[line_start..line_end];
             let has_keyword = line_has_context_keyword(line);
             // A context-free line can only hold a marked (current-generation)
             // key, so skip it outright unless the marker literal is present.
             if !has_keyword && !line.contains(LICENSE_KEY_MARKER) {
-                continue;
+                return;
             }
             let push = |candidates: &mut Vec<Candidate>, start: usize, end: usize, marked: bool| {
                 let Some(range) = ByteRange::new(line_start + start, line_start + end) else {
@@ -347,7 +343,7 @@ impl Detector for NewRelicLicenseKeyDetector {
                     push(&mut candidates, prefix_at, key_end, true);
                 }
             }
-        }
+        });
         super::sort_candidates_by_start(&mut candidates);
         Ok(candidates)
     }
