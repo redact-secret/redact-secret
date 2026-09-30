@@ -66,9 +66,20 @@ impl PiiSelection {
     /// Returns one of the fixed `PII_SELECTOR_*` errors. No error contains a
     /// selector or any caller input.
     pub fn parse(selectors: &[&str]) -> Result<Self, SecretScanError> {
+        // The `off` selection every PII-off `initialize()` passes: the same
+        // value the catalog walk below yields for no selectors, without
+        // building its sets. Initialization then neither runs nor, under a
+        // lazily compiling WebAssembly engine, compiles that code
+        // (issue #1043).
+        if selectors.is_empty() {
+            return Ok(Self::default());
+        }
         Self::parse_with_catalog(selectors, KNOWN_FAMILIES, AVAILABLE_FAMILIES)
     }
 
+    // Kept out of line so the empty-selection path in `parse` stays a small
+    // function (issue #1043).
+    #[inline(never)]
     fn parse_with_catalog(
         selectors: &[&str],
         known_families: &[&str],
