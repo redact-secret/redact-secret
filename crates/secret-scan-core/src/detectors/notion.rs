@@ -79,17 +79,16 @@ fn push(candidates: &mut Vec<Candidate>, ranges: Vec<(usize, usize)>, signals: [
 /// `ntn_` followed by an exact 11-digit run and an exact 35-byte alphanumeric
 /// run, with no separator between the two: unlike [`super::github`]'s
 /// fine-grained shape, there is no literal byte between the segments to
-/// anchor on, so the digit run is checked directly against the precomputed
-/// alphanumeric-run table the way [`super::sendgrid`] checks its own
-/// fixed-length segments.
+/// anchor on, so the digit run is checked directly against the alphanumeric
+/// run end the way [`super::sendgrid`] checks its own fixed-length segments.
 fn scan_ntn(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    // Input without the prefix returns before the run-end table is built
-    // (issue #982).
+    // Input without the prefix returns before any run is measured (issue
+    // #982); the cursor measures only the runs asked about (issue #1056).
     let Some(first) = pattern::find_literal(bytes, NTN_PREFIX.as_bytes(), 0) else {
         return Vec::new();
     };
-    let ends = pattern::run_ends(bytes, is_alnum);
+    let mut ends = pattern::RunCursor::new(bytes, is_alnum);
     let mut matches = Vec::new();
     let mut start = first;
     while start < bytes.len() {
@@ -98,7 +97,7 @@ fn scan_ntn(input: &str) -> Vec<(usize, usize)> {
             continue;
         }
 
-        let Some(end) = ntn_end(bytes, &ends, start + NTN_PREFIX.len()) else {
+        let Some(end) = ntn_end(bytes, &mut ends, start + NTN_PREFIX.len()) else {
             start += 1;
             continue;
         };
@@ -111,8 +110,8 @@ fn scan_ntn(input: &str) -> Vec<(usize, usize)> {
     matches
 }
 
-fn ntn_end(bytes: &[u8], ends: &[usize], suffix_start: usize) -> Option<usize> {
-    if ends[suffix_start] < suffix_start + NTN_DIGIT_LEN + NTN_SUFFIX_LEN {
+fn ntn_end(bytes: &[u8], ends: &mut pattern::RunCursor<'_>, suffix_start: usize) -> Option<usize> {
+    if ends.end(suffix_start) < suffix_start + NTN_DIGIT_LEN + NTN_SUFFIX_LEN {
         return None;
     }
     let digits_ok = bytes[suffix_start..suffix_start + NTN_DIGIT_LEN]

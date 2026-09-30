@@ -87,7 +87,7 @@
 //! extension past the floor is read in full, as more opaque secret, same
 //! as beta.4.
 
-use crate::detectors::pattern::{self, Alphabet, PrefixShape};
+use crate::detectors::pattern::{self, Alphabet, PrefixShape, RunCursor};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -241,23 +241,19 @@ fn scan(input: &str) -> Vec<Match> {
 /// a missing separator is rejected rather than re-read into a wider run.
 fn scan_app_level(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    // The run tables are built on the first prefix occurrence: most inputs
-    // carry none, and each table is a pass and an allocation (issue #950).
-    let mut tables: Option<(Vec<usize>, Vec<usize>)> = None;
+    // Run cursors, which measure only the runs asked about rather than
+    // building a whole-input table on the first prefix occurrence (issues
+    // #950, #1056).
+    let mut digit_ends = RunCursor::new(bytes, DIGIT_ALPHABET);
+    let mut alnum_ends = RunCursor::new(bytes, pattern::is_alnum);
     let mut matches = Vec::new();
     let mut start = 0;
     while let Some(found) = pattern::find_literal(bytes, APP_LEVEL_PREFIX.as_bytes(), start) {
         start = found;
-        let (digit_ends, alnum_ends) = tables.get_or_insert_with(|| {
-            (
-                pattern::run_ends(bytes, DIGIT_ALPHABET),
-                pattern::run_ends(bytes, pattern::is_alnum),
-            )
-        });
         let Some(end) = app_level_end(
             bytes,
-            digit_ends,
-            alnum_ends,
+            &mut digit_ends,
+            &mut alnum_ends,
             start + APP_LEVEL_PREFIX.len(),
         ) else {
             start += 1;
@@ -273,17 +269,22 @@ fn scan_app_level(input: &str) -> Vec<(usize, usize)> {
 
 /// The end of the four `-`-separated app-level sections beginning at
 /// `cursor`, in digit, alphanumeric, digit, alphanumeric order.
-fn app_level_end(
+fn app_level_end<'a>(
     bytes: &[u8],
-    digit_ends: &[usize],
-    alnum_ends: &[usize],
+    digit_ends: &mut RunCursor<'a>,
+    alnum_ends: &mut RunCursor<'a>,
     mut cursor: usize,
 ) -> Option<usize> {
-    for (index, ends) in [digit_ends, alnum_ends, digit_ends, alnum_ends]
-        .into_iter()
-        .enumerate()
-    {
-        let section_end = *ends.get(cursor)?;
+    for index in 0..4 {
+        if cursor > bytes.len() {
+            return None;
+        }
+        let ends = if index % 2 == 0 {
+            &mut *digit_ends
+        } else {
+            &mut *alnum_ends
+        };
+        let section_end = ends.end(cursor);
         if section_end == cursor {
             return None;
         }
@@ -373,8 +374,9 @@ fn scan_sectioned(
     shape: SectionedShape,
 ) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    // Built on the first prefix occurrence, as in [`scan_app_level`].
-    let mut tables: Option<(Vec<usize>, Vec<usize>)> = None;
+    // Run cursors, as in [`scan_app_level`] (issue #1056).
+    let mut digit_ends = RunCursor::new(bytes, DIGIT_ALPHABET);
+    let mut tail_ends = RunCursor::new(bytes, shape.tail_alphabet);
     let mut matches = Vec::new();
     let mut start = 0;
     while let Some(found) = pattern::find_literal(bytes, prefix.as_bytes(), start) {
@@ -383,14 +385,13 @@ fn scan_sectioned(
             start += 1;
             continue;
         }
-        let (digit_ends, tail_ends) = tables.get_or_insert_with(|| {
-            (
-                pattern::run_ends(bytes, DIGIT_ALPHABET),
-                pattern::run_ends(bytes, shape.tail_alphabet),
-            )
-        });
-        let Some(end) = sectioned_end(bytes, digit_ends, tail_ends, start + prefix.len(), shape)
-        else {
+        let Some(end) = sectioned_end(
+            bytes,
+            &mut digit_ends,
+            &mut tail_ends,
+            start + prefix.len(),
+            shape,
+        ) else {
             start += 1;
             continue;
         };
@@ -409,8 +410,8 @@ fn scan_sectioned(
 /// re-read as part of a wider section or the tail.
 fn sectioned_end(
     bytes: &[u8],
-    digit_ends: &[usize],
-    tail_ends: &[usize],
+    digit_ends: &mut RunCursor<'_>,
+    tail_ends: &mut RunCursor<'_>,
     mut cursor: usize,
     shape: SectionedShape,
 ) -> Option<usize> {
@@ -421,7 +422,7 @@ fn sectioned_end(
         }
         cursor = section_end + 1;
     }
-    let available = tail_ends[cursor] - cursor;
+    let available = tail_ends.end(cursor) - cursor;
     if available < shape.tail_min {
         return None;
     }
@@ -436,12 +437,12 @@ fn sectioned_end(
 /// The end of the maximal digit run starting at `start`, only when its
 /// length falls within `[digit_min, digit_max]`.
 fn digit_section_end(
-    digit_ends: &[usize],
+    digit_ends: &mut RunCursor<'_>,
     start: usize,
     digit_min: usize,
     digit_max: usize,
 ) -> Option<usize> {
-    let end = digit_ends[start];
+    let end = digit_ends.end(start);
     let len = end - start;
     (digit_min..=digit_max).contains(&len).then_some(end)
 }

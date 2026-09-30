@@ -84,7 +84,7 @@
 //! length, and colon separator are specific enough on their own, the same
 //! tradeoff every other fixed-prefix provider grammar in this crate makes.
 
-use crate::detectors::pattern::{self, is_alnum_dash};
+use crate::detectors::pattern::{self, RunCursor, is_alnum_dash};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -111,12 +111,14 @@ impl Detector for FirebaseServerKeyDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        // Input without the prefix returns before the run-end table is built
-        // (issue #982).
+        // Input without the prefix returns before any run is measured
+        // (issue #982). One cursor per segment keeps each one's queries
+        // non-decreasing, so each measures a byte at most once (issue #1056).
         let Some(first) = pattern::find_literal(bytes, PREFIX, 0) else {
             return Ok(Vec::new());
         };
-        let alnum_dash_ends = pattern::run_ends(bytes, is_alnum_dash);
+        let mut body_ends = RunCursor::new(bytes, is_alnum_dash);
+        let mut tail_ends = RunCursor::new(bytes, is_alnum_dash);
         let mut candidates = Vec::new();
         let mut start = first;
         while start < bytes.len() {
@@ -125,7 +127,7 @@ impl Detector for FirebaseServerKeyDetector {
                 continue;
             }
 
-            let Some(end) = match_at(bytes, &alnum_dash_ends, start) else {
+            let Some(end) = match_at(bytes, &mut body_ends, &mut tail_ends, start) else {
                 start += 1;
                 continue;
             };
@@ -149,9 +151,14 @@ impl Detector for FirebaseServerKeyDetector {
 /// at `start`, where `bytes[start..]` is already known to begin with
 /// [`PREFIX`]. Returns the exclusive end offset on success; the caller
 /// still applies the boundary check.
-fn match_at(bytes: &[u8], alnum_dash_ends: &[usize], start: usize) -> Option<usize> {
+fn match_at(
+    bytes: &[u8],
+    body_ends: &mut RunCursor<'_>,
+    tail_ends: &mut RunCursor<'_>,
+    start: usize,
+) -> Option<usize> {
     let body_start = start + PREFIX.len();
-    if alnum_dash_ends[body_start] < body_start + BODY_LEN {
+    if body_ends.end(body_start) < body_start + BODY_LEN {
         return None;
     }
     let separator = body_start + BODY_LEN;
@@ -160,7 +167,7 @@ fn match_at(bytes: &[u8], alnum_dash_ends: &[usize], start: usize) -> Option<usi
     }
 
     let tail_start = separator + 1;
-    if alnum_dash_ends[tail_start] < tail_start + TAIL_LEN {
+    if tail_ends.end(tail_start) < tail_start + TAIL_LEN {
         return None;
     }
 

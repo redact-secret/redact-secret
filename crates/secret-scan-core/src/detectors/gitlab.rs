@@ -252,12 +252,13 @@ impl Detector for GitlabRunnerAuthenticationTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        // Input without the prefix returns before the run-end table is built
-        // (issue #982).
+        // Input without the prefix returns before any run is measured
+        // (issue #982); the cursor measures only the runs asked about
+        // (issue #1056).
         let Some(first) = pattern::find_literal(bytes, RUNNER_PREFIX.as_bytes(), 0) else {
             return Ok(Vec::new());
         };
-        let run_ends = pattern::run_ends(bytes, is_token_char);
+        let mut run_ends = pattern::RunCursor::new(bytes, is_token_char);
         let mut candidates = Vec::new();
         let mut start = first;
         while start < bytes.len() {
@@ -266,7 +267,7 @@ impl Detector for GitlabRunnerAuthenticationTokenDetector {
                 continue;
             }
             let body_start = start + RUNNER_PREFIX.len();
-            let run_end = run_ends[body_start];
+            let run_end = run_ends.end(body_start);
             let routable = (bytes.get(run_end) == Some(&b'.'))
                 .then(|| routable_end(bytes, start, body_start, run_end))
                 .flatten();
