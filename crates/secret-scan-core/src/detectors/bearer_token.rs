@@ -25,7 +25,7 @@
 
 use super::generic_token::is_vendor_prefixed_placeholder;
 use super::text::{
-    ascii_run_len, ends_with_ci, is_instructional_token_placeholder, is_js_whitespace,
+    ascii_run_len, ends_with_ci, find_ci, is_instructional_token_placeholder, is_js_whitespace,
     is_repeated_character_filler, matches_placeholder_vocabulary, prev_char, rskip_while_chars,
     starts_with_ci,
 };
@@ -369,10 +369,28 @@ fn is_secret_token_body_byte(byte: u8) -> bool {
 /// part of the body, and a body of placeholder vocabulary or filler is
 /// excluded like a `Bearer` value.
 fn secret_token_uri_candidates(input: &str) -> Vec<Candidate> {
+    secret_token_uri_candidates_from(input, |bytes, from| {
+        find_ci(bytes, from, SECRET_TOKEN_SCHEME)
+    })
+}
+
+/// [`secret_token_uri_candidates`] over the offsets `next` yields: the next
+/// offset at or after `from` that can start a scheme (`None` when none can).
+/// Each yielded offset is still checked in full, so `next` only has to skip
+/// offsets that cannot match.
+fn secret_token_uri_candidates_from(
+    input: &str,
+    mut next: impl FnMut(&[u8], usize) -> Option<usize>,
+) -> Vec<Candidate> {
     let bytes = input.as_bytes();
     let mut candidates = Vec::new();
     let mut cursor = 0usize;
     while cursor + SECRET_TOKEN_SCHEME.len() <= bytes.len() {
+        let Some(at) = next(bytes, cursor) else { break };
+        cursor = at;
+        if cursor + SECRET_TOKEN_SCHEME.len() > bytes.len() {
+            break;
+        }
         if !bytes[cursor..cursor + SECRET_TOKEN_SCHEME.len()]
             .eq_ignore_ascii_case(SECRET_TOKEN_SCHEME)
             || (cursor > 0 && is_boundary_identifier_char(bytes[cursor - 1]))
@@ -424,87 +442,181 @@ impl Detector for BearerTokenDetector {
         input: &str,
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
-        let bytes = input.as_bytes();
-        let mut candidates = Vec::new();
-        let mut cursor = 0usize;
-
-        while cursor < bytes.len() {
-            let Some((scheme_end, header)) = match_scheme_at(input, cursor) else {
-                cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
-                continue;
-            };
-
-            let ws_len = ascii_run_len(bytes, scheme_end, is_space_or_tab);
-            if ws_len == 0 {
-                cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
-                continue;
-            }
-            let value_start = scheme_end + ws_len;
-
-            let token_len = ascii_run_len(bytes, value_start, is_token_char);
-            if token_len == 0 {
-                cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
-                continue;
-            }
-            let (value_end, runs) = joined_value_end(bytes, value_start, value_start + token_len);
-            // The floor is judged on the whole joined value, padding and the
-            // final run's `=` excluded: a short id before a long secret is
-            // still one credential (issue #918).
-            let last_run_end = runs.last().map_or(value_start + token_len, |&(_, end)| end);
-            if last_run_end - value_start
-                < if header {
-                    MIN_HEADER_TOKEN_LEN
-                } else {
-                    MIN_TOKEN_LEN
+        // A scheme starts with `authorization` or `bearer` (any case), so
+        // the next attempt is at the nearer of the two keywords. Each
+        // keyword's next position is kept until the cursor passes it, so the
+        // input is searched once per keyword.
+        let mut next_authorization: Option<Option<usize>> = None;
+        let mut next_bearer: Option<Option<usize>> = None;
+        let mut candidates = bearer_scheme_candidates(input, |bytes, from| {
+            for (slot, keyword) in [
+                (&mut next_authorization, b"authorization".as_slice()),
+                (&mut next_bearer, b"bearer".as_slice()),
+            ] {
+                if slot.is_none_or(|found| found.is_some_and(|at| at < from)) {
+                    *slot = Some(find_ci(bytes, from, keyword));
                 }
-            {
-                cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
-                continue;
             }
-
-            let boundary_blocked = cursor > 0
-                && is_boundary_identifier_char(bytes[cursor - 1])
-                && !(header && preceded_by_proxy_prefix(bytes, cursor));
-            // An `authorization` that ends a wider header name
-            // (`X-Authorization:`) is not the header this grammar reads, but
-            // the `Bearer` credential after it is still a bare `Bearer`
-            // match. Resuming past the value here hid it, on its own line
-            // and on the next one alike (issue #990).
-            if boundary_blocked && header {
-                cursor += 1;
-                continue;
+            match (next_authorization.flatten(), next_bearer.flatten()) {
+                (Some(a), Some(b)) => Some(a.min(b)),
+                (a, b) => a.or(b),
             }
-            // A joined value is excluded only when every run is filler or
-            // placeholder vocabulary: `YOUR_ID:<real secret>` stays
-            // detected, so a placeholder half never hides a real half.
-            let non_secret = runs
-                .iter()
-                .all(|&(start, end)| is_non_secret_bearer_value(&input[start..end]));
-            if !boundary_blocked
-                && !non_secret
-                && !is_glued_to_placeholder(bytes, value_end)
-                && let Some(range) = ByteRange::new(value_start, value_end)
-            {
-                candidates.push(
-                    Candidate::new("bearer_token", Confidence::High, range)
-                        .with_specificity(Specificity::Structural)
-                        .with_signals(["bearer-scheme"]),
-                );
-            }
-
-            // `matchAll` resumes scanning at the end of the raw regex match
-            // regardless of the boundary check outcome.
-            cursor = value_end.max(cursor + 1);
-        }
-
+        });
         candidates.extend(secret_token_uri_candidates(input));
         Ok(candidates)
     }
 }
 
+/// The `Bearer` scheme pass over the offsets `next` yields (as for
+/// [`secret_token_uri_candidates_from`]); every yielded offset is attempted
+/// in full.
+fn bearer_scheme_candidates(
+    input: &str,
+    mut next: impl FnMut(&[u8], usize) -> Option<usize>,
+) -> Vec<Candidate> {
+    let bytes = input.as_bytes();
+    let mut candidates = Vec::new();
+    let mut cursor = 0usize;
+
+    while cursor < bytes.len() {
+        let Some(at) = next(bytes, cursor) else { break };
+        cursor = at;
+        let Some((scheme_end, header)) = match_scheme_at(input, cursor) else {
+            cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
+            continue;
+        };
+
+        let ws_len = ascii_run_len(bytes, scheme_end, is_space_or_tab);
+        if ws_len == 0 {
+            cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
+            continue;
+        }
+        let value_start = scheme_end + ws_len;
+
+        let token_len = ascii_run_len(bytes, value_start, is_token_char);
+        if token_len == 0 {
+            cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
+            continue;
+        }
+        let (value_end, runs) = joined_value_end(bytes, value_start, value_start + token_len);
+        // The floor is judged on the whole joined value, padding and the
+        // final run's `=` excluded: a short id before a long secret is
+        // still one credential (issue #918).
+        let last_run_end = runs.last().map_or(value_start + token_len, |&(_, end)| end);
+        if last_run_end - value_start
+            < if header {
+                MIN_HEADER_TOKEN_LEN
+            } else {
+                MIN_TOKEN_LEN
+            }
+        {
+            cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
+            continue;
+        }
+
+        let boundary_blocked = cursor > 0
+            && is_boundary_identifier_char(bytes[cursor - 1])
+            && !(header && preceded_by_proxy_prefix(bytes, cursor));
+        // An `authorization` that ends a wider header name
+        // (`X-Authorization:`) is not the header this grammar reads, but
+        // the `Bearer` credential after it is still a bare `Bearer`
+        // match. Resuming past the value here hid it, on its own line
+        // and on the next one alike (issue #990).
+        if boundary_blocked && header {
+            cursor += 1;
+            continue;
+        }
+        // A joined value is excluded only when every run is filler or
+        // placeholder vocabulary: `YOUR_ID:<real secret>` stays
+        // detected, so a placeholder half never hides a real half.
+        let non_secret = runs
+            .iter()
+            .all(|&(start, end)| is_non_secret_bearer_value(&input[start..end]));
+        if !boundary_blocked
+            && !non_secret
+            && !is_glued_to_placeholder(bytes, value_end)
+            && let Some(range) = ByteRange::new(value_start, value_end)
+        {
+            candidates.push(
+                Candidate::new("bearer_token", Confidence::High, range)
+                    .with_specificity(Specificity::Structural)
+                    .with_signals(["bearer-scheme"]),
+            );
+        }
+
+        // `matchAll` resumes scanning at the end of the raw regex match
+        // regardless of the boundary check outcome.
+        cursor = value_end.max(cursor + 1);
+    }
+
+    candidates
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every offset, the way the pre-#1073 loops walked the input.
+    fn every_offset(bytes: &[u8], from: usize) -> Option<usize> {
+        (from < bytes.len()).then_some(from)
+    }
+
+    #[test]
+    fn keyword_jumps_equal_the_per_offset_scan() {
+        let pieces = [
+            "Bearer",
+            "bearer",
+            "BEARER",
+            "Authorization",
+            "authorization",
+            "Proxy-Authorization",
+            "X-Authorization",
+            "secret-token:",
+            "Secret-Token:",
+            " ",
+            "  ",
+            "\t",
+            ":",
+            "\n",
+            "\r\n",
+            "\u{e9}",
+            "\u{2003}",
+            "-",
+            "_",
+            "a",
+            "b",
+            "%",
+            "%4A",
+            "Bearer U1lOVEhFVElDX1JFVk9LRUQ=",
+            "Authorization: Bearer SYNTHETICREVOKED0123",
+            "secret-token:SYNTHETICREVOKED0123",
+            "SYNTHETICREVOKED0123",
+            ".",
+        ];
+        let mut state: u64 = 0x0F1E_2D3C_4B5A_6978;
+        let mut next = move || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (state >> 33) as usize
+        };
+        let mut matched = 0usize;
+        for _ in 0..6000 {
+            let mut input = String::new();
+            for _ in 0..next() % 24 {
+                input.push_str(pieces[next() % pieces.len()]);
+            }
+            let fast = detect(&input);
+            matched += fast.len();
+            let mut oracle = bearer_scheme_candidates(&input, every_offset);
+            oracle.extend(secret_token_uri_candidates_from(&input, every_offset));
+            assert_eq!(fast, oracle, "{input:?}");
+        }
+        assert!(
+            matched > 100,
+            "the generator must exercise real matches: {matched}"
+        );
+    }
 
     fn detect(input: &str) -> Vec<Candidate> {
         BearerTokenDetector
