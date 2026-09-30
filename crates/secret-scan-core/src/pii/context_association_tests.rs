@@ -693,3 +693,372 @@ fn line_offsets_equal_the_normalized_prefix_length_at_every_boundary() {
         }
     }
 }
+
+// Issue #1058: each side's view is clipped to the scalars an accepted
+// occurrence can reach before it is normalized and searched. The unclipped
+// association (`ContextVocabulary::associate_unclipped`) and the pre-#902
+// oracle above are the references.
+
+/// Fillers for long lines: ASCII words and separator runs, combining marks
+/// and conjoining jamo that compose across a cut, Hangul and CJK text with
+/// no ASCII to cut at, invisible runs, and scalars NFC expands or maps.
+const LONG_FILLERS: &[&str] = &[
+    "lorem ",
+    "ipsum",
+    "x",
+    " ",
+    "  \t ",
+    "--__::==",
+    " - ",
+    "e\u{301}",
+    "\u{301}",
+    "\u{301}\u{327}",
+    "\u{1100}\u{1161}",
+    "\u{1161}",
+    "\u{11a8}",
+    "고객 ",
+    "값",
+    "연락처",
+    "中文字符",
+    "中",
+    "привет ",
+    "a|b",
+    "\"",
+    "'",
+    "\u{200b}\u{200b}\u{200b}",
+    "\u{ad}",
+    "\u{fe0f}",
+    "\u{344}",
+    "\u{f73}",
+    "\u{212b}",
+    "\u{2000}",
+    "\u{3000}",
+    "\u{a0}",
+    "EMAIL",
+    "Ip",
+    // Overlapping occurrences of a form, so the non-overlapping search
+    // depends on where a clipped view starts.
+    "examplexample",
+    "exampl",
+    " example",
+];
+
+fn long_filler(generator: &mut Generator, scalars: usize) -> String {
+    let mut text = String::new();
+    while text.chars().count() < scalars {
+        if generator.below(40) == 0 {
+            // A long invisible run: invisible scalars never count towards
+            // the clip, however many there are.
+            text.push_str(&"\u{200b}".repeat(generator.below(400)));
+        } else {
+            text.push_str(generator.pick(LONG_FILLERS));
+        }
+    }
+    text
+}
+
+/// A gap that normalizes to about `distance` scalars. Quotes, pipes and
+/// single spaces keep a field label's gap valid; letters make it invalid.
+fn distance_gap(generator: &mut Generator, distance: usize) -> String {
+    let mut gap = String::new();
+    let mut previous_separator = false;
+    for index in 0..distance {
+        let character = if index == 0 || index + 1 == distance {
+            ' '
+        } else if previous_separator {
+            ['"', '\'', '|', 'y'][generator.below(4)]
+        } else {
+            [' ', '"', '\'', '|', 'y', '"'][generator.below(6)]
+        };
+        previous_separator = character == ' ';
+        gap.push(character);
+    }
+    gap
+}
+
+fn natural_language_label(generator: &mut Generator) -> String {
+    loop {
+        let text = label(generator);
+        let lowered = text.to_lowercase();
+        if [
+            "contact",
+            "example",
+            "documentation",
+            "not",
+            "연락처",
+            "예시",
+            "아님",
+        ]
+        .iter()
+        .any(|form| lowered.contains(form))
+        {
+            return text;
+        }
+    }
+}
+
+/// A long logical line (or a few) with labels at distances around the
+/// field-label (16) and natural-language (64) limits and the clip reach,
+/// behind and ahead of values.
+fn long_line(generator: &mut Generator) -> String {
+    const DISTANCES: &[usize] = &[
+        0, 1, 2, 14, 15, 16, 17, 18, 62, 63, 64, 65, 66, 95, 96, 97, 98, 99, 100, 130,
+    ];
+    let padding = generator.below(260);
+    let mut text = long_filler(generator, padding);
+    for _ in 0..=generator.below(4) {
+        text.push_str(&label(generator));
+        let before = DISTANCES[generator.below(DISTANCES.len())];
+        text.push_str(&distance_gap(generator, before));
+        text.push_str(generator.pick(VALUES));
+        let after = DISTANCES[generator.below(DISTANCES.len())];
+        text.push_str(&distance_gap(generator, after));
+        text.push_str(&natural_language_label(generator));
+        let padding = generator.below(260);
+        text.push_str(&long_filler(generator, padding));
+        if generator.below(8) == 0 {
+            text.push_str(generator.pick(BREAKS));
+        }
+    }
+    text
+}
+
+fn assert_clipping_is_exact(
+    vocabulary: &ContextVocabulary,
+    label: &str,
+    input: &str,
+    candidates: &[(ByteRange, IdentityDomain)],
+) -> usize {
+    let matches = vocabulary.matches(input, candidates);
+    assert_eq!(
+        matches,
+        vocabulary.matches_by(input, candidates, ContextVocabulary::associate_unclipped),
+        "{label}: clipped association differs for {input:?} with {candidates:?}"
+    );
+    matches.iter().filter(|matches| !matches.is_empty()).count()
+}
+
+#[test]
+fn no_vocabulary_form_overlap_follows_a_boundary_so_views_are_clipped() {
+    let vocabulary = ContextVocabulary::new();
+    let longest = vocabulary
+        .entries
+        .iter()
+        .flat_map(|(_, forms)| forms)
+        .map(|form| form.scalars)
+        .max()
+        .unwrap();
+    assert_eq!(vocabulary.reach, Some(MAX_CONTEXT_DISTANCE + longest + 1));
+    // `example` overlaps itself (`examplexample`), but the later occurrence
+    // follows an `l`, which never bounds an occurrence.
+    assert!(!overlap_follows_boundary("example") && !overlap_follows_boundary("a"));
+    assert!(overlap_follows_boundary("a a") && overlap_follows_boundary("ab'ab"));
+    assert!(overlap_follows_boundary("") && !overlap_follows_boundary("e mail address"));
+}
+
+#[test]
+fn normalize_context_equals_the_pre_902_normalization() {
+    let mut generator = Generator(0x1058_0000_0000_0001);
+    let mut texts: Vec<String> = (0..2_000)
+        .map(|_| long_filler(&mut generator, 40))
+        .collect();
+    texts.extend((0..500).map(|_| generated_text(&mut generator)));
+    texts.extend((0u8..128).map(|byte| char::from(byte).to_string()));
+    texts.push("MiXeD--Case__Ascii::==  Text\t\u{b}".to_owned());
+    for text in texts {
+        assert_eq!(
+            normalize_context(&text),
+            oracle::normalize_context(&text),
+            "{text:?}"
+        );
+    }
+}
+
+/// The two views are a suffix and a prefix of the whole ones, with the
+/// dropped scalars accounted for, and never shorter than the reach unless
+/// whole.
+#[test]
+fn clipped_views_are_exact_parts_of_the_whole_views() {
+    let vocabulary = ContextVocabulary::new();
+    let reach = vocabulary.reach.unwrap();
+    let mut generator = Generator(0x1058_0000_0000_0002);
+    let mut clipped = [0usize; 2];
+    for _ in 0..400 {
+        let length = 50 + generator.below(400);
+        let text = long_filler(&mut generator, length);
+        let boundaries: Vec<usize> = text
+            .char_indices()
+            .map(|(index, _)| index)
+            .chain([text.len()])
+            .collect();
+        for _ in 0..20 {
+            let mut pair = [
+                boundaries[generator.below(boundaries.len())],
+                boundaries[generator.below(boundaries.len())],
+            ];
+            pair.sort_unstable();
+            let [start, end] = pair;
+            let whole = normalize_context(&text[start..end]);
+            let whole_scalars = whole.chars().count();
+
+            let (before, dropped) = vocabulary.before_view(&text, start, end);
+            assert!(whole.ends_with(&before), "{text:?} {start}..{end}");
+            assert_eq!(dropped + before.chars().count(), whole_scalars);
+            assert!(before == whole || before.chars().count() >= reach);
+            clipped[0] += usize::from(dropped > 0);
+
+            let after = vocabulary.after_view(&text, start, end);
+            assert!(whole.starts_with(&after), "{text:?} {start}..{end}");
+            assert!(after == whole || after.chars().count() >= reach);
+            clipped[1] += usize::from(after != whole);
+        }
+    }
+    assert!(clipped.iter().all(|count| *count > 300), "{clipped:?}");
+}
+
+#[test]
+fn clipped_association_equals_the_unclipped_one_over_long_lines() {
+    let vocabulary = ContextVocabulary::new();
+    let domains = domains();
+    let mut generator = Generator(0x1058_0000_0000_0003);
+    let mut associated = 0;
+    for case in 0..1_500 {
+        let text = long_line(&mut generator);
+        let label = format!("long line {case}");
+        for candidates in family_candidates(&domains[0].1, &text) {
+            associated += assert_clipping_is_exact(&vocabulary, &label, &text, &candidates);
+            if case % 5 == 0 {
+                assert_same_association(&vocabulary, &label, &text, &candidates);
+            }
+        }
+        let candidates = random_candidates(&mut generator, &text);
+        assert_clipping_is_exact(&vocabulary, &label, &text, &candidates);
+        if case % 10 == 0 {
+            assert_same_contextualized(&domains, &label, &text);
+        }
+    }
+    assert!(
+        associated > 800,
+        "only {associated} candidates associated with context"
+    );
+}
+
+/// Every PII fixture input with a long filler on the same line before and
+/// after it, so the fixture's own context sits near the clip.
+#[test]
+fn clipped_association_equals_the_unclipped_one_over_padded_fixture_inputs() {
+    let vocabulary = ContextVocabulary::new();
+    let domains = domains();
+    let mut generator = Generator(0x1058_0000_0000_0004);
+    let mut associated = 0;
+    for (file, text) in fixtures::PII_FIXTURES {
+        let fixture: serde_json::Value = serde_json::from_str(text).unwrap();
+        let mut found = Vec::new();
+        fixture_inputs(&fixture, &mut found);
+        for input in found {
+            for _ in 0..3 {
+                let [before, after] = [generator.below(200), generator.below(200)];
+                let padded = format!(
+                    "{}{input}{}",
+                    long_filler(&mut generator, before),
+                    long_filler(&mut generator, after),
+                );
+                for candidates in family_candidates(&domains[0].1, &padded) {
+                    associated += assert_clipping_is_exact(&vocabulary, file, &padded, &candidates);
+                }
+            }
+            let padded = format!("{} {input} {}", "lorem ".repeat(40), "ipsum ".repeat(40));
+            assert_same_contextualized(&domains, file, &padded);
+        }
+    }
+    assert!(
+        associated > 200,
+        "only {associated} candidates associated with context"
+    );
+}
+
+/// The view searched for a candidate no longer grows with its distance to
+/// the line start or the previous candidate: a 256 KiB line normalizes and
+/// searches a bounded window on each side.
+#[test]
+fn a_long_line_is_clipped_to_a_bounded_view_on_each_side() {
+    let vocabulary = ContextVocabulary::new();
+    let reach = vocabulary.reach.unwrap();
+    for filler in [
+        "lorem ipsum ",
+        "e\u{301}x ",
+        "고객 값 ",
+        "\u{200b}a\u{200b} ",
+    ] {
+        let text = format!(
+            "{}ip=192.0.2.1 {}",
+            filler.repeat(256 * 1024 / filler.len()),
+            filler.repeat(256 * 1024 / filler.len())
+        );
+        let start = text.find("192.0.2.1").unwrap();
+        let end = start + "192.0.2.1".len();
+        let (before, dropped) = vocabulary.before_view(&text, 0, start);
+        let after = vocabulary.after_view(&text, end, text.len());
+        assert!(dropped > 50_000, "{filler:?}");
+        // Snapping to a segment start adds at most one filler token.
+        let bound = reach + 2 * filler.len();
+        assert!(before.chars().count() < bound, "{filler:?}: {before:?}");
+        assert!(after.chars().count() < bound, "{filler:?}: {after:?}");
+        let candidates = [(
+            ByteRange::new(start, end).unwrap(),
+            IdentityDomain::NetworkAddress,
+        )];
+        assert_clipping_is_exact(&vocabulary, filler, &text, &candidates);
+    }
+}
+
+/// Every form of every entry, before and after a candidate of each of its
+/// domains, at every distance within two scalars of each limit and of the
+/// reach, behind fillers that put the cut at, inside and away from it.
+#[test]
+fn clipped_association_is_exact_for_every_form_around_each_distance_limit() {
+    let vocabulary = ContextVocabulary::new();
+    let reach = vocabulary.reach.unwrap();
+    let mut generator = Generator(0x1058_0000_0000_0005);
+    let mut associated = 0;
+    let mut distances: Vec<usize> = [16, MAX_CONTEXT_DISTANCE, reach]
+        .iter()
+        .flat_map(|limit| limit - 2..=limit + 2)
+        .collect();
+    distances.extend([0, 1]);
+    let fillers = [
+        "lorem ipsum ",
+        "\"",
+        "e\u{301}",
+        "고객값",
+        "\u{200b}",
+        " \u{3000}- ",
+    ];
+    for entry in pii_context_table::CONTEXT_ENTRIES {
+        for form in entry.forms {
+            for domain in entry.domains {
+                for &distance in &distances {
+                    for filler in fillers {
+                        let gap = distance_gap(&mut generator, distance);
+                        let mut text = filler.repeat(1 + generator.below(40));
+                        text.push_str(form);
+                        text.push_str(&gap);
+                        let start = text.len();
+                        text.push_str("192.0.2.1");
+                        let end = text.len();
+                        text.push_str(&gap);
+                        text.push_str(form);
+                        text.push_str(&filler.repeat(1 + generator.below(40)));
+                        let candidates = [(ByteRange::new(start, end).unwrap(), *domain)];
+                        associated +=
+                            assert_clipping_is_exact(&vocabulary, form, &text, &candidates);
+                    }
+                }
+            }
+        }
+    }
+    assert!(
+        associated > 500,
+        "only {associated} candidates associated with context"
+    );
+}

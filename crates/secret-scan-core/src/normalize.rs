@@ -18,9 +18,14 @@ use std::borrow::Cow;
 use crate::invisible_table::INVISIBLE_RANGES;
 use crate::types::ByteRange;
 
-/// Whether `ch` is removed from the scan copy.
-fn is_invisible(ch: char) -> bool {
+/// Whether `ch` is removed from the scan copy: a governed invisible code
+/// point. Everything below the first range (ASCII and most Latin-1) returns
+/// before the binary search.
+pub(crate) fn is_invisible(ch: char) -> bool {
     let code_point = u32::from(ch);
+    if code_point < INVISIBLE_RANGES[0].0 {
+        return false;
+    }
     let following = INVISIBLE_RANGES.partition_point(|&(first, _)| first <= code_point);
     following
         .checked_sub(1)
@@ -233,6 +238,20 @@ mod tests {
                 .all(|pair| pair[0].1 + 1 < pair[1].0)
         );
         assert!(INVISIBLE_RANGES[0].0 >= 0x80);
+    }
+
+    #[test]
+    fn is_invisible_equals_a_linear_table_scan_at_every_code_point() {
+        for character in (0..=0x10_FFFF).filter_map(char::from_u32) {
+            let code_point = u32::from(character);
+            assert_eq!(
+                is_invisible(character),
+                INVISIBLE_RANGES
+                    .iter()
+                    .any(|&(first, last)| (first..=last).contains(&code_point)),
+                "U+{code_point:04X}"
+            );
+        }
     }
 
     #[test]
