@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3780,
+  "fixtureCount": 3788,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16405,6 +16405,173 @@
       "input": "KEY_ID=mykeyid\nKEY_SECRET=mykeysecret\n",
       "expected": [],
       "note": "Issue #1042: my + two or more credential words glued into one lowercase word are the ClickHouse Cloud docs' placeholders the #860 evidence lists; one word after my (mysecret) stays reported."
+    },
+    {
+      "id": "regression-1015-anthropic-admin-angle-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -s https://api.anthropic.com/v1/organizations/users -H \"x-api-key: sk-ant-admin01-<your-key>\"\n",
+      "expected": [],
+      "note": "Issue #1015 (benchmark-gap-1015): the Anthropic Admin documentation placeholder sk-ant-admin01-<your-key> is silent, like its sk-ant-api01-/sk-ant-api03- siblings."
+    },
+    {
+      "id": "regression-1016-deepgram-k8s-env-value",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "env:\n  - name: DEEPGRAM_API_KEY\n    value: \"syntheticrevokedsyntheticrevokedsyntheti\"\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 84
+        }
+      ],
+      "note": "Issue #1016 (benchmark-gap-1016): a Kubernetes env name:/value: pair is one assignment, so the value under DEEPGRAM_API_KEY is the typed Deepgram key."
+    },
+    {
+      "id": "regression-1016-cohere-k8s-env-value",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "env:\n  - name: CO_API_KEY\n    value: \"SyntheticRevokedSyntheticRevokedSyntheti\"\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 78
+        }
+      ],
+      "note": "Issue #1016 (benchmark-gap-1016): the value under CO_API_KEY in a name:/value: pair is the typed Cohere key."
+    },
+    {
+      "id": "regression-1016-mistral-k8s-env-value",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "env:\n  - name: MISTRAL_API_KEY\n    value: \"SyntheticRevokedSyntheticRevoked\"\n",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 75
+        }
+      ],
+      "note": "Issue #1016 (benchmark-gap-1016): the value under MISTRAL_API_KEY in a name:/value: pair is the typed Mistral key."
+    },
+    {
+      "id": "regression-1017-deepgram-create-client",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "import { createClient } from '@deepgram/sdk';\n\nconst deepgram = createClient(\"syntheticrevokedsyntheticrevokedsyntheti\");\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 78,
+          "end": 118
+        }
+      ],
+      "note": "Issue #1017 (benchmark-gap-1017): the Deepgram JS SDK v3 createClient(...) argument is the typed Deepgram key."
+    },
+    {
+      "id": "regression-1017-deepgram-websocket-subprotocol",
+      "detector": "deepgram-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET wss://api.deepgram.com/v1/listen HTTP/1.1\nSec-WebSocket-Protocol: token, syntheticrevokedsyntheticrevokedsyntheti\n",
+      "expected": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 77,
+          "end": 117
+        }
+      ],
+      "note": "Issue #1017 (benchmark-gap-1017): the browser WebSocket token subprotocol under an api.deepgram.com request line carries the typed Deepgram key."
+    },
+    {
+      "id": "regression-1018-cohere-litellm-masked-name",
+      "detector": "cohere-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "18:22:04 - LiteLLM Proxy:DEBUG: router.py:1841 - cohere/command-r-plus call failed; masked_api_key=SyntheticRevokedSyntheticRevokedSyntheti reason=AuthenticationError\n",
+      "expected": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 99,
+          "end": 139
+        }
+      ],
+      "note": "Issue #1018 (benchmark-gap-1018): a complete, unmasked Cohere key under a masked_-led name on a LiteLLM cohere/ route line is reported; only a value that shows masking stays silent."
+    },
+    {
+      "id": "regression-1038-mistral-python-environ-assign",
+      "detector": "mistral-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "import os\n\nos.environ[\"MISTRAL_API_KEY\"] = \"SyntheticRevokedSyntheticRevoked\"\n",
+      "expected": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 76
+        }
+      ],
+      "note": "Issue #1038 (benchmark-gap-1038): a keyed environment store os.environ[\"NAME\"] = \"<v>\" is an assignment, so the literal under MISTRAL_API_KEY is the typed Mistral key."
     },
     {
       "id": "contextual-negative-993-qualified-placeholder",
