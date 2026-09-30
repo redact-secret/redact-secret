@@ -2299,7 +2299,23 @@ fn starts_with_opencode_prefix(input: &str, start: usize) -> bool {
 /// first key happens to be spelled `env`/`file` (`secret: {file: "/etc/x"}`)
 /// losing the #266 guard's protection -- accepted because it is far rarer
 /// than a real secret embedding one of these substitution prefixes.
-fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)> {
+fn unquoted_assignment_value(
+    input: &str,
+    start: usize,
+    reach: &mut ValueReach,
+) -> Option<(usize, usize)> {
+    unquoted_assignment_value_with(input, start, Some(reach))
+}
+
+/// [`unquoted_assignment_value`], with `reach` standing in for the walk it
+/// would make when the first byte that could end the value decides it (issue
+/// #1055). `None` makes every walk in full, the reference the tests compare
+/// against.
+fn unquoted_assignment_value_with(
+    input: &str,
+    start: usize,
+    reach: Option<&mut ValueReach>,
+) -> Option<(usize, usize)> {
     if let Some(span) = delimited_reference_value(input, start) {
         return Some(span);
     }
@@ -2307,6 +2323,27 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
         && !starts_with_opencode_prefix(input, start)
     {
         return None;
+    }
+    // The walk below ends on a byte of `is_unquoted_value_boundary`, on the
+    // `&` of a next `&name=` parameter, or at the end of the input, and
+    // fails once it has gone `MAX_CONTEXT_VALUE_LENGTH` bytes without one.
+    // Bytes that cannot end it only let it go on, so it is decided by the
+    // first byte at or after `start` that could (issue #1055):
+    // - none within the bound: the walk fails;
+    // - one that always ends it: the walk ends there;
+    // - `}`/`]` (which end it only when no `{`/`[` of the value is open) or a
+    //   `&`/backtick it does not stop at: the walk runs and decides.
+    if let Some(reach) = reach {
+        let stop = reach.first_stop(input, start, is_unquoted_walk_stop)?;
+        let ends_here = match input.as_bytes().get(stop) {
+            Some(b'}' | b']') => false,
+            Some(b'&') => stop > start && starts_query_parameter(input, stop),
+            Some(b'`') => stop > start,
+            None | Some(_) => true,
+        };
+        if ends_here {
+            return (stop > start).then_some((start, stop));
+        }
     }
     let mut cursor = start;
     // `{`/`[` opened inside the value itself. While one is open, a `}`/`]`
@@ -2338,11 +2375,88 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
             break;
         }
         cursor += ch.len_utf8();
+        #[cfg(test)]
+        VALUE_WALK_BYTES.with(|bytes| bytes.set(bytes.get() + ch.len_utf8()));
         if cursor - start > MAX_CONTEXT_VALUE_LENGTH {
             return None;
         }
     }
     (cursor > start).then_some((start, cursor))
+}
+
+/// A byte at which [`unquoted_assignment_value_with`]'s walk can end.
+fn is_unquoted_walk_stop(byte: u8) -> bool {
+    matches!(
+        byte,
+        b' ' | b'\t'
+            | 0x0B
+            | 0x0C
+            | b'\r'
+            | b'\n'
+            | b','
+            | b';'
+            | b'}'
+            | b']'
+            | b'"'
+            | b'\''
+            | b'`'
+            | b'&'
+    )
+}
+
+/// The stretch of the input a value scan has already read, kept so the
+/// scans that start inside it do not read it again (issue #1055).
+///
+/// The assignment loop resumes at the end of each assignment's name and
+/// operator, inside the value it just scanned, so a value that never ends
+/// (`?a=?a=?a=...`, `{a=x{a=x...`) is read in full, up to
+/// `MAX_CONTEXT_VALUE_LENGTH` bytes, once per prefix inside it. This keeps
+/// where the last look for a stopping byte got to: no byte in `from..to`
+/// stops a scan and, when `hit`, `to` is the first byte that does (or the end
+/// of the input). A scan that starts in `from..=to` continues from `to`, so a
+/// byte is read once however many scans pass over it.
+#[derive(Default)]
+struct ValueReach {
+    from: usize,
+    to: usize,
+    hit: bool,
+}
+
+impl ValueReach {
+    /// The first position at or after `start` whose byte satisfies `stops`
+    /// (the end of the input counts), if it is at most
+    /// `MAX_CONTEXT_VALUE_LENGTH` bytes from `start`: the furthest a scan
+    /// from `start` can go before it gives up. `stops` must hold only for
+    /// ASCII bytes, and `start` must be on a character boundary.
+    fn first_stop(&mut self, input: &str, start: usize, stops: fn(u8) -> bool) -> Option<usize> {
+        let bytes = input.as_bytes();
+        if start < self.from || start > self.to {
+            *self = Self {
+                from: start,
+                to: start,
+                hit: false,
+            };
+        }
+        let limit = start.saturating_add(MAX_CONTEXT_VALUE_LENGTH);
+        while !self.hit && self.to <= limit {
+            #[cfg(test)]
+            VALUE_REACH_BYTES.with(|bytes| bytes.set(bytes.get() + 1));
+            match bytes.get(self.to) {
+                None => self.hit = true,
+                Some(&byte) if stops(byte) => self.hit = true,
+                Some(_) => self.to += 1,
+            }
+        }
+        (self.hit && self.to <= limit).then_some(self.to)
+    }
+}
+
+#[cfg(test)]
+thread_local! {
+    /// Bytes the unquoted value walk has read on this thread.
+    static VALUE_WALK_BYTES: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+    /// Bytes [`ValueReach`] has read on this thread.
+    static VALUE_REACH_BYTES: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
 }
 
 /// Scans a value opened by an escaped quote (`\"...\"`), the form a JSON
@@ -2378,7 +2492,11 @@ fn escaped_quoted_assignment_value(input: &str, backslash: usize) -> Option<(usi
     None
 }
 
-fn assignment_value(input: &str, start: usize) -> Option<(usize, usize, ValueForm)> {
+fn assignment_value(
+    input: &str,
+    start: usize,
+    reach: &mut ValueReach,
+) -> Option<(usize, usize, ValueForm)> {
     match char_at(input, start) {
         Some('"' | '\'') => quoted_assignment_value(input, start)
             .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Quoted)),
@@ -2391,7 +2509,7 @@ fn assignment_value(input: &str, start: usize) -> Option<(usize, usize, ValueFor
             escaped_quoted_assignment_value(input, start)
                 .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Quoted))
         }
-        _ => unquoted_assignment_value(input, start)
+        _ => unquoted_assignment_value(input, start, reach)
             .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Unquoted)),
     }
 }
@@ -2511,7 +2629,27 @@ fn parse_query_parameter(input: &str, start: usize) -> Option<(usize, usize, usi
 
 /// A query parameter value ends at the next parameter (`&`), the fragment
 /// (`#`), or anything that ends a URL in running text.
-fn query_parameter_value(input: &str, start: usize) -> Option<(usize, usize)> {
+fn query_parameter_value(
+    input: &str,
+    start: usize,
+    reach: &mut ValueReach,
+) -> Option<(usize, usize)> {
+    // The value ends at the first byte below, wherever the scan began, so a
+    // stop further than the length bound is a failure and a nearer one is the
+    // end of the value (issue #1055).
+    let stop = reach.first_stop(input, start, is_query_value_stop)?;
+    (stop > start).then_some((start, stop))
+}
+
+/// A byte at which a query parameter value ends.
+fn is_query_value_stop(byte: u8) -> bool {
+    is_unquoted_walk_stop(byte) || matches!(byte, b'#' | b')' | b'<' | b'>')
+}
+
+/// The original walk [`query_parameter_value`] replaces, the reference the
+/// tests compare it against.
+#[cfg(test)]
+fn query_parameter_value_walk(input: &str, start: usize) -> Option<(usize, usize)> {
     let mut cursor = start;
     while let Some(ch) = char_at(input, cursor) {
         if is_unquoted_value_boundary(Some(ch)) || matches!(ch, '&' | '#' | ')' | '<' | '>') {
@@ -2665,6 +2803,9 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let otpauth_spans = otpauth_uri_spans(input);
     let jwk_lines = jwk_line_spans(input);
     let mut templates = OpenTemplateTracker::default();
+    let mut value_lines = ValueLinePairing::default();
+    let mut query_reach = ValueReach::default();
+    let mut unquoted_reach = ValueReach::default();
     // One buffer for every assignment's normalized name (issue #984).
     let mut normalized = String::new();
 
@@ -2690,10 +2831,10 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
         };
 
         let value_span = if query {
-            query_parameter_value(input, prefix_end)
+            query_parameter_value(input, prefix_end, &mut query_reach)
                 .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Unquoted))
         } else {
-            assignment_value(input, prefix_end)
+            assignment_value(input, prefix_end, &mut unquoted_reach)
         };
         if let Some((value_start, value_end, form)) = value_span
             && (!call_open || form == ValueForm::Quoted)
@@ -2718,10 +2859,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 normalized.push_str(&rest);
             } else if matches!(names, NameSource::BuiltIn)
                 && &input[name_start..name_end] == "value"
-                && let Some(paired) = super::text::list_item_paired_name(
-                    input,
-                    super::text::line_around(input, name_start, name_end),
-                )
+                && let Some(paired) = value_lines.paired_name(input, name_start, name_end)
             {
                 // Issue #1016: a Kubernetes-style `env` entry's `value:` is
                 // assigned to the name its sibling `name:` key gives.
@@ -2862,6 +3000,51 @@ impl OpenTemplateTracker {
         self.position = end;
         self.opened && !self.closed
     }
+}
+
+/// The name a Kubernetes-style `env` item pairs with a `value` assignment
+/// ([`super::text::list_item_paired_name`], issue #1016), remembered for
+/// the line it was read on (issue #1054).
+///
+/// That answer depends only on the line, and a line holds no line break, so
+/// every `value` name inside it has the same line. The assignment loop asks
+/// once per line instead of walking back to the line start for every
+/// `value=` on it, which made `k` of them on one line of length `L` cost
+/// `O(k * L)`.
+#[derive(Default)]
+struct ValueLinePairing<'a> {
+    /// The last line read and the name it pairs with, if any.
+    last: Option<((usize, usize), Option<&'a str>)>,
+}
+
+impl<'a> ValueLinePairing<'a> {
+    /// [`super::text::list_item_paired_name`] for the line around
+    /// `name_start..name_end`, a span with no line break inside it.
+    fn paired_name(
+        &mut self,
+        input: &'a str,
+        name_start: usize,
+        name_end: usize,
+    ) -> Option<&'a str> {
+        if let Some(((line_start, line_end), paired)) = self.last
+            && line_start <= name_start
+            && name_end <= line_end
+        {
+            return paired;
+        }
+        #[cfg(test)]
+        VALUE_LINE_READS.with(|reads| reads.set(reads.get() + 1));
+        let line = super::text::line_around(input, name_start, name_end);
+        let paired = super::text::list_item_paired_name(input, line);
+        self.last = Some((line, paired));
+        paired
+    }
+}
+
+#[cfg(test)]
+thread_local! {
+    /// How many lines [`ValueLinePairing`] has read on this thread.
+    static VALUE_LINE_READS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
 }
 
 // --- single-line call with one positional literal (issue #866) ---------------
@@ -6014,6 +6197,250 @@ mod tests {
             "//registry.npmjs.org/:_authToken=short\n",
         ] {
             assert!(npmrc_spans(input).is_empty(), "{input}");
+        }
+    }
+
+    // --- issue #1054: one line read per line of `value` names ---------------
+
+    fn value_line_reads() -> usize {
+        VALUE_LINE_READS.with(std::cell::Cell::get)
+    }
+
+    #[test]
+    fn value_names_on_one_long_line_read_that_line_once() {
+        let input = " value=x".repeat(8192);
+        let before = value_line_reads();
+        detect(&input);
+        assert_eq!(value_line_reads() - before, 1);
+
+        let lines = format!("{input}\n{input}\r\n{input}\r{input}");
+        let before = value_line_reads();
+        detect(&lines);
+        assert_eq!(value_line_reads() - before, 4);
+    }
+
+    #[test]
+    fn value_line_pairing_matches_reading_each_line_afresh() {
+        const PIECES: &[&str] = &[
+            "value",
+            "value",
+            "name",
+            ":",
+            ": ",
+            "=",
+            " ",
+            "  ",
+            "- ",
+            "-",
+            "\t",
+            "\r",
+            "\n",
+            "\r\n",
+            "DEEPGRAM_API_KEY",
+            "x",
+            "\u{e9}",
+            "\u{200b}",
+            "# c",
+            "{",
+            "valueFrom",
+            "\"",
+            "'",
+        ];
+        let mut state = 0x2545_f491_4f6c_dd1du64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % bound as u64).unwrap()
+        };
+        let mut inputs: Vec<String> = vec![
+            "env:\n  - name: DEEPGRAM_API_KEY\n    value: x\n".into(),
+            "env:\n  - value: x value: y\n    name: A_KEY\n".into(),
+            "value: x value=y\r\n- name: A\r".into(),
+        ];
+        for _ in 0..20_000 {
+            let len = 1 + next(14);
+            inputs.push((0..len).map(|_| PIECES[next(PIECES.len())]).collect());
+        }
+        let mut paired = 0usize;
+        for input in &inputs {
+            let spans: Vec<(usize, usize)> = input
+                .match_indices("value")
+                .map(|(at, name)| (at, at + name.len()))
+                .collect();
+            // Forward, as the assignment loop asks, then in a scrambled order.
+            let mut orders = vec![spans.clone()];
+            let mut scrambled = spans.clone();
+            for index in (1..scrambled.len()).rev() {
+                scrambled.swap(index, next(index + 1));
+            }
+            orders.push(scrambled);
+            for order in orders {
+                let mut memo = ValueLinePairing::default();
+                for (start, end) in order {
+                    let expected = super::super::text::list_item_paired_name(
+                        input,
+                        super::super::text::line_around(input, start, end),
+                    );
+                    assert_eq!(
+                        memo.paired_name(input, start, end),
+                        expected,
+                        "{input:?} at {start}"
+                    );
+                    paired += usize::from(expected.is_some());
+                }
+            }
+        }
+        assert!(paired > 0, "the generated inputs never pair a name");
+    }
+
+    // --- issue #1055: no byte is rescanned for every prefix inside a value ----
+
+    fn value_scan_bytes() -> usize {
+        VALUE_WALK_BYTES.with(std::cell::Cell::get) + VALUE_REACH_BYTES.with(std::cell::Cell::get)
+    }
+
+    #[test]
+    fn prefixes_inside_a_value_do_not_rescan_it() {
+        for unit in [
+            "?a=",
+            "{a=x",
+            "(a=",
+            "&a=",
+            "a={a=",
+            "a=[a=",
+            "{a=x".repeat(900).as_str(),
+        ] {
+            // The long unit ends in a space: each value ends 3.6 KB ahead.
+            let unit = if unit.len() > 100 {
+                format!("{unit} ")
+            } else {
+                unit.to_owned()
+            };
+            let input = unit.repeat(65_536 / unit.len());
+            let before = value_scan_bytes();
+            detect(&input);
+            let scanned = value_scan_bytes() - before;
+            // Linear: a few reads per byte, not `MAX_CONTEXT_VALUE_LENGTH`.
+            assert!(
+                scanned <= 4 * input.len(),
+                "{:?}: {scanned} bytes read for {} bytes",
+                &unit[..unit.len().min(12)],
+                input.len()
+            );
+        }
+    }
+
+    /// Generated inputs: short pieces plus filler runs around the length bound,
+    /// so a scan that just fits, just misses, and one that stops early all occur.
+    fn reach_inputs() -> Vec<String> {
+        const PIECES: &[&str] = &[
+            "a=", "?a=", "&a=", "#a=", "{", "}", "[", "]", "(", ")", "<", ">", " ", "\t", "\r",
+            "\n", ",", ";", "\"", "'", "`", "&", "\u{e9}", "\u{200b}", "x", "xy", "value:", "=",
+        ];
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % bound as u64).unwrap()
+        };
+        let mut inputs: Vec<String> = vec![
+            String::new(),
+            "a=".into(),
+            "?a=x&b=y#c=z)".into(),
+            "a=x&b=1 a=x&1=2".into(),
+        ];
+        for fill in [
+            MAX_CONTEXT_VALUE_LENGTH - 2,
+            MAX_CONTEXT_VALUE_LENGTH - 1,
+            MAX_CONTEXT_VALUE_LENGTH,
+            MAX_CONTEXT_VALUE_LENGTH + 1,
+            MAX_CONTEXT_VALUE_LENGTH + 2,
+        ] {
+            for stop in ["", " ", "}", "&a=", "#", ")"] {
+                inputs.push(format!("a={}{stop}", "x".repeat(fill)));
+                inputs.push(format!("?a={}{stop}", "x".repeat(fill)));
+                inputs.push(format!("?a=?a={}{stop}", "x".repeat(fill)));
+                inputs.push(format!("a={{a={}{stop}a=x", "x".repeat(fill)));
+            }
+        }
+        for _ in 0..3_000 {
+            let len = 1 + next(16);
+            let mut text: String = (0..len).map(|_| PIECES[next(PIECES.len())]).collect();
+            if next(16) == 0 {
+                let at = (0..=text.len()).rev().find(|&at| text.is_char_boundary(at));
+                text.insert_str(
+                    at.unwrap_or(0),
+                    &"x".repeat(MAX_CONTEXT_VALUE_LENGTH - 3 + next(7)),
+                );
+            }
+            inputs.push(text);
+        }
+        inputs
+    }
+
+    /// Every character boundary of `input`, forward as the assignment loop
+    /// asks, then scrambled.
+    fn start_orders(input: &str, mut swap: impl FnMut(usize) -> usize) -> [Vec<usize>; 2] {
+        // A long input is sampled: each start costs a full walk in the reference.
+        let long = input.len() > 512;
+        let forward: Vec<usize> = (0..=input.len())
+            .filter(|&at| input.is_char_boundary(at))
+            .filter(|&at| !long || at % 61 == 0 || at < 40 || input.len() - at < 40)
+            .collect();
+        let mut scrambled = forward.clone();
+        for index in (1..scrambled.len()).rev() {
+            scrambled.swap(index, swap(index + 1));
+        }
+        [forward, scrambled]
+    }
+
+    #[test]
+    fn query_parameter_value_matches_the_full_walk() {
+        let mut state = 0x2545_f491_4f6c_dd1du64;
+        for input in reach_inputs() {
+            let orders = start_orders(&input, |bound| {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                usize::try_from(state % bound as u64).unwrap()
+            });
+            for order in orders {
+                let mut reach = ValueReach::default();
+                for start in order {
+                    assert_eq!(
+                        query_parameter_value(&input, start, &mut reach),
+                        query_parameter_value_walk(&input, start),
+                        "{:?} at {start}",
+                        &input[..input.len().min(40)]
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn unquoted_assignment_value_matches_the_full_walk() {
+        let mut state = 0x1234_5678_9abc_def1u64;
+        for input in reach_inputs() {
+            let orders = start_orders(&input, |bound| {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                usize::try_from(state % bound as u64).unwrap()
+            });
+            for order in orders {
+                let mut reach = ValueReach::default();
+                for start in order {
+                    assert_eq!(
+                        unquoted_assignment_value(&input, start, &mut reach),
+                        unquoted_assignment_value_with(&input, start, None),
+                        "{:?} at {start}",
+                        &input[..input.len().min(40)]
+                    );
+                }
+            }
         }
     }
 }
