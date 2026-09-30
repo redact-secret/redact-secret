@@ -2675,7 +2675,9 @@ fn otpauth_uri_spans(input: &str) -> Vec<(usize, usize)> {
     let mut spans = Vec::new();
     let mut index = 0usize;
     while index + SCHEME.len() <= bytes.len() {
-        if bytes[index..index + SCHEME.len()].eq_ignore_ascii_case(SCHEME) {
+        if matches!(bytes[index], b'o' | b'O')
+            && bytes[index..index + SCHEME.len()].eq_ignore_ascii_case(SCHEME)
+        {
             let mut end = index + SCHEME.len();
             while end < bytes.len() && !matches!(bytes[end], b'\r' | b'\n' | b'"' | b'\'' | b'`') {
                 end += 1;
@@ -2796,6 +2798,68 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPref
     None
 }
 
+/// The first char boundary at or after `from` where
+/// [`try_match_assignment_prefix`] can possibly match, or `input.len()`
+/// (issue #1091).
+///
+/// A prefix needs the position to be a line start or its character to be a
+/// boundary (`is_prefix_boundary_char`), `[`, `(`, `?`, `&` or `#`. This
+/// skips ASCII bytes that are none of those in one table lookup each and
+/// stops conservatively, leaving the exact test to the caller, at every
+/// non-ASCII lead byte (Unicode whitespace, U+FEFF) and at every position
+/// that is the input start or follows a line terminator byte or the last byte of U+2028/U+2029.
+fn next_assignment_position(input: &str, from: usize) -> usize {
+    const fn table() -> [bool; 256] {
+        let mut stops = [false; 256];
+        let mut byte = 0u8;
+        loop {
+            stops[byte as usize] = matches!(
+                byte,
+                b'\t'
+                    | b'\n'
+                    | 0x0B
+                    | 0x0C
+                    | b'\r'
+                    | b' '
+                    | b'{'
+                    | b','
+                    | b';'
+                    | b'"'
+                    | b'\''
+                    | b'`'
+                    | b'['
+                    | b'('
+                    | b'?'
+                    | b'&'
+                    | b'#'
+            ) || byte >= 0xC0;
+            if byte == u8::MAX {
+                break;
+            }
+            byte += 1;
+        }
+        stops
+    }
+    static STOPS: [bool; 256] = table();
+
+    let bytes = input.as_bytes();
+    let mut index = from;
+    while index < bytes.len() {
+        let byte = bytes[index];
+        // Continuation bytes are not char boundaries and never stop.
+        if byte & 0xC0 != 0x80 {
+            if STOPS[usize::from(byte)] {
+                return index;
+            }
+            if index == 0 || matches!(bytes[index - 1], b'\n' | b'\r' | 0xA8 | 0xA9) {
+                return index;
+            }
+        }
+        index += 1;
+    }
+    bytes.len()
+}
+
 fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     let mut cursor = 0usize;
@@ -2825,7 +2889,10 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                     .is_none_or(|index| otpauth_spans[index].1 <= cursor)
         })
         else {
-            cursor += char_at(input, cursor).map_or(1, char::len_utf8);
+            cursor = next_assignment_position(
+                input,
+                cursor + char_at(input, cursor).map_or(1, char::len_utf8),
+            );
             continue;
         };
 
@@ -6668,5 +6735,105 @@ mod case_insensitive_differential_tests {
                 "{value:?}"
             );
         }
+    }
+}
+
+/// Differential tests for #1091: the anchored search for the next assignment
+/// prefix must never step over a position the per-character walk it replaced
+/// would have matched.
+#[cfg(test)]
+mod assignment_anchor_tests {
+    use super::*;
+    use crate::test_rng::XorShift32;
+
+    const PIECES: &[&str] = &[
+        "password",
+        "=",
+        ":",
+        " ",
+        "  ",
+        "\t",
+        "\n",
+        "\r",
+        "\r\n",
+        "\u{2028}",
+        "\u{2029}",
+        "\u{00A0}",
+        "\u{3000}",
+        "\u{FEFF}",
+        "\u{200B}",
+        "{",
+        ",",
+        ";",
+        "\"",
+        "'",
+        "`",
+        "[",
+        "(",
+        "?",
+        "&",
+        "#",
+        "x",
+        "Z9",
+        "-",
+        "_",
+        ".",
+        "é",
+        "😀",
+        "\u{E2}",
+        "k",
+        "os.environ[",
+        "otpauth://",
+        "abc",
+        "\\",
+        ")",
+        "]",
+        "\u{0B}",
+        "\u{0C}",
+        "\u{85}",
+    ];
+
+    /// The walk the anchor replaced: the first char boundary at or after
+    /// `from` where a prefix matches, else the input length.
+    fn old_next_match(input: &str, from: usize) -> usize {
+        let mut pos = from;
+        while pos < input.len() {
+            if try_match_assignment_prefix(input, pos).is_some() {
+                return pos;
+            }
+            pos += char_at(input, pos).map_or(1, char::len_utf8);
+        }
+        input.len()
+    }
+
+    #[test]
+    fn anchor_never_skips_a_matching_position() {
+        let mut rng = XorShift32::new(0x1091_0001);
+        for _ in 0..4000 {
+            let input = rng.text(PIECES, 14);
+            let mut from = 0usize;
+            while from <= input.len() {
+                let anchored = next_assignment_position(&input, from);
+                assert!(input.is_char_boundary(anchored), "{input:?} {from}");
+                assert!(anchored >= from, "{input:?} {from}");
+                let expected = old_next_match(&input, from);
+                assert!(anchored <= expected, "{input:?} from {from}");
+                // Landing early is allowed; the walk from there agrees.
+                assert_eq!(old_next_match(&input, anchored), expected, "{input:?}");
+                from += char_at(&input, from).map_or(1, char::len_utf8);
+            }
+        }
+    }
+
+    #[test]
+    fn anchor_handles_empty_and_boundary_inputs() {
+        assert_eq!(next_assignment_position("", 0), 0);
+        assert_eq!(next_assignment_position("abc", 0), 0);
+        assert_eq!(next_assignment_position("abc", 1), 3);
+        assert_eq!(next_assignment_position("abc d", 1), 3);
+        assert_eq!(next_assignment_position("abc\nxyz", 1), 3);
+        assert_eq!(next_assignment_position("abc\nxyz", 4), 4);
+        assert_eq!(next_assignment_position("a\u{2028}b", 1), 1);
+        assert_eq!(next_assignment_position("a\u{2028}b c", 4), 4);
     }
 }
