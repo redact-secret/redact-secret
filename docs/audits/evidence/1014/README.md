@@ -17,6 +17,14 @@ record, and it does not authorize implementation. Step 5 of #1014 opens
 separately scoped product and benchmarks issues only after the maintainer
 reviews these handoffs.
 
+Addendum, 2026-09-30: the ten "T1 without a handoff" candidates of the
+[2026-09-30 status](https://github.com/redact-secret/redact-secret/issues/1014)
+(ranks 11, 14–17, 19, 20, 24, 26, 28) now have step-3 records, every one of
+the 50 candidates has an explicit step-4 disposition, and step 5 is drafted
+(see [Step 4](#step-4-disposition-of-all-50-candidates) and
+[Step 5](#step-5-implementation-issues-to-open)). The ranked table above is the
+frozen step-1 state and is not rewritten.
+
 No key was issued for this research. No value here is, or is derived from,
 an issued or leaked credential, and no complete key-shaped example appears:
 shapes are given by prefix, length, alphabet and separators only. Provider
@@ -235,6 +243,172 @@ overlap, and its handoff excludes it.
   is one example repeated in three provider SDK READMEs, not a docs response
   example plus fixtures. Does that meet R5?
 
+## Step-3 handoffs, second batch (2026-09-30)
+
+The ten candidates that step 1 called T1 but that needed a derivation, a
+policy decision or no ruling id. Each was researched broad first (open web,
+forums, public repositories, scanner rule sets and provider code), source
+classes were labelled afterwards, and every grammar rests on at least two
+independent sources where two exist. Shapes are schematic: no complete
+key-shaped value appears, because a synthetic value in the exact shape can
+still trip push protection. Test values are built at run time. No key was
+issued and no provider API was called.
+
+| Rank | Family | Record | Readiness | Route |
+| ---: | --- | --- | --- | --- |
+| 11 | `xata:api-key` | [xata.md](xata.md) | **READY** (body range derived from the bit-packed base62 encoder: `[0-9A-Za-z]{32,36}` after `xau_`/`xao_`) | new detector `xata-api-key` |
+| 14 | `sourcegraph:access-token` | [sourcegraph.md](sourcegraph.md) | **READY** (T1 as of 2025-11-18, R1 and R9) | new detector `sourcegraph-token` |
+| 15 | `unkey:root-key` | [unkey.md](unkey.md) | **READY** for the version 1 root key (`unkey_` + 8 + `unkeyv1` + 42 base58) and the dashboard form (`unkey_3Z` + 22); customer-prefixed keys need **Q10** | new detector `unkey-root-key` |
+| 16 | `buildkite:user-access-token` | [buildkite.md](buildkite.md) | **READY** (15 prefixes, R2; floor 24 from the provider's own redactor) | new detector `buildkite-token` |
+| 17, 18 | `pydantic:logfire-token` (AI Gateway key is a role of it) | [pydantic-logfire.md](pydantic-logfire.md) | **READY** (lexical grammar T1; the body floor is narrowing policy, **Q7**, non-blocking) | new detector `pydantic-logfire-token` |
+| 19 | `mapbox:secret-access-token` | [mapbox.md](mapbox.md) | **READY, conditional on Q7** | new detector `mapbox-token` |
+| 20 | `fly:access-token` | [fly.md](fly.md) | **READY, conditional on Q7** (whole comma bundle; the `FlyV1 ` scheme stays outside the span) | new detector `fly-token` |
+| 24 | `square:access-token` | [square.md](square.md) | **READY under R5**, **Q8** (the provider disclaims length validation and its examples disagree); issuance check recommended | new detector `square-token` |
+| 26 | `ory:network-api-key` | [ory.md](ory.md) | siblings (`ory_st_`, `ory_at_`/`ory_rt_`/`ory_ac_`) **READY**; admin keys (`ory_pat_`, `ory_apikey_`, `ory_wak_`) **BLOCKED** on issuance | new detector `ory-token` (siblings only) |
+| 28 | `mercury:api-token` | [mercury.md](mercury.md) | **BLOCKED**: one provider example, no bound on the body width (**Q6** extended, or a structure-only issuance check) | none until unblocked; `bearer-token` already redacts the `secret-token:` form |
+
+Nine of the ten are READY in whole or in part. None of their prefixes is
+claimed by a current detector at `main`
+[`cfa8736`](https://github.com/redact-secret/redact-secret/commit/cfa87360)
+(checked against the detector sources and `benchmarks/support-matrix.json`).
+The one overlap is Mercury, where `bearer-token` already claims the `secret-token:`
+form, and Mapbox, where `jwt` does not claim the `sk.` header.
+
+## New ruling questions (2026-09-30)
+
+Q1–Q6 above stay open. Q6 is extended: Mercury has the same shape of problem
+as Stytch (one provider example, no fixtures).
+
+- **Q7, floors for open-ended segments.** Logfire, Mapbox, Fly and Buildkite
+  have segments with no provider-stated length. Mapbox (payload floor 20) and
+  Fly (body floor 64) derive a floor from provider code or wire format;
+  Logfire (floor 20, region cap 16) uses a policy floor below every observed
+  value; Buildkite uses the provider redactor's own 24. May a derived or
+  narrowing policy floor serve as the T1 floor when no alphabet is narrowed
+  (R8 intact)? **Recommendation: yes.** If no: Fly needs a provider-stated
+  floor or an issuance check, Mapbox falls back to a lead-pinned payload,
+  Logfire to `{1,}`.
+- **Q8, R5 when the provider disclaims length.** Square says not to validate
+  token length, and its own examples differ (`EAAA` + 60 vs a 63-character
+  `EAAl` form; 43 vs 44). May R5 still support an exact-width grammar?
+  **Recommendation: yes**, claim `EAAA` + 60 and `sq0csp-` + 43 or 44, leave
+  the conflicting shapes unclaimed, and run the issuance check.
+- **Q9, short-lived or weakly sourced siblings.** Confirm that Mapbox `tk.`
+  (expires within one hour) and a standalone Fly `fo1_` stay unclaimed.
+  **Recommendation: yes**, until a provider source states their length.
+- **Q10, Unkey customer-prefixed keys.** Version 1 customer keys
+  (`<1–16 byte prefix>_` + 8 + `unkeyv1` + 42) are credentials for the
+  customer's own product, anchored on the `unkeyv1` marker; Unkey's own
+  scanning covers root keys only. Claim them as a separate finding type
+  `unkey_api_key`? **Recommendation: yes.**
+- Q1 extends to Xata and Unkey version 1 (both checksum-bearing).
+  **Recommendation:** keep them lexical, as Polar and crates.io shipped.
+
+Newly recorded as policy choices, not rulings: the Buildkite floor (24 vs the
+provider's "38 or more" remark), Sourcegraph `sgd_`/`sgph_` as a later
+extension, and Ory enterprise custom OAuth2 prefixes as an accepted false
+negative.
+
+## Step 4: disposition of all 50 candidates
+
+Written 2026-09-30. One row per candidate, at `main`
+[`cfa8736`](https://github.com/redact-secret/redact-secret/commit/cfa87360).
+The Disposition column uses these terms:
+
+- **SHIPPED**: detector merged to `main`, unreleased (product issue and PR
+  from the [#1014 status](https://github.com/redact-secret/redact-secret/issues/1014)).
+- **HANDOFF READY**: a record above, implementation issue drafted in step 5.
+- **BLOCKED**: a named gate (ruling, issuance, evidence, policy).
+- **T2 FAMILY**: eligible for a distinct T2 family under the
+  [Together/Tavily precedent](../../../specs/detector-families.md); no handoff
+  written yet. A T2 handoff is the next action, no ruling needed.
+- **GENERIC**: no dedicated family; generic coverage stays.
+- **DEFERRED**: not pursued now, with the reason.
+
+| Rank | # | Candidate | Disposition | Gate or next action |
+| ---: | ---: | --- | --- | --- |
+| 1 | 30 | `bitwarden:secrets-manager-access-token` | SHIPPED (#1019, PR #1039) | none |
+| 2 | 48 | `polar:organization-access-token` | SHIPPED (#1020, PR #1039) | Q1 for the CRC32 |
+| 3 | 15 | `sonarqube:token` | SHIPPED (#1021, PR #1039) | none |
+| 4 | 21 | `rubygems:api-key` | SHIPPED (#1023, PR #1039) | none |
+| 5 | 23 | `clojars:deploy-token` | SHIPPED (#1025, PR #1039) | none |
+| 6 | 22 | `crates-io:api-token` | SHIPPED (#1031, PR #1039) | Q1 for the check character |
+| 7 | 31 | `dynatrace:api-token` | SHIPPED (#1032, PR #1039) | none |
+| 8 | 42 | `paddle:api-key` | SHIPPED (#1033, PR #1039) | none |
+| 9 | 32 | `honeycomb:api-key` | SHIPPED for the ingest key (#1034, PR #1039) | management key BLOCKED on issuance |
+| 10 | 33 | `axiom:api-token` | SHIPPED (#1035, PR #1039) | none |
+| 11 | 37 | `xata:api-key` | HANDOFF READY ([xata.md](xata.md)) | Q1 for the CRC32; classic keys stay generic |
+| 12 | 08 | `azure:storage-account-key` | BLOCKED on **Q2** | after Q2, a handoff; legacy 86-character form stays generic |
+| 13 | 36 | `datastax:astra-db-application-token` | BLOCKED on **Q3** | if Q3 is refused, issuance of the 64-byte tail |
+| 14 | 16 | `sourcegraph:access-token` | HANDOFF READY ([sourcegraph.md](sourcegraph.md)) | optional issuance check (server repo is private) |
+| 15 | 24 | `unkey:root-key` | HANDOFF READY ([unkey.md](unkey.md)) | **Q10** for customer-prefixed keys; Q1 for the CRC-32C |
+| 16 | 13 | `buildkite:user-access-token` | HANDOFF READY ([buildkite.md](buildkite.md)) | none |
+| 17 | 01 | `pydantic:logfire-write-token` | HANDOFF READY ([pydantic-logfire.md](pydantic-logfire.md)) | **Q7** (non-blocking) |
+| 18 | 02 | `pydantic:ai-gateway-api-key` | MERGED into rank 17 (same namespace, one detector) | none |
+| 19 | 09 | `mapbox:secret-access-token` | HANDOFF READY, conditional ([mapbox.md](mapbox.md)) | **Q7**; **Q9** for `tk.` |
+| 20 | 18 | `fly:access-token` | HANDOFF READY, conditional ([fly.md](fly.md)) | **Q7**; **Q9** for `fo1_` |
+| 21 | 07 | `azure:ai-services-key` | BLOCKED on **Q2** | route is extending the CASK scanner with `ACOG`, not a new family |
+| 22 | 11 | `tailscale:api-key` | BLOCKED (policy: floor-only grammar) | else issuance of the secret length |
+| 23 | 12 | `circleci:personal-access-token` | BLOCKED (policy: alphabet `[A-Za-z0-9]` for the 40-byte segment) | then a T2 handoff; `CCIPRJ_` layout unconfirmed |
+| 24 | 41 | `square:access-token` | HANDOFF READY ([square.md](square.md)) | **Q8**; issuance check recommended |
+| 25 | 40 | `onesignal:rich-auth-token` | BLOCKED (R2 authorship check of the scanning rule) | then a handoff |
+| 26 | 39 | `ory:network-api-key` | HANDOFF READY for siblings ([ory.md](ory.md)); admin keys BLOCKED on issuance | one project key and one workspace key, structure only |
+| 27 | 38 | `stytch:project-secret` | BLOCKED on **Q6** | then a handoff |
+| 28 | 47 | `mercury:api-token` | BLOCKED ([mercury.md](mercury.md)) | **Q6** (extended) or issuance of a Read Only and a Read and Write token |
+| 29 | 25 | `zuplo:consumer-api-key` | T2 FAMILY | Q1 for the CRC32 |
+| 30 | 43 | `flutterwave:secret-key` | T2 FAMILY | policy alphabet for the 32-byte segment |
+| 31 | 46 | `shippo:api-token` | T2 FAMILY | none |
+| 32 | 45 | `duffel:access-token` | T2 FAMILY | none |
+| 33 | 49 | `brevo:api-key` | T2 FAMILY | none |
+| 34 | 50 | `mailersend:api-token` | T2 FAMILY | floor by policy; `mssp.` prose collision |
+| 35 | 26 | `airtable:personal-access-token` | T2 FAMILY | secret half required |
+| 36 | 28 | `contentful:personal-access-token` | T2 FAMILY | 43 vs 46 eras to settle |
+| 37 | 29 | `hubspot:private-app-access-token` | DEFERRED | format is being replaced by Service Keys; revisit after the migration |
+| 38 | 10 | `elastic:cloud-api-key` | BLOCKED (evidence: a T1 length for `essu_`) | provider source or issuance |
+| 39 | 03 | `llamaindex:llama-cloud-api-key` | BLOCKED (evidence: a T1 length) | provider source or issuance |
+| 40 | 14 | `figma:personal-access-token` | BLOCKED (evidence: a T1 length) | provider source or issuance |
+| 41 | 17 | `harness:personal-access-token` | BLOCKED (evidence: segment lengths) | provider source or issuance |
+| 42 | 05 | `jina:api-key` | BLOCKED (evidence: a T1 length) | provider source or issuance |
+| 43 | 04 | `kaggle:api-token` | BLOCKED (issuance) | one issued token, structure only |
+| 44 | 34 | `launchdarkly:access-token` | DEFERRED | `api-`/`sdk-` + UUID collides with resource ids; context-gated coverage only, not a family |
+| 45 | 35 | `devcycle:server-sdk-key` | BLOCKED (issuance) | one issued key, structure only; `DEVCYCLE_SERVER_SDK_KEY=` is also a generic-name miss |
+| 46 | 20 | `octopus-deploy:api-key` | DEFERRED | `API-` collides with ticket keys and gateway names; context-gated at best |
+| 47 | 27 | `asana:personal-access-token` | BLOCKED on **Q4** | the provider documents the format as opaque |
+| 48 | 44 | `gocardless:access-token` | GENERIC | `live_`/`sandbox_` are generic words; no family |
+| 49 | 06 | `mixedbread:api-key` | BLOCKED (issuance) | one issued key, structure only |
+| 50 | 19 | `dbt-cloud:service-token` | BLOCKED (issuance) | one issued token per prefix (`dbtc_`, `dbtu_`), structure only |
+
+Counts (50): 10 SHIPPED; 9 HANDOFF READY (two conditional on Q7, Ory
+siblings only); 1 merged into another (rank 18); 8 T2 FAMILY; 3 DEFERRED;
+1 GENERIC; 18 BLOCKED (6 on rulings Q2, Q3, Q4 and Q6; 3 on policy or
+authorship; 5 on evidence; 4 on issuance). Honeycomb management keys and Ory
+admin keys are BLOCKED parts of rows counted as SHIPPED or HANDOFF READY.
+
+## Step 5: implementation issues to open
+
+Not opened by this record. The drafts are in the maintainer's hands: one
+product issue per READY family, per-family commits inside one PR for the
+batch, and one benchmarks issue modelled on
+[benchmarks#528](https://github.com/redact-secret/redact-secret-benchmarks/issues/528),
+which covered ranks 1 to 10 and is closed. The titles:
+
+| Repository | Title | Covers | Gate |
+| --- | --- | --- | --- |
+| product | Beta.12: `xata:api-key` detector | xata.md | none |
+| product | Beta.12: `sourcegraph:access-token` detector | sourcegraph.md | none |
+| product | Beta.12: `unkey:root-key` detector | unkey.md | Q10 for the customer-prefixed type only |
+| product | Beta.12: `buildkite:user-access-token` detector | buildkite.md | none |
+| product | Beta.12: `pydantic:logfire-token` detector | pydantic-logfire.md | Q7 (non-blocking) |
+| product | Beta.12: `square:access-token` detector | square.md | Q8 |
+| product | Beta.12: `ory:session-and-oauth-tokens` detector | ory.md (siblings) | none |
+| product | Beta.12: `mapbox:secret-access-token` detector | mapbox.md | Q7 |
+| product | Beta.12: `fly:access-token` detector | fly.md | Q7 |
+| benchmarks | Beta.12: contracts and corpus for the #1014 second-wave families | the nine above | product issues above; fixtures need the Xata bit-packed base62 and CRC32, the Unkey CRC-32C, the Buildkite JWT-body case, the Fly bundle-span case, the Mapbox no-double-report case |
+| benchmarks | Measure one issued key per issuance-gated #1014 candidate (structure only) | Honeycomb management, Ory admin, Mercury, Kaggle, DevCycle, Mixedbread, dbt Cloud, Tailscale | issuance by the maintainer; model: benchmarks#526 |
+
+The full bodies are drafted in the task report for #1014, not in the
+repository.
+
 ## Research inputs
 
 - The per-candidate research tables (step 1) are issue comments on #1014:
@@ -256,6 +430,12 @@ overlap, and its handoff excludes it.
 - [x] Open grammar questions are raised as rulings (Q1–Q6), not averaged into
   a wider grammar.
 - [x] No credential value or real-derived material appears in this record.
+- [x] (2026-09-30) The ten candidates without a handoff have step-3 records
+  (seven READY, two conditional on Q7 or Q8, Mercury BLOCKED with the exact
+  gate, Ory admin keys BLOCKED).
+- [x] (2026-09-30) Every one of the 50 candidates has an explicit disposition.
+- [ ] Step 5: the product and benchmarks issues above are opened after
+  maintainer review.
 
 ## Authority
 
