@@ -1595,15 +1595,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "Repointed from benchmark-gap-932-masked-key-policy (benchmarks record product-932-masked-key-policy), which recorded the #379 LiteLLM proxy debug row as a policy decision under decision-redact-provider-named-credential-assignments section 2. Issue #1018 amended that policy: a masked_/redacted_/hashed_ lead excludes only a value that shows masking or hashing, and the keyword-gated providers read a LiteLLM model route, so the complete Cohere key under masked_api_key= on a cohere/ route line is cohere_api_key / redact. The benchmarks record is now product-1018 (fixed). Found by the Beta.11 family-evidence corpus (redact-secret-benchmarks#379); the corpus hash is the beta8-379 hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). The fixing commit landed in PR #1039 (main 4fb7882). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "Repointed from benchmark-gap-932-masked-key-policy (benchmarks record product-932-masked-key-policy), which recorded the #379 LiteLLM proxy debug row as a policy decision under decision-redact-provider-named-credential-assignments section 2. Issue #1018 amended that policy: a masked_/redacted_/hashed_ lead excludes only a value that shows masking or hashing, and the keyword-gated providers read a LiteLLM model route, so the complete Cohere key under masked_api_key= on a cohere/ route line is cohere_api_key / redact. The benchmarks record is now product-1018 (fixed). Found by the Beta.11 family-evidence corpus (redact-secret-benchmarks#379); the corpus hash is the beta8-379 hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). The fixing commit landed in PR #1039 (main 4fb7882). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     },
     {
       "id": "benchmark-gap-933",
@@ -1800,15 +1813,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "False positive found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): generic-token redacted the Anthropic Admin documentation placeholder sk-ant-admin01-<your-key> it left alone behind sk-ant-api01-/sk-ant-api03-. The fixing commit (PR #1039, main 4fb7882) lists the 14-byte sk-ant-admin01 prefix beside the 12-byte vendor-prefix cap. The corpus hash is the beta8-384a hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "False positive found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): generic-token redacted the Anthropic Admin documentation placeholder sk-ant-admin01-<your-key> it left alone behind sk-ant-api01-/sk-ant-api03-. The fixing commit (PR #1039, main 4fb7882) lists the 14-byte sk-ant-admin01 prefix beside the 12-byte vendor-prefix cap. The corpus hash is the beta8-384a hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     },
     {
       "id": "benchmark-gap-1016",
@@ -1834,15 +1860,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "False negative found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): a Kubernetes env name:/value: pair was never read as an assignment, so the Deepgram, Cohere and Mistral values were missed. The fixing commit (PR #1039, main 4fb7882) reads the pair on adjacent lines as <NAME>=<v> and holds the item's first line in the incremental session. The corpus hash is the beta8-384e hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "False negative found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): a Kubernetes env name:/value: pair was never read as an assignment, so the Deepgram, Cohere and Mistral values were missed. The fixing commit (PR #1039, main 4fb7882) reads the pair on adjacent lines as <NAME>=<v> and holds the item's first line in the incremental session. The corpus hash is the beta8-384e hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     },
     {
       "id": "benchmark-gap-1017",
@@ -1866,15 +1905,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "False negative found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): deepgram-api-key missed the JS SDK v3 createClient(...) factory and the browser WebSocket token subprotocol. The fixing commit (PR #1039, main 4fb7882) types both. The corpus hash is the beta8-384e hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "False negative found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): deepgram-api-key missed the JS SDK v3 createClient(...) factory and the browser WebSocket token subprotocol. The fixing commit (PR #1039, main 4fb7882) types both. The corpus hash is the beta8-384e hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     },
     {
       "id": "benchmark-gap-1038",
@@ -1896,15 +1948,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "False negative found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): a Python subscript store os.environ[\"NAME\"] = \"<literal>\" was never read as an assignment, so the Mistral value was missed. The fixing commit (PR #1039, main 4fb7882) reads keyed environment stores as assignments. The corpus hash is the beta8-384e hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "False negative found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): a Python subscript store os.environ[\"NAME\"] = \"<literal>\" was never read as an assignment, so the Mistral value was missed. The fixing commit (PR #1039, main 4fb7882) reads keyed environment stores as assignments. The corpus hash is the beta8-384e hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     },
     {
       "id": "benchmark-gap-1041",
@@ -1927,15 +1992,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "False positive found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): since #1026 the bare secret_access_key name reached generic-token, which redacted the hyphenated placeholder phrase placeholder-not-a-key in a Rust test config (published 0.1.0-beta.11 left it silent). The fixing commit (this product batch) treats a phrase led by a distinctive placeholder word and made of listed credential, negation and filler words like the single placeholder word. The corpus hash is the real-world-shapes hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "False positive found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): since #1026 the bare secret_access_key name reached generic-token, which redacted the hyphenated placeholder phrase placeholder-not-a-key in a Rust test config (published 0.1.0-beta.11 left it silent). The fixing commit (this product batch) treats a phrase led by a distinctive placeholder word and made of listed credential, negation and filler words like the single placeholder word. The corpus hash is the real-world-shapes hash at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     },
     {
       "id": "benchmark-gap-1042",
@@ -1973,15 +2051,28 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821875",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776822049",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821900",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821888",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820898",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820913",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821010",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776820907",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109776821120",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109778531665",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36681168598/job/109777998147"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "False positive found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): seven placeholder controls were reported (the Vercel x-run fillers, the RunPod word fixture and the ClickHouse mykeysecret the #860/#1013 evidence lists, and the benchmark-authored Paddle ellipsis and Bitwarden x-run). The fixing commit (this product batch) makes vercel-token skip a one-character filler body and generic-token skip a lead-word phrase behind a vendor prefix, an ellipsis after a bare vendor prefix, a filler layout with : and = padding, and my glued to two or more credential words. The corpus hashes are the beta8-1012e, beta8-464f, beta8-528h, beta8-528a and beta8-464b hashes at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. Both gates stay pending until an Artifact qualification run over the canonical fixtures and a fixed-candidate benchmark rerun are recorded."
+      "note": "False positive found by the Beta.12 benchmarks graduation (redact-secret-benchmarks PR #530): seven placeholder controls were reported (the Vercel x-run fillers, the RunPod word fixture and the ClickHouse mykeysecret the #860/#1013 evidence lists, and the benchmark-authored Paddle ellipsis and Bitwarden x-run). The fixing commit (this product batch) makes vercel-token skip a one-character filler body and generic-token skip a lead-word phrase behind a vendor prefix, an ellipsis after a bare vendor prefix, a filler layout with : and = padding, and my glued to two or more credential words. The corpus hashes are the beta8-1012e, beta8-464f, beta8-528h, beta8-528a and beta8-464b hashes at the pinned benchmarks revision 561125c3 (PR #530 head 4098786). Canonical inputs are freshly built synthetic values. productConformance passed: the canonical fixtures pass in Artifact qualification run 36681168598 at 9e95cfe2 (PR #1045 head, a descendant of the fixing commit): Rust native host on ubuntu, macOS and Windows, the wasm32 target, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, the N-API addon, the Python wheel matrix and the MCP golden path. The run's only failing jobs are Benchmark pin drift and the Artifact inventory that depends on it, because the pinned benchmarks commit 4098786 reaches benchmarks develop only when redact-secret-benchmarks PR #530 merges; no conformance job failed. benchmarkRevalidation stays pending until the fixed-candidate benchmark rerun is recorded."
     }
   ]
 }
