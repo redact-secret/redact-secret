@@ -90,8 +90,12 @@ impl PiiSelection {
             canonical.insert(canonicalize_selector(selector)?);
         }
 
-        let known: BTreeSet<&str> = known_families.iter().copied().collect();
-        let available: BTreeSet<&str> = available_families.iter().copied().collect();
+        // The catalogs are read only by membership and by filtering into the
+        // `closure` set, so the slices serve as they are; collecting them
+        // into sets linked a `&str` slice sort into the WebAssembly build
+        // for nothing (issue #1043).
+        let known = known_families;
+        let available = available_families;
         let mut closure = BTreeSet::new();
         for selector in &canonical {
             if selector == "pii:global" {
@@ -128,10 +132,10 @@ impl PiiSelection {
             }
             let family =
                 selector_to_family(selector).ok_or(SecretScanErrorCode::PiiSelectorInvalid)?;
-            if !known.contains(family.as_str()) {
+            if !known.contains(&family.as_str()) {
                 return Err(SecretScanErrorCode::PiiSelectorUnsupported.into());
             }
-            if !available.contains(family.as_str()) {
+            if !available.contains(&family.as_str()) {
                 return Err(SecretScanErrorCode::PiiSelectorUnavailable.into());
             }
             closure.insert(family);
