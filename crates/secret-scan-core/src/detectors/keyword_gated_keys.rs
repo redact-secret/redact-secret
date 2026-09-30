@@ -724,9 +724,13 @@ fn context(
 ) -> Option<(Confidence, &'static str)> {
     let header_context = line_context.header;
     let bytes = line.as_bytes();
-    if let Some(key) = text::assignment_key(bytes, start) {
+    // Issue #1038: `os.environ["NAME"] = "<v>"` and its sibling keyed stores
+    // are the assignment `NAME = "<v>"`.
+    let key = text::assignment_key(bytes, start)
+        .and_then(|key| std::str::from_utf8(key).ok())
+        .or_else(|| text::keyed_store_name(line, start));
+    if let Some(key) = key {
         let key_start = key.as_ptr() as usize - bytes.as_ptr() as usize;
-        let key = std::str::from_utf8(key).ok()?;
         // Issue #1016: a Kubernetes-style `env` entry's `value:` is assigned
         // to the name of its sibling `name:` key.
         let key = match line_context.paired_name {

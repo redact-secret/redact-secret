@@ -52,6 +52,13 @@ evidence is linked from each published version.
   sibling `provider: deepgram` field (#1017). These were missed or typed
   `generic-token`; the JSON `{"provider":"deepgram","auth":...}` form moves
   from warn to redact. A bare 40-hex run stays unreported.
+- A keyed environment store is read as an assignment (#1038):
+  `os.environ["NAME"] = "<v>"` (single quotes too), `process.env["NAME"] =`,
+  Ruby `ENV["NAME"] =`, `settings["api_key"] =`,
+  `os.environ.setdefault("NAME", "<v>")` and `os.putenv("NAME", "<v>")`.
+  `MISTRAL_API_KEY`, `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed
+  provider findings and other credential names give `generic-token`; reads,
+  references, placeholders and non-credential names stay silent.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

@@ -2538,6 +2538,20 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPref
     if is_prefix_boundary_char(ch) {
         return parse_name_and_operator(input, pos + ch.len_utf8()).map(plain);
     }
+    // Issue #1038: a keyed environment store, `os.environ["NAME"] = "<v>"`
+    // or `os.environ.setdefault("NAME", "<v>")`, is the assignment
+    // `NAME = "<v>"`; a call takes only a quoted literal.
+    if matches!(ch, '[' | '(')
+        && let Some(store) = super::text::keyed_store_prefix(input, pos)
+    {
+        return Some(AssignmentPrefix {
+            name_start: store.name_start,
+            name_end: store.name_end,
+            prefix_end: store.value_start,
+            query: false,
+            call_open: store.call,
+        });
+    }
     if ch == '(' {
         return parse_name_and_operator(input, pos + 1).map(
             |(name_start, name_end, prefix_end)| AssignmentPrefix {

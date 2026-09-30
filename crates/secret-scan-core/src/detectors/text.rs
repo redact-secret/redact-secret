@@ -743,6 +743,139 @@ pub(super) fn is_provider_named_assignment(
         })
 }
 
+// --- Keyed environment stores (issue #1038) ---------------------------------
+
+/// Last callee segments that store `(name, value)` into an environment:
+/// Python `os.environ.setdefault` and `os.putenv`, and `setenv`.
+const ENV_STORE_CALLEES: &[&str] = &["setdefault", "putenv", "setenv"];
+
+/// Most bytes between a value and the `[` or `(` that opens its keyed store
+/// (`["` + a 128-byte name + `"] = "`).
+const MAX_STORE_PREFIX: usize = 160;
+
+/// A keyed-store prefix: the name span and the offset where the value
+/// starts, which is its opening quote.
+pub(super) struct StorePrefix {
+    pub(super) name_start: usize,
+    pub(super) name_end: usize,
+    pub(super) value_start: usize,
+    /// The prefix is a `(name, value)` call, where only a quoted literal
+    /// value counts.
+    pub(super) call: bool,
+}
+
+/// Parses a keyed store opening at byte `open` of `input` (issue #1038),
+/// read as the assignment `NAME = <value>`:
+///
+/// - `<target>["NAME"] = ` (single quotes too): `os.environ["NAME"] =`,
+///   `process.env['NAME'] =`, Ruby `ENV["NAME"] =`, `settings["api_key"] =`.
+///   The `[` follows an identifier byte or a closing `)`/`]`, and the `=`
+///   is not part of `==`.
+/// - `<callee>("NAME", ` where the callee's last segment is one of
+///   [`ENV_STORE_CALLEES`]: `os.environ.setdefault("NAME", `,
+///   `os.putenv("NAME", `.
+///
+/// The name is `[A-Za-z_][A-Za-z0-9_.-]*`, at most 128 bytes, between
+/// matching quotes. `value_start` must hold a quote for the caller to read
+/// a literal; the prefix never crosses a line end.
+pub(super) fn keyed_store_prefix(input: &str, open: usize) -> Option<StorePrefix> {
+    let bytes = input.as_bytes();
+    let call = match bytes.get(open)? {
+        b'[' => {
+            let target = *bytes.get(open.checked_sub(1)?)?;
+            if !(target.is_ascii_alphanumeric() || matches!(target, b'_' | b')' | b']')) {
+                return None;
+            }
+            false
+        }
+        b'(' => {
+            let callee_end = open;
+            let callee_start = callee_end
+                - bytes[..callee_end]
+                    .iter()
+                    .rev()
+                    .take_while(|&&byte| byte.is_ascii_alphanumeric() || byte == b'_')
+                    .count();
+            if !ENV_STORE_CALLEES.contains(&&input[callee_start..callee_end]) {
+                return None;
+            }
+            true
+        }
+        _ => return None,
+    };
+    let horizontal = |byte: u8| matches!(byte, b' ' | b'\t');
+    let mut at = open + 1;
+    if call {
+        at += ascii_run_len(bytes, at, horizontal);
+    }
+    let quote = *bytes
+        .get(at)
+        .filter(|&&byte| matches!(byte, b'"' | b'\''))?;
+    at += 1;
+    let name_start = at;
+    if !bytes
+        .get(at)
+        .is_some_and(|&byte| byte.is_ascii_alphabetic() || byte == b'_')
+    {
+        return None;
+    }
+    at += ascii_run_len(bytes, at, |byte| {
+        byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-')
+    });
+    let name_end = at;
+    if name_end - name_start > 128 || bytes.get(at) != Some(&quote) {
+        return None;
+    }
+    at += 1;
+    at += ascii_run_len(bytes, at, horizontal);
+    if call {
+        if bytes.get(at) != Some(&b',') {
+            return None;
+        }
+        at += 1;
+    } else {
+        if bytes.get(at) != Some(&b']') {
+            return None;
+        }
+        at += 1;
+        at += ascii_run_len(bytes, at, horizontal);
+        if bytes.get(at) != Some(&b'=') || bytes.get(at + 1) == Some(&b'=') {
+            return None;
+        }
+        at += 1;
+    }
+    at += ascii_run_len(bytes, at, horizontal);
+    Some(StorePrefix {
+        name_start,
+        name_end,
+        value_start: at,
+        call,
+    })
+}
+
+/// The name of the keyed store (issue #1038, [`keyed_store_prefix`]) whose
+/// quoted literal value opens at byte `value_start` of `line`, the byte
+/// after the opening quote.
+pub(super) fn keyed_store_name(line: &str, value_start: usize) -> Option<&str> {
+    let bytes = line.as_bytes();
+    let quote_at = value_start.checked_sub(1)?;
+    if !matches!(bytes.get(quote_at), Some(b'"' | b'\'')) {
+        return None;
+    }
+    let floor = quote_at.saturating_sub(MAX_STORE_PREFIX);
+    for open in (floor..quote_at).rev() {
+        if !matches!(bytes[open], b'[' | b'(') {
+            continue;
+        }
+        if let Some(prefix) = keyed_store_prefix(line, open)
+            && prefix.value_start == quote_at
+        {
+            return Some(&line[prefix.name_start..prefix.name_end]);
+        }
+    }
+    None
+}
+
 // --- YAML list-item `name:`/`value:` pairs (issue #1016) -------------------
 
 /// One `key:` line of a YAML block sequence or mapping, as
@@ -1108,5 +1241,40 @@ mod list_item_pair_tests {
         ] {
             assert!(!has_open_list_item_pair(closed), "{closed:?}");
         }
+    }
+}
+
+#[cfg(test)]
+mod keyed_store_tests {
+    use super::{keyed_store_name, keyed_store_prefix};
+
+    #[test]
+    fn subscript_and_call_stores_name_their_value() {
+        let line = "os.environ[\"API_TOKEN\"] = \"v\"";
+        let prefix = keyed_store_prefix(line, 10).unwrap();
+        assert_eq!(&line[prefix.name_start..prefix.name_end], "API_TOKEN");
+        assert_eq!(prefix.value_start, line.len() - 3);
+        assert!(!prefix.call);
+        assert_eq!(keyed_store_name(line, line.len() - 2), Some("API_TOKEN"));
+        let call = "os.putenv( 'API_TOKEN' , 'v')";
+        assert_eq!(keyed_store_name(call, call.len() - 3), Some("API_TOKEN"));
+        assert!(keyed_store_prefix(call, 9).unwrap().call);
+    }
+
+    #[test]
+    fn comparisons_reads_and_other_callees_are_not_stores() {
+        for (line, open) in [
+            ("x[\"A\"] == \"v\"", 1),
+            ("x[\"A\"]", 1),
+            (" [\"A\"] = \"v\"", 1),
+            ("x[A] = \"v\"", 1),
+            ("x[\"A'] = \"v\"", 1),
+            ("x[\"1A\"] = \"v\"", 1),
+            ("get(\"A\", \"v\")", 3),
+            ("setdefault(\"A\" \"v\")", 10),
+        ] {
+            assert!(keyed_store_prefix(line, open).is_none(), "{line}");
+        }
+        assert_eq!(keyed_store_name("x = \"v\"", 5), None);
     }
 }
