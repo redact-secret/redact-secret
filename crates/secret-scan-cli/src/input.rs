@@ -5,6 +5,7 @@
 //! source larger than [`MAX_INPUT_BYTES`] stops the run with the core's
 //! `INPUT_LIMIT_EXCEEDED` code instead of being scanned in part.
 
+use std::borrow::Cow;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -35,29 +36,47 @@ impl Utf8Stream {
 
     /// Decodes `chunk`, returning every complete character it completes.
     ///
+    /// When nothing is carried, the complete prefix of `chunk` is handed on
+    /// borrowed and only an incomplete trailing sequence (at most
+    /// [`MAX_CARRY_BYTES`] bytes) is copied into the carry. Only a chunk that
+    /// follows a carried sequence is copied, once, and its text is moved out
+    /// of that buffer rather than copied again.
+    ///
     /// # Errors
     ///
     /// Returns [`Failure::NotUtf8`] when `chunk` contains a sequence that no
     /// continuation can complete.
-    pub fn push(&mut self, chunk: &[u8]) -> Result<String, Failure> {
+    pub fn push<'a>(&mut self, chunk: &'a [u8]) -> Result<Cow<'a, str>, Failure> {
+        if self.carry.is_empty() {
+            let valid_up_to = match std::str::from_utf8(chunk) {
+                Ok(text) => return Ok(Cow::Borrowed(text)),
+                Err(error) if error.error_len().is_none() => error.valid_up_to(),
+                Err(_) => return Err(Failure::NotUtf8),
+            };
+            let (complete, incomplete) = chunk.split_at(valid_up_to);
+            if incomplete.len() > MAX_CARRY_BYTES {
+                return Err(Failure::NotUtf8);
+            }
+            let text = std::str::from_utf8(complete).map_err(|_| Failure::NotUtf8)?;
+            self.carry.extend_from_slice(incomplete);
+            return Ok(Cow::Borrowed(text));
+        }
+
         let mut buffer = std::mem::take(&mut self.carry);
         buffer.extend_from_slice(chunk);
-
         let valid_up_to = match std::str::from_utf8(&buffer) {
-            Ok(text) => return Ok(text.to_owned()),
+            Ok(_) => buffer.len(),
             Err(error) if error.error_len().is_none() => error.valid_up_to(),
             Err(_) => return Err(Failure::NotUtf8),
         };
-
-        let (complete, incomplete) = buffer.split_at(valid_up_to);
-        if incomplete.len() > MAX_CARRY_BYTES {
+        if buffer.len() - valid_up_to > MAX_CARRY_BYTES {
             return Err(Failure::NotUtf8);
         }
-        let text = std::str::from_utf8(complete)
-            .map_err(|_| Failure::NotUtf8)?
-            .to_owned();
-        self.carry = incomplete.to_vec();
-        Ok(text)
+        self.carry = buffer.split_off(valid_up_to);
+        // `buffer` now holds exactly the validated prefix, so this moves it.
+        String::from_utf8(buffer)
+            .map(Cow::Owned)
+            .map_err(|_| Failure::NotUtf8)
     }
 
     /// Asserts that the stream ended on a character boundary.
@@ -144,6 +163,161 @@ fn read_bounded_bytes(reader: impl Read, max_bytes: usize) -> Result<Vec<u8>, Fa
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The pre-#1088 decoder, kept as the oracle the fast path must match.
+    #[derive(Default)]
+    struct OracleStream {
+        carry: Vec<u8>,
+    }
+
+    impl OracleStream {
+        fn push(&mut self, chunk: &[u8]) -> Result<String, Failure> {
+            let mut buffer = std::mem::take(&mut self.carry);
+            buffer.extend_from_slice(chunk);
+            let valid_up_to = match std::str::from_utf8(&buffer) {
+                Ok(text) => return Ok(text.to_owned()),
+                Err(error) if error.error_len().is_none() => error.valid_up_to(),
+                Err(_) => return Err(Failure::NotUtf8),
+            };
+            let (complete, incomplete) = buffer.split_at(valid_up_to);
+            if incomplete.len() > MAX_CARRY_BYTES {
+                return Err(Failure::NotUtf8);
+            }
+            let text = std::str::from_utf8(complete)
+                .map_err(|_| Failure::NotUtf8)?
+                .to_owned();
+            self.carry = incomplete.to_vec();
+            Ok(text)
+        }
+
+        fn finish(&self) -> Result<(), Failure> {
+            if self.carry.is_empty() {
+                Ok(())
+            } else {
+                Err(Failure::NotUtf8)
+            }
+        }
+    }
+
+    /// Fixed-seed xorshift64*; every draw is reduced in `u32` so the
+    /// generators behave identically on 32-bit `usize` targets.
+    struct Rng(u64);
+
+    impl Rng {
+        fn next(&mut self) -> u64 {
+            self.0 ^= self.0 >> 12;
+            self.0 ^= self.0 << 25;
+            self.0 ^= self.0 >> 27;
+            self.0.wrapping_mul(0x2545_f491_4f6c_dd1d)
+        }
+
+        /// A value in `0..bound` (`bound` > 0, below 2^16).
+        fn below(&mut self, bound: u32) -> usize {
+            let draw = u32::try_from(self.next() >> 40).unwrap_or(0) % bound;
+            usize::try_from(draw).unwrap_or(0)
+        }
+    }
+
+    const FRAGMENTS: [&[u8]; 12] = [
+        b"a",
+        b"token ",
+        b"\n",
+        "\u{00e9}".as_bytes(),
+        "\u{20ac}".as_bytes(),
+        "\u{1f511}".as_bytes(),
+        b"\xe2\x82",
+        b"\xf0\x9f",
+        b"\xc3",
+        b"\xff",
+        b"\x80",
+        b"\xed\xa0\x80",
+    ];
+
+    fn run_new(input: &[u8], cuts: &[usize]) -> (Result<String, Failure>, Result<(), Failure>) {
+        let mut decoder = Utf8Stream::new();
+        let mut seen = String::new();
+        let mut start = 0;
+        for &end in cuts.iter().chain(std::iter::once(&input.len())) {
+            match decoder.push(&input[start..end]) {
+                Ok(text) => seen.push_str(&text),
+                Err(failure) => return (Err(failure), Err(failure)),
+            }
+            start = end;
+        }
+        (Ok(seen), decoder.finish())
+    }
+
+    fn run_old(input: &[u8], cuts: &[usize]) -> (Result<String, Failure>, Result<(), Failure>) {
+        let mut decoder = OracleStream::default();
+        let mut seen = String::new();
+        let mut start = 0;
+        for &end in cuts.iter().chain(std::iter::once(&input.len())) {
+            match decoder.push(&input[start..end]) {
+                Ok(text) => seen.push_str(&text),
+                Err(failure) => return (Err(failure), Err(failure)),
+            }
+            start = end;
+        }
+        (Ok(seen), decoder.finish())
+    }
+
+    #[test]
+    fn the_fast_path_matches_the_old_decoder_on_random_chunkings() {
+        let mut rng = Rng(0x9e37_79b9_7f4a_7c15);
+        for _ in 0..4000 {
+            let mut input = Vec::new();
+            for _ in 0..rng.below(12) {
+                input.extend_from_slice(FRAGMENTS[rng.below(12)]);
+            }
+            let mut cuts: Vec<usize> = (0..rng.below(8))
+                .map(|_| rng.below(u32::try_from(input.len() + 1).unwrap_or(1)))
+                .collect();
+            cuts.sort_unstable();
+            assert_eq!(run_new(&input, &cuts), run_old(&input, &cuts));
+        }
+    }
+
+    #[test]
+    fn a_valid_input_split_at_every_offset_decodes_unchanged() {
+        let input = "a\u{00e9}\u{20ac}\u{1f511}z".as_bytes();
+        for first in 0..=input.len() {
+            for second in first..=input.len() {
+                let cuts = [first, second];
+                assert_eq!(run_new(input, &cuts), run_old(input, &cuts));
+                assert_eq!(
+                    run_new(input, &cuts).0.as_deref(),
+                    Ok("a\u{00e9}\u{20ac}\u{1f511}z")
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn empty_chunks_and_a_truncated_tail_match_the_old_decoder() {
+        let input = [b'a', 0xe2, 0x82];
+        for cuts in [&[][..], &[0], &[1, 1], &[2], &[3]] {
+            assert_eq!(run_new(&input, cuts), run_old(&input, cuts));
+        }
+        assert_eq!(run_new(&input, &[]).1, Err(Failure::NotUtf8));
+    }
+
+    #[test]
+    fn a_chunk_with_nothing_carried_is_handed_on_borrowed() {
+        let mut decoder = Utf8Stream::new();
+        let chunk = "ab\u{20ac}".as_bytes();
+        assert!(matches!(
+            decoder.push(chunk),
+            Ok(Cow::Borrowed("ab\u{20ac}"))
+        ));
+        let split = "x\u{20ac}".as_bytes();
+        let head = decoder.push(&split[..2]).unwrap();
+        assert!(
+            matches!(head, Cow::Borrowed(_)),
+            "the complete prefix must stay borrowed"
+        );
+        assert_eq!(head, "x");
+        assert_eq!(decoder.push(&split[2..]).unwrap(), "\u{20ac}");
+    }
 
     #[test]
     fn a_character_split_across_chunks_is_carried() {
