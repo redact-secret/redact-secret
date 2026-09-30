@@ -473,13 +473,9 @@ impl Detector for PiiDomain {
                 .ok_or(DetectorFailure)?;
             let specificity = identity_specificity.min(sensitivity_specificity);
             let range = alternatives[0].range;
-            let governed_invisible_inside_range =
-                input[range.start()..range.end()].chars().any(|character| {
-                    let code_point = character as u32;
-                    crate::invisible_table::INVISIBLE_RANGES
-                        .iter()
-                        .any(|(start, end)| (*start..=*end).contains(&code_point))
-                });
+            let governed_invisible_inside_range = input[range.start()..range.end()]
+                .chars()
+                .any(crate::normalize::is_invisible);
             let obfuscation = if governed_invisible_inside_range
                 || alternatives
                     .iter()
@@ -747,6 +743,23 @@ mod pii_context_table;
 fn normalize_context(value: &str) -> String {
     let mut tokenized = String::new();
     let mut in_separator = false;
+    // No governed invisible code point is ASCII and NFC leaves ASCII text
+    // unchanged, so an ASCII value only needs case folding and collapsing.
+    if value.is_ascii() {
+        for byte in value.bytes() {
+            let character = char::from(byte.to_ascii_lowercase());
+            if is_context_separator(character) {
+                if !in_separator {
+                    tokenized.push(' ');
+                    in_separator = true;
+                }
+            } else {
+                tokenized.push(character);
+                in_separator = false;
+            }
+        }
+        return tokenized;
+    }
     for character in visible_nfc(value).map(|character| character.to_ascii_lowercase()) {
         let separator = is_context_separator(character);
         if separator {
@@ -774,14 +787,7 @@ fn visible_nfc(value: &str) -> impl Iterator<Item = char> + '_ {
     reason = "a named `Iterator::filter` predicate, so both callers share one iterator type"
 )]
 fn is_visible(character: &char) -> bool {
-    !is_governed_invisible(*character)
-}
-
-fn is_governed_invisible(character: char) -> bool {
-    let code_point = character as u32;
-    crate::invisible_table::INVISIBLE_RANGES
-        .iter()
-        .any(|(start, end)| (*start..=*end).contains(&code_point))
+    !crate::normalize::is_invisible(*character)
 }
 
 /// A separator of the context-only view, after ASCII case folding.
@@ -863,7 +869,19 @@ struct NormalizedForm {
 /// through [`normalize_context`], in table then form order.
 struct ContextVocabulary {
     entries: Vec<(&'static ContextEntry, Vec<NormalizedForm>)>,
+    /// How many scalars of each side's view [`ContextVocabulary::associate`]
+    /// needs, counted from the candidate (issue #1058): every accepted
+    /// occurrence lies within [`MAX_CONTEXT_DISTANCE`] of the candidate, is at
+    /// most the longest form long, and has one more scalar beyond it for its
+    /// boundary check. `None` when an accepted occurrence of some form could
+    /// depend on text farther away ([`overlap_follows_boundary`]), so views
+    /// are never clipped.
+    reach: Option<usize>,
 }
+
+/// The farthest a context occurrence associates, in context-view scalars:
+/// the natural-language label limit, which bounds the field-label one.
+const MAX_CONTEXT_DISTANCE: usize = 64;
 
 /// The vocabulary every adapter in the process shares, normalized the first
 /// time a candidate needs it rather than when a registry or session is built.
@@ -885,8 +903,15 @@ impl ContextVocabulary {
                     .collect();
                 (entry, forms)
             })
-            .collect();
-        Self { entries }
+            .collect::<Vec<(&'static ContextEntry, Vec<NormalizedForm>)>>();
+        let forms = || entries.iter().flat_map(|(_, forms)| forms);
+        let reach = forms()
+            .all(|form| !overlap_follows_boundary(&form.text))
+            .then(|| {
+                let longest = forms().map(|form| form.scalars).max().unwrap_or(0);
+                MAX_CONTEXT_DISTANCE + longest + 1
+            });
+        Self { entries, reach }
     }
 
     fn shared() -> &'static Self {
@@ -905,6 +930,25 @@ impl ContextVocabulary {
         &self,
         input: &str,
         candidates: &[(ByteRange, IdentityDomain)],
+    ) -> Vec<Vec<ContextMatch>> {
+        self.matches_by(input, candidates, Self::associate)
+    }
+
+    /// [`ContextVocabulary::matches`] with the per-candidate association
+    /// passed in, so tests can run the unclipped one as an oracle.
+    fn matches_by(
+        &self,
+        input: &str,
+        candidates: &[(ByteRange, IdentityDomain)],
+        associate: impl Fn(
+            &Self,
+            &str,
+            ByteRange,
+            IdentityDomain,
+            [usize; 2],
+            &LineOffsets,
+            &LineOccurrences,
+        ) -> Vec<ContextMatch>,
     ) -> Vec<Vec<ContextMatch>> {
         let mut result = vec![Vec::new(); candidates.len()];
         if candidates.is_empty() {
@@ -987,7 +1031,8 @@ impl ContextVocabulary {
             let occurrences = LineOccurrences::new(input, &window, &offsets);
             for (_, [candidate_index, before_barrier, after_barrier]) in group {
                 let (range, domain) = candidates[*candidate_index];
-                result[*candidate_index] = self.associate(
+                result[*candidate_index] = associate(
+                    self,
                     input,
                     range,
                     domain,
@@ -1005,11 +1050,11 @@ impl ContextVocabulary {
     /// the per-call driver above stays small: in the WebAssembly build each
     /// function is compiled and tiered up on its own, and a whole-input scan
     /// calls this once per candidate.
+    ///
+    /// Only the [`ContextVocabulary::reach`] scalars of each view next to the
+    /// candidate can hold an accepted occurrence, so each view is clipped
+    /// there before it is normalized and searched (issue #1058).
     #[inline(never)]
-    #[allow(
-        clippy::too_many_lines,
-        reason = "the bounded association rules are one ordered contract"
-    )]
     fn associate(
         &self,
         input: &str,
@@ -1019,14 +1064,120 @@ impl ContextVocabulary {
         offsets: &LineOffsets,
         occurrences: &LineOccurrences,
     ) -> Vec<ContextMatch> {
-        let mut found = Vec::new();
+        let (before, clipped_scalars) = self.before_view(input, before_barrier, range.start());
+        let after = self.after_view(input, range.end(), after_barrier);
+        self.associate_views(
+            domain,
+            [&before, &after],
+            [
+                offsets.at(before_barrier) + clipped_scalars,
+                offsets.at(range.end()),
+            ],
+            occurrences,
+        )
+    }
+
+    /// [`ContextVocabulary::associate`] before issue #1058: both views
+    /// normalized whole. The oracle of the clipping.
+    #[cfg(test)]
+    fn associate_unclipped(
+        &self,
+        input: &str,
+        range: ByteRange,
+        domain: IdentityDomain,
+        [before_barrier, after_barrier]: [usize; 2],
+        offsets: &LineOffsets,
+        occurrences: &LineOccurrences,
+    ) -> Vec<ContextMatch> {
         let before = normalize_context(&input[before_barrier..range.start()]);
         let after = normalize_context(&input[range.end()..after_barrier]);
-        let before_offset = offsets.at(before_barrier);
-        let after_offset = offsets.at(range.end());
+        self.associate_views(
+            domain,
+            [&before, &after],
+            [offsets.at(before_barrier), offsets.at(range.end())],
+            occurrences,
+        )
+    }
+
+    /// The context-only view of `input[barrier..end]`, possibly without a
+    /// prefix, and the scalar count of the dropped prefix.
+    ///
+    /// The view keeps at least [`ContextVocabulary::reach`] scalars. The cut
+    /// is at an ASCII scalar or a Hangul syllable, where NFC splits
+    /// ([`starts_normalization_segment`]), so the whole view is the dropped
+    /// prefix's view followed by the kept one, except that a separator run
+    /// spanning the cut collapses to the prefix's one space. Every accepted
+    /// occurrence of the whole view lies in the kept view with its preceding
+    /// scalar, and the kept view accepts no other: its search can differ from
+    /// the whole view's only on occurrences that overlap an earlier one of
+    /// the same form, which are never accepted
+    /// ([`overlap_follows_boundary`]), or on one at its first scalar, which
+    /// lies beyond [`MAX_CONTEXT_DISTANCE`].
+    fn before_view(&self, input: &str, barrier: usize, end: usize) -> (String, usize) {
+        if let Some(reach) = self.reach {
+            let mut target = reach;
+            loop {
+                let cut = clip_before(input, barrier, end, target);
+                if cut == barrier {
+                    break;
+                }
+                let mut view = normalize_context(&input[cut..end]);
+                // The collapse below removes at most one scalar.
+                if view.chars().count() > reach {
+                    let mut dropped = ContextScalars::default();
+                    dropped.feed(&input[barrier..cut]);
+                    if dropped.in_separator && view.starts_with(' ') {
+                        view.remove(0);
+                    }
+                    return (view, dropped.count);
+                }
+                // Composition shrank the text below its raw scalar count.
+                target = target.saturating_mul(2);
+            }
+        }
+        (normalize_context(&input[barrier..end]), 0)
+    }
+
+    /// The context-only view of `input[start..barrier]`, possibly without a
+    /// suffix: a prefix of the whole view (the cut is where NFC splits, and a
+    /// collapsed separator run keeps its first space) holding at least
+    /// [`ContextVocabulary::reach`] scalars, so every occurrence within
+    /// [`MAX_CONTEXT_DISTANCE`] and the scalar after it are unchanged.
+    fn after_view(&self, input: &str, start: usize, barrier: usize) -> String {
+        if let Some(reach) = self.reach {
+            let mut target = reach;
+            loop {
+                let cut = clip_after(input, start, barrier, target);
+                if cut == barrier {
+                    break;
+                }
+                let view = normalize_context(&input[start..cut]);
+                if view.chars().count() >= reach {
+                    return view;
+                }
+                target = target.saturating_mul(2);
+            }
+        }
+        normalize_context(&input[start..barrier])
+    }
+
+    /// The association over the two context-only views of one candidate,
+    /// given the line scalar offset each view starts at.
+    #[allow(
+        clippy::too_many_lines,
+        reason = "the bounded association rules are one ordered contract"
+    )]
+    fn associate_views(
+        &self,
+        domain: IdentityDomain,
+        [before, after]: [&str; 2],
+        [before_offset, after_offset]: [usize; 2],
+        occurrences: &LineOccurrences,
+    ) -> Vec<ContextMatch> {
+        let mut found = Vec::new();
         let views = [
-            (0usize, before.as_str(), before.chars().count()),
-            (1usize, after.as_str(), after.chars().count()),
+            (0usize, before, before.chars().count()),
+            (1usize, after, after.chars().count()),
         ];
         for (entry, forms) in self
             .entries
@@ -1067,7 +1218,7 @@ impl ContextVocabulary {
                         let limit = if entry.kind == ContextKind::FieldLabel {
                             16
                         } else {
-                            64
+                            MAX_CONTEXT_DISTANCE
                         };
                         if distance > limit {
                             continue;
@@ -1258,6 +1409,80 @@ impl LogicalLines {
 /// Hangul syllables, so removing them first does not move such a split.
 fn starts_normalization_segment(character: char) -> bool {
     character.is_ascii() || ('\u{AC00}'..='\u{D7A3}').contains(&character)
+}
+
+/// Where a clipped before view of `input[barrier..end]` starts: the last
+/// normalization segment start ([`starts_normalization_segment`]) with at
+/// least `target` visible, separator-collapsed scalars from it to `end`, or
+/// `barrier` when there is none. The count is taken before NFC, so it only
+/// estimates the view's length; the caller checks the normalized view.
+/// Invisible code points are not counted, so a long run of them never cuts
+/// the view short.
+fn clip_before(input: &str, barrier: usize, end: usize, target: usize) -> usize {
+    let mut counted = 0usize;
+    let mut in_separator = false;
+    for (index, character) in input[barrier..end].char_indices().rev() {
+        if counted >= target && starts_normalization_segment(character) {
+            return barrier + index;
+        }
+        count_visible(character, &mut counted, &mut in_separator);
+    }
+    barrier
+}
+
+/// Where a clipped after view of `input[start..barrier]` ends: the first
+/// normalization segment start with at least `target` visible,
+/// separator-collapsed scalars before it, or `barrier` when there is none.
+fn clip_after(input: &str, start: usize, barrier: usize, target: usize) -> usize {
+    let mut counted = 0usize;
+    let mut in_separator = false;
+    for (index, character) in input[start..barrier].char_indices() {
+        if counted >= target && starts_normalization_segment(character) {
+            return start + index;
+        }
+        count_visible(character, &mut counted, &mut in_separator);
+    }
+    barrier
+}
+
+/// One raw scalar of the clip estimate: invisible code points and
+/// combining marks, which NFC usually composes into the scalar before them,
+/// count nothing, and a separator run counts once.
+fn count_visible(character: char, counted: &mut usize, in_separator: &mut bool) {
+    if crate::normalize::is_invisible(character)
+        || unicode_normalization::char::is_combining_mark(character)
+    {
+        return;
+    }
+    if is_context_separator(character) {
+        if !*in_separator {
+            *counted += 1;
+            *in_separator = true;
+        }
+    } else {
+        *counted += 1;
+        *in_separator = false;
+    }
+}
+
+/// Whether `form` is empty, or two of its occurrences can overlap with the
+/// later one preceded by a scalar that can bound a context occurrence.
+///
+/// The search for a form is non-overlapping, so which occurrence of an
+/// overlapping chain it reports depends on where the searched view starts.
+/// An occurrence that starts inside an earlier one of the same form is
+/// preceded by a scalar of that form; when no such scalar can be a boundary
+/// ([`is_context_boundary`]), that occurrence is never accepted wherever the
+/// view starts, and a clipped before view reports the same accepted
+/// occurrences as the whole one.
+fn overlap_follows_boundary(form: &str) -> bool {
+    form.is_empty()
+        || form.char_indices().skip(1).any(|(index, _)| {
+            form.starts_with(&form[index..])
+                && form[..index].chars().next_back().is_some_and(|character| {
+                    character.is_whitespace() || matches!(character, '"' | '\'' | '|')
+                })
+        })
 }
 
 /// The scalar count of [`normalize_context`] kept as a running state, so the

@@ -1,5 +1,7 @@
 //! Conservative RFC 5322 / RFC 6531 email family contract v1.
 
+use std::sync::OnceLock;
+
 use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
 
 use super::{
@@ -126,6 +128,37 @@ fn email_label_key_length(local: &str) -> Option<usize> {
 
 fn is_email_label_key(key: &str) -> bool {
     let view = normalize_context(key);
+    email_label_forms().iter().any(|form| {
+        view == *form
+            || view
+                .strip_suffix(form.as_str())
+                .is_some_and(|head| head.ends_with(' '))
+    })
+}
+
+/// The context-only view of every form of a positive high-signal email
+/// field label, normalized once per process instead of on every key.
+fn email_label_forms() -> &'static [String] {
+    static FORMS: OnceLock<Vec<String>> = OnceLock::new();
+    FORMS.get_or_init(|| {
+        pii_context_table::CONTEXT_ENTRIES
+            .iter()
+            .filter(|entry| {
+                entry.kind == ContextKind::FieldLabel
+                    && entry.class == ContextClass::Positive
+                    && entry.strength == ContextStrength::HighSignal
+                    && entry.domains.contains(&IdentityDomain::Email)
+            })
+            .flat_map(|entry| entry.forms.iter().map(|form| normalize_context(form)))
+            .collect()
+    })
+}
+
+/// [`is_email_label_key`] before issue #1058, which renormalized every form
+/// on every call: the oracle for its test.
+#[cfg(test)]
+fn is_email_label_key_unshared(key: &str) -> bool {
+    let view = normalize_context(key);
     pii_context_table::CONTEXT_ENTRIES
         .iter()
         .filter(|entry| {
@@ -181,14 +214,14 @@ fn valid_boundary(input: &str, start: usize, end: usize) -> bool {
             && character != '.'
             && character != '@'
             && !is_combining_mark(character)
-            && !is_governed_invisible(character)
+            && !crate::normalize::is_invisible(character)
     }) && right.is_none_or(|character| {
         !is_domain_character(character)
             && !character.is_alphanumeric()
             && character != '.'
             && character != '@'
             && !is_combining_mark(character)
-            && !is_governed_invisible(character)
+            && !crate::normalize::is_invisible(character)
     })
 }
 
@@ -294,13 +327,6 @@ fn bounded_token_start(input: &str, start: usize) -> usize {
         })
 }
 
-fn is_governed_invisible(character: char) -> bool {
-    let code_point = character as u32;
-    crate::invisible_table::INVISIBLE_RANGES
-        .iter()
-        .any(|(start, end)| (*start..=*end).contains(&code_point))
-}
-
 fn reserved_documentation_domain(domain: &str) -> bool {
     let lowercase = domain.to_ascii_lowercase();
     ["example.com", "example.net", "example.org"]
@@ -317,6 +343,33 @@ mod tests {
 
     fn candidates(input: &str) -> Vec<Alternative> {
         detect_email_candidates(input)
+    }
+
+    #[test]
+    fn shared_label_forms_classify_every_key_as_the_per_call_normalization_did() {
+        let mut keys: Vec<String> = pii_context_table::CONTEXT_ENTRIES
+            .iter()
+            .flat_map(|entry| entry.forms.iter().map(|form| (*form).to_owned()))
+            .collect();
+        let mut variants = Vec::new();
+        for key in &keys {
+            for prefix in ["", "x", "x ", "x_", "x-", "\u{200b}", "고객 ", "e\u{301} "] {
+                for suffix in ["", "s", " ", "\u{301}"] {
+                    variants.push(format!("{prefix}{}{suffix}", key.to_ascii_uppercase()));
+                    variants.push(format!("{prefix}{}{suffix}", key.replace(' ', "_")));
+                    variants.push(format!("{prefix}{}{suffix}", key.replace(' ', "\u{200b}-")));
+                }
+            }
+        }
+        keys.extend(variants);
+        keys.extend(["", " ", "mail", "emai", "e mail", "E\u{AD}MAIL"].map(str::to_owned));
+        let mut labels = 0;
+        for key in &keys {
+            let expected = is_email_label_key_unshared(key);
+            assert_eq!(is_email_label_key(key), expected, "{key:?}");
+            labels += usize::from(expected);
+        }
+        assert!(labels > 100, "only {labels} keys were labels");
     }
 
     #[test]

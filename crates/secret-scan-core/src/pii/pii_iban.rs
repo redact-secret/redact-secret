@@ -253,14 +253,7 @@ fn blocks_boundary(character: char) -> bool {
     character.is_alphanumeric()
         || matches!(character, '_' | '%')
         || is_combining_mark(character)
-        || is_governed_invisible(character)
-}
-
-fn is_governed_invisible(character: char) -> bool {
-    let code_point = character as u32;
-    crate::invisible_table::INVISIBLE_RANGES
-        .iter()
-        .any(|(start, end)| (*start..=*end).contains(&code_point))
+        || crate::normalize::is_invisible(character)
 }
 
 fn fully_delimited_reference(input: &str, start: usize, end: usize) -> bool {
