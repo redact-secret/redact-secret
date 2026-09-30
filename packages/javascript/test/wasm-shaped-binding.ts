@@ -166,6 +166,19 @@ export function createWasmShapedBinding(
       const incrementalFindings = options.incrementalFindings ?? [];
       let state: WasmIncrementalSanitizer["state"] = "accepting";
 
+      function incrementalResult(
+        text: string,
+        found: readonly WasmFinding[],
+      ): WasmIncrementalResult {
+        return {
+          takeText: () => text,
+          takeFindings: () => found,
+          free: () => {
+            calls.push("free");
+          },
+        };
+      }
+
       function requireAccepting(): void {
         if (state !== "accepting") throw invalidStateError();
       }
@@ -177,7 +190,7 @@ export function createWasmShapedBinding(
         append: (chunk): WasmIncrementalResult => {
           requireAccepting();
           calls.push(`append:${chunk.length}`);
-          return { text: chunk, findings: [] };
+          return incrementalResult(chunk, []);
         },
         finalize: (): WasmIncrementalResult => {
           requireAccepting();
@@ -186,7 +199,7 @@ export function createWasmShapedBinding(
             policy?.(toDetectedFindingMetadata(finding), { findingIndex: index });
             formatter?.(finding, { placeholderIndex: index + 1 });
           });
-          return { text: "", findings: incrementalFindings };
+          return incrementalResult("", incrementalFindings);
         },
         abort: () => {
           requireAccepting();

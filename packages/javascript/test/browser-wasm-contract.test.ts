@@ -286,6 +286,22 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     );
   });
 
+  it("frees each incremental result handle exactly once and flows start/end through", async () => {
+    const wasm = createWasmShapedBinding({
+      incrementalFindings: [sampleWasmFinding],
+    });
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
+    await runtime.initialize();
+
+    const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
+    session.append("SYNTHETIC_REVOKED_CHUNK");
+    expect(wasm.calls.filter((call) => call === "free")).toHaveLength(1);
+    const { findings } = session.finalize();
+
+    expect(findings[0]).toMatchObject({ start: 8, end: 39 });
+    expect(wasm.calls.filter((call) => call === "free")).toHaveLength(2);
+  });
+
   it("flattens the opaque, nested-range findings finalize returns", async () => {
     const wasm = createWasmShapedBinding({
       incrementalFindings: [sampleWasmFinding],
