@@ -98,3 +98,9 @@ review rule, and #1080
 starts from the inventory's terminal-transition table rather than from a
 blanket wrapper around the scanner. The decision changes no code, API or
 detection behavior.
+
+Follow-up, not a change to this decision: the measured zeroization design for
+#1080 is in [`docs/audits/evidence/1080`](../audits/evidence/1080/README.md).
+It stays a proposal until a maintainer rules and a new ADR amends the core's
+no-Cargo-features rule; this decision's vocabulary and "no erasure claim
+without a mechanism" rule apply to it unchanged.

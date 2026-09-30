@@ -155,6 +155,21 @@ it cannot be equivalent to protected-memory secret storage.
   This library does not provide that.
 - Treat `warn` and `allow` output as still carrying the value.
 
+## Proposed: an opt-in zeroization mode (#1080, not implemented)
+
+**No build of the core zeroizes anything today, and nothing above changes.**
+[#1080](https://github.com/redact-secret/redact-secret/issues/1080) evaluated
+an opt-in mode and recorded a measured design in
+[#1080 evidence](../audits/evidence/1080/README.md). If it is adopted, a core
+Cargo feature would overwrite, with `zeroize`, the current allocation of the
+incremental `retained` and `scanned` buffers, the owned text of a normalized
+copy and the private-key lookbehind, at flush, growth, `finalize`, `abort`,
+failure and drop. It would not cover the caller's input or the returned
+output, detector temporaries, any earlier allocation of a buffer outside that
+list, any host copy, or anything in the "does not guarantee" list above.
+Adopting it needs a maintainer ruling and an ADR that amends the core's
+no-Cargo-features rule. Until then this page's contract is the one above.
+
 ## Changing this page
 
 A change that adds an owned copy of input-derived text to the core states why
