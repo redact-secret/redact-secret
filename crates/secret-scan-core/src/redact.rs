@@ -6,8 +6,6 @@
 //! itself (only [`Finding`] metadata and the immutable `input`), and every
 //! failure is a sanitized [`SecretScanError`].
 
-use std::collections::{BTreeMap, BTreeSet};
-
 use crate::error::{FormatterFailure, SecretScanError, SecretScanErrorCode};
 use crate::limits::WholeInputLimits;
 use crate::types::{ByteRange, Finding, PlaceholderContext, PlaceholderFormatter};
@@ -53,9 +51,10 @@ pub fn typed_placeholder_formatter(
     Ok(format!("<{normalized}_{}>", context.placeholder_index()))
 }
 
-/// Matched values eligible to be reproduced by a placeholder, indexed by
-/// byte length so a formatter output can be checked in one pass over its
-/// substrings.
+/// Matched values eligible to be reproduced by a placeholder, held as
+/// borrowed slices of `input` (sorted, deduplicated) so no matched text is
+/// copied. A formatter output is checked by walking an implicit trie over
+/// the sorted slices.
 ///
 /// Every finding in the call contributes its matched text, regardless of its
 /// own action: a `warn`/`allow` finding's value must not reappear inside a
@@ -63,46 +62,69 @@ pub fn typed_placeholder_formatter(
 /// `redact`/`block` finding's own value may. Only findings whose matched
 /// text is no longer than [`MAX_PLACEHOLDER_LENGTH`] are eligible: a longer
 /// matched value can never fit inside a valid placeholder, so indexing it
-/// would be wasted work.
-struct ForbiddenMatchedText {
-    by_length: BTreeMap<usize, BTreeSet<String>>,
+/// would be wasted work. (A `ByteRange` is never empty, so neither is an indexed value.)
+struct ForbiddenMatchedText<'a> {
+    values: Vec<&'a str>,
+    /// Length of the shortest indexed value; windows shorter than this
+    /// cannot match.
+    shortest: usize,
 }
 
-impl ForbiddenMatchedText {
-    fn build(input: &str, findings: &[&Finding]) -> Self {
-        let mut by_length: BTreeMap<usize, BTreeSet<String>> = BTreeMap::new();
-        for finding in findings {
-            let range = finding.range();
-            if range.len() > MAX_PLACEHOLDER_LENGTH {
-                continue;
-            }
-            by_length
-                .entry(range.len())
-                .or_default()
-                .insert(input[range.start()..range.end()].to_string());
-        }
-        Self { by_length }
+impl<'a> ForbiddenMatchedText<'a> {
+    fn build(input: &'a str, findings: &[&Finding]) -> Self {
+        let mut values: Vec<&'a str> = findings
+            .iter()
+            .map(|finding| finding.range())
+            .filter(|range| range.len() <= MAX_PLACEHOLDER_LENGTH)
+            .map(|range| &input[range.start()..range.end()])
+            .collect();
+        values.sort_unstable();
+        values.dedup();
+        let shortest = values.iter().map(|value| value.len()).min().unwrap_or(0);
+        Self { values, shortest }
     }
 
     /// `true` when `placeholder` contains any indexed matched value as a
-    /// substring.
-    ///
-    /// `by_length` iterates in ascending key order, so the scan stops as
-    /// soon as a length exceeds what remains of `placeholder`.
+    /// substring starting and ending on character boundaries.
     fn contains(&self, placeholder: &str) -> bool {
-        for (&length, values) in &self.by_length {
-            if length == 0 || length > placeholder.len() {
+        if self.values.is_empty() {
+            return false;
+        }
+        let shortest = self.shortest;
+        let bytes = placeholder.as_bytes();
+        for start in 0..bytes.len() {
+            if bytes.len() - start < shortest {
+                break;
+            }
+            if !placeholder.is_char_boundary(start) {
                 continue;
             }
-            let mut start = 0;
-            while start + length <= placeholder.len() {
-                if placeholder.is_char_boundary(start)
-                    && placeholder.is_char_boundary(start + length)
-                    && values.contains(&placeholder[start..start + length])
-                {
-                    return true;
+            let (mut lo, mut hi) = (0, self.values.len());
+            let mut depth = 0;
+            loop {
+                // Sorted order puts the value exactly `depth` bytes long,
+                // if any, first among those sharing this prefix.
+                if self.values[lo].len() == depth {
+                    if placeholder.is_char_boundary(start + depth) {
+                        return true;
+                    }
+                    lo += 1;
+                    if lo == hi {
+                        break;
+                    }
                 }
-                start += 1;
+                let Some(&byte) = bytes.get(start + depth) else {
+                    break;
+                };
+                let window = &self.values[lo..hi];
+                let below = window.partition_point(|value| value.as_bytes()[depth] < byte);
+                let through = below
+                    + window[below..].partition_point(|value| value.as_bytes()[depth] <= byte);
+                (lo, hi) = (lo + below, lo + through);
+                if lo == hi {
+                    break;
+                }
+                depth += 1;
             }
         }
         false
@@ -208,19 +230,16 @@ pub fn redact_with_limits(
     let ordered = ordered_and_disjoint(findings, input)?;
     let forbidden = ForbiddenMatchedText::build(input, &ordered);
 
-    let mut output = String::with_capacity(input.len());
-    let mut cursor = 0;
-    let mut placeholder_index = 0;
-    for finding in ordered {
-        if !finding.action().replaces_text() {
-            continue;
-        }
-
-        let range = finding.range();
-        output.push_str(&input[cursor..range.start()]);
-
-        placeholder_index += 1;
-        let context = PlaceholderContext::new(placeholder_index);
+    // Phase 1: format and validate every replaced finding in order, so the
+    // formatter call order and the first error are unchanged and no partial
+    // output exists when a placeholder fails.
+    let mut placeholders: Vec<String> = Vec::new();
+    let mut output_len = input.len();
+    for finding in ordered
+        .iter()
+        .filter(|finding| finding.action().replaces_text())
+    {
+        let context = PlaceholderContext::new(placeholders.len() + 1);
         let placeholder = formatter
             .format(finding, &context)
             .map_err(|_| SecretScanError::new(SecretScanErrorCode::PlaceholderFailure))?;
@@ -230,11 +249,24 @@ pub fn redact_with_limits(
         {
             return Err(SecretScanErrorCode::InvalidPlaceholder.into());
         }
-        output.push_str(&placeholder);
+        output_len = output_len - finding.range().len() + placeholder.len();
+        placeholders.push(placeholder);
+    }
 
+    // Phase 2: copy into a buffer of exactly the final size.
+    let mut output = String::with_capacity(output_len);
+    let mut cursor = 0;
+    let replaced = ordered
+        .into_iter()
+        .filter(|finding| finding.action().replaces_text());
+    for (finding, placeholder) in replaced.zip(&placeholders) {
+        let range = finding.range();
+        output.push_str(&input[cursor..range.start()]);
+        output.push_str(placeholder);
         cursor = range.end();
     }
     output.push_str(&input[cursor..]);
+    debug_assert_eq!(output.len(), output_len);
     Ok(output)
 }
 
@@ -445,5 +477,328 @@ mod tests {
             redact(input, &[], &default_placeholder_formatter).unwrap(),
             input
         );
+    }
+
+    // ---- differential oracle: the pre-#1076 implementation, verbatim ----
+    use std::collections::{BTreeMap, BTreeSet};
+    use std::fmt::Write as _;
+
+    struct OldForbidden {
+        by_length: BTreeMap<usize, BTreeSet<String>>,
+    }
+
+    impl OldForbidden {
+        fn build(input: &str, findings: &[&Finding]) -> Self {
+            let mut by_length: BTreeMap<usize, BTreeSet<String>> = BTreeMap::new();
+            for finding in findings {
+                let range = finding.range();
+                if range.len() > MAX_PLACEHOLDER_LENGTH {
+                    continue;
+                }
+                by_length
+                    .entry(range.len())
+                    .or_default()
+                    .insert(input[range.start()..range.end()].to_string());
+            }
+            Self { by_length }
+        }
+
+        /// `true` when `placeholder` contains any indexed matched value as a
+        /// substring.
+        ///
+        /// `by_length` iterates in ascending key order, so the scan stops as
+        /// soon as a length exceeds what remains of `placeholder`.
+        fn contains(&self, placeholder: &str) -> bool {
+            for (&length, values) in &self.by_length {
+                if length == 0 || length > placeholder.len() {
+                    continue;
+                }
+                let mut start = 0;
+                while start + length <= placeholder.len() {
+                    if placeholder.is_char_boundary(start)
+                        && placeholder.is_char_boundary(start + length)
+                        && values.contains(&placeholder[start..start + length])
+                    {
+                        return true;
+                    }
+                    start += 1;
+                }
+            }
+            false
+        }
+    }
+
+    fn oracle_redact(
+        input: &str,
+        findings: &[Finding],
+        formatter: &dyn PlaceholderFormatter,
+    ) -> Result<String, SecretScanError> {
+        let ordered = ordered_and_disjoint(findings, input)?;
+        let forbidden = OldForbidden::build(input, &ordered);
+        let mut output = String::with_capacity(input.len());
+        let mut cursor = 0;
+        let mut placeholder_index = 0;
+        for finding in ordered {
+            if !finding.action().replaces_text() {
+                continue;
+            }
+            let range = finding.range();
+            output.push_str(&input[cursor..range.start()]);
+            placeholder_index += 1;
+            let context = PlaceholderContext::new(placeholder_index);
+            let placeholder = formatter
+                .format(finding, &context)
+                .map_err(|_| SecretScanError::new(SecretScanErrorCode::PlaceholderFailure))?;
+            if placeholder.is_empty()
+                || placeholder.len() > MAX_PLACEHOLDER_LENGTH
+                || forbidden.contains(&placeholder)
+            {
+                return Err(SecretScanErrorCode::InvalidPlaceholder.into());
+            }
+            output.push_str(&placeholder);
+            cursor = range.end();
+        }
+        output.push_str(&input[cursor..]);
+        Ok(output)
+    }
+
+    struct Rng(u64);
+    impl Rng {
+        fn next(&mut self) -> u64 {
+            self.0 ^= self.0 << 13;
+            self.0 ^= self.0 >> 7;
+            self.0 ^= self.0 << 17;
+            self.0
+        }
+        fn below(&mut self, n: usize) -> usize {
+            usize::try_from(self.next() % n as u64).unwrap()
+        }
+    }
+
+    /// Small alphabet with multibyte characters so that values, prefixes and
+    /// char-boundary cases collide often.
+    const ALPHABET: [&str; 8] = ["a", "b", "ab", "é", "键", "\u{1F511}", "a", "b"];
+
+    fn random_text(rng: &mut Rng, max_units: usize) -> String {
+        (0..rng.below(max_units + 1))
+            .map(|_| ALPHABET[rng.below(ALPHABET.len())])
+            .collect()
+    }
+
+    fn char_starts(text: &str) -> Vec<usize> {
+        let mut starts: Vec<usize> = text.char_indices().map(|(i, _)| i).collect();
+        starts.push(text.len());
+        starts
+    }
+
+    #[test]
+    fn differential_against_the_pre_1076_implementation() {
+        let mut rng = Rng(0x9E37_79B9_7F4A_7C15);
+        for case in 0..6000 {
+            let input = random_text(&mut rng, if case % 50 == 0 { 400 } else { 24 });
+            let bounds = char_starts(&input);
+            // Random disjoint findings, some empty, some long, mixed actions.
+            let mut findings = Vec::new();
+            let mut at = 0;
+            while at < bounds.len() {
+                if at + 1 < bounds.len() && rng.below(3) == 0 {
+                    let end_index = (at + 1 + rng.below(if case % 50 == 0 { 300 } else { 5 }))
+                        .min(bounds.len() - 1);
+                    let action =
+                        [Action::Redact, Action::Block, Action::Warn, Action::Allow][rng.below(4)];
+                    findings.push(finding("finding-1", bounds[at], bounds[end_index], action));
+                    at = end_index;
+                }
+                at += 1;
+            }
+            // Fixed placeholder pool: derived from input pieces, so some collide.
+            let mut prng = Rng(rng.next() | 1);
+            let pool: Vec<String> = (0..4)
+                .map(|_| match prng.below(6) {
+                    0 => String::new(),
+                    1 => "x".repeat(MAX_PLACEHOLDER_LENGTH + 1),
+                    2 | 3 => format!("<{}>", random_text(&mut prng, 6)),
+                    4 => random_text(&mut prng, 300),
+                    _ => format!("<R{}>", prng.below(100)),
+                })
+                .collect();
+            let fail_at = prng.below(12);
+            let build = |log: std::rc::Rc<std::cell::RefCell<Vec<usize>>>| {
+                let pool = pool.clone();
+                move |_: &Finding, context: &PlaceholderContext| {
+                    log.borrow_mut().push(context.placeholder_index());
+                    if context.placeholder_index() == fail_at {
+                        return Err(FormatterFailure);
+                    }
+                    Ok(pool[context.placeholder_index() % pool.len()].clone())
+                }
+            };
+            let old_log = std::rc::Rc::<std::cell::RefCell<Vec<usize>>>::default();
+            let new_log = std::rc::Rc::<std::cell::RefCell<Vec<usize>>>::default();
+            let old = oracle_redact(&input, &findings, &build(std::rc::Rc::clone(&old_log)));
+            let new = redact(&input, &findings, &build(std::rc::Rc::clone(&new_log)));
+            assert_eq!(
+                old.as_ref().map_err(|e| e.code()),
+                new.as_ref().map_err(|e| e.code()),
+                "case {case}"
+            );
+            assert_eq!(
+                *old_log.borrow(),
+                *new_log.borrow(),
+                "call order, case {case}"
+            );
+            if let Ok(output) = &new {
+                assert_eq!(output.capacity(), output.len(), "case {case}");
+            }
+        }
+    }
+
+    #[test]
+    fn index_matches_the_oracle_on_random_placeholders() {
+        let mut rng = Rng(0xD1B5_4A32_C192_ED03);
+        let mut hits = 0;
+        for case in 0..4000 {
+            let input = random_text(&mut rng, 40);
+            let bounds = char_starts(&input);
+            let mut findings = Vec::new();
+            let mut at = 0;
+            while at + 1 < bounds.len() {
+                let end = (at + 1 + rng.below(4)).min(bounds.len() - 1);
+                findings.push(finding("finding-1", bounds[at], bounds[end], Action::Warn));
+                at = end;
+            }
+            let refs: Vec<&Finding> = findings.iter().collect();
+            let old = OldForbidden::build(&input, &refs);
+            let new = ForbiddenMatchedText::build(&input, &refs);
+            for _ in 0..20 {
+                let placeholder = random_text(&mut rng, 12);
+                let expected = old.contains(&placeholder);
+                hits += usize::from(expected);
+                assert_eq!(expected, new.contains(&placeholder), "case {case}");
+            }
+        }
+        assert!(hits > 1000, "generator must exercise the matching branch");
+    }
+
+    #[test]
+    fn index_handles_empty_input_multibyte_and_boundary_edges() {
+        let refs: Vec<&Finding> = Vec::new();
+        assert!(!ForbiddenMatchedText::build("", &refs).contains("anything"));
+        // A value of continuation-looking bytes never matches mid-character.
+        let input = "é";
+        let findings = [finding("finding-1", 0, 2, Action::Redact)];
+        let refs: Vec<&Finding> = findings.iter().collect();
+        let index = ForbiddenMatchedText::build(input, &refs);
+        assert!(index.contains("<é>"));
+        assert!(!index.contains("<e\u{301}>"));
+        assert!(!index.contains(""));
+        // Overlong values are not indexed; value equal to the maximum is.
+        let long = "a".repeat(MAX_PLACEHOLDER_LENGTH + 1);
+        let findings = [finding("finding-1", 0, long.len(), Action::Redact)];
+        let refs: Vec<&Finding> = findings.iter().collect();
+        assert!(!ForbiddenMatchedText::build(&long, &refs).contains(&"a".repeat(256)));
+        let max = "a".repeat(MAX_PLACEHOLDER_LENGTH);
+        let findings = [finding("finding-1", 0, max.len(), Action::Redact)];
+        let refs: Vec<&Finding> = findings.iter().collect();
+        assert!(ForbiddenMatchedText::build(&max, &refs).contains(&max));
+    }
+
+    #[test]
+    fn output_capacity_equals_length_when_placeholders_grow_or_shrink() {
+        let input = "aaa|SYNTHETIC_REVOKED_VALUE|é";
+        let findings = [
+            finding("finding-1", 0, 3, Action::Redact),
+            finding("finding-2", 4, 27, Action::Redact),
+        ];
+        let output = redact(input, &findings, &default_placeholder_formatter).unwrap();
+        assert_eq!(output.capacity(), output.len());
+        let output = redact(input, &[], &default_placeholder_formatter).unwrap();
+        assert_eq!(output.capacity(), output.len());
+    }
+
+    /// Invariant fuzz (fixed seed, 20000 cases) on the public `redact`
+    /// contract: action gate, placeholder boundary, exact reconstruction,
+    /// determinism, exact capacity, and forged-range rejection without panic.
+    #[test]
+    fn redact_invariants_hold_on_20000_random_cases() {
+        let mut rng = Rng(0xA5A5_1076_0000_0001);
+        for case in 0..20_000 {
+            let input = random_text(&mut rng, 30);
+            let bounds = char_starts(&input);
+            let mut findings = Vec::new();
+            let mut at = 0;
+            while at + 1 < bounds.len() {
+                if rng.below(3) == 0 {
+                    let end = (at + 1 + rng.below(5)).min(bounds.len() - 1);
+                    let action =
+                        [Action::Redact, Action::Block, Action::Warn, Action::Allow][rng.below(4)];
+                    findings.push(finding("finding-1", bounds[at], bounds[end], action));
+                    at = end;
+                }
+                at += 1;
+            }
+            // Never reproduces any value: index-tagged placeholder.
+            let safe = |_: &Finding, context: &PlaceholderContext| {
+                Ok(format!("<#{}>", context.placeholder_index()))
+            };
+            let output = redact(&input, &findings, &safe).unwrap();
+            assert_eq!(output, redact(&input, &findings, &safe).unwrap(), "{case}");
+            assert_eq!(output.capacity(), output.len(), "{case}");
+            let mut expected = String::new();
+            let (mut cursor, mut n) = (0, 0);
+            for f in &findings {
+                let range = f.range();
+                expected.push_str(&input[cursor..range.start()]);
+                if f.action().replaces_text() {
+                    n += 1;
+                    let _ = write!(expected, "<#{n}>");
+                } else {
+                    expected.push_str(&input[range.start()..range.end()]);
+                }
+                cursor = range.end();
+            }
+            expected.push_str(&input[cursor..]);
+            assert_eq!(output, expected, "{case}");
+
+            // A placeholder embedding any finding's value is always rejected.
+            if let Some(victim) = findings.get(rng.below(findings.len().max(1))) {
+                let value = input[victim.range().start()..victim.range().end()].to_string();
+                if findings.iter().any(|f| f.action().replaces_text()) {
+                    let leaky = |_: &Finding, _: &PlaceholderContext| Ok(format!("<{value}>"));
+                    assert_eq!(
+                        redact(&input, &findings, &leaky).unwrap_err().code(),
+                        SecretScanErrorCode::InvalidPlaceholder,
+                        "{case}"
+                    );
+                }
+            }
+
+            // Forged ranges: out of bounds, mid-character, overlapping.
+            let forged = match rng.below(3) {
+                0 => vec![finding(
+                    "finding-1",
+                    0,
+                    input.len() + 1 + rng.below(3),
+                    Action::Redact,
+                )],
+                1 if input.chars().any(|c| c.len_utf8() > 1) => {
+                    let mid = input
+                        .char_indices()
+                        .find(|(_, c)| c.len_utf8() > 1)
+                        .unwrap()
+                        .0
+                        + 1;
+                    vec![finding("finding-1", mid, mid + 1, Action::Redact)]
+                }
+                _ if input.len() >= 2 => vec![
+                    finding("finding-1", 0, 2.min(input.len()), Action::Redact),
+                    finding("finding-2", 1, input.len(), Action::Redact),
+                ],
+                _ => continue,
+            };
+            let code = redact(&input, &forged, &safe).map_err(SecretScanError::code);
+            let old = oracle_redact(&input, &forged, &safe).map_err(SecretScanError::code);
+            assert_eq!(code, old, "{case}");
+        }
     }
 }
