@@ -146,6 +146,29 @@ evidence is linked from each published version.
   provider findings and other credential names give `generic-token`; reads,
   references, placeholders and non-credential names stay silent.
 
+### Performance
+
+- Reduced WebAssembly initialization time and artifact size (#1043).
+  Findings, ranges, actions and output are unchanged, and no dependency was
+  added. Chromium compiles WebAssembly lazily, so every function
+  `initialize()` touches is compiled inside it; initialization now compiles
+  38 functions (16 KB of body) instead of 100 (31.5 KB):
+  - The built-in detectors are static tables the registry borrows, with each
+    row carrying the detector's id, instead of a `Vec` of boxes built per
+    call whose ids were read through `id()`.
+  - A PII-off `initialize()` returns the off selection without walking the
+    PII family catalog, and the catalog is read as slices rather than
+    collected into sets.
+  - Stripe and New Relic share one stable candidate sort, and the `.npmrc`
+    key scan merges two ordered index runs instead of sorting them.
+
+  The `full` artifact is 568,229 bytes raw / 198,292 gzip (was 594,038 /
+  205,213) and `common` 365,741 / 130,954 (was 380,855 / 136,253). Measured
+  locally with core's own browser performance runner, 200 interleaved
+  samples a side, `scale-logs-small-whole` initialization is 0.881 [0.807,
+  0.938] of `4fb78827` and 1.187 [1.108, 1.265] of beta.8; processing is
+  unchanged.
+
 ## 0.1.0-beta.11 — 2026-09-29
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.11/README.md).
