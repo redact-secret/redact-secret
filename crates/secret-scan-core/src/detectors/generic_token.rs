@@ -7,7 +7,7 @@
 
 use super::pattern::{self, PrefixShape};
 use super::text::{
-    OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, ends_with_ci, find_ci,
+    OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, contains_ci, ends_with_ci, find_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
     is_glued_instructional_placeholder, is_glued_my_placeholder, is_horizontal_js_whitespace,
     is_instructional_token_placeholder, is_js_whitespace, is_lead_word_phrase_placeholder,
@@ -229,15 +229,14 @@ const MIN_X_MASK_RUN: usize = 4;
 /// length or a `$`-delimited crypt string (`$2b$12$...`).
 fn value_shows_masking_or_hashing(lead: &str, value: &str) -> bool {
     let bytes = value.as_bytes();
-    let lower = value.to_ascii_lowercase();
     let x_run = bytes
         .chunk_by(|left, right| left == right)
         .any(|run| matches!(run[0], b'x' | b'X') && run.len() >= MIN_X_MASK_RUN);
     let shows_mask = value.contains(['*', '\u{2022}', '\u{2026}'])
         || value.contains("...")
         || x_run
-        || lower.contains("redacted")
-        || lower.contains("masked")
+        || contains_ci(value, "redacted")
+        || contains_ci(value, "masked")
         || starts_with_digest_label(value);
     if shows_mask {
         return true;
@@ -611,9 +610,11 @@ fn is_placeholder_led_phrase(value: &str) -> bool {
     count > 0
 }
 
-fn is_boolean_null_or_digits(lower: &str) -> bool {
-    matches!(lower, "true" | "false" | "null" | "undefined")
-        || (!lower.is_empty() && lower.bytes().all(|byte| byte.is_ascii_digit()))
+fn is_boolean_null_or_digits(value: &str) -> bool {
+    ["true", "false", "null", "undefined"]
+        .iter()
+        .any(|word| value.eq_ignore_ascii_case(word))
+        || (!value.is_empty() && value.bytes().all(|byte| byte.is_ascii_digit()))
 }
 
 fn starts_with_env_reference(value: &str) -> bool {
@@ -1518,11 +1519,10 @@ fn is_source_code_expression(value: &str, form: ValueForm) -> bool {
 /// immaterial: the only check that reads it, [`is_truncated_call_expression`],
 /// needs a bracket the character class already forbids.
 fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
-    let lower = value.to_ascii_lowercase();
-    is_generic_placeholder_word(&lower)
+    is_generic_placeholder_word(value)
         || is_instructional_token_placeholder(value)
         || is_glued_my_placeholder(value)
-        || is_boolean_null_or_digits(&lower)
+        || is_boolean_null_or_digits(value)
         || starts_with_env_reference(value)
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
@@ -1661,12 +1661,11 @@ fn is_composite_with_placeholder_secret_part(value: &str) -> bool {
     {
         return false;
     }
-    let lower = last.to_ascii_lowercase();
     starts_with_env_reference(last)
         || is_template_reference(last)
         || is_interpolation_reference(last)
         || starts_with_angle_bracket_reference(last)
-        || is_generic_placeholder_word(&lower)
+        || is_generic_placeholder_word(last)
         || is_instructional_token_placeholder(last)
         || is_repeated_character_filler(last)
         || is_credential_noun_phrase(last)
@@ -1881,7 +1880,7 @@ pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
                     || is_counting_run_body(rest)
                     || starts_with_angle_bracket_reference(rest)
                     || is_repeated_character_filler(rest)
-                    || is_generic_placeholder_word(&rest.to_ascii_lowercase()))
+                    || is_generic_placeholder_word(rest))
         })
 }
 
@@ -6563,6 +6562,111 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+}
+
+/// Differential tests for #1086: the case-insensitive checks that used to run
+/// on a lowercased copy of the value now run on the value itself.
+#[cfg(test)]
+mod case_insensitive_differential_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    /// The implementation before #1086: lowercase, then compare.
+    fn old_value_shows_masking_or_hashing(lead: &str, value: &str) -> bool {
+        let bytes = value.as_bytes();
+        let lower = value.to_ascii_lowercase();
+        let x_run = bytes
+            .chunk_by(|left, right| left == right)
+            .any(|run| matches!(run[0], b'x' | b'X') && run.len() >= MIN_X_MASK_RUN);
+        let shows_mask = value.contains(['*', '\u{2022}', '\u{2026}'])
+            || value.contains("...")
+            || x_run
+            || lower.contains("redacted")
+            || lower.contains("masked")
+            || starts_with_digest_label(value);
+        if shows_mask {
+            return true;
+        }
+        HASH_NAME_LEADS.contains(&lead)
+            && ((HEX_DIGEST_LENGTHS.contains(&value.len())
+                && bytes.iter().all(u8::is_ascii_hexdigit))
+                || (value.starts_with('$') && value[1..].contains('$')))
+    }
+
+    fn old_is_boolean_null_or_digits(lower: &str) -> bool {
+        matches!(lower, "true" | "false" | "null" | "undefined")
+            || (!lower.is_empty() && lower.bytes().all(|byte| byte.is_ascii_digit()))
+    }
+
+    const WORDS: &[&str] = &[
+        "redacted",
+        "REDACTED",
+        "Masked",
+        "mAsKeD",
+        "true",
+        "FALSE",
+        "Null",
+        "UNDEFINED",
+        "changeme",
+        "CHANGE_ME",
+        "placeholder",
+        "Example",
+        "your",
+        "API",
+        "key",
+        "token",
+        "password",
+        "secret",
+        "sha256:",
+        "$2b$12$",
+        "deadbeef",
+        "123456",
+        "0000",
+        "\u{212a}ey",
+        "tru\u{e9}",
+    ];
+
+    fn inputs() -> Vec<String> {
+        let mut rng = XorShift32::new(0x1086_0001);
+        let mut out: Vec<String> = vec![String::new()];
+        out.extend(WORDS.iter().map(|word| (*word).to_owned()));
+        let mut pieces: Vec<&str> = BOUNDARY_PIECES.to_vec();
+        pieces.extend_from_slice(WORDS);
+        for _ in 0..4000 {
+            out.push(rng.text(&pieces, 6));
+        }
+        out
+    }
+
+    #[test]
+    fn masking_check_matches_the_lowercasing_implementation() {
+        for value in inputs() {
+            for lead in ["masked", "hashed", "redacted", "api"] {
+                assert_eq!(
+                    value_shows_masking_or_hashing(lead, &value),
+                    old_value_shows_masking_or_hashing(lead, &value),
+                    "{value:?} under {lead}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn placeholder_and_literal_checks_match_the_lowercasing_implementation() {
+        for value in inputs() {
+            let lower = value.to_ascii_lowercase();
+            assert_eq!(
+                is_generic_placeholder_word(&value),
+                is_generic_placeholder_word(&lower),
+                "{value:?}"
+            );
+            assert_eq!(
+                is_boolean_null_or_digits(&value),
+                old_is_boolean_null_or_digits(&lower),
+                "{value:?}"
+            );
         }
     }
 }

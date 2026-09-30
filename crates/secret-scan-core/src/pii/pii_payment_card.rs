@@ -78,7 +78,7 @@ fn detect_payment_cards(input: &str) -> Vec<Alternative> {
             && right_boundary(input, end)
             && let Some(digits) = normalize_display(&input[index..end])
             && supported_payment_range(digits.as_bytes())
-            && StructuredValidatorRegistry::validate("luhn", 1, &digits).is_ok()
+            && StructuredValidatorRegistry::validate("luhn", 1, digits.as_str()).is_ok()
             && let Some(range) = ByteRange::new(index, end)
         {
             let sensitivity = if SUPPORTED_BRAND_TEST_PANS.contains(&digits.as_str()) {
@@ -121,9 +121,32 @@ fn display_run_end(bytes: &[u8], start: usize) -> usize {
     end
 }
 
-fn normalize_display(display: &str) -> Option<String> {
+/// The digits of one display-form card number, held on the stack: at most
+/// [`MAX_PAN_DIGITS`] ASCII digits, so no heap copy of the number exists.
+struct PanDigits {
+    buffer: [u8; MAX_PAN_DIGITS],
+    len: usize,
+}
+
+impl PanDigits {
+    fn as_bytes(&self) -> &[u8] {
+        &self.buffer[..self.len]
+    }
+
+    fn as_str(&self) -> &str {
+        // The buffer only ever holds ASCII digits.
+        std::str::from_utf8(self.as_bytes()).unwrap_or_default()
+    }
+}
+
+fn normalize_display(display: &str) -> Option<PanDigits> {
     let bytes = display.as_bytes();
-    let mut digits = String::with_capacity(MAX_PAN_DIGITS);
+    let mut digits = PanDigits {
+        buffer: [0; MAX_PAN_DIGITS],
+        len: 0,
+    };
+    // Digits seen, counted past the buffer so an over-long run is rejected.
+    let mut seen = 0_usize;
     let mut separator = None;
     let mut separators = 0;
     let mut group_digits = 0;
@@ -131,7 +154,11 @@ fn normalize_display(display: &str) -> Option<String> {
     let mut groups = 0;
     for (index, byte) in bytes.iter().copied().enumerate() {
         if byte.is_ascii_digit() {
-            digits.push(char::from(byte));
+            if let Some(slot) = digits.buffer.get_mut(seen) {
+                *slot = byte;
+                digits.len = seen + 1;
+            }
+            seen += 1;
             group_digits += 1;
             continue;
         }
@@ -157,7 +184,7 @@ fn normalize_display(display: &str) -> Option<String> {
         }
     }
     (MIN_PAN_DIGITS..=MAX_PAN_DIGITS)
-        .contains(&digits.len())
+        .contains(&seen)
         .then_some(digits)
 }
 
@@ -410,5 +437,109 @@ mod tests {
     fn scanner_is_bounded_before_validation() {
         let input = format!("{} {}", "4".repeat(1_000_000), "5".repeat(1_000_000));
         assert!(detect_payment_cards(&input).is_empty());
+    }
+}
+
+/// Differential test for #1086: `normalize_display` keeps the digits on the
+/// stack instead of in a heap `String`.
+#[cfg(test)]
+mod stack_digits_differential_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    /// The implementation before #1086.
+    fn old_normalize_display(display: &str) -> Option<String> {
+        let bytes = display.as_bytes();
+        let mut digits = String::with_capacity(MAX_PAN_DIGITS);
+        let mut separator = None;
+        let mut separators = 0;
+        let mut group_digits = 0;
+        let mut group_lengths = [0_usize; 5];
+        let mut groups = 0;
+        for (index, byte) in bytes.iter().copied().enumerate() {
+            if byte.is_ascii_digit() {
+                digits.push(char::from(byte));
+                group_digits += 1;
+                continue;
+            }
+            if !is_separator(byte)
+                || index == 0
+                || index + 1 == bytes.len()
+                || separators == MAX_SEPARATORS
+                || separator.is_some_and(|existing| existing != byte)
+            {
+                return None;
+            }
+            group_lengths[groups] = group_digits;
+            groups += 1;
+            separator = Some(byte);
+            separators += 1;
+            group_digits = 0;
+        }
+        if separator.is_some() {
+            group_lengths[groups] = group_digits;
+            groups += 1;
+            if !matches!(&group_lengths[..groups], [4, 4, 4, 4] | [4, 6, 5]) {
+                return None;
+            }
+        }
+        (MIN_PAN_DIGITS..=MAX_PAN_DIGITS)
+            .contains(&digits.len())
+            .then_some(digits)
+    }
+
+    #[test]
+    fn normalized_digits_match_the_string_implementation() {
+        let pieces: Vec<&str> = BOUNDARY_PIECES
+            .iter()
+            .copied()
+            .chain([
+                "0000", "1234", "4111", "12345", "123456", " ", "-", "--", "  ",
+            ])
+            .collect();
+        let mut rng = XorShift32::new(0x1086_0006);
+        let mut inputs: Vec<String> = vec![
+            String::new(),
+            "-".to_owned(),
+            "4111111111111111".to_owned(),
+            "4111 1111 1111 1111".to_owned(),
+            "4111-1111-1111-1111".to_owned(),
+            "3400 123456 12345".to_owned(),
+            "0".repeat(MAX_PAN_DIGITS),
+            "0".repeat(MAX_PAN_DIGITS + 1),
+            "0".repeat(MAX_PAN_DIGITS * 4),
+            "0".repeat(MIN_PAN_DIGITS - 1),
+        ];
+        for _ in 0..8000 {
+            inputs.push(rng.text(&pieces, 9));
+        }
+        // Digit runs of every length with group separators, so the accepted
+        // and the over-long cases are both common.
+        for _ in 0..4000 {
+            let separator = ["", " ", "-", ".", "\u{a0}"][rng.below(5)];
+            let groups = 1 + rng.below(6);
+            let mut display = String::new();
+            for group in 0..groups {
+                if group > 0 {
+                    display.push_str(separator);
+                }
+                for _ in 0..rng.below(8) {
+                    display.push(char::from(b'0' + u8::try_from(rng.below(10)).unwrap_or(0)));
+                }
+            }
+            inputs.push(display);
+        }
+        let mut hits = 0;
+        for input in &inputs {
+            let old = old_normalize_display(input);
+            let new = normalize_display(input);
+            assert_eq!(
+                new.as_ref().map(PanDigits::as_str),
+                old.as_deref(),
+                "{input:?}"
+            );
+            hits += usize::from(old.is_some());
+        }
+        assert!(hits > 20, "the generator must reach the accepted cases");
     }
 }

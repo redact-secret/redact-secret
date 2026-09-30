@@ -192,6 +192,15 @@ evidence is linked from each published version.
 
 ### Performance
 
+- Detectors no longer copy a matched value, line or name into a lowercased
+  `String` just to compare it case-insensitively: the generic-token and
+  connection-string placeholder checks, the keyword-gated provider checks
+  (call, host, model route, provider field, WebSocket token subprotocol),
+  the AWS secret-access-key name check and the reserved email-domain check
+  compare in place, and the payment-card digits are held on the stack. Fewer
+  owned plaintext copies (#1086, from #1079); no output change: findings,
+  ranges, ids and order are identical, and each site is tested against its
+  previous implementation.
 - Per-scan and per-line work no longer repeats. Always-run detectors skip
   bytes that cannot start a match (discord, bearer, generic-token
   authorization, the shared case-insensitive keyword search) (#1073);
