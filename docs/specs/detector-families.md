@@ -25,9 +25,10 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `apify_api_token` | `apify-api-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Apify docs placeholder prefix, R4; provider-authored leak linter alphabet and floor, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `atlassian_api_token` | `atlassian-api-token` | `always-redact` | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `authorization_credential` | `generic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
-| `aws_access_key_id` | `aws-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `aws_access_key_id` | `aws-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; `AKIA` and `ASIA` + 16 `[A-Z0-9]`, the `ASIA` contract T2 in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `aws_bedrock_long_term_api_key` | `aws-bedrock-long-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; grammar in `detectors::aws_bedrock`'s module doc, `ABSK` + standard Base64 with `={0,2}` padding (T1, maintainer ruling accepted 2026-09-27 on the AWS Security Blog scan pattern, [#778](https://github.com/redact-secret/redact-secret/issues/778)), 109-269 body bytes (T2), recorded in [#864 evidence](../audits/evidence/864/README.md) |
 | `aws_bedrock_short_term_api_key` | `aws-bedrock-short-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; two families rather than one (client-minted presigned URL vs issued credential), `bedrock-api-key-` prefix + fixed 133-byte Base64 head + standard Base64 alphabet (T1, maintainer ruling accepted 2026-09-27 on the AWS token-generator SDKs (python/js/java) plus the AWS Security Blog, [#779](https://github.com/redact-secret/redact-secret/issues/779)), tail floor and total length T2, recorded in [#864 evidence](../audits/evidence/864/README.md) |
+| `aws_secret_access_key` | `aws-secret-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T2, context-constrained (name or adjacent `AKIA`/`ASIA` ID), grammar and trade-offs in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
@@ -71,8 +72,9 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `github_oauth_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `gitlab_runner_authentication_token` | `gitlab-runner-authentication-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
-| `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); the routable `glpat-` form is reported whole since [#1022](https://github.com/redact-secret/redact-secret/issues/1022) (T1), grammar in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `google_api_key` | `google-api-key` | `always-redact` | [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](../decisions/2026-09-24-redact-google-api-keys-inside-firebase-web-config.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
+| `google_oauth_client_secret` | `google-oauth-client-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T2, grammar and trade-offs in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `grafana_cloud_access_policy_token` | `grafana-cloud-access-policy-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_service_account_token` | `grafana-service-account-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `groq_api_key` | `groq-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -854,6 +856,89 @@ such as a snake_case identifier of exactly that width or a padded placeholder
 (the #867 precedent); rare. Cost: two four-byte prefixes on the shared
 known-format scan; `c` is a common lead byte, so the shared prefilter skips
 the scan on input where the byte pairs of neither prefix all occur.
+## Unsupported-variant contracts (#1012)
+
+Issue [#1012](https://github.com/redact-secret/redact-secret/issues/1012)
+froze contract research for the credential variants the pinned support
+matrix lists as `unsupported`
+([evidence](../audits/evidence/1012/README.md)). This section records the
+READY outcomes and product gaps that are implemented. No row is a
+support-status claim; promotion stays gated on core conformance and the
+benchmarks arrival and profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `gitlab:routable-personal-access-token` | `gitlab-token` | `glpat-` + unpadded base64url `[A-Za-z0-9_-]{27,300}` + `.` + 2 base36 version + `.` + 2 base36 payload length (equal to the payload length) + 7 base36 CRC-32 of every byte from `g` through the length holder; the whole value is the span, and a `[A-Za-z0-9_-]` byte glued after the CRC rejects the routable form | `gitlab_token` (unchanged) | T1 (GitLab generator, decoder, PAT model and design document; provider-authored rules, R2) |
+| `aws:sts-temporary-access-key` | `aws-access-key` | `ASIA` + exactly 16 `[A-Z0-9]` (20 in total); a `[A-Za-z0-9]` byte before or after rejects the match; typed, actioned and bounded exactly like `AKIA` | `aws_access_key_id` (unchanged) | prefix T1 (AWS IAM identifiers docs); body T2 (AWS docs example, AWS-owned git-secrets and ferret-scan rules, four peer scanners); T1 if R2 is applied to ferret-scan |
+| `aws:iam-user-secret-access-key` | `aws-secret-access-key` | exactly 40 `[A-Za-z0-9/+]` with at least one uppercase and one lowercase letter; no `[A-Za-z0-9/+]` byte before and no `[A-Za-z0-9/+=]` byte after; claimed only under an AWS secret access key name (compact name ending `secretaccesskey`, `awssecretkey` or `awssecret`, or the phrase `secret access key`, then `=` or `:`) or on the line of, or directly below, an `AKIA`/`ASIA` access key ID | `aws_secret_access_key` | T2, context-constrained (AWS docs example, AWS-owned git-secrets and ferret-scan rules, peer scanners); T1 if R2 is applied; AWS Macie makes context T1; the name list, adjacency window and mixed-case guard are policy |
+| `google:oauth2-credential` (client secret) | `google-oauth-client-secret` | `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]` (35 in total); a `[A-Za-z0-9_-]` byte before or after rejects the match, and any other width is rejected whole | `google_oauth_client_secret` | T2 (Google's osv-scalibr rule, noseyparker, CredSweeper); T1 if R2 is applied to osv-scalibr |
+
+AWS temporary access key IDs
+([#1027](https://github.com/redact-secret/redact-secret/issues/1027),
+[handoff](../audits/evidence/1012/aws-sts-temporary-access-key.md)).
+`aws-access-key` already claimed `ASIA` beside `AKIA`; #1027 records the
+contract, conformance and tests without changing the grammar. The ID is an
+identifier, usable only with its secret access key and session token;
+redacting a bare ID stays the product policy, as for `AKIA`. The body class
+is the wider `[A-Z0-9]`, since no AWS source settles Base32. False negatives:
+IDs of 17 to 128 characters or with lowercase, which the STS API allows but
+no example or rule shows. False positives: a 20-character uppercase
+identifier that happens to start `ASIA`. `ABIA` and `ACCA` are identifiers
+(#1012) and stay unclaimed.
+
+AWS secret access keys
+([#1028](https://github.com/redact-secret/redact-secret/issues/1028),
+[handoff](../audits/evidence/1012/aws-iam-user-secret-access-key.md)). The
+value has no prefix, so the contract is context-constrained, as AWS's own
+detectors (Macie, git-secrets, ferret-scan) are. A new detector,
+`aws-secret-access-key`, reports `aws_secret_access_key` at provider
+specificity, high and always redacted, so it wins the overlap with the
+`contextual_secret` that `generic-token` reports under the same names. The
+name is read back over at most 96 bytes of the value's line. The adjacency
+rule reads the value's own line and the line directly above it; the
+incremental session holds a line that carries an access key ID open for one
+more line, so streamed and whole-input scans agree. The mixed-case guard
+keeps a 40-hex Git SHA out. False negatives: a bare secret with no name or
+ID, an ID on the line below the secret or two lines away, a 41-byte
+temporary secret and a padded value (both still redacted by `generic-token`
+under a name). False positives: a 40-character mixed-case Base64-alphabet
+value under an AWS secret name, or on or below an access key ID line, that
+is not a secret. The AWS documentation example secret stays exempt by exact
+equality (the pipeline's vendor placeholder literals). Cost: a literal check,
+one access-key-ID scan and one pass over each line's Base64 runs.
+
+Google OAuth client secrets
+([#1029](https://github.com/redact-secret/redact-secret/issues/1029),
+[handoff](../audits/evidence/1012/google-oauth2-credential.md)). Google
+publishes no grammar; its own osv-scalibr rule was narrowed to exactly 28
+body bytes in 2025, and two peer rules agree. The detector reports the
+bare value, which gave no finding before, and wins the overlap with the
+`client_secret` `contextual_secret` and with `bearer_token`. `google` is not
+added to `generic-token`'s dedicated-provider deferral list, so unprefixed
+legacy secrets under `GOOGLE_*` names stay redacted by context. The access
+token `ya29.` and the refresh token `1//` stay unclaimed (BLOCKED in #1012).
+False negatives: unprefixed legacy secrets outside named contexts, a future
+width change. False positives: a `GOCSPX-` + 28 value that is not a Google
+client secret, none known; a padded placeholder of exactly that width is
+claimed (the #867 precedent). Cost: one prefix on the shared known-format
+scan.
+
+GitLab routable personal access tokens
+([#1022](https://github.com/redact-secret/redact-secret/issues/1022),
+[handoff](../audits/evidence/1012/gitlab-routable-personal-access-token.md)).
+Every PAT GitLab.com has issued since 2025-07-24 is routable. Before #1022
+the legacy `glpat-` + 20 run stopped at the first `.`, so the
+`.<version>.<length><crc>` tail stayed in plaintext after redaction. The
+routable branch reuses the offline length-holder and CRC-32 check of the
+routable `glrt-` form (#730) and reports the whole value. A value whose tail
+does not verify (the unversioned 2024-11 to 2025-04 form, an instance or
+admin-custom prefix whose CRC covers another prefix, a corrupted CRC, a
+glued byte) is not reported whole, and keeps the unchanged legacy match over
+the payload run, so no previously redacted byte is released. False
+negatives: the tail of those non-verifying forms; a future version whose
+layout changes. False positives: none known; a chance CRC match is about one
+in 78 billion. Cost: one CRC-32 over at most 319 bytes, only after a
+`glpat-` run that ends at `.`.
 
 ## Rules
 
@@ -906,6 +991,10 @@ the scan on input where the byte pairs of neither prefix all occur.
 | The Cloudflare account-token prefix is adopted under the frozen `cfut_` contract. | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Hugging Face organization-token prefix is adopted under `hf_`'s frozen body grammar, tiered as T2. | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack credential family is completed: the user-token grammar and the rotation family's version section are frozen. | [Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| Google OAuth client secrets `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]` are reported as `google_oauth_client_secret` at provider specificity, bare or in any context; `ya29.` access tokens and `1//` refresh tokens stay unclaimed (T2, [#1029](https://github.com/redact-secret/redact-secret/issues/1029), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| AWS secret access keys, exactly 40 `[A-Za-z0-9/+]` with mixed case, are reported as `aws_secret_access_key` at provider specificity only under an AWS secret access key name or on or directly below an `AKIA`/`ASIA` ID line (T2, context-constrained, [#1028](https://github.com/redact-secret/redact-secret/issues/1028), section above). | generic policy default, no dedicated ADR; applies the existing context-gated provider policy (the Twilio and Confluent paired-identifier precedent) to one more family |
+| AWS `ASIA` + exactly 16 `[A-Z0-9]` temporary access key IDs are reported as `aws_access_key_id`, typed and actioned exactly like `AKIA` (T2, [#1027](https://github.com/redact-secret/redact-secret/issues/1027), section above). | generic policy default, no dedicated ADR; records the existing `aws-access-key` claim as a contract |
+| A routable GitLab `glpat-` personal access token whose length holder and CRC-32 verify is reported as one `gitlab_token` finding through its last CRC byte; a non-verifying dotted tail keeps the legacy payload match ([#1022](https://github.com/redact-secret/redact-secret/issues/1022), section above). This closes the routable-PAT gap the GitLab inventory ADR tracked. | generic policy default, no dedicated ADR; applies the existing routable `glrt-` grammar (#730) to one more GitLab prefix |
 | The GitLab token-prefix table is inventoried, and its two undeclared prefixes are given a contract. | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `pinecone-api-key` reports a legacy lowercase `8-4-4-4-12` UUID as `pinecone_api_key` at high confidence only when it is the value assigned to a Pinecone API-key name on the same line: a name normalizing to `pinecone_api_key`/`pinecone_apikey`/`pinecone_key`, or to `api_key`/`apikey` on a line containing `pinecone`. A bare UUID, a UUID under an id-named key, a UUID whose name is on another line, and an all-one-digit placeholder UUID stay unclaimed ([#702](https://github.com/redact-secret/redact-secret/issues/702)). | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
 | GitHub's six token families map onto six independent finding types under one detector. | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |

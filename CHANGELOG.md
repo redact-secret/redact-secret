@@ -27,6 +27,35 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- `google-oauth-client-secret` (#1029): Google OAuth client secrets,
+  `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]`, as `google_oauth_client_secret`
+  (always redacted), bare or in any context.
+- `aws-secret-access-key` (#1028): the AWS secret access key, exactly 40
+  `[A-Za-z0-9/+]` with mixed case, as `aws_secret_access_key` (always
+  redacted), claimed only under an AWS secret key name or on or directly
+  below an `AKIA`/`ASIA` access key ID line. The incremental session holds an
+  ID line open for one more line.
+- The AWS temporary access key ID contract (`ASIA` + exactly 16 `[A-Z0-9]`,
+  T2) is recorded beside `AKIA` with conformance fixtures and tests (#1027).
+  Grammar, type and action are unchanged.
+
+### Fixed
+
+- `gitlab-token` reports a routable GitLab personal access token
+  (`glpat-<payload>.<version>.<length><crc>`, every PAT GitLab.com issues
+  since 2025-07-24) as one `gitlab_token` finding through its last CRC byte
+  when the length holder and CRC-32 verify (#1022). Before, the finding
+  stopped at the first `.` and the version, length and CRC tail stayed in
+  plaintext. A tail that does not verify keeps the unchanged legacy match.
+- `generic-token` redacts the value of the `.npmrc` credential keys
+  `_authToken`, `_auth` and `_password` (registry-scoped `//host/:_authToken=`
+  or at line start) as a high `contextual_secret` (#1024). The leading `_`
+  kept them outside the assignment grammar, so private-registry tokens and
+  legacy UUIDs on these lines had no finding.
+- `generic-token` treats `secret_access_key` as a high-signal credential name
+  (#1026), so the AWS API member `"SecretAccessKey": "..."` (STS, IAM and
+  CloudFormation JSON, SDK `secretAccessKey`) is redacted at any width. Before,
+  only `aws_secret_access_key` was a name and the JSON form had no finding.
 
 ### Fixed
 

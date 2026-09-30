@@ -41,6 +41,13 @@
       "schemes": null
     },
     {
+      "type": "aws_secret_access_key",
+      "detector": "aws-secret-access-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "AWS_SECRET_ACCESS_KEY=SyntheticRevokedAwsSecretAccessKeyValue0",
+      "schemes": null
+    },
+    {
       "type": "github_token",
       "detector": "github-token",
       "policyClass": "always-redact",
@@ -248,6 +255,13 @@
       "detector": "google-api-key",
       "policyClass": "always-redact",
       "reconciliationTrigger": "AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
+      "schemes": null
+    },
+    {
+      "type": "google_oauth_client_secret",
+      "detector": "google-oauth-client-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0047OCSPX-SyntheticRevokedGoogleClient",
       "schemes": null
     },
     {

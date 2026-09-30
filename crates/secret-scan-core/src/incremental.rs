@@ -67,10 +67,10 @@
 use std::borrow::Cow;
 
 use crate::detectors::{
-    PrivateKeyRetentionTracker, continues_previous_line, has_open_bearer_authorization,
-    has_open_confluent_properties, has_open_contextual_assignment, has_open_deepgram_request,
-    has_open_heroku_legacy_context, has_open_list_item_pair, has_open_provider_sibling,
-    has_open_twilio_cli_table, is_open_tail_neutral,
+    PrivateKeyRetentionTracker, continues_previous_line, has_open_aws_access_key_id_line,
+    has_open_bearer_authorization, has_open_confluent_properties, has_open_contextual_assignment,
+    has_open_deepgram_request, has_open_heroku_legacy_context, has_open_list_item_pair,
+    has_open_provider_sibling, has_open_twilio_cli_table, is_open_tail_neutral,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 #[cfg(test)]
@@ -111,6 +111,11 @@ const HEROKU_LEGACY_DETECTOR_ID: &str = "heroku-api-key-legacy";
 /// holds a unit open for its layout.
 const TWILIO_AUTH_TOKEN_DETECTOR_ID: &str = "twilio-auth-token";
 const CONFLUENT_LEGACY_DETECTOR_ID: &str = "confluent-cloud-api-secret-legacy";
+
+/// The built-in detector that reads an AWS access key ID on the line above a
+/// secret access key (issue #1028): a session holds a line carrying an ID
+/// open for exactly one more line.
+const AWS_SECRET_ACCESS_KEY_DETECTOR_ID: &str = "aws-secret-access-key";
 
 /// Explicit, positive byte limits every incremental session requires. There
 /// are no environment-derived or silent defaults.
@@ -380,6 +385,7 @@ struct LookbackHints {
     list_item_pair: bool,
     provider_sibling: bool,
     deepgram_request: bool,
+    aws_secret_access_key: bool,
 }
 
 impl LookbackHints {
@@ -391,6 +397,7 @@ impl LookbackHints {
             list_item_pair: reads_list_item_pairs(registry),
             provider_sibling: reads_provider_siblings(registry),
             deepgram_request: registry.contains(DEEPGRAM_DETECTOR_ID),
+            aws_secret_access_key: registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID),
         }
     }
 }
@@ -741,7 +748,7 @@ impl IncrementalSanitizer {
     /// The scan copy is maintained as pieces arrive rather than rebuilt here,
     /// and the two tail checks, whose backward scan crosses any run of blank
     /// lines, reuse their last result when only whitespace has arrived since
-    /// (issue #986). The three lookback checks read a bounded number of lines
+    /// (issue #986). The four lookback checks read a bounded number of lines
     /// and run as before. Only the current unit is judged: closed units
     /// waiting in the batch are never part of it (issue #985).
     fn has_open_single_line_construct(&mut self) -> bool {
@@ -762,7 +769,8 @@ impl IncrementalSanitizer {
             || (lookbacks.confluent_legacy && has_open_confluent_properties(scanned))
             || (lookbacks.list_item_pair && has_open_list_item_pair(scanned))
             || (lookbacks.provider_sibling && has_open_provider_sibling(scanned))
-            || (lookbacks.deepgram_request && has_open_deepgram_request(scanned));
+            || (lookbacks.deepgram_request && has_open_deepgram_request(scanned))
+            || (lookbacks.aws_secret_access_key && has_open_aws_access_key_id_line(scanned));
         #[cfg(test)]
         self.assert_open_construct_matches_the_rescan(open);
         open
@@ -794,7 +802,9 @@ impl IncrementalSanitizer {
             || (reads_list_item_pairs(&self.registry) && has_open_list_item_pair(&rescanned))
             || (reads_provider_siblings(&self.registry) && has_open_provider_sibling(&rescanned))
             || (self.registry.contains(DEEPGRAM_DETECTOR_ID)
-                && has_open_deepgram_request(&rescanned));
+                && has_open_deepgram_request(&rescanned))
+            || (self.registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID)
+                && has_open_aws_access_key_id_line(&rescanned));
         assert_eq!(open, reference, "open single-line construct");
     }
 

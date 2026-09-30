@@ -110,6 +110,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "aws-asia-positive-chat-sentence",
+            "aws-asia-positive-credentials-file",
+            "aws-asia-positive-digits-outside-base32",
+            "aws-asia-positive-dotenv",
+            "aws-asia-positive-sts-json",
             "aws-positive-akia",
             "aws-positive-asia-canonical",
             "aws-positive-example-shaped-value-in-comment-context",
@@ -138,6 +143,10 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "aws-asia-boundary-asib-prefix",
+            "aws-asia-boundary-body-fifteen",
+            "aws-asia-boundary-body-seventeen",
+            "aws-asia-boundary-lowercase-byte",
             "aws-boundary-embedded"
           ],
           "state": "supported"
@@ -145,6 +154,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "aws-asia-negative-other-iam-identifiers",
             "aws-negative-account-id",
             "aws-negative-arn-resource",
             "aws-negative-arn-role",
@@ -159,6 +169,10 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "aws-asia-boundary-asib-prefix",
+            "aws-asia-boundary-body-fifteen",
+            "aws-asia-boundary-body-seventeen",
+            "aws-asia-boundary-lowercase-byte",
             "aws-boundary-embedded"
           ],
           "state": "supported"
@@ -394,6 +408,89 @@
       ],
       "note": "Coverage declaration for aws_bedrock_short_term_api_key (aws-bedrock-short-term-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "aws_bedrock_short_term_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "aws-secret-access-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-positive-aws-configure-prompt",
+            "aws-secret-access-key-positive-console-csv",
+            "aws-secret-access-key-positive-credentials-file",
+            "aws-secret-access-key-positive-dotenv",
+            "aws-secret-access-key-positive-iam-create-access-key-json",
+            "aws-secret-access-key-positive-line-below-temporary-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-overlap-contextual-name"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-adversarial-long-line"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-boundary-below-unclaimed-identifier",
+            "aws-secret-access-key-boundary-dash-inside"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-negative-bare-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "aws-secret-access-key-boundary-below-unclaimed-identifier",
+            "aws-secret-access-key-boundary-dash-inside"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for aws_secret_access_key (aws-secret-access-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "aws_secret_access_key"
     },
     {
       "behaviorClass": "provider",
@@ -1089,7 +1186,17 @@
             "gitlab-positive-log",
             "gitlab-positive-min-length",
             "gitlab-positive-personal-access",
-            "gitlab-positive-yaml"
+            "gitlab-positive-yaml",
+            "gitlab-routable-pat-positive-bare-max-payload",
+            "gitlab-routable-pat-positive-bare-min-payload",
+            "gitlab-routable-pat-positive-curl-bearer",
+            "gitlab-routable-pat-positive-dotenv",
+            "gitlab-routable-pat-positive-json",
+            "gitlab-routable-pat-positive-legacy-twenty-byte-unchanged",
+            "gitlab-routable-pat-positive-private-token-header",
+            "gitlab-routable-pat-positive-sdk-call",
+            "gitlab-routable-pat-positive-yaml",
+            "gitlab-routable-pat-regression-sentence-period"
           ],
           "state": "supported"
         },
@@ -1103,7 +1210,8 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "gitlab-adversarial-long-suffix"
+            "gitlab-adversarial-long-suffix",
+            "gitlab-routable-pat-adversarial-repeated-dotted-prefix"
           ],
           "state": "supported"
         },
@@ -1116,7 +1224,12 @@
             "gitlab-boundary-delimiter",
             "gitlab-boundary-invalid-alphabet",
             "gitlab-boundary-routable-short-payload",
-            "gitlab-boundary-routable-truncated-match"
+            "gitlab-boundary-routable-truncated-match",
+            "gitlab-routable-pat-boundary-crc-mismatch",
+            "gitlab-routable-pat-boundary-glued-trailing-byte",
+            "gitlab-routable-pat-boundary-length-holder-mismatch",
+            "gitlab-routable-pat-boundary-payload-below-floor",
+            "gitlab-routable-pat-boundary-unversioned-form"
           ],
           "state": "supported"
         },
@@ -1142,7 +1255,12 @@
             "gitlab-boundary-delimiter",
             "gitlab-boundary-invalid-alphabet",
             "gitlab-boundary-routable-short-payload",
-            "gitlab-boundary-routable-truncated-match"
+            "gitlab-boundary-routable-truncated-match",
+            "gitlab-routable-pat-boundary-crc-mismatch",
+            "gitlab-routable-pat-boundary-glued-trailing-byte",
+            "gitlab-routable-pat-boundary-length-holder-mismatch",
+            "gitlab-routable-pat-boundary-payload-below-floor",
+            "gitlab-routable-pat-boundary-unversioned-form"
           ],
           "state": "supported"
         },
@@ -3964,6 +4082,96 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "google-oauth-client-secret",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "google-oauth-client-secret-positive-bare",
+            "google-oauth-client-secret-positive-chat-sentence",
+            "google-oauth-client-secret-positive-client-secret-json",
+            "google-oauth-client-secret-positive-dash-underscore-body",
+            "google-oauth-client-secret-positive-dotenv",
+            "google-oauth-client-secret-positive-form-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "google-oauth-client-secret-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "google-oauth-client-secret-adversarial-repeated-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "google-oauth-client-secret-boundary-body-27",
+            "google-oauth-client-secret-boundary-body-29",
+            "google-oauth-client-secret-boundary-glued-before",
+            "google-oauth-client-secret-boundary-lowercase-prefix",
+            "google-oauth-client-secret-boundary-underscore-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "google-oauth-client-secret-negative-client-id",
+            "google-oauth-client-secret-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "google-oauth-client-secret-boundary-body-27",
+            "google-oauth-client-secret-boundary-body-29",
+            "google-oauth-client-secret-boundary-glued-before",
+            "google-oauth-client-secret-boundary-lowercase-prefix",
+            "google-oauth-client-secret-boundary-underscore-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for google_oauth_client_secret (google-oauth-client-secret), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "google_oauth_client_secret"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "sendgrid-token",
       "dimensions": [
         {
@@ -5184,6 +5392,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "aws-secret-access-key-name-positive-sdk-camel-case",
+            "aws-secret-access-key-name-positive-sts-json",
+            "aws-secret-access-key-name-positive-yaml",
             "contextual-host-chat",
             "contextual-host-dotenv",
             "contextual-host-http",
@@ -5268,6 +5479,12 @@
             "generic-token-sdk-call-positive-python-kwarg-spaced",
             "generic-token-sdk-call-positive-rust-builder-positional",
             "generic-token-sdk-call-positive-typescript-named-argument",
+            "npmrc-auth-positive-base64-userinfo",
+            "npmrc-authtoken-positive-bare-line-start",
+            "npmrc-authtoken-positive-private-registry",
+            "npmrc-authtoken-positive-registry-scoped-uuid",
+            "npmrc-authtoken-positive-shell-echo",
+            "npmrc-password-positive-quoted",
             "regression-generic-token-markdown-inline-code-boundary",
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
@@ -5381,6 +5598,9 @@
         {
           "dimension": "host-context",
           "evidenceFixtureIds": [
+            "aws-secret-access-key-name-positive-sdk-camel-case",
+            "aws-secret-access-key-name-positive-sts-json",
+            "aws-secret-access-key-name-positive-yaml",
             "contextual-adversarial-overlong",
             "contextual-host-chat",
             "contextual-host-dotenv",
@@ -5533,6 +5753,12 @@
             "generic-token-sdk-call-positive-typescript-named-argument",
             "invisible-contextual-keyword-zwsp",
             "invisible-contextual-value-zwsp",
+            "npmrc-auth-positive-base64-userinfo",
+            "npmrc-authtoken-positive-bare-line-start",
+            "npmrc-authtoken-positive-private-registry",
+            "npmrc-authtoken-positive-registry-scoped-uuid",
+            "npmrc-authtoken-positive-shell-echo",
+            "npmrc-password-positive-quoted",
             "regression-generic-token-markdown-inline-code-boundary",
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
@@ -13501,6 +13727,7 @@
             "aws-adversarial-long-suffix",
             "aws-bedrock-long-term-api-key-adversarial-dense-findings",
             "aws-bedrock-short-term-api-key-adversarial-dense-findings",
+            "aws-secret-access-key-adversarial-long-line",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
@@ -13541,8 +13768,10 @@
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
+            "gitlab-routable-pat-adversarial-repeated-dotted-prefix",
             "gitlab-runner-token-adversarial-long-suffix",
             "google-adversarial-long-suffix",
+            "google-oauth-client-secret-adversarial-repeated-prefix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
             "groq-api-key-adversarial-long-suffix",
@@ -13576,6 +13805,7 @@
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
+            "npmrc-auth-adversarial-repeated-keys",
             "nvidia-api-key-adversarial-long-body-run",
             "nvidia-api-key-adversarial-long-run",
             "okta-api-token-adversarial-dense-findings",
@@ -13964,6 +14194,7 @@
             "aws-adversarial-long-suffix",
             "aws-bedrock-long-term-api-key-adversarial-dense-findings",
             "aws-bedrock-short-term-api-key-adversarial-dense-findings",
+            "aws-secret-access-key-adversarial-long-line",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
@@ -14004,8 +14235,10 @@
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
+            "gitlab-routable-pat-adversarial-repeated-dotted-prefix",
             "gitlab-runner-token-adversarial-long-suffix",
             "google-adversarial-long-suffix",
+            "google-oauth-client-secret-adversarial-repeated-prefix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
             "groq-api-key-adversarial-long-suffix",
@@ -14039,6 +14272,7 @@
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
+            "npmrc-auth-adversarial-repeated-keys",
             "nvidia-api-key-adversarial-long-body-run",
             "nvidia-api-key-adversarial-long-run",
             "okta-api-token-adversarial-dense-findings",

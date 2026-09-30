@@ -189,7 +189,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-98 built-in detectors emit 122 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+100 built-in detectors emit 124 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -197,6 +197,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `aws-access-key` | `aws_access_key_id` | `always-redact` | — |
 | `aws-bedrock-long-term-api-key` | `aws_bedrock_long_term_api_key` | `always-redact` | — |
 | `aws-bedrock-short-term-api-key` | `aws_bedrock_short_term_api_key` | `always-redact` | — |
+| `aws-secret-access-key` | `aws_secret_access_key` | `always-redact` | — |
 | `github-token` | `github_token`, `github_oauth_token`, `github_app_user_to_server_token`, `github_app_installation_token`, `github_app_refresh_token`, `github_fine_grained_personal_access_token` | `always-redact` | — |
 | `gitlab-token` | `gitlab_token` | `always-redact` | — |
 | `openai-token` | `openai_api_key`, `openai_admin_api_key` | `always-redact` | — |
@@ -216,6 +217,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `vercel-token` | `vercel_token` | `always-redact` | — |
 | `npm-token` | `npm_access_token` | `always-redact` | — |
 | `google-api-key` | `google_api_key` | `always-redact` | — |
+| `google-oauth-client-secret` | `google_oauth_client_secret` | `always-redact` | — |
 | `sendgrid-token` | `sendgrid_api_key` | `always-redact` | — |
 | `microsoft-entra-client-secret` | `microsoft_entra_client_secret` | `always-redact` | — |
 | `azure-devops-personal-access-token` | `azure_devops_personal_access_token` | `always-redact` | — |

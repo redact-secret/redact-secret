@@ -37,6 +37,7 @@ mod firecrawl;
 mod generic_token;
 mod github;
 mod gitlab;
+mod google_oauth;
 mod grafana;
 mod helicone;
 mod heroku;
@@ -89,6 +90,7 @@ use private_key::PrivateKeyDetector;
 use prefilter::Literals;
 pub(crate) use prefilter::{PairSet, RequiredLiterals};
 
+pub(crate) use aws::has_open_aws_access_key_id_line;
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{
@@ -143,11 +145,16 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
 }
 
 /// Every built-in detector, in canonical registration order.
+///
+/// One entry per line by contract (`scripts/measure-detector-cost.mjs`
+/// comments entries out by line), so the list outgrows the line lint.
 #[must_use]
+#[allow(clippy::too_many_lines)]
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(PrivateKeyDetector),
         Box::new(aws::AwsAccessKeyDetector),
+        Box::new(aws::AwsSecretAccessKeyDetector),
         Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
         Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
         Box::new(github::GitHubTokenDetector),
@@ -169,6 +176,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::VERCEL),
         Box::new(additional_providers::NPM),
         Box::new(additional_providers::GOOGLE),
+        Box::new(google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
@@ -316,6 +324,7 @@ pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
 /// `prefilter::tests::only_the_reviewed_built_ins_run_on_every_call`).
 const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     ("aws-access-key", aws::REQUIRED_LITERALS),
+    ("aws-secret-access-key", aws::SECRET_REQUIRED_LITERALS),
     (
         "aws-bedrock-long-term-api-key",
         aws_bedrock::LONG_TERM_REQUIRED_LITERALS,
@@ -397,6 +406,12 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     (
         additional_providers::GOOGLE.detector_id(),
         &[Literals::Shapes(additional_providers::GOOGLE.shapes())],
+    ),
+    (
+        google_oauth::GOOGLE_OAUTH_CLIENT_SECRET.detector_id(),
+        &[Literals::Shapes(
+            google_oauth::GOOGLE_OAUTH_CLIENT_SECRET.shapes(),
+        )],
     ),
     (
         datadog::DATADOG_APPLICATION_KEY.detector_id(),
@@ -606,6 +621,7 @@ pub(crate) enum Pack {
 pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("private-key", Pack::Common),
     ("aws-access-key", Pack::Provider),
+    ("aws-secret-access-key", Pack::Provider),
     ("aws-bedrock-long-term-api-key", Pack::Provider),
     ("aws-bedrock-short-term-api-key", Pack::Provider),
     ("github-token", Pack::Provider),
@@ -627,6 +643,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("vercel-token", Pack::Provider),
     ("npm-token", Pack::Provider),
     ("google-api-key", Pack::Provider),
+    ("google-oauth-client-secret", Pack::Provider),
     ("sendgrid-token", Pack::Provider),
     ("microsoft-entra-client-secret", Pack::Provider),
     ("azure-devops-personal-access-token", Pack::Provider),
@@ -739,6 +756,7 @@ mod tests {
             vec![
                 "private-key",
                 "aws-access-key",
+                "aws-secret-access-key",
                 "aws-bedrock-long-term-api-key",
                 "aws-bedrock-short-term-api-key",
                 "github-token",
@@ -760,6 +778,7 @@ mod tests {
                 "vercel-token",
                 "npm-token",
                 "google-api-key",
+                "google-oauth-client-secret",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
                 "azure-devops-personal-access-token",

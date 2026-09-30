@@ -27,6 +27,9 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
     "refresh_token",
     "session_token",
     "aws_secret_access_key",
+    // The unprefixed AWS API member (`"SecretAccessKey"` in STS, IAM and
+    // CloudFormation JSON, `secretAccessKey` in the SDKs), issue #1026.
+    "secret_access_key",
     "aws_session_token",
     "password",
     "passwd",
@@ -3074,6 +3077,103 @@ fn vendor_prefixed_policy_body_is_high_entropy(bytes: &[u8], _start: usize, end:
     crate::shannon_entropy(body) >= HIGH_ENTROPY_THRESHOLD
 }
 
+// --- `.npmrc` credential keys (issue #1024) ----------------------------------
+
+/// The `.npmrc` keys that carry a registry credential: a bearer token, the
+/// Base64 of `user:password`, and the Base64 of a password. The leading `_`
+/// keeps them outside the assignment grammar (a name starts with a letter),
+/// so before issue #1024 `//registry.npmjs.org/:_authToken=<value>` gave no
+/// finding unless the value was an `npm_` token.
+const NPMRC_CREDENTIAL_KEYS: [&str; 3] = ["_authToken", "_auth", "_password"];
+
+/// Candidates for the value of an `.npmrc` credential key, registry-scoped
+/// (`//host/path/:_authToken=...`, the `:` directly after a `/`) or bare at
+/// the start of a line (optionally indented), then `=` with optional
+/// horizontal whitespace around it (issue #1024,
+/// `docs/audits/evidence/1012/npm-legacy-token.md`). The value is one
+/// quoted literal or the unquoted run up to whitespace or a quote. These keys carry a
+/// credential by construction, whatever the registry and token shape, so
+/// every value that survives the shared reference and placeholder
+/// exclusions (`${NPM_TOKEN}`, `<token>`, masked displays) is `High`
+/// `contextual_secret`; the host, not the shape, decides the issuer, so no
+/// provider type is claimed. Other `.npmrc` keys (`username`, `email`,
+/// `registry`) are not credentials and stay silent.
+fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
+    let mut candidates = Vec::new();
+    // Key starts in input order, so a value run measured once can be
+    // reused by every later key inside it.
+    let mut key_starts: Vec<usize> = input
+        .match_indices("_auth")
+        .chain(input.match_indices("_password"))
+        .map(|(start, _)| start)
+        .collect();
+    key_starts.sort_unstable();
+    let mut run_end = 0usize;
+    for key_start in key_starts {
+        let Some(key) = NPMRC_CREDENTIAL_KEYS
+            .iter()
+            .filter(|key| input[key_start..].starts_with(**key))
+            .max_by_key(|key| key.len())
+        else {
+            continue;
+        };
+        let bytes = input.as_bytes();
+        let scoped = key_start >= 2 && bytes[key_start - 1] == b':' && bytes[key_start - 2] == b'/';
+        let indented_line_start = {
+            let lead = rskip_while_chars(input, key_start, is_horizontal_js_whitespace);
+            is_line_start(input, lead)
+        };
+        if !scoped && !indented_line_start {
+            continue;
+        }
+        let mut cursor =
+            skip_while_chars(input, key_start + key.len(), is_horizontal_js_whitespace);
+        if char_at(input, cursor) != Some('=') {
+            continue;
+        }
+        cursor = skip_while_chars(input, cursor + 1, is_horizontal_js_whitespace);
+        let (value_start, value_end, form) = match char_at(input, cursor) {
+            Some('"' | '\'') => {
+                let Some((start, end)) = quoted_assignment_value(input, cursor) else {
+                    continue;
+                };
+                (start, end, ValueForm::Quoted)
+            }
+            Some(_) => {
+                // A quote ends the run: the line may itself sit inside a
+                // quoted shell string (`echo "//host/:_authToken=V" > .npmrc`).
+                // A run already measured for an earlier key on it ends at
+                // the same byte, which keeps a line of repeated keys linear.
+                let end = if cursor < run_end {
+                    run_end
+                } else {
+                    skip_while_chars(input, cursor, |ch| {
+                        !is_js_whitespace(ch) && !matches!(ch, '"' | '\'' | '`')
+                    })
+                };
+                run_end = end;
+                (cursor, end, ValueForm::Unquoted)
+            }
+            None => continue,
+        };
+        let value = &input[value_start..value_end];
+        if value.len() < MIN_CONTEXT_VALUE_LENGTH
+            || value.len() > MAX_CONTEXT_VALUE_LENGTH
+            || is_non_secret_reference(value, form)
+        {
+            continue;
+        }
+        if let Some(range) = ByteRange::new(value_start, value_end) {
+            candidates.push(
+                Candidate::new("contextual_secret", Confidence::High, range)
+                    .with_specificity(Specificity::Contextual)
+                    .with_signals(["npmrc-credential-key", "credential-by-construction"]),
+            );
+        }
+    }
+    candidates
+}
+
 struct GenericTokenDetector {
     names: NameSource,
 }
@@ -3101,6 +3201,7 @@ impl Detector for GenericTokenDetector {
             candidates.extend(authorization_candidates(input));
             candidates.extend(bare_vendor_prefix_candidates(input));
             candidates.extend(call_argument_candidates(input));
+            candidates.extend(npmrc_credential_candidates(input));
         }
         Ok(candidates)
     }
@@ -5692,6 +5793,53 @@ mod tests {
             "api_key:endpoint:0synthetic",
         ] {
             assert!(!detect(input).is_empty(), "{input:?}");
+        }
+    }
+
+    fn npmrc_spans(input: &str) -> Vec<(usize, usize)> {
+        npmrc_credential_candidates(input)
+            .iter()
+            .map(|candidate| {
+                assert_eq!(candidate.confidence(), Confidence::High);
+                (candidate.range().start(), candidate.range().end())
+            })
+            .collect()
+    }
+
+    #[test]
+    fn npmrc_credential_keys_report_their_value() {
+        let value = "Synthetic0Revoked1Registry2Token3";
+        for input in [
+            format!("//registry.npmjs.org/:_authToken={value}\n"),
+            format!("//npm.example.invalid/repo/npm/:_auth = \"{value}\"\n"),
+            format!("//npm.example.invalid/:_password={value}"),
+            format!("_authToken={value}\n"),
+            format!("  _auth={value}\r\n"),
+        ] {
+            let start = input.find(value).unwrap();
+            assert_eq!(
+                npmrc_spans(&input),
+                vec![(start, start + value.len())],
+                "{input}"
+            );
+        }
+    }
+
+    #[test]
+    fn npmrc_references_placeholders_and_other_keys_stay_silent() {
+        for input in [
+            "//registry.npmjs.org/:_authToken=${NPM_TOKEN}\n",
+            "//registry.npmjs.org/:_authToken=<your-token>\n",
+            "//registry.npmjs.org/:_authToken=\n",
+            "//registry.npmjs.org/:username=synthetic-user\n",
+            "//registry.npmjs.org/:email=someone@example.invalid\n",
+            "registry=https://registry.npmjs.org/\n",
+            "the _authToken=Synthetic0Revoked1Registry2Token3 in prose\n",
+            "x:_authToken=Synthetic0Revoked1Registry2Token3\n",
+            "//registry.npmjs.org/:_authorization=Synthetic0Revoked1Registry2Token3\n",
+            "//registry.npmjs.org/:_authToken=short\n",
+        ] {
+            assert!(npmrc_spans(input).is_empty(), "{input}");
         }
     }
 }

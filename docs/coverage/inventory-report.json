@@ -104,12 +104,15 @@
     {
       "detector": "aws-access-key",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 29,
         "hostContextsExercised": [
+          "chat",
           "dotenv",
           "javascript",
+          "json",
           "log",
-          "plain-text"
+          "plain-text",
+          "toml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -123,6 +126,11 @@
         ]
       },
       "evidenceFixtureIds": [
+        "aws-asia-positive-chat-sentence",
+        "aws-asia-positive-credentials-file",
+        "aws-asia-positive-digits-outside-base32",
+        "aws-asia-positive-dotenv",
+        "aws-asia-positive-sts-json",
         "aws-positive-akia",
         "aws-positive-asia-canonical",
         "aws-positive-example-shaped-value-in-comment-context",
@@ -212,6 +220,43 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "aws_bedrock_short_term_api_key"
+    },
+    {
+      "detector": "aws-secret-access-key",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "json",
+          "plain-text",
+          "terminal",
+          "toml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "aws-secret-access-key-positive-aws-configure-prompt",
+        "aws-secret-access-key-positive-console-csv",
+        "aws-secret-access-key-positive-credentials-file",
+        "aws-secret-access-key-positive-dotenv",
+        "aws-secret-access-key-positive-iam-create-access-key-json",
+        "aws-secret-access-key-positive-line-below-temporary-id"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "aws_secret_access_key"
     },
     {
       "detector": "github-token",
@@ -529,18 +574,22 @@
     {
       "detector": "gitlab-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 41,
         "hostContextsExercised": [
+          "chat",
+          "curl",
           "dotenv",
           "http",
           "json",
           "log",
           "plain-text",
+          "python",
           "shell",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -558,7 +607,17 @@
         "gitlab-positive-log",
         "gitlab-positive-min-length",
         "gitlab-positive-personal-access",
-        "gitlab-positive-yaml"
+        "gitlab-positive-yaml",
+        "gitlab-routable-pat-positive-bare-max-payload",
+        "gitlab-routable-pat-positive-bare-min-payload",
+        "gitlab-routable-pat-positive-curl-bearer",
+        "gitlab-routable-pat-positive-dotenv",
+        "gitlab-routable-pat-positive-json",
+        "gitlab-routable-pat-positive-legacy-twenty-byte-unchanged",
+        "gitlab-routable-pat-positive-private-token-header",
+        "gitlab-routable-pat-positive-sdk-call",
+        "gitlab-routable-pat-positive-yaml",
+        "gitlab-routable-pat-regression-sentence-period"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1534,6 +1593,41 @@
       "type": "google_api_key"
     },
     {
+      "detector": "google-oauth-client-secret",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "google-oauth-client-secret-positive-bare",
+        "google-oauth-client-secret-positive-chat-sentence",
+        "google-oauth-client-secret-positive-client-secret-json",
+        "google-oauth-client-secret-positive-dash-underscore-body",
+        "google-oauth-client-secret-positive-dotenv",
+        "google-oauth-client-secret-positive-form-body"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "google_oauth_client_secret"
+    },
+    {
       "detector": "sendgrid-token",
       "evidence": {
         "fixtureCount": 27,
@@ -2065,7 +2159,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2099,6 +2193,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "aws-secret-access-key-name-positive-sdk-camel-case",
+        "aws-secret-access-key-name-positive-sts-json",
+        "aws-secret-access-key-name-positive-yaml",
         "contextual-host-chat",
         "contextual-host-dotenv",
         "contextual-host-http",
@@ -2183,6 +2280,12 @@
         "generic-token-sdk-call-positive-python-kwarg-spaced",
         "generic-token-sdk-call-positive-rust-builder-positional",
         "generic-token-sdk-call-positive-typescript-named-argument",
+        "npmrc-auth-positive-base64-userinfo",
+        "npmrc-authtoken-positive-bare-line-start",
+        "npmrc-authtoken-positive-private-registry",
+        "npmrc-authtoken-positive-registry-scoped-uuid",
+        "npmrc-authtoken-positive-shell-echo",
+        "npmrc-password-positive-quoted",
         "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
@@ -2198,7 +2301,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2274,7 +2377,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -5554,7 +5657,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 122,
+    "supported": 124,
     "unresolved": 0
   }
 }
