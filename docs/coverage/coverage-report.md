@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 127/127 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 134/134 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 127 |
+| supported | 134 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 138.
+Coverage declarations: 145.
 
 ## Coverage by detector
 
@@ -35,9 +35,11 @@ Coverage declarations: 138.
 | aws-secret-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| bitwarden-secrets-manager-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cerebras-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| clojars-deploy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | composio-api-key | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
@@ -96,6 +98,7 @@ Coverage declarations: 138.
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| polar-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | posthog-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -104,12 +107,14 @@ Coverage declarations: 138.
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| rubygems-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | runpod-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
+| sonarqube-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -143,9 +148,11 @@ Coverage declarations: 138.
 | aws_secret_access_key | aws-secret-access-key | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
+| bitwarden_secrets_manager_access_token | bitwarden-secrets-manager-access-token | provider | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
 | cerebras_api_key | cerebras-api-key | provider | supported | not-applicable | none |
 | clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
+| clojars_deploy_token | clojars-deploy-token | provider | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
 | composio_org_api_key | composio-api-key | provider | supported | not-applicable | none |
@@ -219,6 +226,8 @@ Coverage declarations: 138.
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
+| polar_api_credential | polar-token | provider | supported | not-applicable | none |
+| polar_organization_access_token | polar-token | provider | supported | not-applicable | none |
 | posthog_personal_api_key | posthog-token | provider | supported | not-applicable | none |
 | posthog_project_secret_api_key | posthog-token | provider | supported | not-applicable | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
@@ -228,6 +237,7 @@ Coverage declarations: 138.
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | resend_api_key | resend-api-key | provider | supported | not-applicable | none |
+| rubygems_api_key | rubygems-api-key | provider | supported | not-applicable | none |
 | runpod_api_key | runpod-api-key | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
@@ -236,6 +246,8 @@ Coverage declarations: 138.
 | slack_app_level_token | slack-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
 | slack_user_token | slack-token | provider | supported | not-applicable | none |
+| sonarqube_analysis_token | sonarqube-token | provider | supported | not-applicable | none |
+| sonarqube_user_token | sonarqube-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
@@ -282,15 +294,15 @@ Coverage declarations: 138.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 138 | 0 | 0 |
-| boundary | 127 | 0 | 0 |
-| host-context | 127 | 0 | 0 |
+| adversarial | 145 | 0 | 0 |
+| boundary | 134 | 0 | 0 |
+| host-context | 134 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 138 | 0 | 0 |
-| near-miss-negative | 127 | 0 | 0 |
-| overlap | 127 | 0 | 0 |
-| positive | 127 | 0 | 0 |
-| range | 138 | 0 | 0 |
+| malformed | 145 | 0 | 0 |
+| near-miss-negative | 134 | 0 | 0 |
+| overlap | 134 | 0 | 0 |
+| positive | 134 | 0 | 0 |
+| range | 145 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

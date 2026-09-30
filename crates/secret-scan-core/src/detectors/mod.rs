@@ -17,9 +17,11 @@ mod aws;
 mod aws_bedrock;
 mod azure_devops;
 mod bearer_token;
+mod bitwarden;
 mod browserbase;
 mod cerebras;
 mod clickhouse_cloud;
+mod clojars;
 mod cloudflare;
 mod composio;
 mod confluent;
@@ -61,17 +63,20 @@ mod openai;
 mod otpauth;
 mod pattern;
 mod pinecone;
+mod polar;
 mod posthog;
 mod postman;
 mod prefilter;
 mod private_key;
 mod resend;
+mod rubygems;
 mod ruleset_adapter;
 mod runpod;
 mod sendgrid;
 mod sentry;
 mod shopify;
 mod slack;
+mod sonarqube;
 mod stripe;
 mod telegram;
 mod terraform;
@@ -150,7 +155,7 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
 /// One entry per line by contract (`scripts/measure-detector-cost.mjs`
 /// comments entries out by line), so the list outgrows the line lint.
 #[must_use]
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines)] // one line per built-in detector
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(PrivateKeyDetector),
@@ -248,6 +253,11 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(browserbase::BROWSERBASE_API_KEY),
         Box::new(runpod::RUNPOD_API_KEY),
         Box::new(cerebras::CEREBRAS_API_KEY),
+        Box::new(bitwarden::BitwardenSecretsManagerAccessTokenDetector),
+        Box::new(polar::POLAR),
+        Box::new(sonarqube::SONARQUBE),
+        Box::new(rubygems::RUBYGEMS_API_KEY),
+        Box::new(clojars::CLOJARS_DEPLOY_TOKEN),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -537,6 +547,23 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(cerebras::CEREBRAS_API_KEY.shapes())],
     ),
     (
+        "bitwarden-secrets-manager-access-token",
+        bitwarden::REQUIRED_LITERALS,
+    ),
+    ("polar-token", &[Literals::Shapes(polar::POLAR.shapes())]),
+    (
+        "sonarqube-token",
+        &[Literals::Shapes(sonarqube::SONARQUBE.shapes())],
+    ),
+    (
+        "rubygems-api-key",
+        &[Literals::Shapes(rubygems::RUBYGEMS_API_KEY.shapes())],
+    ),
+    (
+        "clojars-deploy-token",
+        &[Literals::Shapes(clojars::CLOJARS_DEPLOY_TOKEN.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -715,6 +742,11 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("browserbase-api-key", Pack::Provider),
     ("runpod-api-key", Pack::Provider),
     ("cerebras-api-key", Pack::Provider),
+    ("bitwarden-secrets-manager-access-token", Pack::Provider),
+    ("polar-token", Pack::Provider),
+    ("sonarqube-token", Pack::Provider),
+    ("rubygems-api-key", Pack::Provider),
+    ("clojars-deploy-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -850,6 +882,11 @@ mod tests {
                 "browserbase-api-key",
                 "runpod-api-key",
                 "cerebras-api-key",
+                "bitwarden-secrets-manager-access-token",
+                "polar-token",
+                "sonarqube-token",
+                "rubygems-api-key",
+                "clojars-deploy-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1231,6 +1268,19 @@ mod tests {
         let onepassword_service_account_token_input =
             format!("ops_eyJ{}", "SyntheticRevokedOnePasswordFixture".repeat(8));
         let convex_deployment_key_input = format!("convex-self-hosted|01{}", "deadbeef".repeat(9));
+        let bitwarden_secrets_manager_access_token_input = format!(
+            "0.{}.{}:{}==",
+            "5e7c0ded-0000-4000-8000-5e7c0ded0000",
+            "SyntheticRevokedBitwardenSecre",
+            "SyntheticRevokedKey000"
+        );
+        let polar_token_input = format!(
+            "polar_oat_{}",
+            "SyntheticRevokedPolarOrganizationToken00000"
+        );
+        let sonarqube_token_input = format!("squ_{}", "5e7c0ded".repeat(5));
+        let rubygems_api_key_input = format!("rubygems_{}", "5e7c0ded".repeat(6));
+        let clojars_deploy_token_input = format!("CLOJARS_{}5e7c", "5e7c0ded".repeat(7));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -1322,6 +1372,14 @@ mod tests {
             ("browserbase-api-key", browserbase_api_key_input.as_str()),
             ("runpod-api-key", runpod_api_key_input.as_str()),
             ("cerebras-api-key", cerebras_api_key_input.as_str()),
+            (
+                "bitwarden-secrets-manager-access-token",
+                bitwarden_secrets_manager_access_token_input.as_str(),
+            ),
+            ("polar-token", polar_token_input.as_str()),
+            ("sonarqube-token", sonarqube_token_input.as_str()),
+            ("rubygems-api-key", rubygems_api_key_input.as_str()),
+            ("clojars-deploy-token", clojars_deploy_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

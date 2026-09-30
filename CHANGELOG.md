@@ -43,6 +43,30 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- New provider detectors from the #1014 broad-discovery handoffs, each always
+  redacted at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences
+  generic detection missed. No support-status claim until benchmarks
+  arrival evidence:
+  - `bitwarden-secrets-manager-access-token` (#1019): Bitwarden Secrets
+    Manager machine-account access tokens, `0.` + UUID + `.` + 30
+    alphanumeric client secret + `:` + a padded 16-byte Base64 key
+    (`bitwarden_secrets_manager_access_token`).
+  - `polar-token` (#1020): Polar `polar_oat_` + 43 alphanumeric organization
+    access tokens (`polar_organization_access_token`) and `polar_pat_`,
+    `polar_at_u_`/`polar_at_o_`, `polar_rt_u_`/`polar_rt_o_`, `polar_cs_` and
+    `polar_crt_` + 43 URL-safe API credentials (`polar_api_credential`); the
+    public `polar_ci_` client id is never claimed, and Polar `whsec_` webhook
+    secrets stay with `stripe-token`.
+  - `sonarqube-token` (#1021): SonarQube Server `squ_` user tokens
+    (`sonarqube_user_token`) and `sqa_`/`sqp_` global and project analysis
+    tokens (`sonarqube_analysis_token`), each + 40 lowercase hex; public
+    `sqb_` badge tokens are never claimed.
+  - `rubygems-api-key` (#1023): RubyGems.org `rubygems_` + 48 lowercase hex
+    API keys (`rubygems_api_key`).
+  - `clojars-deploy-token` (#1025): Clojars `CLOJARS_` + 60 lowercase hex
+    deploy tokens (`clojars_deploy_token`).
 - `google-oauth-client-secret` (#1029): Google OAuth client secrets,
   `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]`, as `google_oauth_client_secret`
   (always redacted), bare or in any context.

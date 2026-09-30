@@ -90,6 +90,11 @@ export const CANONICAL_IDS = [
   "browserbase-api-key",
   "runpod-api-key",
   "cerebras-api-key",
+  "bitwarden-secrets-manager-access-token",
+  "polar-token",
+  "sonarqube-token",
+  "rubygems-api-key",
+  "clojars-deploy-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -124,13 +129,15 @@ export const GROUPS = {
     "daytona-api-key",
     "clickhouse-cloud-api-secret",
     "runpod-api-key",
+    "bitwarden-secrets-manager-access-token",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
     "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
     "inngest-signing-key",
+    "sonarqube-token",
   ],
-  "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
+  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "rubygems-api-key", "clojars-deploy-token"],
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
@@ -138,6 +145,7 @@ export const GROUPS = {
     "resend-api-key",
     "apify-api-token",
     "browserbase-api-key",
+    "polar-token",
   ],
 };
 

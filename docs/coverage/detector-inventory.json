@@ -918,6 +918,55 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0063sk-SyntheticRevokedCerebrasApiKey_SyntheticRevokedC",
       "schemes": null
+    },
+    {
+      "type": "bitwarden_secrets_manager_access_token",
+      "detector": "bitwarden-secrets-manager-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0030.5e7c0ded-0000-4000-8000-5e7c0ded0000.SyntheticRevokedBitwardenSecre:SyntheticRevokedKey000==",
+      "schemes": null
+    },
+    {
+      "type": "polar_organization_access_token",
+      "detector": "polar-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070olar_oat_SyntheticRevokedPolarOrganizationToken00000",
+      "schemes": null
+    },
+    {
+      "type": "polar_api_credential",
+      "detector": "polar-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070olar_pat_SyntheticRevoked-Polar_PersonalToken0000000",
+      "schemes": null
+    },
+    {
+      "type": "sonarqube_user_token",
+      "detector": "sonarqube-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073qu_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "sonarqube_analysis_token",
+      "detector": "sonarqube-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073qa_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "rubygems_api_key",
+      "detector": "rubygems-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0072ubygems_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "clojars_deploy_token",
+      "detector": "clojars-deploy-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0043LOJARS_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c",
+      "schemes": null
     }
   ],
   "consumers": [
