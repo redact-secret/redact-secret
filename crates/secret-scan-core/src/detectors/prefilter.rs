@@ -271,6 +271,14 @@ impl SlotSet {
         slot < MAX_SLOTS && self.bits[slot / 64] & (1 << (slot % 64)) != 0
     }
 
+    /// `true` when every slot of `self` is in `other`.
+    fn is_subset_of(&self, other: &Self) -> bool {
+        self.bits
+            .iter()
+            .zip(&other.bits)
+            .all(|(mine, theirs)| mine & !theirs == 0)
+    }
+
     fn len(&self) -> u32 {
         self.bits.iter().map(|word| word.count_ones()).sum()
     }
@@ -294,13 +302,25 @@ struct Entry {
 pub(crate) struct LiteralMatcher {
     /// Bit `pair_index(a, b)` is set when some literal begins with `a b`.
     leads: Box<[u64; PAIR_TABLE_WORDS]>,
+    /// Per word of `leads`, the number of set bits in the words before it:
+    /// with a popcount of the bits below a lead, the lead's rank, which is
+    /// its index into `groups`.
+    ranks: Box<[u32; PAIR_TABLE_WORDS]>,
     /// Every declared literal, sorted by its first pair (then by slot).
     entries: Box<[Entry]>,
-    /// `(first pair, start, end)`: the `entries` beginning with each lead
-    /// pair, sorted by pair.
-    groups: Box<[(u16, u32, u32)]>,
+    /// The `entries` beginning with each lead pair, in lead-rank order.
+    groups: Box<[Group]>,
     /// The slots that declared anything.
     declared: SlotSet,
+}
+
+/// The `entries[start..end]` beginning with one lead pair, and the slots
+/// that declared them.
+#[derive(Clone, Copy)]
+struct Group {
+    start: u32,
+    end: u32,
+    slots: SlotSet,
 }
 
 impl std::fmt::Debug for LiteralMatcher {
@@ -340,32 +360,49 @@ impl LiteralMatcher {
         let lead = |entry: &Entry| pair_index(entry.literal[0], entry.literal[1]);
         entries.sort_by_key(|entry| (lead(entry), entry.slot));
         let mut leads = Box::new([0u64; PAIR_TABLE_WORDS]);
-        let mut groups: Vec<(u16, u32, u32)> = Vec::new();
+        let mut groups: Vec<Group> = Vec::new();
+        let mut last_pair = None;
         for (index, entry) in entries.iter().enumerate() {
             let pair = lead(entry);
-            leads[pair / 64] |= 1 << (pair % 64);
             let index = u32::try_from(index).ok()?;
-            match groups.last_mut() {
-                Some((last, _, end)) if usize::from(*last) == pair => *end = index + 1,
-                _ => groups.push((u16::try_from(pair).ok()?, index, index + 1)),
+            if last_pair == Some(pair) {
+                if let Some(group) = groups.last_mut() {
+                    group.end = index + 1;
+                    group.slots.insert(usize::from(entry.slot));
+                }
+            } else {
+                leads[pair / 64] |= 1 << (pair % 64);
+                let mut slots = SlotSet::default();
+                slots.insert(usize::from(entry.slot));
+                groups.push(Group {
+                    start: index,
+                    end: index + 1,
+                    slots,
+                });
+                last_pair = Some(pair);
             }
+        }
+        let mut ranks = Box::new([0u32; PAIR_TABLE_WORDS]);
+        let mut seen = 0u32;
+        for (rank, word) in ranks.iter_mut().zip(leads.iter()) {
+            *rank = seen;
+            seen += word.count_ones();
         }
         Some(Self {
             leads,
+            ranks,
             entries: entries.into_boxed_slice(),
             groups: groups.into_boxed_slice(),
             declared,
         })
     }
 
-    /// The literals whose first pair is `pair`, which is in the lead set.
-    fn group(&self, pair: usize) -> &[Entry] {
-        self.groups
-            .binary_search_by_key(&pair, |&(lead, _, _)| usize::from(lead))
-            .map_or(&[], |found| {
-                let (_, start, end) = self.groups[found];
-                &self.entries[start as usize..end as usize]
-            })
+    /// The group of the literals whose first pair is `lead`, which is in
+    /// the lead set: its rank among the set bits is its index.
+    fn group(&self, lead: usize) -> &Group {
+        let word = lead / 64;
+        let below = self.leads[word] & ((1u64 << (lead % 64)) - 1);
+        &self.groups[self.ranks[word] as usize + below.count_ones() as usize]
     }
 
     /// The registry positions whose detector declared a literal that occurs
@@ -382,8 +419,12 @@ impl LiteralMatcher {
             if self.leads[lead / 64] & (1 << (lead % 64)) == 0 {
                 continue;
             }
+            let group = self.group(lead);
+            if group.slots.is_subset_of(&present) {
+                continue;
+            }
             let rest = &text[offset..];
-            for entry in self.group(lead) {
+            for entry in &self.entries[group.start as usize..group.end as usize] {
                 let slot = usize::from(entry.slot);
                 if !present.contains(slot) && rest.starts_with(entry.literal) {
                     present.insert(slot);
@@ -1070,5 +1111,86 @@ mod tests {
         assert_eq!(long_run_lines(&input).as_deref(), Some(&[(0, 40)][..]));
         assert!(long_run_lines(&input[..45]).is_none());
         assert!(long_run_lines(&input.clone()).is_none());
+    }
+
+    /// The straightforward oracle the lead-group lookup replaced: every
+    /// declared literal searched as a substring.
+    fn present_oracle(matcher: &LiteralMatcher, text: &[u8]) -> Vec<usize> {
+        let mut slots: Vec<usize> = matcher
+            .entries
+            .iter()
+            .filter(|entry| {
+                text.windows(entry.literal.len())
+                    .any(|window| window == entry.literal)
+            })
+            .map(|entry| usize::from(entry.slot))
+            .collect();
+        slots.sort_unstable();
+        slots.dedup();
+        slots
+    }
+
+    fn present_slots(matcher: &LiteralMatcher, text: &[u8]) -> Vec<usize> {
+        let found = matcher.present(text);
+        (0..MAX_SLOTS)
+            .filter(|&slot| found.contains(slot))
+            .collect()
+    }
+
+    /// The rank-indexed group lookup and the exhausted-group skip agree
+    /// with a substring oracle on random text built from shared-lead,
+    /// duplicated and truncated literals, non-ASCII and invisible pieces.
+    #[test]
+    fn lead_group_lookup_matches_a_substring_oracle() {
+        use crate::test_rng::XorShift32;
+        let a =
+            RequiredLiterals::any_of(&[Literals::Strs(&["ghp_", "gho_", "gh", "ab_cd"])]).unwrap();
+        let b = RequiredLiterals::any_of(&[Literals::Strs(&["ghp_", "ghx", "zz"])]).unwrap();
+        let c = RequiredLiterals::any_of(&[Literals::Strs(&["ab_", "ab_cd", "é!", "\u{200B}x"])])
+            .unwrap();
+        let matcher = LiteralMatcher::compile([Some(&a), None, Some(&b), Some(&c)]).unwrap();
+        let pieces = [
+            "g", "gh", "ghp", "ghp_", "gho", "gho_", "ghx", "ab", "ab_", "ab_c", "ab_cd", "zz",
+            "z", "é", "é!", "\u{200B}", "x", " ", "~", "_", "漢",
+        ];
+        let mut rng = XorShift32::new(0x1093);
+        for _ in 0..4000 {
+            let text = rng.text(&pieces, 12);
+            assert_eq!(
+                present_slots(&matcher, text.as_bytes()),
+                present_oracle(&matcher, text.as_bytes()),
+                "{text:?}"
+            );
+        }
+        for registry in [
+            DetectorRegistry::with_built_in([]).unwrap(),
+            DetectorRegistry::with_common_built_in([]).unwrap(),
+        ] {
+            let matcher = registry.prefilter().unwrap();
+            let literals: Vec<String> = matcher
+                .entries
+                .iter()
+                .map(|entry| String::from_utf8_lossy(entry.literal).into_owned())
+                .collect();
+            let pieces: Vec<&str> = literals
+                .iter()
+                .flat_map(|literal| {
+                    let cut = literal
+                        .char_indices()
+                        .nth(2)
+                        .map_or(literal.len(), |(i, _)| i);
+                    [literal.as_str(), &literal[..cut]]
+                })
+                .chain(["é", " ", "\u{200B}", "~"])
+                .collect();
+            for _ in 0..1500 {
+                let text = rng.text(&pieces, 10);
+                assert_eq!(
+                    present_slots(matcher, text.as_bytes()),
+                    present_oracle(matcher, text.as_bytes()),
+                    "{text:?}"
+                );
+            }
+        }
     }
 }

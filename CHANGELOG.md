@@ -222,6 +222,10 @@ evidence is linked from each published version.
   Findings, ranges, ids, order and redacted text are unchanged. Python
   `ScanResult.findings` still returns a list, now of the same `Finding`
   objects on every read (`res.findings[0] is res.findings[0]`).
+- The shared literal matcher finds a lead group by rank in its lead table
+  instead of a binary search, and skips a lead group whose detectors have all
+  been seen, so a lead-dense input repeats less work (#1093). The matched
+  detector set is unchanged and is tested against a substring oracle.
 
 - Scan cost is now linear on inputs that were quadratic or repeated work:
   generic-token `value` names and repeated `?a=`, `{a=x`, `(a=` prefixes on
