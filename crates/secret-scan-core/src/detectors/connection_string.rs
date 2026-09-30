@@ -648,7 +648,7 @@ fn azure_storage_candidate(input: &str, anchor: usize) -> Option<Candidate> {
         account_key.value_start + account_key.value.len(),
     )?;
     Some(
-        Candidate::new("connection_string_password", Confidence::High, range)
+        Candidate::built_in("connection_string_password", Confidence::High, range)
             .with_specificity(Specificity::Structural)
             .with_signals(vec!["azure-storage-account-key", "known-endpoint-suffix"]),
     )
@@ -730,7 +730,7 @@ impl Detector for ConnectionStringDetector {
 
             if let Some(range) = ByteRange::new(start, end) {
                 candidates.push(
-                    Candidate::new("connection_string_password", confidence, range)
+                    Candidate::built_in("connection_string_password", confidence, range)
                         .with_specificity(Specificity::Structural)
                         .with_signals(signals),
                 );

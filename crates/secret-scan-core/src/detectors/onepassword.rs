@@ -94,7 +94,7 @@ impl Detector for OnePasswordServiceAccountTokenDetector {
             }
             if let Some(range) = ByteRange::new(start, end) {
                 candidates.push(
-                    Candidate::new(TYPE_NAME, Confidence::High, range)
+                    Candidate::built_in(TYPE_NAME, Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(SIGNALS),
                 );

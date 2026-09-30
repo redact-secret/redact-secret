@@ -180,7 +180,7 @@ fn legacy_candidates(input: &str) -> Vec<Candidate> {
                 && let Some(range) = ByteRange::new(line_start + start, line_start + end)
             {
                 candidates.push(
-                    Candidate::new("pinecone_api_key", Confidence::High, range)
+                    Candidate::built_in("pinecone_api_key", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(LEGACY_SIGNALS),
                 );

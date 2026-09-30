@@ -137,7 +137,7 @@ impl Detector for TelegramBotTokenDetector {
                 && let Some(range) = ByteRange::new(start, end)
             {
                 candidates.push(
-                    Candidate::new("telegram_bot_token", Confidence::High, range)
+                    Candidate::built_in("telegram_bot_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(["telegram-documented-id-colon-secret-shape"]),
                 );

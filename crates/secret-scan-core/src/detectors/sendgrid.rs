@@ -58,7 +58,7 @@ impl Detector for SendgridTokenDetector {
                 && let Some(range) = ByteRange::new(start, end)
             {
                 candidates.push(
-                    Candidate::new("sendgrid_api_key", Confidence::High, range)
+                    Candidate::built_in("sendgrid_api_key", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(["sendgrid-documented-shape", "two-segment-exact-length"]),
                 );

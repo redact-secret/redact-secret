@@ -126,7 +126,7 @@ impl Detector for BitwardenSecretsManagerAccessTokenDetector {
             let end = padding_start + PADDING.len();
             if let Some(range) = ByteRange::new(start, end) {
                 candidates.push(
-                    Candidate::new(
+                    Candidate::built_in(
                         "bitwarden_secrets_manager_access_token",
                         Confidence::High,
                         range,

@@ -178,7 +178,7 @@ impl Detector for SlackTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new(type_name, Confidence::High, range)
+                Candidate::built_in(type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(signals.iter().copied()),
             );

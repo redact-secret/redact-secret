@@ -89,7 +89,7 @@ impl Detector for OpenAiTokenDetector {
             };
             let type_name = finding_type(bytes, start);
             candidates.push(
-                Candidate::new(type_name, Confidence::High, range)
+                Candidate::built_in(type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(["openai-prefix", "openai-marker"]),
             );

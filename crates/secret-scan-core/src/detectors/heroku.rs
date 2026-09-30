@@ -584,7 +584,7 @@ impl Detector for HerokuApiKeyLegacyDetector {
                     (Confidence::Medium, "heroku-keyword-cooccurrence")
                 };
                 candidates.push(
-                    Candidate::new("heroku_api_key_legacy", confidence, range)
+                    Candidate::built_in("heroku_api_key_legacy", confidence, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals([signal]),
                 );

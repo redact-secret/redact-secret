@@ -419,7 +419,7 @@ fn secret_token_uri_candidates_from(
             && let Some(range) = ByteRange::new(cursor, end)
         {
             candidates.push(
-                Candidate::new("bearer_token", Confidence::High, range)
+                Candidate::built_in("bearer_token", Confidence::High, range)
                     .with_specificity(Specificity::Structural)
                     .with_signals(["secret-token-uri"]),
             );
@@ -538,7 +538,7 @@ fn bearer_scheme_candidates(
             && let Some(range) = ByteRange::new(value_start, value_end)
         {
             candidates.push(
-                Candidate::new("bearer_token", Confidence::High, range)
+                Candidate::built_in("bearer_token", Confidence::High, range)
                     .with_specificity(Specificity::Structural)
                     .with_signals(["bearer-scheme"]),
             );

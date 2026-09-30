@@ -69,7 +69,7 @@ impl Detector for StripeTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new(WEBHOOK_TYPE, Confidence::High, range)
+                Candidate::built_in(WEBHOOK_TYPE, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(WEBHOOK_SIGNALS),
             );

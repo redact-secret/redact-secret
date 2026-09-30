@@ -136,7 +136,7 @@ impl Detector for FirebaseServerKeyDetector {
                 && let Some(range) = ByteRange::new(start, end)
             {
                 candidates.push(
-                    Candidate::new("firebase_server_key", Confidence::High, range)
+                    Candidate::built_in("firebase_server_key", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(["firebase-documented-prefix", "two-segment-exact-length"]),
                 );

@@ -73,7 +73,7 @@ impl Detector for AzureDevOpsPersonalAccessTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new(
+                Candidate::built_in(
                     "azure_devops_personal_access_token",
                     Confidence::High,
                     range,

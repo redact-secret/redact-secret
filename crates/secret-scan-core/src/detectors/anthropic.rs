@@ -73,7 +73,7 @@ impl Detector for AnthropicTokenDetector {
             for (prefix, type_name) in PREFIXES {
                 if bytes[start..].starts_with(prefix.as_bytes()) {
                     candidates.push(
-                        Candidate::new(type_name, Confidence::High, range)
+                        Candidate::built_in(type_name, Confidence::High, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals(["anthropic-versioned-prefix", "opaque-suffix"]),
                     );

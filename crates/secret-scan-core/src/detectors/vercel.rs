@@ -130,9 +130,9 @@ impl Detector for VercelDetector {
                 continue;
             };
             let candidate = match typed_class(&bytes[start..end]) {
-                Some(type_name) => Candidate::new(type_name, Confidence::High, range)
+                Some(type_name) => Candidate::built_in(type_name, Confidence::High, range)
                     .with_signals(TYPED_SIGNALS.iter().copied()),
-                None => Candidate::new(AGGREGATE_TYPE, Confidence::High, range)
+                None => Candidate::built_in(AGGREGATE_TYPE, Confidence::High, range)
                     .with_signals(signals.iter().copied()),
             };
             candidates.push(candidate.with_specificity(Specificity::Provider));
