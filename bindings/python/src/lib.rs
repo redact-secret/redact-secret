@@ -19,6 +19,8 @@
 
 mod incremental;
 
+use std::cell::RefCell;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 use pyo3::exceptions::PyValueError;
@@ -38,6 +40,9 @@ use redact_secret::{
 /// The Unicode string-index unit every range this module reports uses.
 const RANGE_UNIT: &str = "unicode-code-points";
 static PII_SELECTION: OnceLock<Mutex<Option<PiiSelection>>> = OnceLock::new();
+/// Bumped whenever [`PII_SELECTION`] changes, so a cached registry built under
+/// an earlier selection is rebuilt (issue #1059).
+static PII_EPOCH: AtomicU64 = AtomicU64::new(0);
 
 pub(crate) fn active_pii_selection() -> PiiSelection {
     PII_SELECTION
@@ -424,17 +429,85 @@ fn char_offset(text: &str, byte_offset: usize) -> Option<usize> {
     Some(text[..byte_offset].chars().count())
 }
 
-/// Converts a validated finding range to code point `(start, end)`.
-///
-/// The pipeline only ever produces char-aligned, in-bounds ranges, so
-/// failure here would indicate an internal inconsistency; it is still
-/// reported as a sanitized error rather than panicking.
+/// The pre-#1053 per-range conversion, kept as the test oracle for
+/// [`CharOffsets::range`].
+#[cfg(test)]
 fn char_range(text: &str, range: ByteRange) -> PyResult<(usize, usize)> {
     let start = char_offset(text, range.start())
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
     let end = char_offset(text, range.end())
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
     Ok((start, end))
+}
+
+/// Converts UTF-8 byte offsets into one `text` to code point offsets,
+/// resuming each conversion from the previous one (issue #1053).
+///
+/// Pipeline findings arrive in ascending, disjoint order, so converting a
+/// whole call's findings (policy callback, formatter callback, and returned
+/// findings) is one pass over `text` rather than a prefix rescan per offset.
+/// An offset before the previous one restarts from the beginning, so any
+/// order is correct. An all-ASCII `text` skips the walk: there, bytes and
+/// code points coincide. Every result equals [`char_offset`]'s.
+pub(crate) struct CharOffsets<'a> {
+    text: &'a str,
+    ascii: bool,
+    /// A character boundary of `text`, and its code point offset.
+    byte: usize,
+    chars: usize,
+    /// Bytes of `text` walked so far, for the linear-cost test.
+    #[cfg(test)]
+    walked: usize,
+}
+
+impl<'a> CharOffsets<'a> {
+    pub(crate) fn new(text: &'a str) -> Self {
+        Self {
+            text,
+            ascii: text.is_ascii(),
+            byte: 0,
+            chars: 0,
+            #[cfg(test)]
+            walked: 0,
+        }
+    }
+
+    /// [`char_offset`] for `byte_offset`: `None` when it is out of bounds
+    /// or splits a character.
+    fn offset(&mut self, byte_offset: usize) -> Option<usize> {
+        if byte_offset > self.text.len() || !self.text.is_char_boundary(byte_offset) {
+            return None;
+        }
+        if self.ascii {
+            return Some(byte_offset);
+        }
+        if byte_offset < self.byte {
+            self.byte = 0;
+            self.chars = 0;
+        }
+        self.chars += self.text[self.byte..byte_offset].chars().count();
+        #[cfg(test)]
+        {
+            self.walked += byte_offset - self.byte;
+        }
+        self.byte = byte_offset;
+        Some(self.chars)
+    }
+
+    /// Converts a validated finding range to code point `(start, end)`.
+    ///
+    /// The pipeline only ever produces char-aligned, in-bounds ranges, so
+    /// failure here would indicate an internal inconsistency; it is still
+    /// reported as a sanitized error rather than panicking.
+    fn range(&mut self, range: ByteRange) -> PyResult<(usize, usize)> {
+        let start = self
+            .offset(range.start())
+            .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
+        let end = self
+            .offset(range.end())
+            .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
+        Ok((start, end))
+    }
 }
 
 /// Converts a UTF-8 byte offset into `text` (the core's native range unit,
@@ -455,18 +528,19 @@ fn byte_offset_to_char_offset(text: &str, byte_offset: usize) -> PyResult<usize>
         .ok_or_else(|| PyValueError::new_err("byte_offset is out of bounds or splits a character."))
 }
 
-/// Extracts owned `text` from an argument that must be a Python string.
+/// Borrows `text` from an argument that must be a Python string, without
+/// copying it (issue #1059): a Python `str` is immutable, and the borrow is
+/// tied to `value`, which keeps the object alive.
 ///
 /// Rejects a non-string argument with the sanitized `InvalidInputError`
 /// instead of a generic `TypeError`, matching the cross-language contract:
 /// `SecretScanErrorCode::InvalidInput` is "produced by bindings" for this
 /// exact case.
-pub(crate) fn extract_text(value: &Bound<'_, PyAny>) -> PyResult<String> {
+pub(crate) fn extract_text<'a>(value: &'a Bound<'_, PyAny>) -> PyResult<&'a str> {
     let text = value
         .cast::<PyString>()
         .map_err(|_| map_error_code(SecretScanErrorCode::InvalidInput))?;
     text.to_str()
-        .map(str::to_owned)
         .map_err(|_| map_error_code(SecretScanErrorCode::InvalidInput))
 }
 
@@ -762,26 +836,115 @@ impl PyWholeInputLimits {
 // Detection and policy
 // ---------------------------------------------------------------------
 
-/// Builds a registry of every built-in detector, plus every detector
-/// `ruleset` declares when given (issue #495,
-/// `decision-define-declarative-detector-ruleset-contract`). There is no
-/// custom detector *callback* surface (`decision-define-runtime-bindings`);
-/// a declarative ruleset is data the core parses and matches itself, never
-/// host code.
+/// Why [`with_registry`] could not produce a registry.
+#[derive(Debug)]
+enum RegistryError {
+    Core(CoreError),
+    Ruleset(RulesetError),
+}
+
+impl RegistryError {
+    fn into_py(self) -> PyErr {
+        match self {
+            Self::Core(error) => map_core_error(error),
+            Self::Ruleset(error) => map_ruleset_error(error),
+        }
+    }
+}
+
+/// One thread's cached registries (issue #1059): the built-in registry, and
+/// the registry for the last ruleset seen. Each is tagged with the
+/// [`PII_EPOCH`] it was built under, so `initialize(pii)` invalidates both.
 ///
-/// # Errors
+/// `DetectorRegistry` holds `Box<dyn Detector>` objects that are not required
+/// to be `Sync`, so the cache is thread-local, as in the Node and WASM
+/// bindings.
+#[derive(Default)]
+struct RegistryCache {
+    built_in: Option<(u64, DetectorRegistry)>,
+    with_ruleset: Option<(u64, Vec<u8>, DetectorRegistry)>,
+}
+
+thread_local! {
+    static REGISTRY_CACHE: RefCell<RegistryCache> = RefCell::new(RegistryCache::default());
+    /// Registries built on this thread, for the cache-reuse tests.
+    #[cfg(test)]
+    static REGISTRY_BUILDS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+/// The error for a cache slot that was just filled yet is empty: unreachable,
+/// reported as a sanitized detector failure rather than panicking.
+fn unreachable_cache_miss() -> RegistryError {
+    RegistryError::Core(SecretScanErrorCode::DetectorFailure.into())
+}
+
+/// Counts one registry build (test builds only).
+fn note_registry_build() {
+    #[cfg(test)]
+    REGISTRY_BUILDS.with(|builds| builds.set(builds.get() + 1));
+}
+
+/// Runs `f` against the registry of every built-in detector, plus every
+/// detector `ruleset` declares when given (issue #495,
+/// `decision-define-declarative-detector-ruleset-contract`), building it only
+/// when this thread has none cached for the current PII selection and the
+/// same ruleset bytes. There is no custom detector *callback* surface
+/// (`decision-define-runtime-bindings`); a declarative ruleset is data the
+/// core parses and matches itself, never host code.
 ///
-/// `InvalidOptionsError` when `ruleset` is neither `bytes`/`bytearray` nor
-/// `str`, and `InvalidRulesetError` when it does not parse.
-fn registry_with_ruleset(ruleset: Option<&Bound<'_, PyAny>>) -> PyResult<DetectorRegistry> {
-    let selection = active_pii_selection();
-    let custom = if let Some(value) = ruleset {
-        let bytes = extract_ruleset_bytes(value)?;
-        load_ruleset(&bytes).map_err(map_ruleset_error)?
-    } else {
-        Vec::new()
-    };
-    DetectorRegistry::with_built_in_and_pii_custom(&selection, custom).map_err(map_core_error)
+/// Errors are never cached: a rejected ruleset is re-parsed, and rejected
+/// again, on the next call.
+fn with_registry<T>(
+    ruleset: Option<&[u8]>,
+    f: impl FnOnce(&DetectorRegistry) -> T,
+) -> Result<T, RegistryError> {
+    // Read before building: an `initialize` racing this call can only make
+    // the stored epoch stale (a rebuild next call), never a stale registry
+    // look current.
+    let epoch = PII_EPOCH.load(Ordering::SeqCst);
+    REGISTRY_CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        match ruleset {
+            None => {
+                if cache
+                    .built_in
+                    .as_ref()
+                    .is_none_or(|(built, _)| *built != epoch)
+                {
+                    let registry = DetectorRegistry::with_built_in_and_pii_custom(
+                        &active_pii_selection(),
+                        Vec::new(),
+                    )
+                    .map_err(RegistryError::Core)?;
+                    note_registry_build();
+                    cache.built_in = Some((epoch, registry));
+                }
+                let (_, registry) = cache.built_in.as_ref().ok_or_else(unreachable_cache_miss)?;
+                Ok(f(registry))
+            }
+            Some(bytes) => {
+                let hit = cache
+                    .with_ruleset
+                    .as_ref()
+                    .is_some_and(|(built, cached, _)| *built == epoch && cached == bytes);
+                if !hit {
+                    let custom = load_ruleset(bytes).map_err(RegistryError::Ruleset)?;
+                    let registry = DetectorRegistry::with_built_in_and_pii_custom(
+                        &active_pii_selection(),
+                        custom,
+                    )
+                    .map_err(RegistryError::Core)?;
+                    note_registry_build();
+                    cache.with_ruleset = Some((epoch, bytes.to_vec(), registry));
+                }
+                let (_, _, registry) = cache
+                    .with_ruleset
+                    .as_ref()
+                    .ok_or_else(unreachable_cache_miss)?;
+                Ok(f(registry))
+            }
+        }
+    })
 }
 
 /// Extracts ruleset bytes from a `bytes`/`bytearray` or `str` argument
@@ -805,13 +968,24 @@ fn extract_ruleset_bytes(value: &Bound<'_, PyAny>) -> PyResult<Vec<u8>> {
 /// it does not inherit the default whole-input bound for free
 /// (`decision-bound-whole-input-operations-by-default`).
 fn detect(
+    py: Python<'_>,
     text: &str,
     limits: &WholeInputLimits,
     ruleset: Option<&Bound<'_, PyAny>>,
 ) -> PyResult<Vec<DetectedFinding>> {
     limits.check_input(text).map_err(map_core_error)?;
-    let registry = registry_with_ruleset(ruleset)?;
-    let detected = run_detector_pipeline(text, &registry).map_err(map_core_error)?;
+    let ruleset_bytes = ruleset.map(extract_ruleset_bytes).transpose()?;
+    // No Python object is touched while detecting, so other Python threads
+    // run meanwhile. The registry is `!Sync`, so it is looked up on this
+    // thread inside the closure rather than passed in.
+    let detected = py
+        .detach(|| {
+            with_registry(ruleset_bytes.as_deref(), |registry| {
+                run_detector_pipeline(text, registry)
+            })
+        })
+        .map_err(RegistryError::into_py)?
+        .map_err(map_core_error)?;
     limits
         .check_findings(detected.len())
         .map_err(map_core_error)?;
@@ -838,13 +1012,14 @@ fn default_action(finding: &DetectedFinding, index: usize, count: usize) -> PyRe
 /// failure.
 fn call_python_policy(
     callable: &Bound<'_, PyAny>,
-    text: &str,
+    offsets: &RefCell<CharOffsets<'_>>,
     finding: &DetectedFinding,
     index: usize,
     count: usize,
 ) -> PyResult<Action> {
     let py = callable.py();
-    let (start, end) = char_range(text, finding.range())?;
+    // The borrow ends with this statement, before the callback runs.
+    let (start, end) = offsets.borrow_mut().range(finding.range())?;
     let py_finding = Bound::new(py, PyDetectedFinding::from_core(finding, start, end))?;
     let py_context = Bound::new(
         py,
@@ -865,9 +1040,10 @@ fn call_python_policy(
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidPolicyAction))
 }
 
-/// Evaluates `policy` (or the default policy when `None`) once per finding.
+/// Evaluates `policy` (or the default policy when `None`) once per finding;
+/// `offsets` converts each range `policy` sees.
 fn apply_policy(
-    text: &str,
+    offsets: &RefCell<CharOffsets<'_>>,
     detected: Vec<DetectedFinding>,
     policy: Option<&Bound<'_, PyAny>>,
 ) -> PyResult<Vec<CoreFinding>> {
@@ -876,7 +1052,7 @@ fn apply_policy(
     for (index, finding) in detected.into_iter().enumerate() {
         let action = match policy {
             None => default_action(&finding, index, count)?,
-            Some(callable) => call_python_policy(callable, text, &finding, index, count)?,
+            Some(callable) => call_python_policy(callable, offsets, &finding, index, count)?,
         };
         findings.push(finding.with_action(action));
     }
@@ -884,11 +1060,15 @@ fn apply_policy(
 }
 
 /// Converts core findings to their Python-visible, code point-ranged form.
-fn findings_to_py(text: &str, findings: Vec<CoreFinding>) -> PyResult<Vec<PyFinding>> {
+fn findings_to_py(
+    offsets: &RefCell<CharOffsets<'_>>,
+    findings: Vec<CoreFinding>,
+) -> PyResult<Vec<PyFinding>> {
+    let mut offsets = offsets.borrow_mut();
     findings
         .into_iter()
         .map(|finding| {
-            let (start, end) = char_range(text, finding.range())?;
+            let (start, end) = offsets.range(finding.range())?;
             Ok(PyFinding::from_core(finding, start, end))
         })
         .collect()
@@ -903,19 +1083,23 @@ fn findings_to_py(text: &str, findings: Vec<CoreFinding>) -> PyResult<Vec<PyFind
 /// A raised exception or a non-string return value becomes an opaque
 /// `FormatterFailure`, which `redact_secret::redact` reports as
 /// `PlaceholderFailureError`; the callback's own error is discarded.
-struct PyFormatterAdapter<'py, 'a> {
+struct PyFormatterAdapter<'py, 'a, 'text> {
     callable: &'a Bound<'py, PyAny>,
-    text: &'a str,
+    offsets: &'a RefCell<CharOffsets<'text>>,
 }
 
-impl PlaceholderFormatter for PyFormatterAdapter<'_, '_> {
+impl PlaceholderFormatter for PyFormatterAdapter<'_, '_, '_> {
     fn format(
         &self,
         finding: &CoreFinding,
         context: &PlaceholderContext,
     ) -> Result<String, redact_secret::FormatterFailure> {
-        let (start, end) =
-            char_range(self.text, finding.range()).map_err(|_| redact_secret::FormatterFailure)?;
+        // The borrow ends with this statement, before the callback runs.
+        let (start, end) = self
+            .offsets
+            .borrow_mut()
+            .range(finding.range())
+            .map_err(|_| redact_secret::FormatterFailure)?;
         let py_finding = Bound::new(
             self.callable.py(),
             PyFinding::from_core(finding.clone(), start, end),
@@ -946,13 +1130,14 @@ fn redact_core(
     findings: &[CoreFinding],
     formatter: Option<&Bound<'_, PyAny>>,
     limits: &WholeInputLimits,
+    offsets: &RefCell<CharOffsets<'_>>,
 ) -> PyResult<String> {
     match formatter {
         None => {
             core_redact(text, findings, &core_default_formatter, limits).map_err(map_core_error)
         }
         Some(callable) => {
-            let adapter = PyFormatterAdapter { callable, text };
+            let adapter = PyFormatterAdapter { callable, offsets };
             core_redact(text, findings, &adapter, limits).map_err(map_core_error)
         }
     }
@@ -1009,9 +1194,10 @@ fn scan<'py>(
 ) -> PyResult<Vec<PyFinding>> {
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
-    let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
-    let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
-    findings_to_py(&text_owned, findings)
+    let detected = detect(text.py(), text_owned, &limits, ruleset.as_ref())?;
+    let offsets = RefCell::new(CharOffsets::new(text_owned));
+    let findings = apply_policy(&offsets, detected, policy.as_ref())?;
+    findings_to_py(&offsets, findings)
 }
 
 /// Replaces every `redact`/`block` finding's span in `text` with a
@@ -1053,7 +1239,14 @@ fn redact<'py>(
         .iter()
         .map(|finding| finding.inner.clone())
         .collect();
-    redact_core(&text_owned, &core_findings, formatter.as_ref(), &limits)
+    let offsets = RefCell::new(CharOffsets::new(text_owned));
+    redact_core(
+        text_owned,
+        &core_findings,
+        formatter.as_ref(),
+        &limits,
+        &offsets,
+    )
 }
 
 /// Scans `text` and redacts it in one call, guaranteeing the returned
@@ -1074,10 +1267,13 @@ fn scan_and_redact<'py>(
 ) -> PyResult<PyScanResult> {
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
-    let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
-    let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
-    let redacted_text = redact_core(&text_owned, &findings, formatter.as_ref(), &limits)?;
-    let py_findings = findings_to_py(&text_owned, findings)?;
+    let detected = detect(text.py(), text_owned, &limits, ruleset.as_ref())?;
+    // One converter for the whole call: the policy callback, the formatter
+    // callback, and the returned findings all convert through it.
+    let offsets = RefCell::new(CharOffsets::new(text_owned));
+    let findings = apply_policy(&offsets, detected, policy.as_ref())?;
+    let redacted_text = redact_core(text_owned, &findings, formatter.as_ref(), &limits, &offsets)?;
+    let py_findings = findings_to_py(&offsets, findings)?;
     Ok(PyScanResult {
         text: redacted_text,
         findings: py_findings,
@@ -1155,6 +1351,7 @@ fn initialize(pii: Vec<String>) -> PyResult<()> {
         }
     } else {
         *guard = Some(selection);
+        PII_EPOCH.fetch_add(1, Ordering::SeqCst);
     }
     Ok(())
 }
@@ -1203,7 +1400,77 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::byte_offset_to_char_offset;
+    use std::sync::atomic::Ordering;
+
+    use super::{
+        ByteRange, CharOffsets, PII_EPOCH, REGISTRY_BUILDS, RegistryError,
+        byte_offset_to_char_offset, char_offset, char_range, run_detector_pipeline, with_registry,
+    };
+
+    /// A minimal, valid declarative ruleset.
+    const RULESET: &[u8] = b"ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+    fn builds() -> usize {
+        REGISTRY_BUILDS.with(std::cell::Cell::get)
+    }
+
+    fn detect_count(ruleset: Option<&[u8]>, text: &str) -> usize {
+        with_registry(ruleset, |registry| {
+            run_detector_pipeline(text, registry).unwrap().len()
+        })
+        .unwrap()
+    }
+
+    /// Issue #1059: repeated calls reuse one registry per thread, a changed
+    /// ruleset or a PII selection change rebuilds, and the ruleset's detector
+    /// still applies after the built-in registry was cached.
+    #[test]
+    fn the_registry_is_built_once_until_the_ruleset_or_pii_epoch_changes() {
+        // A fresh thread: the cache is thread-local, so other tests cannot
+        // have filled it.
+        std::thread::spawn(|| {
+            let acme = "x ACME_aaaaaaaaaaaaaaaaaaaaaaaa y";
+            let start = builds();
+            for _ in 0..5 {
+                assert_eq!(detect_count(None, "nothing here"), 0);
+            }
+            assert_eq!(builds() - start, 1);
+
+            // The ruleset registry is separate from the built-in one, reused
+            // for identical bytes, and its detector applies.
+            for _ in 0..5 {
+                assert_eq!(detect_count(Some(RULESET), acme), 1);
+            }
+            assert_eq!(builds() - start, 2);
+            assert_eq!(detect_count(None, acme), 0);
+            assert_eq!(builds() - start, 2);
+
+            // Different ruleset bytes rebuild.
+            let other: Vec<u8> = RULESET.iter().copied().chain(*b"\n").collect();
+            detect_count(Some(&other), acme);
+            assert_eq!(builds() - start, 3);
+
+            // A new PII epoch invalidates both caches.
+            PII_EPOCH.fetch_add(1, Ordering::SeqCst);
+            detect_count(None, acme);
+            detect_count(Some(&other), acme);
+            assert_eq!(builds() - start, 5);
+
+            // A rejected ruleset is never cached.
+            let rejected = with_registry(Some(b"not a ruleset"), |_| ());
+            assert!(matches!(rejected, Err(RegistryError::Ruleset(_))));
+            assert!(with_registry(Some(b"not a ruleset"), |_| ()).is_err());
+            assert_eq!(detect_count(Some(&other), acme), 1);
+        })
+        .join()
+        .unwrap();
+    }
 
     /// Mirrors `conformance/fixtures/unicode-conversion-corpus.json`
     /// (`decision-govern-cross-language-conformance`): an astral
@@ -1272,5 +1539,85 @@ mod tests {
     #[test]
     fn rejects_an_out_of_bounds_offset() {
         assert!(byte_offset_to_char_offset("abc", 4).is_err());
+    }
+
+    /// Deterministic generated inputs: ASCII-only, BMP, astral, invisible
+    /// code points, and the empty string.
+    fn generated_inputs() -> Vec<String> {
+        const POOL: [char; 10] = [
+            'a',
+            'Z',
+            '\n',
+            '\u{E9}',
+            '\u{4E2D}',
+            '\u{1F511}',
+            '\u{200B}',
+            '\u{FEFF}',
+            '\u{E0041}',
+            '\u{AD}',
+        ];
+        let mut inputs = vec![String::new(), "a".to_owned(), "abc def".to_owned()];
+        let mut state: u64 = 0x9E37_79B9_7F4A_7C15;
+        for length in 0..48 {
+            for ascii_only in [false, true] {
+                let mut input = String::new();
+                for _ in 0..length {
+                    state = state
+                        .wrapping_mul(6_364_136_223_846_793_005)
+                        .wrapping_add(1_442_695_040_888_963_407);
+                    let pick = usize::try_from(state >> 33).unwrap();
+                    let pool = if ascii_only { 3 } else { POOL.len() };
+                    input.push(POOL[pick % pool]);
+                }
+                inputs.push(input);
+            }
+        }
+        inputs
+    }
+
+    /// Every offset `0..=len + 1` (on and off character boundaries, and out
+    /// of bounds), ascending, then a repeating non-monotonic permutation,
+    /// then descending, through one converter each.
+    #[test]
+    fn forward_converter_matches_the_per_offset_oracle_in_any_order() {
+        for input in generated_inputs() {
+            let offsets: Vec<usize> = (0..=input.len() + 1).collect();
+            let mut queries = offsets.clone();
+            queries
+                .extend((0..offsets.len()).map(|index| offsets[(index * 7 + 3) % offsets.len()]));
+            queries.extend(offsets.iter().rev().copied());
+            let mut converter = CharOffsets::new(&input);
+            for &offset in &queries {
+                assert_eq!(
+                    converter.offset(offset),
+                    char_offset(&input, offset),
+                    "{input:?} {offset}"
+                );
+            }
+            let mut converter = CharOffsets::new(&input);
+            for &start in &offsets {
+                for &end in &offsets {
+                    let Some(range) = ByteRange::new(start, end) else {
+                        continue;
+                    };
+                    assert_eq!(
+                        converter.range(range).ok(),
+                        char_range(&input, range).ok(),
+                        "{input:?} {range:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn forward_converter_walks_each_byte_once_for_ascending_offsets() {
+        let input = "a\u{1F511}\u{E9}\u{4E2D}b\u{200B}".repeat(64);
+        let mut converter = CharOffsets::new(&input);
+        for offset in (0..=input.len()).filter(|&offset| input.is_char_boundary(offset)) {
+            converter.offset(offset);
+            converter.offset(offset);
+        }
+        assert_eq!(converter.walked, input.len());
     }
 }
