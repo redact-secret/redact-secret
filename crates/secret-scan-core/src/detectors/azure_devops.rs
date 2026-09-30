@@ -41,7 +41,7 @@
 //! name -- so it is an intentional false negative here, not a dedicated or
 //! contextual detection target.
 
-use crate::detectors::pattern::{self, is_alnum};
+use crate::detectors::pattern::{self, RunCursor, is_alnum};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -95,16 +95,19 @@ impl Detector for AzureDevOpsPersonalAccessTokenDetector {
 ///
 /// An input with no `AZDO` substring at all -- the overwhelming majority of
 /// scanned text, including every other provider's own token shapes -- returns
-/// before paying for [`pattern::run_ends`]'s whole-input table, which is the
-/// only allocation this detector would otherwise make regardless of whether
-/// the literal is present; large adversarial inputs stay within their
-/// declared runtime budget on this fast path.
+/// before doing any run measurement; large adversarial inputs stay within
+/// their declared runtime budget on this fast path.
+///
+/// Run ends come from two [`RunCursor`]s, one for the segment before the
+/// anchor and one for the segment after it, so each sees non-decreasing
+/// queries and measures each byte at most once (issue #1056).
 fn scan(input: &str) -> Vec<(usize, usize)> {
     if input.len() < PREFIX_LEN + ANCHOR.len() + SUFFIX_LEN || !input.contains(ANCHOR) {
         return Vec::new();
     }
     let bytes = input.as_bytes();
-    let ends = pattern::run_ends(bytes, is_alnum);
+    let mut prefix_ends = RunCursor::new(bytes, is_alnum);
+    let mut suffix_ends = RunCursor::new(bytes, is_alnum);
     let mut matches = Vec::new();
     let mut anchor = 0;
     while anchor < bytes.len() {
@@ -112,7 +115,7 @@ fn scan(input: &str) -> Vec<(usize, usize)> {
             anchor += 1;
             continue;
         }
-        let Some((start, end)) = match_at(bytes, &ends, anchor) else {
+        let Some((start, end)) = match_at(bytes, &mut prefix_ends, &mut suffix_ends, anchor) else {
             anchor += 1;
             continue;
         };
@@ -132,15 +135,20 @@ fn scan(input: &str) -> Vec<(usize, usize)> {
 /// the boundary check below sees an alphanumeric byte immediately before the
 /// candidate `start`, the same way a `{76}` regex quantifier followed by a
 /// boundary assertion would reject it.
-fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize)> {
+fn match_at(
+    bytes: &[u8],
+    prefix_ends: &mut RunCursor<'_>,
+    suffix_ends: &mut RunCursor<'_>,
+    anchor: usize,
+) -> Option<(usize, usize)> {
     let start = anchor.checked_sub(PREFIX_LEN)?;
-    if ends[start] < anchor {
+    if prefix_ends.end(start) < anchor {
         return None;
     }
 
     let suffix_start = anchor + ANCHOR.len();
     let end = suffix_start.checked_add(SUFFIX_LEN)?;
-    if end > bytes.len() || ends[suffix_start] < end {
+    if end > bytes.len() || suffix_ends.end(suffix_start) < end {
         return None;
     }
 

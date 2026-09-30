@@ -304,11 +304,20 @@ pub(crate) fn carries_aws_access_key_id(line: &str) -> bool {
 /// A line that carries an ID is never held (issue #1040): a run on it is
 /// already claimed, and the line below reads it through the session's copy.
 /// A run claimed by a name on its line holds nothing either.
+#[cfg(test)]
 pub(crate) fn has_open_aws_secret_candidate_line(
     unit: &str,
     above_has_id: impl FnOnce() -> bool,
 ) -> bool {
-    let tail = text::last_lines(unit, 2);
+    has_open_aws_secret_candidate_line_in(&super::lookback_tail(unit), above_has_id)
+}
+
+/// [`has_open_aws_secret_candidate_line`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_aws_secret_candidate_line_in(
+    tail: &[&str],
+    above_has_id: impl FnOnce() -> bool,
+) -> bool {
+    let tail = text::tail_lines(tail, 2);
     let Some(&last) = tail.last() else {
         return false;
     };
@@ -318,7 +327,7 @@ pub(crate) fn has_open_aws_secret_candidate_line(
     if !secret_runs(last, 0, last.len()).any(|(run_start, _)| !is_named(last, 0, run_start)) {
         return false;
     }
-    let above = match tail.as_slice() {
+    let above = match tail {
         [above, _] => carries_aws_access_key_id(above),
         _ => above_has_id(),
     };

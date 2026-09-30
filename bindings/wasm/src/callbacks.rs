@@ -9,6 +9,8 @@
 //! message (which could echo the input) into the public error surface
 //! (`decision-govern-cross-language-conformance`).
 
+use std::cell::RefCell;
+
 use js_sys::Function;
 use redact_secret::{
     Action, DetectedFinding, Finding, FormatterFailure, PlaceholderContext, PlaceholderFormatter,
@@ -17,18 +19,24 @@ use redact_secret::{
 use wasm_bindgen::JsValue;
 
 use crate::metadata;
+use crate::range::Utf16Ranges;
 
 /// Wraps a JavaScript function as a [`Policy`]: called with
 /// `(findingMetadata, context)`, it must return one of the four fixed action
 /// names (`"redact"`, `"block"`, `"warn"`, `"allow"`).
 pub(crate) struct JsPolicy<'a> {
-    input: &'a str,
+    /// Converts each finding's range over the whole input in one forward
+    /// pass across calls, rather than from byte 0 per finding (issue #1053).
+    ranges: RefCell<Utf16Ranges<'a>>,
     function: &'a Function,
 }
 
 impl<'a> JsPolicy<'a> {
-    pub(crate) const fn new(input: &'a str, function: &'a Function) -> Self {
-        Self { input, function }
+    pub(crate) fn new(input: &'a str, function: &'a Function) -> Self {
+        Self {
+            ranges: RefCell::new(Utf16Ranges::new(input)),
+            function,
+        }
     }
 }
 
@@ -38,8 +46,9 @@ impl Policy for JsPolicy<'_> {
         finding: &DetectedFinding,
         context: &PolicyContext,
     ) -> Result<Action, PolicyFailure> {
+        let (start, end) = self.ranges.borrow_mut().convert(finding.range());
         let finding_metadata =
-            metadata::policy_finding(self.input, finding).map_err(|_| PolicyFailure)?;
+            metadata::policy_finding_with_range(finding, start, end).map_err(|_| PolicyFailure)?;
         let context_metadata = metadata::policy_context(*context).map_err(|_| PolicyFailure)?;
         let result = self
             .function
@@ -55,13 +64,18 @@ impl Policy for JsPolicy<'_> {
 /// further validation of that string (non-empty, bounded, not reproducing a
 /// matched value) is the core's responsibility, not this wrapper's.
 pub(crate) struct JsPlaceholderFormatter<'a> {
-    input: &'a str,
+    /// Converts each finding's range over the whole input in one forward
+    /// pass across calls, rather than from byte 0 per finding (issue #1053).
+    ranges: RefCell<Utf16Ranges<'a>>,
     function: &'a Function,
 }
 
 impl<'a> JsPlaceholderFormatter<'a> {
-    pub(crate) const fn new(input: &'a str, function: &'a Function) -> Self {
-        Self { input, function }
+    pub(crate) fn new(input: &'a str, function: &'a Function) -> Self {
+        Self {
+            ranges: RefCell::new(Utf16Ranges::new(input)),
+            function,
+        }
     }
 }
 
@@ -71,8 +85,9 @@ impl PlaceholderFormatter for JsPlaceholderFormatter<'_> {
         finding: &Finding,
         context: &PlaceholderContext,
     ) -> Result<String, FormatterFailure> {
-        let finding_metadata =
-            metadata::formatter_finding(self.input, finding).map_err(|_| FormatterFailure)?;
+        let (start, end) = self.ranges.borrow_mut().convert(finding.range());
+        let finding_metadata = metadata::formatter_finding_with_range(finding, start, end)
+            .map_err(|_| FormatterFailure)?;
         let context_metadata =
             metadata::placeholder_context(*context).map_err(|_| FormatterFailure)?;
         let result = self

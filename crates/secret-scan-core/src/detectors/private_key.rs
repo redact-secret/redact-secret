@@ -278,18 +278,32 @@ impl PrivateKeyRetentionTracker {
     /// `BEGIN` delimiter has been seen since the last [`reset`](Self::reset),
     /// and whether a block is currently open (an unresolved `BEGIN` remains
     /// on the delimiter stack).
+    ///
+    /// The first piece after a [`reset`](Self::reset), which is every piece
+    /// of a unit that arrives as one line, is scanned in place: with no
+    /// lookbehind there is nothing to join it to. `lookbehind` only ever
+    /// holds a bounded delimiter suffix, and its allocation is reused for the
+    /// next one instead of reallocated (issue #1060).
     pub(crate) fn append(&mut self, piece: &str) -> (bool, bool) {
-        let input = format!("{}{piece}", self.lookbehind);
+        let joined;
+        let input = if self.lookbehind.is_empty() {
+            piece
+        } else {
+            joined = [self.lookbehind.as_str(), piece].concat();
+            joined.as_str()
+        };
         let input_offset = self.processed_bytes - self.lookbehind.len();
         scan_delimiters(
-            &input,
+            input,
             &mut self.state,
             self.processed_bytes,
             input_offset,
             |_| {},
         );
         self.processed_bytes += piece.len();
-        self.lookbehind = byte_suffix(&input, MAX_DELIMITER_LEN.saturating_sub(1)).to_string();
+        let suffix = byte_suffix(input, MAX_DELIMITER_LEN.saturating_sub(1));
+        self.lookbehind.clear();
+        self.lookbehind.push_str(suffix);
         (self.state.has_begin, !self.state.stack.is_empty())
     }
 

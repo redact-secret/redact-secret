@@ -93,12 +93,13 @@ impl Detector for TerraformCloudTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        // Input without the marker returns before the run-end table is built
-        // (issue #982).
+        // Input without the marker returns before any run is measured
+        // (issue #982); the cursor measures only the runs asked about
+        // (issue #1056).
         let Some(first) = find_marker(bytes, 0) else {
             return Ok(Vec::new());
         };
-        let alnum_ends = pattern::run_ends(bytes, is_alnum);
+        let mut alnum_ends = pattern::RunCursor::new(bytes, is_alnum);
         let mut candidates = Vec::new();
         let mut cursor = first;
         while cursor < bytes.len() {
@@ -106,7 +107,7 @@ impl Detector for TerraformCloudTokenDetector {
                 break;
             };
 
-            if let Some(range) = match_at(bytes, &alnum_ends, marker_start) {
+            if let Some(range) = match_at(bytes, &mut alnum_ends, marker_start) {
                 candidates.push(
                     Candidate::new("terraform_cloud_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
@@ -135,7 +136,11 @@ fn find_marker(bytes: &[u8], from: usize) -> Option<usize> {
 /// Attempts a `<14 alnum>.atlasv1.<67 alnum>` match anchored on the marker
 /// found at `marker_start`. Returns the whole candidate's byte range on
 /// success.
-fn match_at(bytes: &[u8], alnum_ends: &[usize], marker_start: usize) -> Option<ByteRange> {
+fn match_at(
+    bytes: &[u8],
+    alnum_ends: &mut pattern::RunCursor<'_>,
+    marker_start: usize,
+) -> Option<ByteRange> {
     if marker_start < PREFIX_LEN {
         return None;
     }
@@ -151,7 +156,7 @@ fn match_at(bytes: &[u8], alnum_ends: &[usize], marker_start: usize) -> Option<B
     }
 
     let suffix_start = marker_start + MARKER.len();
-    if alnum_ends[suffix_start] < suffix_start + SUFFIX_LEN {
+    if alnum_ends.end(suffix_start) < suffix_start + SUFFIX_LEN {
         return None;
     }
     let end = suffix_start + SUFFIX_LEN;

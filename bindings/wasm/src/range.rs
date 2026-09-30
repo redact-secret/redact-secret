@@ -18,6 +18,9 @@ use crate::util::saturating_u32;
 ///
 /// Returns `None` when `byte_offset` is out of bounds or splits a
 /// multi-byte character's encoding rather than landing on its boundary.
+///
+/// Test-only since issue #1053: the per-offset oracle for [`Utf16Ranges`].
+#[cfg(test)]
 fn byte_offset_to_utf16_offset(input: &str, byte_offset: usize) -> Option<usize> {
     if byte_offset > input.len() || !input.is_char_boundary(byte_offset) {
         return None;
@@ -37,6 +40,10 @@ fn byte_offset_to_utf16_offset(input: &str, byte_offset: usize) -> Option<usize>
 ///
 /// [`Finding`]: redact_secret::Finding
 /// [`DetectedFinding`]: redact_secret::DetectedFinding
+///
+/// Test-only since issue #1053: every production conversion goes through
+/// [`Utf16Ranges`], and this stays as its per-offset oracle.
+#[cfg(test)]
 pub(crate) fn to_utf16_range(input: &str, range: ByteRange) -> (u32, u32) {
     let full_length = || input.encode_utf16().count();
     let start = byte_offset_to_utf16_offset(input, range.start()).unwrap_or_else(full_length);
@@ -47,24 +54,29 @@ pub(crate) fn to_utf16_range(input: &str, range: ByteRange) -> (u32, u32) {
 /// Converts the ranges of several findings over one `input` to UTF-16
 /// code units, resuming each conversion from where the previous one ended.
 ///
-/// [`to_utf16_range`] counts from the start of `input` on every call, so
+/// `to_utf16_range` counts from the start of `input` on every call, so
 /// converting every finding of a whole-input scan that way costs
 /// input length times finding count. Findings arrive in ascending offset
 /// order, so resuming from the last converted offset makes the whole batch
 /// one pass over `input`; an offset before the last one restarts from the
-/// beginning, and every returned bound equals [`to_utf16_range`]'s (issue
+/// beginning, and every returned bound equals `to_utf16_range`'s (issue
 /// #950).
+///
+/// An all-ASCII `input` skips the walk entirely: there, UTF-8 bytes and
+/// UTF-16 code units coincide (issue #1053).
 pub(crate) struct Utf16Ranges<'a> {
     input: &'a str,
+    ascii: bool,
     /// A character boundary of `input`, and its UTF-16 offset.
     byte: usize,
     utf16: usize,
 }
 
 impl<'a> Utf16Ranges<'a> {
-    pub(crate) const fn new(input: &'a str) -> Self {
+    pub(crate) fn new(input: &'a str) -> Self {
         Self {
             input,
+            ascii: input.is_ascii(),
             byte: 0,
             utf16: 0,
         }
@@ -73,6 +85,9 @@ impl<'a> Utf16Ranges<'a> {
     fn offset(&mut self, byte_offset: usize) -> Option<usize> {
         if byte_offset > self.input.len() || !self.input.is_char_boundary(byte_offset) {
             return None;
+        }
+        if self.ascii {
+            return Some(byte_offset);
         }
         if byte_offset < self.byte {
             self.byte = 0;
@@ -83,7 +98,7 @@ impl<'a> Utf16Ranges<'a> {
         Some(self.utf16)
     }
 
-    /// [`to_utf16_range`] for `range`, with the same fallback for a bound
+    /// `to_utf16_range` for `range`, with the same fallback for a bound
     /// that is out of bounds or off a character boundary.
     pub(crate) fn convert(&mut self, range: ByteRange) -> (u32, u32) {
         let input = self.input;
@@ -182,6 +197,12 @@ mod tests {
             .map(|fixture| fixture.input)
             .collect();
         inputs.push("a\u{1F511}é中b\u{1F600}".to_owned());
+        // Issue #1053: the ASCII fast path (including the empty input) and
+        // invisible code points, BMP and astral.
+        inputs.push(String::new());
+        inputs.push("abc def\n".to_owned());
+        inputs.push("\u{200B}x\u{FEFF}\u{E0041}y\u{AD}\u{2060}".to_owned());
+        inputs.push("\u{E0041}".to_owned());
         for input in &inputs {
             // Every pair of offsets, including ones off a character boundary
             // and past the end, in ascending then descending order.

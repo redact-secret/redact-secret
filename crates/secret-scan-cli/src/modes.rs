@@ -33,10 +33,8 @@ use crate::report::{Report, SafeFinding};
 /// The core, not the CLI, performs every grammar and cost-bound check
 /// (`redact_secret::load_ruleset`); this only reads the file and confirms
 /// the read bytes are loadable at all. Every source scan later re-parses
-/// the same bytes to get its own fresh detector set — parsing is cheap and
-/// stateless, and [`DetectorRegistry::with_built_in`] consumes its custom
-/// iterator, so a registry cannot be reused across sources anyway (the
-/// built-in-only path already rebuilds one per source).
+/// the same bytes: [`check`] builds one registry from them and reuses it
+/// for every file (issue #1059).
 ///
 /// # Errors
 ///
@@ -75,9 +73,14 @@ pub fn check(
     selection: &redact_secret::PiiSelection,
 ) -> Report {
     let mut report = Report::new();
+    // Built on the first file and reused for the rest: `scan` only borrows
+    // it, and building it costs more than scanning a small file. A build
+    // failure is recorded against the file that hit it and retried for the
+    // next one, so it is reported per file as it always was.
+    let mut registry = None;
     for source in sources {
         let identity = source.identity();
-        match check_source(source, stdin, ruleset, selection) {
+        match check_source(source, stdin, ruleset, selection, &mut registry) {
             Ok(findings) => report.push_source(identity, findings),
             Err(failure) => report.push_failure(identity, failure),
         }
@@ -90,6 +93,7 @@ fn check_source(
     stdin: &mut dyn Read,
     ruleset: Option<&[u8]>,
     selection: &redact_secret::PiiSelection,
+    registry: &mut Option<DetectorRegistry>,
 ) -> Result<Vec<SafeFinding>, Failure> {
     match source {
         // `args::parse` refuses `--ruleset` combined with standard input
@@ -102,7 +106,7 @@ fn check_source(
             // unit produces is dropped with the result that carried it.
             stream(stdin, &mut session, &mut |_sanitized| Ok(()))
         }
-        Source::File(path) => check_file(path, ruleset, selection),
+        Source::File(path) => check_file(path, ruleset, selection, registry),
     }
 }
 
@@ -110,10 +114,14 @@ fn check_file(
     path: &Path,
     ruleset: Option<&[u8]>,
     selection: &redact_secret::PiiSelection,
+    registry: &mut Option<DetectorRegistry>,
 ) -> Result<Vec<SafeFinding>, Failure> {
-    let registry = registry_for(ruleset, selection)?;
+    let registry = match registry {
+        Some(registry) => registry,
+        empty => empty.insert(registry_for(ruleset, selection)?),
+    };
     let text = read_file_text(path)?;
-    let findings = scan(&text, &registry, &DefaultPolicy)?;
+    let findings = scan(&text, registry, &DefaultPolicy)?;
     drop(text);
     Ok(collect(&findings))
 }

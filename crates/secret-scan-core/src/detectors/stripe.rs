@@ -98,12 +98,12 @@ fn has_filler_body(value: &str) -> bool {
 /// embeds the prefix never yields a second, shorter reading.
 fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    // Input without the prefix returns before the run-end table is built
-    // (issue #982).
+    // Input without the prefix returns before any run is measured (issue
+    // #982); the cursor measures only the runs asked about (issue #1056).
     let Some(first) = pattern::find_literal(bytes, WEBHOOK_PREFIX.as_bytes(), 0) else {
         return Vec::new();
     };
-    let body_ends = pattern::run_ends(bytes, is_base64_body);
+    let mut body_ends = pattern::RunCursor::new(bytes, is_base64_body);
     let mut matches = Vec::new();
     let mut start = first;
     while start < bytes.len() {
@@ -112,7 +112,7 @@ fn scan_webhook(input: &str) -> Vec<(usize, usize)> {
             continue;
         }
         let body_start = start + WEBHOOK_PREFIX.len();
-        let body_end = body_ends[body_start];
+        let body_end = body_ends.end(body_start);
         if body_end - body_start < WEBHOOK_BODY_MIN {
             start += 1;
             continue;

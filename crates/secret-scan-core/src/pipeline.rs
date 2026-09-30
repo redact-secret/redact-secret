@@ -8,7 +8,7 @@
 
 use std::cmp::Ordering;
 
-use crate::detectors::PairSet;
+use crate::detectors::ScanScope;
 use crate::error::{DetectorFailure, SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
 use crate::limits::WholeInputLimits;
@@ -161,12 +161,20 @@ fn validate_candidate<'a>(
 /// batch rather than with each unit (issue #985).
 ///
 /// A built-in detector that declared literals (issue #983) is skipped when
-/// the scan copy's byte pairs rule out every one of them: it would have
-/// returned no candidates. It still gets its empty list, so the lists stay
-/// aligned with registration order. The pair set covers the whole batch, so
-/// a pair absent from it is absent from every unit. Debug builds run the
-/// skipped detector anyway and assert that it proposes nothing, so every
-/// test that scans also checks the declarations.
+/// none of them occurs in the scan copy: it would have returned no
+/// candidates. One pass of the registry's compiled [`LiteralMatcher`]
+/// (issue #1057) finds exactly which declaring detectors have a literal in
+/// the copy. A skipped detector still gets its empty list, so the lists
+/// stay aligned with registration order. The pass covers the whole batch,
+/// so a literal absent from it is absent from every unit. Debug builds run
+/// the skipped detector anyway and assert that it proposes nothing, so
+/// every test that scans also checks the declarations.
+///
+/// The detectors run inside a [`ScanScope`] over `scanned`, which lets a
+/// ruleset detector rule its prefix out from byte pairs shared by every
+/// ruleset detector of the call.
+///
+/// [`LiteralMatcher`]: crate::detectors::LiteralMatcher
 fn collect_candidates(
     scanned: &str,
     registry: &DetectorRegistry,
@@ -177,10 +185,15 @@ fn collect_candidates(
     // size hint, so the list grew by doubling on every call, and an
     // incremental session makes one call per closed line (issue #950).
     let mut per_detector = Vec::with_capacity(registry.len());
-    let mut pairs = None;
-    for registered in registry.detectors() {
-        if let Some(required) = registered.required_literals()
-            && !required.may_match(pairs.get_or_insert_with(|| PairSet::of(scanned.as_bytes())))
+    let present = registry
+        .prefilter()
+        .map(|matcher| matcher.present(scanned.as_bytes()));
+    let _scope = ScanScope::enter(scanned);
+    for (position, registered) in registry.detectors().iter().enumerate() {
+        if registered.required_literals().is_some()
+            && present
+                .as_ref()
+                .is_some_and(|present| !present.contains(position))
         {
             #[cfg(debug_assertions)]
             assert_skip_is_exact(scanned, context, registered);

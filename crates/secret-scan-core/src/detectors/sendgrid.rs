@@ -8,7 +8,7 @@
 //! this detector walks the match by hand the way [`super::jwt`] does for its
 //! own multi-segment shape.
 
-use crate::detectors::pattern::{self, is_alnum_dash};
+use crate::detectors::pattern::{self, RunCursor, is_alnum_dash};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -33,12 +33,14 @@ impl Detector for SendgridTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        // Input without the prefix returns before the run-end table is built
-        // (issue #982).
+        // Input without the prefix returns before any run is measured
+        // (issue #982). One cursor per segment keeps each one's queries
+        // non-decreasing, so each measures a byte at most once (issue #1056).
         let Some(first) = pattern::find_literal(bytes, PREFIX, 0) else {
             return Ok(Vec::new());
         };
-        let ends = pattern::run_ends(bytes, is_alnum_dash);
+        let mut id_ends = RunCursor::new(bytes, is_alnum_dash);
+        let mut secret_ends = RunCursor::new(bytes, is_alnum_dash);
         let mut candidates = Vec::new();
         let mut start = first;
         while start < bytes.len() {
@@ -47,7 +49,7 @@ impl Detector for SendgridTokenDetector {
                 continue;
             }
 
-            let Some(end) = match_at(bytes, &ends, start) else {
+            let Some(end) = match_at(bytes, &mut id_ends, &mut secret_ends, start) else {
                 start += 1;
                 continue;
             };
@@ -72,12 +74,18 @@ impl Detector for SendgridTokenDetector {
 /// exclusive end offset on success; the caller still applies the boundary
 /// check.
 ///
-/// `ends` is the precomputed maximal-run-end table from
-/// [`pattern::run_ends`], so each segment's length is a table lookup rather
-/// than a rescan, keeping the whole detector linear in the input length.
-fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
+/// `id_ends` and `secret_ends` are [`RunCursor`]s, one per segment, so each
+/// sees non-decreasing queries and measures a byte at most once, keeping
+/// the whole detector linear in the input length without a whole-input
+/// table (issue #1056).
+fn match_at(
+    bytes: &[u8],
+    id_ends: &mut RunCursor<'_>,
+    secret_ends: &mut RunCursor<'_>,
+    start: usize,
+) -> Option<usize> {
     let id_start = start + PREFIX.len();
-    if ends[id_start] < id_start + ID_LEN {
+    if id_ends.end(id_start) < id_start + ID_LEN {
         return None;
     }
     let dot = id_start + ID_LEN;
@@ -86,7 +94,7 @@ fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
     }
 
     let secret_start = dot + 1;
-    if ends[secret_start] < secret_start + SECRET_LEN {
+    if secret_ends.end(secret_start) < secret_start + SECRET_LEN {
         return None;
     }
 

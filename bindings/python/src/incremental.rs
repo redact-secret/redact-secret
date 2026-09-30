@@ -610,8 +610,8 @@ impl PyIncrementalSanitizer {
                 return Err(error);
             }
         };
-        self.index.borrow_mut().observe(&text);
-        match self.session.append(&text) {
+        self.index.borrow_mut().observe(text);
+        match self.session.append(text) {
             Ok(result) => self.finish(result, false),
             Err(error) => Err(self.fail(error)),
         }

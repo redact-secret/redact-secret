@@ -227,12 +227,14 @@ impl<'a> PrefixShape<'a> {
 /// For every offset, the exclusive end of the maximal run of `alphabet`
 /// bytes starting there.
 ///
-/// A detector may see the same alphabet run touched by several candidate
-/// prefixes (a prefix's own bytes are often themselves alphabet members), so
-/// computing this table once per scan — rather than rescanning forward from
-/// each candidate position — keeps a whole scan linear in the input length
-/// instead of quadratic on adversarial input.
+/// The test oracle for [`RunCursor`] and [`run_end`]. Detectors used to
+/// build this table on their first prefix hit, which cost a whole-input
+/// pass and `8 * (n + 1)` bytes per alphabet per detector however short the
+/// matched span (issue #1056); they now ask a [`RunCursor`], which answers
+/// every query identically without the table.
+#[cfg(test)]
 pub(super) fn run_ends(bytes: &[u8], alphabet: Alphabet) -> Vec<usize> {
+    probe::record_table();
     let mut ends = vec![0usize; bytes.len() + 1];
     ends[bytes.len()] = bytes.len();
     for index in (0..bytes.len()).rev() {
@@ -258,8 +260,8 @@ pub(super) fn run_end(bytes: &[u8], from: usize, alphabet: Alphabet) -> usize {
         .unwrap_or(bytes.len() - from)
 }
 
-/// [`run_ends`] answered on demand: the same value for every query, in any
-/// query order, without the whole-input table (issue #982).
+/// The `run_ends` table answered on demand: the same value for every query,
+/// in any query order, without the whole-input table (issues #982, #1056).
 ///
 /// The cursor caches the last maximal run it measured. A query inside that
 /// run, or at its end, is answered from the cache. Any other query scans
@@ -300,6 +302,14 @@ impl<'a> RunCursor<'a> {
     /// `run_ends(bytes, alphabet)[at]`. Panics when `at > bytes.len()`, as
     /// indexing the table would.
     pub(super) fn end(&mut self, at: usize) -> usize {
+        let end = self.measure(at);
+        #[cfg(test)]
+        probe::check_answer(self.bytes, self.alphabet, at, end);
+        end
+    }
+
+    /// [`Self::end`] without the test-only oracle check.
+    fn measure(&mut self, at: usize) -> usize {
         if self.start <= at && at <= self.end {
             return self.end;
         }
@@ -314,6 +324,7 @@ impl<'a> RunCursor<'a> {
         #[cfg(test)]
         {
             self.scanned += end - at;
+            probe::record_scanned(end - at);
         }
         // Every byte from `at` to the cached run's start is in the
         // alphabet, so the run continues through the cached run.
@@ -329,6 +340,75 @@ impl<'a> RunCursor<'a> {
     #[cfg(test)]
     pub(super) fn scanned(&self) -> usize {
         self.scanned
+    }
+}
+
+/// Test-only instrumentation shared by every [`RunCursor`] on the current
+/// thread, so a test can observe the cursors a detector builds internally
+/// (issue #1056): how many bytes they tested in total, and, while
+/// [`probe::with_table_check`] runs, that every answer equals the
+/// [`run_ends`] table the detectors used to build.
+#[cfg(test)]
+pub(super) mod probe {
+    use super::{Alphabet, run_ends};
+    use std::cell::Cell;
+
+    thread_local! {
+        static SCANNED: Cell<usize> = const { Cell::new(0) };
+        static CHECKING: Cell<bool> = const { Cell::new(false) };
+        static CHECKED: Cell<usize> = const { Cell::new(0) };
+        static TABLES: Cell<usize> = const { Cell::new(0) };
+    }
+
+    pub(in crate::detectors) fn record_scanned(bytes: usize) {
+        SCANNED.with(|scanned| scanned.set(scanned.get() + bytes));
+    }
+
+    pub(in crate::detectors) fn record_table() {
+        TABLES.with(|tables| tables.set(tables.get() + 1));
+    }
+
+    /// Whole-input tables built on this thread while `body` runs.
+    pub(in crate::detectors) fn tables_during(body: impl FnOnce()) -> usize {
+        let before = TABLES.with(Cell::get);
+        body();
+        TABLES.with(Cell::get) - before
+    }
+
+    pub(in crate::detectors) fn check_answer(
+        bytes: &[u8],
+        alphabet: Alphabet,
+        at: usize,
+        end: usize,
+    ) {
+        if CHECKING.with(Cell::get) {
+            assert_eq!(end, run_ends(bytes, alphabet)[at], "{bytes:?} at {at}");
+            CHECKED.with(|checked| checked.set(checked.get() + 1));
+        }
+    }
+
+    /// Bytes tested by every cursor on this thread while `body` runs.
+    pub(in crate::detectors) fn scanned_during(body: impl FnOnce()) -> usize {
+        let before = SCANNED.with(Cell::get);
+        body();
+        SCANNED.with(Cell::get) - before
+    }
+
+    /// Runs `body` asserting every cursor answer on this thread against
+    /// the whole-input table; returns how many answers were checked.
+    pub(in crate::detectors) fn with_table_check(body: impl FnOnce()) -> usize {
+        struct Reset;
+        impl Drop for Reset {
+            fn drop(&mut self) {
+                CHECKING.with(|checking| checking.set(false));
+            }
+        }
+        let before = CHECKED.with(Cell::get);
+        CHECKING.with(|checking| checking.set(true));
+        let reset = Reset;
+        body();
+        drop(reset);
+        CHECKED.with(Cell::get) - before
     }
 }
 
@@ -560,16 +640,24 @@ pub(super) fn scan_prefixed_shapes(
     let Some(mut start) = lead_bytes.find(bytes, 0) else {
         return Vec::new();
     };
-    // Run-end tables are built on first use, one per distinct alphabet:
-    // most inputs contain no prefix at all, and an eager table costs a pass
-    // and an allocation per alphabet. Function-pointer identity
-    // (`std::ptr::fn_addr_eq`, not `==`, whose result the compiler does not
-    // guarantee is meaningful) is enough to share a table: a same-address
-    // false positive between two distinct `Alphabet` functions would only
-    // share a table those functions' identical code already makes
-    // interchangeable. `Vec::new` does not allocate, so a scan that finds no
-    // prefix never allocates here (issue #950).
-    let mut tables: Vec<(Alphabet, Vec<usize>)> = Vec::new();
+    // One run cursor per distinct alphabet, made on first use. A cursor
+    // measures only the runs the scan asks about, so a prefix hit costs its
+    // own run rather than a whole-input table pass and `8 * (n + 1)` bytes
+    // per alphabet (issue #1056). Queries are forward except that a
+    // shorter prefix at a later start can ask up to the longest prefix's
+    // length behind the previous query. The cursor answers any order
+    // exactly; a step back re-measures only the bytes it steps over, and
+    // can evict the cached run so a later query measures that run again.
+    // Every scan start is distinct and a step back reaches at most the
+    // longest prefix's length, so each run is measured at most that many
+    // extra times: still linear in the input. Function-pointer identity (`std::ptr::fn_addr_eq`, not
+    // `==`, whose result the compiler does not guarantee is meaningful) is
+    // enough to share a cursor: a same-address false positive between two
+    // distinct `Alphabet` functions would only share a cursor those
+    // functions' identical code already makes interchangeable. `Vec::new`
+    // does not allocate, so a scan that finds no prefix never allocates
+    // here (issue #950).
+    let mut cursors: Vec<RunCursor<'_>> = Vec::new();
 
     let mut matches = Vec::new();
     while start < bytes.len() {
@@ -588,18 +676,17 @@ pub(super) fn scan_prefixed_shapes(
             continue;
         };
 
-        let table_index = if let Some(index) = tables
+        let cursor_index = if let Some(index) = cursors
             .iter()
-            .position(|&(alphabet, _)| std::ptr::fn_addr_eq(alphabet, shape.alphabet))
+            .position(|cursor| std::ptr::fn_addr_eq(cursor.alphabet, shape.alphabet))
         {
             index
         } else {
-            tables.push((shape.alphabet, run_ends(bytes, shape.alphabet)));
-            tables.len() - 1
+            cursors.push(RunCursor::new(bytes, shape.alphabet));
+            cursors.len() - 1
         };
-        let ends = &tables[table_index].1;
         let suffix_start = start + shape.prefix.len();
-        let available = ends[suffix_start] - suffix_start;
+        let available = cursors[cursor_index].end(suffix_start) - suffix_start;
         let matched_len = match shape.run {
             RunLength::Exact(len) if available >= len => len,
             RunLength::OneOf(lens) => {
@@ -999,5 +1086,329 @@ mod tests {
         // check, so no further candidate is proposed.
         assert_eq!(matches, Vec::new());
         assert!(input.len() > 79_000);
+    }
+
+    /// The built-in detectors that used to build a whole-input run-end table
+    /// and now ask a [`RunCursor`] (issue #1056), plus two
+    /// [`scan_prefixed_shapes`] users.
+    const SWITCHED: [&str; 14] = [
+        "azure-devops-personal-access-token",
+        "firebase-server-key",
+        "gitlab-runner-authentication-token",
+        "grafana-service-account-token",
+        "microsoft-entra-client-secret",
+        "notion-token",
+        "openai-token",
+        "sendgrid-token",
+        "sentry-org-auth-token",
+        "slack-token",
+        "stripe-token",
+        "terraform-cloud-token",
+        "github-token",
+        "docker-token",
+    ];
+
+    const DIGITS: &[u8] = b"0123456789";
+    const ALNUM: &[u8] = b"SYNTHETICrevoked0123456789";
+    const ALNUM_DASH: &[u8] = b"SYNTHETICrevoked0123456789-_";
+    const HEX: &[u8] = b"0123456789abcdef";
+    const BASE64: &[u8] = b"SYNTHETICrevoked0123456789+/";
+
+    /// A piece of a synthetic value: a literal, or a run of `len` bytes
+    /// drawn from a pool.
+    #[derive(Clone, Copy)]
+    enum Piece {
+        Lit(&'static str),
+        Run(&'static [u8], usize),
+    }
+
+    use Piece::{Lit, Run};
+
+    /// One documented-looking shape per switched grammar, built only from
+    /// the synthetic pools above.
+    const TEMPLATES: &[&[Piece]] = &[
+        &[Run(ALNUM, 76), Lit("AZDO"), Run(ALNUM, 4)],
+        &[
+            Lit("AAAA"),
+            Run(ALNUM_DASH, 7),
+            Lit(":"),
+            Run(ALNUM_DASH, 140),
+        ],
+        &[Lit("glrt-"), Run(ALNUM_DASH, 20)],
+        &[
+            Lit("glrt-"),
+            Run(ALNUM_DASH, 27),
+            Lit("."),
+            Run(ALNUM, 2),
+            Lit("."),
+            Run(ALNUM, 9),
+        ],
+        &[Lit("glsa_"), Run(ALNUM, 32), Lit("_"), Run(HEX, 8)],
+        &[Run(ALNUM, 3), Run(DIGITS, 1), Lit("Q~"), Run(ALNUM, 32)],
+        &[Lit("ntn_"), Run(DIGITS, 11), Run(ALNUM, 35)],
+        &[Lit("sk-"), Run(ALNUM, 20), Lit("T3BlbkFJ"), Run(ALNUM, 20)],
+        &[
+            Lit("sk-proj-"),
+            Run(ALNUM_DASH, 74),
+            Lit("T3BlbkFJ"),
+            Run(ALNUM_DASH, 74),
+        ],
+        &[
+            Lit("sk-svcacct-"),
+            Run(ALNUM_DASH, 58),
+            Lit("T3BlbkFJ"),
+            Run(ALNUM_DASH, 58),
+        ],
+        &[
+            Lit("SG."),
+            Run(ALNUM_DASH, 22),
+            Lit("."),
+            Run(ALNUM_DASH, 43),
+        ],
+        &[
+            Lit("sntrys_eyJ"),
+            Run(BASE64, 30),
+            Lit("=_"),
+            Run(BASE64, 43),
+        ],
+        &[Lit("whsec_"), Run(BASE64, 32)],
+        &[
+            Lit("xoxb-"),
+            Run(DIGITS, 11),
+            Lit("-"),
+            Run(DIGITS, 12),
+            Lit("-"),
+            Run(ALNUM, 24),
+        ],
+        &[
+            Lit("xoxp-"),
+            Run(DIGITS, 6),
+            Lit("-"),
+            Run(DIGITS, 7),
+            Lit("-"),
+            Run(DIGITS, 8),
+            Lit("-"),
+            Run(ALNUM, 28),
+        ],
+        &[
+            Lit("xapp-"),
+            Run(DIGITS, 1),
+            Lit("-"),
+            Run(ALNUM, 11),
+            Lit("-"),
+            Run(DIGITS, 13),
+            Lit("-"),
+            Run(ALNUM, 64),
+        ],
+        &[
+            Lit("xoxe.xoxb-"),
+            Run(DIGITS, 1),
+            Lit("-"),
+            Run(ALNUM_DASH, 30),
+        ],
+        &[Run(ALNUM, 14), Lit(".atlasv1."), Run(ALNUM, 67)],
+        &[Lit("ghp_"), Run(ALNUM, 36)],
+        &[Lit("dckr_pat_"), Run(ALNUM_DASH, 27)],
+    ];
+
+    /// Filler between values: separators, non-ASCII and invisible code
+    /// points, and bare prefixes with nothing valid after them.
+    const FILLER: &[&str] = &[
+        " ",
+        "\n",
+        "-",
+        "_",
+        ".",
+        ":",
+        "=",
+        "/",
+        "é",
+        "\u{200B}",
+        "\u{FEFF}",
+        "한",
+        "sk-",
+        "xoxb-",
+        "xapp-",
+        "xoxe.",
+        "AZDO",
+        "Q~",
+        "glrt-",
+        "glsa_",
+        "eyJ",
+        "T3BlbkFJ",
+        "SG.",
+        "AAAA",
+        "ntn_",
+        "whsec_",
+        ".atlasv1.",
+        "sntrys_",
+        "ghp_",
+    ];
+
+    /// `template`'s pieces with random pool bytes; with `perturb`, each run
+    /// length is sometimes one byte short or long.
+    fn render(rng: &mut XorShift, template: &[Piece], perturb: bool) -> String {
+        let mut value = String::new();
+        for piece in template {
+            match *piece {
+                Lit(literal) => value.push_str(literal),
+                Run(pool, len) => {
+                    let len = match rng.below(if perturb { 6 } else { 1 }) {
+                        1 => len.saturating_sub(1),
+                        2 => len + 1,
+                        _ => len,
+                    };
+                    value.extend((0..len).map(|_| char::from(pool[rng.below(pool.len())])));
+                }
+            }
+        }
+        value
+    }
+
+    /// Generated inputs mixing whole and near-miss values, glued or
+    /// separated, with runs cut off at the end of the input.
+    fn generated_detector_inputs(rng: &mut XorShift) -> Vec<String> {
+        let mut inputs = vec![String::new(), "xoxb-".to_owned(), "sk-".to_owned()];
+        for template in TEMPLATES {
+            inputs.push(render(rng, template, false));
+        }
+        for _ in 0..300 {
+            let mut input = String::new();
+            for _ in 0..=rng.below(10) {
+                match rng.below(3) {
+                    0 => {
+                        let template = TEMPLATES[rng.below(TEMPLATES.len())];
+                        input.push_str(&render(rng, template, true));
+                    }
+                    1 => input.push_str(FILLER[rng.below(FILLER.len())]),
+                    _ => {
+                        let len = rng.below(40);
+                        input.push_str(&render(rng, &[Run(ALNUM_DASH, len)], false));
+                    }
+                }
+            }
+            if rng.below(4) == 0 {
+                let mut cut = rng.below(input.len() + 1);
+                while !input.is_char_boundary(cut) {
+                    cut -= 1;
+                }
+                input.truncate(cut);
+            }
+            inputs.push(input);
+        }
+        inputs
+    }
+
+    /// Every run query every built-in detector makes on generated inputs is
+    /// answered exactly as the whole-input table would answer it (issue
+    /// #1056). The detectors' only change is where that answer comes from,
+    /// so their output is unchanged; the test also requires each switched
+    /// detector to have made queries and found candidates, so the match
+    /// paths, not only the rejections, were compared.
+    #[test]
+    fn every_detector_run_query_equals_the_whole_input_table() {
+        use crate::types::{Detector, DetectorContext};
+        let mut rng = XorShift(0x1056_0001_c0de_5eed);
+        let mut queries = std::collections::HashMap::<&str, usize>::new();
+        let mut found = std::collections::HashMap::<&str, usize>::new();
+        for input in generated_detector_inputs(&mut rng) {
+            for row in crate::detectors::built_in_detectors() {
+                let detector: &dyn Detector = &**row;
+                let mut candidates = 0;
+                let checked = probe::with_table_check(|| {
+                    candidates = detector
+                        .detect(&input, &DetectorContext::new(input.len()))
+                        .map_or(0, |candidates| candidates.len());
+                });
+                *queries.entry(row.id).or_default() += checked;
+                *found.entry(row.id).or_default() += candidates;
+            }
+        }
+        for id in SWITCHED {
+            assert!(
+                queries.get(id).copied().unwrap_or(0) > 0,
+                "{id} made no query"
+            );
+            assert!(
+                found.get(id).copied().unwrap_or(0) > 0,
+                "{id} found nothing"
+            );
+        }
+    }
+
+    /// A prefix hit costs the runs the detector asks about, not a pass over
+    /// the whole input: each switched detector builds no table and tests
+    /// the same number of bytes whether the value is followed by 4 KiB or
+    /// 256 KiB of prefix-free text (issue #1056).
+    #[test]
+    fn switched_detectors_measure_only_the_queried_runs() {
+        use crate::types::{Detector, DetectorContext};
+        let mut rng = XorShift(0x1056_0002_0bad_cafe);
+        let filler = "plain words, spaces; nothing else. ";
+        for template in TEMPLATES {
+            let value = render(&mut rng, template, false);
+            let mut measured = Vec::new();
+            for filler_len in [4 << 10, 256 << 10] {
+                let input = format!("{value} {}", filler.repeat(filler_len / filler.len()));
+                let mut scanned = 0;
+                let mut candidates = 0;
+                let tables = probe::tables_during(|| {
+                    scanned = probe::scanned_during(|| {
+                        for row in crate::detectors::built_in_detectors() {
+                            if !SWITCHED.contains(&row.id) {
+                                continue;
+                            }
+                            let detector: &dyn Detector = &**row;
+                            candidates += detector
+                                .detect(&input, &DetectorContext::new(input.len()))
+                                .map_or(0, |candidates| candidates.len());
+                        }
+                    });
+                });
+                assert_eq!(tables, 0, "{value}");
+                measured.push((scanned, candidates));
+            }
+            assert_eq!(measured[0], measured[1], "{value}");
+            assert!(measured[1].0 <= 8 * value.len(), "{value} {measured:?}");
+        }
+    }
+
+    /// [`scan_prefixed_shapes`] with prefixes of different lengths sharing
+    /// an alphabet, so a shorter prefix at a later start queries behind the
+    /// previous query: every answer still equals the table, and the bytes
+    /// tested stay within the longest prefix's length plus one per input
+    /// byte (issue #1056).
+    #[test]
+    fn scan_prefixed_shapes_stays_exact_and_linear_when_queries_step_back() {
+        const LONGEST: usize = 8;
+        let shapes = [
+            PrefixShape::exact("ab-cdefg", 12, is_alnum, &[]),
+            PrefixShape::exact("b", 12, is_alnum, &[]),
+            PrefixShape::one_of("cd", &[3, 5], is_alnum, &[]),
+            PrefixShape::at_least("g-", 4, is_alnum_dash, &[]),
+            PrefixShape::open_floor("e", 2, is_alnum_dash, &[]),
+        ];
+        let pieces = ["ab-cdefg", "b", "cd", "g-", "e", "-", " ", "é", "\u{200B}"];
+        let mut rng = XorShift(0x1056_0003_feed_f00d);
+        for _ in 0..300 {
+            let mut input = String::new();
+            for _ in 0..rng.below(40) {
+                if rng.below(3) == 0 {
+                    let len = rng.below(30);
+                    input.push_str(&render(&mut rng, &[Run(ALNUM, len)], false));
+                } else {
+                    input.push_str(pieces[rng.below(pieces.len())]);
+                }
+            }
+            let scanned = probe::scanned_during(|| {
+                probe::with_table_check(|| {
+                    scan_prefixed_shapes(&input, &shapes, is_alnum_dash);
+                });
+            });
+            assert!(
+                scanned <= (LONGEST + 1) * (input.len() + 1),
+                "{input:?} {scanned}"
+            );
+        }
     }
 }

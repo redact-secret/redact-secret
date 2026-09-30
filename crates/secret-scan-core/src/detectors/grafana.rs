@@ -45,7 +45,7 @@
 //! own, the same tradeoff every other fixed-prefix provider grammar in this
 //! crate already makes.
 
-use crate::detectors::pattern::{self, is_alnum};
+use crate::detectors::pattern::{self, RunCursor, is_alnum};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -77,13 +77,14 @@ impl Detector for GrafanaServiceAccountTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let bytes = input.as_bytes();
-        // Input without the prefix returns before the run-end tables are built
-        // (issue #982).
+        // Input without the prefix returns before any run is measured
+        // (issue #982); the cursors measure only the runs asked about
+        // (issue #1056).
         let Some(first) = pattern::find_literal(bytes, PREFIX, 0) else {
             return Ok(Vec::new());
         };
-        let alnum_ends = pattern::run_ends(bytes, is_alnum);
-        let hex_ends = pattern::run_ends(bytes, is_hex);
+        let mut alnum_ends = RunCursor::new(bytes, is_alnum);
+        let mut hex_ends = RunCursor::new(bytes, is_hex);
         let mut candidates = Vec::new();
         let mut start = first;
         while start < bytes.len() {
@@ -92,7 +93,7 @@ impl Detector for GrafanaServiceAccountTokenDetector {
                 continue;
             }
 
-            let Some(end) = match_at(bytes, &alnum_ends, &hex_ends, start) else {
+            let Some(end) = match_at(bytes, &mut alnum_ends, &mut hex_ends, start) else {
                 start += 1;
                 continue;
             };
@@ -117,13 +118,18 @@ impl Detector for GrafanaServiceAccountTokenDetector {
 /// Returns the exclusive end offset on success; the caller still applies
 /// the boundary check.
 ///
-/// `alnum_ends` and `hex_ends` are the precomputed maximal-run-end tables
-/// from [`pattern::run_ends`], so each segment's length is a table lookup
-/// rather than a rescan, keeping the whole detector linear in the input
-/// length.
-fn match_at(bytes: &[u8], alnum_ends: &[usize], hex_ends: &[usize], start: usize) -> Option<usize> {
+/// `alnum_ends` and `hex_ends` are [`RunCursor`]s over the two segment
+/// alphabets. Each sees non-decreasing queries, so each measures a byte at
+/// most once and the whole detector stays linear in the input length
+/// without a whole-input table (issue #1056).
+fn match_at(
+    bytes: &[u8],
+    alnum_ends: &mut RunCursor<'_>,
+    hex_ends: &mut RunCursor<'_>,
+    start: usize,
+) -> Option<usize> {
     let body_start = start + PREFIX.len();
-    if alnum_ends[body_start] < body_start + BODY_LEN {
+    if alnum_ends.end(body_start) < body_start + BODY_LEN {
         return None;
     }
     let separator = body_start + BODY_LEN;
@@ -132,7 +138,7 @@ fn match_at(bytes: &[u8], alnum_ends: &[usize], hex_ends: &[usize], start: usize
     }
 
     let checksum_start = separator + 1;
-    if hex_ends[checksum_start] < checksum_start + CHECKSUM_LEN {
+    if hex_ends.end(checksum_start) < checksum_start + CHECKSUM_LEN {
         return None;
     }
 

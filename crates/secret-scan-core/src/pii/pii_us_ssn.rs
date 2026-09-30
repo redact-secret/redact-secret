@@ -142,7 +142,7 @@ fn blocks_boundary(character: char) -> bool {
         || is_combining_mark(character)
         || character.is_whitespace() && !character.is_ascii()
         || is_unicode_dash(character)
-        || is_governed_invisible(character)
+        || crate::normalize::is_invisible(character)
 }
 
 fn is_unicode_dash(character: char) -> bool {
@@ -165,13 +165,6 @@ fn is_unicode_dash(character: char) -> bool {
             | '\u{fe63}'
             | '\u{ff0d}'
     )
-}
-
-fn is_governed_invisible(character: char) -> bool {
-    let code_point = character as u32;
-    crate::invisible_table::INVISIBLE_RANGES
-        .iter()
-        .any(|(start, end)| (*start..=*end).contains(&code_point))
 }
 
 fn fully_delimited_reference(input: &str, start: usize, end: usize) -> bool {

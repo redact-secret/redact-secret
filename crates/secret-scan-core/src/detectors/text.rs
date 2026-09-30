@@ -192,6 +192,15 @@ pub(super) fn last_lines(input: &str, count: usize) -> Vec<&str> {
     tail
 }
 
+/// The last `count` lines of `tail`, a [`last_lines`] result for a count at
+/// least `count`: exactly `last_lines(input, count)` over the same input,
+/// since both walk back from the same end and stop at the same first line.
+/// The incremental session computes one tail for every lookback hint and
+/// each hint reads its own window from it (issue #1060).
+pub(super) fn tail_lines<'t, 'a>(tail: &'t [&'a str], count: usize) -> &'t [&'a str] {
+    &tail[tail.len().saturating_sub(count)..]
+}
+
 /// Advances `start` past every consecutive character matching `pred`.
 pub(super) fn skip_while_chars(input: &str, start: usize, pred: fn(char) -> bool) -> usize {
     let mut cursor = start;
@@ -1110,8 +1119,14 @@ pub(super) fn list_item_paired_name(input: &str, line: (usize, usize)) -> Option
 /// with a `name:` or `value:` key, so the incremental session holds it open
 /// for the one following line that can complete the pair. Holding a line
 /// that never pairs only delays its output by one line.
+#[cfg(test)]
 pub(crate) fn has_open_list_item_pair(input: &str) -> bool {
-    last_lines(input, 1).first().is_some_and(|line| {
+    has_open_list_item_pair_in(&super::lookback_tail(input))
+}
+
+/// [`has_open_list_item_pair`] over a [`super::lookback_tail`].
+pub(crate) fn has_open_list_item_pair_in(tail: &[&str]) -> bool {
+    tail_lines(tail, 1).first().is_some_and(|line| {
         item_key_line(line)
             .is_some_and(|parsed| parsed.item_start && matches!(parsed.key, "name" | "value"))
     })
@@ -1240,6 +1255,22 @@ mod line_tests {
             for count in 1..=4 {
                 let expected = &all[all.len().saturating_sub(count)..];
                 assert_eq!(last_lines(&input, count), expected, "{input:?} {count}");
+            }
+        }
+    }
+
+    #[test]
+    fn every_hint_window_of_the_shared_lookback_tail_is_its_own_last_lines() {
+        // Issue #1060: the session computes one tail and each lookback hint
+        // reads its own window of it.
+        for input in generated_inputs() {
+            let tail = crate::detectors::lookback_tail(&input);
+            for count in 1..=super::super::MAX_LOOKBACK_LINES {
+                assert_eq!(
+                    super::tail_lines(&tail, count),
+                    last_lines(&input, count),
+                    "{input:?} {count}"
+                );
             }
         }
     }
