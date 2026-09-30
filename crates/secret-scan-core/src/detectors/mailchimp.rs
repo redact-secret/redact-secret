@@ -165,7 +165,6 @@
 //!   positive; this is the same class of risk every other keyword-gated
 //!   bare-format detector in this registry already accepts.
 
-use super::text::lines;
 use crate::detectors::pattern::{self, Alphabet};
 use crate::detectors::prefilter::Literals;
 use crate::detectors::text;
@@ -251,7 +250,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (line_start, line_end) in lines(input) {
+        text::for_each_long_run_line(input, |line_start, line_end| {
             let line = &input[line_start..line_end];
             let has_keyword = line_has_context_keyword(line);
 
@@ -290,7 +289,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
                 }
                 start = hex_end;
             }
-        }
+        });
         Ok(candidates)
     }
 }

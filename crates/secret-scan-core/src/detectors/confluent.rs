@@ -94,7 +94,6 @@
 //! bootstrap host strings all carry a `-` outside this module's alphabets
 //! and are excluded automatically, with no special-casing needed.
 
-use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -326,25 +325,20 @@ impl Detector for ConfluentLegacyApiSecretDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        let all_lines: Vec<(usize, usize)> = lines(input).collect();
-        for (index, &(line_start, line_end)) in all_lines.iter().enumerate() {
+        text::for_each_long_run_line(input, |line_start, line_end| {
             let line = &input[line_start..line_end];
             let raw_matches =
                 scan_bare_legacy_runs(line, pattern::is_base64_body, is_confluent_secret_boundary);
             if raw_matches.is_empty() {
-                continue;
+                return;
             }
             let same_line = line_contains_ci(line, CONTEXT_KEYWORD);
             let in_properties_block = !same_line && {
-                let previous: Vec<&str> = all_lines
-                    [index.saturating_sub(PROPERTIES_LOOKBACK_LINES)..index]
-                    .iter()
-                    .map(|&(start, end)| &input[start..end])
-                    .collect();
+                let previous = text::preceding_lines(input, line_start, PROPERTIES_LOOKBACK_LINES);
                 ends_inside_confluent_properties(&previous)
             };
             if !same_line && !in_properties_block {
-                continue;
+                return;
             }
             for (relative_start, relative_end) in raw_matches {
                 if !same_line && !is_basic_auth_user_info_secret(line, relative_start) {
@@ -387,7 +381,7 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                         .with_signals([signal]),
                 );
             }
-        }
+        });
         Ok(candidates)
     }
 }

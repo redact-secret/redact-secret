@@ -203,7 +203,6 @@
 //! generation) is broader application-API authority, even though the core
 //! applies different policy classes across the confidence gradient.
 
-use super::text::lines;
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::detectors::text;
@@ -300,11 +299,11 @@ fn detect_context_gated(
     specific_signal: &str,
 ) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    for (line_start, line_end) in lines(input) {
+    text::for_each_long_run_line(input, |line_start, line_end| {
         let line = &input[line_start..line_end];
         let raw_matches = scan_bare_secret_runs(line, exact_len, is_lower_hex, pattern::is_alnum);
         if raw_matches.is_empty() {
-            continue;
+            return;
         }
 
         let (confidence, signal) = if specific_markers
@@ -315,7 +314,7 @@ fn detect_context_gated(
         } else if line_contains_ci(line, VENDOR_KEYWORD) {
             (Confidence::Medium, "datadog-keyword-cooccurrence")
         } else {
-            continue;
+            return;
         };
 
         for (relative_start, relative_end) in raw_matches {
@@ -340,7 +339,7 @@ fn detect_context_gated(
                     .with_signals([signal]),
             );
         }
-    }
+    });
     candidates
 }
 

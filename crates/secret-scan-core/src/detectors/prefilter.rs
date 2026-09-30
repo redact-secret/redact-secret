@@ -32,6 +32,7 @@
 
 use std::cell::RefCell;
 use std::marker::PhantomData;
+use std::rc::Rc;
 
 use super::pattern::PrefixShape;
 
@@ -405,6 +406,9 @@ struct ActiveScan {
     start: usize,
     len: usize,
     pairs: Option<Pairs>,
+    /// The lines holding a long alphabet run, as byte ranges, once a
+    /// bare-shape detector has asked (issue #1075). Never text.
+    long_run_lines: Option<Rc<[(usize, usize)]>>,
 }
 
 thread_local! {
@@ -426,6 +430,7 @@ impl ScanScope {
             start: scanned.as_ptr() as usize,
             len: scanned.len(),
             pairs: None,
+            long_run_lines: None,
         };
         let previous = ACTIVE_SCAN
             .try_with(|cell| {
@@ -481,6 +486,34 @@ pub(crate) fn ruleset_literal_may_occur(input: &str, literal: &[u8]) -> bool {
             }
         })
         .unwrap_or(true)
+}
+
+/// The lines of `input` that hold a run of 32 or more `[A-Za-z0-9+/=_-]`
+/// bytes ([`super::text::long_run_line_spans`]), when `input` is the scan
+/// copy of the innermost [`ScanScope`] on this thread; built once per scan
+/// copy and shared by every bare-shape detector. `None` in every other case
+/// (outside a scan, a different or partial input), where the caller walks
+/// every line as before.
+pub(super) fn long_run_lines(input: &str) -> Option<Rc<[(usize, usize)]>> {
+    ACTIVE_SCAN
+        .try_with(|cell| {
+            let mut current = cell.try_borrow_mut().ok()?;
+            let active = current.as_mut()?;
+            if active.start != input.as_ptr() as usize || active.len != input.len() {
+                return None;
+            }
+            let spans = active.long_run_lines.get_or_insert_with(|| {
+                let spans = super::text::long_run_line_spans(input);
+                // Every skipped line must hold no long run, so a detector
+                // skipping it would have found nothing.
+                #[cfg(debug_assertions)]
+                assert_eq!(spans, super::text::long_run_line_spans_by_line(input));
+                spans.into()
+            });
+            Some(Rc::clone(spans))
+        })
+        .ok()
+        .flatten()
 }
 
 #[cfg(test)]
@@ -823,5 +856,94 @@ mod tests {
                 "generic-token",
             ]
         );
+    }
+
+    /// Issue #1075: a bare-shape detector handed the scan copy walks only the
+    /// lines holding a long run; handed anything else it walks every line.
+    /// Both must find exactly the same candidates.
+    #[test]
+    fn bare_shape_detectors_agree_inside_and_outside_a_scan() {
+        use crate::types::{Detector, DetectorContext};
+        let detectors: Vec<Box<dyn Detector>> = vec![
+            Box::new(super::super::twilio::TwilioAuthTokenDetector),
+            Box::new(super::super::twilio::TwilioApiKeySecretDetector),
+            Box::new(super::super::datadog::DatadogApiKeyDetector),
+            Box::new(super::super::datadog::DatadogApplicationKeyLegacyDetector),
+            Box::new(super::super::new_relic::NewRelicLicenseKeyDetector),
+            Box::new(super::super::heroku::HerokuApiKeyLegacyDetector),
+            Box::new(super::super::confluent::ConfluentLegacyApiSecretDetector),
+            Box::new(super::super::pinecone::PineconeApiKeyDetector),
+            Box::new(super::super::mailchimp::MailchimpMarketingApiKeyDetector),
+        ];
+        let hex32 = "0123456789abcdef0123456789abcdef";
+        let hex40 = "0123456789abcdef0123456789abcdef01234567";
+        let uuid = "01234567-89ab-cdef-0123-456789abcdef";
+        let b64 = "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789+/AbCdEfGhIjKlMnOpQrStUvWxYz01";
+        let alnum32 = "AbCdEfGhIjKlMnOpQrStUvWxYz012345";
+        let pool: Vec<String> = vec![
+            format!("TWILIO_AUTH_TOKEN={hex32}"),
+            format!("AC{hex32} {hex32}"),
+            format!("SK{alnum32} {alnum32}"),
+            format!("twilio api {alnum32}"),
+            "twilio profiles:list --properties authToken".to_owned(),
+            "ID     Auth Token".to_owned(),
+            format!("pf_one  {hex32}"),
+            format!("DD_API_KEY={hex32}"),
+            format!("datadog {hex40}"),
+            format!("DD_APPLICATION_KEY={hex40}"),
+            format!("NEW_RELIC_LICENSE_KEY={hex40}"),
+            format!("{}FFFFNRAL", &hex32),
+            format!("eu01xx{}FFFFNRAL", &hex32[..26]),
+            format!("HEROKU_API_KEY={uuid}"),
+            "heroku auth:token".to_owned(),
+            format!("machine api.heroku.test password {uuid}"),
+            format!("confluent.api.secret={b64}"),
+            "schema.registry.url=https://confluent.test".to_owned(),
+            format!("basic.auth.user.info=key:{b64}"),
+            format!("pinecone_api_key = {uuid}"),
+            format!("mailchimp {hex32}-us12"),
+            format!("{hex32}-us1"),
+            format!("{hex32}-us1.example.test"),
+            "short line".to_owned(),
+            "0123456789abcdef".to_owned(),
+            String::new(),
+            "caf\u{e9} \u{597D} 0123".to_owned(),
+        ];
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state >> 8).unwrap()
+        };
+        let mut found = 0usize;
+        for _ in 0..600 {
+            let mut input = String::new();
+            for _ in 0..=(next() % 9) {
+                input.push_str(&pool[next() % pool.len()]);
+                input.push_str(["\n", "\r\n", "\r", " ", "\n\n"][next() % 5]);
+            }
+            let context = DetectorContext::new(input.len());
+            for detector in &detectors {
+                let outside = detector.detect(&input, &context).unwrap();
+                let inside = {
+                    let _scope = ScanScope::enter(&input);
+                    detector.detect(&input, &context).unwrap()
+                };
+                assert_eq!(inside, outside, "{} {input:?}", detector.id());
+                found += outside.len();
+            }
+        }
+        assert!(found > 500, "the inputs must exercise matches, saw {found}");
+    }
+
+    #[test]
+    fn the_long_run_index_is_only_handed_out_for_the_active_scan_copy() {
+        let input = format!("{}\nshort\n", "a".repeat(40));
+        assert!(long_run_lines(&input).is_none());
+        let _scope = ScanScope::enter(&input);
+        assert_eq!(long_run_lines(&input).as_deref(), Some(&[(0, 40)][..]));
+        assert!(long_run_lines(&input[..45]).is_none());
+        assert!(long_run_lines(&input.clone()).is_none());
     }
 }
