@@ -165,10 +165,10 @@ fn run_redact(
 /// [`lifecycle::with_registry`] plus [`run_scan`], flattened into the one
 /// `JsValue` error every exported function reports.
 ///
-/// When `ruleset` is given, this bypasses the cached registry entirely and
-/// builds a fresh one over [`lifecycle::registry_with_ruleset`] instead:
-/// ruleset content can differ on every call, where the built-in-only
-/// registry is the same value every time. `initialize()` is still required
+/// When `ruleset` is given, this bypasses the built-in registry and uses
+/// [`lifecycle::with_ruleset_registry`] instead: a one-entry cache keyed by
+/// the ruleset bytes, so repeating one ruleset builds its registry once
+/// while a changed ruleset replaces the entry (issue #1059). `initialize()` is still required
 /// first either way, so every exported operation keeps the one documented
 /// rule ("every synchronous operation requires a prior successful
 /// `initialize()`") regardless of whether it carries a ruleset.
@@ -184,8 +184,11 @@ fn scan_after_initialize(
             .map_err(|error| to_js_error(error.into())),
         Some(bytes) => {
             lifecycle::ensure_initialized().map_err(to_js_error)?;
-            let registry = lifecycle::registry_with_ruleset(bytes).map_err(to_js_error)?;
-            run_scan(input, &registry, policy, limits).map_err(|error| to_js_error(error.into()))
+            lifecycle::with_ruleset_registry(bytes, |registry| {
+                run_scan(input, registry, policy, limits)
+            })
+            .map_err(to_js_error)?
+            .map_err(|error| to_js_error(error.into()))
         }
     }
 }

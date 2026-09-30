@@ -14,7 +14,8 @@
 //!
 //! [`Detector`]: redact_secret::Detector
 
-use std::cell::OnceCell;
+use std::cell::{OnceCell, RefCell};
+use std::rc::Rc;
 
 use redact_secret::{
     DetectorRegistry, IncrementalLimits, IncrementalPolicy, IncrementalSanitizer, PiiSelection,
@@ -79,7 +80,8 @@ fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErr
 /// Builds a registry over this artifact's compiled profile's built-ins,
 /// plus every detector `ruleset` declares (issue #495,
 /// `decision-define-declarative-detector-ruleset-contract`). Unlike
-/// [`build_registry`]'s cached result, this is built fresh per call:
+/// [`build_registry`]'s cached result, this is built per ruleset (see
+/// [`with_ruleset_registry`] for the one-entry cache over it):
 /// `ruleset`'s content can differ on every call, where the built-in-only
 /// registry is the same value every time. The compile-time profile
 /// selection is the same reachability rule [`build_registry`] documents, so
@@ -129,6 +131,56 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
     let detectors = redact_secret::load_ruleset(ruleset)?;
     active_selection()?;
     Ok(DetectorRegistry::with_common_built_in(detectors)?)
+}
+
+/// The registry for the ruleset this thread last built, so a caller that
+/// repeats one ruleset parses it and builds the registry once rather than
+/// per call (issue #1059). One entry: a changed ruleset replaces it, and a
+/// rejected ruleset is never stored. The PII selection and compiled profile
+/// cannot change after a successful [`initialize`], so the ruleset bytes are
+/// the whole key. Thread-local for the same `!Sync` reason as [`REGISTRY`].
+struct RulesetEntry {
+    ruleset: Vec<u8>,
+    registry: DetectorRegistry,
+}
+
+thread_local! {
+    static RULESET_REGISTRY: RefCell<Option<Rc<RulesetEntry>>> = const { RefCell::new(None) };
+    /// Ruleset registries built on this thread, for the cache-reuse test.
+    #[cfg(test)]
+    static RULESET_BUILDS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+/// Calls `f` with the registry over `ruleset`'s detectors, building it only
+/// when it is not the one this thread last built.
+///
+/// The entry is cloned out of the cache before `f` runs, so a JavaScript
+/// policy callback inside `f` that scans again with another ruleset cannot
+/// hit a held borrow.
+///
+/// # Errors
+///
+/// The errors of [`registry_with_ruleset`]; nothing is cached on failure.
+pub(crate) fn with_ruleset_registry<T>(
+    ruleset: &[u8],
+    f: impl FnOnce(&DetectorRegistry) -> T,
+) -> Result<T, WasmErrorCode> {
+    let entry = RULESET_REGISTRY.with(|cache| -> Result<Rc<RulesetEntry>, WasmErrorCode> {
+        let mut cache = cache.borrow_mut();
+        if let Some(entry) = cache.as_ref().filter(|entry| entry.ruleset == ruleset) {
+            return Ok(Rc::clone(entry));
+        }
+        let registry = registry_with_ruleset(ruleset)?;
+        #[cfg(test)]
+        RULESET_BUILDS.with(|builds| builds.set(builds.get() + 1));
+        let entry = Rc::new(RulesetEntry {
+            ruleset: ruleset.to_vec(),
+            registry,
+        });
+        *cache = Some(Rc::clone(&entry));
+        Ok(entry)
+    })?;
+    Ok(f(&entry.registry))
 }
 
 /// The selection captured by the last successful [`initialize`], as the
@@ -381,5 +433,77 @@ mod tests {
             WasmErrorCode::Core(SecretScanErrorCode::PiiActivationConflict)
         );
         assert!(!with_registry(|registry| registry.contains("pii-domain")).unwrap());
+    }
+
+    const RULESET_A: &[u8] = b"ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+    const RULESET_B: &[u8] = b"ruleset-revision: 1\n\
+detector: other-internal-token\n\
+specificity: contextual\n\
+prefix: \"OTHER_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+    fn builds() -> usize {
+        RULESET_BUILDS.with(std::cell::Cell::get)
+    }
+
+    #[test]
+    fn a_ruleset_registry_is_built_once_per_ruleset_and_matches_a_fresh_one() {
+        assert_eq!(
+            with_ruleset_registry(RULESET_A, |_| ()).unwrap_err(),
+            WasmErrorCode::NotInitialized
+        );
+        assert_eq!(builds(), 0);
+        initialize(&[]).unwrap();
+        let input = format!("ACME_{} OTHER_{}", "a".repeat(20), "b".repeat(20));
+        let scan = |registry: &DetectorRegistry| {
+            redact_secret::scan(&input, registry, &redact_secret::DefaultPolicy).unwrap()
+        };
+        let fresh = scan(&registry_with_ruleset(RULESET_A).unwrap());
+        assert_eq!(fresh.len(), 1);
+        for _ in 0..3 {
+            assert_eq!(with_ruleset_registry(RULESET_A, scan).unwrap(), fresh);
+        }
+        assert_eq!(builds(), 1);
+        // A changed ruleset replaces the entry and never sees the old one's
+        // detector.
+        let other = with_ruleset_registry(RULESET_B, scan).unwrap();
+        assert_eq!(other.len(), 1);
+        assert_ne!(other, fresh);
+        assert_eq!(builds(), 2);
+        assert_eq!(with_ruleset_registry(RULESET_A, scan).unwrap(), fresh);
+        assert_eq!(builds(), 3);
+    }
+
+    #[test]
+    fn a_rejected_ruleset_is_not_cached_and_keeps_the_previous_entry() {
+        initialize(&[]).unwrap();
+        with_ruleset_registry(RULESET_A, |_| ()).unwrap();
+        for _ in 0..2 {
+            assert!(with_ruleset_registry(b"ruleset-revision: 2\n", |_| ()).is_err());
+        }
+        assert_eq!(builds(), 1);
+        with_ruleset_registry(RULESET_A, |_| ()).unwrap();
+        assert_eq!(builds(), 1);
+    }
+
+    #[test]
+    fn a_ruleset_scan_may_reenter_with_another_ruleset() {
+        initialize(&[]).unwrap();
+        let inner = with_ruleset_registry(RULESET_A, |_| {
+            with_ruleset_registry(RULESET_B, |registry| {
+                registry.contains("other-internal-token")
+            })
+        })
+        .unwrap()
+        .unwrap();
+        assert!(inner);
     }
 }

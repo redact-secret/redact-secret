@@ -191,6 +191,13 @@ evidence is linked from each published version.
   releases the GIL during detection and caches its registry per thread, and
   the CLI check mode builds its registry once (#1059).
 
+- The WebAssembly binding keeps the registry built from the last `ruleset`
+  passed to `scan`/`scanAndRedact` and reuses it while the same ruleset bytes
+  repeat, instead of parsing the ruleset and building a registry per call
+  (#1059). A different ruleset replaces the entry and a rejected one is never
+  kept. Findings and errors are unchanged. A short scan with a ruleset takes
+  about 3 us instead of 68 us (Node 22, release `full` artifact, single run).
+
 - Reduced WebAssembly initialization time and artifact size (#1043).
   Findings, ranges, actions and output are unchanged, and no dependency was
   added. Chromium compiles WebAssembly lazily, so every function
