@@ -209,9 +209,7 @@ pub(super) const CONFLUENT_CLOUD_API_SECRET: KnownFormatProviderDetector =
 
 /// `true` when `needle` (ASCII, case-insensitive) occurs anywhere in `line`.
 fn line_contains_ci(line: &str, needle: &str) -> bool {
-    let bytes = line.as_bytes();
-    needle.len() <= bytes.len()
-        && (0..=bytes.len() - needle.len()).any(|pos| text::starts_with_ci(line, pos, needle))
+    text::contains_ci(line, needle)
 }
 
 /// Every non-overlapping, boundary-checked bare run of exactly

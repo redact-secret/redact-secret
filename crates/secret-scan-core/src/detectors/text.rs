@@ -249,6 +249,71 @@ pub(super) fn starts_with_ci(input: &str, pos: usize, literal: &str) -> bool {
         .is_some_and(|window| window.eq_ignore_ascii_case(literal))
 }
 
+/// The first offset at or after `from` where the ASCII `needle` occurs
+/// case-insensitively in `bytes`, or `None`. An empty needle matches at
+/// `from` when `from <= bytes.len()`.
+///
+/// The first needle byte is searched eight bytes at a time (the word-at-a-time
+/// zero-byte test of [`next_line_byte`]) in both its cases when it is a
+/// letter, and each candidate window is then compared in full, so the result
+/// equals a per-offset [`starts_with_ci`] scan. Byte comparison never needs a
+/// character boundary; a found offset starts with an ASCII byte when the
+/// needle does.
+pub(super) fn find_ci(bytes: &[u8], from: usize, needle: &[u8]) -> Option<usize> {
+    const ONES: u64 = u64::from_le_bytes([0x01; 8]);
+    const HIGHS: u64 = u64::from_le_bytes([0x80; 8]);
+    let Some(&first) = needle.first() else {
+        return (from <= bytes.len()).then_some(from);
+    };
+    let last_start = bytes.len().checked_sub(needle.len())?;
+    let lower = first.to_ascii_lowercase();
+    let upper = first.to_ascii_uppercase();
+    let lower_word = u64::from_le_bytes([lower; 8]);
+    let upper_word = u64::from_le_bytes([upper; 8]);
+    let mut at = from;
+    while at <= last_start {
+        // Skip to the next candidate first byte.
+        let mut found = None;
+        while at <= last_start {
+            if let Some(chunk) = bytes.get(at..at + 8) {
+                let mut word = [0u8; 8];
+                word.copy_from_slice(chunk);
+                let word = u64::from_le_bytes(word);
+                let lo = word ^ lower_word;
+                let up = word ^ upper_word;
+                let marks = ((lo.wrapping_sub(ONES) & !lo) | (up.wrapping_sub(ONES) & !up)) & HIGHS;
+                if marks == 0 {
+                    at += 8;
+                    continue;
+                }
+                at += (marks.trailing_zeros() / 8) as usize;
+                found = Some(at);
+                break;
+            }
+            if bytes[at] == lower || bytes[at] == upper {
+                found = Some(at);
+                break;
+            }
+            at += 1;
+        }
+        let candidate = found?;
+        if candidate > last_start {
+            return None;
+        }
+        if bytes[candidate..candidate + needle.len()].eq_ignore_ascii_case(needle) {
+            return Some(candidate);
+        }
+        at = candidate + 1;
+    }
+    None
+}
+
+/// `true` when the ASCII `needle` occurs anywhere in `haystack`,
+/// case-insensitively ([`find_ci`]).
+pub(super) fn contains_ci(haystack: &str, needle: &str) -> bool {
+    find_ci(haystack.as_bytes(), 0, needle.as_bytes()).is_some()
+}
+
 /// Case-insensitive ASCII literal suffix match.
 pub(super) fn ends_with_ci(value: &str, suffix: &str) -> bool {
     let bytes = value.as_bytes();
@@ -821,10 +886,7 @@ pub(super) fn is_provider_named_assignment(
         return true;
     }
     super::generic_token::is_high_signal_name(&normalized)
-        && keywords.iter().any(|keyword| {
-            line.len() >= keyword.len()
-                && (0..=line.len() - keyword.len()).any(|pos| starts_with_ci(line, pos, keyword))
-        })
+        && keywords.iter().any(|keyword| contains_ci(line, keyword))
 }
 
 // --- Keyed environment stores (issue #1038) ---------------------------------
@@ -1382,5 +1444,95 @@ mod keyed_store_tests {
             assert!(keyed_store_prefix(line, open).is_none(), "{line}");
         }
         assert_eq!(keyed_store_name("x = \"v\"", 5), None);
+    }
+}
+
+#[cfg(test)]
+mod find_ci_tests {
+    use super::{contains_ci, find_ci, starts_with_ci};
+
+    /// The pre-#1073 per-offset scan every detector used to carry.
+    fn find_oracle(haystack: &str, from: usize, needle: &str) -> Option<usize> {
+        let len = haystack.len();
+        if needle.len() > len {
+            return None;
+        }
+        (from..=len - needle.len()).find(|&pos| starts_with_ci(haystack, pos, needle))
+    }
+
+    #[test]
+    fn find_ci_equals_the_per_offset_oracle_on_random_and_boundary_inputs() {
+        let pieces = [
+            "a",
+            "K",
+            "e",
+            "y",
+            "KEY",
+            "api",
+            "Token",
+            "tOkEn",
+            "twilio",
+            "TWILIO",
+            "-",
+            "_",
+            " ",
+            "\u{e9}",
+            "\u{1F511}",
+            "\n",
+            "0",
+            "\u{212A}",
+            "secret",
+        ];
+        let needles = [
+            "key",
+            "token",
+            "twilio",
+            "api-key",
+            "secret",
+            "a",
+            "k",
+            "0",
+            "dd-app-key",
+            "-x",
+            "",
+        ];
+        let mut state: u64 = 0xD1B5_4A32_D192_ED03;
+        let mut next = move || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (state >> 33) as usize
+        };
+        for _ in 0..4000 {
+            let mut input = String::new();
+            for _ in 0..next() % 40 {
+                input.push_str(pieces[next() % pieces.len()]);
+            }
+            for needle in needles {
+                let from = if input.is_empty() {
+                    0
+                } else {
+                    next() % (input.len() + 1)
+                };
+                assert_eq!(
+                    find_ci(input.as_bytes(), from, needle.as_bytes()),
+                    find_oracle(&input, from, needle),
+                    "{input:?} {needle:?} {from}"
+                );
+                assert_eq!(
+                    contains_ci(&input, needle),
+                    find_oracle(&input, 0, needle).is_some()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn find_ci_handles_short_empty_and_out_of_range_inputs() {
+        assert_eq!(find_ci(b"", 0, b"key"), None);
+        assert_eq!(find_ci(b"", 0, b""), Some(0));
+        assert_eq!(find_ci(b"ab", 5, b"a"), None);
+        assert_eq!(find_ci(b"xxxxxxxxxxxxxxxKEY", 0, b"key"), Some(15));
+        assert_eq!(find_ci(b"xxxxxxxxxxxxxxxKE", 0, b"key"), None);
     }
 }

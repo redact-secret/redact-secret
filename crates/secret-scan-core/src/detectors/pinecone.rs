@@ -148,8 +148,7 @@ fn assigned_key(line: &[u8], value_start: usize) -> Option<&[u8]> {
 
 /// `true` when `line` contains `needle` (ASCII, case-insensitive).
 fn line_contains_ci(line: &str, needle: &str) -> bool {
-    line.len() >= needle.len()
-        && (0..=line.len() - needle.len()).any(|pos| text::starts_with_ci(line, pos, needle))
+    text::contains_ci(line, needle)
 }
 
 /// `true` when `key` names the Pinecone API key on `line`.

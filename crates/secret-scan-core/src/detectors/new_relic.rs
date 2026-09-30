@@ -241,12 +241,9 @@ impl Detector for NewRelicUserApiKeyDetector {
 /// `true` when any of [`CONTEXT_KEYWORDS`] occurs (case-insensitively)
 /// anywhere in `line`.
 fn line_has_context_keyword(line: &str) -> bool {
-    let bytes = line.as_bytes();
-    CONTEXT_KEYWORDS.iter().any(|needle| {
-        let needle_len = needle.len();
-        needle_len <= bytes.len()
-            && (0..=bytes.len() - needle_len).any(|pos| text::starts_with_ci(line, pos, needle))
-    })
+    CONTEXT_KEYWORDS
+        .iter()
+        .any(|needle| text::contains_ci(line, needle))
 }
 
 /// Detects a New Relic License Key: a marked current-generation key

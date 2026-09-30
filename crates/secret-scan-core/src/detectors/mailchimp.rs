@@ -195,11 +195,7 @@ fn is_key_hex(byte: u8) -> bool {
 /// `true` when [`CONTEXT_KEYWORD`] occurs (case-insensitively) anywhere in
 /// `line`.
 fn line_has_context_keyword(line: &str) -> bool {
-    let bytes = line.as_bytes();
-    let needle_len = CONTEXT_KEYWORD.len();
-    needle_len <= bytes.len()
-        && (0..=bytes.len() - needle_len)
-            .any(|pos| text::starts_with_ci(line, pos, CONTEXT_KEYWORD))
+    text::contains_ci(line, CONTEXT_KEYWORD)
 }
 
 /// Returns the end offset (relative to `bytes`) of a valid
