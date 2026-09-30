@@ -7,7 +7,7 @@
 
 use super::pattern::{self, PrefixShape};
 use super::text::{
-    OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, ends_with_ci,
+    OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, ends_with_ci, find_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
     is_glued_instructional_placeholder, is_glued_my_placeholder, is_horizontal_js_whitespace,
     is_instructional_token_placeholder, is_js_whitespace, is_lead_word_phrase_placeholder,
@@ -3242,35 +3242,83 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
     }
 }
 
+/// Bytes a match may cross between its start position and the
+/// `authorization` keyword: the `[ \t]*` run, the `Proxy-` prefix, and the
+/// `\r`/`\n` a mid-input start sits on. An explicit set, all ASCII.
+fn is_authorization_lead_byte(byte: u8) -> bool {
+    matches!(
+        byte,
+        b' ' | b'\t'
+            | b'\r'
+            | b'\n'
+            | b'-'
+            | b'p'
+            | b'P'
+            | b'r'
+            | b'R'
+            | b'o'
+            | b'O'
+            | b'x'
+            | b'X'
+            | b'y'
+            | b'Y'
+    )
+}
+
+/// The first match at or after `cursor`, with the offset it starts at.
+///
+/// Every match at `pos` contains `authorization` (any case) at `q >= pos`,
+/// with only [`is_authorization_lead_byte`] bytes in `pos..q`. So the next
+/// keyword is found eight bytes at a time, and only the offsets from the
+/// start of the lead-byte run before it (never below `cursor`) are tried
+/// with the exact per-offset check. Those offsets are ASCII, hence char
+/// boundaries; every offset skipped has no keyword within reach and cannot
+/// match.
+fn next_authorization_match(input: &str, mut cursor: usize) -> Option<(usize, AuthorizationMatch)> {
+    let bytes = input.as_bytes();
+    while cursor < bytes.len() {
+        let keyword = find_ci(bytes, cursor, b"authorization")?;
+        let mut start = keyword;
+        while start > cursor && is_authorization_lead_byte(bytes[start - 1]) {
+            start -= 1;
+        }
+        for pos in start..=keyword {
+            if let Some(m) = try_match_authorization_at(input, pos) {
+                return Some((pos, m));
+            }
+        }
+        cursor = keyword + 1;
+    }
+    None
+}
+
+fn authorization_candidate(m: &AuthorizationMatch, input: &str) -> Option<Candidate> {
+    let value = &input[m.value_start..m.value_end];
+    if is_non_secret_reference(value, ValueForm::Unquoted) {
+        return None;
+    }
+    let range = ByteRange::new(m.value_start, m.value_end)?;
+    let confidence = if value.len() >= MIN_HIGH_ENTROPY_LENGTH
+        && crate::shannon_entropy(value) >= HIGH_ENTROPY_THRESHOLD
+    {
+        Confidence::High
+    } else {
+        Confidence::Medium
+    };
+    Some(
+        Candidate::new("authorization_credential", confidence, range)
+            .with_specificity(Specificity::Structural)
+            .with_signals([format!("authorization-{}-scheme", m.scheme)]),
+    )
+}
+
 fn authorization_candidates(input: &str) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     let mut cursor = 0usize;
 
-    while cursor < input.len() {
-        let Some(m) = try_match_authorization_at(input, cursor) else {
-            cursor += char_at(input, cursor).map_or(1, char::len_utf8);
-            continue;
-        };
-
-        let value = &input[m.value_start..m.value_end];
-        if !is_non_secret_reference(value, ValueForm::Unquoted)
-            && let Some(range) = ByteRange::new(m.value_start, m.value_end)
-        {
-            let confidence = if value.len() >= MIN_HIGH_ENTROPY_LENGTH
-                && crate::shannon_entropy(value) >= HIGH_ENTROPY_THRESHOLD
-            {
-                Confidence::High
-            } else {
-                Confidence::Medium
-            };
-            candidates.push(
-                Candidate::new("authorization_credential", confidence, range)
-                    .with_specificity(Specificity::Structural)
-                    .with_signals([format!("authorization-{}-scheme", m.scheme)]),
-            );
-        }
-
-        cursor = m.value_end.max(cursor + 1);
+    while let Some((pos, m)) = next_authorization_match(input, cursor) {
+        candidates.extend(authorization_candidate(&m, input));
+        cursor = m.value_end.max(pos + 1);
     }
 
     candidates
@@ -3504,6 +3552,80 @@ pub(crate) fn generic_token_ruleset_names_detector(names: Vec<String>) -> Box<dy
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The pre-#1073 pass: an exact attempt at every character.
+    fn authorization_candidates_oracle(input: &str) -> Vec<Candidate> {
+        let mut candidates = Vec::new();
+        let mut cursor = 0usize;
+        while cursor < input.len() {
+            let Some(m) = try_match_authorization_at(input, cursor) else {
+                cursor += char_at(input, cursor).map_or(1, char::len_utf8);
+                continue;
+            };
+            candidates.extend(authorization_candidate(&m, input));
+            cursor = m.value_end.max(cursor + 1);
+        }
+        candidates
+    }
+
+    #[test]
+    fn the_keyword_jump_equals_the_per_character_authorization_pass() {
+        let pieces = [
+            "Authorization",
+            "authorization",
+            "AUTHORIZATION",
+            "Proxy-Authorization",
+            "proxy-",
+            "Basic",
+            "basic",
+            "Token",
+            "Key",
+            " ",
+            "  ",
+            "\t",
+            ":",
+            "\"",
+            "'",
+            "\r",
+            "\n",
+            "\r\n",
+            "\u{2028}",
+            "\u{e9}",
+            "-",
+            "_",
+            "a",
+            "p",
+            "curl -H '",
+            "U1lOVEhFVElDX1JFVk9LRUQ=",
+            "SYNTHETICREVOKED0123",
+            "x",
+            "Authorization: Basic U1lOVEhFVElDX1JFVk9LRUQ=",
+            "Proxy-Authorization: Key SYNTHETICREVOKED0123",
+            "authorization : token U1lOVEhFVElDX1JFVk9LRUQ=",
+        ];
+        let mut state: u64 = 0x1234_5678_9ABC_DEF1;
+        let mut next = move || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (state >> 33) as usize
+        };
+        assert!(authorization_candidates("").is_empty());
+        let mut matched = 0usize;
+        for _ in 0..6000 {
+            let mut input = String::new();
+            for _ in 0..next() % 24 {
+                input.push_str(pieces[next() % pieces.len()]);
+            }
+            let fast = authorization_candidates(&input);
+            matched += fast.len();
+            assert_eq!(fast, authorization_candidates_oracle(&input), "{input:?}");
+        }
+        assert!(
+            matched > 100,
+            "the generator must exercise real matches: {matched}"
+        );
+    }
 
     fn detect(input: &str) -> Vec<Candidate> {
         GenericTokenDetector {
