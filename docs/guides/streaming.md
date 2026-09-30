@@ -208,4 +208,5 @@ accepts text, not bytes; the host owns decoding, cancellation, and backpressure.
 Previously emitted text cannot be recalled after a later failure. Require
 successful finalization before committing output when your application needs
 all-or-nothing processing. Discarding retained text is not a guarantee of secure
-memory zeroization or erasure of caller-owned input.
+memory zeroization or erasure of caller-owned input; see
+[plaintext memory lifetime](../reference/plaintext-lifetime.md).

@@ -28,6 +28,7 @@ the generated [support matrix](support-matrix.md).
 | What credentials can be detected, and what can be missed? | [Detection and limits](reference/detection.md) |
 | What did the bounded reliability assessment observe? | [Detection reliability](reference/detection-reliability.md) |
 | Can I process a stream? | [Streaming](guides/streaming.md) |
+| How long does plaintext stay in memory, and what is erased? | [Plaintext memory lifetime](reference/plaintext-lifetime.md) |
 | What must an AI-context integration guarantee? | [AI-context boundary contract](reference/ai-context-boundary.md) |
 | What may an MCP integration claim, and which tool-call points must it protect? | [MCP redaction boundary contract](reference/mcp-boundary.md) |
 | What may an MCP integration claim for resource contents it reads (`resources/read`)? | [MCP `resources/read` boundary contract](reference/mcp-resources-read.md) |
