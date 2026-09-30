@@ -13,7 +13,6 @@ use redact_secret::{
 };
 use wasm_bindgen::JsValue;
 
-use crate::range;
 use crate::util::saturating_u32;
 
 fn set(object: &Object, key: &str, value: &JsValue) -> Result<(), JsValue> {
@@ -50,24 +49,14 @@ fn detected_finding_object_with_range(
     Ok(object)
 }
 
-/// As [`detected_finding_object_with_range`], converting `finding`'s range to
-/// UTF-16 code units for the whole known `input` first.
-fn detected_finding_object(input: &str, finding: &DetectedFinding) -> Result<Object, JsValue> {
-    let (start, end) = range::to_utf16_range(input, finding.range());
-    detected_finding_object_with_range(finding, start, end)
-}
-
 /// Builds the safe metadata a policy callback receives: `finding`'s fields,
-/// with no `action` (the policy has not chosen one yet).
-pub(crate) fn policy_finding(input: &str, finding: &DetectedFinding) -> Result<JsValue, JsValue> {
-    Ok(detected_finding_object(input, finding)?.into())
-}
-
-/// As [`policy_finding`], given an already-converted UTF-16 `start`/`end`
-/// rather than the whole logical input.
+/// with no `action` (the policy has not chosen one yet), given its
+/// already-converted UTF-16 `start`/`end`.
 ///
-/// Used by [`crate::incremental`], which never holds the whole session input:
-/// its ranges come from the chunk-by-chunk `Utf16Index` instead.
+/// The whole-input callbacks convert through one forward-only
+/// `range::Utf16Ranges` per callback adapter (issue #1053);
+/// [`crate::incremental`], which never holds the whole session input, takes
+/// its ranges from the chunk-by-chunk `Utf16Index` instead.
 pub(crate) fn policy_finding_with_range(
     finding: &DetectedFinding,
     start: u32,
@@ -108,19 +97,8 @@ pub(crate) fn incremental_policy_context(
 }
 
 /// Builds the safe metadata a placeholder-formatter callback receives:
-/// `finding`'s fields plus the `action` the policy already chose.
-pub(crate) fn formatter_finding(input: &str, finding: &Finding) -> Result<JsValue, JsValue> {
-    let object = detected_finding_object(input, finding.detected())?;
-    set(
-        &object,
-        "action",
-        &JsValue::from_str(finding.action().as_str()),
-    )?;
-    Ok(object.into())
-}
-
-/// As [`formatter_finding`], given an already-converted UTF-16 `start`/`end`
-/// rather than the whole logical input (see [`policy_finding_with_range`]).
+/// `finding`'s fields plus the `action` the policy already chose, given its
+/// already-converted UTF-16 `start`/`end` (see [`policy_finding_with_range`]).
 pub(crate) fn formatter_finding_with_range(
     finding: &Finding,
     start: u32,

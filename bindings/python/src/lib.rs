@@ -19,6 +19,7 @@
 
 mod incremental;
 
+use std::cell::RefCell;
 use std::sync::{Mutex, OnceLock};
 
 use pyo3::exceptions::PyValueError;
@@ -424,17 +425,85 @@ fn char_offset(text: &str, byte_offset: usize) -> Option<usize> {
     Some(text[..byte_offset].chars().count())
 }
 
-/// Converts a validated finding range to code point `(start, end)`.
-///
-/// The pipeline only ever produces char-aligned, in-bounds ranges, so
-/// failure here would indicate an internal inconsistency; it is still
-/// reported as a sanitized error rather than panicking.
+/// The pre-#1053 per-range conversion, kept as the test oracle for
+/// [`CharOffsets::range`].
+#[cfg(test)]
 fn char_range(text: &str, range: ByteRange) -> PyResult<(usize, usize)> {
     let start = char_offset(text, range.start())
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
     let end = char_offset(text, range.end())
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
     Ok((start, end))
+}
+
+/// Converts UTF-8 byte offsets into one `text` to code point offsets,
+/// resuming each conversion from the previous one (issue #1053).
+///
+/// Pipeline findings arrive in ascending, disjoint order, so converting a
+/// whole call's findings (policy callback, formatter callback, and returned
+/// findings) is one pass over `text` rather than a prefix rescan per offset.
+/// An offset before the previous one restarts from the beginning, so any
+/// order is correct. An all-ASCII `text` skips the walk: there, bytes and
+/// code points coincide. Every result equals [`char_offset`]'s.
+pub(crate) struct CharOffsets<'a> {
+    text: &'a str,
+    ascii: bool,
+    /// A character boundary of `text`, and its code point offset.
+    byte: usize,
+    chars: usize,
+    /// Bytes of `text` walked so far, for the linear-cost test.
+    #[cfg(test)]
+    walked: usize,
+}
+
+impl<'a> CharOffsets<'a> {
+    pub(crate) fn new(text: &'a str) -> Self {
+        Self {
+            text,
+            ascii: text.is_ascii(),
+            byte: 0,
+            chars: 0,
+            #[cfg(test)]
+            walked: 0,
+        }
+    }
+
+    /// [`char_offset`] for `byte_offset`: `None` when it is out of bounds
+    /// or splits a character.
+    fn offset(&mut self, byte_offset: usize) -> Option<usize> {
+        if byte_offset > self.text.len() || !self.text.is_char_boundary(byte_offset) {
+            return None;
+        }
+        if self.ascii {
+            return Some(byte_offset);
+        }
+        if byte_offset < self.byte {
+            self.byte = 0;
+            self.chars = 0;
+        }
+        self.chars += self.text[self.byte..byte_offset].chars().count();
+        #[cfg(test)]
+        {
+            self.walked += byte_offset - self.byte;
+        }
+        self.byte = byte_offset;
+        Some(self.chars)
+    }
+
+    /// Converts a validated finding range to code point `(start, end)`.
+    ///
+    /// The pipeline only ever produces char-aligned, in-bounds ranges, so
+    /// failure here would indicate an internal inconsistency; it is still
+    /// reported as a sanitized error rather than panicking.
+    fn range(&mut self, range: ByteRange) -> PyResult<(usize, usize)> {
+        let start = self
+            .offset(range.start())
+            .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
+        let end = self
+            .offset(range.end())
+            .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidCandidate))?;
+        Ok((start, end))
+    }
 }
 
 /// Converts a UTF-8 byte offset into `text` (the core's native range unit,
@@ -838,13 +907,14 @@ fn default_action(finding: &DetectedFinding, index: usize, count: usize) -> PyRe
 /// failure.
 fn call_python_policy(
     callable: &Bound<'_, PyAny>,
-    text: &str,
+    offsets: &RefCell<CharOffsets<'_>>,
     finding: &DetectedFinding,
     index: usize,
     count: usize,
 ) -> PyResult<Action> {
     let py = callable.py();
-    let (start, end) = char_range(text, finding.range())?;
+    // The borrow ends with this statement, before the callback runs.
+    let (start, end) = offsets.borrow_mut().range(finding.range())?;
     let py_finding = Bound::new(py, PyDetectedFinding::from_core(finding, start, end))?;
     let py_context = Bound::new(
         py,
@@ -865,9 +935,10 @@ fn call_python_policy(
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidPolicyAction))
 }
 
-/// Evaluates `policy` (or the default policy when `None`) once per finding.
+/// Evaluates `policy` (or the default policy when `None`) once per finding;
+/// `offsets` converts each range `policy` sees.
 fn apply_policy(
-    text: &str,
+    offsets: &RefCell<CharOffsets<'_>>,
     detected: Vec<DetectedFinding>,
     policy: Option<&Bound<'_, PyAny>>,
 ) -> PyResult<Vec<CoreFinding>> {
@@ -876,7 +947,7 @@ fn apply_policy(
     for (index, finding) in detected.into_iter().enumerate() {
         let action = match policy {
             None => default_action(&finding, index, count)?,
-            Some(callable) => call_python_policy(callable, text, &finding, index, count)?,
+            Some(callable) => call_python_policy(callable, offsets, &finding, index, count)?,
         };
         findings.push(finding.with_action(action));
     }
@@ -884,11 +955,15 @@ fn apply_policy(
 }
 
 /// Converts core findings to their Python-visible, code point-ranged form.
-fn findings_to_py(text: &str, findings: Vec<CoreFinding>) -> PyResult<Vec<PyFinding>> {
+fn findings_to_py(
+    offsets: &RefCell<CharOffsets<'_>>,
+    findings: Vec<CoreFinding>,
+) -> PyResult<Vec<PyFinding>> {
+    let mut offsets = offsets.borrow_mut();
     findings
         .into_iter()
         .map(|finding| {
-            let (start, end) = char_range(text, finding.range())?;
+            let (start, end) = offsets.range(finding.range())?;
             Ok(PyFinding::from_core(finding, start, end))
         })
         .collect()
@@ -903,19 +978,23 @@ fn findings_to_py(text: &str, findings: Vec<CoreFinding>) -> PyResult<Vec<PyFind
 /// A raised exception or a non-string return value becomes an opaque
 /// `FormatterFailure`, which `redact_secret::redact` reports as
 /// `PlaceholderFailureError`; the callback's own error is discarded.
-struct PyFormatterAdapter<'py, 'a> {
+struct PyFormatterAdapter<'py, 'a, 'text> {
     callable: &'a Bound<'py, PyAny>,
-    text: &'a str,
+    offsets: &'a RefCell<CharOffsets<'text>>,
 }
 
-impl PlaceholderFormatter for PyFormatterAdapter<'_, '_> {
+impl PlaceholderFormatter for PyFormatterAdapter<'_, '_, '_> {
     fn format(
         &self,
         finding: &CoreFinding,
         context: &PlaceholderContext,
     ) -> Result<String, redact_secret::FormatterFailure> {
-        let (start, end) =
-            char_range(self.text, finding.range()).map_err(|_| redact_secret::FormatterFailure)?;
+        // The borrow ends with this statement, before the callback runs.
+        let (start, end) = self
+            .offsets
+            .borrow_mut()
+            .range(finding.range())
+            .map_err(|_| redact_secret::FormatterFailure)?;
         let py_finding = Bound::new(
             self.callable.py(),
             PyFinding::from_core(finding.clone(), start, end),
@@ -946,13 +1025,14 @@ fn redact_core(
     findings: &[CoreFinding],
     formatter: Option<&Bound<'_, PyAny>>,
     limits: &WholeInputLimits,
+    offsets: &RefCell<CharOffsets<'_>>,
 ) -> PyResult<String> {
     match formatter {
         None => {
             core_redact(text, findings, &core_default_formatter, limits).map_err(map_core_error)
         }
         Some(callable) => {
-            let adapter = PyFormatterAdapter { callable, text };
+            let adapter = PyFormatterAdapter { callable, offsets };
             core_redact(text, findings, &adapter, limits).map_err(map_core_error)
         }
     }
@@ -1010,8 +1090,9 @@ fn scan<'py>(
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
     let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
-    let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
-    findings_to_py(&text_owned, findings)
+    let offsets = RefCell::new(CharOffsets::new(&text_owned));
+    let findings = apply_policy(&offsets, detected, policy.as_ref())?;
+    findings_to_py(&offsets, findings)
 }
 
 /// Replaces every `redact`/`block` finding's span in `text` with a
@@ -1053,7 +1134,14 @@ fn redact<'py>(
         .iter()
         .map(|finding| finding.inner.clone())
         .collect();
-    redact_core(&text_owned, &core_findings, formatter.as_ref(), &limits)
+    let offsets = RefCell::new(CharOffsets::new(&text_owned));
+    redact_core(
+        &text_owned,
+        &core_findings,
+        formatter.as_ref(),
+        &limits,
+        &offsets,
+    )
 }
 
 /// Scans `text` and redacts it in one call, guaranteeing the returned
@@ -1075,9 +1163,18 @@ fn scan_and_redact<'py>(
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
     let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
-    let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
-    let redacted_text = redact_core(&text_owned, &findings, formatter.as_ref(), &limits)?;
-    let py_findings = findings_to_py(&text_owned, findings)?;
+    // One converter for the whole call: the policy callback, the formatter
+    // callback, and the returned findings all convert through it.
+    let offsets = RefCell::new(CharOffsets::new(&text_owned));
+    let findings = apply_policy(&offsets, detected, policy.as_ref())?;
+    let redacted_text = redact_core(
+        &text_owned,
+        &findings,
+        formatter.as_ref(),
+        &limits,
+        &offsets,
+    )?;
+    let py_findings = findings_to_py(&offsets, findings)?;
     Ok(PyScanResult {
         text: redacted_text,
         findings: py_findings,
@@ -1203,7 +1300,7 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::byte_offset_to_char_offset;
+    use super::{ByteRange, CharOffsets, byte_offset_to_char_offset, char_offset, char_range};
 
     /// Mirrors `conformance/fixtures/unicode-conversion-corpus.json`
     /// (`decision-govern-cross-language-conformance`): an astral
@@ -1272,5 +1369,85 @@ mod tests {
     #[test]
     fn rejects_an_out_of_bounds_offset() {
         assert!(byte_offset_to_char_offset("abc", 4).is_err());
+    }
+
+    /// Deterministic generated inputs: ASCII-only, BMP, astral, invisible
+    /// code points, and the empty string.
+    fn generated_inputs() -> Vec<String> {
+        const POOL: [char; 10] = [
+            'a',
+            'Z',
+            '\n',
+            '\u{E9}',
+            '\u{4E2D}',
+            '\u{1F511}',
+            '\u{200B}',
+            '\u{FEFF}',
+            '\u{E0041}',
+            '\u{AD}',
+        ];
+        let mut inputs = vec![String::new(), "a".to_owned(), "abc def".to_owned()];
+        let mut state: u64 = 0x9E37_79B9_7F4A_7C15;
+        for length in 0..48 {
+            for ascii_only in [false, true] {
+                let mut input = String::new();
+                for _ in 0..length {
+                    state = state
+                        .wrapping_mul(6_364_136_223_846_793_005)
+                        .wrapping_add(1_442_695_040_888_963_407);
+                    let pick = usize::try_from(state >> 33).unwrap();
+                    let pool = if ascii_only { 3 } else { POOL.len() };
+                    input.push(POOL[pick % pool]);
+                }
+                inputs.push(input);
+            }
+        }
+        inputs
+    }
+
+    /// Every offset `0..=len + 1` (on and off character boundaries, and out
+    /// of bounds), ascending, then a repeating non-monotonic permutation,
+    /// then descending, through one converter each.
+    #[test]
+    fn forward_converter_matches_the_per_offset_oracle_in_any_order() {
+        for input in generated_inputs() {
+            let offsets: Vec<usize> = (0..=input.len() + 1).collect();
+            let mut queries = offsets.clone();
+            queries
+                .extend((0..offsets.len()).map(|index| offsets[(index * 7 + 3) % offsets.len()]));
+            queries.extend(offsets.iter().rev().copied());
+            let mut converter = CharOffsets::new(&input);
+            for &offset in &queries {
+                assert_eq!(
+                    converter.offset(offset),
+                    char_offset(&input, offset),
+                    "{input:?} {offset}"
+                );
+            }
+            let mut converter = CharOffsets::new(&input);
+            for &start in &offsets {
+                for &end in &offsets {
+                    let Some(range) = ByteRange::new(start, end) else {
+                        continue;
+                    };
+                    assert_eq!(
+                        converter.range(range).ok(),
+                        char_range(&input, range).ok(),
+                        "{input:?} {range:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn forward_converter_walks_each_byte_once_for_ascending_offsets() {
+        let input = "a\u{1F511}\u{E9}\u{4E2D}b\u{200B}".repeat(64);
+        let mut converter = CharOffsets::new(&input);
+        for offset in (0..=input.len()).filter(|&offset| input.is_char_boundary(offset)) {
+            converter.offset(offset);
+            converter.offset(offset);
+        }
+        assert_eq!(converter.walked, input.len());
     }
 }

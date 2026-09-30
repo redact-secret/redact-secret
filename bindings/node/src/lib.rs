@@ -12,7 +12,7 @@ mod error;
 mod incremental;
 mod offsets;
 
-use std::cell::OnceCell;
+use std::cell::{OnceCell, RefCell};
 
 use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
@@ -25,7 +25,7 @@ use redact_secret::{
 };
 
 use crate::error::{JsError, to_js_error, to_js_ruleset_error};
-use crate::offsets::{byte_to_utf16, utf16_to_byte};
+use crate::offsets::{Utf16Offsets, utf16_offsets_to_bytes};
 // Re-exported so the incremental N-API surface (a public export like `scan`
 // or `redact`, just organized in its own module) is part of this crate's
 // effective public API rather than dead code the compiler cannot prove any
@@ -376,19 +376,25 @@ pub fn pii_activation_common() -> napi::Result<String, String> {
     .map_err(to_js_error)
 }
 
-fn to_js_detected_finding(input: &str, finding: &DetectedFinding) -> JsDetectedFinding {
+/// Converts `finding` to its N-API shape, its range through `offsets` (the
+/// one converter every conversion over this call's input shares).
+fn to_js_detected_finding(
+    offsets: &mut Utf16Offsets<'_>,
+    finding: &DetectedFinding,
+) -> JsDetectedFinding {
     JsDetectedFinding {
         id: finding.id().to_owned(),
         r#type: finding.type_name().to_owned(),
         detector: finding.detector().to_owned(),
         confidence: finding.confidence().as_str().to_owned(),
         obfuscation: finding.obfuscation().as_str().to_owned(),
-        start: byte_to_utf16(input, finding.range().start()),
-        end: byte_to_utf16(input, finding.range().end()),
+        start: offsets.utf16_at(finding.range().start()),
+        end: offsets.utf16_at(finding.range().end()),
     }
 }
 
-fn to_js_finding(input: &str, finding: &Finding) -> JsFinding {
+/// As [`to_js_detected_finding`], for a finding with its chosen action.
+fn to_js_finding(offsets: &mut Utf16Offsets<'_>, finding: &Finding) -> JsFinding {
     JsFinding {
         id: finding.id().to_owned(),
         r#type: finding.type_name().to_owned(),
@@ -396,22 +402,58 @@ fn to_js_finding(input: &str, finding: &Finding) -> JsFinding {
         confidence: finding.confidence().as_str().to_owned(),
         action: finding.action().as_str().to_owned(),
         obfuscation: finding.obfuscation().as_str().to_owned(),
-        start: byte_to_utf16(input, finding.range().start()),
-        end: byte_to_utf16(input, finding.range().end()),
+        start: offsets.utf16_at(finding.range().start()),
+        end: offsets.utf16_at(finding.range().end()),
     }
 }
 
-/// Reconstructs a native [`Finding`] from a JavaScript-supplied [`JsFinding`],
-/// converting its UTF-16 range back to UTF-8 bytes.
+/// Converts every finding of one call to its N-API shape in one pass over
+/// `offsets`' input.
+fn to_js_findings(offsets: &mut Utf16Offsets<'_>, findings: &[Finding]) -> Vec<JsFinding> {
+    findings
+        .iter()
+        .map(|finding| to_js_finding(offsets, finding))
+        .collect()
+}
+
+/// Reconstructs native [`Finding`]s from JavaScript-supplied [`JsFinding`]s,
+/// converting every UTF-16 range back to UTF-8 bytes in one walk over
+/// `input` ([`utf16_offsets_to_bytes`]).
+///
+/// # Errors
+///
+/// The first error, in `findings` order, that [`from_js_finding`] reports.
+fn from_js_findings(input: &str, findings: &[JsFinding]) -> Result<Vec<Finding>, SecretScanError> {
+    let requested: Vec<usize> = findings
+        .iter()
+        .flat_map(|finding| [finding.start as usize, finding.end as usize])
+        .collect();
+    let resolved = utf16_offsets_to_bytes(input, &requested);
+    findings
+        .iter()
+        .enumerate()
+        .map(|(index, finding)| {
+            from_js_finding(finding, resolved[2 * index], resolved[2 * index + 1])
+        })
+        .collect()
+}
+
+/// Reconstructs a native [`Finding`] from a JavaScript-supplied [`JsFinding`]
+/// whose UTF-16 range bounds were already resolved to UTF-8 bytes.
 ///
 /// # Errors
 ///
 /// Returns [`SecretScanErrorCode::InvalidFindings`] when a range offset is
-/// out of bounds or splits a surrogate pair, `start >= end`, or `confidence`
-/// / `action` is not one of the fixed wire names.
-fn from_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretScanError> {
-    let start = utf16_to_byte(input, finding.start as usize)?;
-    let end = utf16_to_byte(input, finding.end as usize)?;
+/// out of bounds or splits a surrogate pair (`start`/`end` carry that
+/// resolution error, start first), `start >= end`, or `confidence` /
+/// `action` is not one of the fixed wire names.
+fn from_js_finding(
+    finding: &JsFinding,
+    start: Result<usize, SecretScanError>,
+    end: Result<usize, SecretScanError>,
+) -> Result<Finding, SecretScanError> {
+    let start = start?;
+    let end = end?;
     let range = ByteRange::new(start, end).ok_or(SecretScanErrorCode::InvalidFindings)?;
     let confidence =
         Confidence::from_name(&finding.confidence).ok_or(SecretScanErrorCode::InvalidFindings)?;
@@ -435,11 +477,15 @@ fn from_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretSc
 /// Checks `limits` explicitly: unlike [`run_redact`], this function calls
 /// `run_detector_pipeline` directly rather than a core function that already
 /// applies a limit set, so it does not inherit the default bound for free.
+///
+/// `offsets` converts each finding's range for `policy`; it must be over
+/// `input`.
 fn run_scan(
     input: &str,
     registry: &DetectorRegistry,
     policy: Option<&PolicyCallback<'_>>,
     limits: &WholeInputLimits,
+    offsets: &RefCell<Utf16Offsets<'_>>,
 ) -> Result<Vec<Finding>, SecretScanError> {
     limits.check_input(input)?;
     let detected = run_detector_pipeline(input, registry)?;
@@ -452,7 +498,7 @@ fn run_scan(
             |(finding_index, finding)| -> Result<Finding, SecretScanError> {
                 let context = PolicyContext::new(finding_index, finding_count);
                 let action = if let Some(callback) = policy {
-                    let js_finding = to_js_detected_finding(input, &finding);
+                    let js_finding = to_js_detected_finding(&mut offsets.borrow_mut(), &finding);
                     let js_context = JsPolicyContext {
                         finding_index: u32::try_from(finding_index).unwrap_or(u32::MAX),
                         finding_count: u32::try_from(finding_count).unwrap_or(u32::MAX),
@@ -475,18 +521,19 @@ fn run_scan(
 
 /// Adapts a JavaScript placeholder formatter callback to
 /// [`PlaceholderFormatter`].
-struct JsFormatterAdapter<'a, 'env> {
+struct JsFormatterAdapter<'a, 'input, 'env> {
     callback: &'a FormatterCallback<'env>,
-    input: &'a str,
+    offsets: &'a RefCell<Utf16Offsets<'input>>,
 }
 
-impl PlaceholderFormatter for JsFormatterAdapter<'_, '_> {
+impl PlaceholderFormatter for JsFormatterAdapter<'_, '_, '_> {
     fn format(
         &self,
         finding: &Finding,
         context: &PlaceholderContext,
     ) -> Result<String, FormatterFailure> {
-        let js_finding = to_js_finding(self.input, finding);
+        // The borrow ends with this statement, before the callback runs.
+        let js_finding = to_js_finding(&mut self.offsets.borrow_mut(), finding);
         let js_context = JsPlaceholderContext {
             placeholder_index: u32::try_from(context.placeholder_index()).unwrap_or(u32::MAX),
         };
@@ -496,15 +543,18 @@ impl PlaceholderFormatter for JsFormatterAdapter<'_, '_> {
     }
 }
 
+/// Redacts `input`; `offsets` (over `input`) converts each range `formatter`
+/// sees.
 fn run_redact(
     input: &str,
     findings: &[Finding],
     formatter: Option<&FormatterCallback<'_>>,
     limits: &WholeInputLimits,
+    offsets: &RefCell<Utf16Offsets<'_>>,
 ) -> Result<String, SecretScanError> {
     match formatter {
         Some(callback) => {
-            let adapter = JsFormatterAdapter { callback, input };
+            let adapter = JsFormatterAdapter { callback, offsets };
             core_redact_with_limits(input, findings, &adapter, limits)
         }
         None => core_redact_with_limits(input, findings, &default_placeholder_formatter, limits),
@@ -542,17 +592,33 @@ fn run_scan_for_profile(
     policy: Option<&PolicyCallback<'_>>,
     limits: &WholeInputLimits,
     ruleset: Option<&[u8]>,
+    offsets: &RefCell<Utf16Offsets<'_>>,
 ) -> napi::Result<Vec<Finding>, String> {
     match ruleset {
         None => with_profile_registry(profile, |registry| {
-            run_scan(input, registry, policy, limits)
+            run_scan(input, registry, policy, limits, offsets)
         })
         .map_err(to_js_error),
         Some(bytes) => {
             let registry = registry_with_ruleset(profile, bytes)?;
-            run_scan(input, &registry, policy, limits).map_err(to_js_error)
+            run_scan(input, &registry, policy, limits, offsets).map_err(to_js_error)
         }
     }
+}
+
+/// [`run_scan_for_profile`] plus the conversion of its findings to their
+/// N-API shape, all through one [`Utf16Offsets`] over `input`.
+fn scan_for_profile(
+    profile: Profile,
+    input: &str,
+    policy: Option<&PolicyCallback<'_>>,
+    limits: Option<&JsWholeInputLimits>,
+    ruleset: Option<&[u8]>,
+) -> napi::Result<Vec<JsFinding>, String> {
+    let limits = resolve_whole_input_limits(limits).map_err(to_js_error)?;
+    let offsets = RefCell::new(Utf16Offsets::new(input));
+    let findings = run_scan_for_profile(profile, input, policy, &limits, ruleset, &offsets)?;
+    Ok(to_js_findings(&mut offsets.borrow_mut(), &findings))
 }
 
 /// Scans `input` and returns every finding, in input order, with UTF-16
@@ -590,15 +656,13 @@ pub fn scan(
     limits: Option<JsWholeInputLimits>,
     ruleset: Option<Buffer>,
 ) -> napi::Result<Vec<JsFinding>, String> {
-    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
-    let findings = run_scan_for_profile(
+    scan_for_profile(
         Profile::Full,
         &input,
         policy.as_ref(),
-        &limits,
+        limits.as_ref(),
         ruleset.as_deref(),
-    )?;
-    Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
+    )
 }
 
 /// The `common`-profile analogue of [`scan`]
@@ -621,15 +685,13 @@ pub fn scan_common(
     limits: Option<JsWholeInputLimits>,
     ruleset: Option<Buffer>,
 ) -> napi::Result<Vec<JsFinding>, String> {
-    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
-    let findings = run_scan_for_profile(
+    scan_for_profile(
         Profile::Common,
         &input,
         policy.as_ref(),
-        &limits,
+        limits.as_ref(),
         ruleset.as_deref(),
-    )?;
-    Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
+    )
 }
 
 /// Replaces `redact`/`block` findings in `input` with placeholder text,
@@ -665,12 +727,16 @@ pub fn redact(
     limits: Option<JsWholeInputLimits>,
 ) -> napi::Result<String, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
-    let native_findings: Vec<Finding> = findings
-        .iter()
-        .map(|finding| from_js_finding(&input, finding))
-        .collect::<Result<_, _>>()
-        .map_err(to_js_error)?;
-    run_redact(&input, &native_findings, formatter.as_ref(), &limits).map_err(to_js_error)
+    let native_findings = from_js_findings(&input, &findings).map_err(to_js_error)?;
+    let offsets = RefCell::new(Utf16Offsets::new(&input));
+    run_redact(
+        &input,
+        &native_findings,
+        formatter.as_ref(),
+        &limits,
+        &offsets,
+    )
+    .map_err(to_js_error)
 }
 
 /// Runs [`run_scan_for_profile`] then [`run_redact`] against `profile`,
@@ -683,9 +749,13 @@ fn run_scan_and_redact_for_profile(
     limits: &WholeInputLimits,
     ruleset: Option<&[u8]>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
-    let findings = run_scan_for_profile(profile, input, policy, limits, ruleset)?;
-    let redacted = run_redact(input, &findings, formatter, limits).map_err(to_js_error)?;
-    let js_findings = findings.iter().map(|f| to_js_finding(input, f)).collect();
+    // One converter for the whole call: the policy callback, the formatter
+    // callback, and the returned findings all convert through it.
+    let offsets = RefCell::new(Utf16Offsets::new(input));
+    let findings = run_scan_for_profile(profile, input, policy, limits, ruleset, &offsets)?;
+    let redacted =
+        run_redact(input, &findings, formatter, limits, &offsets).map_err(to_js_error)?;
+    let js_findings = to_js_findings(&mut offsets.borrow_mut(), &findings);
     Ok(JsScanAndRedactResult {
         findings: js_findings,
         redacted,
@@ -756,6 +826,14 @@ pub fn scan_and_redact_common(
 mod tests {
     use super::*;
 
+    fn offsets_for(input: &str) -> RefCell<Utf16Offsets<'_>> {
+        RefCell::new(Utf16Offsets::new(input))
+    }
+
+    fn from_one_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretScanError> {
+        from_js_findings(input, std::slice::from_ref(finding)).map(|mut all| all.remove(0))
+    }
+
     /// Comparable field tuple for a [`JsFinding`], which has no [`PartialEq`]
     /// of its own.
     fn finding_key(finding: &JsFinding) -> (&str, &str, &str, &str, &str, &str, u32, u32) {
@@ -773,7 +851,13 @@ mod tests {
 
     fn scan_default(input: &str) -> Vec<Finding> {
         with_profile_registry(Profile::Full, |registry| {
-            run_scan(input, registry, None, &WholeInputLimits::default())
+            run_scan(
+                input,
+                registry,
+                None,
+                &WholeInputLimits::default(),
+                &offsets_for(input),
+            )
         })
         .unwrap()
     }
@@ -803,16 +887,23 @@ mod tests {
         let finding = &findings[0];
         assert_eq!(finding.action(), Action::Redact);
 
-        let js_finding = to_js_finding(input, finding);
+        let js_finding = to_js_finding(&mut Utf16Offsets::new(input), finding);
         // The key emoji (one astral character, a UTF-16 surrogate pair) and
         // the following space sit entirely before the match.
         assert_eq!(
             js_finding.start,
-            byte_to_utf16(input, finding.range().start())
+            crate::offsets::byte_to_utf16(input, finding.range().start())
         );
         assert!(js_finding.start >= 3);
 
-        let redacted = run_redact(input, &findings, None, &WholeInputLimits::default()).unwrap();
+        let redacted = run_redact(
+            input,
+            &findings,
+            None,
+            &WholeInputLimits::default(),
+            &offsets_for(input),
+        )
+        .unwrap();
         assert!(redacted.starts_with("\u{1F511} Authorization: Bearer <SECRET_1>"));
         assert!(!redacted.contains("sk-syntheticRevokedExampleToken"));
     }
@@ -832,11 +923,13 @@ mod tests {
         let findings = scan_default(input);
         assert_eq!(findings.len(), 1);
 
-        let js_findings: Vec<JsFinding> =
-            findings.iter().map(|f| to_js_finding(input, f)).collect();
+        let js_findings: Vec<JsFinding> = findings
+            .iter()
+            .map(|f| to_js_finding(&mut Utf16Offsets::new(input), f))
+            .collect();
         let native_again: Vec<Finding> = js_findings
             .iter()
-            .map(|f| from_js_finding(input, f).unwrap())
+            .map(|f| from_one_js_finding(input, f).unwrap())
             .collect();
         assert_eq!(native_again, findings);
     }
@@ -854,7 +947,7 @@ mod tests {
             start: 1,
             end: 2,
         };
-        let error = from_js_finding(input, &malformed).unwrap_err();
+        let error = from_one_js_finding(input, &malformed).unwrap_err();
         assert_eq!(error.code(), SecretScanErrorCode::InvalidFindings);
     }
 
@@ -871,7 +964,7 @@ mod tests {
             start: 0,
             end: 5,
         };
-        let error = from_js_finding(input, &malformed).unwrap_err();
+        let error = from_one_js_finding(input, &malformed).unwrap_err();
         assert_eq!(error.code(), SecretScanErrorCode::InvalidFindings);
     }
 
@@ -879,9 +972,18 @@ mod tests {
     fn scan_and_redact_matches_separate_scan_then_redact() {
         let input = "Authorization: Bearer sk-syntheticRevokedExampleToken00000000000000000000";
         let findings = scan_default(input);
-        let redacted = run_redact(input, &findings, None, &WholeInputLimits::default()).unwrap();
-        let js_findings: Vec<JsFinding> =
-            findings.iter().map(|f| to_js_finding(input, f)).collect();
+        let redacted = run_redact(
+            input,
+            &findings,
+            None,
+            &WholeInputLimits::default(),
+            &offsets_for(input),
+        )
+        .unwrap();
+        let js_findings: Vec<JsFinding> = findings
+            .iter()
+            .map(|f| to_js_finding(&mut Utf16Offsets::new(input), f))
+            .collect();
         assert_eq!(js_findings.len(), 1);
 
         let combined = scan_and_redact(input.to_owned(), None, None, None, None).unwrap();
@@ -898,7 +1000,13 @@ mod tests {
 
     fn scan_common_default(input: &str) -> Vec<Finding> {
         with_profile_registry(Profile::Common, |registry| {
-            run_scan(input, registry, None, &WholeInputLimits::default())
+            run_scan(
+                input,
+                registry,
+                None,
+                &WholeInputLimits::default(),
+                &offsets_for(input),
+            )
         })
         .unwrap()
     }
@@ -946,10 +1054,19 @@ mod tests {
         let input = "postgres://user:SYNTHETIC_REVOKED_PASSWORD@example.test:5432/db";
         let findings = scan_common_default(input);
         assert_eq!(findings.len(), 1);
-        let redacted = run_redact(input, &findings, None, &WholeInputLimits::default()).unwrap();
+        let redacted = run_redact(
+            input,
+            &findings,
+            None,
+            &WholeInputLimits::default(),
+            &offsets_for(input),
+        )
+        .unwrap();
         assert!(!redacted.contains("SYNTHETIC_REVOKED_PASSWORD"));
-        let js_findings: Vec<JsFinding> =
-            findings.iter().map(|f| to_js_finding(input, f)).collect();
+        let js_findings: Vec<JsFinding> = findings
+            .iter()
+            .map(|f| to_js_finding(&mut Utf16Offsets::new(input), f))
+            .collect();
 
         let combined = scan_and_redact_common(input.to_owned(), None, None, None, None).unwrap();
         assert_eq!(
@@ -1132,11 +1249,17 @@ validator: none\n";
             let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
             for case in document["cases"].as_array().unwrap() {
                 let input = case["input"].as_str().unwrap();
-                let findings =
-                    run_scan(input, &registry, None, &WholeInputLimits::default()).unwrap();
+                let findings = run_scan(
+                    input,
+                    &registry,
+                    None,
+                    &WholeInputLimits::default(),
+                    &offsets_for(input),
+                )
+                .unwrap();
                 let actual: Vec<serde_json::Value> = findings
                     .into_iter()
-                    .map(|finding| to_js_finding(input, &finding))
+                    .map(|finding| to_js_finding(&mut Utf16Offsets::new(input), &finding))
                     .map(|finding| {
                         serde_json::json!({
                             "detector": finding.detector,
@@ -1180,10 +1303,17 @@ validator: none\n";
         let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
         for case in document["cases"].as_array().unwrap() {
             let input = case["input"].as_str().unwrap();
-            let findings = run_scan(input, &registry, None, &WholeInputLimits::default()).unwrap();
+            let findings = run_scan(
+                input,
+                &registry,
+                None,
+                &WholeInputLimits::default(),
+                &offsets_for(input),
+            )
+            .unwrap();
             let actual: Vec<serde_json::Value> = findings
                 .into_iter()
-                .map(|finding| to_js_finding(input, &finding))
+                .map(|finding| to_js_finding(&mut Utf16Offsets::new(input), &finding))
                 .map(|finding| {
                     serde_json::json!({
                         "detector": finding.detector,
