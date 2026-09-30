@@ -33,6 +33,7 @@ use super::pattern::{
     self, Alphabet, PrefixShape, RunLength, is_alnum, is_alnum_dash, is_alnum_dash_dot,
     is_base64_body, is_digit, is_lower_hex, is_upper_alnum,
 };
+use super::prefilter;
 
 /// Maps a ruleset's named alphabet to the matching byte-class predicate —
 /// the same seven functions [`super::pattern`] already defines for every
@@ -111,6 +112,25 @@ impl Detector for RulesetDetector {
         input: &str,
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
+        // Every candidate starts with the prefix. Inside a pipeline scan the
+        // scan copy's shared byte pairs can rule it out without searching
+        // (issue #1057); debug builds search anyway and check that the scan
+        // would have found nothing.
+        if !prefilter::ruleset_literal_may_occur(input, self.spec.prefix().as_bytes()) {
+            #[cfg(debug_assertions)]
+            assert!(
+                self.scan(input).is_empty(),
+                "the ruleset prefilter ruled out a prefix that occurs in its input"
+            );
+            return Ok(Vec::new());
+        }
+        Ok(self.scan(input))
+    }
+}
+
+impl RulesetDetector {
+    /// Every candidate in `input`, found by searching it.
+    fn scan(&self, input: &str) -> Vec<Candidate> {
         let alphabet = alphabet_fn(self.spec.alphabet());
         let run = match self.spec.run() {
             RunSpec::Exact(count) => RunLength::Exact(count),
@@ -145,7 +165,7 @@ impl Detector for RulesetDetector {
                     .with_specificity(self.spec.specificity()),
             );
         }
-        Ok(candidates)
+        candidates
     }
 }
 
