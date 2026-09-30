@@ -294,7 +294,7 @@ fn scan_bare_secret_runs(
 fn detect_context_gated(
     input: &str,
     exact_len: usize,
-    type_name: &str,
+    type_name: &'static str,
     specific_markers: &[&str],
     specific_signal: &str,
 ) -> Vec<Candidate> {
@@ -334,7 +334,7 @@ fn detect_context_gated(
                 (confidence, signal)
             };
             candidates.push(
-                Candidate::new(type_name, confidence, range)
+                Candidate::built_in(type_name, confidence, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals([signal]),
             );

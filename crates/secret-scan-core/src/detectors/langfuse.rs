@@ -72,7 +72,7 @@ impl Detector for LangfuseSecretKeyDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("langfuse_secret_key", Confidence::High, range)
+                Candidate::built_in("langfuse_secret_key", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(signals.iter().copied()),
             );

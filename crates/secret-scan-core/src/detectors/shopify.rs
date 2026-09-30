@@ -39,7 +39,7 @@ impl Detector for ShopifyTokenDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("shopify_access_token", Confidence::High, range)
+                Candidate::built_in("shopify_access_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(["shopify-documented-prefix", "opaque-suffix"]),
             );

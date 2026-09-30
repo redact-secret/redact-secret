@@ -215,7 +215,7 @@ fn candidates(
         .filter_map(|found| {
             let range = ByteRange::new(found.start, found.end)?;
             Some(
-                Candidate::new(type_name, Confidence::High, range)
+                Candidate::built_in(type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(signals(&found).iter().copied()),
             )

@@ -42,7 +42,7 @@ impl Detector for AwsAccessKeyDetector {
                 continue;
             };
             candidates.push(
-                Candidate::new("aws_access_key_id", Confidence::High, range)
+                Candidate::built_in("aws_access_key_id", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(["aws-prefix", "fixed-length"]),
             );
@@ -293,7 +293,7 @@ impl Detector for AwsSecretAccessKeyDetector {
                 };
                 if let Some(range) = ByteRange::new(run_start, run_end) {
                     candidates.push(
-                        Candidate::new(SECRET_TYPE, Confidence::High, range)
+                        Candidate::built_in(SECRET_TYPE, Confidence::High, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals(["aws-secret-width", signal]),
                     );

@@ -299,7 +299,7 @@ fn detect_context_gated(
     boundary: Alphabet,
     identifier_prefix: &str,
     identifier_alphabet: Alphabet,
-    type_name: &str,
+    type_name: &'static str,
     identifier_signal: &str,
     cli_table: bool,
 ) -> Vec<Candidate> {
@@ -360,7 +360,7 @@ fn detect_context_gated(
                 (confidence, signal)
             };
             candidates.push(
-                Candidate::new(type_name, confidence, range)
+                Candidate::built_in(type_name, confidence, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals([signal]),
             );

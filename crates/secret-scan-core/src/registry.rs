@@ -4,6 +4,7 @@
 //! breaker and it fixes the order in which detectors run. Built-in detectors
 //! are always registered before custom ones.
 
+use std::borrow::Cow;
 use std::sync::OnceLock;
 
 use crate::detectors::{
@@ -60,7 +61,7 @@ impl Profile {
 /// The id is read exactly once so a detector whose `id()` is not stable
 /// cannot change the public `detector` field of findings after validation.
 pub struct RegisteredDetector {
-    id: String,
+    id: Cow<'static, str>,
     detector: Held,
     /// The literals a built-in detector declared for the shared prefilter
     /// (issue #983). `None` for every custom detector and for built-ins
@@ -73,6 +74,11 @@ impl RegisteredDetector {
     /// The validated id.
     #[must_use]
     pub fn id(&self) -> &str {
+        &self.id
+    }
+
+    /// The id as stored; borrowed for a built-in.
+    pub(crate) const fn id_cow(&self) -> &Cow<'static, str> {
         &self.id
     }
 
@@ -127,7 +133,7 @@ impl DetectorRegistry {
     pub(crate) fn with_internal_test_detector(detector: Box<dyn Detector>) -> Self {
         Self {
             detectors: vec![RegisteredDetector {
-                id: detector.id().to_owned(),
+                id: Cow::Owned(detector.id().to_owned()),
                 detector: Held::Custom(detector),
                 required: None,
             }],
@@ -321,7 +327,7 @@ impl DetectorRegistry {
         let mut registry = self;
         if !selection.is_off() {
             registry.detectors.push(RegisteredDetector {
-                id: "pii-domain".to_owned(),
+                id: Cow::Borrowed("pii-domain"),
                 detector: Held::Custom(adapter(selection)),
                 required: None,
             });
@@ -401,7 +407,7 @@ impl DetectorRegistry {
         let id = detector.id();
         self.validate_id(id, reject_built_in_ids)?;
         self.detectors.push(RegisteredDetector {
-            id: id.to_owned(),
+            id: Cow::Owned(id.to_owned()),
             detector: Held::Custom(detector),
             required: None,
         });
@@ -415,13 +421,13 @@ impl DetectorRegistry {
     /// #1043).
     fn push_validated_built_in(
         &mut self,
-        id: &str,
+        id: &'static str,
         detector: BuiltInDetector,
         required: Option<RequiredLiterals>,
     ) -> Result<(), SecretScanError> {
         self.validate_id(id, false)?;
         self.detectors.push(RegisteredDetector {
-            id: id.to_owned(),
+            id: Cow::Borrowed(id),
             detector: Held::BuiltIn(detector),
             required,
         });

@@ -6,6 +6,7 @@
 //! original-input coordinates
 //! (`decision-normalize-invisible-characters-before-detection`).
 
+use std::borrow::Cow;
 use std::cmp::Ordering;
 
 use crate::detectors::ScanScope;
@@ -46,8 +47,8 @@ pub(crate) fn is_known_vendor_placeholder_literal(matched: &str) -> bool {
 
 /// A validated candidate with the keys overlap resolution sorts on.
 struct RankedCandidate<'a> {
-    type_name: &'a str,
-    detector: &'a str,
+    type_name: &'a Cow<'static, str>,
+    detector: &'a Cow<'static, str>,
     confidence: Confidence,
     specificity: Specificity,
     /// [`Action::overlap_resolution_severity`] of the action this candidate
@@ -101,6 +102,7 @@ fn validate_candidate<'a>(
     candidate_order: usize,
     emission_index: usize,
 ) -> Result<RankedCandidate<'a>, SecretScanError> {
+    let type_name_cow = candidate.type_name_cow();
     let type_name = candidate.type_name();
     let scanned = normalized.text();
     let scanned_range = candidate.range();
@@ -139,8 +141,8 @@ fn validate_candidate<'a>(
     let resolved_severity = default_action_for(type_name, confidence).overlap_resolution_severity();
 
     Ok(RankedCandidate {
-        type_name,
-        detector: registered.id(),
+        type_name: type_name_cow,
+        detector: registered.id_cow(),
         confidence,
         specificity: candidate.effective_specificity(),
         resolved_severity,
@@ -403,6 +405,18 @@ fn select_optimal_disjoint_set(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<Rank
             .then_with(|| a.priority(b))
     });
 
+    // Sorted by end, the set is pairwise disjoint exactly when each range
+    // starts at or after the previous one's end. The DP then takes every
+    // candidate (each weight is positive, and the best predecessor total
+    // is always the one just before it), so the sorted order is its answer
+    // and the four tables are not built.
+    if ranked
+        .windows(2)
+        .all(|pair| pair[1].range.start() >= pair[0].range.end())
+    {
+        return ranked;
+    }
+
     let n = ranked.len();
     let ends: Vec<usize> = ranked
         .iter()
@@ -633,14 +647,14 @@ pub(crate) fn detect_units(
         .into_iter()
         .enumerate()
         .map(|(index, candidate)| {
-            Ok(DetectedFinding::new(
+            Ok(DetectedFinding::from_validated(
                 format!("finding-{}", index + 1),
-                candidate.type_name,
-                candidate.detector,
+                candidate.type_name.clone(),
+                candidate.detector.clone(),
                 candidate.confidence,
                 candidate.range,
-            )?
-            .with_obfuscation(candidate.obfuscation))
+                candidate.obfuscation,
+            ))
         })
         .collect::<Result<Vec<_>, SecretScanError>>()
         .map(Some)
@@ -881,6 +895,9 @@ mod tests {
     /// `severity` is 0-3 like [`crate::types::Action::overlap_resolution_severity`];
     /// `type_name` and `detector` are stable per-test leaked strings so the
     /// resulting `RankedCandidate` can outlive the function that builds it.
+    const SYNTHETIC_TYPE: Cow<'static, str> = Cow::Borrowed("synthetic_type");
+    const SYNTHETIC_DETECTOR: Cow<'static, str> = Cow::Borrowed("synthetic-detector");
+
     fn synthetic(
         severity: u8,
         specificity: Specificity,
@@ -891,8 +908,8 @@ mod tests {
         candidate_order: usize,
     ) -> RankedCandidate<'static> {
         RankedCandidate {
-            type_name: "synthetic_type",
-            detector: "synthetic-detector",
+            type_name: &SYNTHETIC_TYPE,
+            detector: &SYNTHETIC_DETECTOR,
             confidence,
             specificity,
             resolved_severity: severity,
@@ -901,6 +918,179 @@ mod tests {
             detector_order,
             candidate_order,
             emission_index: candidate_order,
+        }
+    }
+
+    /// The resolver before the disjoint fast path (#1094): the full
+    /// weighted-interval DP on every nonempty set.
+    fn select_dp_oracle(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<RankedCandidate<'_>> {
+        // Nothing to select: most closed lines of an incremental session carry
+        // no candidate, and the tables below would each allocate (issue #950).
+        if ranked.is_empty() {
+            return ranked;
+        }
+        ranked.sort_unstable_by(|a, b| {
+            a.range
+                .end()
+                .cmp(&b.range.end())
+                .then_with(|| a.priority(b))
+        });
+
+        let n = ranked.len();
+        let ends: Vec<usize> = ranked
+            .iter()
+            .map(|candidate| candidate.range.end())
+            .collect();
+        // Strictly exceeds `n`, the number of candidates that could ever be
+        // summed at one dominance tier; see `EvidenceWeight`'s doc comment.
+        let base = n as u128 + 1;
+
+        let mut totals: Vec<EvidenceWeight> = Vec::with_capacity(n + 1);
+        totals.push(EvidenceWeight::default());
+        let mut include: Vec<bool> = Vec::with_capacity(n);
+
+        for (i, candidate) in ranked.iter().enumerate() {
+            let pred = ends[..i].partition_point(|&end| end <= candidate.range.start());
+            let with_candidate = EvidenceWeight::of(candidate, base).plus(totals[pred]);
+            let without_candidate = totals[i];
+            if with_candidate > without_candidate {
+                include.push(true);
+                totals.push(with_candidate);
+            } else {
+                include.push(false);
+                totals.push(without_candidate);
+            }
+        }
+
+        let mut selected_mask = vec![false; n];
+        let mut i = n;
+        while i > 0 {
+            if include[i - 1] {
+                selected_mask[i - 1] = true;
+                let start = ranked[i - 1].range.start();
+                i = ends[..i - 1].partition_point(|&end| end <= start);
+            } else {
+                i -= 1;
+            }
+        }
+
+        ranked
+            .into_iter()
+            .zip(selected_mask)
+            .filter_map(|(candidate, selected)| selected.then_some(candidate))
+            .collect()
+    }
+
+    fn key(selected: &[RankedCandidate<'_>]) -> Vec<(usize, usize, usize, usize)> {
+        selected
+            .iter()
+            .map(|c| {
+                (
+                    c.detector_order,
+                    c.candidate_order,
+                    c.range.start(),
+                    c.range.end(),
+                )
+            })
+            .collect()
+    }
+
+    /// Random candidate sets over a tiny coordinate space, so equal ranges,
+    /// containment, adjacency, empty ranges and exact weight ties all occur,
+    /// with mostly-disjoint sets included to hit the fast path.
+    #[test]
+    fn disjoint_fast_path_matches_the_full_dp_on_random_sets() {
+        use crate::test_rng::XorShift32;
+        let specificities = [
+            Specificity::Entropy,
+            Specificity::Contextual,
+            Specificity::Structural,
+            Specificity::Provider,
+        ];
+        let confidences = [Confidence::Low, Confidence::Medium, Confidence::High];
+        let mut rng = XorShift32::new(0x1094_0001);
+        let mut fast = 0_usize;
+        for case in 0..6000_usize {
+            let count = rng.below(9);
+            let span = 4 + rng.below(28);
+            let mostly_disjoint = case % 3 == 0;
+            let mut cursor = 0_usize;
+            let params: Vec<(u8, usize, usize, usize, usize, usize)> = (0..count)
+                .map(|i| {
+                    let (start, end) = if mostly_disjoint && rng.below(8) != 0 {
+                        let start = cursor + rng.below(3);
+                        let end = start + 1 + rng.below(4);
+                        cursor = end;
+                        (start, end)
+                    } else {
+                        let start = rng.below(span);
+                        (start, start + 1 + rng.below(span / 2 + 1))
+                    };
+                    let severity = u8::try_from(rng.below(4)).unwrap_or(0);
+                    (severity, rng.below(4), rng.below(3), start, end, i)
+                })
+                .collect();
+            let build = || -> Vec<RankedCandidate<'static>> {
+                params
+                    .iter()
+                    .map(|&(severity, spec, conf, start, end, i)| {
+                        synthetic(
+                            severity,
+                            specificities[spec],
+                            confidences[conf],
+                            start,
+                            end,
+                            i % 3,
+                            i / 3,
+                        )
+                    })
+                    .collect()
+            };
+            let mut sorted = build();
+            sorted.sort_unstable_by(|a, b| {
+                a.range
+                    .end()
+                    .cmp(&b.range.end())
+                    .then_with(|| a.priority(b))
+            });
+            if sorted
+                .windows(2)
+                .all(|pair| pair[1].range.start() >= pair[0].range.end())
+            {
+                fast += 1;
+            }
+            assert_eq!(
+                key(&select_optimal_disjoint_set(build())),
+                key(&select_dp_oracle(build())),
+                "case {case}: {params:?}"
+            );
+        }
+        assert!(fast > 500, "fast path exercised only {fast} times");
+    }
+
+    #[test]
+    fn disjoint_fast_path_keeps_equal_endpoints_and_adjacent_ranges() {
+        let make = |ranges: &[(usize, usize)]| -> Vec<RankedCandidate<'static>> {
+            ranges
+                .iter()
+                .enumerate()
+                .map(|(i, &(start, end))| {
+                    synthetic(1, Specificity::Provider, Confidence::High, start, end, 0, i)
+                })
+                .collect()
+        };
+        for ranges in [
+            vec![(0, 3), (3, 6), (6, 7), (7, 9)],
+            vec![(2, 3), (2, 3), (2, 4)],
+            vec![(5, 8), (0, 5), (8, 9)],
+            vec![(0, 4), (0, 4)],
+            vec![(0, 4), (1, 3)],
+        ] {
+            assert_eq!(
+                key(&select_optimal_disjoint_set(make(&ranges))),
+                key(&select_dp_oracle(make(&ranges))),
+                "{ranges:?}"
+            );
         }
     }
 

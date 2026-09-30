@@ -102,7 +102,7 @@ impl Detector for GrafanaServiceAccountTokenDetector {
                 && let Some(range) = ByteRange::new(start, end)
             {
                 candidates.push(
-                    Candidate::new("grafana_service_account_token", Confidence::High, range)
+                    Candidate::built_in("grafana_service_account_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
                         .with_signals(["grafana-documented-prefix", "two-segment-exact-length"]),
                 );

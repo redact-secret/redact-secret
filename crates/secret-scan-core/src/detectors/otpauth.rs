@@ -190,7 +190,7 @@ impl Detector for OtpauthDetector {
             };
 
             candidates.push(
-                Candidate::new("otpauth_secret", Confidence::High, range)
+                Candidate::built_in("otpauth_secret", Confidence::High, range)
                     .with_specificity(Specificity::Structural)
                     .with_signals(["otpauth-scheme", signal]),
             );

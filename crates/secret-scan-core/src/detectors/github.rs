@@ -98,7 +98,7 @@ fn push_classic_family(candidates: &mut Vec<Candidate>, input: &str) {
         for (prefix, type_name) in CLASSIC_FAMILY_PREFIXES {
             if bytes[start..].starts_with(prefix.as_bytes()) {
                 candidates.push(
-                    Candidate::new(type_name, Confidence::High, range)
+                    Candidate::built_in(type_name, Confidence::High, range)
                         .with_specificity(Specificity::Provider),
                 );
                 break;
@@ -113,7 +113,7 @@ fn push(candidates: &mut Vec<Candidate>, ranges: Vec<(usize, usize)>, type_name:
             continue;
         };
         candidates.push(
-            Candidate::new(type_name, Confidence::High, range)
+            Candidate::built_in(type_name, Confidence::High, range)
                 .with_specificity(Specificity::Provider),
         );
     }

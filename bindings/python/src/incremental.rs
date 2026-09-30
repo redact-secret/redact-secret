@@ -54,15 +54,22 @@ use crate::{
 /// unresolved input, so once a call returns, no later finding can start
 /// before `total_bytes - max_buffered_bytes`; everything below that is
 /// collapsed into a running count. During `observe`, the index also includes
-/// the entire incoming chunk until result conversion completes. Pruning bounds
-/// live offsets between calls, but `VecDeque` can retain its peak allocation
-/// until `clear`; the buffer limit alone is not a bound on index memory.
+/// the entire incoming chunk until result conversion completes. Adjacent
+/// same-width characters are recorded as one run, and `prune` releases
+/// capacity a large chunk left behind, but the buffer limit alone is still
+/// not a bound on index memory during one very large append.
 pub(crate) struct CodePointIndex {
-    /// Absolute byte offsets, ascending, of continuation bytes at or above
-    /// `floor`.
-    continuations: VecDeque<usize>,
-    /// Number of continuation bytes below `floor`.
-    below_floor: usize,
+    /// Ascending byte offsets of isolated or short non-ASCII characters, one
+    /// entry per continuation byte, at or above `floor`.
+    discounts: VecDeque<usize>,
+    /// Ascending runs of adjacent same-width non-ASCII characters (CJK
+    /// text, emoji strings), one record per run instead of one entry per
+    /// continuation byte.
+    runs: VecDeque<Run>,
+    /// Shortfall units popped from `discounts` (below `floor`).
+    discounts_below_floor: usize,
+    /// Shortfall units popped from `runs`, whole or in part (below `floor`).
+    runs_below_floor: usize,
     /// Lowest byte offset this index can still convert.
     floor: usize,
     /// Total input bytes observed so far.
@@ -72,12 +79,48 @@ pub(crate) struct CodePointIndex {
     max_buffered_bytes: usize,
 }
 
+/// `count` adjacent non-ASCII characters of `width` UTF-8 bytes each, the
+/// first starting at byte `start`.
+struct Run {
+    start: usize,
+    /// Cumulative continuation bytes of every run up to and including this one,
+    /// counted from the start of the session (never reduced by pruning).
+    cumulative_shortfall: usize,
+    count: u32,
+    width: u8,
+}
+
+impl Run {
+    /// Continuation bytes of one character of this run.
+    fn shortfall(&self) -> usize {
+        shortfall_of_width(self.width)
+    }
+
+    /// Byte offset of the first character after this run.
+    fn end(&self) -> usize {
+        self.start + self.count as usize * usize::from(self.width)
+    }
+}
+
+/// UTF-8 continuation bytes of a character of `width` bytes: the amount a
+/// code point offset falls short of the byte offset after it.
+fn shortfall_of_width(width: u8) -> usize {
+    usize::from(width) - 1
+}
+
+/// A run is recorded only when it replaces at least this many per-unit
+/// entries, so the worst case (isolated characters) costs no more than it
+/// did before runs existed.
+const MIN_RUN_SHORTFALL: usize = 4;
+
 impl CodePointIndex {
     /// Creates an index for a session with the given buffer limit.
     fn new(max_buffered_bytes: usize) -> Self {
         Self {
-            continuations: VecDeque::new(),
-            below_floor: 0,
+            discounts: VecDeque::new(),
+            runs: VecDeque::new(),
+            discounts_below_floor: 0,
+            runs_below_floor: 0,
             floor: 0,
             total_bytes: 0,
             max_buffered_bytes,
@@ -86,31 +129,133 @@ impl CodePointIndex {
 
     /// Records `chunk`'s UTF-8 shape as the next piece of logical input.
     fn observe(&mut self, chunk: &str) {
-        for (index, byte) in chunk.as_bytes().iter().enumerate() {
-            if byte & 0b1100_0000 == 0b1000_0000 {
-                self.continuations.push_back(self.total_bytes + index);
+        // The run being extended: (start, width, count).
+        let mut pending: Option<(usize, u8, u32)> = None;
+        for (index, ch) in chunk.char_indices() {
+            let width = ch.len_utf8();
+            if width == 1 {
+                continue;
             }
+            let start = self.total_bytes + index;
+            let width = u8::try_from(width).unwrap_or(4);
+            match &mut pending {
+                Some((run_start, run_width, count))
+                    if *run_width == width
+                        && *count < u32::MAX
+                        && *run_start + *count as usize * usize::from(width) == start =>
+                {
+                    *count += 1;
+                }
+                _ => {
+                    if let Some((run_start, run_width, count)) = pending.take() {
+                        self.record(run_start, run_width, count);
+                    }
+                    pending = Some((start, width, 1));
+                }
+            }
+        }
+        if let Some((run_start, run_width, count)) = pending {
+            self.record(run_start, run_width, count);
         }
         self.total_bytes += chunk.len();
     }
 
+    /// Records `count` adjacent `width`-byte characters from `start`: onto
+    /// the last run when it ends exactly there, as a new run when long
+    /// enough to beat per-byte entries, and as per-byte entries otherwise.
+    fn record(&mut self, start: usize, width: u8, count: u32) {
+        let shortfall = shortfall_of_width(width);
+        let added = count as usize * shortfall;
+        if let Some(last) = self.runs.back_mut()
+            && last.width == width
+            && last.end() == start
+            && last.count.checked_add(count).is_some()
+        {
+            last.count += count;
+            last.cumulative_shortfall += added;
+            return;
+        }
+        if added >= MIN_RUN_SHORTFALL {
+            let previous = self
+                .runs
+                .back()
+                .map_or(self.runs_below_floor, |last| last.cumulative_shortfall);
+            self.runs.push_back(Run {
+                start,
+                cumulative_shortfall: previous + added,
+                count,
+                width,
+            });
+        } else {
+            for index in 0..count as usize {
+                for _ in 0..shortfall {
+                    self.discounts.push_back(start + index * usize::from(width));
+                }
+            }
+        }
+    }
+
     /// Drops the offsets no later call can ask about, after a call has
-    /// returned and the core's retained window has settled.
+    /// returned and the core's retained window has settled, and returns the
+    /// capacity a large earlier chunk left behind.
     fn prune(&mut self) {
         let floor = self.total_bytes.saturating_sub(self.max_buffered_bytes);
-        while self.continuations.front().is_some_and(|&at| at < floor) {
-            self.continuations.pop_front();
-            self.below_floor += 1;
+        while self.discounts.front().is_some_and(|&at| at < floor) {
+            self.discounts.pop_front();
+            self.discounts_below_floor += 1;
+        }
+        while let Some(front) = self.runs.front_mut() {
+            if front.start >= floor {
+                break;
+            }
+            let width = usize::from(front.width);
+            // Characters of the run that start below `floor`.
+            let below = (floor - front.start).div_ceil(width);
+            if below >= front.count as usize {
+                self.runs_below_floor = front.cumulative_shortfall;
+                self.runs.pop_front();
+            } else {
+                self.runs_below_floor += below * front.shortfall();
+                front.start += below * width;
+                front.count -= u32::try_from(below).unwrap_or(u32::MAX);
+                break;
+            }
         }
         self.floor = floor;
+        shrink_if_sparse(&mut self.discounts);
+        shrink_if_sparse(&mut self.runs);
     }
 
     /// Forgets everything: used when a session ends and no further offset
     /// can be reported.
     fn clear(&mut self) {
-        self.continuations = VecDeque::new();
-        self.below_floor = 0;
+        self.discounts = VecDeque::new();
+        self.runs = VecDeque::new();
+        self.discounts_below_floor = 0;
+        self.runs_below_floor = 0;
         self.floor = self.total_bytes;
+    }
+
+    /// Shortfall units of every character starting below `byte_offset`.
+    fn shortfall_before(&self, byte_offset: usize) -> usize {
+        let discounts =
+            self.discounts_below_floor + self.discounts.partition_point(|&at| at < byte_offset);
+        let started = self.runs.partition_point(|run| run.start < byte_offset);
+        let runs = match started.checked_sub(1) {
+            None => self.runs_below_floor,
+            Some(last) => {
+                let run = &self.runs[last];
+                let before = match last.checked_sub(1) {
+                    None => self.runs_below_floor,
+                    Some(previous) => self.runs[previous].cumulative_shortfall,
+                };
+                let characters = (byte_offset - run.start)
+                    .div_ceil(usize::from(run.width))
+                    .min(run.count as usize);
+                before + characters * run.shortfall()
+            }
+        };
+        discounts + runs
     }
 
     /// Converts one absolute byte offset, or `None` when it falls below the
@@ -119,8 +264,7 @@ impl CodePointIndex {
         if byte_offset < self.floor {
             return None;
         }
-        let before = self.below_floor + self.continuations.partition_point(|&at| at < byte_offset);
-        byte_offset.checked_sub(before)
+        byte_offset.checked_sub(self.shortfall_before(byte_offset))
     }
 
     /// Converts a finding's absolute byte range to `(start, end)` code
@@ -130,6 +274,64 @@ impl CodePointIndex {
             self.char_offset(range.start())?,
             self.char_offset(range.end())?,
         ))
+    }
+}
+
+/// Releases the capacity a peak (one very large chunk) left behind once the
+/// live entries are far fewer than the allocation.
+fn shrink_if_sparse<T>(entries: &mut VecDeque<T>) {
+    if entries.capacity() > 64 && entries.capacity() / 4 > entries.len() {
+        entries.shrink_to(entries.len() * 2);
+    }
+}
+
+/// The pre-#1096 index: one entry per continuation byte, never compacted. Kept
+/// as the test oracle for [`CodePointIndex`].
+#[cfg(test)]
+struct OracleIndex {
+    discounts: VecDeque<usize>,
+    below_floor: usize,
+    floor: usize,
+    total_bytes: usize,
+    max_buffered_bytes: usize,
+}
+
+#[cfg(test)]
+impl OracleIndex {
+    fn new(max_buffered_bytes: usize) -> Self {
+        Self {
+            discounts: VecDeque::new(),
+            below_floor: 0,
+            floor: 0,
+            total_bytes: 0,
+            max_buffered_bytes,
+        }
+    }
+
+    fn observe(&mut self, chunk: &str) {
+        for (index, byte) in chunk.as_bytes().iter().enumerate() {
+            if byte & 0b1100_0000 == 0b1000_0000 {
+                self.discounts.push_back(self.total_bytes + index);
+            }
+        }
+        self.total_bytes += chunk.len();
+    }
+
+    fn prune(&mut self) {
+        let floor = self.total_bytes.saturating_sub(self.max_buffered_bytes);
+        while self.discounts.front().is_some_and(|&at| at < floor) {
+            self.discounts.pop_front();
+            self.below_floor += 1;
+        }
+        self.floor = floor;
+    }
+
+    fn char_offset(&self, byte_offset: usize) -> Option<usize> {
+        if byte_offset < self.floor {
+            return None;
+        }
+        let before = self.below_floor + self.discounts.partition_point(|&at| at < byte_offset);
+        byte_offset.checked_sub(before)
     }
 }
 
@@ -720,7 +922,7 @@ pub(crate) fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::CodePointIndex;
+    use super::{CodePointIndex, OracleIndex};
 
     /// The independent reference the binding must agree with: the number of
     /// code points in the UTF-8 prefix ending at `byte_offset`.
@@ -788,7 +990,7 @@ mod tests {
     fn ascii_input_records_nothing_and_converts_identically() {
         let mut index = CodePointIndex::new(64);
         index.observe("api_key=SYNTHETIC_REVOKED\n");
-        assert!(index.continuations.is_empty());
+        assert!(index.discounts.is_empty());
         assert_eq!(index.char_offset(0), Some(0));
         assert_eq!(index.char_offset(25), Some(25));
     }
@@ -798,8 +1000,125 @@ mod tests {
         let mut index = CodePointIndex::new(64);
         index.observe("\u{1F511}abc");
         index.clear();
-        assert!(index.continuations.is_empty());
-        assert_eq!(index.below_floor, 0);
+        assert!(index.discounts.is_empty());
+        assert_eq!(index.discounts_below_floor, 0);
+        assert_eq!(index.runs_below_floor, 0);
+        assert!(index.runs.is_empty());
         assert_eq!(index.char_offset(0), None);
+    }
+
+    /// A fixed-seed 32-bit generator: usize-safe on wasm32.
+    fn next(state: &mut u32) -> u32 {
+        *state ^= *state << 13;
+        *state ^= *state >> 17;
+        *state ^= *state << 5;
+        *state
+    }
+
+    /// Random text made of ASCII islands and runs of 2-, 3- and 4-byte
+    /// characters, including combining marks and invisible code points.
+    fn random_text(state: &mut u32, chars: usize) -> String {
+        const POOL: [&[char]; 5] = [
+            &['a', 'b', ' ', '\n', '='],
+            &['\u{00E9}', '\u{0416}', '\u{00FC}'],
+            &['\u{4E2D}', '\u{6587}', '\u{0301}', '\u{200B}', '\u{FEFF}'],
+            &['\u{1F511}', '\u{1F512}', '\u{10400}'],
+            &['\u{07FF}', '\u{0800}', '\u{FFFD}'],
+        ];
+        let mut out = String::new();
+        while out.chars().count() < chars {
+            let pool = POOL[(next(state) % 5) as usize];
+            let run = 1 + next(state) % 9;
+            for _ in 0..run {
+                out.push(pool[(next(state) as usize) % pool.len()]);
+            }
+        }
+        out
+    }
+
+    #[test]
+    fn compacted_index_matches_the_per_unit_oracle_on_random_streams() {
+        for seed in 1..=40u32 {
+            let mut state = seed.wrapping_mul(2_654_435_761) | 1;
+            let window = 1 + (next(&mut state) % 300) as usize;
+            let mut index = CodePointIndex::new(window);
+            let mut oracle = OracleIndex::new(window);
+            let mut joined = String::new();
+            for _ in 0..12 {
+                let chars = (next(&mut state) % 200) as usize;
+                let chunk = random_text(&mut state, chars);
+                index.observe(&chunk);
+                oracle.observe(&chunk);
+                joined.push_str(&chunk);
+                // Queries before pruning span the whole retained input.
+                for byte_offset in 0..=joined.len() {
+                    if joined.is_char_boundary(byte_offset) {
+                        assert_eq!(
+                            index.char_offset(byte_offset),
+                            oracle.char_offset(byte_offset),
+                            "seed {seed} offset {byte_offset} before prune",
+                        );
+                    }
+                }
+                if !next(&mut state).is_multiple_of(4) {
+                    index.prune();
+                    oracle.prune();
+                }
+                for byte_offset in 0..=joined.len() {
+                    if joined.is_char_boundary(byte_offset) {
+                        assert_eq!(
+                            index.char_offset(byte_offset),
+                            oracle.char_offset(byte_offset),
+                            "seed {seed} offset {byte_offset} after prune",
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn dense_runs_are_recorded_compactly_and_prune_inside_a_run() {
+        let cjk = "\u{4E2D}".repeat(1000);
+        let emoji = "\u{1F511}".repeat(1000);
+        let mut index = CodePointIndex::new(300);
+        let mut oracle = OracleIndex::new(300);
+        let mut joined = String::new();
+        for chunk in [cjk.as_str(), "ab", emoji.as_str(), cjk.as_str()] {
+            index.observe(chunk);
+            oracle.observe(chunk);
+            joined.push_str(chunk);
+            index.prune();
+            oracle.prune();
+        }
+        // Three dense runs, no per-unit entries.
+        assert!(index.discounts.len() <= 2, "{}", index.discounts.len());
+        assert!(index.runs.len() <= 3, "{}", index.runs.len());
+        let floor = joined.len() - 300;
+        for byte_offset in floor - 7..=joined.len() {
+            if joined.is_char_boundary(byte_offset) {
+                assert_eq!(
+                    index.char_offset(byte_offset),
+                    oracle.char_offset(byte_offset),
+                    "offset {byte_offset}",
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_run_continues_across_a_chunk_boundary_and_capacity_is_released() {
+        let mut index = CodePointIndex::new(64);
+        let big = "\u{1F511}".repeat(50_000);
+        index.observe(&big);
+        index.observe(&big);
+        assert_eq!(index.runs.len(), 1);
+        index.prune();
+        for chunk in ["tail\u{1F511}\n"; 3] {
+            index.observe(chunk);
+            index.prune();
+        }
+        assert!(index.discounts.capacity() <= 256);
+        assert!(index.runs.capacity() <= 256);
     }
 }

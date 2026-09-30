@@ -258,7 +258,7 @@ impl Detector for MailgunApiKeyDetector {
                 {
                     let (confidence, context_signal) = context_confidence(line, pos);
                     candidates.push(
-                        Candidate::new("mailgun_api_key", confidence, range)
+                        Candidate::built_in("mailgun_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals([context_signal, "documented-key-prefix"]),
                     );
@@ -280,7 +280,7 @@ impl Detector for MailgunApiKeyDetector {
                 {
                     let (confidence, context_signal) = context_confidence(line, start);
                     candidates.push(
-                        Candidate::new("mailgun_api_key", confidence, range)
+                        Candidate::built_in("mailgun_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals([context_signal, "hex-triplet-shape"]),
                     );

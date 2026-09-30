@@ -208,6 +208,12 @@ evidence is linked from each published version.
   once per batch, instead of being built and copied a second time. Findings,
   ranges, ids, order, redacted text and error codes are unchanged, as is what
   a session retains and for how long.
+- The four keyword-gated AI detectors (mistral, cohere, ai21, deepgram) share
+  one case-insensitive pass per scan copy for their provider words instead of
+  each searching the whole input on its own (#1092); a spec that names another
+  word, and any input that is not the active scan copy, keep the per-spec
+  search. Findings, ranges, ids and order are unchanged, and the shared pass
+  is tested against the per-spec search.
 - Per-scan and per-line work no longer repeats. Always-run detectors skip
   bytes that cannot start a match (discord, bearer, generic-token
   authorization, the shared case-insensitive keyword search) (#1073);
@@ -222,6 +228,10 @@ evidence is linked from each published version.
   Findings, ranges, ids, order and redacted text are unchanged. Python
   `ScanResult.findings` still returns a list, now of the same `Finding`
   objects on every read (`res.findings[0] is res.findings[0]`).
+- The shared literal matcher finds a lead group by rank in its lead table
+  instead of a binary search, and skips a lead group whose detectors have all
+  been seen, so a lead-dense input repeats less work (#1093). The matched
+  detector set is unchanged and is tested against a substring oracle.
 
 - Scan cost is now linear on inputs that were quadratic or repeated work:
   generic-token `value` names and repeated `?a=`, `{a=x`, `(a=` prefixes on

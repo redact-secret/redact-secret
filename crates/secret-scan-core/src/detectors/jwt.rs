@@ -206,7 +206,7 @@ impl Detector for JwtDetector {
                 && let Some(range) = ByteRange::new(cursor, end)
             {
                 candidates.push(
-                    Candidate::new("jwt", Confidence::High, range)
+                    Candidate::built_in("jwt", Confidence::High, range)
                         .with_specificity(Specificity::Structural)
                         .with_signals(["three-segments", "encoded-json-prefixes"]),
                 );

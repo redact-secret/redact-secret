@@ -5,6 +5,8 @@
 //! candidate or finding after it has been validated. Ranges are UTF-8 byte
 //! offsets into the scanned input ([`crate::RANGE_UNIT`]).
 
+use std::borrow::Cow;
+
 use crate::error::{
     DetectorFailure, FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode,
 };
@@ -311,7 +313,7 @@ impl DetectorContext {
 /// pipeline before it can influence any public result.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Candidate {
-    type_name: String,
+    type_name: Cow<'static, str>,
     confidence: Confidence,
     specificity: Option<Specificity>,
     range: ByteRange,
@@ -326,7 +328,27 @@ impl Candidate {
     #[must_use]
     pub fn new(type_name: impl Into<String>, confidence: Confidence, range: ByteRange) -> Self {
         Self {
-            type_name: type_name.into(),
+            type_name: Cow::Owned(type_name.into()),
+            confidence,
+            specificity: None,
+            range,
+            signals: Vec::new(),
+            obfuscation: Obfuscation::None,
+            reject_invisible_normalization: false,
+        }
+    }
+
+    /// [`new`](Self::new) for a `'static` type name: the name is borrowed, so
+    /// constructing the candidate does not allocate it. Built-in detectors
+    /// use this; the public constructor keeps owning its argument.
+    #[must_use]
+    pub(crate) const fn built_in(
+        type_name: &'static str,
+        confidence: Confidence,
+        range: ByteRange,
+    ) -> Self {
+        Self {
+            type_name: Cow::Borrowed(type_name),
             confidence,
             specificity: None,
             range,
@@ -375,6 +397,12 @@ impl Candidate {
     /// The finding type this candidate claims.
     #[must_use]
     pub fn type_name(&self) -> &str {
+        &self.type_name
+    }
+
+    /// The claimed type as stored: borrowed for a built-in detector's
+    /// static name, so a finding built from it allocates nothing.
+    pub(crate) const fn type_name_cow(&self) -> &Cow<'static, str> {
         &self.type_name
     }
 
@@ -464,8 +492,8 @@ pub trait Detector {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct DetectedFinding {
     id: String,
-    type_name: String,
-    detector: String,
+    type_name: Cow<'static, str>,
+    detector: Cow<'static, str>,
     confidence: Confidence,
     range: ByteRange,
     obfuscation: Obfuscation,
@@ -495,12 +523,35 @@ impl DetectedFinding {
         }
         Ok(Self {
             id,
-            type_name,
-            detector,
+            type_name: Cow::Owned(type_name),
+            detector: Cow::Owned(detector),
             confidence,
             range,
             obfuscation: Obfuscation::None,
         })
+    }
+
+    /// The pipeline's constructor: `type_name` was validated as a candidate
+    /// type, `detector` at registration, and `id` is `finding-<n>`, so no
+    /// identifier is re-checked here. Built-in names arrive borrowed and
+    /// allocate nothing.
+    pub(crate) fn from_validated(
+        id: String,
+        type_name: Cow<'static, str>,
+        detector: Cow<'static, str>,
+        confidence: Confidence,
+        range: ByteRange,
+        obfuscation: Obfuscation,
+    ) -> Self {
+        debug_assert!(is_identifier(&id) && is_identifier(&type_name) && is_identifier(&detector));
+        Self {
+            id,
+            type_name,
+            detector,
+            confidence,
+            range,
+            obfuscation,
+        }
     }
 
     /// Attaches the invisible-character-obfuscation signal.
@@ -527,6 +578,23 @@ impl DetectedFinding {
         debug_assert!(is_identifier(&id));
         self.id = id;
         self
+    }
+
+    /// This finding at `range`, with an empty id: for the unit-local view the
+    /// incremental session hands to `redact_into`, whose wrapping formatter
+    /// reads only the range and formats the global finding instead, so the
+    /// local view never allocates or clones an id (issue #1095). Its id is not
+    /// an [identifier](is_identifier): it must never leave the crate.
+    #[must_use]
+    pub(crate) fn relocated_without_id(&self, range: ByteRange) -> Self {
+        Self {
+            id: String::new(),
+            type_name: self.type_name.clone(),
+            detector: self.detector.clone(),
+            confidence: self.confidence,
+            range,
+            obfuscation: self.obfuscation,
+        }
     }
 
     /// Deterministic finding id (`finding-1`, `finding-2`, ...).

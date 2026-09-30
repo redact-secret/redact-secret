@@ -282,7 +282,7 @@ impl Detector for MailchimpMarketingApiKeyDetector {
                         (Confidence::Medium, "mailchimp-keyword-cooccurrence")
                     };
                     candidates.push(
-                        Candidate::new("mailchimp_api_key", confidence, range)
+                        Candidate::built_in("mailchimp_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
                             .with_signals([context_signal, "documented-datacenter-suffix"]),
                     );
