@@ -418,6 +418,11 @@ selects workloads by substring, `--no-detectors` skips attribution, and
 `--json` prints one JSON document for evidence records to cite. Progress goes
 to stderr. The workloads, their known limits, and a baseline on `main` are in
 [`docs/audits/evidence/981/README.md`](audits/evidence/981/README.md).
+Since #1053 through #1060 it also covers the one-line value, query, brace and
+paren rescan workloads, source with provider prefixes, and one-line PII input
+at 64 and 256 KiB. Every row reports throughput in MB/s. Incremental timing
+excludes registry construction, and a `registry-build` microbenchmark times
+that construction separately.
 It measures this repository's code for engineering work. Release budget
 judgements stay in `redact-secret-benchmarks`.
 
