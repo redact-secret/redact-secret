@@ -14,9 +14,11 @@ use crate::evidence::shadow::ShadowComparison;
 use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
 use crate::pii::is_reserved_detector_id;
+use crate::policy::DefaultPolicy;
 use crate::policy::default_action_for;
+use crate::redact::default_placeholder_formatter;
 use crate::redact::redact_with_limits;
-use crate::registry::{DetectorRegistry, RegisteredDetector};
+use crate::registry::{DetectorRegistry, Profile, RegisteredDetector};
 use crate::types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     Obfuscation, PlaceholderFormatter, Policy, PolicyContext, ScanResult, Specificity,
@@ -781,6 +783,93 @@ pub fn scan_and_redact_with_limits(
     let findings = scan_with_limits(input, registry, policy, limits)?;
     let text = redact_with_limits(input, &findings, formatter, limits)?;
     Ok(ScanResult::new(text, findings))
+}
+
+/// Redacts `input` with the supported defaults, in one call.
+///
+/// This is the minimal path: the `full` built-in [`Profile`], the
+/// [`DefaultPolicy`], the
+/// [`default_placeholder_formatter`], and the default [`WholeInputLimits`].
+/// It is exactly [`sanitize_with_profile`] with [`Profile::Full`], and through
+/// it exactly [`scan_and_redact`] over a registry from
+/// [`DetectorRegistry::with_built_in`] with no custom detectors. The result
+/// keeps the evidence: [`ScanResult::text`] is the redacted text and
+/// [`ScanResult::findings`] carries byte ranges into the original `input`.
+///
+/// ```
+/// let result = redact_secret::sanitize("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000")?;
+/// assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+/// # Ok::<(), redact_secret::SecretScanError>(())
+/// ```
+///
+/// # Advanced use
+///
+/// For a `common` profile see [`sanitize_with_profile`]. For custom
+/// detectors, PII activation, a custom [`Policy`] or
+/// [`PlaceholderFormatter`](crate::PlaceholderFormatter), explicit
+/// [`WholeInputLimits`], or a reused registry, build a [`DetectorRegistry`]
+/// and call [`scan_and_redact`] or [`scan_and_redact_with_limits`]. Chunked
+/// input uses [`IncrementalSanitizer`](crate::IncrementalSanitizer), which
+/// supports no custom detectors, so this convenience layer does not either.
+///
+/// # Design decisions (#1078)
+///
+/// - Function, not a `Sanitizer` value: there is no state worth holding, and
+///   `IncrementalSanitizer` already owns the "sanitizer" noun for a stateful
+///   session.
+/// - Stateless: building the built-in registry costs about 18 microseconds
+///   (`registry-build` bench), so nothing is cached and no hidden global
+///   exists. A caller scanning in a hot loop builds a [`DetectorRegistry`]
+///   once and calls [`scan_and_redact`].
+/// - Returns [`ScanResult`], never a bare `String`: dropping the findings
+///   would discard the evidence callers need to audit or block. Use
+///   [`ScanResult::text`] for the text.
+///
+/// # Errors
+///
+/// Exactly the errors [`scan_and_redact`] reports, unchanged: a failed
+/// built-in registry construction, [`SecretScanErrorCode::InputLimitExceeded`],
+/// [`SecretScanErrorCode::FindingLimitExceeded`], and policy or formatter
+/// failures. Nothing is truncated, retried, or weakened.
+pub fn sanitize(input: &str) -> Result<ScanResult, SecretScanError> {
+    sanitize_with_profile(input, Profile::Full)
+}
+
+/// Same as [`sanitize`], for the built-in detectors of `profile`.
+///
+/// [`Profile::Full`] is the default and compatibility baseline;
+/// [`Profile::Common`] is the smaller, format-agnostic subset for size- or
+/// latency-sensitive preventive use, and may report fewer findings than
+/// `full` by design. Everything else (policy, formatter, limits, errors)
+/// is that of [`sanitize`]: this is [`scan_and_redact`] over a registry from
+/// [`DetectorRegistry::with_built_in`] or
+/// [`DetectorRegistry::with_common_built_in`] with no custom detectors.
+///
+/// ```
+/// use redact_secret::Profile;
+///
+/// let result = redact_secret::sanitize_with_profile("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE", Profile::Common)?;
+/// assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+/// # Ok::<(), redact_secret::SecretScanError>(())
+/// ```
+///
+/// A plain argument rather than a builder keeps the convenience layer one
+/// function wide (#1078).
+///
+/// # Errors
+///
+/// See [`sanitize`].
+pub fn sanitize_with_profile(input: &str, profile: Profile) -> Result<ScanResult, SecretScanError> {
+    let registry = match profile {
+        Profile::Full => DetectorRegistry::with_built_in([])?,
+        Profile::Common => DetectorRegistry::with_common_built_in([])?,
+    };
+    scan_and_redact(
+        input,
+        &registry,
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+    )
 }
 
 #[cfg(test)]
