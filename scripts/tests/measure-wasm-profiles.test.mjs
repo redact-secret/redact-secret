@@ -56,14 +56,16 @@ use crate::types::Detector;
 use private_key::PrivateKeyDetector;
 
 #[must_use]
-pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
-    vec![
-        Box::new(PrivateKeyDetector),
-        Box::new(acme::AcmeTokenDetector),
-        zeta::zeta_detector(),
-        Box::new(acme::ACME_LEGACY),
-        jwt::jwt_detector(),
-    ]
+pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
+    #[rustfmt::skip]
+    static DETECTORS: &[BuiltInRow] = &[
+        row("private-key", &PrivateKeyDetector),
+        row("acme-token", &acme::AcmeTokenDetector),
+        row("zeta-key", &zeta::ZetaKeyDetector),
+        row("acme-legacy", &acme::ACME_LEGACY),
+        row("jwt", &jwt::JwtDetector),
+    ];
+    DETECTORS
 }
 
 pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[

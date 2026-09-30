@@ -129,7 +129,8 @@ fn base32_secret_range(value: &str, value_start: usize) -> Option<ByteRange> {
     ByteRange::new(value_start, value_start + index)
 }
 
-struct OtpauthDetector;
+/// The structural `otpauth://` TOTP/HOTP secret detector.
+pub(super) struct OtpauthDetector;
 
 impl Detector for OtpauthDetector {
     fn id(&self) -> &'static str {
@@ -197,12 +198,6 @@ impl Detector for OtpauthDetector {
 
         Ok(candidates)
     }
-}
-
-/// The structural `otpauth://` TOTP/HOTP secret detector.
-#[must_use]
-pub fn otpauth_detector() -> Box<dyn Detector> {
-    Box::new(OtpauthDetector)
 }
 
 /// The literals one of which every `otpauth` candidate contains, for the

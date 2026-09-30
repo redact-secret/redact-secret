@@ -3180,13 +3180,23 @@ const NPMRC_CREDENTIAL_KEYS: [&str; 3] = ["_authToken", "_auth", "_password"];
 fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     // Key starts in input order, so a value run measured once can be
-    // reused by every later key inside it.
-    let mut key_starts: Vec<usize> = input
+    // reused by every later key inside it. Each `match_indices` already
+    // yields ascending starts, and no start begins both needles, so merging
+    // the two runs gives the sorted order without instantiating a slice sort
+    // for `usize`, which cost the WebAssembly build about 4 KB (issue #1043).
+    let mut auth = input
         .match_indices("_auth")
-        .chain(input.match_indices("_password"))
         .map(|(start, _)| start)
-        .collect();
-    key_starts.sort_unstable();
+        .peekable();
+    let mut password = input
+        .match_indices("_password")
+        .map(|(start, _)| start)
+        .peekable();
+    let key_starts = std::iter::from_fn(|| match (auth.peek(), password.peek()) {
+        (Some(&a), Some(&p)) if p < a => password.next(),
+        (Some(_), _) => auth.next(),
+        (None, _) => password.next(),
+    });
     let mut run_end = 0usize;
     for key_start in key_starts {
         let Some(key) = NPMRC_CREDENTIAL_KEYS
@@ -3253,9 +3263,16 @@ fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-struct GenericTokenDetector {
+/// The contextual assignment and `Basic`/`Token` authorization detector.
+pub(super) struct GenericTokenDetector {
     names: NameSource,
 }
+
+/// The built-in `generic-token` detector, as the registry's static table of
+/// built-ins holds it (issue #1043).
+pub(super) static GENERIC_TOKEN: GenericTokenDetector = GenericTokenDetector {
+    names: NameSource::BuiltIn,
+};
 
 impl Detector for GenericTokenDetector {
     fn id(&self) -> &'static str {
@@ -3284,14 +3301,6 @@ impl Detector for GenericTokenDetector {
         }
         Ok(candidates)
     }
-}
-
-/// The contextual assignment and `Basic`/`Token` authorization detector.
-#[must_use]
-pub fn generic_token_detector() -> Box<dyn Detector> {
-    Box::new(GenericTokenDetector {
-        names: NameSource::BuiltIn,
-    })
 }
 
 /// The declarative ruleset names-section detector (issue #484): matches

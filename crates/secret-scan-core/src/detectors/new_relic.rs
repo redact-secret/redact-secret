@@ -348,7 +348,7 @@ impl Detector for NewRelicLicenseKeyDetector {
                 }
             }
         }
-        candidates.sort_by_key(|candidate| candidate.range().start());
+        super::sort_candidates_by_start(&mut candidates);
         Ok(candidates)
     }
 }

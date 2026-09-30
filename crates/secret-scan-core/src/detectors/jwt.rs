@@ -170,7 +170,8 @@ fn is_supabase_legacy_anon_claim(payload: &[u8]) -> bool {
     text.contains("\"iss\":\"supabase\"") && text.contains("\"role\":\"anon\"")
 }
 
-struct JwtDetector;
+/// The structural JWT detector.
+pub(super) struct JwtDetector;
 
 impl Detector for JwtDetector {
     fn id(&self) -> &'static str {
@@ -218,12 +219,6 @@ impl Detector for JwtDetector {
 
         Ok(candidates)
     }
-}
-
-/// The structural JWT detector.
-#[must_use]
-pub fn jwt_detector() -> Box<dyn Detector> {
-    Box::new(JwtDetector)
 }
 
 /// The literals one of which every `jwt` candidate contains, for the

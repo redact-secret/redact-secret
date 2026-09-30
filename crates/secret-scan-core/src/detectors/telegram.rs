@@ -216,12 +216,6 @@ fn boundary_ok(bytes: &[u8], start: usize, end: usize) -> bool {
     start_ok && end_ok
 }
 
-/// The Telegram Bot API token detector.
-#[must_use]
-pub fn telegram_bot_token_detector() -> Box<dyn Detector> {
-    Box::new(TelegramBotTokenDetector)
-}
-
 /// The literals one of which every `telegram-bot-token` candidate contains, for the
 /// shared prefilter (`super::prefilter`, issue #983).
 ///
