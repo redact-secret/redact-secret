@@ -95,7 +95,9 @@ fn out_of_scope_forms_and_benign_controls_are_silent() {
         // Non-credential argument names, including identifier siblings.
         format!("Client(model=\"{v}\")"),
         format!("Client(api_key_id=\"{v}\")"),
-        format!("Client(redacted_api_key=\"{v}\")"),
+        // A masking lead over a masked value (#1018: an unmasked value under
+        // `redacted_api_key` is judged as `api_key`).
+        "Client(redacted_api_key=\"Sy7n********************Zt3\")".to_owned(),
         // The bare `token` name stays unmatched (#702), as an argument too.
         format!("Client(token=\"{v}\")"),
         // A positional literal to a constructor with no credential name.

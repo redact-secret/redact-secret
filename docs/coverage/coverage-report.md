@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 122/122 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 141/141 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 122 |
+| supported | 141 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 133.
+Coverage declarations: 152.
 
 ## Coverage by detector
 
@@ -32,11 +32,15 @@ Coverage declarations: 133.
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| aws-secret-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| axiom-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| bitwarden-secrets-manager-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cerebras-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| clojars-deploy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cohere-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | composio-api-key | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
@@ -44,6 +48,7 @@ Coverage declarations: 133.
 | confluent-cloud-api-secret-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | convex-deployment-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| crates-io-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | databricks-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -54,6 +59,7 @@ Coverage declarations: 133.
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | doppler-token | 7 | supported: 7, intentionally-unsupported: 0, unresolved: 0 |
+| dynatrace-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | e2b-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | elevenlabs-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -64,12 +70,14 @@ Coverage declarations: 133.
 | gitlab-runner-authentication-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| google-oauth-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | groq-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | helicone-api-key | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| honeycomb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | inngest-signing-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -92,8 +100,10 @@ Coverage declarations: 133.
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| paddle-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| polar-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | posthog-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -102,12 +112,14 @@ Coverage declarations: 133.
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| rubygems-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | runpod-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
+| sonarqube-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -120,7 +132,7 @@ Coverage declarations: 133.
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| vercel-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| vercel-token | 4 | supported: 4, intentionally-unsupported: 0, unresolved: 0 |
 | wandb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | xai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 
@@ -138,11 +150,16 @@ Coverage declarations: 133.
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
 | aws_bedrock_long_term_api_key | aws-bedrock-long-term-api-key | provider | supported | not-applicable | none |
 | aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
+| aws_secret_access_key | aws-secret-access-key | provider | supported | not-applicable | none |
+| axiom_api_token | axiom-token | provider | supported | not-applicable | none |
+| axiom_personal_token | axiom-token | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
+| bitwarden_secrets_manager_access_token | bitwarden-secrets-manager-access-token | provider | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
 | cerebras_api_key | cerebras-api-key | provider | supported | not-applicable | none |
 | clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
+| clojars_deploy_token | clojars-deploy-token | provider | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | cohere_api_key | cohere-api-key | provider | supported | not-applicable | none |
 | composio_org_api_key | composio-api-key | provider | supported | not-applicable | none |
@@ -153,6 +170,8 @@ Coverage declarations: 133.
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
 | convex_deployment_key | convex-deployment-key | provider | supported | not-applicable | none |
+| crates_io_api_token | crates-io-token | provider | supported | not-applicable | none |
+| crates_io_trusted_publishing_token | crates-io-token | provider | supported | not-applicable | none |
 | databricks_personal_access_token | databricks-personal-access-token | provider | supported | not-applicable | none |
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
@@ -169,6 +188,7 @@ Coverage declarations: 133.
 | doppler_service_account_identity_token | doppler-token | provider | supported | not-applicable | none |
 | doppler_service_account_token | doppler-token | provider | supported | not-applicable | none |
 | doppler_service_token | doppler-token | provider | supported | not-applicable | none |
+| dynatrace_token | dynatrace-token | provider | supported | not-applicable | none |
 | e2b_api_key | e2b-api-key | provider | supported | not-applicable | none |
 | elevenlabs_api_key | elevenlabs-api-key | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
@@ -183,6 +203,7 @@ Coverage declarations: 133.
 | gitlab_runner_authentication_token | gitlab-runner-authentication-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
+| google_oauth_client_secret | google-oauth-client-secret | provider | supported | not-applicable | none |
 | grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
 | grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
 | groq_api_key | groq-api-key | provider | supported | not-applicable | none |
@@ -190,6 +211,7 @@ Coverage declarations: 133.
 | helicone_write_api_key | helicone-api-key | provider | supported | not-applicable | none |
 | heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
+| honeycomb_ingest_key | honeycomb-api-key | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | inngest_signing_key | inngest-signing-key | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
@@ -213,8 +235,11 @@ Coverage declarations: 133.
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
+| paddle_api_key | paddle-api-key | provider | supported | not-applicable | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
+| polar_api_credential | polar-token | provider | supported | not-applicable | none |
+| polar_organization_access_token | polar-token | provider | supported | not-applicable | none |
 | posthog_personal_api_key | posthog-token | provider | supported | not-applicable | none |
 | posthog_project_secret_api_key | posthog-token | provider | supported | not-applicable | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
@@ -224,6 +249,7 @@ Coverage declarations: 133.
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | resend_api_key | resend-api-key | provider | supported | not-applicable | none |
+| rubygems_api_key | rubygems-api-key | provider | supported | not-applicable | none |
 | runpod_api_key | runpod-api-key | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
@@ -232,6 +258,8 @@ Coverage declarations: 133.
 | slack_app_level_token | slack-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
 | slack_user_token | slack-token | provider | supported | not-applicable | none |
+| sonarqube_analysis_token | sonarqube-token | provider | supported | not-applicable | none |
+| sonarqube_user_token | sonarqube-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
@@ -247,6 +275,9 @@ Coverage declarations: 133.
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
 | vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
+| vercel_app_access_token | vercel-token | provider | supported | not-applicable | none |
+| vercel_app_refresh_token | vercel-token | provider | supported | not-applicable | none |
+| vercel_personal_access_token | vercel-token | provider | supported | not-applicable | none |
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
 | wandb_api_key | wandb-api-key | provider | supported | not-applicable | none |
 | xai_api_key | xai-api-key | provider | supported | not-applicable | none |
@@ -275,15 +306,15 @@ Coverage declarations: 133.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 133 | 0 | 0 |
-| boundary | 122 | 0 | 0 |
-| host-context | 122 | 0 | 0 |
+| adversarial | 152 | 0 | 0 |
+| boundary | 141 | 0 | 0 |
+| host-context | 141 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 133 | 0 | 0 |
-| near-miss-negative | 122 | 0 | 0 |
-| overlap | 122 | 0 | 0 |
-| positive | 122 | 0 | 0 |
-| range | 133 | 0 | 0 |
+| malformed | 152 | 0 | 0 |
+| near-miss-negative | 141 | 0 | 0 |
+| overlap | 141 | 0 | 0 |
+| positive | 141 | 0 | 0 |
+| range | 152 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

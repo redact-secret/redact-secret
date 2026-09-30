@@ -27,6 +27,9 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
     "refresh_token",
     "session_token",
     "aws_secret_access_key",
+    // The unprefixed AWS API member (`"SecretAccessKey"` in STS, IAM and
+    // CloudFormation JSON, `secretAccessKey` in the SDKs), issue #1026.
+    "secret_access_key",
     "aws_session_token",
     "password",
     "passwd",
@@ -192,6 +195,87 @@ fn prefix_says_not_secret(normalized: &str) -> bool {
         .split('_')
         .next()
         .is_some_and(|lead| NON_SECRET_NAME_LEADS.contains(&lead))
+}
+
+/// Non-secret leads whose name alone never excludes a value: the name says
+/// what the field should hold, not what it holds (issue #1018). Only
+/// `publishable` is left out, since a publishable key is public by the
+/// provider's own documentation.
+const VALUE_CHECKED_NAME_LEADS: &[&str] = &[
+    "redacted",
+    "masked",
+    "hashed",
+    "hash",
+    "obfuscated",
+    "truncated",
+    "sanitized",
+];
+
+/// Leads that say the value is a digest rather than a mask.
+const HASH_NAME_LEADS: &[&str] = &["hashed", "hash"];
+
+/// Hex lengths of the common digests (MD5, SHA-1, SHA-224, SHA-256,
+/// SHA-384, SHA-512).
+const HEX_DIGEST_LENGTHS: &[usize] = &[32, 40, 56, 64, 96, 128];
+
+/// Shortest run of one `x`/`X` that reads as a mask under a masking lead.
+const MIN_X_MASK_RUN: usize = 4;
+
+/// `true` when `value` itself shows it was masked or hashed, under a name
+/// led by `lead` ([`VALUE_CHECKED_NAME_LEADS`]): any `*`, `•` or `…`, a
+/// `...` gap, a run of four or more `x`/`X`, a `redacted`/`masked` word, a
+/// digest label (`sha256:`), and under a hash lead a hex digest of a common
+/// length or a `$`-delimited crypt string (`$2b$12$...`).
+fn value_shows_masking_or_hashing(lead: &str, value: &str) -> bool {
+    let bytes = value.as_bytes();
+    let lower = value.to_ascii_lowercase();
+    let x_run = bytes
+        .chunk_by(|left, right| left == right)
+        .any(|run| matches!(run[0], b'x' | b'X') && run.len() >= MIN_X_MASK_RUN);
+    let shows_mask = value.contains(['*', '\u{2022}', '\u{2026}'])
+        || value.contains("...")
+        || x_run
+        || lower.contains("redacted")
+        || lower.contains("masked")
+        || starts_with_digest_label(value);
+    if shows_mask {
+        return true;
+    }
+    HASH_NAME_LEADS.contains(&lead)
+        && ((HEX_DIGEST_LENGTHS.contains(&value.len()) && bytes.iter().all(u8::is_ascii_hexdigit))
+            || (value.starts_with('$') && value[1..].contains('$')))
+}
+
+/// The name a value-checked lead stands in front of (`masked_api_key` reads
+/// `api_key`), when the lead is one of [`VALUE_CHECKED_NAME_LEADS`] and a
+/// name follows it. Issue #1018 narrowed
+/// `decision-redact-provider-named-credential-assignments` section 2: a
+/// `masked_`/`redacted_`/`hashed_`-led name excludes a value only when the
+/// value itself shows masking or hashing
+/// ([`value_shows_masking_or_hashing`]); a complete, unmasked value under it
+/// is judged under the name the lead stands in front of.
+fn value_checked_lead_rest(normalized: &str) -> Option<(&str, &str)> {
+    let (lead, rest) = normalized.split_once('_')?;
+    (VALUE_CHECKED_NAME_LEADS.contains(&lead) && !rest.is_empty()).then_some((lead, rest))
+}
+
+/// `true` when `normalized` is led by a value-checked lead
+/// ([`value_checked_lead_rest`]) and `value` does not show masking or
+/// hashing, so the value is judged as a credential. Shared with the
+/// keyword-gated detectors (issue #1018).
+pub(super) fn is_unmasked_under_masking_lead(normalized: &str, value: &str) -> bool {
+    value_checked_lead_rest(normalized)
+        .is_some_and(|(lead, _)| !value_shows_masking_or_hashing(lead, value))
+}
+
+/// `true` when `normalized` opens with a lead that says the value is not
+/// the secret and `value` bears that out: `publishable_` always, a
+/// value-checked lead ([`VALUE_CHECKED_NAME_LEADS`]) only when the value
+/// shows masking or hashing (issue #1018).
+pub(super) fn masking_lead_hides_value(normalized: &str, value: &str) -> bool {
+    normalized.split('_').next() == Some("publishable")
+        || value_checked_lead_rest(normalized)
+            .is_some_and(|(lead, _)| value_shows_masking_or_hashing(lead, value))
 }
 
 /// `true` when a name carries a provider with a dedicated detector
@@ -430,6 +514,10 @@ pub(crate) fn has_open_contextual_assignment(input: &str) -> bool {
     is_high_signal_name(&normalized)
         || is_ambiguous_name(&normalized)
         || is_open_jwk_secret_member(input, name_start, name_end)
+        // Issue #1018: `masked_api_key` reads `api_key` when its value turns
+        // out to be unmasked, so the name holds the line open like `api_key`.
+        || value_checked_lead_rest(&normalized)
+            .is_some_and(|(_, rest)| is_high_signal_name(rest) || is_ambiguous_name(rest))
 }
 
 /// `true` when the name at `name_start..name_end` is a quoted JWK secret
@@ -1651,6 +1739,18 @@ fn is_prefixed_filler_body(value: &str) -> bool {
 /// The longest vendor prefix [`is_vendor_prefixed_placeholder`] strips.
 const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 
+/// Dedicated-detector prefixes longer than
+/// [`MAX_VENDOR_PLACEHOLDER_PREFIX_LEN`] that are stripped all the same, each
+/// written without its trailing separator. Issue #1015: `sk-ant-admin01` is
+/// the Anthropic Admin prefix, and its documentation placeholders
+/// (`sk-ant-admin01-<your-key>`) get the same treatment as the 12-byte
+/// `sk-ant-api01`/`sk-ant-api03` siblings. Listing the exact prefix keeps the
+/// general 12-byte cap for every other lowercase lead (`longvendorname_`).
+const LONG_VENDOR_PLACEHOLDER_PREFIXES: &[&str] = &["sk-ant-admin01"];
+
+/// The longest entry of [`LONG_VENDOR_PLACEHOLDER_PREFIXES`].
+const MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 14;
+
 /// `true` for a documentation placeholder behind a short vendor prefix:
 /// `pplx-your-api-key-here`, `lsv2_pt_your_key_here`, `pcsk_***`,
 /// `pul-xxxxxxxx`, `xapp-<your-app-level-token>`. The prefix is at most
@@ -1670,8 +1770,13 @@ const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
     value
         .char_indices()
-        .take_while(|&(index, _)| index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN)
-        .filter(|&(index, ch)| index > 0 && matches!(ch, '_' | '-'))
+        .take_while(|&(index, _)| index <= MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN)
+        .filter(|&(index, ch)| {
+            index > 0
+                && matches!(ch, '_' | '-')
+                && (index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN
+                    || LONG_VENDOR_PLACEHOLDER_PREFIXES.contains(&&value[..index]))
+        })
         .any(|(index, _)| {
             let rest = &value[index + 1..];
             let prefix = &value[..index];
@@ -2436,6 +2541,20 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPref
     if is_prefix_boundary_char(ch) {
         return parse_name_and_operator(input, pos + ch.len_utf8()).map(plain);
     }
+    // Issue #1038: a keyed environment store, `os.environ["NAME"] = "<v>"`
+    // or `os.environ.setdefault("NAME", "<v>")`, is the assignment
+    // `NAME = "<v>"`; a call takes only a quoted literal.
+    if matches!(ch, '[' | '(')
+        && let Some(store) = super::text::keyed_store_prefix(input, pos)
+    {
+        return Some(AssignmentPrefix {
+            name_start: store.name_start,
+            name_end: store.name_end,
+            prefix_end: store.value_start,
+            query: false,
+            call_open: store.call,
+        });
+    }
     if ch == '(' {
         return parse_name_and_operator(input, pos + 1).map(
             |(name_start, name_end, prefix_end)| AssignmentPrefix {
@@ -2509,6 +2628,25 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 // `private_key` name's high-signal bucket (issue #821).
                 normalized.clear();
                 normalized.push_str("private_key");
+            } else if matches!(names, NameSource::BuiltIn)
+                && is_unmasked_under_masking_lead(&normalized, value)
+                && let Some((_, rest)) = value_checked_lead_rest(&normalized)
+            {
+                // Issue #1018: an unmasked value under `masked_api_key` is
+                // judged under `api_key`.
+                let rest = rest.to_owned();
+                normalized.clear();
+                normalized.push_str(&rest);
+            } else if matches!(names, NameSource::BuiltIn)
+                && &input[name_start..name_end] == "value"
+                && let Some(paired) = super::text::list_item_paired_name(
+                    input,
+                    super::text::line_around(input, name_start, name_end),
+                )
+            {
+                // Issue #1016: a Kubernetes-style `env` entry's `value:` is
+                // assigned to the name its sibling `name:` key gives.
+                normalize_name_into(paired, &mut normalized);
             }
             // The templated-lookup check runs only for a pair that would
             // otherwise be reported (issue #989).
@@ -2939,6 +3077,103 @@ fn vendor_prefixed_policy_body_is_high_entropy(bytes: &[u8], _start: usize, end:
     crate::shannon_entropy(body) >= HIGH_ENTROPY_THRESHOLD
 }
 
+// --- `.npmrc` credential keys (issue #1024) ----------------------------------
+
+/// The `.npmrc` keys that carry a registry credential: a bearer token, the
+/// Base64 of `user:password`, and the Base64 of a password. The leading `_`
+/// keeps them outside the assignment grammar (a name starts with a letter),
+/// so before issue #1024 `//registry.npmjs.org/:_authToken=<value>` gave no
+/// finding unless the value was an `npm_` token.
+const NPMRC_CREDENTIAL_KEYS: [&str; 3] = ["_authToken", "_auth", "_password"];
+
+/// Candidates for the value of an `.npmrc` credential key, registry-scoped
+/// (`//host/path/:_authToken=...`, the `:` directly after a `/`) or bare at
+/// the start of a line (optionally indented), then `=` with optional
+/// horizontal whitespace around it (issue #1024,
+/// `docs/audits/evidence/1012/npm-legacy-token.md`). The value is one
+/// quoted literal or the unquoted run up to whitespace or a quote. These keys carry a
+/// credential by construction, whatever the registry and token shape, so
+/// every value that survives the shared reference and placeholder
+/// exclusions (`${NPM_TOKEN}`, `<token>`, masked displays) is `High`
+/// `contextual_secret`; the host, not the shape, decides the issuer, so no
+/// provider type is claimed. Other `.npmrc` keys (`username`, `email`,
+/// `registry`) are not credentials and stay silent.
+fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
+    let mut candidates = Vec::new();
+    // Key starts in input order, so a value run measured once can be
+    // reused by every later key inside it.
+    let mut key_starts: Vec<usize> = input
+        .match_indices("_auth")
+        .chain(input.match_indices("_password"))
+        .map(|(start, _)| start)
+        .collect();
+    key_starts.sort_unstable();
+    let mut run_end = 0usize;
+    for key_start in key_starts {
+        let Some(key) = NPMRC_CREDENTIAL_KEYS
+            .iter()
+            .filter(|key| input[key_start..].starts_with(**key))
+            .max_by_key(|key| key.len())
+        else {
+            continue;
+        };
+        let bytes = input.as_bytes();
+        let scoped = key_start >= 2 && bytes[key_start - 1] == b':' && bytes[key_start - 2] == b'/';
+        let indented_line_start = {
+            let lead = rskip_while_chars(input, key_start, is_horizontal_js_whitespace);
+            is_line_start(input, lead)
+        };
+        if !scoped && !indented_line_start {
+            continue;
+        }
+        let mut cursor =
+            skip_while_chars(input, key_start + key.len(), is_horizontal_js_whitespace);
+        if char_at(input, cursor) != Some('=') {
+            continue;
+        }
+        cursor = skip_while_chars(input, cursor + 1, is_horizontal_js_whitespace);
+        let (value_start, value_end, form) = match char_at(input, cursor) {
+            Some('"' | '\'') => {
+                let Some((start, end)) = quoted_assignment_value(input, cursor) else {
+                    continue;
+                };
+                (start, end, ValueForm::Quoted)
+            }
+            Some(_) => {
+                // A quote ends the run: the line may itself sit inside a
+                // quoted shell string (`echo "//host/:_authToken=V" > .npmrc`).
+                // A run already measured for an earlier key on it ends at
+                // the same byte, which keeps a line of repeated keys linear.
+                let end = if cursor < run_end {
+                    run_end
+                } else {
+                    skip_while_chars(input, cursor, |ch| {
+                        !is_js_whitespace(ch) && !matches!(ch, '"' | '\'' | '`')
+                    })
+                };
+                run_end = end;
+                (cursor, end, ValueForm::Unquoted)
+            }
+            None => continue,
+        };
+        let value = &input[value_start..value_end];
+        if value.len() < MIN_CONTEXT_VALUE_LENGTH
+            || value.len() > MAX_CONTEXT_VALUE_LENGTH
+            || is_non_secret_reference(value, form)
+        {
+            continue;
+        }
+        if let Some(range) = ByteRange::new(value_start, value_end) {
+            candidates.push(
+                Candidate::new("contextual_secret", Confidence::High, range)
+                    .with_specificity(Specificity::Contextual)
+                    .with_signals(["npmrc-credential-key", "credential-by-construction"]),
+            );
+        }
+    }
+    candidates
+}
+
 struct GenericTokenDetector {
     names: NameSource,
 }
@@ -2966,6 +3201,7 @@ impl Detector for GenericTokenDetector {
             candidates.extend(authorization_candidates(input));
             candidates.extend(bare_vendor_prefix_candidates(input));
             candidates.extend(call_argument_candidates(input));
+            candidates.extend(npmrc_credential_candidates(input));
         }
         Ok(candidates)
     }
@@ -3364,18 +3600,55 @@ mod tests {
     }
 
     // issue #702: a lead that says the value is redacted, hashed or public
-    // is not a secret name.
+    // is not a secret name. Issue #1018 narrowed it: the lead excludes a
+    // value only when the value shows masking or hashing, except
+    // `publishable`, which is public by the provider's documentation.
     #[test]
     fn non_secret_prefixes_are_not_generic_names() {
-        for name in [
-            "redactedApiKey",
-            "hashed_token",
-            "publishable_key",
-            "masked_api_key",
+        let hex64 = "0123456789abcdef".repeat(4);
+        for input in [
+            "publishable_key=SYNTHETIC_REVOKED_CONTEXT_VALUE".to_owned(),
+            "hashed_token=SYNTHETIC_REVOKED_CONTEXT_VALUE".to_owned(),
+            format!("masked_api_key=9ctA{}lwCk", "*".repeat(32)),
+            format!("masked_api_key=abcd{}", "x".repeat(28)),
+            "redactedApiKey=SYNTHETIC...VALUE_TAIL".to_owned(),
+            "masked_secret=[REDACTED]-SYNTHETIC-VALUE".to_owned(),
+            format!("hashed_api_key={hex64}"),
+            "hash_secret=$2b$12$SYNTHETICsaltSYNTHETIChashvalue0000".to_owned(),
+            format!("hashed_password=sha256:{hex64}"),
+            "masked_api_key=Ab3\u{2022}\u{2022}\u{2022}\u{2022}Cd4Ef5Gh6Jk7".to_owned(),
         ] {
-            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
             assert!(detect(&input).is_empty(), "{input}");
         }
+    }
+
+    // issue #1018: a complete, unmasked value under a value-checked lead is
+    // judged under the name the lead stands in front of.
+    #[test]
+    fn an_unmasked_value_under_a_masking_lead_is_judged_under_the_rest_of_the_name() {
+        for name in [
+            "masked_api_key",
+            "redactedApiKey",
+            "hashed_password",
+            "obfuscated_client_secret",
+            "sanitized_access_token",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            let candidates = detect(&input);
+            assert_eq!(
+                only_range(&candidates),
+                (name.len() + 1, input.len()),
+                "{input}"
+            );
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+            assert!(
+                has_open_contextual_assignment(&format!("{name}=")),
+                "{name}"
+            );
+        }
+        // The bare `token` name stays unmatched behind a lead too.
+        assert!(detect("hashed_token=SYNTHETIC_REVOKED_CONTEXT_VALUE").is_empty());
+        assert!(!has_open_contextual_assignment("publishable_key="));
     }
 
     // issue #948: a provider prefix no longer hands a high-signal name to
@@ -3464,11 +3737,17 @@ mod tests {
             "STRIPE_API_URL",
             "TWILIO_ACCOUNT_SID",
             "OPENAI_ORG_ID",
-            "redacted_openai_api_key",
-            "MASKED_STRIPE_SECRET_KEY",
         ] {
             let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE_9f3K");
             assert!(detect(&input).is_empty(), "{input}");
+        }
+        // Issue #1018: a masking lead excludes only a value that shows the
+        // masking; an unmasked one is judged under the rest of the name.
+        for name in ["redacted_openai_api_key", "MASKED_STRIPE_SECRET_KEY"] {
+            let masked = format!("{name}=SYNTHETIC{}9f3K", "*".repeat(16));
+            assert!(detect(&masked).is_empty(), "{masked}");
+            let unmasked = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE_9f3K");
+            assert_eq!(detect(&unmasked).len(), 1, "{unmasked}");
         }
     }
 
@@ -3519,6 +3798,20 @@ mod tests {
         ] {
             assert!(detect(input).is_empty(), "{input}");
         }
+    }
+
+    #[test]
+    fn the_vendor_placeholder_prefix_limit_covers_the_anthropic_admin_prefix() {
+        // Issue #1015: the 14-byte `sk-ant-admin01` prefix is stripped like
+        // its 12-byte siblings; any other lead over 12 bytes is not.
+        assert!(is_vendor_prefixed_placeholder("sk-ant-admin01-<your-key>"));
+        assert!(is_vendor_prefixed_placeholder("sk-ant-admin01-YOUR_KEY"));
+        assert!(is_vendor_prefixed_placeholder("sk-ant-admin01-..."));
+        assert!(!is_vendor_prefixed_placeholder("sk-ant-admin02-<your-key>"));
+        assert!(!is_vendor_prefixed_placeholder("abcdefghijklmn-<your-key>"));
+        assert!(!is_vendor_prefixed_placeholder(
+            "sk-ant-admin01-Ab3Cd4Ef5Gh6"
+        ));
     }
 
     #[test]
@@ -5500,6 +5793,53 @@ mod tests {
             "api_key:endpoint:0synthetic",
         ] {
             assert!(!detect(input).is_empty(), "{input:?}");
+        }
+    }
+
+    fn npmrc_spans(input: &str) -> Vec<(usize, usize)> {
+        npmrc_credential_candidates(input)
+            .iter()
+            .map(|candidate| {
+                assert_eq!(candidate.confidence(), Confidence::High);
+                (candidate.range().start(), candidate.range().end())
+            })
+            .collect()
+    }
+
+    #[test]
+    fn npmrc_credential_keys_report_their_value() {
+        let value = "Synthetic0Revoked1Registry2Token3";
+        for input in [
+            format!("//registry.npmjs.org/:_authToken={value}\n"),
+            format!("//npm.example.invalid/repo/npm/:_auth = \"{value}\"\n"),
+            format!("//npm.example.invalid/:_password={value}"),
+            format!("_authToken={value}\n"),
+            format!("  _auth={value}\r\n"),
+        ] {
+            let start = input.find(value).unwrap();
+            assert_eq!(
+                npmrc_spans(&input),
+                vec![(start, start + value.len())],
+                "{input}"
+            );
+        }
+    }
+
+    #[test]
+    fn npmrc_references_placeholders_and_other_keys_stay_silent() {
+        for input in [
+            "//registry.npmjs.org/:_authToken=${NPM_TOKEN}\n",
+            "//registry.npmjs.org/:_authToken=<your-token>\n",
+            "//registry.npmjs.org/:_authToken=\n",
+            "//registry.npmjs.org/:username=synthetic-user\n",
+            "//registry.npmjs.org/:email=someone@example.invalid\n",
+            "registry=https://registry.npmjs.org/\n",
+            "the _authToken=Synthetic0Revoked1Registry2Token3 in prose\n",
+            "x:_authToken=Synthetic0Revoked1Registry2Token3\n",
+            "//registry.npmjs.org/:_authorization=Synthetic0Revoked1Registry2Token3\n",
+            "//registry.npmjs.org/:_authToken=short\n",
+        ] {
+            assert!(npmrc_spans(input).is_empty(), "{input}");
         }
     }
 }

@@ -25,14 +25,19 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `apify_api_token` | `apify-api-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Apify docs placeholder prefix, R4; provider-authored leak linter alphabet and floor, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `atlassian_api_token` | `atlassian-api-token` | `always-redact` | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `authorization_credential` | `generic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
-| `aws_access_key_id` | `aws-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `aws_access_key_id` | `aws-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; `AKIA` and `ASIA` + 16 `[A-Z0-9]`, the `ASIA` contract T2 in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `aws_bedrock_long_term_api_key` | `aws-bedrock-long-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; grammar in `detectors::aws_bedrock`'s module doc, `ABSK` + standard Base64 with `={0,2}` padding (T1, maintainer ruling accepted 2026-09-27 on the AWS Security Blog scan pattern, [#778](https://github.com/redact-secret/redact-secret/issues/778)), 109-269 body bytes (T2), recorded in [#864 evidence](../audits/evidence/864/README.md) |
 | `aws_bedrock_short_term_api_key` | `aws-bedrock-short-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; two families rather than one (client-minted presigned URL vs issued credential), `bedrock-api-key-` prefix + fixed 133-byte Base64 head + standard Base64 alphabet (T1, maintainer ruling accepted 2026-09-27 on the AWS token-generator SDKs (python/js/java) plus the AWS Security Blog, [#779](https://github.com/redact-secret/redact-secret/issues/779)), tail floor and total length T2, recorded in [#864 evidence](../audits/evidence/864/README.md) |
+| `aws_secret_access_key` | `aws-secret-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T2, context-constrained (name or adjacent `AKIA`/`ASIA` ID), grammar and trade-offs in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
+| `axiom_api_token` | `axiom-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (axiom-go runtime check, R6), UUID layout and lowercase hex T1 by example (docs response example and SDK fixtures, R5), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
+| `axiom_personal_token` | `axiom-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (axiom-go runtime check, R6), UUID layout and lowercase hex T1 by example (R5), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `bitwarden_secrets_manager_access_token` | `bitwarden-secrets-manager-access-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider parser, server generator and docs example, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `cerebras_api_key` | `cerebras-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 prefixes and width (provider validator, R1; staff statement, R3 as of 2025-10), alphabet by policy (R10), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `clickhouse_cloud_api_secret` | `clickhouse-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-04 (provider staff statement and staff-authored regex, R2 and R3; the older 39-byte example is set aside by R3 date order), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
+| `clojars_deploy_token` | `clojars-deploy-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator and server validator, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `composio_org_api_key` | `composio-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and a dated staff statement under R3; `uak_` width under R6), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
@@ -43,6 +48,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `connection_string_password` | `connection-string` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
 | `contextual_secret` | `generic-token` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `convex_deployment_key` | `convex-deployment-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider code: backend key format and generator; hex length derived from the generator), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
+| `crates_io_api_token` | `crates-io-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (crates.io server generator, R1), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
+| `crates_io_trusted_publishing_token` | `crates-io-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (crates.io trusted-publishing generator, R1); the check character is not a rejection gate (pending ruling Q1), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `databricks_personal_access_token` | `databricks-personal-access-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `datadog_api_key` | `datadog-api-key` | `confidence-gated` | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `datadog_application_key` | `datadog-application-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; current `ddapp_`-prefixed shape added by issue #671, applying the existing `confluent_cloud_api_secret` / `heroku_api_key` current/legacy split policy to this family |
@@ -59,6 +66,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `doppler_service_account_identity_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `doppler_service_account_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `doppler_service_token` | `doppler-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Doppler docs), one type per role per [the GitHub token-family ADR](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
+| `dynatrace_token` | `dynatrace-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Dynatrace docs for structure and lengths; base32 alphabet from the provider's `dttoken` generator, R1), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `e2b_api_key` | `e2b-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `elevenlabs_api_key` | `elevenlabs-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -71,8 +79,9 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `github_oauth_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `gitlab_runner_authentication_token` | `gitlab-runner-authentication-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
-| `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); the routable `glpat-` form is reported whole since [#1022](https://github.com/redact-secret/redact-secret/issues/1022) (T1), grammar in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `google_api_key` | `google-api-key` | `always-redact` | [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](../decisions/2026-09-24-redact-google-api-keys-inside-firebase-web-config.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
+| `google_oauth_client_secret` | `google-oauth-client-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T2, grammar and trade-offs in [Unsupported-variant contracts (#1012)](#unsupported-variant-contracts-1012) |
 | `grafana_cloud_access_policy_token` | `grafana-cloud-access-policy-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_service_account_token` | `grafana-service-account-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `groq_api_key` | `groq-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -80,6 +89,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `helicone_write_api_key` | `helicone-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider validator regexes and generators), `[a-z0-9]` per ruling R8, grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `heroku_api_key` | `heroku-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #740 adds the documented 41-character `HRKU-` + lower-case UUID generation beside `HRKU-AA` + 58, grammar in `detectors::heroku`'s module doc |
 | `heroku_api_key_legacy` | `heroku-api-key-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository; issue #714 excludes a UUID assigned to an identifier-shaped key (last word `id` or `uuid`, e.g. `HEROKU_APP_ID`) from the `heroku` keyword gate, grammar in `detectors::heroku`'s module doc; issue #743 also accepts two documented multi-line layouts (a Heroku `.netrc` entry's `password`, `heroku auth:token` output, held open by an incremental retention hint) and excludes a UUID that is a URL path segment; issue #934 excludes an all-one-digit UUID placeholder (`00000000-0000-0000-0000-000000000000`); issue #933 adds a third multi-line layout, the `Token:` row of `heroku authorizations:<verb>` table output; issue #936 reports a UUID read through any of the three layouts at `high` (redact), the same-line keyword path staying `medium` unless the key names Heroku |
+| `honeycomb_ingest_key` | `honeycomb-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Honeycomb docs prefix; provider SDK regex, length gate and fixtures, R1 and R5); management keys stay issuance-gated and unclaimed, grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `huggingface_token` | `huggingface-token` | `always-redact` | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `inngest_signing_key` | `inngest-signing-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Inngest provider code constants, docs generation command and SDK fixtures), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `jwt` | `jwt` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
@@ -103,8 +113,11 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `openai_api_key` | `openai-token` | `always-redact` | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `openrouter_api_key` | `openrouter-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `otpauth_secret` | `otpauth-uri` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `paddle_api_key` | `paddle-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Paddle docs publish the full regex and the 69-character length), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `perplexity_api_key` | `perplexity-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `pinecone_api_key` | `pinecone-api-key` | `always-redact` | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
+| `polar_api_credential` | `polar-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and prefix constants, R1 and R9; union of the URL-safe and alphanumeric eras), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
+| `polar_organization_access_token` | `polar-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and prefix constants, R1 and R9); the CRC32 never rejects a match (ruling Q1 open), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `posthog_personal_api_key` | `posthog-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code and unit tests under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `posthog_project_secret_api_key` | `posthog-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator code and unit tests under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `postman_api_key` | `postman-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -114,6 +127,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `pypi_api_token` | `pypi-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `replicate_api_token` | `replicate-api-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `resend_api_key` | `resend-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (Resend CLI), layout T1 by example (docs response example and SDK fixtures, R5), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
+| `rubygems_api_key` | `rubygems-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `runpod_api_key` | `runpod-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 prefix and alphabet (provider blog and scrubber, R2), policy floor 31 under R10, grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `sendgrid_api_key` | `sendgrid-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `sentry_org_auth_token` | `sentry-org-auth-token` | `always-redact` | [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -122,6 +136,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `slack_app_level_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `slack_token` | `slack-token` | `always-redact` | [Freeze the Slack bot token grammar as a three-section dash-separated shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `slack_user_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `sonarqube_analysis_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
+| `sonarqube_user_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #934 excludes a body that is one repeated character (`sk_test_` plus a run of `x`) |
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -137,7 +153,10 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `twilio_auth_token` | `twilio-auth-token` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); issue #933 also reads the `Auth Token` column of a `twilio` CLI table (bounded, with an incremental retention hint), reported `high` (redact) since issue #936 |
 | `vault_token` | `vault-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `vendor_prefixed_credential` | `generic-token` | `always-redact` | [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md) |
-| `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `vercel_app_access_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vca_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2, one provider value), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); grammar and trade-offs in [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
+| `vercel_app_refresh_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vcr_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2, body shared with the `vca_` example), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
+| `vercel_personal_access_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vcp_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
+| `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; since issue #1036 the unqualified compatibility type: every `vci_` and `vck_` match, and every `vcp_`/`vca_`/`vcr_` match off the exact-56 contract (security-first fallback), all at the unchanged pre-split `>= 20` `[A-Za-z0-9_-]` shape. It claims no grammar (pending maintainer ruling Q-VC); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
 | `wandb_api_key` | `wandb-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (W&B test constant, R5), alphabet T1 (SDK validator, R1); the 64–96 band is a tolerant range around the documented width, grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `xai_api_key` | `xai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 <!-- detector-families:end -->
@@ -290,7 +309,64 @@ generated finding-type inventory above.
 | `docker:personal-access-token`, `docker:oauth-access-token` | T1 on the provider-stated `dckr_pat_` / `dckr_oat_` prefixes; the OAT body is exactly 27 (the provider example) or 32 bytes (#708). | [#647](../audits/evidence/647/README.md), [#648](../audits/evidence/648/README.md), [#575](../audits/evidence/575/README.md) |
 | `elevenlabs:api-key` | `sk_` + exactly 48 lowercase hex, with an optional `_residency_<[a-z0-9]+>` suffix inside the finding span so a residency key is redacted whole. T1 on the `sk_` prefix and the suffix, maintainer ruling accepted 2026-09-27 on provider SDK code (`elevenlabs-python` `speech_engine/server.py` and `resource.py`, `elevenlabs-js` `SpeechEngineResource.ts`; the provider documents neither in prose), following the `huggingface:api-token` precedent; the 48-hex body stays T2 (trufflehog v2, betterleaks, measured public fragments) — no provider document or staff statement states its length or alphabet. Stripe `sk_live_`/`sk_test_`/`sk_org_`, Pollinations `sk_` + 32, 47/49-hex, uppercase and filler bodies and any other `_` suffix stay unclaimed; the legacy bare 32-hex form stays marker-gated under `generic-token` (`elevenlabs` is deliberately not a dedicated-provider segment). | [#865](https://github.com/redact-secret/redact-secret/issues/865), [#788](https://github.com/redact-secret/redact-secret/issues/788), [redact-secret-benchmarks#384](https://github.com/redact-secret/redact-secret-benchmarks/issues/384) |
 | `supabase:secret-key` | T1 on the provider-documented `sb_secret_` + 22 + `_` + 8 base64url layout (self-hosted auth-keys page, which states hosted keys share the format, and the provider key script); the `_` is checked by position, and the checksum value is not validated because the hosted input is undocumented (#742). | [#742](https://github.com/redact-secret/redact-secret/issues/742), [redact-secret-benchmarks#231](https://github.com/redact-secret/redact-secret-benchmarks/issues/231) |
-| `vercel:personal-access-token`, `vercel:integration-token`, `vercel:app-access-token`, `vercel:app-refresh-token`, `vercel:api-key` | Five independently meaningful modern credential classes are tracked separately. `vcp_`, `vca_`, `vcr_`, and `vck_` are evidence-backed literal markers; the integration source establishes only `vci`, not the underscore. All five remain pending/T0 because no complete body grammar or boundary is documented. The current aggregate `vercel_token` runtime finding and its unreviewed suffix floor do not establish these contracts. Unprefixed examples stay outside the modern contract with issuance status unresolved. | [#858](../audits/evidence/858/README.md) |
+| `vercel:personal-access-token`, `vercel:app-access-token`, `vercel:app-refresh-token` | T2 on `vcp_` / `vca_` / `vcr_` + exactly 56 `[A-Za-z0-9]` (60 in total), no `_` or `-` in the body, no checksum requirement; each reports its own finding type (#1036). A value with the marker but another body keeps the pre-split `vercel_token` finding (security-first fallback). `vca_` and `vcr_` are thin: one checksum-valid provider value, whose body the `vcr_` example reuses. The legacy unprefixed 24-character form is excluded from all three. | [#1013 vercel](../audits/evidence/1013/vercel.md), [#858](../audits/evidence/858/README.md) |
+| `vercel:integration-token`, `vercel:api-key` | Still pending, T0 on the body: `vck_` is a provider-backed marker, but no provider source writes `vci_` with the underscore, and neither has a full-length provider value. Both keep the interim `>= 20` `[A-Za-z0-9_-]` shape and the unqualified compatibility type `vercel_token`, so their redaction is not reduced; no grammar is claimed. Unblocks on maintainer ruling Q-VC (one generator family) or one issued value each. | [#1013 vercel](../audits/evidence/1013/vercel.md), [#858](../audits/evidence/858/README.md) |
+
+## Vercel per-class split (#1036)
+
+`vercel-token` reports one finding type per Vercel credential class
+([#1036](https://github.com/redact-secret/redact-secret/issues/1036), research
+[#1013](../audits/evidence/1013/vercel.md), taxonomy
+[#858](../audits/evidence/858/README.md)), under one detector id, the
+one-detector, several-types model of `github-token`. `Provider` specificity,
+high confidence, always redacted.
+
+Matching is unchanged: every prefix is matched exactly as before #1036, the
+marker plus at least 20 `[A-Za-z0-9_-]` in one maximal run, with a
+`[A-Za-z0-9_-]` boundary on both sides. Every span, and so every redaction,
+equals the pre-split detector's (pinned by an oracle test against the
+pre-split table). Only the finding type of a match is refined:
+
+| Matched value | Finding type | Tier |
+| --- | --- | --- |
+| `vcp_` + exactly 56 `[A-Za-z0-9]` (60 in total) | `vercel_personal_access_token` | T2 (provider CLI example as a shape, CredSweeper, Kingfisher) |
+| `vca_` + exactly 56 `[A-Za-z0-9]` | `vercel_app_access_token` | T2, thin (one checksum-valid provider value, copied by both peer rules) |
+| `vcr_` + exactly 56 `[A-Za-z0-9]` | `vercel_app_refresh_token` | T2, thin (the provider example reuses the `vca_` body) |
+| any other match: `vcp_`/`vca_`/`vcr_` off the exact contract, and every `vci_`/`vck_` | `vercel_token` | none claimed; `vci_`/`vck_` pending Q-VC |
+
+Security-first fallback: a `vcp_`, `vca_` or `vcr_` value whose body is not
+exactly 56 alphanumerics (55 or 57 bytes, a `_` or `-` in the body, a glued
+`..._backup` or `...-1`) is still reported, whole and redacted, as the
+unqualified `vercel_token`, in every context, bare and in prose included.
+Nothing redacted before #1036 becomes unredacted. Because the run is maximal,
+a typed value glued to a wider identifier is reported whole as
+`vercel_token`, never truncated to a typed 60-byte span. The markers are
+case-sensitive. The CRC-32/base62 tail Kingfisher checks is not required: it
+is provider-backed on one `vca_` value only, and the provider's own CLI
+`vcp_` example fails it. `dpl_` deployment ids, `prj_`/`team_` ids, every
+other `vc?_` letter and the legacy unprefixed 24-character form stay
+unclaimed. `vercel` stays in `generic-token`'s dedicated-provider deferral
+list, unchanged.
+
+`vci_` and `vck_` always report `vercel_token`, which claims no grammar for
+them. The shared shape's alphabet equals its boundary, so a glued
+`..._backup` is absorbed into the match, the open-floor defect #551 left out
+of scope; it is kept so no redaction is lost, until Q-VC or issuance decides a
+grammar.
+
+Compatibility: `vercel_token` shipped for all five prefixes. Code that
+filters, allowlists or counts findings by `vercel_token` no longer sees
+exact-contract `vcp_`, `vca_` or `vcr_` values; it must also match the three
+new types. `vercel_token` still reports every other match. The detector id
+and the always-redact action are unchanged.
+
+False negatives: none added; the match set is the pre-#1036 one. False
+positives: unchanged in count and span. A 56-byte alphanumeric filler after a
+typed marker (`vcp_` + 56 `x`) is typed as a personal access token, and the
+open-floor false positives of the old shape (short, over-long or punctuated
+bodies after any marker) stay, now under `vercel_token`. Cost: one byte-class
+check of each matched span; prefixes, lead bytes and prefilter literals are
+unchanged.
 
 ## Beta.8 arrival contracts
 
@@ -415,9 +491,9 @@ provider context is adjacent on the same line, never as a bare 32/40-byte run.
 | Family | Shape (scanner-inferred, not issuer-backed) | Context that qualifies the value | Status |
 | --- | --- | --- | --- |
 | `mistral:studio-api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `mistral`; `Mistral(...)` call argument; `mistral` then a credential key within 32 bytes | landed, `mistral-api-key` |
-| `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional; a credential-named builder method, `Cohere.builder().token("...")` (#932) | landed, `cohere-api-key` |
+| `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional; a credential-named builder method, `Cohere.builder().token("...")` (#932); a credential-named key, unmasked `masked_api_key=` included, on a line naming a `cohere/<model>` route (#1018) | landed, `cohere-api-key` |
 | `ai21:api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `ai21`; `AI21Client(...)` argument | landed, `ai21-api-key` |
-| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; the last positional literal of a `deepgram.` call, `deepgram.NewRESTWithDefaults(ctx, "...")` (#932); `Authorization: Token <v>` or HTTPie `Authorization:Token <v>` on a line naming `deepgram` (`high` when the line names a host under the `deepgram.com` API domain, #936) | landed, `deepgram-api-key` |
+| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; the last positional literal of a `deepgram.` call, `deepgram.NewRESTWithDefaults(ctx, "...")` (#932); `Authorization: Token <v>` or HTTPie `Authorization:Token <v>` on a line naming `deepgram` (`high` when the line names a host under the `deepgram.com` API domain, #936); since #1017 the JS SDK v3 `createClient("...")` / `createClient({ key: "..." })` on a line naming `deepgram`, the WebSocket token subprotocol (`Sec-WebSocket-Protocol: token, <v>`, `["token", "<v>"]`) with the same host rule, a token header or subprotocol whose request line or `Host:` header names the API host up to 8 header lines above, and a sibling `provider: deepgram` field (same line, or up to 6 keys above in the same YAML mapping) under a credential key or `auth` | landed, `deepgram-api-key` |
 | `exa:api-key` | none: no source states any shape (only the key *id* is documented, as a UUID) | none | **not landed**; stays with `generic-token` (env, JSON, YAML, `x-api-key`, `Bearer`), its SDK-call keyword-argument form is read by `generic-token` since #866; a positional `Exa("...")` stays out (no credential name) |
 
 Confidence: a named assignment (`MISTRAL_API_KEY=`, `"deepgramApiKey":`) or an
@@ -432,6 +508,25 @@ as specific as a provider-named key. A look-alike host
 (`api.deepgram.com.example.test`, `deepgram.company`) stays `medium`. The types are not in the always-redact
 list, like `twilio_auth_token`.
 
+Issue [#1017](https://github.com/redact-secret/redact-secret/issues/1017)
+applies the same structural rule (the #936 amendment of
+`decision-redact-provider-named-credential-assignments`) to more Deepgram
+forms, all `high`: the `createClient` factory of `@deepgram/sdk` when the line
+names `deepgram` (its import or its receiving variable); the browser WebSocket
+`token` subprotocol on a request to the API host (`medium` with `deepgram`
+only as a word); a token header or subprotocol whose request line or `Host:`
+header names the API host on an earlier line of the same request (at most 8
+header lines up, no blank or non-header line between); and a credential key
+(or `auth`) beside a `provider: <keyword>` field, on the same line
+(`{"provider":"deepgram","auth":"..."}`, which `generic-token` only warned on)
+or up to 6 keys above in the same YAML mapping. The sibling-field and
+multi-line rules apply to all four keyword-gated families. The incremental
+session holds the request block and the mapping open over exactly those
+windows. FN that remains: `createClient` with Deepgram named only on another
+line (an import far above), a nested key between `provider:` and the key,
+and a request split by a body. FP cost: a 40-byte `[0-9a-z]` value in one of
+those slots that is not a Deepgram key.
+
 Excluded on purpose: a key ending in an identifier or location segment
 (`MISTRAL_KEY_ID`, `DEEPGRAM_PROJECT_ID`, `COHERE_ORG_ID`, `AI21_TEAM_ID`), a
 non-credential argument (`Mistral(model="...")`), placeholders and
@@ -439,7 +534,11 @@ repeated-character filler, a value behind a hash label (`md5:`), a run of any
 other length or alphabet (31/33 bytes, `_`/`-` inside, uppercase Deepgram), and
 context on another line (a multi-line constructor keeps `api_key=` on a line
 that names nothing; that stays a false negative, as does any provider key under
-a keyword-free name such as `API_KEY=`). The bare `Bearer` header is
+a keyword-free name such as `API_KEY=`). One two-line layout is read since
+[#1016](https://github.com/redact-secret/redact-secret/issues/1016): a
+Kubernetes-style `env` entry, whose `value:` takes the name of the sibling
+`name:` key on the adjacent line (`- name: DEEPGRAM_API_KEY` /
+`value: "..."` is a named assignment, `high`). The bare `Bearer` header is
 `bearer-token`'s and is not repeated here.
 
 Trade-offs. False negatives: keys that differ from the inferred shape, and the
@@ -831,6 +930,290 @@ such as a snake_case identifier of exactly that width or a padded placeholder
 (the #867 precedent); rare. Cost: two four-byte prefixes on the shared
 known-format scan; `c` is a common lead byte, so the shared prefilter skips
 the scan on input where the byte pairs of neither prefix all occur.
+## Unsupported-variant contracts (#1012)
+
+Issue [#1012](https://github.com/redact-secret/redact-secret/issues/1012)
+froze contract research for the credential variants the pinned support
+matrix lists as `unsupported`
+([evidence](../audits/evidence/1012/README.md)). This section records the
+READY outcomes and product gaps that are implemented. No row is a
+support-status claim; promotion stays gated on core conformance and the
+benchmarks arrival and profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `gitlab:routable-personal-access-token` | `gitlab-token` | `glpat-` + unpadded base64url `[A-Za-z0-9_-]{27,300}` + `.` + 2 base36 version + `.` + 2 base36 payload length (equal to the payload length) + 7 base36 CRC-32 of every byte from `g` through the length holder; the whole value is the span, and a `[A-Za-z0-9_-]` byte glued after the CRC rejects the routable form | `gitlab_token` (unchanged) | T1 (GitLab generator, decoder, PAT model and design document; provider-authored rules, R2) |
+| `aws:sts-temporary-access-key` | `aws-access-key` | `ASIA` + exactly 16 `[A-Z0-9]` (20 in total); a `[A-Za-z0-9]` byte before or after rejects the match; typed, actioned and bounded exactly like `AKIA` | `aws_access_key_id` (unchanged) | prefix T1 (AWS IAM identifiers docs); body T2 (AWS docs example, AWS-owned git-secrets and ferret-scan rules, four peer scanners); T1 if R2 is applied to ferret-scan |
+| `aws:iam-user-secret-access-key` | `aws-secret-access-key` | exactly 40 `[A-Za-z0-9/+]` with at least one uppercase and one lowercase letter; no `[A-Za-z0-9/+]` byte before and no `[A-Za-z0-9/+=]` byte after; claimed only under an AWS secret access key name (compact name ending `secretaccesskey`, `awssecretkey` or `awssecret`, or the phrase `secret access key`, then `=` or `:`) or on the line of, or directly below, an `AKIA`/`ASIA` access key ID | `aws_secret_access_key` | T2, context-constrained (AWS docs example, AWS-owned git-secrets and ferret-scan rules, peer scanners); T1 if R2 is applied; AWS Macie makes context T1; the name list, adjacency window and mixed-case guard are policy |
+| `google:oauth2-credential` (client secret) | `google-oauth-client-secret` | `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]` (35 in total); a `[A-Za-z0-9_-]` byte before or after rejects the match, and any other width is rejected whole | `google_oauth_client_secret` | T2 (Google's osv-scalibr rule, noseyparker, CredSweeper); T1 if R2 is applied to osv-scalibr |
+
+AWS temporary access key IDs
+([#1027](https://github.com/redact-secret/redact-secret/issues/1027),
+[handoff](../audits/evidence/1012/aws-sts-temporary-access-key.md)).
+`aws-access-key` already claimed `ASIA` beside `AKIA`; #1027 records the
+contract, conformance and tests without changing the grammar. The ID is an
+identifier, usable only with its secret access key and session token;
+redacting a bare ID stays the product policy, as for `AKIA`. The body class
+is the wider `[A-Z0-9]`, since no AWS source settles Base32. False negatives:
+IDs of 17 to 128 characters or with lowercase, which the STS API allows but
+no example or rule shows. False positives: a 20-character uppercase
+identifier that happens to start `ASIA`. `ABIA` and `ACCA` are identifiers
+(#1012) and stay unclaimed.
+
+AWS secret access keys
+([#1028](https://github.com/redact-secret/redact-secret/issues/1028),
+[handoff](../audits/evidence/1012/aws-iam-user-secret-access-key.md)). The
+value has no prefix, so the contract is context-constrained, as AWS's own
+detectors (Macie, git-secrets, ferret-scan) are. A new detector,
+`aws-secret-access-key`, reports `aws_secret_access_key` at provider
+specificity, high and always redacted, so it wins the overlap with the
+`contextual_secret` that `generic-token` reports under the same names. The
+name is read back over at most 96 bytes of the value's line. The adjacency
+rule reads the value's own line and the line directly above it; the
+incremental session holds a line that carries an access key ID open for one
+more line, so streamed and whole-input scans agree. The mixed-case guard
+keeps a 40-hex Git SHA out. False negatives: a bare secret with no name or
+ID, an ID on the line below the secret or two lines away, a 41-byte
+temporary secret and a padded value (both still redacted by `generic-token`
+under a name). False positives: a 40-character mixed-case Base64-alphabet
+value under an AWS secret name, or on or below an access key ID line, that
+is not a secret. The AWS documentation example secret stays exempt by exact
+equality (the pipeline's vendor placeholder literals). Cost: a literal check,
+one access-key-ID scan and one pass over each line's Base64 runs.
+
+Google OAuth client secrets
+([#1029](https://github.com/redact-secret/redact-secret/issues/1029),
+[handoff](../audits/evidence/1012/google-oauth2-credential.md)). Google
+publishes no grammar; its own osv-scalibr rule was narrowed to exactly 28
+body bytes in 2025, and two peer rules agree. The detector reports the
+bare value, which gave no finding before, and wins the overlap with the
+`client_secret` `contextual_secret` and with `bearer_token`. `google` is not
+added to `generic-token`'s dedicated-provider deferral list, so unprefixed
+legacy secrets under `GOOGLE_*` names stay redacted by context. The access
+token `ya29.` and the refresh token `1//` stay unclaimed (BLOCKED in #1012).
+False negatives: unprefixed legacy secrets outside named contexts, a future
+width change. False positives: a `GOCSPX-` + 28 value that is not a Google
+client secret, none known; a padded placeholder of exactly that width is
+claimed (the #867 precedent). Cost: one prefix on the shared known-format
+scan.
+
+GitLab routable personal access tokens
+([#1022](https://github.com/redact-secret/redact-secret/issues/1022),
+[handoff](../audits/evidence/1012/gitlab-routable-personal-access-token.md)).
+Every PAT GitLab.com has issued since 2025-07-24 is routable. Before #1022
+the legacy `glpat-` + 20 run stopped at the first `.`, so the
+`.<version>.<length><crc>` tail stayed in plaintext after redaction. The
+routable branch reuses the offline length-holder and CRC-32 check of the
+routable `glrt-` form (#730) and reports the whole value. A value whose tail
+does not verify (the unversioned 2024-11 to 2025-04 form, an instance or
+admin-custom prefix whose CRC covers another prefix, a corrupted CRC, a
+glued byte) is not reported whole, and keeps the unchanged legacy match over
+the payload run, so no previously redacted byte is released. False
+negatives: the tail of those non-verifying forms; a future version whose
+layout changes. False positives: none known; a chance CRC match is about one
+in 78 billion. Cost: one CRC-32 over at most 319 bytes, only after a
+`glpat-` run that ends at `.`.
+
+## Beta.12 broad-discovery provider families (#1014)
+
+The families of issue
+[#1014](https://github.com/redact-secret/redact-secret/issues/1014)
+([ranked candidates](../audits/evidence/1014/README.md)) are each a new
+detector with provider-specific finding types, `Provider` specificity, high
+confidence and always redacted, so overlap resolution reports one provider
+finding per span over `contextual_secret`, `bearer_token` and
+`authorization_credential`. The frozen contract for each family, with its
+sources, tier rationale, excluded shapes and issuance checklist, is its step-3
+handoff; this section records only the implemented grammar and its
+trade-offs.
+
+Shared rules: a value is rejected when the byte before it or after it
+continues an identifier (`[A-Za-z0-9_-]`, adjusted per family where noted),
+so an embedded, over-long or glued value is an intentional false negative,
+never a truncated match. A provider checksum never rejects a shape-valid
+match: security comes first, so a failed checksum is not an intentional false
+negative, and ruling Q1 of the handoff index stays open for the maintainer.
+Documented-public siblings (ruling Q5) stay unclaimed. None of these
+providers is added to `generic-token`'s dedicated-provider deferral list: each
+has shapes these contracts exclude, and deferral would turn a provider-named
+assignment of one into a silent miss. No row is a support-status claim;
+promotion stays gated on core conformance and the benchmarks arrival and
+profile evidence.
+
+| Family | Detector | Contract | Finding types | Tier |
+| --- | --- | --- | --- | --- |
+| `bitwarden:secrets-manager-access-token` | `bitwarden-secrets-manager-access-token` | `0.` + UUID (8-4-4-4-12 hex, either case) + `.` + exactly 30 `[A-Za-z0-9]` + `:` + 22 `[A-Za-z0-9+/]` + `==` (94 in total); the byte before `0` must not be `[A-Za-z0-9._-]` and the byte after `==` must not be `[A-Za-z0-9+/=]` | `bitwarden_secrets_manager_access_token` | T1 (provider parser, server generator and docs example, R1) |
+| `polar:organization-access-token` | `polar-token` | `polar_oat_` + exactly 43 `[A-Za-z0-9]`; `polar_pat_`, `polar_at_u_`, `polar_at_o_`, `polar_rt_u_`, `polar_rt_o_`, `polar_cs_` or `polar_crt_` + exactly 43 `[A-Za-z0-9_-]` | `polar_organization_access_token` (`polar_oat_`), `polar_api_credential` (the other API roles) | T1 (provider server generator and prefix constants, R1 and R9) |
+| `sonarqube:token` | `sonarqube-token` | `squ_`, `sqa_` or `sqp_` + exactly 40 `[0-9a-f]` (44 in total) | `sonarqube_user_token` (`squ_`), `sonarqube_analysis_token` (`sqa_`, `sqp_`) | T1 (provider server generator and token type enum, R1) |
+| `rubygems:api-key` | `rubygems-api-key` | `rubygems_` + exactly 48 `[0-9a-f]` (57 in total) | `rubygems_api_key` | T1 (provider server generator, R1) |
+| `clojars:deploy-token` | `clojars-deploy-token` | `CLOJARS_` (case-sensitive) + exactly 60 `[0-9a-f]` (68 in total) | `clojars_deploy_token` | T1 (provider generator and server validator, R1) |
+
+Bitwarden ([#1019](https://github.com/redact-secret/redact-secret/issues/1019),
+[handoff](../audits/evidence/1014/bitwarden.md)). The token carries the
+machine account's client secret and the key that decrypts its secrets. The
+`0.` lead is too common to index, so the scan anchors on the closing `==` and
+checks the fixed 94-byte layout that ends there, O(1) per `==`. The leading
+boundary adds `.` so `10.<uuid>…` and `v0.<uuid>…` are not claimed; the
+trailing boundary is the Base64 alphabet plus `=`. The UUID accepts both
+cases because the parser does. False negatives: an unpadded key (the parser
+accepts it, the generator never emits it), a future version other than `0`,
+a token split across lines, and Password Manager `user.`/`organization.` API
+keys, which have no token grammar and stay with generic context. False
+positives: an unrelated `0.` + UUID + `.` + 30 alphanumerics + `:` + padded
+16-byte Base64 value; none is known. Cost: one `==` search plus a fixed
+layout check.
+
+Polar ([#1020](https://github.com/redact-secret/redact-secret/issues/1020),
+[handoff](../audits/evidence/1014/polar.md)). The generator has emitted 37
+alphanumerics plus a 6-character base62 CRC32 since 2025-01-02, and 43
+unpadded URL-safe Base64 bytes before that. Organization access tokens
+postdate the change, so only `polar_oat_` has the alphanumeric body; the
+other API roles take the union of both eras. The `polar_oat_` checksum does
+not reject a shape-valid match (ruling Q1 open); it could never apply to the
+other roles, whose era-1 bodies carry no checksum. Two finding types separate
+the organization token from the user, OAuth and client credentials, following
+the one-type-per-role precedent. The public `polar_ci_` client id (Q5),
+browser-side `polar_c_`/`polar_cl_` checkout secrets and session or
+single-use tokens are not prefixes here. A Polar webhook secret uses
+Stripe's `whsec_` prefix and stays reported as
+`stripe_webhook_signing_secret`: redacted, attributed to Stripe. False
+negatives: session and single-use tokens outside named contexts, a future
+generator change, and the misattributed webhook secret. False positives: an
+unrelated `polar_<role>_` + exactly 43 URL-safe bytes; none is known. Cost:
+eight prefixes on the shared known-format scan.
+
+SonarQube ([#1021](https://github.com/redact-secret/redact-secret/issues/1021),
+[handoff](../audits/evidence/1014/sonarqube.md)). The server generator writes
+`sq` + the type letter + `_` + 20 random bytes as lowercase hex. A user
+token acts as the user, administration included, and gets its own type; the
+global and project analysis tokens share one. Without the prefix the body is
+SHA-1 shaped, so the prefix is load-bearing and unprefixed legacy tokens
+(before SonarQube 9.5) stay with generic context. `sqb_` project badge
+tokens are read-only and published in badge URLs by design (Q5), so they are
+never claimed. False negatives: legacy tokens outside named contexts, badge
+tokens, SonarQube Cloud `sqco_` tokens and an uppercased copy. False
+positives: an unrelated `squ_`/`sqa_`/`sqp_` + exactly 40 lowercase hex,
+such as an identifier that suffixes a SHA-1; rare. Cost: three prefixes on
+the shared known-format scan.
+
+RubyGems ([#1023](https://github.com/redact-secret/redact-secret/issues/1023),
+[handoff](../audits/evidence/1014/rubygems.md)). The server generator returns
+`rubygems_` + `SecureRandom.hex(24)`; OIDC-exchanged short-lived keys come
+from the same generator and are covered. RubyGems sends the key in
+`Authorization` without a scheme, and the provider type wins that span.
+Metadata keys such as `rubygems_version` fail the body. False negatives:
+legacy unprefixed keys outside named contexts and an uppercased copy. False
+positives: an unrelated `rubygems_` + exactly 48 lowercase hex; none is
+known. Cost: one prefix on the shared known-format scan.
+
+Clojars ([#1025](https://github.com/redact-secret/redact-secret/issues/1025),
+[handoff](../audits/evidence/1014/clojars.md)). The generator and the server's
+own validator `^CLOJARS_[0-9a-f]{60}$` agree, so the contract is exactly the
+validator. Environment names such as `CLOJARS_USERNAME` and
+`CLOJARS_PASSWORD` fail the body. False negatives: an uppercased copy and
+legacy account passwords. False positives: none known for `CLOJARS_` +
+exactly 60 lowercase hex. Cost: one prefix on the shared known-format scan.
+
+## Beta.12 broad-discovery families, ranks 6 to 10 (#1014)
+
+Ranks 6 to 10 of the
+[#1014 broad-discovery ranking](../audits/evidence/1014/README.md) are each a
+new detector with its own finding types, `Provider` specificity, high
+confidence and always redacted, so overlap resolution reports one provider
+finding per span over `contextual_secret`, `bearer_token` and
+`authorization_credential`. The frozen contract for each family, with its
+sources, tier rationale, excluded shapes and issuance checklist, is its
+step-3 handoff in that folder; this section records only the implemented
+grammar and its trade-offs. Before these detectors, a bare value, a chat
+sentence and a JSON `"token"` value of every one of these families were
+missed.
+
+Shared rules: a value is rejected when the byte before it or after it
+continues an identifier (`[A-Za-z0-9_-]`, adjusted per family where noted),
+so an embedded, over-long or glued value is an intentional false negative,
+never a truncated match. A provider checksum is never a rejection gate (a
+shape-valid value is reported whatever its check character; maintainer
+ruling Q1 on #1014 is pending). None of these providers is added to
+`generic-token`'s dedicated-provider deferral list. No row is a
+support-status claim; promotion stays gated on core conformance and the
+benchmarks arrival and profile evidence.
+
+| Family | Detector | Grammar | Finding type | Tier |
+| --- | --- | --- | --- | --- |
+| `crates-io:api-token` | `crates-io-token` | `cio` + exactly 32 `[A-Za-z0-9]` (35 in total); `cio_tp_` + exactly 32 `[A-Za-z0-9]` (39 in total), tried first | `crates_io_api_token`, `crates_io_trusted_publishing_token` | T1 (crates.io server generators, R1) |
+| `dynatrace:api-token` | `dynatrace-token` | `dt0` + `c`\|`s` + 2 digits + `.` + exactly 24 `[A-Z2-7]` + `.` + exactly 64 `[A-Z2-7]` (96 in total), the whole token as the span; the byte before `dt0` must not be `[A-Za-z0-9_.-]` unless it ends a `%20`, and a `.` after the token rejects only when another `[A-Za-z0-9_-]` byte follows it | `dynatrace_token` | T1 (docs structure, lengths and prefix table; base32 alphabet from the provider generator, R1) |
+| `paddle:api-key` | `paddle-api-key` | `pdl_live_apikey_`\|`pdl_sdbx_apikey_` + exactly 26 `[a-z0-9]` + `_` + exactly 22 `[A-Za-z0-9]` + `_` + exactly 3 `[A-Za-z0-9]` (69 in total, five `_`) | `paddle_api_key` | T1 (provider docs regex and length) |
+| `honeycomb:api-key` (ingest only) | `honeycomb-api-key` | `hc` + one `[a-z]` + `ik_` (environment) or `ic_` (classic) + exactly 58 `[a-z0-9]` (64 in total) | `honeycomb_ingest_key` | T1 (docs prefix; SDK regex, 64-byte gate and fixtures, R1 and R5); management key issuance-gated |
+| `axiom:api-token` | `axiom-token` | `xaat-` or `xapt-` + a lowercase-hex UUID (8-4-4-4-12, `-` at body offsets 8, 13, 18 and 23; 41 in total) | `axiom_api_token` (`xaat-`), `axiom_personal_token` (`xapt-`) | prefix T1 (R6); layout and alphabet T1 by example (R5) |
+
+crates.io ([#1031](https://github.com/redact-secret/redact-secret/issues/1031),
+[handoff](../audits/evidence/1014/crates-io.md)). `cio` is a 3-letter
+trigram, so the exact 32-byte body and both boundaries carry the precision.
+The `cio` body alphabet excludes `_`, so a trusted-publishing token is never
+read as an API token. The trusted-publishing check character (XOR of the raw
+bytes, modulo 62) is not verified. False negatives: a token glued to
+identifier bytes, and pre-`cio` legacy tokens, which the server no longer
+accepts. False positives: a standalone 35-byte alphanumeric value that starts
+with `cio` (about one random run in 238,000). Cost: two prefixes on the
+shared known-format scan.
+
+Dynatrace ([#1032](https://github.com/redact-secret/redact-secret/issues/1032),
+[handoff](../audits/evidence/1014/dynatrace.md)). Classic `dt0c01` access
+tokens and `dt0s01`–`dt0s16` platform tokens share one type. The span is the
+whole token, not only the secret portion, so the redacted output keeps no
+half-token; the token identifier alone (`<prefix>.<24>`, documented as safe to
+log) fails the fixed width and stays unclaimed. `Authorization: Api-Token …`
+resolves to the provider type over `authorization_credential`. The leading
+boundary also accepts a percent-encoded space, because Dynatrace's
+OpenTelemetry exporter setup writes `Authorization=Api-Token%20<token>`; the
+trailing boundary lets a sentence-ending period through. Scanners that allow
+lowercase or `0`, `1`, `8`, `9` (`[a-z0-9]`, `[A-Z0-9]`) are wider than the
+issued grammar and are not followed. False negatives: a lowercased copy, a
+glued value, and any future format of another alphabet or width. False
+positives: an unrelated `dt0[cs]NN.` + 24 + `.` + 64 base32 value; none is
+known. Cost: one literal search for `dt0` and a 96-byte fixed-width check.
+
+Paddle ([#1033](https://github.com/redact-secret/redact-secret/issues/1033),
+[handoff](../audits/evidence/1014/paddle.md)). The grammar is Paddle's own
+published regex. Live and sandbox keys are one type: a sandbox key still
+reads and changes sandbox data and is a policy violation to commit. The
+`apikey_` + 26 key id inside a key is part of the one span; on its own it is
+a non-secret identifier (API responses, webhooks) and is never claimed.
+False negatives: legacy keys from before 2025-05-06 (50 unprefixed
+`[a-z0-9]`) outside named contexts, where generic context still covers
+`PADDLE_API_KEY=`, and a glued key. False positives: none known for this
+69-byte layout. Cost: two prefixes on the shared known-format scan plus a
+53-byte post check.
+
+Honeycomb ([#1034](https://github.com/redact-secret/redact-secret/issues/1034),
+[handoff](../audits/evidence/1014/honeycomb.md)). Only ingest keys are
+claimed. Environment (`ik`) and classic (`ic`) ingest keys are one type: the
+docs define the key value as the key id and secret concatenated with no
+separator, so the whole 64 bytes are the span. **Management keys
+(`hc[a-z]mk_` + 26 + `:` + 32) stay unclaimed**: they are issuance-gated on
+the alphabet of both segments (the docs placeholder is digits only and no
+fixture exists), and `honeycomb_management_key` is added only after a
+maintainer-issued key clears that gate. Key ids alone (`hc?ik_`/`hc?mk_` +
+26, `hc?lk_`, `hc?en_`) are non-secret and fail the 58-byte body.
+False negatives: management keys, 22-character configuration keys and
+32-hex classic keys outside named contexts, and a glued key. False
+positives: an unrelated `hc?ik_`/`hc?ic_` + 58 lowercase alphanumerics; none
+is known. Cost: one `hc` prefix on the shared known-format scan plus a
+62-byte post check.
+
+Axiom ([#1035](https://github.com/redact-secret/redact-secret/issues/1035),
+[handoff](../audits/evidence/1014/axiom.md)). API tokens and personal
+access tokens are separate types: a personal token carries the user's full
+console and API access. The prefix is load-bearing, so a bare UUID stays
+unclaimed and the UUID body keeps the value apart from `jwt` and
+`bearer_token`. The only real-shaped example is one docs response; the SDK
+fixtures fix the layout with placeholder bytes, so the handoff recommends a
+structure-only issuance check (basic, advanced and personal tokens) to
+confirm the layout and the case. It does not block this row. False
+negatives: an uppercased copy, a token outside the UUID layout, and a glued
+token. False positives: an unrelated `xaat-`/`xapt-` + lowercase UUID; none is
+known. Cost: two prefixes on the shared known-format scan plus a 36-byte post
+check.
 
 ## Rules
 
@@ -844,6 +1227,7 @@ the scan on input where the byte pairs of neither prefix all occur.
 | Doppler `dp.<type>.` tokens (seven documented types, 40–44 alphanumeric body, optional `dp.st.` environment segment) are reported as one finding type per type at provider specificity, bare or in any context ([#903](https://github.com/redact-secret/redact-secret/issues/903), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the GitHub one-type-per-family precedent to one more family |
 | Trigger.dev `tr_<env>_sk_` + 24 and `tr_<env>_` + 24 or 20 alphanumeric secret keys (four documented env slugs), and `tr_pat_` + 40 `[1-9a-km-z]` personal access tokens, are reported as two finding types at provider specificity, bare or in any context; `pk_<env>_`, `tr_oat_` and JWT forms stay unclaimed ([#904](https://github.com/redact-secret/redact-secret/issues/904), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | E2B `e2b_` + exactly 40 lowercase hex API keys are reported as `e2b_api_key` at provider specificity, bare or in any context; retired `sk_e2b_` tokens and `e2b_` module names stay unclaimed ([#905](https://github.com/redact-secret/redact-secret/issues/905), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| Vercel `vcp_`, `vca_` and `vcr_` + exactly 56 `[A-Za-z0-9]` are reported as `vercel_personal_access_token`, `vercel_app_access_token` and `vercel_app_refresh_token` at provider specificity; every other `vercel-token` match (`vci_`, `vck_`, and typed markers off the exact contract) stays `vercel_token` at the unchanged pre-split shape, so no redaction is lost ([#1036](https://github.com/redact-secret/redact-secret/issues/1036), section above). | generic policy default, no dedicated ADR; applies the GitHub one-type-per-family precedent and the existing exact-length prefixed policy to one more family |
 | PostHog `phx_` personal and `phs_` project secret API keys (42–49 alphanumeric) are reported as two finding types at provider specificity, bare or in any context; the public `phc_` project token is never claimed ([#906](https://github.com/redact-secret/redact-secret/issues/906), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent (Stripe `pk_`) to one more family |
 | Helicone `sk-`/`pk-` + `helicone` + optional `-eu`/`-rl` + four 7-byte `[a-z0-9]` groups, and the `sk-helicone-proxy-` key with a trailing UUID, are reported as `helicone_api_key` (`sk-`) and `helicone_write_api_key` (`pk-`, redacted by default) at provider specificity, bare or in any context; legacy bare `sk-`, `-cp-` and `-gov` forms stay unclaimed ([#907](https://github.com/redact-secret/redact-secret/issues/907), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family, with the group alphabet fixed by ruling R8 |
 | Firecrawl `fc-` + a dashless lowercase UUIDv4 (32 hex, version and variant nibbles enforced) is reported as `firecrawl_api_key` at provider specificity, bare or in any context; legacy dashed UUIDs, `fco_` and `fcmcp_` stay unclaimed ([#908](https://github.com/redact-secret/redact-secret/issues/908), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
@@ -854,12 +1238,22 @@ the scan on input where the byte pairs of neither prefix all occur.
 | Resend `re_` + 8 + `_` + 24 alphanumeric API keys with both letter cases are reported as `resend_api_key` at provider specificity, bare or in any context ([#915](https://github.com/redact-secret/redact-secret/issues/915), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Apify `apify_api_` + 20–128 alphanumeric API tokens are reported as `apify_api_token` at provider specificity, bare or in any context; `apify_ui_` stays unclaimed ([#916](https://github.com/redact-secret/redact-secret/issues/916), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | W&B `wandb_v1_` + 64–96 `[A-Za-z0-9_]` API keys are reported as `wandb_api_key` at provider specificity, bare or in any context; a leading `<host>-` label stays outside the span, and the band is tolerant around the documented 77 until an issuance check ([#917](https://github.com/redact-secret/redact-secret/issues/917), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Bitwarden Secrets Manager `0.<uuid>.<30 alphanumeric>:<22 Base64>==` access tokens are reported as `bitwarden_secrets_manager_access_token` at provider specificity, bare or in any context; unpadded keys, other versions and Password Manager API keys stay unclaimed ([#1019](https://github.com/redact-secret/redact-secret/issues/1019), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Polar `polar_oat_` + 43 alphanumeric organization access tokens and `polar_pat_`/`polar_at_u_`/`polar_at_o_`/`polar_rt_u_`/`polar_rt_o_`/`polar_cs_`/`polar_crt_` + 43 `[A-Za-z0-9_-]` API credentials are reported as two finding types at provider specificity, bare or in any context; the checksum never rejects a match, `polar_ci_` and checkout secrets stay unclaimed, and `whsec_` stays with Stripe ([#1020](https://github.com/redact-secret/redact-secret/issues/1020), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy and the public-key exclusion precedent to one more family |
+| SonarQube `squ_` user tokens and `sqa_`/`sqp_` analysis tokens (+ 40 lowercase hex) are reported as two finding types at provider specificity, bare or in any context; `sqb_` badge tokens and unprefixed legacy tokens stay unclaimed ([#1021](https://github.com/redact-secret/redact-secret/issues/1021), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy and the public-key exclusion precedent to one more family |
+| RubyGems.org `rubygems_` + 48 lowercase hex API keys are reported as `rubygems_api_key` at provider specificity, bare or in any context; legacy unprefixed keys stay unclaimed ([#1023](https://github.com/redact-secret/redact-secret/issues/1023), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| Clojars `CLOJARS_` + 60 lowercase hex deploy tokens are reported as `clojars_deploy_token` at provider specificity, bare or in any context; `CLOJARS_*` environment names and legacy passwords stay unclaimed ([#1025](https://github.com/redact-secret/redact-secret/issues/1025), section above, #1014). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
 | Daytona `dtn_` + exactly 64 lowercase-hex API keys are reported as `daytona_api_key` at provider specificity, bare or in any context ([#970](https://github.com/redact-secret/redact-secret/issues/970), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | ClickHouse Cloud `4b1d` + exactly 38 alphanumeric API key secrets with at least one uppercase letter are reported as `clickhouse_cloud_api_secret` at provider specificity, bare or in any context; the key ID stays unclaimed ([#971](https://github.com/redact-secret/redact-secret/issues/971), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | NVIDIA `nvapi-` + 60–128 `[A-Za-z0-9_-]` API keys are reported as `nvidia_api_key` at provider specificity, bare or in any context; the legacy prefixless NGC key stays unclaimed ([#972](https://github.com/redact-secret/redact-secret/issues/972), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Browserbase `bb_live_` + 20–128 alphanumeric API keys are reported as `browserbase_api_key` at provider specificity, bare or in any context; `bb_test_` stays unclaimed ([#973](https://github.com/redact-secret/redact-secret/issues/973), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | RunPod `rpa_` + 31–128 alphanumeric API keys are reported as `runpod_api_key` at provider specificity, bare or in any context; Redirect.pizza `rpa_` + 30 and `rps_` S3 secrets stay unclaimed ([#974](https://github.com/redact-secret/redact-secret/issues/974), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Cerebras `csk-` or `csk_` + exactly 48 `[A-Za-z0-9_-]` API keys are reported as `cerebras_api_key` at provider specificity, bare or in any context; Pinecone `pcsk_` keys stay `pinecone_api_key` only ([#975](https://github.com/redact-secret/redact-secret/issues/975), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| crates.io `cio` + 32 alphanumeric API tokens and `cio_tp_` + 32 alphanumeric trusted-publishing tokens are reported as `crates_io_api_token` and `crates_io_trusted_publishing_token` at provider specificity, bare or in any context; the trusted-publishing check character is not a rejection gate ([#1031](https://github.com/redact-secret/redact-secret/issues/1031), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Dynatrace `dt0[cs]NN.` + 24 + `.` + 64 base32 access and platform tokens are reported whole as `dynatrace_token` at provider specificity, bare or in any context, including after `Api-Token%20`; the token identifier alone stays unclaimed ([#1032](https://github.com/redact-secret/redact-secret/issues/1032), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Paddle `pdl_live_apikey_`/`pdl_sdbx_apikey_` + 26 + `_` + 22 + `_` + 3 API keys are reported as `paddle_api_key` at provider specificity, bare or in any context; the `apikey_` key id alone and legacy unprefixed keys stay unclaimed ([#1033](https://github.com/redact-secret/redact-secret/issues/1033), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Honeycomb `hc[a-z]ik_`/`hc[a-z]ic_` + 58 lowercase alphanumeric ingest keys are reported as `honeycomb_ingest_key` at provider specificity, bare or in any context; management keys stay unclaimed until their issuance check, and key ids, configuration and classic hex keys stay unclaimed ([#1034](https://github.com/redact-secret/redact-secret/issues/1034), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Axiom `xaat-` and `xapt-` + lowercase-hex UUID tokens are reported as `axiom_api_token` and `axiom_personal_token` at provider specificity, bare or in any context; placeholders and bare UUIDs stay unclaimed ([#1035](https://github.com/redact-secret/redact-secret/issues/1035), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -883,6 +1277,10 @@ the scan on input where the byte pairs of neither prefix all occur.
 | The Cloudflare account-token prefix is adopted under the frozen `cfut_` contract. | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Hugging Face organization-token prefix is adopted under `hf_`'s frozen body grammar, tiered as T2. | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack credential family is completed: the user-token grammar and the rotation family's version section are frozen. | [Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| Google OAuth client secrets `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]` are reported as `google_oauth_client_secret` at provider specificity, bare or in any context; `ya29.` access tokens and `1//` refresh tokens stay unclaimed (T2, [#1029](https://github.com/redact-secret/redact-secret/issues/1029), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to one more family |
+| AWS secret access keys, exactly 40 `[A-Za-z0-9/+]` with mixed case, are reported as `aws_secret_access_key` at provider specificity only under an AWS secret access key name or on or directly below an `AKIA`/`ASIA` ID line (T2, context-constrained, [#1028](https://github.com/redact-secret/redact-secret/issues/1028), section above). | generic policy default, no dedicated ADR; applies the existing context-gated provider policy (the Twilio and Confluent paired-identifier precedent) to one more family |
+| AWS `ASIA` + exactly 16 `[A-Z0-9]` temporary access key IDs are reported as `aws_access_key_id`, typed and actioned exactly like `AKIA` (T2, [#1027](https://github.com/redact-secret/redact-secret/issues/1027), section above). | generic policy default, no dedicated ADR; records the existing `aws-access-key` claim as a contract |
+| A routable GitLab `glpat-` personal access token whose length holder and CRC-32 verify is reported as one `gitlab_token` finding through its last CRC byte; a non-verifying dotted tail keeps the legacy payload match ([#1022](https://github.com/redact-secret/redact-secret/issues/1022), section above). This closes the routable-PAT gap the GitLab inventory ADR tracked. | generic policy default, no dedicated ADR; applies the existing routable `glrt-` grammar (#730) to one more GitLab prefix |
 | The GitLab token-prefix table is inventoried, and its two undeclared prefixes are given a contract. | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `pinecone-api-key` reports a legacy lowercase `8-4-4-4-12` UUID as `pinecone_api_key` at high confidence only when it is the value assigned to a Pinecone API-key name on the same line: a name normalizing to `pinecone_api_key`/`pinecone_apikey`/`pinecone_key`, or to `api_key`/`apikey` on a line containing `pinecone`. A bare UUID, a UUID under an id-named key, a UUID whose name is on another line, and an all-one-digit placeholder UUID stay unclaimed ([#702](https://github.com/redact-secret/redact-secret/issues/702)). | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
 | GitHub's six token families map onto six independent finding types under one detector. | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |

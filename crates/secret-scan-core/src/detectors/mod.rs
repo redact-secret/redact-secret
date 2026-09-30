@@ -15,21 +15,26 @@ mod apify;
 mod atlassian;
 mod aws;
 mod aws_bedrock;
+mod axiom;
 mod azure_devops;
 mod bearer_token;
+mod bitwarden;
 mod browserbase;
 mod cerebras;
 mod clickhouse_cloud;
+mod clojars;
 mod cloudflare;
 mod composio;
 mod confluent;
 mod connection_string;
 mod convex;
+mod crates_io;
 mod databricks;
 mod datadog;
 mod daytona;
 mod discord;
 mod doppler;
+mod dynatrace;
 mod e2b;
 mod elevenlabs;
 mod firebase;
@@ -37,9 +42,11 @@ mod firecrawl;
 mod generic_token;
 mod github;
 mod gitlab;
+mod google_oauth;
 mod grafana;
 mod helicone;
 mod heroku;
+mod honeycomb;
 mod inngest;
 mod jwt;
 mod keyword_gated_keys;
@@ -58,19 +65,23 @@ mod okta;
 mod onepassword;
 mod openai;
 mod otpauth;
+mod paddle;
 mod pattern;
 mod pinecone;
+mod polar;
 mod posthog;
 mod postman;
 mod prefilter;
 mod private_key;
 mod resend;
+mod rubygems;
 mod ruleset_adapter;
 mod runpod;
 mod sendgrid;
 mod sentry;
 mod shopify;
 mod slack;
+mod sonarqube;
 mod stripe;
 mod telegram;
 mod terraform;
@@ -80,6 +91,7 @@ mod travisci;
 mod trigger_dev;
 mod twilio;
 mod vault;
+mod vercel;
 mod wandb;
 
 use crate::types::Detector;
@@ -89,6 +101,7 @@ use private_key::PrivateKeyDetector;
 use prefilter::Literals;
 pub(crate) use prefilter::{PairSet, RequiredLiterals};
 
+pub(crate) use aws::has_open_aws_access_key_id_line;
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties;
 pub(crate) use generic_token::{
@@ -96,8 +109,10 @@ pub(crate) use generic_token::{
     has_open_contextual_assignment, is_reserved_name, normalize_name,
 };
 pub(crate) use heroku::has_open_heroku_legacy_context;
+pub(crate) use keyword_gated_keys::{has_open_deepgram_request, has_open_provider_sibling};
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
+pub(crate) use text::has_open_list_item_pair;
 pub(crate) use twilio::has_open_twilio_cli_table;
 
 /// `true` when appending `appended` to any input leaves both
@@ -141,11 +156,16 @@ pub(crate) fn continues_previous_line(unit: &str) -> bool {
 }
 
 /// Every built-in detector, in canonical registration order.
+///
+/// One entry per line by contract (`scripts/measure-detector-cost.mjs`
+/// comments entries out by line), so the list outgrows the line lint.
 #[must_use]
+#[allow(clippy::too_many_lines)] // one line per built-in detector
 pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(PrivateKeyDetector),
         Box::new(aws::AwsAccessKeyDetector),
+        Box::new(aws::AwsSecretAccessKeyDetector),
         Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
         Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
         Box::new(github::GitHubTokenDetector),
@@ -164,9 +184,10 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(linear::LINEAR),
         Box::new(additional_providers::SUPABASE),
         Box::new(additional_providers::SUPABASE_PAT),
-        Box::new(additional_providers::VERCEL),
+        Box::new(vercel::VERCEL),
         Box::new(additional_providers::NPM),
         Box::new(additional_providers::GOOGLE),
+        Box::new(google_oauth::GOOGLE_OAUTH_CLIENT_SECRET),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
@@ -237,6 +258,16 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(browserbase::BROWSERBASE_API_KEY),
         Box::new(runpod::RUNPOD_API_KEY),
         Box::new(cerebras::CEREBRAS_API_KEY),
+        Box::new(bitwarden::BitwardenSecretsManagerAccessTokenDetector),
+        Box::new(polar::POLAR),
+        Box::new(sonarqube::SONARQUBE),
+        Box::new(rubygems::RUBYGEMS_API_KEY),
+        Box::new(clojars::CLOJARS_DEPLOY_TOKEN),
+        Box::new(crates_io::CRATES_IO),
+        Box::new(dynatrace::DynatraceTokenDetector),
+        Box::new(paddle::PADDLE_API_KEY),
+        Box::new(honeycomb::HONEYCOMB_INGEST_KEY),
+        Box::new(axiom::AXIOM),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -314,6 +345,7 @@ pub(crate) fn common_built_in_entries() -> Vec<BuiltIn> {
 /// `prefilter::tests::only_the_reviewed_built_ins_run_on_every_call`).
 const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     ("aws-access-key", aws::REQUIRED_LITERALS),
+    ("aws-secret-access-key", aws::SECRET_REQUIRED_LITERALS),
     (
         "aws-bedrock-long-term-api-key",
         aws_bedrock::LONG_TERM_REQUIRED_LITERALS,
@@ -385,8 +417,8 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(additional_providers::SUPABASE.shapes())],
     ),
     (
-        additional_providers::VERCEL.detector_id(),
-        &[Literals::Shapes(additional_providers::VERCEL.shapes())],
+        vercel::VERCEL.detector_id(),
+        &[Literals::Shapes(vercel::VERCEL.shapes())],
     ),
     (
         additional_providers::NPM.detector_id(),
@@ -395,6 +427,12 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     (
         additional_providers::GOOGLE.detector_id(),
         &[Literals::Shapes(additional_providers::GOOGLE.shapes())],
+    ),
+    (
+        google_oauth::GOOGLE_OAUTH_CLIENT_SECRET.detector_id(),
+        &[Literals::Shapes(
+            google_oauth::GOOGLE_OAUTH_CLIENT_SECRET.shapes(),
+        )],
     ),
     (
         datadog::DATADOG_APPLICATION_KEY.detector_id(),
@@ -519,6 +557,43 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(cerebras::CEREBRAS_API_KEY.shapes())],
     ),
     (
+        "bitwarden-secrets-manager-access-token",
+        bitwarden::REQUIRED_LITERALS,
+    ),
+    ("polar-token", &[Literals::Shapes(polar::POLAR.shapes())]),
+    (
+        "sonarqube-token",
+        &[Literals::Shapes(sonarqube::SONARQUBE.shapes())],
+    ),
+    (
+        "rubygems-api-key",
+        &[Literals::Shapes(rubygems::RUBYGEMS_API_KEY.shapes())],
+    ),
+    (
+        "clojars-deploy-token",
+        &[Literals::Shapes(clojars::CLOJARS_DEPLOY_TOKEN.shapes())],
+    ),
+    (
+        crates_io::CRATES_IO.detector_id(),
+        &[Literals::Shapes(crates_io::CRATES_IO.shapes())],
+    ),
+    (
+        dynatrace::ID,
+        &[Literals::Strs(dynatrace::REQUIRED_LITERALS)],
+    ),
+    (
+        paddle::PADDLE_API_KEY.detector_id(),
+        &[Literals::Shapes(paddle::PADDLE_API_KEY.shapes())],
+    ),
+    (
+        honeycomb::HONEYCOMB_INGEST_KEY.detector_id(),
+        &[Literals::Shapes(honeycomb::HONEYCOMB_INGEST_KEY.shapes())],
+    ),
+    (
+        axiom::AXIOM.detector_id(),
+        &[Literals::Shapes(axiom::AXIOM.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -604,6 +679,7 @@ pub(crate) enum Pack {
 pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("private-key", Pack::Common),
     ("aws-access-key", Pack::Provider),
+    ("aws-secret-access-key", Pack::Provider),
     ("aws-bedrock-long-term-api-key", Pack::Provider),
     ("aws-bedrock-short-term-api-key", Pack::Provider),
     ("github-token", Pack::Provider),
@@ -625,6 +701,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("vercel-token", Pack::Provider),
     ("npm-token", Pack::Provider),
     ("google-api-key", Pack::Provider),
+    ("google-oauth-client-secret", Pack::Provider),
     ("sendgrid-token", Pack::Provider),
     ("microsoft-entra-client-secret", Pack::Provider),
     ("azure-devops-personal-access-token", Pack::Provider),
@@ -695,6 +772,16 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("browserbase-api-key", Pack::Provider),
     ("runpod-api-key", Pack::Provider),
     ("cerebras-api-key", Pack::Provider),
+    ("bitwarden-secrets-manager-access-token", Pack::Provider),
+    ("polar-token", Pack::Provider),
+    ("sonarqube-token", Pack::Provider),
+    ("rubygems-api-key", Pack::Provider),
+    ("clojars-deploy-token", Pack::Provider),
+    ("crates-io-token", Pack::Provider),
+    ("dynatrace-token", Pack::Provider),
+    ("paddle-api-key", Pack::Provider),
+    ("honeycomb-api-key", Pack::Provider),
+    ("axiom-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -737,6 +824,7 @@ mod tests {
             vec![
                 "private-key",
                 "aws-access-key",
+                "aws-secret-access-key",
                 "aws-bedrock-long-term-api-key",
                 "aws-bedrock-short-term-api-key",
                 "github-token",
@@ -758,6 +846,7 @@ mod tests {
                 "vercel-token",
                 "npm-token",
                 "google-api-key",
+                "google-oauth-client-secret",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
                 "azure-devops-personal-access-token",
@@ -828,6 +917,16 @@ mod tests {
                 "browserbase-api-key",
                 "runpod-api-key",
                 "cerebras-api-key",
+                "bitwarden-secrets-manager-access-token",
+                "polar-token",
+                "sonarqube-token",
+                "rubygems-api-key",
+                "clojars-deploy-token",
+                "crates-io-token",
+                "dynatrace-token",
+                "paddle-api-key",
+                "honeycomb-api-key",
+                "axiom-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1188,6 +1287,21 @@ mod tests {
         let helicone_api_key_input = format!("sk-helicone-{}", "synthet-icrevok-edfixtr-helico1");
         let firecrawl_api_key_input = format!("fc-{}", "0123456789ab4def8123456789abcdef");
         let composio_api_key_input = format!("ak_{}", "Synthetic_Revoked-Ak");
+        let crates_io_token_input = format!("cio{}", "SyntheticRevokedCratesIoToken000");
+        let dynatrace_token_input = format!(
+            "dt0c01.{}.{}",
+            "SYNTHETICREVOKEDDYNATRCE",
+            "SYNTHETICREVOKED".repeat(4)
+        );
+        let paddle_api_key_input = format!(
+            "pdl_sdbx_apikey_{}_{}_{}",
+            "syntheticrevokedpaddle0000", "SyntheticRevokedSecret", "X9z"
+        );
+        let honeycomb_api_key_input = format!(
+            "hcxik_{}{}",
+            "syntheticrevokedhoneycombingestkey", "0123456789abcdefghijklmn"
+        );
+        let axiom_token_input = format!("xaat-{}", "5e7c0ded-0000-4000-8000-deadbeef0001");
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1209,6 +1323,19 @@ mod tests {
         let onepassword_service_account_token_input =
             format!("ops_eyJ{}", "SyntheticRevokedOnePasswordFixture".repeat(8));
         let convex_deployment_key_input = format!("convex-self-hosted|01{}", "deadbeef".repeat(9));
+        let bitwarden_secrets_manager_access_token_input = format!(
+            "0.{}.{}:{}==",
+            "5e7c0ded-0000-4000-8000-5e7c0ded0000",
+            "SyntheticRevokedBitwardenSecre",
+            "SyntheticRevokedKey000"
+        );
+        let polar_token_input = format!(
+            "polar_oat_{}",
+            "SyntheticRevokedPolarOrganizationToken00000"
+        );
+        let sonarqube_token_input = format!("squ_{}", "5e7c0ded".repeat(5));
+        let rubygems_api_key_input = format!("rubygems_{}", "5e7c0ded".repeat(6));
+        let clojars_deploy_token_input = format!("CLOJARS_{}5e7c", "5e7c0ded".repeat(7));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -1300,6 +1427,19 @@ mod tests {
             ("browserbase-api-key", browserbase_api_key_input.as_str()),
             ("runpod-api-key", runpod_api_key_input.as_str()),
             ("cerebras-api-key", cerebras_api_key_input.as_str()),
+            (
+                "bitwarden-secrets-manager-access-token",
+                bitwarden_secrets_manager_access_token_input.as_str(),
+            ),
+            ("polar-token", polar_token_input.as_str()),
+            ("sonarqube-token", sonarqube_token_input.as_str()),
+            ("rubygems-api-key", rubygems_api_key_input.as_str()),
+            ("clojars-deploy-token", clojars_deploy_token_input.as_str()),
+            ("crates-io-token", crates_io_token_input.as_str()),
+            ("dynatrace-token", dynatrace_token_input.as_str()),
+            ("paddle-api-key", paddle_api_key_input.as_str()),
+            ("honeycomb-api-key", honeycomb_api_key_input.as_str()),
+            ("axiom-token", axiom_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

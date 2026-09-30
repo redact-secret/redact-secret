@@ -5,6 +5,22 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Breaking and compatibility changes
+
+- `vercel-token` now reports one finding type per Vercel credential class
+  instead of `vercel_token` for every prefix (#1036, research #1013):
+  `vcp_` is `vercel_personal_access_token`, `vca_` `vercel_app_access_token`
+  and `vcr_` `vercel_app_refresh_token`, each only for the marker plus exactly
+  56 `[A-Za-z0-9]` (60 bytes). `vci_` and `vck_` keep `vercel_token` and their
+  previous shape unchanged; that type now claims no grammar for them, pending
+  a maintainer ruling. Code that filters, allowlists, or counts findings by
+  `vercel_token` stops seeing exact-contract `vcp_`, `vca_` and `vcr_` values
+  and must match the three new types as well. The detector id and always-redact action are
+  unchanged. A `vcp_`, `vca_` or `vcr_` value with any other body (shorter,
+  longer, or with `_` or `-`) is still reported as `vercel_token` exactly as
+  before, bare and in prose included: every span and redaction is unchanged,
+  only the type of an exact-contract value is new.
+
 ### Added
 
 - New provider detectors from the #860 issuance-gated handoffs released by
@@ -27,6 +43,108 @@ evidence is linked from each published version.
   - `cerebras-api-key` (#975): Cerebras `csk-` or `csk_` + exactly 48
     `[A-Za-z0-9_-]` inference API keys (`cerebras_api_key`); Pinecone `pcsk_`
     keys stay `pinecone_api_key` only.
+- New provider detectors from the #1014 broad-discovery handoffs, each always
+  redacted at provider specificity so it wins overlap resolution over
+  `contextual_secret`, `bearer_token` and `authorization_credential`, and
+  each covering the bare, chat-sentence and JSON `"token"` occurrences
+  generic detection missed. No support-status claim until benchmarks
+  arrival evidence:
+  - `bitwarden-secrets-manager-access-token` (#1019): Bitwarden Secrets
+    Manager machine-account access tokens, `0.` + UUID + `.` + 30
+    alphanumeric client secret + `:` + a padded 16-byte Base64 key
+    (`bitwarden_secrets_manager_access_token`).
+  - `polar-token` (#1020): Polar `polar_oat_` + 43 alphanumeric organization
+    access tokens (`polar_organization_access_token`) and `polar_pat_`,
+    `polar_at_u_`/`polar_at_o_`, `polar_rt_u_`/`polar_rt_o_`, `polar_cs_` and
+    `polar_crt_` + 43 URL-safe API credentials (`polar_api_credential`); the
+    public `polar_ci_` client id is never claimed, and Polar `whsec_` webhook
+    secrets stay with `stripe-token`.
+  - `sonarqube-token` (#1021): SonarQube Server `squ_` user tokens
+    (`sonarqube_user_token`) and `sqa_`/`sqp_` global and project analysis
+    tokens (`sonarqube_analysis_token`), each + 40 lowercase hex; public
+    `sqb_` badge tokens are never claimed.
+  - `rubygems-api-key` (#1023): RubyGems.org `rubygems_` + 48 lowercase hex
+    API keys (`rubygems_api_key`).
+  - `clojars-deploy-token` (#1025): Clojars `CLOJARS_` + 60 lowercase hex
+    deploy tokens (`clojars_deploy_token`).
+- New provider detectors from the #1014 broad-discovery handoffs (ranks 6 to
+  10), each always redacted at provider specificity and each covering the
+  bare, chat-sentence and JSON `"token"` occurrences generic detection
+  missed:
+  - `crates-io-token` (#1031): crates.io `cio` + 32 alphanumeric API tokens
+    (`crates_io_api_token`) and `cio_tp_` + 32 trusted-publishing tokens
+    (`crates_io_trusted_publishing_token`); the check character is not a
+    rejection gate.
+  - `dynatrace-token` (#1032): Dynatrace `dt0c01`/`dt0sNN` access and
+    platform tokens, `<prefix>.<24>.<64>` uppercase base32, reported whole as
+    `dynatrace_token`; the token identifier alone stays unclaimed.
+  - `paddle-api-key` (#1033): Paddle Billing `pdl_live_apikey_` and
+    `pdl_sdbx_apikey_` API keys in the documented 69-character layout
+    (`paddle_api_key`); the `apikey_` key id alone stays unclaimed.
+  - `honeycomb-api-key` (#1034): Honeycomb `hc?ik_`/`hc?ic_` + 58 ingest
+    keys (`honeycomb_ingest_key`). Management keys stay unclaimed until a
+    maintainer issuance check settles their alphabet.
+  - `axiom-token` (#1035): Axiom `xaat-` API tokens (`axiom_api_token`)
+    and `xapt-` personal access tokens (`axiom_personal_token`), each
+    `-` + a lowercase-hex UUID; bare UUIDs and placeholders stay unclaimed.
+- `google-oauth-client-secret` (#1029): Google OAuth client secrets,
+  `GOCSPX-` + exactly 28 `[A-Za-z0-9_-]`, as `google_oauth_client_secret`
+  (always redacted), bare or in any context.
+- `aws-secret-access-key` (#1028): the AWS secret access key, exactly 40
+  `[A-Za-z0-9/+]` with mixed case, as `aws_secret_access_key` (always
+  redacted), claimed only under an AWS secret key name or on or directly
+  below an `AKIA`/`ASIA` access key ID line. The incremental session holds an
+  ID line open for one more line.
+- The AWS temporary access key ID contract (`ASIA` + exactly 16 `[A-Z0-9]`,
+  T2) is recorded beside `AKIA` with conformance fixtures and tests (#1027).
+  Grammar, type and action are unchanged.
+
+### Fixed
+
+- `gitlab-token` reports a routable GitLab personal access token
+  (`glpat-<payload>.<version>.<length><crc>`, every PAT GitLab.com issues
+  since 2025-07-24) as one `gitlab_token` finding through its last CRC byte
+  when the length holder and CRC-32 verify (#1022). Before, the finding
+  stopped at the first `.` and the version, length and CRC tail stayed in
+  plaintext. A tail that does not verify keeps the unchanged legacy match.
+- `generic-token` redacts the value of the `.npmrc` credential keys
+  `_authToken`, `_auth` and `_password` (registry-scoped `//host/:_authToken=`
+  or at line start) as a high `contextual_secret` (#1024). The leading `_`
+  kept them outside the assignment grammar, so private-registry tokens and
+  legacy UUIDs on these lines had no finding.
+- `generic-token` treats `secret_access_key` as a high-signal credential name
+  (#1026), so the AWS API member `"SecretAccessKey": "..."` (STS, IAM and
+  CloudFormation JSON, SDK `secretAccessKey`) is redacted at any width. Before,
+  only `aws_secret_access_key` was a name and the JSON form had no finding.
+- `generic-token` no longer redacts Anthropic Admin documentation placeholders
+  (`sk-ant-admin01-<your-key>`, `-YOUR_KEY`, `-...`), matching the
+  `sk-ant-api01-`/`sk-ant-api03-` siblings (#1015). A well-formed Admin key is
+  still `anthropic_admin_api_key`, and an off-grammar body is still reported.
+- A complete, unmasked value under a `masked_`/`redacted_`/`hashed_`-led
+  credential name is reported again (#1018): the lead excludes only a value
+  that shows masking or hashing, and the keyword-gated providers read a
+  `LiteLLM` model route (`cohere/command-r-plus`), so an unmasked Cohere key
+  under `masked_api_key=` is `cohere_api_key` / redact. Masked displays stay
+  silent; `publishable_` names are unchanged.
+- A Kubernetes-style `env` entry (`- name: <NAME>` / `value: "<v>"` on two
+  lines, either order) is read as the assignment `<NAME>=<v>` (#1016):
+  `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed provider findings, and
+  any other credential name gives `generic-token` at its usual floors.
+  `valueFrom:`, placeholders and non-credential names stay silent, and the
+  incremental session holds the item's first line so chunked scans agree.
+- `deepgram-api-key` covers the JS SDK v3 `createClient(...)` factory, the
+  browser WebSocket `token` subprotocol, a token header whose request line
+  or `Host:` header names `api.deepgram.com` on an earlier line, and a
+  sibling `provider: deepgram` field (#1017). These were missed or typed
+  `generic-token`; the JSON `{"provider":"deepgram","auth":...}` form moves
+  from warn to redact. A bare 40-hex run stays unreported.
+- A keyed environment store is read as an assignment (#1038):
+  `os.environ["NAME"] = "<v>"` (single quotes too), `process.env["NAME"] =`,
+  Ruby `ENV["NAME"] =`, `settings["api_key"] =`,
+  `os.environ.setdefault("NAME", "<v>")` and `os.putenv("NAME", "<v>")`.
+  `MISTRAL_API_KEY`, `DEEPGRAM_API_KEY` and `CO_API_KEY` give the typed
+  provider findings and other credential names give `generic-token`; reads,
+  references, placeholders and non-credential names stay silent.
 
 ## 0.1.0-beta.11 — 2026-09-29
 

@@ -41,6 +41,13 @@
       "schemes": null
     },
     {
+      "type": "aws_secret_access_key",
+      "detector": "aws-secret-access-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "AWS_SECRET_ACCESS_KEY=SyntheticRevokedAwsSecretAccessKeyValue0",
+      "schemes": null
+    },
+    {
       "type": "github_token",
       "detector": "github-token",
       "policyClass": "always-redact",
@@ -237,6 +244,27 @@
       "schemes": null
     },
     {
+      "type": "vercel_personal_access_token",
+      "detector": "vercel-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0076cp_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "vercel_app_access_token",
+      "detector": "vercel-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0076ca_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "vercel_app_refresh_token",
+      "detector": "vercel-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0076cr_SyntheticRevokedVercelFixture000000000000000000000000000",
+      "schemes": null
+    },
+    {
       "type": "npm_access_token",
       "detector": "npm-token",
       "policyClass": "always-redact",
@@ -248,6 +276,13 @@
       "detector": "google-api-key",
       "policyClass": "always-redact",
       "reconciliationTrigger": "AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
+      "schemes": null
+    },
+    {
+      "type": "google_oauth_client_secret",
+      "detector": "google-oauth-client-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0047OCSPX-SyntheticRevokedGoogleClient",
       "schemes": null
     },
     {
@@ -882,6 +917,104 @@
       "detector": "cerebras-api-key",
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0063sk-SyntheticRevokedCerebrasApiKey_SyntheticRevokedC",
+      "schemes": null
+    },
+    {
+      "type": "bitwarden_secrets_manager_access_token",
+      "detector": "bitwarden-secrets-manager-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0030.5e7c0ded-0000-4000-8000-5e7c0ded0000.SyntheticRevokedBitwardenSecre:SyntheticRevokedKey000==",
+      "schemes": null
+    },
+    {
+      "type": "polar_organization_access_token",
+      "detector": "polar-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070olar_oat_SyntheticRevokedPolarOrganizationToken00000",
+      "schemes": null
+    },
+    {
+      "type": "polar_api_credential",
+      "detector": "polar-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070olar_pat_SyntheticRevoked-Polar_PersonalToken0000000",
+      "schemes": null
+    },
+    {
+      "type": "sonarqube_user_token",
+      "detector": "sonarqube-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073qu_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "sonarqube_analysis_token",
+      "detector": "sonarqube-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073qa_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "rubygems_api_key",
+      "detector": "rubygems-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0072ubygems_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "clojars_deploy_token",
+      "detector": "clojars-deploy-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0043LOJARS_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c",
+      "schemes": null
+    },
+    {
+      "type": "crates_io_api_token",
+      "detector": "crates-io-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063ioSyntheticRevokedCratesIoToken000",
+      "schemes": null
+    },
+    {
+      "type": "crates_io_trusted_publishing_token",
+      "detector": "crates-io-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0063io_tp_SyntheticRevokedTrustPubToken000",
+      "schemes": null
+    },
+    {
+      "type": "dynatrace_token",
+      "detector": "dynatrace-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0064t0c01.SYNTHETICREVOKEDDYNATRCE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "schemes": null
+    },
+    {
+      "type": "paddle_api_key",
+      "detector": "paddle-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070dl_sdbx_apikey_syntheticrevokedpaddle0000_SyntheticRevokedSecret_X9z",
+      "schemes": null
+    },
+    {
+      "type": "honeycomb_ingest_key",
+      "detector": "honeycomb-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0068cxik_syntheticrevokedhoneycombingestkey0123456789abcdefghijklmn",
+      "schemes": null
+    },
+    {
+      "type": "axiom_api_token",
+      "detector": "axiom-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
+      "schemes": null
+    },
+    {
+      "type": "axiom_personal_token",
+      "detector": "axiom-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078apt-deadbeef-5e7c-4ded-9000-000000000002",
       "schemes": null
     }
   ],

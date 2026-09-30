@@ -141,3 +141,39 @@ fn every_byte_partition_reproduces_the_whole_input_result() {
         }
     }
 }
+
+/// Issue #1018: a complete, unmasked Cohere key logged under `LiteLLM`'s
+/// `masked_api_key=` beside a `cohere/<model>` route is `cohere_api_key` /
+/// redact; the masked display of the same field stays silent, and the plain
+/// `api_key=` form keeps its generic finding. The value is built at run time
+/// from low-entropy filler.
+#[test]
+fn an_unmasked_key_under_a_litellm_masked_field_is_redacted() {
+    let registry = registry();
+    let key = "aB3dE5gH7j".repeat(4);
+    let line = format!(
+        "18:22:04 - LiteLLM Proxy:DEBUG: router.py:1841 - cohere/command-r-plus call failed; masked_api_key={key} reason=AuthenticationError"
+    );
+    let findings = scan(&line, &registry, &DefaultPolicy).unwrap();
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].type_name(), "cohere_api_key");
+    assert_eq!(findings[0].range(), ByteRange::new(99, 139).unwrap());
+    assert_eq!(findings[0].action(), redact_secret::Action::Redact);
+    for pieces in utf8_byte_partitions(&line) {
+        let session = run(&as_chunks(&pieces));
+        assert_eq!(session.text(), whole_input(&line).0, "{pieces:?}");
+    }
+
+    let plain = format!("cohere call failed; api_key={key}");
+    let findings = scan(&plain, &registry, &DefaultPolicy).unwrap();
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].action(), redact_secret::Action::Redact);
+
+    let masked = format!(
+        "cohere call failed; masked_api_key={}{}{}",
+        &key[..4],
+        "*".repeat(32),
+        &key[36..]
+    );
+    assert!(scan(&masked, &registry, &DefaultPolicy).unwrap().is_empty());
+}

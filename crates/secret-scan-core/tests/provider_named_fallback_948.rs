@@ -271,13 +271,22 @@ fn placeholder_reference_and_identifier_controls_stay_silent() {
         "GITHUB_CREDENTIALS",
         "GITHUB_CSRF_TOKEN",
         "STRIPE_EXISTING_SECRET",
-        "REDACTED_OPENAI_API_KEY",
-        "MASKED_STRIPE_SECRET_KEY",
     ] {
         for input in contexts(name, &value) {
             let (_, findings) = whole_input(&input);
             assert!(findings.is_empty(), "{input}: {findings:?}");
         }
+    }
+    // Issue #1018: a masking lead silences only a value that shows the
+    // masking; the unmasked value is judged under the rest of the name.
+    let masked = format!("{}{}", &value[..4], "*".repeat(value.len() - 4));
+    for name in ["REDACTED_OPENAI_API_KEY", "MASKED_STRIPE_SECRET_KEY"] {
+        for input in contexts(name, &masked) {
+            let (_, findings) = whole_input(&input);
+            assert!(findings.is_empty(), "{input}: {findings:?}");
+        }
+        let (_, findings) = whole_input(&format!("{name}={value}"));
+        assert_eq!(findings.len(), 1, "{name}: {findings:?}");
     }
 }
 

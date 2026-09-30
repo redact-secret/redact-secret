@@ -63,10 +63,10 @@ const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors",
  * of silently mismatching.
  */
 export const CANONICAL_IDS = [
-  "private-key", "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "github-token", "gitlab-token", "openai-token",
+  "private-key", "aws-access-key", "aws-secret-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "github-token", "gitlab-token", "openai-token",
   "anthropic-token", "shopify-token", "vault-token", "stripe-token", "slack-token",
   "pypi-token", "huggingface-token", "docker-token", "cloudflare-token", "digitalocean-token",
-  "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key",
+  "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key", "google-oauth-client-secret",
   "sendgrid-token", "microsoft-entra-client-secret", "azure-devops-personal-access-token",
   "notion-token", "atlassian-api-token", "twilio-auth-token", "twilio-api-key-secret",
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
@@ -90,6 +90,16 @@ export const CANONICAL_IDS = [
   "browserbase-api-key",
   "runpod-api-key",
   "cerebras-api-key",
+  "bitwarden-secrets-manager-access-token",
+  "polar-token",
+  "sonarqube-token",
+  "rubygems-api-key",
+  "clojars-deploy-token",
+  "crates-io-token",
+  "dynatrace-token",
+  "paddle-api-key",
+  "honeycomb-api-key",
+  "axiom-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -112,8 +122,8 @@ export const GROUPS = {
     "cerebras-api-key",
   ],
   cloud: [
-    "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
-    "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
+    "aws-access-key", "aws-secret-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
+    "supabase-management-token", "vercel-token", "google-api-key", "google-oauth-client-secret", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "pinecone-api-key", "databricks-personal-access-token",
@@ -124,13 +134,18 @@ export const GROUPS = {
     "daytona-api-key",
     "clickhouse-cloud-api-secret",
     "runpod-api-key",
+    "bitwarden-secrets-manager-access-token",
+    "dynatrace-token",
+    "honeycomb-api-key",
+    "axiom-token",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
     "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
     "inngest-signing-key",
+    "sonarqube-token",
   ],
-  "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
+  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "rubygems-api-key", "clojars-deploy-token", "crates-io-token"],
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
@@ -138,6 +153,8 @@ export const GROUPS = {
     "resend-api-key",
     "apify-api-token",
     "browserbase-api-key",
+    "polar-token",
+    "paddle-api-key",
   ],
 };
 

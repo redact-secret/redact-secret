@@ -104,12 +104,15 @@
     {
       "detector": "aws-access-key",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 29,
         "hostContextsExercised": [
+          "chat",
           "dotenv",
           "javascript",
+          "json",
           "log",
-          "plain-text"
+          "plain-text",
+          "toml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -123,6 +126,11 @@
         ]
       },
       "evidenceFixtureIds": [
+        "aws-asia-positive-chat-sentence",
+        "aws-asia-positive-credentials-file",
+        "aws-asia-positive-digits-outside-base32",
+        "aws-asia-positive-dotenv",
+        "aws-asia-positive-sts-json",
         "aws-positive-akia",
         "aws-positive-asia-canonical",
         "aws-positive-example-shaped-value-in-comment-context",
@@ -212,6 +220,43 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "aws_bedrock_short_term_api_key"
+    },
+    {
+      "detector": "aws-secret-access-key",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "json",
+          "plain-text",
+          "terminal",
+          "toml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "aws-secret-access-key-positive-aws-configure-prompt",
+        "aws-secret-access-key-positive-console-csv",
+        "aws-secret-access-key-positive-credentials-file",
+        "aws-secret-access-key-positive-dotenv",
+        "aws-secret-access-key-positive-iam-create-access-key-json",
+        "aws-secret-access-key-positive-line-below-temporary-id"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "aws_secret_access_key"
     },
     {
       "detector": "github-token",
@@ -529,18 +574,22 @@
     {
       "detector": "gitlab-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 41,
         "hostContextsExercised": [
+          "chat",
+          "curl",
           "dotenv",
           "http",
           "json",
           "log",
           "plain-text",
+          "python",
           "shell",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -558,7 +607,17 @@
         "gitlab-positive-log",
         "gitlab-positive-min-length",
         "gitlab-positive-personal-access",
-        "gitlab-positive-yaml"
+        "gitlab-positive-yaml",
+        "gitlab-routable-pat-positive-bare-max-payload",
+        "gitlab-routable-pat-positive-bare-min-payload",
+        "gitlab-routable-pat-positive-curl-bearer",
+        "gitlab-routable-pat-positive-dotenv",
+        "gitlab-routable-pat-positive-json",
+        "gitlab-routable-pat-positive-legacy-twenty-byte-unchanged",
+        "gitlab-routable-pat-positive-private-token-header",
+        "gitlab-routable-pat-positive-sdk-call",
+        "gitlab-routable-pat-positive-yaml",
+        "gitlab-routable-pat-regression-sentence-period"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1415,17 +1474,23 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 70,
         "hostContextsExercised": [
+          "chat",
+          "curl",
           "dotenv",
+          "github-actions",
+          "http",
           "json",
           "log",
           "plain-text",
           "shell",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1437,6 +1502,7 @@
       },
       "evidenceFixtureIds": [
         "vercel-positive-all-prefixes",
+        "vercel-positive-class-isolation",
         "vercel-positive-crlf-unicode-prefix",
         "vercel-positive-doc-style-placeholder",
         "vercel-positive-dotenv",
@@ -1452,6 +1518,139 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "vercel_token"
+    },
+    {
+      "detector": "vercel-token",
+      "evidence": {
+        "fixtureCount": 70,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "vercel-pat-positive-bare",
+        "vercel-pat-positive-chat-sentence",
+        "vercel-pat-positive-cli-flag",
+        "vercel-pat-positive-crlf-unicode-prefix",
+        "vercel-pat-positive-curl-bearer",
+        "vercel-pat-positive-dotenv",
+        "vercel-pat-positive-github-actions",
+        "vercel-pat-positive-json-token-key",
+        "vercel-pat-positive-log",
+        "vercel-pat-positive-punctuation-adjacent",
+        "vercel-pat-positive-repeated-value",
+        "vercel-pat-positive-shell-export",
+        "vercel-pat-positive-typescript-sdk",
+        "vercel-pat-positive-yaml",
+        "vercel-positive-class-isolation"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vercel_personal_access_token"
+    },
+    {
+      "detector": "vercel-token",
+      "evidence": {
+        "fixtureCount": 70,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "vercel-app-access-positive-bare",
+        "vercel-app-access-positive-dotenv",
+        "vercel-app-access-positive-json-token-key",
+        "vercel-positive-class-isolation",
+        "vercel-positive-oauth-token-response"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vercel_app_access_token"
+    },
+    {
+      "detector": "vercel-token",
+      "evidence": {
+        "fixtureCount": 70,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "boundary",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "vercel-app-refresh-positive-bare",
+        "vercel-app-refresh-positive-dotenv",
+        "vercel-app-refresh-positive-json-token-key",
+        "vercel-positive-class-isolation",
+        "vercel-positive-oauth-token-response"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vercel_app_refresh_token"
     },
     {
       "detector": "npm-token",
@@ -1532,6 +1731,41 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "google_api_key"
+    },
+    {
+      "detector": "google-oauth-client-secret",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "google-oauth-client-secret-positive-bare",
+        "google-oauth-client-secret-positive-chat-sentence",
+        "google-oauth-client-secret-positive-client-secret-json",
+        "google-oauth-client-secret-positive-dash-underscore-body",
+        "google-oauth-client-secret-positive-dotenv",
+        "google-oauth-client-secret-positive-form-body"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "google_oauth_client_secret"
     },
     {
       "detector": "sendgrid-token",
@@ -2065,7 +2299,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2099,6 +2333,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "aws-secret-access-key-name-positive-sdk-camel-case",
+        "aws-secret-access-key-name-positive-sts-json",
+        "aws-secret-access-key-name-positive-yaml",
         "contextual-host-chat",
         "contextual-host-dotenv",
         "contextual-host-http",
@@ -2183,6 +2420,12 @@
         "generic-token-sdk-call-positive-python-kwarg-spaced",
         "generic-token-sdk-call-positive-rust-builder-positional",
         "generic-token-sdk-call-positive-typescript-named-argument",
+        "npmrc-auth-positive-base64-userinfo",
+        "npmrc-authtoken-positive-bare-line-start",
+        "npmrc-authtoken-positive-private-registry",
+        "npmrc-authtoken-positive-registry-scoped-uuid",
+        "npmrc-authtoken-positive-shell-echo",
+        "npmrc-password-positive-quoted",
         "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
@@ -2198,7 +2441,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2274,7 +2517,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 264,
+        "fixtureCount": 281,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -5549,12 +5792,713 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "cerebras_api_key"
+    },
+    {
+      "detector": "bitwarden-secrets-manager-access-token",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "bitwarden-sm-access-token-positive-bare",
+        "bitwarden-sm-access-token-positive-chat-sentence",
+        "bitwarden-sm-access-token-positive-crlf-unicode-prefix",
+        "bitwarden-sm-access-token-positive-curl-bearer",
+        "bitwarden-sm-access-token-positive-docker-env",
+        "bitwarden-sm-access-token-positive-dotenv",
+        "bitwarden-sm-access-token-positive-github-actions-with",
+        "bitwarden-sm-access-token-positive-json-config",
+        "bitwarden-sm-access-token-positive-json-token-key",
+        "bitwarden-sm-access-token-positive-log",
+        "bitwarden-sm-access-token-positive-mcp-env-block",
+        "bitwarden-sm-access-token-positive-punctuation-adjacent",
+        "bitwarden-sm-access-token-positive-repeated-value",
+        "bitwarden-sm-access-token-positive-sdk-call",
+        "bitwarden-sm-access-token-positive-shell-export",
+        "bitwarden-sm-access-token-positive-tool-call-arguments",
+        "bitwarden-sm-access-token-positive-uppercase-uuid",
+        "bitwarden-sm-access-token-positive-x-api-key-header",
+        "bitwarden-sm-access-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "bitwarden_secrets_manager_access_token"
+    },
+    {
+      "detector": "polar-token",
+      "evidence": {
+        "fixtureCount": 55,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "polar-token-positive-bare",
+        "polar-token-positive-chat-sentence",
+        "polar-token-positive-crlf-unicode-prefix",
+        "polar-token-positive-curl-bearer",
+        "polar-token-positive-dotenv",
+        "polar-token-positive-json-config",
+        "polar-token-positive-json-token-key",
+        "polar-token-positive-log",
+        "polar-token-positive-mcp-env-block",
+        "polar-token-positive-punctuation-adjacent",
+        "polar-token-positive-python-sdk",
+        "polar-token-positive-repeated-value",
+        "polar-token-positive-sdk-call",
+        "polar-token-positive-shell-export",
+        "polar-token-positive-tool-call-arguments",
+        "polar-token-positive-typescript-sdk",
+        "polar-token-positive-x-api-key-header",
+        "polar-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "polar_organization_access_token"
+    },
+    {
+      "detector": "polar-token",
+      "evidence": {
+        "fixtureCount": 55,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "polar-token-positive-client-registration-token",
+        "polar-token-positive-client-registration-token-json-token",
+        "polar-token-positive-oauth-client-secret",
+        "polar-token-positive-oauth-client-secret-json-token",
+        "polar-token-positive-oauth-org-access-token",
+        "polar-token-positive-oauth-org-access-token-json-token",
+        "polar-token-positive-oauth-org-refresh-token",
+        "polar-token-positive-oauth-org-refresh-token-json-token",
+        "polar-token-positive-oauth-user-access-token",
+        "polar-token-positive-oauth-user-access-token-json-token",
+        "polar-token-positive-oauth-user-refresh-token",
+        "polar-token-positive-oauth-user-refresh-token-json-token",
+        "polar-token-positive-pat-alnum-body",
+        "polar-token-positive-pat-alnum-body-json-token",
+        "polar-token-positive-pat-url-safe-body",
+        "polar-token-positive-pat-url-safe-body-json-token"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "polar_api_credential"
+    },
+    {
+      "detector": "sonarqube-token",
+      "evidence": {
+        "fixtureCount": 42,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sonarqube-token-positive-bare",
+        "sonarqube-token-positive-chat-sentence",
+        "sonarqube-token-positive-crlf-unicode-prefix",
+        "sonarqube-token-positive-curl-bearer",
+        "sonarqube-token-positive-dotenv",
+        "sonarqube-token-positive-json-config",
+        "sonarqube-token-positive-json-token-key",
+        "sonarqube-token-positive-legacy-login",
+        "sonarqube-token-positive-log",
+        "sonarqube-token-positive-punctuation-adjacent",
+        "sonarqube-token-positive-repeated-value",
+        "sonarqube-token-positive-sdk-call",
+        "sonarqube-token-positive-shell-export",
+        "sonarqube-token-positive-tool-call-arguments",
+        "sonarqube-token-positive-x-api-key-header",
+        "sonarqube-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sonarqube_user_token"
+    },
+    {
+      "detector": "sonarqube-token",
+      "evidence": {
+        "fixtureCount": 42,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sonarqube-token-positive-github-actions-env",
+        "sonarqube-token-positive-global-analysis-bare",
+        "sonarqube-token-positive-global-analysis-chat",
+        "sonarqube-token-positive-gradle-system-prop",
+        "sonarqube-token-positive-project-analysis-bare",
+        "sonarqube-token-positive-project-analysis-json-token",
+        "sonarqube-token-positive-properties-file"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sonarqube_analysis_token"
+    },
+    {
+      "detector": "rubygems-api-key",
+      "evidence": {
+        "fixtureCount": 34,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "rubygems-api-key-positive-authorization-no-scheme",
+        "rubygems-api-key-positive-bare",
+        "rubygems-api-key-positive-chat-sentence",
+        "rubygems-api-key-positive-crlf-unicode-prefix",
+        "rubygems-api-key-positive-curl-bearer",
+        "rubygems-api-key-positive-dotenv",
+        "rubygems-api-key-positive-gem-credentials-yaml",
+        "rubygems-api-key-positive-github-actions-env",
+        "rubygems-api-key-positive-json-config",
+        "rubygems-api-key-positive-json-token-key",
+        "rubygems-api-key-positive-log",
+        "rubygems-api-key-positive-punctuation-adjacent",
+        "rubygems-api-key-positive-repeated-value",
+        "rubygems-api-key-positive-sdk-call",
+        "rubygems-api-key-positive-shell-export",
+        "rubygems-api-key-positive-tool-call-arguments",
+        "rubygems-api-key-positive-x-api-key-header",
+        "rubygems-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "rubygems_api_key"
+    },
+    {
+      "detector": "clojars-deploy-token",
+      "evidence": {
+        "fixtureCount": 31,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "clojars-deploy-token-positive-bare",
+        "clojars-deploy-token-positive-chat-sentence",
+        "clojars-deploy-token-positive-crlf-unicode-prefix",
+        "clojars-deploy-token-positive-curl-bearer",
+        "clojars-deploy-token-positive-dotenv",
+        "clojars-deploy-token-positive-github-actions-env",
+        "clojars-deploy-token-positive-json-config",
+        "clojars-deploy-token-positive-json-token-key",
+        "clojars-deploy-token-positive-log",
+        "clojars-deploy-token-positive-maven-settings-xml",
+        "clojars-deploy-token-positive-punctuation-adjacent",
+        "clojars-deploy-token-positive-repeated-value",
+        "clojars-deploy-token-positive-sdk-call",
+        "clojars-deploy-token-positive-shell-export",
+        "clojars-deploy-token-positive-tool-call-arguments",
+        "clojars-deploy-token-positive-x-api-key-header",
+        "clojars-deploy-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "clojars_deploy_token"
+    },
+    {
+      "detector": "crates-io-token",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "crates-io-token-positive-bare",
+        "crates-io-token-positive-cargo-publish-flag",
+        "crates-io-token-positive-chat-sentence",
+        "crates-io-token-positive-credentials-toml",
+        "crates-io-token-positive-crlf-unicode-prefix",
+        "crates-io-token-positive-curl-bearer",
+        "crates-io-token-positive-dotenv",
+        "crates-io-token-positive-github-actions-env",
+        "crates-io-token-positive-json-config",
+        "crates-io-token-positive-json-token-key",
+        "crates-io-token-positive-log",
+        "crates-io-token-positive-punctuation-adjacent",
+        "crates-io-token-positive-python-sdk-call",
+        "crates-io-token-positive-repeated-value",
+        "crates-io-token-positive-shell-export",
+        "crates-io-token-positive-tool-call-arguments",
+        "crates-io-token-positive-x-api-key-header",
+        "crates-io-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "crates_io_api_token"
+    },
+    {
+      "detector": "crates-io-token",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "crates-io-token-positive-second-sample",
+        "crates-io-token-positive-second-sample-dotenv",
+        "crates-io-token-positive-trusted-publishing-log",
+        "crates-io-token-positive-trusted-publishing-other-check-char"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "crates_io_trusted_publishing_token"
+    },
+    {
+      "detector": "dynatrace-token",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "kubernetes",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "dynatrace-token-positive-api-token-header",
+        "dynatrace-token-positive-bare",
+        "dynatrace-token-positive-chat-sentence",
+        "dynatrace-token-positive-crlf-unicode-prefix",
+        "dynatrace-token-positive-curl-api-token",
+        "dynatrace-token-positive-curl-bearer",
+        "dynatrace-token-positive-dotenv",
+        "dynatrace-token-positive-json-config",
+        "dynatrace-token-positive-json-token-key",
+        "dynatrace-token-positive-kubernetes-secret",
+        "dynatrace-token-positive-log",
+        "dynatrace-token-positive-otel-percent-encoded-header",
+        "dynatrace-token-positive-punctuation-adjacent",
+        "dynatrace-token-positive-python-sdk-call",
+        "dynatrace-token-positive-repeated-value",
+        "dynatrace-token-positive-second-sample",
+        "dynatrace-token-positive-second-sample-dotenv",
+        "dynatrace-token-positive-sentence-period",
+        "dynatrace-token-positive-shell-export",
+        "dynatrace-token-positive-tool-call-arguments",
+        "dynatrace-token-positive-x-api-key-header",
+        "dynatrace-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "dynatrace_token"
+    },
+    {
+      "detector": "paddle-api-key",
+      "evidence": {
+        "fixtureCount": 39,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "paddle-api-key-positive-bare",
+        "paddle-api-key-positive-chat-sentence",
+        "paddle-api-key-positive-crlf-unicode-prefix",
+        "paddle-api-key-positive-curl-bearer",
+        "paddle-api-key-positive-dotenv",
+        "paddle-api-key-positive-json-config",
+        "paddle-api-key-positive-json-token-key",
+        "paddle-api-key-positive-log",
+        "paddle-api-key-positive-punctuation-adjacent",
+        "paddle-api-key-positive-python-client",
+        "paddle-api-key-positive-python-sdk-call",
+        "paddle-api-key-positive-repeated-value",
+        "paddle-api-key-positive-sdk-constructor",
+        "paddle-api-key-positive-second-sample",
+        "paddle-api-key-positive-second-sample-dotenv",
+        "paddle-api-key-positive-shell-export",
+        "paddle-api-key-positive-tool-call-arguments",
+        "paddle-api-key-positive-x-api-key-header",
+        "paddle-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "paddle_api_key"
+    },
+    {
+      "detector": "honeycomb-api-key",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "honeycomb-api-key-positive-bare",
+        "honeycomb-api-key-positive-chat-sentence",
+        "honeycomb-api-key-positive-crlf-unicode-prefix",
+        "honeycomb-api-key-positive-curl-bearer",
+        "honeycomb-api-key-positive-dotenv",
+        "honeycomb-api-key-positive-json-config",
+        "honeycomb-api-key-positive-json-token-key",
+        "honeycomb-api-key-positive-libhoney-config",
+        "honeycomb-api-key-positive-log",
+        "honeycomb-api-key-positive-otel-collector-yaml",
+        "honeycomb-api-key-positive-otel-headers-env",
+        "honeycomb-api-key-positive-punctuation-adjacent",
+        "honeycomb-api-key-positive-python-sdk-call",
+        "honeycomb-api-key-positive-repeated-value",
+        "honeycomb-api-key-positive-second-sample",
+        "honeycomb-api-key-positive-second-sample-dotenv",
+        "honeycomb-api-key-positive-shell-export",
+        "honeycomb-api-key-positive-team-header",
+        "honeycomb-api-key-positive-tool-call-arguments",
+        "honeycomb-api-key-positive-x-api-key-header",
+        "honeycomb-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "honeycomb_ingest_key"
+    },
+    {
+      "detector": "axiom-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "axiom-token-positive-bare",
+        "axiom-token-positive-chat-sentence",
+        "axiom-token-positive-crlf-unicode-prefix",
+        "axiom-token-positive-curl-bearer",
+        "axiom-token-positive-dotenv",
+        "axiom-token-positive-grafana-password",
+        "axiom-token-positive-json-config",
+        "axiom-token-positive-json-token-key",
+        "axiom-token-positive-log",
+        "axiom-token-positive-otel-bearer-header",
+        "axiom-token-positive-punctuation-adjacent",
+        "axiom-token-positive-python-sdk-call",
+        "axiom-token-positive-repeated-value",
+        "axiom-token-positive-shell-export",
+        "axiom-token-positive-tool-call-arguments",
+        "axiom-token-positive-vector-sink",
+        "axiom-token-positive-x-api-key-header",
+        "axiom-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "axiom_api_token"
+    },
+    {
+      "detector": "axiom-token",
+      "evidence": {
+        "fixtureCount": 38,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "axiom-token-positive-personal-token-chat",
+        "axiom-token-positive-second-sample",
+        "axiom-token-positive-second-sample-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "axiom_personal_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 122,
+    "supported": 141,
     "unresolved": 0
   }
 }

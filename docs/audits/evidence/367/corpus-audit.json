@@ -191,6 +191,35 @@
       "tier": null
     },
     {
+      "contexts": [
+        "chat"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "assessment/accuracy",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 237,
+          "start": 207
+        }
+      ],
+      "id": "chat-additional-provider-tokens-one",
+      "kind": null,
+      "lostRanges": [
+        {
+          "end": 237,
+          "start": 207
+        }
+      ],
+      "policyOutcomes": [
+        "redact"
+      ],
+      "retainedRanges": [],
+      "support": null,
+      "tier": null
+    },
+    {
       "contexts": [],
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
@@ -739,6 +768,56 @@
           "start": 0
         }
       ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 504,
+          "start": 464
+        }
+      ],
+      "id": "additional-provider-families",
+      "kind": null,
+      "lostRanges": [
+        {
+          "end": 504,
+          "start": 464
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 81,
+          "start": 41
+        }
+      ],
+      "id": "vercel-embedded-identifier-discriminating-boundary",
+      "kind": null,
+      "lostRanges": [
+        {
+          "end": 81,
+          "start": 41
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -10793,6 +10872,1765 @@
       "tier": "canonical"
     },
     {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 11254,
+          "start": 0
+        }
+      ],
+      "id": "vercel-adversarial-long-suffix",
+      "kind": "adversarial",
+      "lostRanges": [
+        {
+          "end": 11254,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "adversarial"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 59,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-access-fallback-body-55",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 59,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 61,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-access-fallback-body-57",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 61,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-access-fallback-underscore-in-body",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "http"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 82,
+          "start": 22
+        }
+      ],
+      "id": "vercel-app-access-overlap-bearer",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 82,
+          "start": 22
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-access-positive-bare",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "id": "vercel-app-access-positive-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 71,
+          "start": 11
+        }
+      ],
+      "id": "vercel-app-access-positive-json-token-key",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 71,
+          "start": 11
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 59,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-refresh-fallback-body-55",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 59,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 61,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-refresh-fallback-body-57",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 61,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-refresh-fallback-underscore-in-body",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "http"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 82,
+          "start": 22
+        }
+      ],
+      "id": "vercel-app-refresh-overlap-bearer",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 82,
+          "start": 22
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-app-refresh-positive-bare",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "id": "vercel-app-refresh-positive-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 71,
+          "start": 11
+        }
+      ],
+      "id": "vercel-app-refresh-positive-json-token-key",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 71,
+          "start": 11
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-boundary-below-min",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-boundary-case-sensitivity",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-boundary-delimiter",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-boundary-invalid-alphabet",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-boundary-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-deployment-id",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-embedded-in-wider-identifier",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-interpolated-secret-prefix",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-lookalike",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-masked-secret-prefix",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-ordinary-reference",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-negative-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 53,
+          "start": 13
+        }
+      ],
+      "id": "vercel-overlap-context",
+      "kind": "overlap",
+      "lostRanges": [
+        {
+          "end": 53,
+          "start": 13
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 9600,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-adversarial-long-suffix",
+      "kind": "adversarial",
+      "lostRanges": [
+        {
+          "end": 9600,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "adversarial"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-pat-boundary-dash-marker",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-pat-boundary-glued-prefix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-pat-boundary-wrong-case-prefix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 59,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-fallback-body-55",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 59,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "chat"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 76,
+          "start": 17
+        }
+      ],
+      "id": "vercel-pat-fallback-body-55-chat",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 76,
+          "start": 17
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 61,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-fallback-body-57",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 61,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-fallback-dash-in-body",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 67,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-fallback-glued-suffix",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 67,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-fallback-underscore-in-body",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 70,
+          "start": 10
+        }
+      ],
+      "id": "vercel-pat-fallback-underscore-prose",
+      "kind": "boundary",
+      "lostRanges": [
+        {
+          "end": 70,
+          "start": 10
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-pat-negative-embedded-in-wider-identifier",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "vercel-pat-negative-masked",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "http"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 82,
+          "start": 22
+        }
+      ],
+      "id": "vercel-pat-overlap-bearer",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 82,
+          "start": 22
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "id": "vercel-pat-overlap-context",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel-pat-positive-bare",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "chat"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 77,
+          "start": 17
+        }
+      ],
+      "id": "vercel-pat-positive-chat-sentence",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 77,
+          "start": 17
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 89,
+          "start": 29
+        }
+      ],
+      "id": "vercel-pat-positive-cli-flag",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 89,
+          "start": 29
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 74,
+          "start": 14
+        }
+      ],
+      "id": "vercel-pat-positive-crlf-unicode-prefix",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 74,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "curl"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 91,
+          "start": 31
+        }
+      ],
+      "id": "vercel-pat-positive-curl-bearer",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 91,
+          "start": 31
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "id": "vercel-pat-positive-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 73,
+          "start": 13
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "github-actions"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 105,
+          "start": 45
+        }
+      ],
+      "id": "vercel-pat-positive-github-actions",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 105,
+          "start": 45
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 71,
+          "start": 11
+        }
+      ],
+      "id": "vercel-pat-positive-json-token-key",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 71,
+          "start": 11
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 99,
+          "start": 39
+        }
+      ],
+      "id": "vercel-pat-positive-log",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 99,
+          "start": 39
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 68,
+          "start": 8
+        }
+      ],
+      "id": "vercel-pat-positive-punctuation-adjacent",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 68,
+          "start": 8
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        },
+        {
+          "end": 121,
+          "start": 61
+        }
+      ],
+      "id": "vercel-pat-positive-repeated-value",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        },
+        {
+          "end": 121,
+          "start": 61
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 81,
+          "start": 21
+        }
+      ],
+      "id": "vercel-pat-positive-shell-export",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 81,
+          "start": 21
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "typescript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 102,
+          "start": 42
+        }
+      ],
+      "id": "vercel-pat-positive-typescript-sdk",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 102,
+          "start": 42
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 77,
+          "start": 17
+        }
+      ],
+      "id": "vercel-pat-positive-yaml",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 77,
+          "start": 17
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 29,
+          "start": 0
+        },
+        {
+          "end": 59,
+          "start": 30
+        },
+        {
+          "end": 89,
+          "start": 60
+        },
+        {
+          "end": 119,
+          "start": 90
+        }
+      ],
+      "id": "vercel-positive-all-prefixes",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 29,
+          "start": 0
+        },
+        {
+          "end": 59,
+          "start": 30
+        },
+        {
+          "end": 89,
+          "start": 60
+        },
+        {
+          "end": 119,
+          "start": 90
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        },
+        {
+          "end": 121,
+          "start": 61
+        },
+        {
+          "end": 182,
+          "start": 122
+        },
+        {
+          "end": 243,
+          "start": 183
+        },
+        {
+          "end": 304,
+          "start": 244
+        }
+      ],
+      "id": "vercel-positive-class-isolation",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 243,
+          "start": 183
+        },
+        {
+          "end": 304,
+          "start": 244
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        },
+        {
+          "end": 121,
+          "start": 61
+        },
+        {
+          "end": 182,
+          "start": 122
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 45,
+          "start": 14
+        }
+      ],
+      "id": "vercel-positive-crlf-unicode-prefix",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 45,
+          "start": 14
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 24,
+          "start": 0
+        }
+      ],
+      "id": "vercel-positive-doc-style-placeholder",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 24,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 44,
+          "start": 13
+        }
+      ],
+      "id": "vercel-positive-dotenv",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 44,
+          "start": 13
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 48,
+          "start": 17
+        }
+      ],
+      "id": "vercel-positive-json",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 48,
+          "start": 17
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 83,
+          "start": 52
+        }
+      ],
+      "id": "vercel-positive-log",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 83,
+          "start": 52
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 24,
+          "start": 0
+        }
+      ],
+      "id": "vercel-positive-min-length",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 24,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 78,
+          "start": 18
+        },
+        {
+          "end": 203,
+          "start": 143
+        }
+      ],
+      "id": "vercel-positive-oauth-token-response",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 78,
+          "start": 18
+        },
+        {
+          "end": 203,
+          "start": 143
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 38,
+          "start": 7
+        }
+      ],
+      "id": "vercel-positive-punctuation-adjacent",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 38,
+          "start": 7
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 40,
+          "start": 0
+        }
+      ],
+      "id": "vercel-positive-qualified",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 40,
+          "start": 0
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 31,
+          "start": 0
+        },
+        {
+          "end": 63,
+          "start": 32
+        }
+      ],
+      "id": "vercel-positive-repeated-value",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 31,
+          "start": 0
+        },
+        {
+          "end": 63,
+          "start": 32
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 45,
+          "start": 14
+        }
+      ],
+      "id": "vercel-positive-yaml",
+      "kind": "positive",
+      "lostRanges": [
+        {
+          "end": 45,
+          "start": 14
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
       "contexts": [],
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
@@ -11079,6 +12917,102 @@
       ],
       "support": null,
       "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel_app_access_token",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel_app_refresh_token",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "vercel-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "id": "vercel_personal_access_token",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "vercel-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 33,
+          "start": 0
+        }
+      ],
+      "id": "vercel_token",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [
+        {
+          "end": 33,
+          "start": 0
+        }
+      ],
+      "retainedRanges": [],
+      "support": null,
+      "tier": null
     }
   ],
   "schemaVersion": 1,
@@ -11136,6 +13070,12 @@
       "retained": 41,
       "review": 0,
       "silent": 62
+    },
+    "vercel-token": {
+      "broad-shape": 32,
+      "retained": 28,
+      "review": 0,
+      "silent": 17
     }
   }
 }

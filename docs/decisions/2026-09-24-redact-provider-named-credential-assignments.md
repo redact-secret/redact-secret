@@ -202,3 +202,27 @@ This supersedes section 2's provider exception for high-signal names and the
 Evidence: [`docs/audits/evidence/948/README.md`](../audits/evidence/948/README.md).
 Tests: `generic_token` unit tests and
 `tests/provider_named_fallback_948.rs`.
+
+## Amendment: a masking lead excludes only a masked value (#1018)
+
+Amended 2026-09-29. Section 2 let a `masked_`/`redacted_`/`hashed_`-led name
+exclude its value on the name alone, which fails open on a complete, unmasked
+key under such a field, the `LiteLLM` `masked_api_key=` case #932 left
+unreported ([#1018](https://github.com/redact-secret/redact-secret/issues/1018)).
+The name is evidence about intent, not about the bytes. Security-first:
+
+- For the leads `redacted`, `masked`, `hashed`, `hash`, `obfuscated`,
+  `truncated` and `sanitized`, `generic-token` stays silent only when the
+  value shows the masking or hashing (the exact list is in the
+  contextual-detection spec); any other value is judged under the rest of the
+  name (`masked_api_key` as `api_key`) at the unchanged floors. `publishable`
+  still excludes on the name alone.
+- The keyword-gated providers read a `LiteLLM`-style model route: a
+  credential-named key on a line naming `cohere/command-r-plus` is `high`,
+  so the #1018 line is `cohere_api_key` / redact.
+
+FN removed: a complete credential under a masking-led field. FP cost: an
+unmasked non-secret literal, or a digest of an unusual length or encoding,
+under such a name now redacts. Masked displays stay silent under every name.
+Tests: `generic_token` and `keyword_gated_keys` unit tests,
+`tests/provider_named_fallback_948.rs`, `tests/keyword_gated_provider_keys.rs`.

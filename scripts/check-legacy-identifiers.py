@@ -97,6 +97,11 @@ LEGACY_IDENTIFIER_ALLOWLIST: dict[str, str] = {
     "docs/audits/repository-transfer-evidence.md": (
         "a dated pre/post transfer evidence record that must identify the former path"
     ),
+    "docs/audits/evidence/1012/cartesia.md": (
+        "a frozen #1012 research record whose permalink cites a third-party "
+        "repository file named `secret-scan.ts`; the text is another "
+        "project's path, not this project's former name"
+    ),
     "scripts/check-legacy-identifiers.py": (
         "this script's own docstring and token patterns must name the "
         "legacy identifier literally to detect and document it; not a "
