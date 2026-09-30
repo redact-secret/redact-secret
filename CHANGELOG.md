@@ -182,6 +182,19 @@ evidence is linked from each published version.
 
 ### Performance
 
+- Per-scan and per-line work no longer repeats. Always-run detectors skip
+  bytes that cannot start a match (discord, bearer, generic-token
+  authorization, the shared case-insensitive keyword search) (#1073);
+  incremental sessions stop building per-line vectors and re-copying units
+  with no findings (#1074); nine bare-shape detectors visit only lines that
+  hold a 32-byte token run (#1075); `redact` checks forbidden strings against
+  a sorted borrowed index and allocates the output once at its exact size,
+  which also removes the slack capacity (#1076); the Python and WASM result
+  getters no longer clone the text and findings on every read (#1077).
+  Findings, ranges, ids, order and redacted text are unchanged. Python
+  `ScanResult.findings` still returns a list, now of the same `Finding`
+  objects on every read (`res.findings[0] is res.findings[0]`).
+
 - Scan cost is now linear on inputs that were quadratic or repeated work:
   generic-token `value` names and repeated `?a=`, `{a=x`, `(a=` prefixes on
   one long line (#1054, #1055), direct-calling provider detectors (#1056),

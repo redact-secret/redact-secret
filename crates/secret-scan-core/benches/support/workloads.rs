@@ -205,6 +205,20 @@ pub(crate) const WORKLOADS: &[Workload] = &[
         registry: RegistryKind::BuiltIn,
     },
     Workload {
+        name: "hex-heavy-log-64k",
+        description: "log lines dense in long hex / base64 tokens (trace ids, digests, blobs), 64 KiB (#1075)",
+        generate: || hex_heavy_log(KIB64),
+        paths: WHOLE_AND_CLI,
+        registry: RegistryKind::BuiltIn,
+    },
+    Workload {
+        name: "hex-heavy-log-256k",
+        description: "log lines dense in long hex / base64 tokens (trace ids, digests, blobs), 256 KiB (#1075)",
+        generate: || hex_heavy_log(KIB256),
+        paths: WHOLE_AND_CLI,
+        registry: RegistryKind::BuiltIn,
+    },
+    Workload {
         name: "pii-long-line-64k",
         description: "one-line JSON with a labelled email and IPv4 at the end, PII registry, 64 KiB (#1058)",
         generate: || pii_long_line(KIB64),
@@ -446,5 +460,105 @@ fn pii_long_line(target: usize) -> String {
         index += 1;
     }
     input.push_str(TAIL);
+    input
+}
+
+// ---------------------------------------------- #1075 / #1076 additions
+
+/// Deterministic xorshift64 stream, so the generators need no dependency.
+pub(crate) struct Xorshift(pub u64);
+
+impl Xorshift {
+    pub fn next(&mut self) -> u64 {
+        let mut x = self.0;
+        x ^= x << 13;
+        x ^= x >> 7;
+        x ^= x << 17;
+        self.0 = x;
+        x
+    }
+
+    pub fn below(&mut self, bound: usize) -> usize {
+        (self.next() >> 11) as usize % bound
+    }
+}
+
+fn random_run(rng: &mut Xorshift, alphabet: &[u8], len: usize, out: &mut String) {
+    for _ in 0..len {
+        out.push(char::from(alphabet[rng.below(alphabet.len())]));
+    }
+}
+
+/// Log lines where almost every line carries maximal runs of hex or base64
+/// characters of 16 to 88 bytes (trace ids, digests, blobs). No keyword is
+/// planted: the point is many long alphabet runs, the shape the always-run
+/// bare-shape detectors walk (#1075), not findings.
+fn hex_heavy_log(target: usize) -> String {
+    const LOWER_HEX: &[u8] = b"0123456789abcdef";
+    const B64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut rng = Xorshift(0x9E37_79B9_7F4A_7C15);
+    let mut input = String::with_capacity(target + 512);
+    let mut line = 0usize;
+    while input.len() < target {
+        line += 1;
+        let _ = write!(input, "2026-09-12T00:00:{:02}Z INFO ", line % 60);
+        match line % 4 {
+            0 => {
+                input.push_str("trace_id=");
+                random_run(&mut rng, LOWER_HEX, 32, &mut input);
+                input.push_str(" span_id=");
+                random_run(&mut rng, LOWER_HEX, 16, &mut input);
+                input.push_str(" parent=");
+                random_run(&mut rng, LOWER_HEX, 32, &mut input);
+            }
+            1 => {
+                input.push_str("sha256=");
+                random_run(&mut rng, LOWER_HEX, 64, &mut input);
+                input.push_str(" etag=\"");
+                random_run(&mut rng, LOWER_HEX, 32, &mut input);
+                input.push('"');
+            }
+            2 => {
+                input.push_str("blob=");
+                let len = 40 + rng.below(49);
+                random_run(&mut rng, B64, len, &mut input);
+                input.push_str("== size=");
+                let _ = write!(input, "{}", 1000 + rng.below(9000));
+            }
+            _ => {
+                input.push_str("uuid=");
+                random_run(&mut rng, LOWER_HEX, 8, &mut input);
+                for group in [4, 4, 4, 12] {
+                    input.push('-');
+                    random_run(&mut rng, LOWER_HEX, group, &mut input);
+                }
+                input.push_str(" digest=");
+                random_run(&mut rng, LOWER_HEX, 40, &mut input);
+            }
+        }
+        input.push('\n');
+    }
+    input
+}
+
+/// Number of findings in the `dense-findings-redact` input.
+pub(crate) const DENSE_FINDINGS: usize = 49_000;
+
+/// `DENSE_FINDINGS` synthetic tokens of mixed byte length 3 to 40 in
+/// lowercase filler. Every token starts with `Q` and is otherwise upper-case
+/// letters and digits, so no placeholder used by the workload can reproduce
+/// one (redaction would reject it) and a token is a maximal run of
+/// `[A-Z0-9]` (what the bench's own detector reports).
+pub(crate) fn dense_findings_input() -> String {
+    const BODY: &[u8] = b"ABCDEFGHJKLMNPRSTUVWXYZ0123456789";
+    let mut rng = Xorshift(0xD1B5_4A32_D192_ED03);
+    let mut input = String::with_capacity(DENSE_FINDINGS * 32);
+    for index in 0..DENSE_FINDINGS {
+        let _ = write!(input, "req {} tok ", index % 97);
+        let len = 3 + rng.below(38);
+        input.push('Q');
+        random_run(&mut rng, BODY, len - 1, &mut input);
+        input.push_str(if index % 5 == 4 { " ok\n" } else { " ok " });
+    }
     input
 }
