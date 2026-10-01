@@ -12,7 +12,6 @@ here reproduces a matched value.
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 from .conftest import byte_offset_to_char_offset_reference, load_corpus

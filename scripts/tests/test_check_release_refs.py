@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-release-refs.py"
 SPEC = importlib.util.spec_from_file_location("check_release_refs", SCRIPT)
 assert SPEC and SPEC.loader
@@ -32,7 +31,11 @@ def release_workflow(jobs: dict[str, bool]) -> str:
         body += (
             f"  {job_name}:\n"
             "    runs-on: ubuntu-latest\n"
-            + ("    needs:\n" + "".join(f"      - {dep}\n" for dep in CHECK.TAG_NEEDS) if job_name == "tag-release" else "")
+            + (
+                "    needs:\n" + "".join(f"      - {dep}\n" for dep in CHECK.TAG_NEEDS)
+                if job_name == "tag-release"
+                else ""
+            )
             + "    steps:\n"
             + (GUARD_STEP if guarded else UNGUARDED_STEP)
         )
@@ -92,27 +95,21 @@ class ValidateTests(unittest.TestCase):
             repo.release_jobs["publish"] = False
 
         errors = self.run_validate(mutate)
-        self.assertTrue(
-            any("publish" in error and "does not require main" in error for error in errors)
-        )
+        self.assertTrue(any("publish" in error and "does not require main" in error for error in errors))
 
     def test_publish_crates_without_guard_fails(self) -> None:
         def mutate(repo: Repository) -> None:
             repo.release_jobs["publish-crates"] = False
 
         errors = self.run_validate(mutate)
-        self.assertTrue(
-            any("publish-crates" in error and "does not require main" in error for error in errors)
-        )
+        self.assertTrue(any("publish-crates" in error and "does not require main" in error for error in errors))
 
     def test_reconcile_without_guard_fails(self) -> None:
         def mutate(repo: Repository) -> None:
             repo.reconcile_guarded = False
 
         errors = self.run_validate(mutate)
-        self.assertTrue(
-            any("reconcile" in error and "does not require main" in error for error in errors)
-        )
+        self.assertTrue(any("reconcile" in error and "does not require main" in error for error in errors))
 
     def test_missing_reconcile_job_fails(self) -> None:
         def mutate(repo: Repository) -> None:
@@ -159,7 +156,7 @@ class ValidateTests(unittest.TestCase):
             repo = Repository(Path(tmp))
             repo.build()
             path = repo.root / ".github/workflows/release.yml"
-            path.write_text(path.read_text().replace("    steps:\n", '    steps:\n      - run: gh api /git/tags\n', 1))
+            path.write_text(path.read_text().replace("    steps:\n", "    steps:\n      - run: gh api /git/tags\n", 1))
             self.assertTrue(any("only be created by tag-release" in error for error in CHECK.validate(repo.root)))
 
 

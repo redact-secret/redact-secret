@@ -98,9 +98,7 @@ class ReconciliationTests(unittest.TestCase):
 
     def test_still_flags_a_dangling_fixture_id_for_a_closed_record(self) -> None:
         """Fixture ids are stable identities, not content digests: they stay checked."""
-        ledger = ledger_with(
-            record(benchmarkFixtureIds=["gone--fixture"], gates=gates(benchmarkRevalidation="passed"))
-        )
+        ledger = ledger_with(record(benchmarkFixtureIds=["gone--fixture"], gates=gates(benchmarkRevalidation="passed")))
         errors = CHECK.check_reconciliation(MANIFEST, ledger)
         self.assertEqual(len(errors), 1)
         self.assertIn("gone--fixture", errors[0])
@@ -266,7 +264,9 @@ class SchemaDriftTests(unittest.TestCase):
         self.assertEqual(CHECK.check_schema_drift("{}\n", "{}\n", live_source="x@y:z"), [])
 
     def test_flags_a_drifted_copy(self) -> None:
-        errors = CHECK.check_schema_drift('{"a": 1}\n', '{"a": 2}\n', live_source="redact-secret-benchmarks@r:schemas/support-matrix-v1.json")
+        errors = CHECK.check_schema_drift(
+            '{"a": 1}\n', '{"a": 2}\n', live_source="redact-secret-benchmarks@r:schemas/support-matrix-v1.json"
+        )
         self.assertEqual(len(errors), 1)
         self.assertIn(str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH), errors[0])
         self.assertIn("redact-secret-benchmarks@r:schemas/support-matrix-v1.json", errors[0])
@@ -301,9 +301,7 @@ class ManifestProvenanceTests(unittest.TestCase):
         self.assertIn("not a recorded ancestor", errors[0])
 
     def test_flags_a_pinned_commit_outside_the_selected_promotion_branch(self) -> None:
-        errors = CHECK.check_manifest_provenance(
-            MANIFEST, **provenance(pinned_commit_is_ancestor=False)
-        )
+        errors = CHECK.check_manifest_provenance(MANIFEST, **provenance(pinned_commit_is_ancestor=False))
         self.assertEqual(len(errors), 1)
         self.assertIn(str(CHECK.PIN_SOURCE_PATH), errors[0])
         self.assertIn("@develop", errors[0])
@@ -345,7 +343,10 @@ class ManifestProvenanceTests(unittest.TestCase):
         )
         drift = CHECK.check_vendored_file_drift(CHECK.MANIFEST_PATH, "a", "b", live_source="x")
         self.assertEqual(len(drift), 1)
-        self.assertEqual(CHECK.check_schema_drift("a", "b", live_source="x")[0].split(" has drifted")[0], str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH))
+        self.assertEqual(
+            CHECK.check_schema_drift("a", "b", live_source="x")[0].split(" has drifted")[0],
+            str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH),
+        )
 
 
 class SyncVendoredFilesTests(unittest.TestCase):
@@ -381,10 +382,10 @@ class SyncVendoredFilesTests(unittest.TestCase):
                 ),
             ],
         )
-        self.assertEqual((root / CHECK.MANIFEST_PATH).read_text(encoding="utf-8"), "fresh benchmarks/pin-manifest.json\n")
         self.assertEqual(
-            CHECK.benchmark_commit(CHECK.load_json(root / CHECK.PIN_SOURCE_PATH)), pinned
+            (root / CHECK.MANIFEST_PATH).read_text(encoding="utf-8"), "fresh benchmarks/pin-manifest.json\n"
         )
+        self.assertEqual(CHECK.benchmark_commit(CHECK.load_json(root / CHECK.PIN_SOURCE_PATH)), pinned)
         self.assertEqual(
             (root / CHECK.SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8"),
             "fresh schemas/support-matrix-v1.json\n",
@@ -440,15 +441,11 @@ class LocalGitHelperTests(unittest.TestCase):
 
     def test_local_path_changed_since_is_false_when_untouched(self) -> None:
         # `unrelated.txt` never touches DETECTORS_PATH after source_revision.
-        self.assertFalse(
-            CHECK.local_path_changed_since(self.repo, self.source_revision, "main", CHECK.DETECTORS_PATH)
-        )
+        self.assertFalse(CHECK.local_path_changed_since(self.repo, self.source_revision, "main", CHECK.DETECTORS_PATH))
 
     def test_local_path_changed_since_is_true_when_touched_again(self) -> None:
         self._commit("second-detectors-touch.rs", "changed", touch_detectors=True)
-        self.assertTrue(
-            CHECK.local_path_changed_since(self.repo, self.source_revision, "main", CHECK.DETECTORS_PATH)
-        )
+        self.assertTrue(CHECK.local_path_changed_since(self.repo, self.source_revision, "main", CHECK.DETECTORS_PATH))
 
 
 if __name__ == "__main__":

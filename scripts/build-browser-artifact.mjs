@@ -100,14 +100,10 @@ function parseArguments(argv) {
  * lockfile rather than from a hand-maintained copy.
  */
 function readWorkspace() {
-  const metadata = JSON.parse(
-    run("cargo", ["metadata", "--format-version", "1", "--locked"]),
-  );
+  const metadata = JSON.parse(run("cargo", ["metadata", "--format-version", "1", "--locked"]));
   const crate = metadata.packages.find((entry) => entry.name === CRATE);
   if (crate === undefined) fail(`${CRATE} is not a workspace member`);
-  const bindgen = metadata.packages.find(
-    (entry) => entry.name === "wasm-bindgen",
-  );
+  const bindgen = metadata.packages.find((entry) => entry.name === "wasm-bindgen");
   if (bindgen === undefined) fail("wasm-bindgen is not a resolved dependency");
   return {
     version: crate.version,
@@ -144,31 +140,16 @@ function main() {
   const outDir = resolve(REPO_ROOT, options.outDir);
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
-  const wasm = join(
-    workspace.targetDirectory,
-    "wasm32-unknown-unknown",
-    options.profile,
-    `${CARGO_OUT_NAME}.wasm`,
-  );
+  const wasm = join(workspace.targetDirectory, "wasm32-unknown-unknown", options.profile, `${CARGO_OUT_NAME}.wasm`);
   // One cargo output path serves every feature set, so each build is
   // bound with `wasm-bindgen` before the next one overwrites it.
   for (const [, variant] of profileBuilds(options.detectorProfile)) {
-    const build = [
-      "build",
-      "-p",
-      CRATE,
-      "--target",
-      "wasm32-unknown-unknown",
-      "--locked",
-      ...variant.cargoArgs,
-    ];
+    const build = ["build", "-p", CRATE, "--target", "wasm32-unknown-unknown", "--locked", ...variant.cargoArgs];
     if (options.profile === "release") build.push("--release");
     run("cargo", build, { stdio: "inherit" });
-    run(
-      "wasm-bindgen",
-      ["--target", "web", "--out-dir", outDir, "--out-name", variant.outName, wasm],
-      { stdio: "inherit" },
-    );
+    run("wasm-bindgen", ["--target", "web", "--out-dir", outDir, "--out-name", variant.outName, wasm], {
+      stdio: "inherit",
+    });
   }
 
   console.log(

@@ -44,12 +44,7 @@ function profile(outName, cargoArgs, relativeDir, buildCommand) {
 }
 
 export const DETECTOR_PROFILES = {
-  full: profile(
-    "redact_secret_wasm",
-    [],
-    join("bindings", "wasm", "pkg"),
-    "npm run wasm:build",
-  ),
+  full: profile("redact_secret_wasm", [], join("bindings", "wasm", "pkg"), "npm run wasm:build"),
   common: profile(
     "redact_secret_wasm_common",
     ["--no-default-features"],

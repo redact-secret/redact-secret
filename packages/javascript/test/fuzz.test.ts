@@ -79,11 +79,7 @@ const ADVERSARIAL = [
 
 /** A synthetic secret, sometimes with an invisible character spliced in. */
 const secretPiece = fc
-  .tuple(
-    fc.constantFrom(...SECRETS),
-    fc.option(fc.constantFrom("​", "‍", "⁠"), { nil: undefined }),
-    fc.nat(60),
-  )
+  .tuple(fc.constantFrom(...SECRETS), fc.option(fc.constantFrom("​", "‍", "⁠"), { nil: undefined }), fc.nat(60))
   .map(([secret, invisible, at]) =>
     invisible === undefined
       ? secret
@@ -134,8 +130,7 @@ function policyFor(table: ActionTable) {
 }
 
 /** `⟦n⟧`: a formatter whose placeholders can be predicted exactly. */
-const formatter = (_f: unknown, { placeholderIndex }: { placeholderIndex: number }) =>
-  `⟦${placeholderIndex}⟧`;
+const formatter = (_f: unknown, { placeholderIndex }: { placeholderIndex: number }) => `⟦${placeholderIndex}⟧`;
 
 /** Cut points at code point boundaries (a lone surrogate chunk is rejected). */
 function partition(input: string, cuts: readonly number[]): string[] {
@@ -144,7 +139,14 @@ function partition(input: string, cuts: readonly number[]): string[] {
       let cut = c;
       const code = input.charCodeAt(cut);
       const previous = input.charCodeAt(cut - 1);
-      if (cut > 0 && cut < input.length && code >= 0xdc00 && code <= 0xdfff && previous >= 0xd800 && previous <= 0xdbff) {
+      if (
+        cut > 0 &&
+        cut < input.length &&
+        code >= 0xdc00 &&
+        code <= 0xdfff &&
+        previous >= 0xd800 &&
+        previous <= 0xdbff
+      ) {
         cut -= 1;
       }
       return cut;
@@ -213,13 +215,17 @@ beforeAll(async () => {
 });
 
 function run(name: string, body: (api: Core) => void): void {
-  it(name, (context) => {
-    if (core === undefined) {
-      context.skip();
-      return;
-    }
-    body(core);
-  }, TIMEOUT_MS);
+  it(
+    name,
+    (context) => {
+      if (core === undefined) {
+        context.skip();
+        return;
+      }
+      body(core);
+    },
+    TIMEOUT_MS,
+  );
 }
 
 describe(`invariant fuzz (seed ${SEED}, ${RUNS} runs per property)`, () => {
@@ -232,9 +238,16 @@ describe(`invariant fuzz (seed ${SEED}, ${RUNS} runs per property)`, () => {
         if (matched.length >= 8) {
           expect(serialized.includes(matched), `finding leaks ${nameOf(matched)}`).toBe(false);
         }
-        expect(Object.keys(finding).sort()).toEqual(
-          ["action", "confidence", "detector", "end", "id", "obfuscation", "start", "type"],
-        );
+        expect(Object.keys(finding).sort()).toEqual([
+          "action",
+          "confidence",
+          "detector",
+          "end",
+          "id",
+          "obfuscation",
+          "start",
+          "type",
+        ]);
       }
     });
 
@@ -245,7 +258,16 @@ describe(`invariant fuzz (seed ${SEED}, ${RUNS} runs per property)`, () => {
         () => api.scanAndRedact(`${secret} ${lone}`),
         () =>
           api.redact(`${secret} tail`, [
-            { id: "finding-1", type: "t", detector: "d", confidence: "high", obfuscation: "none", action: "redact", start: 0, end: 10_000 },
+            {
+              id: "finding-1",
+              type: "t",
+              detector: "d",
+              confidence: "high",
+              obfuscation: "none",
+              action: "redact",
+              start: 0,
+              end: 10_000,
+            },
           ]),
       ]) {
         let thrown: unknown;
@@ -430,15 +452,18 @@ describe(`invariant fuzz (seed ${SEED}, ${RUNS} runs per property)`, () => {
     });
   }
 
-  run("7a. integer ranges that are out of bounds, inverted, empty, infinite, or overlapping are rejected with a fixed error", (api) => {
-    forgedRangesAreRejected(
-      api,
-      fc.record({
-        start: fc.integer({ min: -5, max: 200 }),
-        end: fc.oneof(fc.integer({ min: -5, max: 200 }), fc.constant(Number.POSITIVE_INFINITY)),
-      }),
-    );
-  });
+  run(
+    "7a. integer ranges that are out of bounds, inverted, empty, infinite, or overlapping are rejected with a fixed error",
+    (api) => {
+      forgedRangesAreRejected(
+        api,
+        fc.record({
+          start: fc.integer({ min: -5, max: 200 }),
+          end: fc.oneof(fc.integer({ min: -5, max: 200 }), fc.constant(Number.POSITIVE_INFINITY)),
+        }),
+      );
+    },
+  );
 
   // KNOWN VIOLATION (see the issue #1143 report): `redact` silently accepts a
   // NaN or fractional `start`/`end` and redacts at a coerced range (NaN -> 0,

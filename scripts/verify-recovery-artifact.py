@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Verify original qualified artifacts before a partial release is resumed."""
+
 from __future__ import annotations
 
 import argparse
@@ -22,7 +23,10 @@ def verify_files(inventory: dict, artifact: str, directory: Path) -> None:
     if set(actual) != set(expected):
         raise ValueError("recovery artifact file set differs from the qualified inventory")
     for name, path in actual.items():
-        if path.stat().st_size != expected[name]["bytes"] or hashlib.sha256(path.read_bytes()).hexdigest() != expected[name]["sha256"]:
+        if (
+            path.stat().st_size != expected[name]["bytes"]
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected[name]["sha256"]
+        ):
             raise ValueError("recovery artifact content differs from the qualified inventory")
 
 
@@ -37,7 +41,9 @@ class PypiState:
 
 
 def _pypi_expected(inventory: dict) -> dict[str, str]:
-    expected = {item["file"]: item["sha256"] for item in inventory["artifacts"] if item["file"].endswith((".whl", ".tar.gz"))}
+    expected = {
+        item["file"]: item["sha256"] for item in inventory["artifacts"] if item["file"].endswith((".whl", ".tar.gz"))
+    }
     if not expected:
         raise ValueError("qualified inventory contains no PyPI files")
     return expected
@@ -161,7 +167,10 @@ def stage_missing_pypi_files(inventory: dict, state: PypiState, directory: Path)
     for name in missing:
         path = actual[name]
         expected_item = expected[name]
-        if path.stat().st_size != expected_item["bytes"] or hashlib.sha256(path.read_bytes()).hexdigest() != expected_item["sha256"]:
+        if (
+            path.stat().st_size != expected_item["bytes"]
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected_item["sha256"]
+        ):
             raise ValueError("recovery artifact content differs from the qualified inventory")
 
     for name, path in actual.items():

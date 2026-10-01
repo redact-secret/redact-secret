@@ -5,7 +5,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-product-positioning.py"
 SPEC = importlib.util.spec_from_file_location("check_product_positioning", SCRIPT)
 assert SPEC and SPEC.loader
@@ -41,7 +40,10 @@ class CheckProductPositioningTest(unittest.TestCase):
 
     def test_a_registry_readme_needs_every_scope_limit_in_its_intro(self) -> None:
         self.assertEqual(CHECK.check_registry_readme("R.md", GOOD_INTRO), [])
-        moved = GOOD_INTRO.replace("See the [support matrix](docs/support-matrix.md).\n\n## Install\n", "## Install\n\n[support matrix](docs/support-matrix.md)\n")
+        moved = GOOD_INTRO.replace(
+            "See the [support matrix](docs/support-matrix.md).\n\n## Install\n",
+            "## Install\n\n[support matrix](docs/support-matrix.md)\n",
+        )
         self.assertEqual(CHECK.check_registry_readme("R.md", moved), ["R.md intro is missing: support matrix link"])
         wrapped = GOOD_INTRO.replace("repository and history", "repository and\nhistory")
         self.assertEqual(CHECK.check_registry_readme("R.md", wrapped), [])

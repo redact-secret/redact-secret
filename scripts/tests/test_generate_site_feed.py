@@ -137,11 +137,14 @@ class SiteFeedTest(unittest.TestCase):
 
     def test_packages_carry_each_registry_spelling(self):
         packages = GEN.build_feed(self.fixture.root)["release"]["packages"]
-        self.assertEqual(packages, [
-            {"ecosystem": "npm", "name": "@redact-secret/core", "version": "0.1.0-beta.10"},
-            {"ecosystem": "crates", "name": "redact-secret", "version": "0.1.0-beta.10"},
-            {"ecosystem": "pypi", "name": "redact-secret", "version": "0.1.0b10"},
-        ])
+        self.assertEqual(
+            packages,
+            [
+                {"ecosystem": "npm", "name": "@redact-secret/core", "version": "0.1.0-beta.10"},
+                {"ecosystem": "crates", "name": "redact-secret", "version": "0.1.0-beta.10"},
+                {"ecosystem": "pypi", "name": "redact-secret", "version": "0.1.0b10"},
+            ],
+        )
 
     def test_only_claimable_family_fields_are_copied(self):
         support = GEN.build_feed(self.fixture.root)["supportMatrix"]
@@ -149,7 +152,9 @@ class SiteFeedTest(unittest.TestCase):
         self.assertTrue(support["gatedLatestRelease"])
         self.assertEqual(support["measuredProductVersion"], "0.1.0-beta.7")
         for entry in support["families"]:
-            self.assertEqual(set(entry), {"provider", "family", "name", "status", "evidenceTier", "qualificationProfile"})
+            self.assertEqual(
+                set(entry), {"provider", "family", "name", "status", "evidenceTier", "qualificationProfile"}
+            )
         self.assertNotIn("internal review note", GEN.render(GEN.build_feed(self.fixture.root)))
 
     def test_matrix_not_gated_by_the_release_is_reported(self):

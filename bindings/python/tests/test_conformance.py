@@ -13,7 +13,6 @@ Every fixture input is synthetic or explicitly revoked
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 from .conftest import byte_offset_to_char_offset_reference, load_corpus

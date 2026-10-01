@@ -6,11 +6,7 @@ import { NodeStreamSanitizer } from "../../src/adapters/node-stream.js";
 import { createStreamSanitizerRuntime } from "../../src/adapters/shared.js";
 import { WebStreamSanitizer } from "../../src/adapters/web-stream.js";
 import { SecretScanError } from "../../src/errors.js";
-import type {
-  IncrementalSanitizer,
-  IncrementalSanitizerResult,
-  SecretFinding,
-} from "../../src/types.js";
+import type { IncrementalSanitizer, IncrementalSanitizerResult, SecretFinding } from "../../src/types.js";
 import { bytes, openSession } from "./support.js";
 
 const FINDINGS_ABOVE_ARGUMENT_CEILING = 150_000;
@@ -153,9 +149,7 @@ describe("stream adapter finding accumulation", () => {
   it("accumulates flushed and finalized findings above the engine argument ceiling", () => {
     const flushed = findingList(75_000);
     const finalized = findingList(75_000);
-    const runtime = createStreamSanitizerRuntime(
-      sessionWithResults(flushed, finalized),
-    );
+    const runtime = createStreamSanitizerRuntime(sessionWithResults(flushed, finalized));
 
     runtime.finalize();
 

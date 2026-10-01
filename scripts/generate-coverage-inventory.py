@@ -70,9 +70,7 @@ def _mentions(fixture: dict, needle: str) -> bool:
 
 
 def _has_expected_type(fixture: dict, type_name: str) -> bool:
-    return any(
-        expectation.get("type") == type_name for expectation in (fixture.get("expected") or [])
-    )
+    return any(expectation.get("type") == type_name for expectation in (fixture.get("expected") or []))
 
 
 def row_state(
@@ -125,15 +123,9 @@ def evidence_dimensions(detector_fixtures: list[dict]) -> dict:
     return {
         "fixtureCount": len(detector_fixtures),
         "kindsWithSupportedEvidence": sorted(
-            {
-                fixture["kind"]
-                for fixture in detector_fixtures
-                if fixture.get("support") == "supported"
-            }
+            {fixture["kind"] for fixture in detector_fixtures if fixture.get("support") == "supported"}
         ),
-        "supportStatesPresent": sorted(
-            {fixture["support"] for fixture in detector_fixtures if "support" in fixture}
-        ),
+        "supportStatesPresent": sorted({fixture["support"] for fixture in detector_fixtures if "support" in fixture}),
         "hostContextsExercised": sorted(
             {context for fixture in detector_fixtures for context in fixture.get("contexts", [])}
         ),
@@ -143,9 +135,7 @@ def evidence_dimensions(detector_fixtures: list[dict]) -> dict:
 def build_report(manifest: dict, corpus: dict, root: Path) -> dict:
     fixtures = corpus["fixtures"]
     declared_detectors = sorted({entry["detector"] for entry in manifest["types"]})
-    corpus_detectors = sorted(
-        {fixture["detector"] for fixture in fixtures if fixture.get("detector") != "unassigned"}
-    )
+    corpus_detectors = sorted({fixture["detector"] for fixture in fixtures if fixture.get("detector") != "unassigned"})
     types_per_detector: dict[str, int] = {}
     for entry in manifest["types"]:
         types_per_detector[entry["detector"]] = types_per_detector.get(entry["detector"], 0) + 1
@@ -156,9 +146,7 @@ def build_report(manifest: dict, corpus: dict, root: Path) -> dict:
         type_name = entry["type"]
         detector_fixtures = fixtures_for_detector(fixtures, detector)
         ambiguous_keyword = type_name.split("_")[0] if types_per_detector[detector] > 1 else None
-        state, evidence_ids = row_state(
-            detector_fixtures, type_name, ambiguous_keyword=ambiguous_keyword
-        )
+        state, evidence_ids = row_state(detector_fixtures, type_name, ambiguous_keyword=ambiguous_keyword)
 
         schemes = entry.get("schemes")
         if schemes:
@@ -209,12 +197,8 @@ def build_report(manifest: dict, corpus: dict, root: Path) -> dict:
         "rowStates": list(ROW_STATES),
         "rows": rows,
         "reconciliation": {
-            "declaredDetectorsMissingFromCorpus": sorted(
-                set(declared_detectors) - set(corpus_detectors)
-            ),
-            "corpusDetectorsMissingFromDeclaration": sorted(
-                set(corpus_detectors) - set(declared_detectors)
-            ),
+            "declaredDetectorsMissingFromCorpus": sorted(set(declared_detectors) - set(corpus_detectors)),
+            "corpusDetectorsMissingFromDeclaration": sorted(set(corpus_detectors) - set(declared_detectors)),
         },
         "consumers": consumers,
         "summary": summary,
@@ -240,9 +224,7 @@ def structural_errors(report: dict) -> list[str]:
         if row["schemeRows"] != "not-applicable":
             for scheme_row in row["schemeRows"]:
                 if scheme_row["state"] not in ROW_STATES:
-                    errors.append(
-                        f"{row['type']}/{scheme_row['scheme']}: invalid row state {scheme_row['state']!r}"
-                    )
+                    errors.append(f"{row['type']}/{scheme_row['scheme']}: invalid row state {scheme_row['state']!r}")
     return errors
 
 

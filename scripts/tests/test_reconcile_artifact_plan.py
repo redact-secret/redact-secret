@@ -9,7 +9,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "reconcile-artifact-plan.py"
 SPEC = importlib.util.spec_from_file_location("reconcile_artifact_plan", SCRIPT)
 assert SPEC and SPEC.loader
@@ -63,10 +62,13 @@ class PlanIndependentTests(unittest.TestCase):
         plan = PLAN.plan_independent(
             {"npm:@redact-secret/wasm": PUBLISHED_MATCHING, "pypi:redact-secret": PUBLISHED_MATCHING}
         )
-        self.assertEqual({name: decision.action for name, decision in plan.items()}, {
-            "npm:@redact-secret/wasm": "skip",
-            "pypi:redact-secret": "skip",
-        })
+        self.assertEqual(
+            {name: decision.action for name, decision in plan.items()},
+            {
+                "npm:@redact-secret/wasm": "skip",
+                "pypi:redact-secret": "skip",
+            },
+        )
 
     def test_partial_success_publishes_only_the_missing_artifact(self) -> None:
         plan = PLAN.plan_independent(
@@ -149,9 +151,7 @@ class CliTests(unittest.TestCase):
         self.assertEqual(payload["pypi:redact-secret"]["action"], "skip")
 
     def test_cli_exits_nonzero_when_any_artifact_is_blocked(self) -> None:
-        path = self._write(
-            {"pypi:redact-secret": {"live_published": True, "content_matches": False}}
-        )
+        path = self._write({"pypi:redact-secret": {"live_published": True, "content_matches": False}})
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             status = PLAN.main(["--observations", str(path)])

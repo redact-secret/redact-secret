@@ -31,7 +31,7 @@ class SyntheticReconstructionTests(unittest.TestCase):
     def test_render_fixture_reports_utf8_byte_offsets_for_the_unicode_context(self) -> None:
         construction = {"context": "unicode-crlf", "parts": [{"literal": "abc"}]}
         content, start, end = AUDIT.render_fixture(construction)
-        self.assertEqual(content, "# \U0001F511 reviewed format\r\nabc\n\r\n")
+        self.assertEqual(content, "# \U0001f511 reviewed format\r\nabc\n\r\n")
         self.assertEqual((start, end), (24, 27))
 
 
@@ -46,20 +46,29 @@ class ContractEvaluationTests(unittest.TestCase):
 
     def test_boundary_bytes_reject_an_embedded_or_overlong_candidate(self) -> None:
         pattern = AUDIT.compile_family(self.FAMILY)
-        self.assertEqual(AUDIT.find_contract_matches("wgt_0123abcd", pattern), [
-            {"start": 0, "end": 12, "variant": "exact"},
-        ])
+        self.assertEqual(
+            AUDIT.find_contract_matches("wgt_0123abcd", pattern),
+            [
+                {"start": 0, "end": 12, "variant": "exact"},
+            ],
+        )
         self.assertEqual(AUDIT.find_contract_matches("wgt_0123abcde", pattern), [])
         self.assertEqual(AUDIT.find_contract_matches("legacywgt_0123abcd", pattern), [])
-        self.assertEqual(AUDIT.find_contract_matches("(wgt_0123abcd).", pattern), [
-            {"start": 1, "end": 13, "variant": "exact"},
-        ])
+        self.assertEqual(
+            AUDIT.find_contract_matches("(wgt_0123abcd).", pattern),
+            [
+                {"start": 1, "end": 13, "variant": "exact"},
+            ],
+        )
 
     def test_matches_are_reported_in_utf8_bytes(self) -> None:
         pattern = AUDIT.compile_family(self.FAMILY)
-        self.assertEqual(AUDIT.find_contract_matches("\U0001F511 wgo_abcd", pattern), [
-            {"start": 5, "end": 13, "variant": "open-ended"},
-        ])
+        self.assertEqual(
+            AUDIT.find_contract_matches("\U0001f511 wgo_abcd", pattern),
+            [
+                {"start": 5, "end": 13, "variant": "open-ended"},
+            ],
+        )
 
     def test_audit_text_dispositions(self) -> None:
         pattern = AUDIT.compile_family(self.FAMILY)
@@ -86,7 +95,9 @@ class ContractEvaluationTests(unittest.TestCase):
 
 
 class BaselineDerivationTests(unittest.TestCase):
-    CONTRACTS = {"families": [{"detector": "widget-token", "variants": [{"id": "exact", "grammar": "wgt_[a-f0-9]{8}"}]}]}
+    CONTRACTS = {
+        "families": [{"detector": "widget-token", "variants": [{"id": "exact", "grammar": "wgt_[a-f0-9]{8}"}]}]
+    }
 
     def _pair(self, twin_parts: list[dict], positive_expected: list[dict] | None = None) -> dict:
         positive_token = {"synthetic": {"label": "w", "length": 8, "alphabet": "hex"}}
@@ -110,18 +121,23 @@ class BaselineDerivationTests(unittest.TestCase):
         }
 
     def test_derives_hashes_ranges_and_contract_view(self) -> None:
-        pair = self._pair([{"literal": "wgt_"}, {"synthetic": {"label": "w", "length": 8, "alphabet": "hex", "take": 7}}])
+        pair = self._pair(
+            [{"literal": "wgt_"}, {"synthetic": {"label": "w", "length": 8, "alphabet": "hex", "take": 7}}]
+        )
         derived, errors = AUDIT.derive_baseline({"pairs": [pair]}, self.CONTRACTS)
         self.assertEqual(errors, [])
         row = derived["pairs"][0]
         self.assertEqual(row["positive"]["contentBytes"], 14)
         self.assertTrue(re.fullmatch(r"[0-9a-f]{64}", row["positive"]["contentSha256"]))
-        self.assertEqual(row["contractView"], {
-            "positiveVariant": "exact",
-            "positiveMatchesExpectedRange": True,
-            "twinFlaggedByContract": False,
-            "twinMutationRetained": True,
-        })
+        self.assertEqual(
+            row["contractView"],
+            {
+                "positiveVariant": "exact",
+                "positiveMatchesExpectedRange": True,
+                "twinFlaggedByContract": False,
+                "twinMutationRetained": True,
+            },
+        )
         self.assertEqual(derived["counts"]["twinsFlaggedByContract"], 0)
         self.assertEqual(derived["counts"]["uniqueMutations"], 1)
 

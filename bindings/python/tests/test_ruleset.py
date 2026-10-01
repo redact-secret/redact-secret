@@ -7,7 +7,6 @@ Every input and ruleset here is synthetic.
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 RULESET_FIXTURE = b"""ruleset-revision: 1
@@ -109,9 +108,7 @@ def test_a_non_bytes_non_str_ruleset_raises_invalid_options_error() -> None:
 
 def test_a_specificity_reserved_to_built_ins_is_rejected() -> None:
     for reserved in ("structural", "provider", "private-key"):
-        malformed = RULESET_FIXTURE.replace(
-            b"specificity: contextual", f"specificity: {reserved}".encode()
-        )
+        malformed = RULESET_FIXTURE.replace(b"specificity: contextual", f"specificity: {reserved}".encode())
         with pytest.raises(redact_secret.InvalidRulesetError) as excinfo:
             redact_secret.scan("irrelevant", ruleset=malformed)
         assert "SPECIFICITY_NOT_CLAIMABLE" in str(excinfo.value)

@@ -36,18 +36,25 @@
  */
 
 import { spawn } from "node:child_process";
-import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-
 import {
-  REPO_ROOT,
+  LANES,
+  parseQuickstart,
+  requirePinnedVersion,
+  SYNTHETIC_INPUT,
+  scenarioCommands,
+  versionSpellings,
+} from "./clean-install-doc.mjs";
+import {
   cleanEnvironment,
   fileDigests,
   freshWorkspace as freshCandidateWorkspace,
   loadNpmCandidate as loadCandidateTarballs,
   makeAssert,
+  REPO_ROOT,
   runShell,
   sha256,
   sourceCommit,
@@ -55,14 +62,6 @@ import {
   verifyNpmInstall as verifyCandidateInstall,
   wheelProbeSource,
 } from "./lib/candidate-install.mjs";
-import {
-  LANES,
-  SYNTHETIC_INPUT,
-  parseQuickstart,
-  requirePinnedVersion,
-  scenarioCommands,
-  versionSpellings,
-} from "./clean-install-doc.mjs";
 
 const QUICKSTART = "docs/quickstart.md";
 const PUBLIC_NPM_REGISTRY = "https://registry.npmjs.org/";
@@ -180,7 +179,14 @@ async function nodeLane(context) {
     artifact: "addon",
     packages: install.packages,
     binaries: install.binaries,
-    checks: { install: "passed", contents: "passed", output: "passed", artifact: "passed", fallback: "passed", failure: "passed" },
+    checks: {
+      install: "passed",
+      contents: "passed",
+      output: "passed",
+      artifact: "passed",
+      fallback: "passed",
+      failure: "passed",
+    },
   };
 }
 
@@ -192,9 +198,10 @@ async function pythonLane(context) {
   assert(run.stdout.replace(/\n$/, "") === scenario.expect, "python output differs from the documented output");
   const elapsedSeconds = timer();
 
-  const wheels = candidateDir === undefined
-    ? []
-    : (await readdir(candidateDir)).filter((name) => name.endsWith(".whl")).map((name) => join(candidateDir, name));
+  const wheels =
+    candidateDir === undefined
+      ? []
+      : (await readdir(candidateDir)).filter((name) => name.endsWith(".whl")).map((name) => join(candidateDir, name));
   assert(candidateDir === undefined || wheels.length > 0, `${candidateDir} holds no wheel`);
   const probe = await runShell(
     `.venv/bin/python -c "$WHEEL_CHECK" ${wheels.map((wheel) => `'${wheel}'`).join(" ")}`,
@@ -203,11 +210,23 @@ async function pythonLane(context) {
   );
   assert(probe.code === 0, `cannot inspect the installed distribution: ${probe.stderr.split("\n").at(-2) ?? ""}`);
   const installed = JSON.parse(probe.stdout);
-  assert(installed.version === versionSpellings(context.version).python, `installed redact-secret ${installed.version}`);
-  assert(candidateDir === undefined || installed.wheel !== null, "the installed wheel is not one of the candidate wheels");
-  assert(installed.files > 0 && installed.mismatched.length === 0, `installed files differ from the wheel: ${installed.mismatched.join(", ")}`);
+  assert(
+    installed.version === versionSpellings(context.version).python,
+    `installed redact-secret ${installed.version}`,
+  );
+  assert(
+    candidateDir === undefined || installed.wheel !== null,
+    "the installed wheel is not one of the candidate wheels",
+  );
+  assert(
+    installed.files > 0 && installed.mismatched.length === 0,
+    `installed files differ from the wheel: ${installed.mismatched.join(", ")}`,
+  );
   const venv = join(project, ".venv") + sep;
-  assert(installed.module.startsWith(venv) && installed.native.startsWith(venv), "redact_secret does not load from the clean virtual environment");
+  assert(
+    installed.module.startsWith(venv) && installed.native.startsWith(venv),
+    "redact_secret does not load from the clean virtual environment",
+  );
 
   // A missing or unloadable extension module must fail the import with the
   // fixed, actionable message, not a loader traceback naming host paths.
@@ -232,7 +251,10 @@ async function pythonLane(context) {
         sha256: wheelPath === undefined ? null : sha256(await readFile(wheelPath)),
       },
     ],
-    binaries: wheelPath === undefined ? [] : [{ package: "redact-secret", file: installed.wheel, sha256: sha256(await readFile(wheelPath)) }],
+    binaries:
+      wheelPath === undefined
+        ? []
+        : [{ package: "redact-secret", file: installed.wheel, sha256: sha256(await readFile(wheelPath)) }],
     checks: { install: "passed", contents: "passed", output: "passed", artifact: "passed", failure: "passed" },
   };
 }
@@ -240,7 +262,8 @@ async function pythonLane(context) {
 async function waitForServer(url, serving) {
   const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
-    if (serving.exitCode !== null) throw new Error(`clean install: the documented serve step exited ${serving.exitCode}`);
+    if (serving.exitCode !== null)
+      throw new Error(`clean install: the documented serve step exited ${serving.exitCode}`);
     try {
       if ((await fetch(url)).ok) return;
     } catch {
@@ -292,7 +315,9 @@ async function browserLane(context) {
       }
     });
     const readOutput = async () => {
-      await page.waitForFunction(() => document.querySelector("#output")?.textContent !== "loading", null, { timeout: 30_000 });
+      await page.waitForFunction(() => document.querySelector("#output")?.textContent !== "loading", null, {
+        timeout: 30_000,
+      });
       return page.locator("#output").textContent();
     };
     await page.goto(url);
@@ -312,9 +337,14 @@ async function browserLane(context) {
     const failing = await browser.newPage();
     await failing.route("**/*.wasm", (route) => route.fulfill({ status: 404, body: "" }));
     await failing.goto(url);
-    await failing.waitForFunction(() => document.querySelector("#output")?.textContent !== "loading", null, { timeout: 30_000 });
+    await failing.waitForFunction(() => document.querySelector("#output")?.textContent !== "loading", null, {
+      timeout: 30_000,
+    });
     const failure = await failing.locator("#output").textContent();
-    assert(failure === `INITIALIZATION_FAILED: ${fixed}`, "a failed .wasm request does not surface the fixed INITIALIZATION_FAILED error");
+    assert(
+      failure === `INITIALIZATION_FAILED: ${fixed}`,
+      "a failed .wasm request does not surface the fixed INITIALIZATION_FAILED error",
+    );
     requireSafeFailure(fixed, { guide: JS_FAILURE_GUIDE, workspace: parent });
 
     return {
@@ -323,7 +353,14 @@ async function browserLane(context) {
       artifact: "wasm",
       packages: install.packages,
       binaries: install.binaries,
-      checks: { install: "passed", contents: "passed", bundle: "passed", output: "passed", artifact: "passed", failure: "passed" },
+      checks: {
+        install: "passed",
+        contents: "passed",
+        bundle: "passed",
+        output: "passed",
+        artifact: "passed",
+        failure: "passed",
+      },
     };
   } finally {
     await browser?.close();

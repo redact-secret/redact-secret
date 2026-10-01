@@ -28,22 +28,22 @@
  * nothing this script prints or writes carries a fixture's `input` or a
  * matched value.
  */
-import { createServer } from "node:http";
+
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-
+import { buildAndEmitAccuracyResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
 import {
   accuracyCorpusHash,
   gitCommit,
   hostCpu,
   hostOs,
   loadAccuracyCorpus,
-  readPackageVersion,
   REPO_ROOT,
+  readPackageVersion,
 } from "./lib/assessment-provenance.mjs";
-import { buildAndEmitAccuracyResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
 
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const JS_PACKAGE_DIR = join(REPO_ROOT, "packages", "javascript");
@@ -215,8 +215,7 @@ async function main() {
     playwright = await import("playwright");
   } catch {
     fail(
-      "playwright is not installed; run `npm ci` and " +
-        "`npx playwright install --with-deps chromium firefox webkit`",
+      "playwright is not installed; run `npm ci` and " + "`npx playwright install --with-deps chromium firefox webkit`",
     );
     return;
   }
@@ -228,9 +227,7 @@ async function main() {
   }
   const fixtures = schema.validateAssessmentFixtures(corpus.fixtures);
   if (fixtures.length !== corpus.fixtureCount || fixtures.length === 0) {
-    fail(
-      `accuracy-corpus.json: expected ${corpus.fixtureCount} fixture(s), found ${fixtures.length}`,
-    );
+    fail(`accuracy-corpus.json: expected ${corpus.fixtureCount} fixture(s), found ${fixtures.length}`);
   }
 
   const directory = await stageServeDirectory(options.artifactDir, fixtures);
@@ -288,10 +285,7 @@ async function main() {
       `${accuracy.policyMismatches} policy mismatch(es) across ${fixturesEvaluated} fixture(s)`,
   );
 
-  if (
-    options.strict &&
-    (accuracy.falsePositives > 0 || accuracy.falseNegatives > 0 || accuracy.policyMismatches > 0)
-  ) {
+  if (options.strict && (accuracy.falsePositives > 0 || accuracy.falseNegatives > 0 || accuracy.policyMismatches > 0)) {
     fail("--strict: at least one mismatch was found");
   }
 }

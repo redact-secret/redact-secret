@@ -53,9 +53,7 @@ STATUS_ORDER = ("stable", "provisional", "pending", "unsupported")
 ECOSYSTEM_ORDER = ("npm", "crates", "pypi")
 ARTIFACT_ECOSYSTEM = {"npm": "npm", "crate": "crates", "pypi": "pypi"}
 
-VERSION = re.compile(
-    r"^(?P<core>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))(?:-(?P<pre>[0-9A-Za-z.-]+))?$"
-)
+VERSION = re.compile(r"^(?P<core>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))(?:-(?P<pre>[0-9A-Za-z.-]+))?$")
 BETA = re.compile(r"^(?P<core>\d+\.\d+\.\d+)-(?P<kind>alpha|beta|rc)\.(?P<number>\d+)$")
 PEP440_KIND = {"alpha": "a", "beta": "b", "rc": "rc"}
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
@@ -122,7 +120,8 @@ def pep440(version: str) -> str:
 def latest_release_record(root: Path) -> Path:
     directory = root / RELEASES_DIR
     versions = [
-        path.name for path in directory.iterdir()
+        path.name
+        for path in directory.iterdir()
         if path.is_dir() and VERSION.match(path.name) and (path / "manifest.json").is_file()
     ]
     require(bool(versions), f"{RELEASES_DIR}: no release record with a manifest.json")
@@ -150,7 +149,10 @@ def release_section(manifest: dict, path: Path) -> tuple[dict, datetime]:
     evidence = manifest.get("release_evidence")
     require(isinstance(evidence, dict), f"{path}: no release_evidence; the record is not final")
     tag = evidence.get("tag")
-    require(isinstance(tag, dict) and tag.get("name") == f"v{version}", f"{path}: release_evidence.tag.name is not v{version}")
+    require(
+        isinstance(tag, dict) and tag.get("name") == f"v{version}",
+        f"{path}: release_evidence.tag.name is not v{version}",
+    )
     require(tag.get("target") == source, f"{path}: the annotated tag does not target source_revision")
     observed = evidence.get("observed_at")
     require(isinstance(observed, str) and DATE.match(observed), f"{path}: release_evidence.observed_at is not a date")
@@ -161,7 +163,10 @@ def release_section(manifest: dict, path: Path) -> tuple[dict, datetime]:
     require(isinstance(state, dict), f"{path}: registry_state is missing")
     packages = []
     for artifact in artifact_set:
-        require(state.get(artifact) == "published", f"{path}: {artifact} is not recorded as published; a partial release is never claimed")
+        require(
+            state.get(artifact) == "published",
+            f"{path}: {artifact} is not recorded as published; a partial release is never claimed",
+        )
         kind, _, name = artifact.partition(":")
         require(kind in ARTIFACT_ECOSYSTEM and name, f"{path}: unknown artifact identity {artifact!r}")
         ecosystem = ARTIFACT_ECOSYSTEM[kind]
@@ -189,7 +194,10 @@ def support_section(matrix: dict, release_manifest: dict) -> tuple[dict, datetim
     report = matrix.get("sourceReport")
     require(isinstance(report, dict), f"{MATRIX_PATH}: sourceReport is missing")
     revision = report.get("revision")
-    require(isinstance(revision, str) and SHA40.match(revision), f"{MATRIX_PATH}: sourceReport.revision is not a 40-hex commit")
+    require(
+        isinstance(revision, str) and SHA40.match(revision),
+        f"{MATRIX_PATH}: sourceReport.revision is not a 40-hex commit",
+    )
     require(report.get("dirty") is False, f"{MATRIX_PATH}: produced from a dirty benchmarks checkout")
     product = report.get("product") or {}
     families_in = matrix.get("families")
@@ -202,14 +210,16 @@ def support_section(matrix: dict, release_manifest: dict) -> tuple[dict, datetim
         status = entry.get("status")
         require(status in distribution, f"{MATRIX_PATH}: {entry.get('family')}: unknown status {status!r}")
         distribution[status] += 1
-        families.append({
-            "provider": entry.get("provider"),
-            "family": entry.get("family"),
-            "name": entry.get("familyName"),
-            "status": status,
-            "evidenceTier": entry.get("evidenceTier"),
-            "qualificationProfile": entry.get("qualificationProfile"),
-        })
+        families.append(
+            {
+                "provider": entry.get("provider"),
+                "family": entry.get("family"),
+                "name": entry.get("familyName"),
+                "status": status,
+                "evidenceTier": entry.get("evidenceTier"),
+                "qualificationProfile": entry.get("qualificationProfile"),
+            }
+        )
     require(
         {key: matrix.get("distribution", {}).get(key) for key in STATUS_ORDER} == distribution,
         f"{MATRIX_PATH}: distribution disagrees with the family statuses",
@@ -217,7 +227,9 @@ def support_section(matrix: dict, release_manifest: dict) -> tuple[dict, datetim
     candidate = (release_manifest.get("support_matrix_drift") or {}).get("candidate") or {}
     section = {
         "benchmarksRevision": revision,
-        "generatedAt": utc_instant(report.get("generatedAt"), f"{MATRIX_PATH}: sourceReport.generatedAt").strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generatedAt": utc_instant(report.get("generatedAt"), f"{MATRIX_PATH}: sourceReport.generatedAt").strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        ),
         "measuredProductVersion": product.get("declaredVersion"),
         "measuredProductRevision": product.get("sourceCommit"),
         "gatedLatestRelease": candidate.get("revision") == revision and candidate.get("runId") == report.get("runId"),

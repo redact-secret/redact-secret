@@ -46,29 +46,35 @@ def cosign_result(returncode: int, stderr: str = "") -> subprocess.CompletedProc
 
 class DetectPlatformKeyTest(unittest.TestCase):
     def test_macos_arm64_maps_to_macos_arm64(self) -> None:
-        with mock.patch.object(INSTALL.platform, "system", return_value="Darwin"), mock.patch.object(
-            INSTALL.platform, "machine", return_value="arm64"
+        with (
+            mock.patch.object(INSTALL.platform, "system", return_value="Darwin"),
+            mock.patch.object(INSTALL.platform, "machine", return_value="arm64"),
         ):
             self.assertEqual(INSTALL.detect_platform_key(), "macos-arm64")
 
     def test_linux_glibc_maps_to_gnu_variant(self) -> None:
-        with mock.patch.object(INSTALL.platform, "system", return_value="Linux"), mock.patch.object(
-            INSTALL.platform, "machine", return_value="x86_64"
-        ), mock.patch.object(INSTALL.os, "confstr", return_value="glibc 2.35"):
+        with (
+            mock.patch.object(INSTALL.platform, "system", return_value="Linux"),
+            mock.patch.object(INSTALL.platform, "machine", return_value="x86_64"),
+            mock.patch.object(INSTALL.os, "confstr", return_value="glibc 2.35"),
+        ):
             self.assertEqual(INSTALL.detect_platform_key(), "linux-x86_64-gnu")
 
     def test_linux_without_glibc_confstr_maps_to_musl_variant(self) -> None:
         def raise_value_error(name: str) -> str:
             raise ValueError(name)
 
-        with mock.patch.object(INSTALL.platform, "system", return_value="Linux"), mock.patch.object(
-            INSTALL.platform, "machine", return_value="x86_64"
-        ), mock.patch.object(INSTALL.os, "confstr", side_effect=raise_value_error):
+        with (
+            mock.patch.object(INSTALL.platform, "system", return_value="Linux"),
+            mock.patch.object(INSTALL.platform, "machine", return_value="x86_64"),
+            mock.patch.object(INSTALL.os, "confstr", side_effect=raise_value_error),
+        ):
             self.assertEqual(INSTALL.detect_platform_key(), "linux-x86_64-musl")
 
     def test_unsupported_platform_fails_closed(self) -> None:
-        with mock.patch.object(INSTALL.platform, "system", return_value="Windows"), mock.patch.object(
-            INSTALL.platform, "machine", return_value="AMD64"
+        with (
+            mock.patch.object(INSTALL.platform, "system", return_value="Windows"),
+            mock.patch.object(INSTALL.platform, "machine", return_value="AMD64"),
         ):
             with self.assertRaises(INSTALL.VerificationFailed):
                 INSTALL.detect_platform_key()

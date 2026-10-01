@@ -23,11 +23,10 @@ interface PackResult {
  * already be real, tracked or built files here for either to appear below.
  */
 function pack(): PackResult {
-  const output = execFileSync(
-    process.platform === "win32" ? "npm.cmd" : "npm",
-    ["pack", "--dry-run", "--json"],
-    { cwd: PACKAGE_ROOT, encoding: "utf8" },
-  );
+  const output = execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["pack", "--dry-run", "--json"], {
+    cwd: PACKAGE_ROOT,
+    encoding: "utf8",
+  });
   const [result] = JSON.parse(output) as PackResult[];
   if (result === undefined) throw new Error("npm pack produced no result");
   return result;
@@ -63,15 +62,7 @@ describe("package contents", () => {
   it("publishes nothing from the repository around it", () => {
     const paths = pack().files.map(({ path }) => path);
 
-    for (const prefix of [
-      "src/",
-      "test/",
-      "crates/",
-      "bindings/",
-      "conformance/",
-      ".github/",
-      "_notes/",
-    ]) {
+    for (const prefix of ["src/", "test/", "crates/", "bindings/", "conformance/", ".github/", "_notes/"]) {
       expect(paths.some((path) => path.startsWith(prefix))).toBe(false);
     }
     expect(paths.some((path) => path.endsWith(".map"))).toBe(false);
@@ -80,22 +71,20 @@ describe("package contents", () => {
 
   it("carries the shared product version in every place that states it", () => {
     const result = pack();
-    const workspaceManifest = JSON.parse(
-      readFileSync(join(REPOSITORY_ROOT, "package.json"), "utf8"),
-    ) as { version: string };
-    const declaredVersion = readFileSync(
-      join(PACKAGE_ROOT, "dist", "version.js"),
-      "utf8",
-    );
+    const workspaceManifest = JSON.parse(readFileSync(join(REPOSITORY_ROOT, "package.json"), "utf8")) as {
+      version: string;
+    };
+    const declaredVersion = readFileSync(join(PACKAGE_ROOT, "dist", "version.js"), "utf8");
 
     expect(result.version).toBe(workspaceManifest.version);
     expect(declaredVersion).toContain(`"${workspaceManifest.version}"`);
   });
 
   it("exposes the reviewed public subpaths and no internal ones", () => {
-    const manifest = JSON.parse(
-      readFileSync(join(PACKAGE_ROOT, "package.json"), "utf8"),
-    ) as { exports: Record<string, unknown>; imports: Record<string, unknown> };
+    const manifest = JSON.parse(readFileSync(join(PACKAGE_ROOT, "package.json"), "utf8")) as {
+      exports: Record<string, unknown>;
+      imports: Record<string, unknown>;
+    };
 
     // The root API, its `common`-profile sibling, plus the two stream
     // adapters and their `common`-profile counterparts. Each adapter is its
@@ -112,10 +101,7 @@ describe("package contents", () => {
     // `#native`/`#native-common` are subpath *imports*: how this package
     // selects its own runtime adapter for each profile, and are not
     // reachable from outside.
-    expect(Object.keys(manifest.imports).sort()).toEqual([
-      "#native",
-      "#native-common",
-    ]);
+    expect(Object.keys(manifest.imports).sort()).toEqual(["#native", "#native-common"]);
   });
 
   it("keeps the Web adapter free of Node-only modules", () => {
@@ -129,10 +115,7 @@ describe("package contents", () => {
       "shared.js",
       "shared.d.ts",
     ]) {
-      const source = readFileSync(
-        join(PACKAGE_ROOT, "dist", "adapters", file),
-        "utf8",
-      );
+      const source = readFileSync(join(PACKAGE_ROOT, "dist", "adapters", file), "utf8");
 
       expect(source, file).not.toMatch(/from\s+["']node:/);
     }

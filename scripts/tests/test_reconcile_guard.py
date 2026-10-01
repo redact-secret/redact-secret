@@ -10,7 +10,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "reconcile-guard.py"
 SPEC = importlib.util.spec_from_file_location("reconcile_guard", SCRIPT)
 assert SPEC and SPEC.loader
@@ -65,9 +64,7 @@ class ReconcileGuardTests(unittest.TestCase):
         return path
 
     def _tags(self) -> list[str]:
-        result = subprocess.run(
-            ["git", "-C", str(self.repo), "tag"], check=True, capture_output=True, text=True
-        )
+        result = subprocess.run(["git", "-C", str(self.repo), "tag"], check=True, capture_output=True, text=True)
         return [line for line in result.stdout.splitlines() if line]
 
     # -- fixture 1: an ancestor commit ------------------------------------
@@ -190,9 +187,7 @@ class ReconcileGuardTests(unittest.TestCase):
     def test_cli_reports_failure_and_exits_nonzero_for_a_missing_record(self) -> None:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
-            status = RECONCILE_GUARD.main(
-                ["--repo", str(self.repo), "--candidate-ref", self.tip, "--version", VERSION]
-            )
+            status = RECONCILE_GUARD.main(["--repo", str(self.repo), "--candidate-ref", self.tip, "--version", VERSION])
         self.assertEqual(status, 1)
         payload = json.loads(buffer.getvalue())
         self.assertFalse(payload["ok"])

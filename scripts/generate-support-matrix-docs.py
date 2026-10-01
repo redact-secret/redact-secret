@@ -109,7 +109,7 @@ STATUS_COPY = {
     "provisional": (
         "Useful today, but the evidence behind it is incomplete -- usually the format "
         "is confirmed by other scanners or by public examples rather than by the "
-        "provider's own documentation. Provisional is not \"almost stable\": it can "
+        'provider\'s own documentation. Provisional is not "almost stable": it can '
         "stay this way indefinitely if a provider never publishes its format. The "
         "Reason column says what is still missing."
     ),
@@ -175,9 +175,7 @@ REASON_GATE_GROUPS = {
 # segment names fixture-profile debt (redact-secret-benchmarks'
 # `benchmarks/support/profiles.ts`); its cell label maps to a group here. Any
 # other `fixtureProfile` segment is unmapped and fails like an unknown gate.
-FIXTURE_PROFILE_DEBT = re.compile(
-    r"^fixtureProfile [a-z-]+: \d+ (?P<cell>[a-z/ -]+?) < \d+ \(\d+ short\)$"
-)
+FIXTURE_PROFILE_DEBT = re.compile(r"^fixtureProfile [a-z-]+: \d+ (?P<cell>[a-z/ -]+?) < \d+ \(\d+ short\)$")
 FIXTURE_PROFILE_CELL_GROUPS = {
     "total fixtures": "fixtures",
     "positive/context cases": "positives",
@@ -392,8 +390,7 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
 
     actual_stable_distribution = {
         profile: sum(
-            family.get("status") == "stable" and family.get("qualificationProfile") == profile
-            for family in families
+            family.get("status") == "stable" and family.get("qualificationProfile") == profile for family in families
         )
         for profile in QUALIFICATION_PROFILE_ORDER
     }
@@ -567,10 +564,12 @@ def render_matrix_markdown(matrix: dict, unmeasured: list[str] | tuple[str, ...]
                 "",
                 f"{len(unmeasured)} built-in detectors ship in the core but are not covered by the pinned "
                 "measurement above, so they have no support status yet. Their absence from the tables above "
-                "means \"not yet measured\", not \"unsupported\": do not read a status into them. The next "
+                'means "not yet measured", not "unsupported": do not read a status into them. The next '
                 "pinned matrix that measures them moves each into a status section.",
                 "",
-                _markdown_table(["Detector", "Measured support status"], [[f"`{d}`", "not yet measured"] for d in unmeasured]),
+                _markdown_table(
+                    ["Detector", "Measured support status"], [[f"`{d}`", "not yet measured"] for d in unmeasured]
+                ),
                 "",
             ]
         )
@@ -606,9 +605,7 @@ def render_readme_fragment(matrix: dict, unmeasured: list[str] | tuple[str, ...]
     stable_counts = stable_distribution(matrix)
     tier_counts = _tier_counts(matrix)
     counts = ", ".join(f"{status}: {distribution.get(status, 0)}" for status in STATUS_ORDER)
-    profile_counts = ", ".join(
-        f"{profile}: {stable_counts[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
-    )
+    profile_counts = ", ".join(f"{profile}: {stable_counts[profile]}" for profile in QUALIFICATION_PROFILE_ORDER)
     evidence_counts = ", ".join(f"{tier}: {tier_counts[tier]}" for tier in EVIDENCE_TIER_ORDER)
     not_measured = (
         f" {len(unmeasured)} shipped detectors are not yet measured and carry no status: "
@@ -623,7 +620,7 @@ def render_readme_fragment(matrix: dict, unmeasured: list[str] | tuple[str, ...]
         f"families; {counts}; stable qualification: {profile_counts}; evidence tiers: {evidence_counts}) "
         "-- generated from evaluation evidence, never hand-written. Stable families are labeled "
         "`Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. "
-        "`provisional` means useful but evidence-incomplete, not \"almost stable\"; unsupported "
+        '`provisional` means useful but evidence-incomplete, not "almost stable"; unsupported '
         "families are listed with their reason. See the full "
         "[support matrix](docs/support-matrix.md)." + not_measured,
         README_END,
@@ -690,9 +687,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         + ". See the [support matrix](/docs/support-matrix.md).",
         "",
         "Stable qualification: "
-        + ", ".join(
-            f"{profile} {stable_distribution(matrix)[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
-        )
+        + ", ".join(f"{profile} {stable_distribution(matrix)[profile]}" for profile in QUALIFICATION_PROFILE_ORDER)
         + ". Evidence tiers: "
         + ", ".join(f"{tier} {_tier_counts(matrix)[tier]}" for tier in EVIDENCE_TIER_ORDER)
         + ".",
@@ -705,10 +700,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
     problem = baseline_problem(matrix, previous)
     if problem is not None:
         lines.append("")
-        lines.append(
-            "The previous pinned matrix is not comparable, so no stable delta is stated: "
-            f"{problem}."
-        )
+        lines.append(f"The previous pinned matrix is not comparable, so no stable delta is stated: {problem}.")
         return "\n".join(lines) + "\n"
 
     previous_by_family = {f["family"]: f["status"] for f in previous["families"]}
@@ -729,9 +721,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         f"scanner pins (benchmarks revision {matrix['sourceReport']['revision'][:12]})."
     )
     lines.append("")
-    lines.append(
-        f"Stable: {current_stable} ({current_stable - previous_stable:+d} from {previous_stable})."
-    )
+    lines.append(f"Stable: {current_stable} ({current_stable - previous_stable:+d} from {previous_stable}).")
 
     lines.append("")
     if moved:
@@ -754,14 +744,14 @@ def changelog_section(changelog: str, version: str) -> str | None:
     entry = re.search(rf"^## {re.escape(version)}(?: .*)?$", changelog, re.M)
     if entry is None:
         return None
-    rest = changelog[entry.end():]
+    rest = changelog[entry.end() :]
     next_entry = re.search(r"^## ", rest, re.M)
     body = rest[: next_entry.start()] if next_entry else rest
     heading = re.search(r"^### Support status$", body, re.M)
     if heading is None:
         return None
-    tail = body[heading.start():]
-    following = re.search(r"^### ", tail[len("### Support status"):], re.M)
+    tail = body[heading.start() :]
+    following = re.search(r"^### ", tail[len("### Support status") :], re.M)
     block = tail[: len("### Support status") + following.start()] if following else tail
     return block.rstrip("\n") + "\n"
 
@@ -787,12 +777,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--schema", type=Path, default=SCHEMA_PATH)
     parser.add_argument("--doc-out", type=Path, default=DOC_PATH)
     parser.add_argument("--readme", type=Path, default=README_PATH)
-    parser.add_argument("--detectors-source", type=Path, default=DETECTORS_PATH, help="the core's detectors/mod.rs holding BUILT_IN_PACKS")
+    parser.add_argument(
+        "--detectors-source",
+        type=Path,
+        default=DETECTORS_PATH,
+        help="the core's detectors/mod.rs holding BUILT_IN_PACKS",
+    )
     parser.add_argument("--changelog", type=Path, default=CHANGELOG_PATH)
     parser.add_argument("--releases-dir", type=Path, default=RELEASES_DIR)
-    parser.add_argument("--check", action="store_true", help="fail if docs/support-matrix.md or README.md are out of date; write nothing")
-    parser.add_argument("--release-note", action="store_true", help="print the release-note fragment to stdout instead of writing docs")
-    parser.add_argument("--previous", type=Path, default=None, help="a previous support-matrix.json to diff against, for --release-note")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="fail if docs/support-matrix.md or README.md are out of date; write nothing",
+    )
+    parser.add_argument(
+        "--release-note", action="store_true", help="print the release-note fragment to stdout instead of writing docs"
+    )
+    parser.add_argument(
+        "--previous", type=Path, default=None, help="a previous support-matrix.json to diff against, for --release-note"
+    )
     args = parser.parse_args(argv)
 
     matrix = load_json(args.matrix)
@@ -820,8 +823,7 @@ def main(argv: list[str] | None = None) -> int:
         problems = []
         if not args.doc_out.exists() or args.doc_out.read_text(encoding="utf-8") != doc_text:
             problems.append(
-                f"{args.doc_out} is out of date; regenerate with "
-                "`python3 -B scripts/generate-support-matrix-docs.py`"
+                f"{args.doc_out} is out of date; regenerate with `python3 -B scripts/generate-support-matrix-docs.py`"
             )
         if readme_text != new_readme_text:
             problems.append(

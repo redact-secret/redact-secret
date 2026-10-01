@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  CLI_ARGUMENT_BUDGET,
-  batchArguments,
-} from "../lib/cli-qualification-batches.mjs";
+import { batchArguments, CLI_ARGUMENT_BUDGET } from "../lib/cli-qualification-batches.mjs";
 
 test("partitions an expanded corpus without losing or reordering paths", () => {
   const paths = Array.from(

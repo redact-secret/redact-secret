@@ -7,7 +7,6 @@ Every input here is synthetic.
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 SYNTHETIC_INPUT = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
@@ -25,17 +24,13 @@ def test_default_behavior_is_unaffected_for_ordinary_input() -> None:
 
 
 def test_scan_accepts_input_exactly_at_an_explicit_byte_bound() -> None:
-    limits = redact_secret.WholeInputLimits(
-        max_input_bytes=len(SYNTHETIC_INPUT), max_findings=10
-    )
+    limits = redact_secret.WholeInputLimits(max_input_bytes=len(SYNTHETIC_INPUT), max_findings=10)
     findings = redact_secret.scan(SYNTHETIC_INPUT, limits=limits)
     assert len(findings) == 1
 
 
 def test_scan_rejects_input_one_byte_over_an_explicit_byte_bound() -> None:
-    limits = redact_secret.WholeInputLimits(
-        max_input_bytes=len(SYNTHETIC_INPUT) - 1, max_findings=10
-    )
+    limits = redact_secret.WholeInputLimits(max_input_bytes=len(SYNTHETIC_INPUT) - 1, max_findings=10)
     with pytest.raises(redact_secret.InputLimitExceededError) as excinfo:
         redact_secret.scan(SYNTHETIC_INPUT, limits=limits)
     assert excinfo.value.code == "INPUT_LIMIT_EXCEEDED"
@@ -53,9 +48,7 @@ def test_redact_and_scan_and_redact_also_honor_an_explicit_byte_bound() -> None:
 
 def test_scan_rejects_a_finding_count_over_an_explicit_bound() -> None:
     # Two disjoint AWS-access-key-shaped candidates.
-    text = "prefix AKIA{} middle AKIA{} suffix".format(
-        "SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2"
-    )
+    text = "prefix AKIA{} middle AKIA{} suffix".format("SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2")
     generous = redact_secret.WholeInputLimits(max_input_bytes=1024, max_findings=100)
     found = redact_secret.scan(text, limits=generous)
     assert len(found) == 2
@@ -73,9 +66,7 @@ def test_redact_independently_enforces_the_finding_bound() -> None:
     """`redact()` bounds `len(findings)` even when the findings did not come
     from a `scan()` call under the same limits — no `scan()` call under
     `strict` is involved here at all."""
-    text = "prefix AKIA{} middle AKIA{} suffix".format(
-        "SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2"
-    )
+    text = "prefix AKIA{} middle AKIA{} suffix".format("SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2")
     generous = redact_secret.WholeInputLimits(max_input_bytes=1024, max_findings=100)
     findings = redact_secret.scan(text, limits=generous)
     assert len(findings) == 2

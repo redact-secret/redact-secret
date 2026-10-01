@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { SCOPES, commands, loadScripts, npmRunTargets, recommend } from "../check-scope.mjs";
+import { commands, loadScripts, npmRunTargets, recommend, SCOPES } from "../check-scope.mjs";
 
 const scripts = loadScripts();
 const ciGates = npmRunTargets(scripts.ci);

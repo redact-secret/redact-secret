@@ -6,11 +6,10 @@ const PACKAGE_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 /** Runs `source` in a fresh Node process resolving the built package. */
 function runInNode(source: string): string {
-  return execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", source],
-    { cwd: PACKAGE_ROOT, encoding: "utf8" },
-  );
+  return execFileSync(process.execPath, ["--input-type=module", "--eval", source], {
+    cwd: PACKAGE_ROOT,
+    encoding: "utf8",
+  });
 }
 
 describe("Node package import", () => {
@@ -41,10 +40,7 @@ describe("Node package import", () => {
 
   it("selects the Node adapter, not the browser one", () => {
     const output = runInNode(
-      [
-        "const { loadNativeBinding } = await import('#native');",
-        "console.log(typeof loadNativeBinding);",
-      ].join(" "),
+      ["const { loadNativeBinding } = await import('#native');", "console.log(typeof loadNativeBinding);"].join(" "),
     );
 
     expect(output.trim()).toBe("function");
@@ -60,10 +56,9 @@ describe("Node package import", () => {
 
   it("selects the Node common-profile adapter, not the browser one", () => {
     const output = runInNode(
-      [
-        "const { loadNativeBinding } = await import('#native-common');",
-        "console.log(typeof loadNativeBinding);",
-      ].join(" "),
+      ["const { loadNativeBinding } = await import('#native-common');", "console.log(typeof loadNativeBinding);"].join(
+        " ",
+      ),
     );
 
     expect(output.trim()).toBe("function");
@@ -118,16 +113,8 @@ describe("Node package import", () => {
     );
 
     expect(JSON.parse(output)).toEqual({
-      node: [
-        "NodeStreamSanitizer",
-        "SecretScanError",
-        "createNodeStreamSanitizer",
-      ],
-      web: [
-        "SecretScanError",
-        "WebStreamSanitizer",
-        "createWebStreamSanitizer",
-      ],
+      node: ["NodeStreamSanitizer", "SecretScanError", "createNodeStreamSanitizer"],
+      web: ["SecretScanError", "WebStreamSanitizer", "createWebStreamSanitizer"],
     });
   });
 
@@ -148,16 +135,8 @@ describe("Node package import", () => {
     );
 
     expect(JSON.parse(output)).toEqual({
-      node: [
-        "NodeStreamSanitizer",
-        "SecretScanError",
-        "createNodeStreamSanitizer",
-      ],
-      web: [
-        "SecretScanError",
-        "WebStreamSanitizer",
-        "createWebStreamSanitizer",
-      ],
+      node: ["NodeStreamSanitizer", "SecretScanError", "createNodeStreamSanitizer"],
+      web: ["SecretScanError", "WebStreamSanitizer", "createWebStreamSanitizer"],
       // The two profile subpaths share one session-free class; only the
       // factory's runtime differs (issue #416).
       sharedNodeClass: true,
@@ -221,8 +200,7 @@ describe("Node package import", () => {
     expect(JSON.parse(output)).toEqual({
       code: "NOT_INITIALIZED",
       name: "SecretScanError",
-      message:
-        "redact-secret is not initialized; await initialize() before this call.",
+      message: "redact-secret is not initialized; await initialize() before this call.",
     });
   });
 

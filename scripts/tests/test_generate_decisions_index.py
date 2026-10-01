@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "generate-decisions-index.py"
 SPEC = importlib.util.spec_from_file_location("generate_decisions_index", SCRIPT)
 assert SPEC and SPEC.loader
@@ -59,7 +58,10 @@ class DecisionsIndexTests(unittest.TestCase):
             encoding="utf-8",
         )
         text = GEN.render_aliases(self.root)
-        self.assertIn(f"| `decision-old` | [Survivor](decisions/2026-09-01-a.md) | [permalink](https://github.com/redact-secret/redact-secret/blob/{sha}/docs/decisions/old.md) |", text)
+        self.assertIn(
+            f"| `decision-old` | [Survivor](decisions/2026-09-01-a.md) | [permalink](https://github.com/redact-secret/redact-secret/blob/{sha}/docs/decisions/old.md) |",
+            text,
+        )
 
     def test_alias_without_a_permalink_row_is_rejected(self) -> None:
         (self.root / "docs" / "decisions" / "2026-09-01-a.md").write_text(

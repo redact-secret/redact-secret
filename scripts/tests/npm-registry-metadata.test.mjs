@@ -1,5 +1,5 @@
-import { test } from "node:test";
 import assert from "node:assert/strict";
+import { test } from "node:test";
 import {
   describePublication,
   listedInPackument,
@@ -13,23 +13,36 @@ const name = "@redact-secret/test";
 const version = "0.1.0-beta.1";
 const metadata = { name, version, dist: { shasum: "a".repeat(40) } };
 test("uses exact version endpoint without aggregate metadata or credentials", async () => {
-  assert.deepEqual(await viewPublished(name, version, async (url, options) => {
-    assert.equal(url.origin, "https://registry.npmjs.org");
-    assert.equal(url.pathname, "/%40redact-secret%2Ftest/0.1.0-beta.1");
-    assert.ok(url.searchParams.has("release_check"));
-    assert.deepEqual(options.headers, { "Cache-Control": "no-cache" });
-    return Response.json(metadata);
-  }), metadata);
+  assert.deepEqual(
+    await viewPublished(name, version, async (url, options) => {
+      assert.equal(url.origin, "https://registry.npmjs.org");
+      assert.equal(url.pathname, "/%40redact-secret%2Ftest/0.1.0-beta.1");
+      assert.ok(url.searchParams.has("release_check"));
+      assert.deepEqual(options.headers, { "Cache-Control": "no-cache" });
+      return Response.json(metadata);
+    }),
+    metadata,
+  );
 });
 test("only 404 is unpublished; authorization and server errors fail closed", async () => {
   assert.equal(await viewPublished(name, version, async () => new Response(null, { status: 404 })), undefined);
   for (const status of [401, 403, 429, 500]) {
-    await assert.rejects(viewPublished(name, version, async () => new Response(null, { status })), /registry returned HTTP/);
+    await assert.rejects(
+      viewPublished(name, version, async () => new Response(null, { status })),
+      /registry returned HTTP/,
+    );
   }
 });
 test("rejects wrong package, version, and absent checksum", async () => {
-  for (const data of [{ ...metadata, name: "wrong" }, { ...metadata, version: "wrong" }, { ...metadata, dist: {} }]) {
-    await assert.rejects(viewPublished(name, version, async () => Response.json(data)), /invalid registry metadata/);
+  for (const data of [
+    { ...metadata, name: "wrong" },
+    { ...metadata, version: "wrong" },
+    { ...metadata, dist: {} },
+  ]) {
+    await assert.rejects(
+      viewPublished(name, version, async () => Response.json(data)),
+      /invalid registry metadata/,
+    );
   }
 });
 
@@ -158,7 +171,10 @@ test("listedInPackument reads the abbreviated install packument", async () => {
   assert.equal(listed, true);
   assert.equal(await listedInPackument(name, version, async () => Response.json({ name, versions: {} })), false);
   assert.equal(await listedInPackument(name, version, async () => new Response(null, { status: 404 })), false);
-  await assert.rejects(listedInPackument(name, version, async () => Response.json({ name: "wrong" })), /invalid registry packument/);
+  await assert.rejects(
+    listedInPackument(name, version, async () => Response.json({ name: "wrong" })),
+    /invalid registry packument/,
+  );
 });
 
 test("waitForInstallable waits until every package is on its version endpoint and in its packument", async () => {
@@ -175,7 +191,13 @@ test("waitForInstallable waits until every package is on its version endpoint an
     const listed = pkg === name || reads >= 3;
     return Response.json({ name: pkg, versions: listed ? { [version]: {} } : {} });
   };
-  await waitForInstallable([{ name, version }, { name: other, version }], { request, pollIntervalMs: 0 });
+  await waitForInstallable(
+    [
+      { name, version },
+      { name: other, version },
+    ],
+    { request, pollIntervalMs: 0 },
+  );
   assert.equal(packumentReads.get(name), 1);
   assert.equal(packumentReads.get(other), 3);
 });

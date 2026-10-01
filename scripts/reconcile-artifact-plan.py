@@ -43,7 +43,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from dataclasses import asdict, dataclass
 
 
@@ -81,15 +80,13 @@ def classify(observation: Observation) -> Decision:
             return Decision("skip", "already published and matches this source revision")
         return Decision(
             "block",
-            "already published with content that does not match this source revision "
-            "(conflicting version)",
+            "already published with content that does not match this source revision (conflicting version)",
         )
     if observation.artifact_available:
         return Decision("publish", "not yet published; the qualified artifact is available")
     return Decision(
         "block",
-        "not yet published, and the qualified build artifact has expired; "
-        "a full release run is required",
+        "not yet published, and the qualified build artifact has expired; a full release run is required",
     )
 
 

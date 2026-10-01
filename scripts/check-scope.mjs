@@ -122,9 +122,7 @@ export function commands(result) {
 }
 
 function git(args) {
-  return execFileSync("git", args, { cwd: REPO_ROOT, encoding: "utf8" })
-    .split("\n")
-    .filter(Boolean);
+  return execFileSync("git", args, { cwd: REPO_ROOT, encoding: "utf8" }).split("\n").filter(Boolean);
 }
 
 function changedPaths(base) {
@@ -174,9 +172,7 @@ function main(argv) {
   if (!run) return 0;
 
   // Under `npm run`, reuse that npm's own entry point; otherwise `npm` on PATH.
-  const [npm, prefix] = process.env.npm_execpath
-    ? [process.execPath, [process.env.npm_execpath]]
-    : ["npm", []];
+  const [npm, prefix] = process.env.npm_execpath ? [process.execPath, [process.env.npm_execpath]] : ["npm", []];
   for (const name of list) {
     console.log(`\n> npm run ${name}`);
     const status = spawnSync(npm, [...prefix, "run", name], { cwd: REPO_ROOT, stdio: "inherit" }).status;

@@ -31,16 +31,21 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
-
-import { buildAndEmitPerformanceResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
 import { cliVersion, resolveCliBinary, runCliProcess, rustcVersion } from "./lib/assessment-cli.mjs";
-import { loadTsModule } from "./lib/load-ts-module.mjs";
+import { buildAndEmitPerformanceResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
 import {
-  gitCommit, hostCpu, hostOs, loadWorkloadProfiles, REPO_ROOT, workloadProfilesHash,
+  gitCommit,
+  hostCpu,
+  hostOs,
+  loadWorkloadProfiles,
+  REPO_ROOT,
+  workloadProfilesHash,
 } from "./lib/assessment-provenance.mjs";
+import { loadTsModule } from "./lib/load-ts-module.mjs";
 
 const DEFAULT_PROFILE = "scale-logs-small-whole";
-const PROCESS_RSS_LIMIT = "A separate, untimed /usr/bin/time-wrapped repetition's whole-process maximum resident set size; it includes process startup, argument parsing, the Rust runtime, and the entire scan, and cannot isolate steady-state or Rust-only memory.";
+const PROCESS_RSS_LIMIT =
+  "A separate, untimed /usr/bin/time-wrapped repetition's whole-process maximum resident set size; it includes process startup, argument parsing, the Rust runtime, and the entire scan, and cannot isolate steady-state or Rust-only memory.";
 
 function fail(message) {
   console.error(message);
@@ -82,7 +87,8 @@ function parseMaxRssBytes(stderrText) {
 function measureRssBytes(wrapper, binary, args, stdinBuffer) {
   if (wrapper === undefined) return undefined;
   const result = spawnSync(wrapper.command, [...wrapper.prefixArgs, binary, ...args], {
-    input: stdinBuffer, maxBuffer: 64 * 1024 * 1024,
+    input: stdinBuffer,
+    maxBuffer: 64 * 1024 * 1024,
   });
   if (result.error !== undefined || ![0, 1].includes(result.status)) return undefined;
   return parseMaxRssBytes(result.stderr.toString("utf8"));
@@ -135,7 +141,9 @@ async function main() {
   }
 
   const unavailable = (reason) => metrics.unavailableMemory(reason, "No samples were available.");
-  const rssSamples = samples.flatMap((sample) => typeof sample.processRssBytes === "number" ? [sample.processRssBytes] : []);
+  const rssSamples = samples.flatMap((sample) =>
+    typeof sample.processRssBytes === "number" ? [sample.processRssBytes] : [],
+  );
   const memoryMetrics = {
     nodeHeap: unavailable("The CLI is a native process, not a Node.js process."),
     nodeRss: unavailable("The CLI is a native process, not a Node.js process."),
@@ -143,32 +151,49 @@ async function main() {
     browserJsHeap: unavailable("The CLI is a native process, not a browser JavaScript environment."),
     wasmLinearMemory: unavailable("The CLI is a native process and does not use WebAssembly linear memory."),
     pythonHeap: unavailable("The CLI is a native process, not a Python allocator."),
-    processRss: rssSamples.length === samples.length
-      ? metrics.availableMemory(
-        rssSamples.map((bytes) => ({ baselineBytes: 0, maximumObservedBytes: bytes })),
-        PROCESS_RSS_LIMIT,
-      )
-      : unavailable("No portable whole-process resident-memory sampling tool is available on this platform."),
+    processRss:
+      rssSamples.length === samples.length
+        ? metrics.availableMemory(
+            rssSamples.map((bytes) => ({ baselineBytes: 0, maximumObservedBytes: bytes })),
+            PROCESS_RSS_LIMIT,
+          )
+        : unavailable("No portable whole-process resident-memory sampling tool is available on this platform."),
     streamingBuffer: unavailable(
       "The CLI's standard-input path streams through the incremental core, but the public contract exposes no retained plaintext buffer size.",
     ),
   };
   const performanceMetrics = {
-    initialization: metrics.summarizeDistribution(samples.map((sample) => sample.initializationMs), "milliseconds"),
-    processing: metrics.summarizeDistribution(samples.map((sample) => sample.processingMs), "milliseconds"),
-    throughput: metrics.summarizeDistribution(samples.map((sample) => sample.throughputBytesPerSecond), "bytes-per-second"),
+    initialization: metrics.summarizeDistribution(
+      samples.map((sample) => sample.initializationMs),
+      "milliseconds",
+    ),
+    processing: metrics.summarizeDistribution(
+      samples.map((sample) => sample.processingMs),
+      "milliseconds",
+    ),
+    throughput: metrics.summarizeDistribution(
+      samples.map((sample) => sample.throughputBytesPerSecond),
+      "bytes-per-second",
+    ),
     memory: memoryMetrics,
   };
 
   const result = await buildAndEmitPerformanceResult({
-    surface: "cli", profileId: profile.id, performance: performanceMetrics,
+    surface: "cli",
+    profileId: profile.id,
+    performance: performanceMetrics,
     provenance: {
-      commit: gitCommit(), artifactIdentity: `redact-secret@${version.version}`,
-      corpusVersion: "1", corpusHash: workloadProfilesHash(), os: hostOs(), cpu: hostCpu(),
+      commit: gitCommit(),
+      artifactIdentity: `redact-secret@${version.version}`,
+      corpusVersion: "1",
+      corpusHash: workloadProfilesHash(),
+      os: hostOs(),
+      cpu: hostCpu(),
       runtime: rustcVersion(),
       command: `node scripts/assessment-cli-performance.mjs ${process.argv.slice(2).join(" ")}`.trim(),
     },
-    jsonOut: options.jsonOut, markdownOut: options.markdownOut,
+    jsonOut: options.jsonOut,
+    markdownOut: options.markdownOut,
   });
   console.error(
     `cli performance: ${result.performance.processing.samples.length} run(s), ` +

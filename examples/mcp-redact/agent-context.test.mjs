@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { register } from "node:module";
 import test from "node:test";
 
-import { buildSafeContext, createGoldenPathBoundary, createGoldenPathBoundaryWith, EXAMPLE_LIMITS } from "./agent-context.mjs";
+import {
+  buildSafeContext,
+  createGoldenPathBoundary,
+  createGoldenPathBoundaryWith,
+  EXAMPLE_LIMITS,
+} from "./agent-context.mjs";
 import { fakeCore, uninitializedCore } from "./fixtures/fake-core.mjs";
 
 function setup(overrides = {}) {
@@ -116,7 +121,12 @@ test("tool dispatch is built from the sanitized input text, never the raw one", 
 test("#610: oversized input is refused by the core's whole-input limit before any detection", async () => {
   const userInput = "x".repeat(EXAMPLE_LIMITS.wholeInputLimits.maxInputBytes + 1);
   const result = await buildSafeContext({ boundary, userInput });
-  assert.deepEqual(result, { outcome: "blocked", reason: "limit_exceeded", code: "INPUT_LIMIT_EXCEEDED", stage: "input" });
+  assert.deepEqual(result, {
+    outcome: "blocked",
+    reason: "limit_exceeded",
+    code: "INPUT_LIMIT_EXCEEDED",
+    stage: "input",
+  });
 });
 
 test("calling before initialize() fails closed with the core's own NOT_INITIALIZED", async () => {
@@ -187,7 +197,11 @@ test("cancellation — an already-aborted signal short-circuits before scanning 
       return fakeCore.scanAndRedact(text, options);
     },
   });
-  const result = await buildSafeContext({ boundary: counting, userInput: "SECRET_TOKEN_1", signal: AbortSignal.abort() });
+  const result = await buildSafeContext({
+    boundary: counting,
+    userInput: "SECRET_TOKEN_1",
+    signal: AbortSignal.abort(),
+  });
   assert.deepEqual(result, { outcome: "aborted", stage: "input" });
   assert.equal(scanned, false);
 });

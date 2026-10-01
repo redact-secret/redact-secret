@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import importlib.util
+import unittest
 from pathlib import Path
 from types import SimpleNamespace
-import unittest
-
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -58,11 +57,16 @@ class FakeApi:
         marker = next(candidate for candidate in markers if candidate in text)
         start = text.index(marker)
         finding = SimpleNamespace(
-            id="finding-1", detector="github-token", type="github_token",
-            confidence="high", action="redact", start=start, end=start + len(marker),
+            id="finding-1",
+            detector="github-token",
+            type="github_token",
+            confidence="high",
+            action="redact",
+            start=start,
+            end=start + len(marker),
         )
         return SimpleNamespace(
-            text=text[:start] + "<SECRET_1>" + text[start + len(marker):],
+            text=text[:start] + "<SECRET_1>" + text[start + len(marker) :],
             findings=[finding],
         )
 
@@ -76,9 +80,7 @@ class FakeApi:
 class PythonAssessmentWorkerTests(unittest.TestCase):
     def test_unicode_code_point_ranges_normalize_to_canonical_bytes(self) -> None:
         text = "\U0001f511 ghp_ASSESSMENTSYNTHETIC0000000000000000"
-        result = WORKER.run_accuracy(
-            FakeApi, {"fixtures": [{"id": "unicode-known-answer", "input": text}]}
-        )
+        result = WORKER.run_accuracy(FakeApi, {"fixtures": [{"id": "unicode-known-answer", "input": text}]})
         finding = result["fixtures"][0]["findings"][0]
         self.assertEqual(finding["start"], len("\U0001f511 ".encode("utf-8")))
         self.assertEqual(finding["end"], len(text.encode("utf-8")))
@@ -117,10 +119,12 @@ class PythonAssessmentWorkerTests(unittest.TestCase):
         with self.assertRaises(WORKER.WorkerFailure) as raised:
             WORKER.run_accuracy(
                 FailingApi,
-                {"fixtures": [
-                    {"id": "first-known-answer", "input": marker},
-                    {"id": "second-known-answer", "input": marker},
-                ]},
+                {
+                    "fixtures": [
+                        {"id": "first-known-answer", "input": marker},
+                        {"id": "second-known-answer", "input": marker},
+                    ]
+                },
             )
         self.assertEqual(str(raised.exception), "second-known-answer:PACKAGE_OPERATION_FAILED")
         self.assertNotIn(marker, str(raised.exception))

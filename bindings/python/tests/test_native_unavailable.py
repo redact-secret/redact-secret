@@ -8,7 +8,6 @@ import sys
 import types
 
 import pytest
-
 import redact_secret
 
 
@@ -17,12 +16,8 @@ def test_missing_native_symbols_raise_the_reinstall_message(
 ) -> None:
     # An extension module that imports but lacks the expected names stands in
     # for an ABI-mismatched or incomplete installation.
-    monkeypatch.setitem(
-        sys.modules, "redact_secret._native", types.ModuleType("redact_secret._native")
-    )
-    spec = importlib.util.spec_from_file_location(
-        "redact_secret_unavailable_probe", redact_secret.__file__
-    )
+    monkeypatch.setitem(sys.modules, "redact_secret._native", types.ModuleType("redact_secret._native"))
+    spec = importlib.util.spec_from_file_location("redact_secret_unavailable_probe", redact_secret.__file__)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
 

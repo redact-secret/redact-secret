@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  createServerHandlerWith,
-  prepareBrowserSubmissionWith,
-} from "./integration.mjs";
+import { createServerHandlerWith, prepareBrowserSubmissionWith } from "./integration.mjs";
 
 const encoder = new TextEncoder();
 const body = (content) => encoder.encode(JSON.stringify({ content }));
@@ -24,7 +21,10 @@ function scanner(input) {
   if (input === "block input") return { text: "<SECRET_1>", findings: [finding("block")] };
   if (input === "warn input") return { text: input, findings: [finding("warn")] };
   if (input === "many findings") {
-    return { text: "<SECRET_1> <SECRET_2>", findings: [finding("redact"), finding("redact", { id: "finding-2", start: 34, end: 59 })] };
+    return {
+      text: "<SECRET_1> <SECRET_2>",
+      findings: [finding("redact"), finding("redact", { id: "finding-2", start: 34, end: 59 })],
+    };
   }
   if (input === "expand output") return { text: "sanitized output is deliberately long", findings: [] };
   if (input === "redact input") return { text: "<SECRET_1>", findings: [finding("redact")] };
@@ -76,7 +76,9 @@ test("server rejects each declared limit before downstream use", async () => {
   assert.equal((await findings(body("many findings"))).code, "RESOURCE_LIMIT_EXCEEDED");
 
   let release;
-  const held = new Promise((resolve) => { release = resolve; });
+  const held = new Promise((resolve) => {
+    release = resolve;
+  });
   const concurrent = createServerHandlerWith({
     scanAndRedact: scanner,
     forward: async () => held,

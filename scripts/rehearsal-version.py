@@ -38,10 +38,11 @@ import json
 import os
 import re
 import sys
-import tomllib
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -90,9 +91,7 @@ def derive(run_id: str, current: str) -> str:
     if not match:
         raise RehearsalError(f"the branch version {current!r} is not X.Y.Z-beta.N")
     if not run_id.isdigit() or int(run_id) <= int(match["number"]):
-        raise RehearsalError(
-            f"run id {run_id!r} must be a number above the current beta number {match['number']}"
-        )
+        raise RehearsalError(f"run id {run_id!r} must be a number above the current beta number {match['number']}")
     return f"{match['release']}-beta.{int(run_id)}"
 
 

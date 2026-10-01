@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-release-gate.py"
 SPEC = importlib.util.spec_from_file_location("check_release_gate", SCRIPT)
 assert SPEC and SPEC.loader
@@ -265,9 +264,7 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any("publish-crates job does not need artifact-qualification" in error for error in errors)
-        )
+        self.assertTrue(any("publish-crates job does not need artifact-qualification" in error for error in errors))
 
     def test_publish_pypi_not_needing_a_gate_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -276,15 +273,12 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "publish-pypi job does not need artifact-qualification" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("publish-pypi job does not need artifact-qualification" in error for error in errors))
 
     def test_missing_publish_crates_job_is_an_error(self) -> None:
-        broken = RELEASE_YML[: RELEASE_YML.index("  publish-crates:")] + RELEASE_YML[RELEASE_YML.index("  publish-pypi:") :]
+        broken = (
+            RELEASE_YML[: RELEASE_YML.index("  publish-crates:")] + RELEASE_YML[RELEASE_YML.index("  publish-pypi:") :]
+        )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(any("missing publish-crates job" in error for error in errors))
@@ -302,12 +296,7 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "publish job does not need publish-native-dependencies" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("publish job does not need publish-native-dependencies" in error for error in errors))
 
     def test_publish_not_needing_wasm_dependency_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -316,29 +305,25 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any("publish job does not need publish-wasm-dependency" in error for error in errors)
-        )
+        self.assertTrue(any("publish job does not need publish-wasm-dependency" in error for error in errors))
 
     def test_missing_publish_native_dependencies_job_is_an_error(self) -> None:
-        broken = RELEASE_YML[: RELEASE_YML.index("  publish-native-dependencies:")] + RELEASE_YML[
-            RELEASE_YML.index("  publish-wasm-dependency:") :
-        ]
+        broken = (
+            RELEASE_YML[: RELEASE_YML.index("  publish-native-dependencies:")]
+            + RELEASE_YML[RELEASE_YML.index("  publish-wasm-dependency:") :]
+        )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any("missing required job 'publish-native-dependencies'" in error for error in errors)
-        )
+        self.assertTrue(any("missing required job 'publish-native-dependencies'" in error for error in errors))
 
     def test_missing_publish_wasm_dependency_job_is_an_error(self) -> None:
-        broken = RELEASE_YML[: RELEASE_YML.index("  publish-wasm-dependency:")] + RELEASE_YML[
-            RELEASE_YML.index("  publish:") :
-        ]
+        broken = (
+            RELEASE_YML[: RELEASE_YML.index("  publish-wasm-dependency:")]
+            + RELEASE_YML[RELEASE_YML.index("  publish:") :]
+        )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any("missing required job 'publish-wasm-dependency'" in error for error in errors)
-        )
+        self.assertTrue(any("missing required job 'publish-wasm-dependency'" in error for error in errors))
 
     def test_missing_profile_verification_step_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -346,26 +331,23 @@ class ReleaseGateTests(unittest.TestCase):
             "        shell: bash\n"
             "        run: |\n"
             "          node --input-type=module <<'NODE_VERIFY'\n"
-            "          import { readFileSync } from \"node:fs\";\n"
-            "          import init, { profile } from \"./bindings/wasm/npm/redact_secret_wasm.js\";\n"
-            "          import initCommon, { profile as profileCommon } from \"./bindings/wasm/npm/redact_secret_wasm_common.js\";\n"
-            "          await init(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_bg.wasm\"));\n"
-            "          if (profile() !== \"full\") { throw new Error(\"not full\"); }\n"
-            "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
-            "          if (profileCommon() !== \"common\") { throw new Error(\"not common\"); }\n"
-            "          if (piiCode(initialize) !== \"PII_SELECTOR_UNAVAILABLE\") { throw new Error(\"default links PII\"); }\n"
-            "          const pii = await import(\"./bindings/wasm/npm/redact_secret_wasm_pii.js\");\n"
-            "          const commonPii = await import(\"./bindings/wasm/npm/redact_secret_wasm_common_pii.js\");\n"
+            '          import { readFileSync } from "node:fs";\n'
+            '          import init, { profile } from "./bindings/wasm/npm/redact_secret_wasm.js";\n'
+            '          import initCommon, { profile as profileCommon } from "./bindings/wasm/npm/redact_secret_wasm_common.js";\n'
+            '          await init(readFileSync("./bindings/wasm/npm/redact_secret_wasm_bg.wasm"));\n'
+            '          if (profile() !== "full") { throw new Error("not full"); }\n'
+            '          await initCommon(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm"));\n'
+            '          if (profileCommon() !== "common") { throw new Error("not common"); }\n'
+            '          if (piiCode(initialize) !== "PII_SELECTOR_UNAVAILABLE") { throw new Error("default links PII"); }\n'
+            '          const pii = await import("./bindings/wasm/npm/redact_secret_wasm_pii.js");\n'
+            '          const commonPii = await import("./bindings/wasm/npm/redact_secret_wasm_common_pii.js");\n'
             "          NODE_VERIFY\n\n",
             "",
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(
-            any(
-                "is missing the 'Verify the root artifact reports the full profile' step" in error
-                for error in errors
-            )
+            any("is missing the 'Verify the root artifact reports the full profile' step" in error for error in errors)
         )
 
     def test_missing_wasm_publish_step_is_an_error(self) -> None:
@@ -376,10 +358,7 @@ class ReleaseGateTests(unittest.TestCase):
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(
-            any(
-                "is missing the 'Pack, content-check, publish, and verify' step" in error
-                for error in errors
-            )
+            any("is missing the 'Pack, content-check, publish, and verify' step" in error for error in errors)
         )
 
     def test_profile_verification_step_after_publish_step_is_an_error(self) -> None:
@@ -388,16 +367,16 @@ class ReleaseGateTests(unittest.TestCase):
             "        shell: bash\n"
             "        run: |\n"
             "          node --input-type=module <<'NODE_VERIFY'\n"
-            "          import { readFileSync } from \"node:fs\";\n"
-            "          import init, { profile } from \"./bindings/wasm/npm/redact_secret_wasm.js\";\n"
-            "          import initCommon, { profile as profileCommon } from \"./bindings/wasm/npm/redact_secret_wasm_common.js\";\n"
-            "          await init(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_bg.wasm\"));\n"
-            "          if (profile() !== \"full\") { throw new Error(\"not full\"); }\n"
-            "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
-            "          if (profileCommon() !== \"common\") { throw new Error(\"not common\"); }\n"
-            "          if (piiCode(initialize) !== \"PII_SELECTOR_UNAVAILABLE\") { throw new Error(\"default links PII\"); }\n"
-            "          const pii = await import(\"./bindings/wasm/npm/redact_secret_wasm_pii.js\");\n"
-            "          const commonPii = await import(\"./bindings/wasm/npm/redact_secret_wasm_common_pii.js\");\n"
+            '          import { readFileSync } from "node:fs";\n'
+            '          import init, { profile } from "./bindings/wasm/npm/redact_secret_wasm.js";\n'
+            '          import initCommon, { profile as profileCommon } from "./bindings/wasm/npm/redact_secret_wasm_common.js";\n'
+            '          await init(readFileSync("./bindings/wasm/npm/redact_secret_wasm_bg.wasm"));\n'
+            '          if (profile() !== "full") { throw new Error("not full"); }\n'
+            '          await initCommon(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm"));\n'
+            '          if (profileCommon() !== "common") { throw new Error("not common"); }\n'
+            '          if (piiCode(initialize) !== "PII_SELECTOR_UNAVAILABLE") { throw new Error("default links PII"); }\n'
+            '          const pii = await import("./bindings/wasm/npm/redact_secret_wasm_pii.js");\n'
+            '          const commonPii = await import("./bindings/wasm/npm/redact_secret_wasm_common_pii.js");\n'
             "          NODE_VERIFY\n\n"
         )
         publish_step = "      - name: Pack, content-check, publish, and verify\n        run: echo noop\n\n"
@@ -405,12 +384,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "must precede 'Pack, content-check, publish, and verify'" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("must precede 'Pack, content-check, publish, and verify'" in error for error in errors))
 
     def test_profile_verification_step_not_asserting_full_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -419,25 +393,18 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any('does not assert the root artifact reports "full"' in error for error in errors)
-        )
+        self.assertTrue(any('does not assert the root artifact reports "full"' in error for error in errors))
 
     def test_profile_verification_step_not_asserting_common_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
-            "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
+            '          await initCommon(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm"));\n'
             '          if (profileCommon() !== "common") { throw new Error("not common"); }\n',
             "",
         )
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                'does not assert the common artifact reports "common"' in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any('does not assert the common artifact reports "common"' in error for error in errors))
 
     def test_profile_verification_step_not_refusing_pii_in_defaults_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -477,32 +444,24 @@ class ReleaseGateTests(unittest.TestCase):
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(
-            any(
-                "'Compute the wrapper package identity' must follow 'Qualify release'" in error
-                for error in errors
-            )
+            any("'Compute the wrapper package identity' must follow 'Qualify release'" in error for error in errors)
         )
 
     def test_missing_wrapper_registry_adapter_install_is_an_error(self) -> None:
         install = (
-            "      - name: Install the example's registry adapter packages\n"
-            "        run: npm run examples:install\n"
+            "      - name: Install the example's registry adapter packages\n        run: npm run examples:install\n"
         )
         broken = RELEASE_YML.replace(install, "")
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(
-            any(
-                "missing the 'Install the example's registry adapter packages' step" in error
-                for error in errors
-            )
+            any("missing the 'Install the example's registry adapter packages' step" in error for error in errors)
         )
 
     def test_wrapper_registry_adapter_install_after_qualification_is_an_error(self) -> None:
         install = (
-            "      - name: Install the example's registry adapter packages\n"
-            "        run: npm run examples:install\n"
+            "      - name: Install the example's registry adapter packages\n        run: npm run examples:install\n"
         )
         qualify = "      - name: Qualify release\n        run: npm run release:check\n"
         broken = RELEASE_YML.replace(install + qualify, qualify + install)
@@ -524,9 +483,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any("does not run npm run examples:install" in error for error in errors)
-        )
+        self.assertTrue(any("does not run npm run examples:install" in error for error in errors))
 
     def test_wrapper_identity_without_build_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -536,25 +493,18 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any("does not run npm run js:build before packing" in error for error in errors)
-        )
+        self.assertTrue(any("does not run npm run js:build before packing" in error for error in errors))
 
     def test_wrapper_publish_not_using_recorded_tarball_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
             "        env:\n          WRAPPER_TARBALL: ${{ steps.pack.outputs.tarball }}\n"
-            "        run: npm publish \"$WRAPPER_TARBALL\"\n",
+            '        run: npm publish "$WRAPPER_TARBALL"\n',
             "        run: npm publish ./packages/javascript\n",
         )
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "'Release package' does not publish the tarball" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("'Release package' does not publish the tarball" in error for error in errors))
 
     def test_missing_wrapper_identity_step_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -565,10 +515,7 @@ class ReleaseGateTests(unittest.TestCase):
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(
-            any(
-                "job 'publish' is missing the 'Compute the wrapper package identity' step" in error
-                for error in errors
-            )
+            any("job 'publish' is missing the 'Compute the wrapper package identity' step" in error for error in errors)
         )
 
     def test_missing_publish_pypi_job_is_missing_error_for_digest_step(self) -> None:
@@ -604,12 +551,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "is missing the 'Publish to PyPI' step" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("is missing the 'Publish to PyPI' step" in error for error in errors))
 
     def test_pypi_digest_step_after_publish_step_is_an_error(self) -> None:
         digest_step = (
@@ -623,8 +565,7 @@ class ReleaseGateTests(unittest.TestCase):
         errors = CHECK.validate(self.root)
         self.assertTrue(
             any(
-                "'Verify published wheels match the qualified inventory' must precede "
-                "'Publish to PyPI'" in error
+                "'Verify published wheels match the qualified inventory' must precede 'Publish to PyPI'" in error
                 for error in errors
             )
         )
@@ -637,12 +578,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "does not run scripts/verify-python-digest.py" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("does not run scripts/verify-python-digest.py" in error for error in errors))
 
     def test_missing_crate_digest_step_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
@@ -668,12 +604,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "is missing the 'Publish redact-secret-cli' step" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("is missing the 'Publish redact-secret-cli' step" in error for error in errors))
 
     def test_crate_digest_step_before_publish_step_is_an_error(self) -> None:
         digest_step = (
@@ -701,21 +632,12 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
-        self.assertTrue(
-            any(
-                "does not run scripts/verify-crate-digest.py" in error
-                for error in errors
-            )
-        )
+        self.assertTrue(any("does not run scripts/verify-crate-digest.py" in error for error in errors))
 
     def test_recovery_assets_must_be_normalized_before_npm_pack(self) -> None:
         self._write(
             "reconcile-release.yml",
-            "name: Reconcile Release\n"
-            "jobs:\n"
-            "  reconcile:\n"
-            "    steps:\n"
-            "      - run: cp recovered/* package/\n",
+            "name: Reconcile Release\njobs:\n  reconcile:\n    steps:\n      - run: cp recovered/* package/\n",
         )
 
         errors = CHECK.validate(self.root)
@@ -761,7 +683,7 @@ class ReleaseGateTests(unittest.TestCase):
             "    steps:\n"
             "      - run: |\n"
             '          chmod 0644 "$package_dir"/$asset_glob\n'
-            "      - run: echo \"${{ needs.reconcile.outputs.source_revision }}\"\n",
+            '      - run: echo "${{ needs.reconcile.outputs.source_revision }}"\n',
         )
         errors = CHECK.validate(self.root)
         self.assertEqual(len(errors), 1, errors)

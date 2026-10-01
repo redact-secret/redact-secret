@@ -29,5 +29,4 @@ export const defaultPlaceholderFormatter: PlaceholderFormatter = (
 export const typedPlaceholderFormatter: PlaceholderFormatter = (
   finding: SecretFinding,
   context: PlaceholderContext,
-): string =>
-  `<${finding.type.toUpperCase().replace(/[.-]/g, "_")}_${context.placeholderIndex}>`;
+): string => `<${finding.type.toUpperCase().replace(/[.-]/g, "_")}_${context.placeholderIndex}>`;

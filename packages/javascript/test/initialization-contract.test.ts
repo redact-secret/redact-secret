@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
+import { describe, expect, it } from "vitest";
 
 import { SecretScanError } from "../src/errors.js";
 import type { NativeBindingLoadOptions } from "../src/native.js";
@@ -15,10 +15,7 @@ const LIMITS = {
 };
 
 const PII_FIXTURE = JSON.parse(
-  readFileSync(
-    new URL("../../../conformance/fixtures/pii-runtime-v1.json", import.meta.url),
-    "utf8",
-  ),
+  readFileSync(new URL("../../../conformance/fixtures/pii-runtime-v1.json", import.meta.url), "utf8"),
 ) as {
   activationCases: Array<{ selectors: string[]; expected: string }>;
   errorCases: Array<{ selectors: string[]; code: string; message: string }>;
@@ -61,11 +58,7 @@ describe("initialization contract", () => {
       return binding;
     }, "full");
 
-    await Promise.all([
-      runtime.initialize(),
-      runtime.initialize(),
-      runtime.initialize(),
-    ]);
+    await Promise.all([runtime.initialize(), runtime.initialize(), runtime.initialize()]);
     await runtime.initialize();
 
     expect(loads).toBe(1);
@@ -80,7 +73,7 @@ describe("initialization contract", () => {
       runtime.initialize({ pii: ["pii:global"] }),
     ]);
     expect(runtime.piiActivation()).toBe(
-        "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2",
+      "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2",
     );
     await expect(runtime.initialize()).rejects.toMatchObject({
       code: "PII_ACTIVATION_CONFLICT",
@@ -99,9 +92,7 @@ describe("initialization contract", () => {
     ];
     for (const options of malformed) {
       const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
-      await expect(
-        runtime.initialize(options as never),
-      ).rejects.toMatchObject({
+      await expect(runtime.initialize(options as never)).rejects.toMatchObject({
         code: "INVALID_OPTIONS",
         message: "Secret scan options are invalid.",
       });
@@ -158,20 +149,13 @@ describe("initialization contract", () => {
       throw new Error("/private/path/to/redact-secret.darwin-arm64.node");
     }, "full");
 
-    await expect(runtime.initialize()).rejects.toThrowError(
-      new SecretScanError("INITIALIZATION_FAILED"),
-    );
+    await expect(runtime.initialize()).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
   });
 
   it("rejects an artifact built from a different product version", async () => {
-    const runtime = createRedactSecretRuntime(
-      async () => createFakeBinding({ version: "0.0.0-other" }),
-      "full",
-    );
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding({ version: "0.0.0-other" }), "full");
 
-    await expect(runtime.initialize()).rejects.toThrowError(
-      expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
-    );
+    await expect(runtime.initialize()).rejects.toThrowError(expect.objectContaining({ code: "INITIALIZATION_FAILED" }));
     expect(() => runtime.scan("SYNTHETIC_REVOKED_VALUE")).toThrowError(
       expect.objectContaining({ code: "NOT_INITIALIZED" }),
     );
@@ -187,14 +171,9 @@ describe("initialization contract", () => {
   });
 
   it("rejects an artifact that reports a different detector profile", async () => {
-    const runtime = createRedactSecretRuntime(
-      async () => createFakeBinding({ profile: "common" }),
-      "full",
-    );
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding({ profile: "common" }), "full");
 
-    await expect(runtime.initialize()).rejects.toThrowError(
-      expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
-    );
+    await expect(runtime.initialize()).rejects.toThrowError(expect.objectContaining({ code: "INITIALIZATION_FAILED" }));
     expect(() => runtime.scan("SYNTHETIC_REVOKED_VALUE")).toThrowError(
       expect.objectContaining({ code: "NOT_INITIALIZED" }),
     );
@@ -212,9 +191,7 @@ describe("initialization contract", () => {
   it("requires initialize before reporting which artifact loaded", () => {
     const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
 
-    expect(() => runtime.artifact()).toThrowError(
-      expect.objectContaining({ code: "NOT_INITIALIZED" }),
-    );
+    expect(() => runtime.artifact()).toThrowError(expect.objectContaining({ code: "NOT_INITIALIZED" }));
   });
 
   it("reports the loaded binding's own artifact kind", async () => {
@@ -248,9 +225,7 @@ describe("PII artifact selection", () => {
       const { loads, runtime } = twoArtifacts();
       await runtime.initialize(options);
       expect(loads).toEqual([{ pii: false }]);
-      expect(runtime.piiActivation()).toBe(
-        "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
-      );
+      expect(runtime.piiActivation()).toBe("credentials=full;selectors=off;families=;vocabulary=pii-context/v2");
     }
     for (const profile of ["full", "common"] as const) {
       const { loads, runtime } = twoArtifacts(profile);
@@ -290,10 +265,7 @@ describe("PII artifact selection", () => {
 
   it("keeps a concurrent different selection an activation conflict, loading once", async () => {
     const { loads, runtime } = twoArtifacts();
-    const results = await Promise.allSettled([
-      runtime.initialize({ pii: ["pii:global"] }),
-      runtime.initialize(),
-    ]);
+    const results = await Promise.allSettled([runtime.initialize({ pii: ["pii:global"] }), runtime.initialize()]);
     expect(results[0].status).toBe("fulfilled");
     expect(results[1]).toMatchObject({
       status: "rejected",
@@ -323,10 +295,7 @@ describe("PII artifact selection", () => {
 
 describe("finding normalization", () => {
   it("freezes every finding and exposes only the documented fields", async () => {
-    const runtime = createRedactSecretRuntime(
-      async () => createFakeBinding({ findings: [sampleFinding] }),
-      "full",
-    );
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding({ findings: [sampleFinding] }), "full");
     await runtime.initialize();
 
     const [finding] = runtime.scan("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE");
@@ -348,10 +317,7 @@ describe("finding normalization", () => {
   });
 
   it("freezes the findings list a scan returns", async () => {
-    const runtime = createRedactSecretRuntime(
-      async () => createFakeBinding({ findings: [sampleFinding] }),
-      "full",
-    );
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding({ findings: [sampleFinding] }), "full");
     await runtime.initialize();
 
     const findings = runtime.scan("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE");
@@ -434,9 +400,7 @@ describe("finding normalization", () => {
       await runtime.initialize();
 
       for (const key of Object.keys(LIMITS) as (keyof typeof LIMITS)[]) {
-        expect(() =>
-          runtime.createIncrementalSanitizer({ limits: { ...LIMITS, [key]: value } }),
-        ).toThrowError(
+        expect(() => runtime.createIncrementalSanitizer({ limits: { ...LIMITS, [key]: value } })).toThrowError(
           expect.objectContaining({ name: "SecretScanError", code: "INVALID_LIMITS" }),
         );
       }
@@ -445,8 +409,7 @@ describe("finding normalization", () => {
   );
 
   it("routes the exported default formatter to the binding's own built-in", async () => {
-    const { defaultPlaceholderFormatter, typedPlaceholderFormatter } =
-      await import("../src/formatters.js");
+    const { defaultPlaceholderFormatter, typedPlaceholderFormatter } = await import("../src/formatters.js");
     const binding = createFakeBinding({ findings: [sampleFinding] });
     const runtime = createRedactSecretRuntime(async () => binding, "full");
     await runtime.initialize();
@@ -458,11 +421,7 @@ describe("finding normalization", () => {
       placeholderFormatter: typedPlaceholderFormatter,
     });
 
-    expect(binding.calls).toEqual([
-      "initialize",
-      "redact:API_KEY=x:0:builtin",
-      "redact:API_KEY=x:0:custom",
-    ]);
+    expect(binding.calls).toEqual(["initialize", "redact:API_KEY=x:0:builtin", "redact:API_KEY=x:0:custom"]);
   });
 });
 
@@ -500,21 +459,14 @@ describe("incremental sessions", () => {
   it("passes the session's limits through to the binding", async () => {
     const { binding } = await openSession();
 
-    expect(binding.calls).toEqual([
-      "initialize",
-      `createIncrementalSanitizer:${LIMITS.maxInputCodeUnits}`,
-    ]);
+    expect(binding.calls).toEqual(["initialize", `createIncrementalSanitizer:${LIMITS.maxInputCodeUnits}`]);
   });
 
   it("keeps the binding's terminal-state error", async () => {
     const { session } = await openSession();
     session.finalize();
 
-    for (const call of [
-      () => session.append("more"),
-      () => session.finalize(),
-      () => session.abort(),
-    ]) {
+    for (const call of [() => session.append("more"), () => session.finalize(), () => session.abort()]) {
       expect(call).toThrowError(
         expect.objectContaining({
           name: "SecretScanError",
@@ -567,9 +519,7 @@ describe("binding handles", () => {
       end: 39,
     });
     expect(Object.keys(finding ?? {})).not.toContain("opaque");
-    expect(
-      (finding as unknown as Record<symbol, unknown>)[NATIVE_HANDLE],
-    ).toBe(handle);
+    expect((finding as unknown as Record<symbol, unknown>)[NATIVE_HANDLE]).toBe(handle);
     expect(runtime.redact(input, findings)).toBe("<SECRET_1>");
   });
 });
@@ -579,38 +529,28 @@ describe("error normalization", () => {
     const nativeError = Object.assign(new Error("Redaction findings are invalid."), {
       code: "INVALID_FINDINGS",
     });
-    const runtime = createRedactSecretRuntime(
-      async () => createFakeBinding({ throwOnScan: nativeError }),
-      "full",
-    );
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding({ throwOnScan: nativeError }), "full");
     await runtime.initialize();
 
     expect(() => runtime.scan("API_KEY=x")).toThrowError(SecretScanError);
-    expect(() => runtime.scan("API_KEY=x")).toThrowError(
-      expect.objectContaining({ code: "INVALID_FINDINGS" }),
-    );
+    expect(() => runtime.scan("API_KEY=x")).toThrowError(expect.objectContaining({ code: "INVALID_FINDINGS" }));
   });
 
   it("replaces an uncoded failure rather than surfacing its message", async () => {
     const runtime = createRedactSecretRuntime(
-      async () =>
-        createFakeBinding({ throwOnScan: new Error("segfault at 0xdeadbeef") }),
+      async () => createFakeBinding({ throwOnScan: new Error("segfault at 0xdeadbeef") }),
       "full",
     );
     await runtime.initialize();
 
-    expect(() => runtime.scan("API_KEY=x")).toThrowError(
-      new SecretScanError("DETECTOR_FAILURE"),
-    );
+    expect(() => runtime.scan("API_KEY=x")).toThrowError(new SecretScanError("DETECTOR_FAILURE"));
   });
 
   it("rejects a non-string input once initialized", async () => {
     const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
     await runtime.initialize();
 
-    expect(() => runtime.scan(42 as unknown as string)).toThrowError(
-      new SecretScanError("INVALID_INPUT"),
-    );
+    expect(() => runtime.scan(42 as unknown as string)).toThrowError(new SecretScanError("INVALID_INPUT"));
   });
 });
 
@@ -634,9 +574,7 @@ describe("unpaired surrogates", () => {
     const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
     await runtime.initialize();
 
-    expect(() => runtime.scan("key\uDC00")).toThrowError(
-      new SecretScanError("UNPAIRED_SURROGATE"),
-    );
+    expect(() => runtime.scan("key\uDC00")).toThrowError(new SecretScanError("UNPAIRED_SURROGATE"));
   });
 
   it("rejects a surrogate pair reversed into two lone surrogates", async () => {
@@ -645,9 +583,7 @@ describe("unpaired surrogates", () => {
 
     // \uDC00\uD800 is a low surrogate followed by a high surrogate — the
     // opposite of a valid pair, so both code units are lone.
-    expect(() => runtime.scan("\uDC00\uD800")).toThrowError(
-      new SecretScanError("UNPAIRED_SURROGATE"),
-    );
+    expect(() => runtime.scan("\uDC00\uD800")).toThrowError(new SecretScanError("UNPAIRED_SURROGATE"));
   });
 
   it("does not reject a well-formed surrogate pair", async () => {
@@ -659,28 +595,27 @@ describe("unpaired surrogates", () => {
     expect(binding.calls).toEqual(["initialize", "scan:\u{1F511}key:builtin"]);
   });
 
-  it.each([42, "\uD800", "\uDC00"])(
-    "discards the native session on invalid incremental input (%j)",
-    async (chunk) => {
-      const binding = createFakeBinding();
-      const runtime = createRedactSecretRuntime(async () => binding, "full");
-      await runtime.initialize();
-      const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
-      session.append("🔑SYNTHETIC_REVOKED_RETAINED_TEXT");
+  it.each([42, "\uD800", "\uDC00"])("discards the native session on invalid incremental input (%j)", async (chunk) => {
+    const binding = createFakeBinding();
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
+    await runtime.initialize();
+    const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
+    session.append("🔑SYNTHETIC_REVOKED_RETAINED_TEXT");
 
-      expect(() => session.append(chunk as string)).toThrowError(
-        new SecretScanError(typeof chunk === "string" ? "UNPAIRED_SURROGATE" : "INVALID_INPUT"),
-      );
-      expect(binding.calls.filter((call) => call === "abort")).toHaveLength(1);
+    expect(() => session.append(chunk as string)).toThrowError(
+      new SecretScanError(typeof chunk === "string" ? "UNPAIRED_SURROGATE" : "INVALID_INPUT"),
+    );
+    expect(binding.calls.filter((call) => call === "abort")).toHaveLength(1);
+    expect(session.state).toBe("failed");
+    for (const operation of [
+      () => session.append("x"),
+      () => session.append(chunk as string),
+      () => session.finalize(),
+      () => session.abort(),
+    ]) {
+      expect(operation).toThrowError(new SecretScanError("INVALID_STATE"));
       expect(session.state).toBe("failed");
-      for (const operation of [
-        () => session.append("x"), () => session.append(chunk as string),
-        () => session.finalize(), () => session.abort(),
-      ]) {
-        expect(operation).toThrowError(new SecretScanError("INVALID_STATE"));
-        expect(session.state).toBe("failed");
-      }
-      expect(binding.calls.filter((call) => call === "abort")).toHaveLength(1);
-    },
-  );
+    }
+    expect(binding.calls.filter((call) => call === "abort")).toHaveLength(1);
+  });
 });

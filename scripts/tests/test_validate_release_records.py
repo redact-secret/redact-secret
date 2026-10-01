@@ -24,10 +24,10 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
         record.mkdir(parents=True)
         (record / "README.md").write_text("record\n")
         inventory = {
-            "sourceCommit": "a" * 40, "productVersion": version,
+            "sourceCommit": "a" * 40,
+            "productVersion": version,
             "conformanceFixtures": {"corpus.json": "b" * 64},
-            "artifacts": [{"family": "python-wheel", "file": f"file-{i}.whl", "sha256": f"{i:064x}"}
-                          for i in range(9)],
+            "artifacts": [{"family": "python-wheel", "file": f"file-{i}.whl", "sha256": f"{i:064x}"} for i in range(9)],
         }
         inventory_path = record / "artifact-inventory.json"
         inventory_path.write_text(json.dumps(inventory))
@@ -39,19 +39,25 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
             elif artifact.startswith("crate:"):
                 registries[artifact] = {"checksum": "c" * 64}
             else:
-                registries[artifact] = {"files": [{"filename": f"file-{i}.whl", "sha256": f"{i:064x}"}
-                                                   for i in range(9)]}
+                registries[artifact] = {
+                    "files": [{"filename": f"file-{i}.whl", "sha256": f"{i:064x}"} for i in range(9)]
+                }
         evidence = {
             "reason": "reconstructed from immutable public metadata",
             "original_manifest": {"registry_state": {"npm:@redact-secret/core": "unknown"}},
-            "registries": registries, "runs": [{"id": 123, "result": "verified"}],
-            "verification": {"node": [str(i) for i in range(MODULE.expected_node_lanes(version))],
-                             "browser": "chromium"},
+            "registries": registries,
+            "runs": [{"id": 123, "result": "verified"}],
+            "verification": {
+                "node": [str(i) for i in range(MODULE.expected_node_lanes(version))],
+                "browser": "chromium",
+            },
             "tag": {"name": f"v{version}", "object": "d" * 40, "target": "a" * 40},
         }
         manifest = {
-            "source_revision": "a" * 40, "conformance_identity": "e" * 40,
-            "version": version, "artifact_set": sorted(artifacts),
+            "source_revision": "a" * 40,
+            "conformance_identity": "e" * 40,
+            "version": version,
+            "artifact_set": sorted(artifacts),
             "registry_state": {name: "published" for name in artifacts},
             "release_evidence": evidence,
             "artifact_inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(),
@@ -59,14 +65,16 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
         if reconstructed:
             manifest["record_kind"] = "reconstructed"
         (record / "manifest.json").write_text(json.dumps(manifest))
-        (root / "CHANGELOG.md").write_text(
-            f"[Publication evidence](docs/releases/{version}/README.md).\n")
+        (root / "CHANGELOG.md").write_text(f"[Publication evidence](docs/releases/{version}/README.md).\n")
         return root
 
     def validate(self, root: Path, changelog: str | None = None, version: str = "1.2.3-beta.4") -> None:
         with mock.patch.object(MODULE, "conformance_identity", return_value="e" * 40):
-            MODULE.validate_record(root, root / f"docs/releases/{version}",
-                                   changelog if changelog is not None else (root / "CHANGELOG.md").read_text())
+            MODULE.validate_record(
+                root,
+                root / f"docs/releases/{version}",
+                changelog if changelog is not None else (root / "CHANGELOG.md").read_text(),
+            )
 
     def test_accepts_complete_workflow_and_reconstructed_records(self) -> None:
         self.validate(self.fixture())
@@ -147,9 +155,11 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
             self.validate(self.fixture(), changelog="")
 
     def test_rejects_version_files_loose_at_a_docs_root(self) -> None:
-        for loose in ("docs/releases/beta.3-release-notes.md",
-                      "docs/releases/1.2.3-beta.4-manifest.json",
-                      "docs/rc.1-notes.md"):
+        for loose in (
+            "docs/releases/beta.3-release-notes.md",
+            "docs/releases/1.2.3-beta.4-manifest.json",
+            "docs/rc.1-notes.md",
+        ):
             root = self.fixture()
             (root / loose).write_text("loose\n")
             with self.assertRaisesRegex(MODULE.InvalidRecord, "outside a version directory"):
@@ -169,23 +179,30 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
     def test_comparable_stages_that_agree_are_accepted(self) -> None:
         digest = "a" * 64
         MODULE.validate_artifact_digests(
-            {"pypi:redact-secret": [{"file": "x.whl", "built": digest, "qualified": digest,
-                                      "published": digest, "comparable": True}]},
+            {
+                "pypi:redact-secret": [
+                    {"file": "x.whl", "built": digest, "qualified": digest, "published": digest, "comparable": True}
+                ]
+            },
             "label",
         )
 
     def test_comparable_stages_that_disagree_are_rejected(self) -> None:
         with self.assertRaisesRegex(MODULE.InvalidRecord, "digest mismatch across stages"):
             MODULE.validate_artifact_digests(
-                {"crate:redact-secret": [{"file": "x.crate", "qualified": "a" * 64,
-                                           "published": "b" * 64, "comparable": True}]},
+                {
+                    "crate:redact-secret": [
+                        {"file": "x.crate", "qualified": "a" * 64, "published": "b" * 64, "comparable": True}
+                    ]
+                },
                 "label",
             )
 
     def test_non_comparable_without_note_is_rejected(self) -> None:
         with self.assertRaisesRegex(MODULE.InvalidRecord, "requires a note"):
             MODULE.validate_artifact_digests(
-                {"npm:@redact-secret/wasm": [{"file": "x.wasm", "comparable": False}]}, "label",
+                {"npm:@redact-secret/wasm": [{"file": "x.wasm", "comparable": False}]},
+                "label",
             )
 
     def test_non_comparable_with_note_is_accepted(self) -> None:

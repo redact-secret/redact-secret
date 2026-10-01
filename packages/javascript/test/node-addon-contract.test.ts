@@ -10,14 +10,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import type {
-  NativeFinding,
-  NativeFormatterCallback,
-} from "../src/native.js";
-import {
-  createBindingFromAddon,
-  createBindingFromCommonAddon,
-} from "../src/runtime/node.js";
+import type { NativeFinding, NativeFormatterCallback } from "../src/native.js";
+import { createBindingFromAddon, createBindingFromCommonAddon } from "../src/runtime/node.js";
 import { sampleFinding } from "./fake-binding.js";
 
 const LIMITS = {
@@ -143,9 +137,7 @@ describe("Node addon binding: scanAndRedact result shape", () => {
       }),
     });
 
-    expect(
-      binding.scanAndRedact("input", undefined, undefined, undefined, undefined),
-    ).toEqual({
+    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined)).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
@@ -174,9 +166,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
         return { findings: [sampleFinding], redacted: input };
       },
       createIncrementalSanitizerCommon: (options) => {
-        calls.push(
-          `createIncrementalSanitizerCommon:${options.limits.maxInputCodeUnits}`,
-        );
+        calls.push(`createIncrementalSanitizerCommon:${options.limits.maxInputCodeUnits}`);
         return {
           state: "accepting",
           append: (chunk) => ({ text: chunk, findings: [] }),
@@ -191,9 +181,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     binding.initialize();
     expect(binding.scan("input", undefined, undefined, undefined)).toEqual([]);
     expect(binding.redact("input", [], undefined, undefined)).toBe("input");
-    expect(
-      binding.scanAndRedact("input", undefined, undefined, undefined, undefined),
-    ).toEqual({
+    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined)).toEqual({
       text: "input",
       findings: [sampleFinding],
     });
@@ -227,9 +215,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
       }),
     });
 
-    expect(
-      binding.scanAndRedact("input", undefined, undefined, undefined, undefined),
-    ).toEqual({
+    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined)).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
@@ -237,14 +223,8 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
 
   it("shares the same redact export as the full-profile binding", () => {
     const calls: string[] = [];
-    const redact = (
-      input: string,
-      findings: readonly NativeFinding[],
-      formatter?: NativeFormatterCallback,
-    ) => {
-      calls.push(
-        `redact:${input}:${findings.length}:${formatter === undefined ? "builtin" : "custom"}`,
-      );
+    const redact = (input: string, findings: readonly NativeFinding[], formatter?: NativeFormatterCallback) => {
+      calls.push(`redact:${input}:${findings.length}:${formatter === undefined ? "builtin" : "custom"}`);
       return input;
     };
 
@@ -282,9 +262,6 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
 
     // Both bindings called the exact same `redact` function, not a
     // per-profile copy of it.
-    expect(calls).toEqual([
-      "redact:api_key=x:1:builtin",
-      "redact:api_key=x:1:builtin",
-    ]);
+    expect(calls).toEqual(["redact:api_key=x:1:builtin", "redact:api_key=x:1:builtin"]);
   });
 });

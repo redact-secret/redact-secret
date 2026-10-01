@@ -9,12 +9,12 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
-  MAX_CONTEXT_VALUE_BYTES,
   deBruijnPairs,
   firstDifference,
   hostileBattery,
   hostileValues,
   lcgValue,
+  MAX_CONTEXT_VALUE_BYTES,
   qualificationInputs,
   summarize,
 } from "../shadow-determinism.mjs";
@@ -47,12 +47,16 @@ test("the input set is deterministic, uniquely named and covers every corpus", (
   const ids = first.map(([id]) => id);
   assert.equal(new Set(ids).size, ids.length);
   for (const prefix of ["synchronous/", "incremental/", "unicode/", "hostile/"]) {
-    assert.ok(ids.some((id) => id.startsWith(prefix)), prefix);
+    assert.ok(
+      ids.some((id) => id.startsWith(prefix)),
+      prefix,
+    );
   }
   assert.equal(hostileBattery().length, hostileValues().length * 4 + 2);
 });
 
-const HEADER = '{"record":"shadow-evaluation","productVersion":"0","model":"m","featureSchema":"f","artifactRevision":1,"modelFingerprint":"x","profile":"full"}';
+const HEADER =
+  '{"record":"shadow-evaluation","productVersion":"0","model":"m","featureSchema":"f","artifactRevision":1,"modelFingerprint":"x","profile":"full"}';
 const STATISTICAL = '{"record":"shadow-comparison","authority":"statistical","band":"high","promotion":"preserve"}';
 const DETERMINISTIC = '{"record":"shadow-comparison","authority":"deterministic","band":"high","promotion":"preserve"}';
 

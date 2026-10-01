@@ -35,7 +35,7 @@ const SPLIT_AT = TEXT.indexOf(SECRET) + HEAD.length + 3;
 const FRAGMENTS = [SECRET, HEAD + TAIL.slice(0, 3), TAIL.slice(3), TAIL];
 
 function assertNoPlaintext(value, label) {
-  const text = typeof value === "string" ? value : JSON.stringify(value) ?? "";
+  const text = typeof value === "string" ? value : (JSON.stringify(value) ?? "");
   for (const fragment of FRAGMENTS) {
     assert.equal(text.includes(fragment), false, `${label}: a secret fragment crossed the boundary`);
   }
@@ -88,8 +88,14 @@ function setup(options = {}) {
 /** The real session drops its retained input on abort: it refuses any further call. */
 function assertSessionDiscarded(record) {
   assert.ok(record.calls.includes("abort"), "the core session was not aborted");
-  assert.throws(() => record.session.append("x"), (error) => error.code === "INVALID_STATE");
-  assert.throws(() => record.session.finalize(), (error) => error.code === "INVALID_STATE");
+  assert.throws(
+    () => record.session.append("x"),
+    (error) => error.code === "INVALID_STATE",
+  );
+  assert.throws(
+    () => record.session.finalize(),
+    (error) => error.code === "INVALID_STATE",
+  );
 }
 
 async function* chunked(parts, hooks = {}) {
@@ -127,7 +133,14 @@ test("a synthetic secret split across chunks is redacted in the model-facing con
   assert.equal(text, "deploy log: AWS_ACCESS_KEY_ID=<SECRET_1> region=us-east-1\n");
   assert.deepEqual(
     result.findings.map(({ detector, action, start, end }) => ({ detector, action, start, end })),
-    [{ detector: "aws-access-key", action: "redact", start: TEXT.indexOf(SECRET), end: TEXT.indexOf(SECRET) + SECRET.length }],
+    [
+      {
+        detector: "aws-access-key",
+        action: "redact",
+        start: TEXT.indexOf(SECRET),
+        end: TEXT.indexOf(SECRET) + SECRET.length,
+      },
+    ],
   );
   assert.deepEqual(sessions[0].calls, ["append", "append", "finalize"]);
   assertNoPlaintext(result, "context");

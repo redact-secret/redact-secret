@@ -93,10 +93,7 @@ export interface PlaceholderContext {
  * is validated: an empty, oversized, or matched-value-reproducing placeholder
  * is rejected.
  */
-export type PlaceholderFormatter = (
-  finding: SecretFinding,
-  context: PlaceholderContext,
-) => string;
+export type PlaceholderFormatter = (finding: SecretFinding, context: PlaceholderContext) => string;
 
 /**
  * Explicit byte and finding-count bounds for {@link scan}, {@link redact},
@@ -141,11 +138,7 @@ export interface ScanResult {
 }
 
 /** The terminally distinct lifecycle states of an incremental session. */
-export type IncrementalSanitizerState =
-  | "accepting"
-  | "finalized"
-  | "aborted"
-  | "failed";
+export type IncrementalSanitizerState = "accepting" | "finalized" | "aborted" | "failed";
 
 /** Position information passed alongside a finding to an incremental policy. */
 export interface IncrementalPolicyContext {
@@ -155,10 +148,7 @@ export interface IncrementalPolicyContext {
 
 /** A custom policy for an incremental session. */
 export interface IncrementalSecretPolicy {
-  evaluate(
-    finding: DetectedSecretFinding,
-    context: IncrementalPolicyContext,
-  ): SecretAction;
+  evaluate(finding: DetectedSecretFinding, context: IncrementalPolicyContext): SecretAction;
 }
 
 /**

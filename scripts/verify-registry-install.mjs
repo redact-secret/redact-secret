@@ -23,15 +23,14 @@ import { execFileSync } from "node:child_process";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-
-import {
-  CANONICAL_FIXTURE_ID,
-  REPO_ROOT_PATH,
-  loadCanonicalFixture,
-  packageVersion,
-} from "./qualify-runtime-fixture.mjs";
 import { qualifyBrowser, qualifyNode } from "./consumer-harness.mjs";
 import { waitForInstallable } from "./npm-registry-metadata.mjs";
+import {
+  CANONICAL_FIXTURE_ID,
+  loadCanonicalFixture,
+  packageVersion,
+  REPO_ROOT_PATH,
+} from "./qualify-runtime-fixture.mjs";
 
 const WRAPPER_PACKAGE_NAME = "@redact-secret/core";
 
@@ -40,12 +39,7 @@ const INTEGRATION_FIXTURE_IDS = Object.freeze({
   warn: "contextual-positive-minimum-length-is-medium-confidence",
   block: "private-key-positive",
 });
-const INCREMENTAL_CORPUS_PATH = join(
-  REPO_ROOT_PATH,
-  "conformance",
-  "fixtures",
-  "incremental-corpus.json",
-);
+const INCREMENTAL_CORPUS_PATH = join(REPO_ROOT_PATH, "conformance", "fixtures", "incremental-corpus.json");
 
 function parseArgs(argv) {
   const index = argv.indexOf("--lane");
@@ -72,16 +66,12 @@ async function buildConsumerProject(version) {
     },
   };
   await writeFile(join(root, "package.json"), JSON.stringify(manifest, null, 2));
-  execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", [
-    "install",
-    "--no-audit",
-    "--no-fund",
-  ], { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
-  await cp(
-    join(REPO_ROOT_PATH, "examples/safe-integration"),
-    join(root, "safe-integration"),
-    { recursive: true },
-  );
+  execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["install", "--no-audit", "--no-fund"], {
+    cwd: root,
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  });
+  await cp(join(REPO_ROOT_PATH, "examples/safe-integration"), join(root, "safe-integration"), { recursive: true });
   return root;
 }
 
@@ -90,9 +80,7 @@ async function buildConsumerProject(version) {
  * this revision declares -- everything `npm install` below must resolve.
  */
 async function registryPackages(version) {
-  const manifest = JSON.parse(
-    await readFile(join(REPO_ROOT_PATH, "packages/javascript/package.json"), "utf8"),
-  );
+  const manifest = JSON.parse(await readFile(join(REPO_ROOT_PATH, "packages/javascript/package.json"), "utf8"));
   return [
     { name: WRAPPER_PACKAGE_NAME, version },
     ...Object.entries({ ...manifest.dependencies, ...manifest.optionalDependencies })
@@ -110,10 +98,7 @@ async function main() {
   const fixture = await loadCanonicalFixture(CANONICAL_FIXTURE_ID);
   const integrationFixtures = Object.fromEntries(
     await Promise.all(
-      Object.entries(INTEGRATION_FIXTURE_IDS).map(async ([kind, id]) => [
-        kind,
-        await loadCanonicalFixture(id),
-      ]),
+      Object.entries(INTEGRATION_FIXTURE_IDS).map(async ([kind, id]) => [kind, await loadCanonicalFixture(id)]),
     ),
   );
   const expectedVersion = await packageVersion();
@@ -132,22 +117,9 @@ async function main() {
   try {
     consumerRoot = await buildConsumerProject(expectedVersion);
     if (lane === "node") {
-      qualifyNode(
-        consumerRoot,
-        fixture,
-        expectedVersion,
-        integrationFixtures,
-        incrementalCorpus,
-      );
+      qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures, incrementalCorpus);
     } else {
-      await qualifyBrowser(
-        consumerRoot,
-        fixture,
-        expectedVersion,
-        "chromium",
-        integrationFixtures,
-        incrementalCorpus,
-      );
+      await qualifyBrowser(consumerRoot, fixture, expectedVersion, "chromium", integrationFixtures, incrementalCorpus);
     }
   } finally {
     if (consumerRoot) await rm(consumerRoot, { recursive: true, force: true });

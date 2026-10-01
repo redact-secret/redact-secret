@@ -84,8 +84,7 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   PII_SELECTOR_UNSUPPORTED: "PII jurisdiction or family is unsupported.",
   PII_SELECTOR_UNAVAILABLE: "PII selection is unavailable in this artifact.",
   PII_ACTIVATION_CONFLICT: "PII activation is already initialized differently.",
-  NOT_INITIALIZED:
-    "redact-secret is not initialized; await initialize() before this call.",
+  NOT_INITIALIZED: "redact-secret is not initialized; await initialize() before this call.",
   // Fixed and input-free like every other message, but also actionable
   // (issue #586): it names the failure classes and the guide that separates
   // them, since the loader's own diagnostic is deliberately withheld.
@@ -114,9 +113,7 @@ export class SecretScanError extends Error {
 function nativeErrorCode(value: unknown): SecretScanErrorCode | undefined {
   if (typeof value !== "object" || value === null) return undefined;
   const { code } = value as { code?: unknown };
-  return typeof code === "string" && ERROR_CODES.has(code)
-    ? (code as SecretScanErrorCode)
-    : undefined;
+  return typeof code === "string" && ERROR_CODES.has(code) ? (code as SecretScanErrorCode) : undefined;
 }
 
 /**
@@ -127,10 +124,7 @@ function nativeErrorCode(value: unknown): SecretScanErrorCode | undefined {
  * value that carries no recognized code is replaced by `fallback` rather than
  * surfaced, so a host-specific message can never reach a caller.
  */
-export function toSecretScanError(
-  thrown: unknown,
-  fallback: SecretScanErrorCode,
-): SecretScanError {
+export function toSecretScanError(thrown: unknown, fallback: SecretScanErrorCode): SecretScanError {
   if (thrown instanceof SecretScanError) return thrown;
   return new SecretScanError(nativeErrorCode(thrown) ?? fallback);
 }

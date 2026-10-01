@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 import sys
 import unittest
 from pathlib import Path
@@ -132,7 +131,9 @@ class BuildReportTests(unittest.TestCase):
 class ReconciliationTests(unittest.TestCase):
     def test_no_errors_when_types_and_detectors_agree(self) -> None:
         inventory_report = {
-            "rows": [{"type": "widget_token", "detector": "widget", "state": "supported", "schemeRows": "not-applicable"}]
+            "rows": [
+                {"type": "widget_token", "detector": "widget", "state": "supported", "schemeRows": "not-applicable"}
+            ]
         }
         declarations_doc = {
             "declarations": [
@@ -149,7 +150,9 @@ class ReconciliationTests(unittest.TestCase):
 
     def test_type_missing_from_declarations_is_an_error(self) -> None:
         inventory_report = {
-            "rows": [{"type": "widget_token", "detector": "widget", "state": "supported", "schemeRows": "not-applicable"}]
+            "rows": [
+                {"type": "widget_token", "detector": "widget", "state": "supported", "schemeRows": "not-applicable"}
+            ]
         }
         declarations_doc = {"declarations": []}
         errors = GEN.reconciliation_errors(inventory_report, declarations_doc)
@@ -173,7 +176,9 @@ class ReconciliationTests(unittest.TestCase):
 
     def test_mismatched_detector_is_an_error(self) -> None:
         inventory_report = {
-            "rows": [{"type": "widget_token", "detector": "widget", "state": "supported", "schemeRows": "not-applicable"}]
+            "rows": [
+                {"type": "widget_token", "detector": "widget", "state": "supported", "schemeRows": "not-applicable"}
+            ]
         }
         declarations_doc = {
             "declarations": [

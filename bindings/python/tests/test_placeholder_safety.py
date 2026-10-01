@@ -7,7 +7,6 @@ reach the output."""
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 
@@ -22,9 +21,7 @@ def test_default_formatter_never_reproduces_input_and_is_deterministic() -> None
 def test_typed_formatter_names_the_finding_type() -> None:
     text = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
     findings = redact_secret.scan(text)
-    redacted = redact_secret.redact(
-        text, findings, formatter=redact_secret.typed_placeholder_formatter
-    )
+    redacted = redact_secret.redact(text, findings, formatter=redact_secret.typed_placeholder_formatter)
     assert "<GITHUB_TOKEN_1>" in redacted
 
 
@@ -32,9 +29,7 @@ def test_custom_formatter_reproducing_a_matched_value_is_rejected() -> None:
     text = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
     findings = redact_secret.scan(text)
 
-    def reproducing(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def reproducing(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         return text[finding.start : finding.end]
 
     with pytest.raises(redact_secret.InvalidPlaceholderError) as excinfo:
@@ -46,9 +41,7 @@ def test_custom_formatter_empty_placeholder_is_rejected() -> None:
     text = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
     findings = redact_secret.scan(text)
 
-    def empty(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def empty(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         return ""
 
     with pytest.raises(redact_secret.InvalidPlaceholderError):
@@ -59,9 +52,7 @@ def test_custom_formatter_oversized_placeholder_is_rejected() -> None:
     text = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
     findings = redact_secret.scan(text)
 
-    def oversized(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def oversized(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         return "x" * 257
 
     with pytest.raises(redact_secret.InvalidPlaceholderError):

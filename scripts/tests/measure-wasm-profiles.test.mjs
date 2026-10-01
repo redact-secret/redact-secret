@@ -1,24 +1,24 @@
-import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { DETECTOR_PROFILES } from "../build-browser-artifact.mjs";
 import {
-  classifyModules,
-  detectorImplementations,
-  detectorModules,
   ARTIFACTS,
   artifactBuild,
   COMMON_PROVIDER_HELPER_MODULES,
+  classifyModules,
+  detectorImplementations,
+  detectorModules,
   guardFailures,
   loadModulePacks,
   modulePacks,
+  PROFILES,
   percentChange,
   piiGuardFailures,
   piiRuntime,
-  PROFILES,
 } from "../measure-wasm-profiles.mjs";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -28,15 +28,22 @@ function packTable() {
   const source = readFileSync(join(DETECTORS_DIR, "mod.rs"), "utf8");
   const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
   assert.ok(table, "BUILT_IN_PACKS not found");
-  return [...table[1].matchAll(/\("([a-z0-9-]+)", Pack::(Common|Provider)\)/g)].map(
-    ([, id, pack]) => ({ id, pack }),
-  );
+  return [...table[1].matchAll(/\("([a-z0-9-]+)", Pack::(Common|Provider)\)/g)].map(([, id, pack]) => ({ id, pack }));
 }
 
 test("module packs follow BUILT_IN_PACKS and built_in_detectors() in the core source", () => {
   const packs = loadModulePacks();
-  assert.deepEqual(packs.common, ["bearer_token", "connection_string", "generic_token", "jwt", "otpauth", "private_key"]);
-  const commonIds = packTable().filter(({ pack }) => pack === "Common").map(({ id }) => id);
+  assert.deepEqual(packs.common, [
+    "bearer_token",
+    "connection_string",
+    "generic_token",
+    "jwt",
+    "otpauth",
+    "private_key",
+  ]);
+  const commonIds = packTable()
+    .filter(({ pack }) => pack === "Common")
+    .map(({ id }) => id);
   assert.equal(commonIds.length, 6);
   for (const module of ["pattern", "ruleset_adapter", "text"]) assert.ok(packs.sharedEngine.includes(module), module);
   for (const module of ["aws", "heroku", "sentry", "ai_inference"]) assert.ok(packs.provider.includes(module), module);
@@ -88,14 +95,17 @@ test("modulePacks classifies a new provider module without a script change", () 
 
 test("modulePacks rejects a list/table mismatch and a mixed-pack module", () => {
   assert.throws(() => modulePacks(SYNTHETIC_MOD_RS.replace('    ("jwt", Pack::Common),\n', "")), /BUILT_IN_PACKS rows/);
-  assert.throws(() => modulePacks(SYNTHETIC_MOD_RS.replace('("acme-legacy", Pack::Provider)', '("acme-legacy", Pack::Common)')), /both common and provider/);
+  assert.throws(
+    () => modulePacks(SYNTHETIC_MOD_RS.replace('("acme-legacy", Pack::Provider)', '("acme-legacy", Pack::Common)')),
+    /both common and provider/,
+  );
 });
 
 test("CI runs the real build-and-guard in the rust-wasm job (#929)", () => {
   const ci = readFileSync(join(REPO_ROOT, ".github", "workflows", "ci.yml"), "utf8");
   const start = ci.indexOf("\n  rust-wasm:\n");
   assert.ok(start >= 0, "rust-wasm job not found");
-  const next = ci.slice(start + 1).search(/\n  [a-z0-9-]+:\n/);
+  const next = ci.slice(start + 1).search(/\n {2}[a-z0-9-]+:\n/);
   const job = next < 0 ? ci.slice(start) : ci.slice(start, start + 1 + next);
   assert.match(job, /node scripts\/measure-wasm-profiles\.mjs --guard-only/);
 });
@@ -141,7 +151,11 @@ test("detectorImplementations reads Detector impls only", () => {
   assert.deepEqual(detectorImplementations(section), ["jwt", "pattern"]);
 });
 
-const PACKS = { common: ["jwt", "private_key"], provider: ["datadog", "github", ...COMMON_PROVIDER_HELPER_MODULES], sharedEngine: ["pattern", "text"] };
+const PACKS = {
+  common: ["jwt", "private_key"],
+  provider: ["datadog", "github", ...COMMON_PROVIDER_HELPER_MODULES],
+  sharedEngine: ["pattern", "text"],
+};
 
 test("classifyModules separates common, shared engine, provider and undeclared code", () => {
   assert.deepEqual(classifyModules(["datadog", "jwt", "mystery", "pattern", "text"], PACKS), {
@@ -192,7 +206,7 @@ test("guardFailures rejects provider helper code outside the reviewed list (#112
 
 test("every reviewed provider helper module is a declared provider module (#1127)", () => {
   for (const module of COMMON_PROVIDER_HELPER_MODULES) {
-    assert.ok(loadModulePacks().provider.includes(module),`${module} is not a provider module of the core`);
+    assert.ok(loadModulePacks().provider.includes(module), `${module} is not a provider module of the core`);
   }
   assert.deepEqual([...COMMON_PROVIDER_HELPER_MODULES].sort(), [...COMMON_PROVIDER_HELPER_MODULES]);
 });
@@ -209,7 +223,10 @@ test("guardFailures rejects a common artifact that links a provider detector or 
 test("guardFailures rejects a missing common detector, an undeclared module and a different export surface", () => {
   const full = artifact(280_000, [...COMMON_MODULES, "aws"]);
   assert.match(guardFailures(full, artifact(220_000, ["jwt"]), PACKS).join(" "), /expected jwt, private_key/);
-  assert.match(guardFailures(full, artifact(220_000, [...COMMON_MODULES, "mystery"]), PACKS).join(" "), /undeclared modules: mystery/);
+  assert.match(
+    guardFailures(full, artifact(220_000, [...COMMON_MODULES, "mystery"]), PACKS).join(" "),
+    /undeclared modules: mystery/,
+  );
   assert.deepEqual(
     guardFailures(full, artifact(220_000, COMMON_MODULES, COMMON_MODULES, ["initialize", "scan"]), PACKS),
     ["full and common export different surfaces"],
@@ -228,7 +245,12 @@ test("piiRuntime reads the adapter, family implementations and unicode_normaliza
   ].join(NUL);
   assert.deepEqual(piiRuntime(section), ["EmailFamily", "NetworkAddress", "PiiDomain", "unicode_normalization"]);
   assert.deepEqual(
-    piiRuntime(["<redact_secret[7f632526a786e8f3]::pii::PiiSelection>::parse", "redact_secret[7f632526a786e8f3]::pii::valid_slug"].join(NUL)),
+    piiRuntime(
+      [
+        "<redact_secret[7f632526a786e8f3]::pii::PiiSelection>::parse",
+        "redact_secret[7f632526a786e8f3]::pii::valid_slug",
+      ].join(NUL),
+    ),
     [],
     "selector parsing is not the PII runtime",
   );

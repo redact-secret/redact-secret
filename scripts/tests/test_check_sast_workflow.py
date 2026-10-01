@@ -110,7 +110,9 @@ class SastWorkflowCheckTest(unittest.TestCase):
 
     def test_scan_step_without_continue_on_error_fails(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir:
-            broken = GOOD_WORKFLOW.replace("        continue-on-error: true\n        run: python3", "        run: python3")
+            broken = GOOD_WORKFLOW.replace(
+                "        continue-on-error: true\n        run: python3", "        run: python3"
+            )
             root = write(Path(root_dir), broken)
             errors = CHECK.validate(root)
             self.assertTrue(any("id: scan) must declare continue-on-error" in error for error in errors))
@@ -141,9 +143,7 @@ class SastWorkflowCheckTest(unittest.TestCase):
             )
             root = write(Path(root_dir), broken)
             errors = CHECK.validate(root)
-            self.assertTrue(
-                any("uploads SARIF but lacks continue-on-error" in error for error in errors)
-            )
+            self.assertTrue(any("uploads SARIF but lacks continue-on-error" in error for error in errors))
 
     def test_sarif_upload_without_id_fails(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir:
@@ -167,9 +167,7 @@ class SastWorkflowCheckTest(unittest.TestCase):
             )
             root = write(Path(root_dir), broken)
             errors = CHECK.validate(root)
-            self.assertTrue(
-                any("must upload the generated SARIF path" in error for error in errors)
-            )
+            self.assertTrue(any("must upload the generated SARIF path" in error for error in errors))
 
     def test_sarif_upload_without_always_fails(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir:
@@ -194,17 +192,11 @@ class SastWorkflowCheckTest(unittest.TestCase):
 
     def test_missing_dismissal_step_fails(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir:
-            before, remainder = GOOD_WORKFLOW.split(
-                "      - name: Synchronize reviewed SARIF suppressions\n", 1
-            )
+            before, remainder = GOOD_WORKFLOW.split("      - name: Synchronize reviewed SARIF suppressions\n", 1)
             _, after = remainder.split("      - name: Enforce scan result\n", 1)
-            root = write(
-                Path(root_dir), before + "      - name: Enforce scan result\n" + after
-            )
+            root = write(Path(root_dir), before + "      - name: Enforce scan result\n" + after)
             errors = CHECK.validate(root)
-            self.assertTrue(
-                any("no step synchronizes SARIF suppressions" in error for error in errors)
-            )
+            self.assertTrue(any("no step synchronizes SARIF suppressions" in error for error in errors))
 
     def test_unpinned_dismissal_action_fails(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir:
@@ -245,12 +237,7 @@ class SastWorkflowCheckTest(unittest.TestCase):
             )
             root = write(Path(root_dir), broken)
             errors = CHECK.validate(root)
-            self.assertTrue(
-                any(
-                    "must require a successful processed SARIF upload" in error
-                    for error in errors
-                )
-            )
+            self.assertTrue(any("must require a successful processed SARIF upload" in error for error in errors))
 
     def test_dismissal_with_wrong_sarif_id_fails(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir:

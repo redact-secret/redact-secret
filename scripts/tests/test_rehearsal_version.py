@@ -9,7 +9,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -100,7 +99,15 @@ class ApplyTests(unittest.TestCase):
         moved = re.findall(r'name = "([^"]+)"\nversion = "' + re.escape(THROWAWAY) + '"', lock)
         self.assertEqual(
             sorted(moved),
-            sorted(["redact-secret", "redact-secret-cli", "redact-secret-node", "redact-secret-python", "redact-secret-wasm"]),
+            sorted(
+                [
+                    "redact-secret",
+                    "redact-secret-cli",
+                    "redact-secret-node",
+                    "redact-secret-python",
+                    "redact-secret-wasm",
+                ]
+            ),
         )
 
     def test_the_repository_lockstep_check_accepts_the_bumped_manifests(self) -> None:
@@ -111,8 +118,10 @@ class ApplyTests(unittest.TestCase):
 
     def _manifest_errors(self) -> list[str]:
         errors = []
-        for relative in WORKSPACE.LOCKSTEP_MANIFESTS + (WORKSPACE.WASM_MANIFEST,) + tuple(
-            WORKSPACE.native_platform_manifests(self.root)
+        for relative in (
+            WORKSPACE.LOCKSTEP_MANIFESTS
+            + (WORKSPACE.WASM_MANIFEST,)
+            + tuple(WORKSPACE.native_platform_manifests(self.root))
         ):
             manifest = json.loads((self.root / relative).read_text(encoding="utf-8"))
             if manifest["version"] != THROWAWAY:
@@ -128,7 +137,7 @@ class ApplyTests(unittest.TestCase):
             REHEARSAL.apply(self.root, self.old)
 
     def test_fails_when_a_file_it_must_move_no_longer_carries_the_version(self) -> None:
-        (self.root / "packages/javascript/src/version.ts").write_text("export const VERSION = \"9.9.9\";\n")
+        (self.root / "packages/javascript/src/version.ts").write_text('export const VERSION = "9.9.9";\n')
         with self.assertRaises(REHEARSAL.RehearsalError):
             REHEARSAL.apply(self.root, THROWAWAY)
 
@@ -145,7 +154,7 @@ class UnpublishedProbeTests(unittest.TestCase):
         self.assertGreaterEqual(len(scoped), 10)
         self.assertIn(f"crates.io redact-secret@{THROWAWAY}", labels)
         self.assertIn(f"crates.io redact-secret-cli@{THROWAWAY}", labels)
-        self.assertIn(f"PyPI redact-secret==0.1.0b9876543210", labels)
+        self.assertIn("PyPI redact-secret==0.1.0b9876543210", labels)
 
     def test_only_a_404_proves_absence(self) -> None:
         self.assertEqual(REHEARSAL.check_unpublished(ROOT, THROWAWAY, status=lambda url: 404), [])
@@ -182,8 +191,14 @@ class WorkflowWiringTests(unittest.TestCase):
             self.assertLess(applied, checkouts, name)
         qualification = self.read("artifact-qualification.yml")
         for job in (
-            "node-addon", "browser", "cli", "package-consumer-node", "package-consumer-browser",
-            "package-consumer-wasm-runtimes", "clean-install", "inventory",
+            "node-addon",
+            "browser",
+            "cli",
+            "package-consumer-node",
+            "package-consumer-browser",
+            "package-consumer-wasm-runtimes",
+            "clean-install",
+            "inventory",
         ):
             match = re.search(r"\n  " + re.escape(job) + r":\n(.*?)(?=\n  [a-z0-9-]+:\n|\Z)", qualification, re.S)
             self.assertIsNotNone(match, job)

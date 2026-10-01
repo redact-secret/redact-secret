@@ -9,12 +9,12 @@
 
 import type { RangeUnit } from "./types.js";
 
+export type { SecretScanErrorCode } from "./errors.js";
+export { SecretScanError } from "./errors.js";
 export {
   defaultPlaceholderFormatter,
   typedPlaceholderFormatter,
 } from "./formatters.js";
-export { SecretScanError } from "./errors.js";
-export type { SecretScanErrorCode } from "./errors.js";
 export { VERSION } from "./version.js";
 
 /** The string-index unit of every range this package reports. */
@@ -24,13 +24,13 @@ export type {
   ArtifactKind,
   DetectedSecretFinding,
   IncrementalLimits,
-  InitializeOptions,
   IncrementalPolicyContext,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
   IncrementalSanitizerResult,
   IncrementalSanitizerState,
   IncrementalSecretPolicy,
+  InitializeOptions,
   PlaceholderContext,
   PlaceholderFormatter,
   PolicyContext,

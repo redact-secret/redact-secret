@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Qualifies the Node WebAssembly fallback (`decision-add-node-wasm-fallback`)
  * against the real published artifact, the way `qualify-node-addon.mjs`
@@ -38,19 +39,19 @@
  *     node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web-common --detector-profile common
  */
 
-import { cp, mkdir, readFile, rm } from "node:fs/promises";
-import { existsSync, mkdirSync, rmSync, symlinkSync } from "node:fs";
 import { spawnSync } from "node:child_process";
-import { Readable } from "node:stream";
+import { existsSync, rmSync, symlinkSync } from "node:fs";
+import { cp, mkdir, readFile, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { Readable } from "node:stream";
 import { pathToFileURL } from "node:url";
 
 import {
-  CANONICAL_FIXTURE_ID,
-  REPO_ROOT_PATH,
   assertMatchesFixture,
+  CANONICAL_FIXTURE_ID,
   loadCanonicalFixture,
   packageVersion,
+  REPO_ROOT_PATH,
 } from "./qualify-runtime-fixture.mjs";
 
 const JS_PACKAGE_DIR = join(REPO_ROOT_PATH, "packages", "javascript");
@@ -73,10 +74,7 @@ function assert(condition, message) {
 }
 
 function assertEqual(actual, expected, message) {
-  assert(
-    actual === expected,
-    `${message}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`,
-  );
+  assert(actual === expected, `${message}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
 }
 
 function parseArguments(argv) {
@@ -97,17 +95,12 @@ function parseArguments(argv) {
     }
   }
   if (options.wasmDir === undefined) {
-    throw new Error(
-      "usage: qualify-node-wasm-fallback.mjs --wasm-dir <dir> [--detector-profile full|common]",
-    );
+    throw new Error("usage: qualify-node-wasm-fallback.mjs --wasm-dir <dir> [--detector-profile full|common]");
   }
   if (options.detectorProfile !== "full" && options.detectorProfile !== "common") {
     throw new Error("--detector-profile must be full or common");
   }
-  if (
-    options.phoneSelector !== undefined
-    && !["exact", "global", "off"].includes(options.phoneSelector)
-  ) {
+  if (options.phoneSelector !== undefined && !["exact", "global", "off"].includes(options.phoneSelector)) {
     throw new Error("--phone-selector must be exact, global, or off");
   }
   return options;
@@ -132,29 +125,28 @@ async function qualifyPhone(api, selectorKind) {
   const fixture = JSON.parse(
     await readFile(join(REPO_ROOT_PATH, "conformance", "fixtures", "pii-phone-v1.json"), "utf8"),
   );
-  const selectors = selectorKind === "exact"
-    ? [fixture.selector]
-    : selectorKind === "global"
-      ? ["pii:global"]
-      : [];
+  const selectors = selectorKind === "exact" ? [fixture.selector] : selectorKind === "global" ? ["pii:global"] : [];
   await api.initialize({ pii: selectors });
   assertEqual(api.artifact(), "wasm", `${selectorKind} phone artifact`);
-  const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
-  const activation = selectorKind === "exact"
-    ? "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v2"
-    : selectorKind === "global"
-      ? `credentials=full;selectors=pii:global;families=${globals};vocabulary=pii-context/v2`
-      : "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
+  const globals =
+    "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
+  const activation =
+    selectorKind === "exact"
+      ? "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v2"
+      : selectorKind === "global"
+        ? `credentials=full;selectors=pii:global;families=${globals};vocabulary=pii-context/v2`
+        : "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
   assertEqual(api.piiActivation(), activation, `${selectorKind} phone activation`);
 
   for (const testCase of fixture.cases) {
-    const expected = selectorKind === "off"
-      ? []
-      : testCase.expected.map((finding) => ({
-          ...finding,
-          start: utf16OffsetFromUtf8(testCase.input, finding.start),
-          end: utf16OffsetFromUtf8(testCase.input, finding.end),
-        }));
+    const expected =
+      selectorKind === "off"
+        ? []
+        : testCase.expected.map((finding) => ({
+            ...finding,
+            start: utf16OffsetFromUtf8(testCase.input, finding.start),
+            end: utf16OffsetFromUtf8(testCase.input, finding.end),
+          }));
     const whole = api.scanAndRedact(testCase.input);
     assertEqual(
       JSON.stringify(whole.findings.map(observable)),
@@ -217,11 +209,7 @@ async function linkWasmFallback(wasmDir) {
 
 async function main() {
   const { wasmDir, detectorProfile, phoneSelector } = parseArguments(process.argv.slice(2));
-  const packageEntry = join(
-    JS_PACKAGE_DIR,
-    "dist",
-    detectorProfile === "common" ? "common.js" : "index.js",
-  );
+  const packageEntry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
   const streamEntry = join(
     JS_PACKAGE_DIR,
     "dist",
@@ -232,8 +220,7 @@ async function main() {
     assert(existsSync(entry), `${entry}: missing; build the package with \`npm run js:build\``);
   }
 
-  const fixtureId =
-    detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
+  const fixtureId = detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
   const fixture = await loadCanonicalFixture(fixtureId);
   const expectedVersion = await packageVersion();
 
@@ -257,7 +244,7 @@ async function main() {
     assertEqual(findings.length, 1, `fixture ${fixture.id} finding count`);
     if (detectorProfile !== "common") assertMatchesFixture(findings[0], fixture);
 
-    const { text, findings: combined } = api.scanAndRedact(fixture.input);
+    const { text } = api.scanAndRedact(fixture.input);
     assertEqual(
       text,
       api.redact(fixture.input, api.scan(fixture.input)),
@@ -286,14 +273,11 @@ async function main() {
     assert(oracle.text !== WRAPPED, "the fallback left a known secret unredacted");
 
     const boundary = Math.floor(encoded.length / 2);
-    const transform = new NodeStreamSanitizer(
-      api.createIncrementalSanitizer({ limits: GENEROUS_LIMITS }),
-    );
+    const transform = new NodeStreamSanitizer(api.createIncrementalSanitizer({ limits: GENEROUS_LIMITS }));
     const output = [];
-    for await (const chunk of Readable.from([
-      encoded.subarray(0, boundary),
-      encoded.subarray(boundary),
-    ]).pipe(transform)) {
+    for await (const chunk of Readable.from([encoded.subarray(0, boundary), encoded.subarray(boundary)]).pipe(
+      transform,
+    )) {
       output.push(chunk);
     }
     assertEqual(

@@ -1,7 +1,7 @@
-import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   buildPatchedSource,
@@ -26,7 +26,7 @@ test("buildPatchedSource rejects a vec/id count mismatch instead of trusting pos
     "fn built_in_detectors() -> &'static [BuiltInRow] {",
     "    #[rustfmt::skip]",
     "    static DETECTORS: &[BuiltInRow] = &[",
-    "        row(\"only-one\", &OnlyOneDetector),",
+    '        row("only-one", &OnlyOneDetector),',
     "    ];",
     "    DETECTORS",
     "}",
@@ -45,7 +45,10 @@ test("buildPatchedSource comments out exactly the requested ids and nothing else
   const commentedLines = patchedLines.filter((line) => line.includes("excluded by scripts/measure-detector-cost.mjs"));
   assert.equal(commentedLines.length, excluded.length);
   for (const id of excluded) {
-    assert.ok(commentedLines.some((line) => line.includes(`(${id})`)), `expected a commented line for ${id}`);
+    assert.ok(
+      commentedLines.some((line) => line.includes(`(${id})`)),
+      `expected a commented line for ${id}`,
+    );
   }
   // Exactly the excluded entries' lines differ; every other line is untouched.
   const originalLines = REAL_SOURCE.split("\n");

@@ -27,7 +27,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-_VALIDATOR = importlib.util.spec_from_file_location("validate_decisions", Path(__file__).with_name("validate-decisions.py"))
+_VALIDATOR = importlib.util.spec_from_file_location(
+    "validate_decisions", Path(__file__).with_name("validate-decisions.py")
+)
 assert _VALIDATOR and _VALIDATOR.loader
 VALIDATE = importlib.util.module_from_spec(_VALIDATOR)
 sys.modules[_VALIDATOR.name] = VALIDATE

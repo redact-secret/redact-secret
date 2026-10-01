@@ -67,9 +67,25 @@ TYPES = {
     "null": lambda v: v is None,
 }
 SUPPORTED = {
-    "$schema", "$id", "$defs", "$ref", "title", "description", "type", "required", "properties",
-    "additionalProperties", "items", "enum", "const", "pattern", "minimum", "maximum",
-    "minItems", "maxItems", "minLength",
+    "$schema",
+    "$id",
+    "$defs",
+    "$ref",
+    "title",
+    "description",
+    "type",
+    "required",
+    "properties",
+    "additionalProperties",
+    "items",
+    "enum",
+    "const",
+    "pattern",
+    "minimum",
+    "maximum",
+    "minItems",
+    "maxItems",
+    "minLength",
 }
 
 
@@ -162,7 +178,9 @@ def check_model(artifact: dict, literal) -> list[str]:
         )
     actual = fingerprint(model)
     if artifact.get("modelFingerprint") != actual:
-        errors.append(f"{ARTIFACT}: modelFingerprint is {artifact.get('modelFingerprint')}, but model hashes to {actual}")
+        errors.append(
+            f"{ARTIFACT}: modelFingerprint is {artifact.get('modelFingerprint')}, but model hashes to {actual}"
+        )
     features = model.get("featureSchema", {})
     aggregation = model.get("aggregation", {})
     if aggregation.get("featureSchema") != features.get("id"):
@@ -309,11 +327,11 @@ def compare_with_base(base: dict | None, head: dict) -> list[str]:
 
 
 def base_artifact(root: Path, rev: str) -> dict | None:
-    result = subprocess.run(
-        ["git", "show", f"{rev}:{ARTIFACT}"], cwd=root, capture_output=True, text=True, check=False
-    )
+    result = subprocess.run(["git", "show", f"{rev}:{ARTIFACT}"], cwd=root, capture_output=True, text=True, check=False)
     if result.returncode != 0:
-        exists = subprocess.run(["git", "rev-parse", "--verify", f"{rev}^{{commit}}"], cwd=root, capture_output=True, check=False)
+        exists = subprocess.run(
+            ["git", "rev-parse", "--verify", f"{rev}^{{commit}}"], cwd=root, capture_output=True, check=False
+        )
         if exists.returncode != 0:
             raise SystemExit(f"--base {rev} is not a commit in this checkout (fetch full history)")
         return None

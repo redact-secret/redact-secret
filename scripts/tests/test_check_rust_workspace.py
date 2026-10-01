@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-rust-workspace.py"
 SPEC = importlib.util.spec_from_file_location("check_rust_workspace", SCRIPT)
 assert SPEC and SPEC.loader
@@ -92,7 +91,9 @@ class Workspace:
         )
         self.write("package.json", json.dumps({"private": True, "version": VERSION, "engines": {"node": NODE_ENGINES}}))
         self.write("bindings/node/package.json", json.dumps({"version": VERSION, "engines": {"node": NODE_ENGINES}}))
-        self.write("packages/javascript/package.json", json.dumps({"version": VERSION, "engines": {"node": NODE_ENGINES}}))
+        self.write(
+            "packages/javascript/package.json", json.dumps({"version": VERSION, "engines": {"node": NODE_ENGINES}})
+        )
         self.write("bindings/wasm/npm/package.json", json.dumps({"version": VERSION}))
         for platform in ("darwin-arm64", "linux-x64-gnu"):
             self.write(
@@ -100,14 +101,29 @@ class Workspace:
                 json.dumps({"version": VERSION, "engines": {"node": NODE_ENGINES}}),
             )
         self.add_member("redact-secret", "crates/secret-scan-core", "src/lib.rs", CORE_LIB, manifest=CORE_MANIFEST)
-        self.add_member("redact-secret-cli", "crates/secret-scan-cli", "src/main.rs", "#![forbid(unsafe_code)]\n", deps=["redact-secret"])
+        self.add_member(
+            "redact-secret-cli",
+            "crates/secret-scan-cli",
+            "src/main.rs",
+            "#![forbid(unsafe_code)]\n",
+            deps=["redact-secret"],
+        )
 
     def write(self, relative: str, content: str) -> None:
         path = self.root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
 
-    def add_member(self, name: str, relative: str, source: str, content: str, deps: list[str] | None = None, lints: str = "[lints]\nworkspace = true\n", manifest: str | None = None) -> None:
+    def add_member(
+        self,
+        name: str,
+        relative: str,
+        source: str,
+        content: str,
+        deps: list[str] | None = None,
+        lints: str = "[lints]\nworkspace = true\n",
+        manifest: str | None = None,
+    ) -> None:
         self.write(f"{relative}/Cargo.toml", manifest or f'[package]\nname = "{name}"\n{lints}')
         self.write(f"{relative}/{source}", content)
         self.packages.append(package(self.root, name, relative, deps or []))
@@ -207,7 +223,7 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
     def test_missing_forbid_unsafe_in_core_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
-            workspace.write("crates/secret-scan-core/src/lib.rs", "pub const VERSION: &str = \"x\";\n")
+            workspace.write("crates/secret-scan-core/src/lib.rs", 'pub const VERSION: &str = "x";\n')
 
         errors = self.run_check(configure)
         self.assertTrue(any("must contain #![forbid(unsafe_code)]" in error for error in errors), errors)
@@ -221,9 +237,16 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
     def test_private_root_version_drift_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
-            workspace.write("package.json", json.dumps({
-                "private": True, "version": "0.2.0", "engines": {"node": NODE_ENGINES},
-            }))
+            workspace.write(
+                "package.json",
+                json.dumps(
+                    {
+                        "private": True,
+                        "version": "0.2.0",
+                        "engines": {"node": NODE_ENGINES},
+                    }
+                ),
+            )
 
         errors = self.run_check(configure)
         self.assertEqual(errors, [f"package.json: version 0.2.0 differs from workspace version {VERSION}"])
@@ -245,21 +268,26 @@ class RustWorkspaceCheckTests(unittest.TestCase):
     def test_a_stale_runtime_package_pin_is_rejected(self) -> None:
         for field in ("dependencies", "optionalDependencies"):
             with self.subTest(field=field):
+
                 def configure(workspace: Workspace, field: str = field) -> None:
                     workspace.write(
                         "packages/javascript/package.json",
-                        json.dumps({
-                            "version": VERSION,
-                            "engines": {"node": NODE_ENGINES},
-                            field: {"@redact-secret/wasm": "0.0.1", "unrelated": "1.0.0"},
-                        }),
+                        json.dumps(
+                            {
+                                "version": VERSION,
+                                "engines": {"node": NODE_ENGINES},
+                                field: {"@redact-secret/wasm": "0.0.1", "unrelated": "1.0.0"},
+                            }
+                        ),
                     )
 
                 errors = self.run_check(configure)
                 self.assertEqual(
                     [error for error in errors if "pins" in error],
-                    [f"packages/javascript/package.json: {field} pins @redact-secret/wasm to 0.0.1, "
-                     f"not workspace version {VERSION}"],
+                    [
+                        f"packages/javascript/package.json: {field} pins @redact-secret/wasm to 0.0.1, "
+                        f"not workspace version {VERSION}"
+                    ],
                 )
 
     def test_member_version_drift_is_rejected(self) -> None:
@@ -342,9 +370,7 @@ class RustWorkspaceCheckTests(unittest.TestCase):
             workspace.write("bindings/wasm/npm/package.json", json.dumps({"version": "0.2.0"}))
 
         errors = self.run_check(configure)
-        self.assertTrue(
-            any("bindings/wasm/npm/package.json: version 0.2.0" in error for error in errors), errors
-        )
+        self.assertTrue(any("bindings/wasm/npm/package.json: version 0.2.0" in error for error in errors), errors)
 
     def test_wasm_package_json_declares_no_engines_and_is_not_checked(self) -> None:
         """The WebAssembly package ships no `engines.node` claim, so a
@@ -361,10 +387,7 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
         errors = self.run_check(configure)
         self.assertTrue(
-            any(
-                "bindings/node/npm/linux-x64-gnu/package.json: version 0.2.0" in error
-                for error in errors
-            ),
+            any("bindings/node/npm/linux-x64-gnu/package.json: version 0.2.0" in error for error in errors),
             errors,
         )
 
@@ -381,10 +404,7 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
         errors = self.run_check(configure)
         self.assertTrue(
-            any(
-                "bindings/node/npm/win32-x64-msvc/package.json: version 0.2.0" in error
-                for error in errors
-            ),
+            any("bindings/node/npm/win32-x64-msvc/package.json: version 0.2.0" in error for error in errors),
             errors,
         )
 
@@ -419,7 +439,9 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
     def test_a_readme_table_missing_an_export_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
-            workspace.write("crates/secret-scan-core/README.md", README.replace("| Version | `VERSION` |", "| Version | none |"))
+            workspace.write(
+                "crates/secret-scan-core/README.md", README.replace("| Version | `VERSION` |", "| Version | none |")
+            )
 
         errors = self.run_check(configure)
         self.assertTrue(any("VERSION is public but absent from the README API table" in e for e in errors), errors)
@@ -565,7 +587,7 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
     def test_runtime_io_in_core_sources_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
-            workspace.write("crates/secret-scan-core/src/types.rs", "fn read() { std::fs::read(\"x\"); }\n")
+            workspace.write("crates/secret-scan-core/src/types.rs", 'fn read() { std::fs::read("x"); }\n')
 
         errors = self.run_check(configure)
         self.assertTrue(any("names std::fs (filesystem access)" in error for error in errors), errors)
@@ -584,7 +606,7 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
     def test_core_features_are_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
-            workspace.write("crates/secret-scan-core/Cargo.toml", CORE_MANIFEST + '[features]\nextra = []\n')
+            workspace.write("crates/secret-scan-core/Cargo.toml", CORE_MANIFEST + "[features]\nextra = []\n")
 
         errors = self.run_check(configure)
         self.assertTrue(any("declares no Cargo features" in error for error in errors), errors)
@@ -618,7 +640,9 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
     def test_core_manifest_without_include_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
-            workspace.write("crates/secret-scan-core/Cargo.toml", '[package]\nname = "redact-secret"\n[lints]\nworkspace = true\n')
+            workspace.write(
+                "crates/secret-scan-core/Cargo.toml", '[package]\nname = "redact-secret"\n[lints]\nworkspace = true\n'
+            )
 
         errors = self.run_check(configure)
         self.assertTrue(any("must declare include" in error for error in errors), errors)

@@ -17,7 +17,6 @@ Every input is synthetic.
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 from .conftest import (
@@ -64,8 +63,7 @@ def test_the_cases_include_offsets_that_diverge_from_utf8_bytes() -> None:
         text
         for text in CASES.values()
         for finding in redact_secret.scan(text)
-        if finding.start != _utf8_length(text, finding.start)
-        or finding.end != _utf8_length(text, finding.end)
+        if finding.start != _utf8_length(text, finding.start) or finding.end != _utf8_length(text, finding.end)
     ]
     assert len(diverging) >= 3
 
@@ -78,9 +76,7 @@ def test_every_partition_reproduces_the_whole_input_result(text: str) -> None:
     for chunks in code_point_partitions(text) + [single_code_point_partition(text)]:
         actual_text, findings = run_session(chunks)
         assert actual_text == reference.text, chunks[:1]
-        assert [
-            (f.id, f.type, f.action, f.start, f.end) for f in findings
-        ] == expected, chunks[:1]
+        assert [(f.id, f.type, f.action, f.start, f.end) for f in findings] == expected, chunks[:1]
 
 
 @pytest.mark.parametrize("text", CASES.values(), ids=list(CASES))

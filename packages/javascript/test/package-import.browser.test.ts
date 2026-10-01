@@ -44,9 +44,7 @@ describe("browser package import", () => {
       ].join("\n"),
     );
 
-    await import(
-      `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`
-    );
+    await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
     const globals = globalThis as typeof globalThis & {
       secretScanExports?: readonly string[];
       secretScanRangeUnit?: string;
@@ -79,9 +77,7 @@ describe("browser package import", () => {
       ].join("\n"),
     );
 
-    await import(
-      `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`
-    );
+    await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
     const globals = globalThis as typeof globalThis & {
       secretScanCommonExports?: readonly string[];
       secretScanCommonProfile?: string;
@@ -116,9 +112,7 @@ describe("browser package import", () => {
       ].join("\n"),
     );
 
-    await import(
-      `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`
-    );
+    await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
     const globals = globalThis as typeof globalThis & {
       secretScanWebStream?: readonly unknown[];
     };
@@ -139,9 +133,7 @@ describe("browser package import", () => {
       ].join("\n"),
     );
 
-    await import(
-      `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`
-    );
+    await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
     const globals = globalThis as typeof globalThis & {
       secretScanCommonWebStream?: readonly unknown[];
     };
@@ -170,18 +162,12 @@ describe("browser package import", () => {
       ].join("\n"),
     );
 
-    await import(
-      `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`
-    );
+    await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
 
-    expect(
-      (globalThis as typeof globalThis & { secretScanBrowserError?: unknown })
-        .secretScanBrowserError,
-    ).toEqual({
+    expect((globalThis as typeof globalThis & { secretScanBrowserError?: unknown }).secretScanBrowserError).toEqual({
       isSecretScanError: true,
       code: "NOT_INITIALIZED",
-      message:
-        "redact-secret is not initialized; await initialize() before this call.",
+      message: "redact-secret is not initialized; await initialize() before this call.",
     });
   });
 });

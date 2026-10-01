@@ -13,17 +13,13 @@ import { LIMITS } from "./support.js";
  */
 describe("Node stream adapter (common profile)", () => {
   it("re-exports the identical NodeStreamSanitizer class as the full-profile module", async () => {
-    const { NodeStreamSanitizer } = await import(
-      "../../src/adapters/node-stream-common.js"
-    );
+    const { NodeStreamSanitizer } = await import("../../src/adapters/node-stream-common.js");
 
     expect(NodeStreamSanitizer).toBe(FullNodeStreamSanitizer);
   });
 
   it("refuses to open a stream before initialize succeeds", async () => {
-    const { createNodeStreamSanitizer } = await import(
-      "../../src/adapters/node-stream-common.js"
-    );
+    const { createNodeStreamSanitizer } = await import("../../src/adapters/node-stream-common.js");
 
     expect(() => createNodeStreamSanitizer({ limits: LIMITS })).toThrowError(
       expect.objectContaining({

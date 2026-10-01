@@ -17,10 +17,10 @@ import importlib.metadata
 import json
 import math
 import platform
-from pathlib import Path
 import sys
 import time
 import tracemalloc
+from pathlib import Path
 from typing import Any
 
 
@@ -85,9 +85,7 @@ def _normalize_finding(text: str, finding: Any) -> dict[str, Any]:
 def _limits(api: Any, input_bytes: int) -> Any:
     max_token_bytes = 8_192
     max_multiline_bytes = 32_768
-    max_buffered_bytes = api.IncrementalLimits.minimum_buffered_bytes(
-        max_token_bytes, max_multiline_bytes
-    )
+    max_buffered_bytes = api.IncrementalLimits.minimum_buffered_bytes(max_token_bytes, max_multiline_bytes)
     return api.IncrementalLimits(
         max_input_bytes=max(input_bytes + 1, max_buffered_bytes),
         max_buffered_bytes=max_buffered_bytes,
@@ -160,9 +158,7 @@ def _maximum_rss_bytes() -> int | None:
     return int(observed * multiplier)
 
 
-def run_performance_sample(
-    api: Any, initialization_ms: float, version: str, request: dict[str, Any]
-) -> dict[str, Any]:
+def run_performance_sample(api: Any, initialization_ms: float, version: str, request: dict[str, Any]) -> dict[str, Any]:
     text = request.get("input")
     chunks = request.get("chunks")
     chunk_profile = request.get("chunkProfile")

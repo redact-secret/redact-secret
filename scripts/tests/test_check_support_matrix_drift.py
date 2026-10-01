@@ -92,12 +92,8 @@ def matrix(families, *, dirty=False):
         "familyCount": len(families),
         "distribution": {},
         "stableDistribution": {
-            "documented": sum(
-                f["status"] == "stable" and f["qualificationProfile"] == "documented" for f in families
-            ),
-            "empirical": sum(
-                f["status"] == "stable" and f["qualificationProfile"] == "empirical" for f in families
-            ),
+            "documented": sum(f["status"] == "stable" and f["qualificationProfile"] == "documented" for f in families),
+            "empirical": sum(f["status"] == "stable" and f["qualificationProfile"] == "empirical" for f in families),
         },
         "families": families,
     }
@@ -145,7 +141,9 @@ class ValidateMatrixTests(unittest.TestCase):
         )
         candidate["stableDistribution"]["policy-qualified"] = 1
         schema = json.loads(json.dumps(SCHEMA))
-        schema["properties"]["families"]["items"]["properties"]["qualificationProfile"]["enum"].append("policy-qualified")
+        schema["properties"]["families"]["items"]["properties"]["qualificationProfile"]["enum"].append(
+            "policy-qualified"
+        )
         self.assertEqual(DRIFT.validate_matrix("candidate", candidate, schema), [])
         candidate["families"][0]["evidenceTier"] = "T1"
         self.assertTrue(
@@ -245,7 +243,10 @@ class BuildDriftTests(unittest.TestCase):
         baseline = matrix([])
         candidate = matrix([family("widget:token", "pending", reason="no contract yet")])
         drift = DRIFT.build_drift(baseline, candidate)
-        self.assertEqual(drift["newAndUnclassified"], [{"provider": "widget", "family": "widget:token", "familyName": "widget:token", "status": "pending"}])
+        self.assertEqual(
+            drift["newAndUnclassified"],
+            [{"provider": "widget", "family": "widget:token", "familyName": "widget:token", "status": "pending"}],
+        )
 
     def test_unchanged_status_with_differing_provider_source_is_stale_provenance(self) -> None:
         old_source = {"url": "https://old", "observedAt": "2026-01-01", "formatVersion": "1", "covers": "prefix"}
@@ -296,7 +297,12 @@ class BuildDriftTests(unittest.TestCase):
 
 class CheckRegressionsTests(unittest.TestCase):
     def make_regression(self, **overrides):
-        regression = {"family": "widget:token", "baselineStatus": "stable", "candidateStatus": "provisional", "reason": "corpus regressed"}
+        regression = {
+            "family": "widget:token",
+            "baselineStatus": "stable",
+            "candidateStatus": "provisional",
+            "reason": "corpus regressed",
+        }
         regression.update(overrides)
         return regression
 

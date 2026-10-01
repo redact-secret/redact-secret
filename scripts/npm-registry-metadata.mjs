@@ -140,11 +140,7 @@ export async function listedInPackument(name, version, request = fetch) {
  */
 export async function waitForInstallable(
   packages,
-  {
-    request = fetch,
-    pollIntervalMs = INSTALLABLE_POLL_INTERVAL_MS,
-    maxWaitMs = INSTALLABLE_MAX_WAIT_MS,
-  } = {},
+  { request = fetch, pollIntervalMs = INSTALLABLE_POLL_INTERVAL_MS, maxWaitMs = INSTALLABLE_MAX_WAIT_MS } = {},
 ) {
   const deadline = Date.now() + maxWaitMs;
   let waiting = [...packages];
@@ -173,9 +169,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const publishAccepted = args.includes("--publish-accepted");
   const [name, version, expected] = args.filter((arg) => arg !== "--publish-accepted");
   if (!name || !version || (publishAccepted && !expected)) {
-    throw new Error(
-      "usage: npm-registry-metadata.mjs <name> <version> [expected-shasum [--publish-accepted]]",
-    );
+    throw new Error("usage: npm-registry-metadata.mjs <name> <version> [expected-shasum [--publish-accepted]]");
   }
   const metadata = await waitForPublished(name, version, {
     expectedShasum: expected || undefined,

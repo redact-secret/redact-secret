@@ -55,7 +55,9 @@ def sync_fixture(
 
 
 def incr_fixture(id_: str, *, expected_count: int = 1) -> dict:
-    expected = [{"detector": "x", "type": "y", "confidence": "high", "specificity": "provider", "start": 0, "end": 1}] * expected_count
+    expected = [
+        {"detector": "x", "type": "y", "confidence": "high", "specificity": "provider", "start": 0, "end": 1}
+    ] * expected_count
     return {"id": id_, "input": "irrelevant", "text": "irrelevant", "expected": expected, "note": "a safe note"}
 
 
@@ -72,7 +74,9 @@ class SynchronousRowTests(unittest.TestCase):
         self.assertNotIn("before", row)
 
     def test_silent_fixture_reports_zero_findings(self) -> None:
-        row = GEN.synchronous_row(sync_fixture("widget-negative-a", "widget", kind="negative", tier="negative", expected_count=0))
+        row = GEN.synchronous_row(
+            sync_fixture("widget-negative-a", "widget", kind="negative", tier="negative", expected_count=0)
+        )
         self.assertEqual(row["result"], "silent")
         self.assertEqual(row["findingCount"], 0)
 
@@ -95,7 +99,9 @@ class SynchronousRowTests(unittest.TestCase):
 class BuildMatrixTests(unittest.TestCase):
     def test_incremental_fixtures_are_attributed_by_id_prefix(self) -> None:
         sync_corpus = {"fixtures": [sync_fixture("widget-positive-a", "widget")]}
-        incremental_corpus = {"fixtures": [incr_fixture("widget-discriminating-boundary"), incr_fixture("gadget-discriminating-boundary")]}
+        incremental_corpus = {
+            "fixtures": [incr_fixture("widget-discriminating-boundary"), incr_fixture("gadget-discriminating-boundary")]
+        }
         matrix = GEN.build_matrix(sync_corpus, incremental_corpus, empty_baseline(), ["widget"])
         ids = [r["fixtureId"] for r in matrix["rows"] if r["scanMode"] == "incremental"]
         self.assertEqual(ids, ["widget-discriminating-boundary"])
@@ -170,7 +176,11 @@ class Beta4TwinBaselineRowsTests(unittest.TestCase):
                     "mutation": "m",
                     "contractView": {},
                     "negative": {"id": "a", "actualBeta4": [], "expected": []},
-                    "positive": {"id": "b", "actualBeta4": [{"start": 0, "end": 1}], "expected": [{"start": 0, "end": 1}]},
+                    "positive": {
+                        "id": "b",
+                        "actualBeta4": [{"start": 0, "end": 1}],
+                        "expected": [{"start": 0, "end": 1}],
+                    },
                 }
             ]
         }

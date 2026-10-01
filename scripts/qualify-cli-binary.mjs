@@ -33,15 +33,7 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import {
-  accessSync,
-  constants,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { accessSync, constants, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -134,24 +126,15 @@ function parseArguments(argv) {
 }
 
 function productVersion() {
-  return JSON.parse(
-    readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8"),
-  ).version;
+  return JSON.parse(readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8")).version;
 }
 
 function loadFixtures() {
-  const corpus = JSON.parse(
-    readFileSync(join(FIXTURES_DIR, "synchronous-corpus.json"), "utf8"),
-  );
-  assert(
-    corpus.offsetUnit === "utf8-byte",
-    `synchronous-corpus.json: offsetUnit is ${corpus.offsetUnit}`,
-  );
+  const corpus = JSON.parse(readFileSync(join(FIXTURES_DIR, "synchronous-corpus.json"), "utf8"));
+  assert(corpus.offsetUnit === "utf8-byte", `synchronous-corpus.json: offsetUnit is ${corpus.offsetUnit}`);
   // "not-yet-evaluated" fixtures carry no expectation and document a future
   // gap, not a current behavioral contract.
-  return corpus.fixtures.filter(
-    (fixture) => fixture.support !== "not-yet-evaluated",
-  );
+  return corpus.fixtures.filter((fixture) => fixture.support !== "not-yet-evaluated");
 }
 
 function runCli(binary, args, stdin = Buffer.alloc(0)) {
@@ -165,11 +148,7 @@ function inspect(binary, target) {
   const sha256 = createHash("sha256").update(readFileSync(binary)).digest("hex");
   console.log(`# ${binary} ${size} bytes sha256:${sha256}`);
   if (target !== undefined) {
-    assertEqual(
-      binary.split(/[\\/]/).at(-1),
-      BINARY_NAME + TARGET_SUFFIXES[target],
-      "binary name",
-    );
+    assertEqual(binary.split(/[\\/]/).at(-1), BINARY_NAME + TARGET_SUFFIXES[target], "binary name");
   }
   if (process.platform !== "win32") {
     accessSync(binary, constants.X_OK);
@@ -179,19 +158,12 @@ function inspect(binary, target) {
 function identity(binary) {
   const version = runCli(binary, ["--version"]);
   assertEqual(version.status, 0, "--version exit code");
-  assertEqual(
-    version.stdout.toString().trim(),
-    `${BINARY_NAME} ${productVersion()}`,
-    "--version output",
-  );
+  assertEqual(version.stdout.toString().trim(), `${BINARY_NAME} ${productVersion()}`, "--version output");
 
   const help = runCli(binary, ["--help"]);
   assertEqual(help.status, 0, "--help exit code");
   const printed = help.stdout.toString();
-  assert(
-    printed.startsWith(`${BINARY_NAME} ${productVersion()}`),
-    "--help did not lead with the product identity",
-  );
+  assert(printed.startsWith(`${BINARY_NAME} ${productVersion()}`), "--help did not lead with the product identity");
   assert(printed.includes(USAGE_PREFIX), "--help printed no usage block on stdout");
 }
 
@@ -207,10 +179,7 @@ function exitCodes(binary, positive) {
   const rejected = runCli(binary, ["--not-an-option"]);
   assertEqual(rejected.status, 2, "usage error exit code");
   assertEqual(rejected.stdout.toString(), "", "a usage error wrote to stdout");
-  assert(
-    rejected.stderr.toString().includes(USAGE_PREFIX),
-    "a usage error printed no usage block on stderr",
-  );
+  assert(rejected.stderr.toString().includes(USAGE_PREFIX), "a usage error printed no usage block on stderr");
 }
 
 /**
@@ -316,20 +285,14 @@ function main() {
   assert(positive !== undefined, "no positive fixture");
 
   console.log(`# ${process.platform}-${process.arch}`);
-  report("the CLI artifact is an executable with the expected name", () =>
-    inspect(options.binary, options.target),
-  );
+  report("the CLI artifact is an executable with the expected name", () => inspect(options.binary, options.target));
   if (failures.length > 0) {
     console.error("\nCLI qualification FAILED: the artifact is unusable");
     process.exit(1);
   }
 
-  report("--version and --help report the product identity", () =>
-    identity(options.binary),
-  );
-  report("the documented exit codes hold", () =>
-    exitCodes(options.binary, positive.input),
-  );
+  report("--version and --help report the product identity", () => identity(options.binary));
+  report("the documented exit codes hold", () => exitCodes(options.binary, positive.input));
 
   const directory = mkdtempSync(join(tmpdir(), "redact-secret-cli-"));
   try {

@@ -131,9 +131,12 @@ test("#612: a rejected client callTool is the fixed tool-error result, and a can
   }, boundary)({ name: "x" });
   assert.equal(rejected.isError, true);
   assert.equal(JSON.stringify(rejected).includes("SECRET_TOKEN_1"), false);
-  const cancelled = await wrapClientCallTool(async () => ({ content: [] }), boundary)({ name: "x" }, {
-    signal: AbortSignal.abort(),
-  });
+  const cancelled = await wrapClientCallTool(async () => ({ content: [] }), boundary)(
+    { name: "x" },
+    {
+      signal: AbortSignal.abort(),
+    },
+  );
   assert.equal(cancelled, null);
 });
 

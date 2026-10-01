@@ -31,13 +31,14 @@ export function qualifyIncrementalInput(createIncrementalSanitizer, SecretScanEr
     });
     // No closing boundary: the core retains text and the binding indexes Unicode.
     const retained = session.append("🔑SYNTHETIC_REVOKED_RETAINED_TEXT");
-    assert(retained.text === "" && retained.findings.length === 0,
-      "invalid input lifecycle: prefix was not retained");
+    assert(retained.text === "" && retained.findings.length === 0, "invalid input lifecycle: prefix was not retained");
     rejects(() => session.append(chunk), code, message);
     assert(session.state === "failed", "invalid input lifecycle: rejection was not failed");
     for (const operation of [
-      () => session.append("x"), () => session.append(chunk),
-      () => session.finalize(), () => session.abort(),
+      () => session.append("x"),
+      () => session.append(chunk),
+      () => session.finalize(),
+      () => session.abort(),
     ]) {
       rejects(operation, "INVALID_STATE", "The incremental sanitizer is no longer accepting input.");
       assert(session.state === "failed", "invalid input lifecycle: terminal state changed");

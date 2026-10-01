@@ -27,9 +27,7 @@ import type {
  * it never appears in `Object.keys`, `JSON.stringify`, or a structural
  * comparison of a public finding.
  */
-export const NATIVE_HANDLE: unique symbol = Symbol.for(
-  "@redact-secret/core.native-handle",
-);
+export const NATIVE_HANDLE: unique symbol = Symbol.for("@redact-secret/core.native-handle");
 
 export interface NativeFinding {
   readonly id: string;
@@ -53,20 +51,14 @@ export interface NativeDetectedFinding {
   readonly end: number;
 }
 
-export type NativePolicyCallback = (
-  finding: NativeDetectedFinding,
-  context: PolicyContext,
-) => string;
+export type NativePolicyCallback = (finding: NativeDetectedFinding, context: PolicyContext) => string;
 
 export type NativeIncrementalPolicyCallback = (
   finding: NativeDetectedFinding,
   context: IncrementalPolicyContext,
 ) => string;
 
-export type NativeFormatterCallback = (
-  finding: NativeFinding,
-  context: PlaceholderContext,
-) => string;
+export type NativeFormatterCallback = (finding: NativeFinding, context: PlaceholderContext) => string;
 
 export interface NativeScanAndRedactResult {
   readonly text: string;
@@ -137,9 +129,7 @@ export interface NativeBinding {
     limits: NativeWholeInputLimits | undefined,
     ruleset: Uint8Array | undefined,
   ): NativeScanAndRedactResult;
-  createIncrementalSanitizer(
-    options: NativeIncrementalOptions,
-  ): NativeIncrementalSanitizer;
+  createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
 }
 
 /**
@@ -156,6 +146,4 @@ export interface NativeBindingLoadOptions {
 }
 
 /** Loads and prepares this runtime's binding. Called at most once per successful load. */
-export type NativeBindingLoader = (
-  options: NativeBindingLoadOptions,
-) => Promise<NativeBinding>;
+export type NativeBindingLoader = (options: NativeBindingLoadOptions) => Promise<NativeBinding>;

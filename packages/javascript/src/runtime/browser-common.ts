@@ -18,11 +18,7 @@
  */
 
 import type { NativeBindingLoader } from "../native.js";
-import {
-  assertWasmModuleShape,
-  createBindingFromWasmModule,
-  type WasmModule,
-} from "./wasm-binding.js";
+import { assertWasmModuleShape, createBindingFromWasmModule, type WasmModule } from "./wasm-binding.js";
 
 /**
  * Loads the `common`-profile WebAssembly artifact published in lockstep with
@@ -36,11 +32,9 @@ import {
  * build is never fetched unless PII is selected.
  */
 async function loadWasmModule(pii: boolean): Promise<WasmModule> {
-  const module = (
-    pii
-      ? await import("@redact-secret/wasm/common/pii")
-      : await import("@redact-secret/wasm/common")
-  ) as unknown as Partial<WasmModule>;
+  const module = (pii
+    ? await import("@redact-secret/wasm/common/pii")
+    : await import("@redact-secret/wasm/common")) as unknown as Partial<WasmModule>;
   assertWasmModuleShape(module);
   return module;
 }

@@ -117,9 +117,7 @@ function reportedRanges(text) {
 }
 
 function errorCode(thrown) {
-  return thrown !== null && typeof thrown === "object" && "code" in thrown
-    ? thrown.code
-    : undefined;
+  return thrown !== null && typeof thrown === "object" && "code" in thrown ? thrown.code : undefined;
 }
 
 export async function qualify(fixtures) {
@@ -217,18 +215,12 @@ export async function qualify(fixtures) {
       const findings = actualTuples(results.flatMap((result) => result.findings));
       const whole = scanAndRedact(fixture.input);
       compared += 1;
-      if (
-        text !== whole.text ||
-        JSON.stringify(findings) !== JSON.stringify(actualTuples(whole.findings))
-      ) {
+      if (text !== whole.text || JSON.stringify(findings) !== JSON.stringify(actualTuples(whole.findings))) {
         mismatched.push(fixture.id);
       }
     }
     assert(compared > 0, "no fixture exercised the incremental session");
-    assert(
-      mismatched.length === 0,
-      `${mismatched.length} fixture(s) disagreed: ${mismatched.slice(0, 5).join(", ")}`,
-    );
+    assert(mismatched.length === 0, `${mismatched.length} fixture(s) disagreed: ${mismatched.slice(0, 5).join(", ")}`);
   });
 
   // The corpus already carries an astral (supplementary-plane) character
@@ -239,8 +231,7 @@ export async function qualify(fixtures) {
   check("the corpus exercises an astral character before a finding", () => {
     const astral = fixtures.synchronous.filter(
       (fixture) =>
-        fixture.expected.length > 0 &&
-        [...fixture.input].some((character) => character.codePointAt(0) > 0xffff),
+        fixture.expected.length > 0 && [...fixture.input].some((character) => character.codePointAt(0) > 0xffff),
     );
     assert(astral.length > 0, "no positive fixture contains an astral character");
   });
@@ -270,9 +261,7 @@ export async function qualify(fixtures) {
     for (const fixture of fixtures.synchronous) {
       if (fixture.expected.length === 0) continue;
       const baseline = reportedRanges(fixture.input);
-      const shifted = reportedRanges(PREFIX + fixture.input).map(
-        ([start, end]) => [start - SHIFT, end - SHIFT],
-      );
+      const shifted = reportedRanges(PREFIX + fixture.input).map(([start, end]) => [start - SHIFT, end - SHIFT]);
       if (JSON.stringify(shifted) !== JSON.stringify(baseline)) {
         perturbed.push(`${fixture.id} (prefix)`);
       }
@@ -283,10 +272,7 @@ export async function qualify(fixtures) {
         perturbed.push(`${fixture.id} (suffix)`);
       }
     }
-    assert(
-      perturbed.length === 0,
-      `${perturbed.length} fixture(s) shifted: ${perturbed.slice(0, 5).join(", ")}`,
-    );
+    assert(perturbed.length === 0, `${perturbed.length} fixture(s) shifted: ${perturbed.slice(0, 5).join(", ")}`);
   });
 
   check("scanAndRedact equals scan then redact and removes every match", () => {
@@ -294,11 +280,7 @@ export async function qualify(fixtures) {
       if (fixture.expected.length === 0) continue;
       const separate = redact(fixture.input, scan(fixture.input));
       const combined = scanAndRedact(fixture.input);
-      assertEqual(
-        combined.text,
-        separate,
-        `fixture ${fixture.id} scanAndRedact disagreed with scan + redact`,
-      );
+      assertEqual(combined.text, separate, `fixture ${fixture.id} scanAndRedact disagreed with scan + redact`);
 
       // Reconstruct the exact expected output from the fixture's own
       // findings, rather than searching the output for leftover matched
@@ -332,9 +314,7 @@ export async function qualify(fixtures) {
   // redacted. Under `common` the first positive fixture can resolve only to
   // a `warn` finding, which a placeholder formatter never sees.
   const redacting = synchronous.find((entry) =>
-    scan(entry.input).some(
-      (finding) => finding.action === "redact" || finding.action === "block",
-    ),
+    scan(entry.input).some((finding) => finding.action === "redact" || finding.action === "block"),
   );
 
   check("a throwing policy callback surfaces POLICY_FAILURE", () => {
@@ -350,10 +330,7 @@ export async function qualify(fixtures) {
     }
     assert(thrown !== undefined, "the throwing policy did not surface");
     assertEqual(errorCode(thrown), "POLICY_FAILURE", "policy failure code");
-    assert(
-      !String(thrown.message).includes(fixture.input),
-      "the error carried the scanned input",
-    );
+    assert(!String(thrown.message).includes(fixture.input), "the error carried the scanned input");
   });
 
   check("a custom policy callback controls the action", () => {
@@ -374,10 +351,7 @@ export async function qualify(fixtures) {
       scan(fixture.input),
       (_finding, context) => `[[REMOVED_${context.placeholderIndex}]]`,
     );
-    assert(
-      output.includes("[[REMOVED_1]]"),
-      `fixture ${fixture.id} ignored the formatter`,
-    );
+    assert(output.includes("[[REMOVED_1]]"), `fixture ${fixture.id} ignored the formatter`);
   });
 
   return { ok: failures === 0, failures, checks: results };

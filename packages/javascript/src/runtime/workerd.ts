@@ -29,11 +29,7 @@
  */
 
 import type { NativeBindingLoader } from "../native.js";
-import {
-  assertWasmModuleShape,
-  createBindingFromWasmModule,
-  type WasmModule,
-} from "./wasm-binding.js";
+import { assertWasmModuleShape, createBindingFromWasmModule, type WasmModule } from "./wasm-binding.js";
 
 export * from "./wasm-binding.js";
 
@@ -43,25 +39,15 @@ export * from "./wasm-binding.js";
  * glue and `.wasm` specifiers, so the bundler compiles both and `workerd`
  * instantiates only the one selected.
  */
-async function loadCompiledWasmModule(
-  pii: boolean,
-): Promise<readonly [WasmModule, object]> {
+async function loadCompiledWasmModule(pii: boolean): Promise<readonly [WasmModule, object]> {
   const [module, artifact] = pii
     ? await Promise.all([
-        import("@redact-secret/wasm/pii") as unknown as Promise<
-          Partial<WasmModule>
-        >,
-        import(
-          "@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm"
-        ) as unknown as Promise<{ default: object }>,
+        import("@redact-secret/wasm/pii") as unknown as Promise<Partial<WasmModule>>,
+        import("@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm") as unknown as Promise<{ default: object }>,
       ])
     : await Promise.all([
-        import("@redact-secret/wasm") as unknown as Promise<
-          Partial<WasmModule>
-        >,
-        import(
-          "@redact-secret/wasm/redact_secret_wasm_bg.wasm"
-        ) as unknown as Promise<{ default: object }>,
+        import("@redact-secret/wasm") as unknown as Promise<Partial<WasmModule>>,
+        import("@redact-secret/wasm/redact_secret_wasm_bg.wasm") as unknown as Promise<{ default: object }>,
       ]);
   assertWasmModuleShape(module);
   return [module, artifact.default];

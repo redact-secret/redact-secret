@@ -60,9 +60,7 @@ def unreleased_section(changelog: str) -> str:
     """The `## Unreleased` section's body, empty when there is none."""
     lines = changelog.splitlines()
     try:
-        start = next(
-            index for index, line in enumerate(lines) if line.strip() == UNRELEASED_HEADING
-        )
+        start = next(index for index, line in enumerate(lines) if line.strip() == UNRELEASED_HEADING)
     except StopIteration:
         return ""
     body: list[str] = []
@@ -99,9 +97,7 @@ def evaluate(
 
 
 def git(root: Path, *args: str) -> str:
-    return subprocess.run(
-        ["git", *args], cwd=root, check=True, capture_output=True, text=True
-    ).stdout
+    return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout
 
 
 def changed_paths(root: Path, base: str, head: str) -> list[str]:

@@ -24,11 +24,7 @@
  */
 
 import type { NativeBindingLoader } from "../native.js";
-import {
-  assertWasmModuleShape,
-  createBindingFromWasmModule,
-  type WasmModule,
-} from "./wasm-binding.js";
+import { assertWasmModuleShape, createBindingFromWasmModule, type WasmModule } from "./wasm-binding.js";
 
 export * from "./wasm-binding.js";
 
@@ -44,11 +40,9 @@ export * from "./wasm-binding.js";
  * build is never fetched unless PII is selected.
  */
 async function loadWasmModule(pii: boolean): Promise<WasmModule> {
-  const module = (
-    pii
-      ? await import("@redact-secret/wasm/pii")
-      : await import("@redact-secret/wasm")
-  ) as unknown as Partial<WasmModule>;
+  const module = (pii
+    ? await import("@redact-secret/wasm/pii")
+    : await import("@redact-secret/wasm")) as unknown as Partial<WasmModule>;
   assertWasmModuleShape(module);
   return module;
 }

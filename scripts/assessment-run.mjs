@@ -36,17 +36,16 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-
+import { buildAndEmitAccuracyResult, loadAssessmentSchema, loadAssessmentScoring } from "./lib/assessment-emit.mjs";
 import {
   accuracyCorpusHash,
   gitCommit,
   hostCpu,
   hostOs,
   loadAccuracyCorpus,
-  readPackageVersion,
   REPO_ROOT,
+  readPackageVersion,
 } from "./lib/assessment-provenance.mjs";
-import { buildAndEmitAccuracyResult, loadAssessmentSchema, loadAssessmentScoring } from "./lib/assessment-emit.mjs";
 
 const JS_PACKAGE_DIR = join(REPO_ROOT, "packages", "javascript");
 const PROFILE_ID = "accuracy-corpus";
@@ -111,9 +110,7 @@ async function main() {
   }
   const fixtures = schema.validateAssessmentFixtures(corpus.fixtures);
   if (fixtures.length !== corpus.fixtureCount || fixtures.length === 0) {
-    fail(
-      `accuracy-corpus.json: expected ${corpus.fixtureCount} fixture(s), found ${fixtures.length}`,
-    );
+    fail(`accuracy-corpus.json: expected ${corpus.fixtureCount} fixture(s), found ${fixtures.length}`);
   }
 
   let run;
@@ -128,9 +125,7 @@ async function main() {
       })),
     );
   } catch (error) {
-    fail(
-      `accuracy evaluation FAILED before completing — ${error instanceof Error ? error.message : String(error)}`,
-    );
+    fail(`accuracy evaluation FAILED before completing — ${error instanceof Error ? error.message : String(error)}`);
     return;
   }
   if (run.fixturesEvaluated !== fixtures.length) {
@@ -167,10 +162,7 @@ async function main() {
       `${accuracy.policyMismatches} policy mismatch(es) across ${run.fixturesEvaluated} fixture(s)`,
   );
 
-  if (
-    options.strict &&
-    (accuracy.falsePositives > 0 || accuracy.falseNegatives > 0 || accuracy.policyMismatches > 0)
-  ) {
+  if (options.strict && (accuracy.falsePositives > 0 || accuracy.falseNegatives > 0 || accuracy.policyMismatches > 0)) {
     fail("--strict: at least one mismatch was found");
   }
 }

@@ -262,9 +262,7 @@ def build_evidence(
         results.append(_run("crate", lambda crate=crate: check_crate(http_read, crate)))
     if pypi_project:
         results.append(_run("pypi", lambda: check_pypi_project(http_read, pypi_project)))
-        results.append(
-            _run("pypi-normalized-aliases", lambda: check_pypi_normalized_aliases(http_read, pypi_project))
-        )
+        results.append(_run("pypi-normalized-aliases", lambda: check_pypi_normalized_aliases(http_read, pypi_project)))
 
     return {
         "issue": 143,
@@ -282,9 +280,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--npm", dest="npm_packages", action="append", default=[])
     parser.add_argument("--crate", dest="crates", action="append", default=[])
     parser.add_argument("--pypi", dest="pypi_project", default=None)
-    parser.add_argument(
-        "--check-repo", action="store_true", help="check whether --repo itself exists on GitHub"
-    )
+    parser.add_argument("--check-repo", action="store_true", help="check whether --repo itself exists on GitHub")
     parser.add_argument("--out", type=argparse.FileType("w"), default=sys.stdout)
     args = parser.parse_args(argv)
 

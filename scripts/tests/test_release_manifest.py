@@ -6,12 +6,11 @@ import os
 import re
 import shutil
 import subprocess
-import textwrap
 import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
-
 
 SCRIPT = Path(__file__).resolve().parents[1] / "release-manifest.py"
 SPEC = importlib.util.spec_from_file_location("release_manifest", SCRIPT)
@@ -155,11 +154,7 @@ class NormalizeArtifactDigestsTests(unittest.TestCase):
 
     def test_missing_stage_values_are_not_a_mismatch(self) -> None:
         _, errors = RELEASE_MANIFEST.normalize_artifact_digests(
-            {
-                "pypi:redact-secret": [
-                    {"file": "redact_secret-0.1.0.tar.gz", "qualified": "a" * 64, "comparable": True}
-                ]
-            }
+            {"pypi:redact-secret": [{"file": "redact_secret-0.1.0.tar.gz", "qualified": "a" * 64, "comparable": True}]}
         )
         self.assertEqual(errors, [])
 
@@ -362,7 +357,16 @@ class CliTests(unittest.TestCase):
     def test_support_matrix_drift_is_recorded_alongside_the_existing_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "manifest.json"
-            drift = json.dumps({"summary": {"regressions": 1, "improvements": 0, "newAndUnclassified": 0, "staleProviderProvenance": 0}})
+            drift = json.dumps(
+                {
+                    "summary": {
+                        "regressions": 1,
+                        "improvements": 0,
+                        "newAndUnclassified": 0,
+                        "staleProviderProvenance": 0,
+                    }
+                }
+            )
             status = RELEASE_MANIFEST.main(
                 [
                     "--source-revision",
@@ -472,15 +476,15 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertIsNotNone(real_node)
         directory.joinpath("curl").write_text(
             "#!/bin/sh\n"
-            "if [ \"${CURL_STATUS:-404}\" = transport ]; then exit 7; fi\n"
+            'if [ "${CURL_STATUS:-404}" = transport ]; then exit 7; fi\n'
             "printf '%s' \"${CURL_STATUS:-404}\"\n",
             encoding="utf-8",
         )
         directory.joinpath("node").write_text(
             "#!/bin/sh\n"
-            "case \"$1\" in\n"
+            'case "$1" in\n'
             "  scripts/npm-registry-metadata.mjs|*/scripts/npm-registry-metadata.mjs)\n"
-            "    case \"${NPM_METADATA_STATE:-unpublished}\" in\n"
+            '    case "${NPM_METADATA_STATE:-unpublished}" in\n'
             "      published) printf '%040d\\n' 0 ;;\n"
             "      unpublished) printf 'unpublished\\n' ;;\n"
             "      malformed|failure) exit 1 ;;\n"
@@ -488,13 +492,15 @@ class WorkflowOutputTests(unittest.TestCase):
             "    exit 0\n"
             "    ;;\n"
             "esac\n"
-            f"exec {real_node!s} \"$@\"\n",
+            f'exec {real_node!s} "$@"\n',
             encoding="utf-8",
         )
         for name in ("curl", "node"):
             directory.joinpath(name).chmod(0o755)
 
-    def _run_report_step(self, name: str, shell: str, directory: Path, *, npm_state: str, curl_status: str) -> dict[str, str]:
+    def _run_report_step(
+        self, name: str, shell: str, directory: Path, *, npm_state: str, curl_status: str
+    ) -> dict[str, str]:
         output = directory / "output"
         output.write_text("")
         registry_state = directory / "registry-state.json"
@@ -552,7 +558,9 @@ class WorkflowOutputTests(unittest.TestCase):
             for npm_state, curl_status, expected in cases:
                 for name, shell in self._report_steps():
                     with self.subTest(step=name, npm_state=npm_state, curl_status=curl_status):
-                        state = self._run_report_step(name, shell, directory, npm_state=npm_state, curl_status=curl_status)
+                        state = self._run_report_step(
+                            name, shell, directory, npm_state=npm_state, curl_status=curl_status
+                        )
                         self.assertTrue(state)
                         uses_npm_helper = name in {"Report registry state", "Report npm registry state"}
                         step_expected = expected
@@ -571,10 +579,13 @@ class WorkflowOutputTests(unittest.TestCase):
             directory = Path(tmp)
             (directory / "packages").symlink_to(root / "packages", target_is_directory=True)
             (directory / "scripts").symlink_to(root / "scripts", target_is_directory=True)
-            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", shell], cwd=directory,
-                           env={**os.environ, "GITHUB_SHA": "a" * 40,
-                                "GITHUB_OUTPUT": str(directory / "output")},
-                           check=True, capture_output=True)
+            subprocess.run(
+                ["bash", "-e", "-o", "pipefail", "-c", shell],
+                cwd=directory,
+                env={**os.environ, "GITHUB_SHA": "a" * 40, "GITHUB_OUTPUT": str(directory / "output")},
+                check=True,
+                capture_output=True,
+            )
             manifest = json.loads((directory / "manifest.json").read_text())
             self.assertEqual(len(manifest["artifact_set"]), 13)
             self.assertEqual(set(manifest["artifact_set"]), set(manifest["registry_state"]))
@@ -591,27 +602,42 @@ class WorkflowOutputTests(unittest.TestCase):
         shell = step.split("        run: |\n", 1)[1].split("      - name:", 1)[0]
         shell = textwrap.dedent(shell)
         self.assertNotRegex(shell, r"\$\{\{")
-        note = "npm repacks it; \"published\" is the registry tarball's own shasum $(exit 1)."
-        wasm_digest = json.dumps({"npm:@redact-secret/wasm": [{
-            "file": "redact_secret_wasm_bg.wasm", "built": "b" * 64, "qualified": "b" * 64,
-            "published": "c" * 40, "comparable": False, "note": note,
-        }]})
+        note = 'npm repacks it; "published" is the registry tarball\'s own shasum $(exit 1).'
+        wasm_digest = json.dumps(
+            {
+                "npm:@redact-secret/wasm": [
+                    {
+                        "file": "redact_secret_wasm_bg.wasm",
+                        "built": "b" * 64,
+                        "qualified": "b" * 64,
+                        "published": "c" * 40,
+                        "comparable": False,
+                        "note": note,
+                    }
+                ]
+            }
+        )
         wasm_state = json.dumps({"npm:@redact-secret/wasm": "published"})
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
             (directory / "packages").symlink_to(root / "packages", target_is_directory=True)
             (directory / "scripts").symlink_to(root / "scripts", target_is_directory=True)
-            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", shell], cwd=directory,
-                           env={**os.environ, "GITHUB_SHA": "a" * 40,
-                                "GITHUB_OUTPUT": str(directory / "output"),
-                                "WASM_ARTIFACT_DIGEST_JSON": wasm_digest,
-                                "WASM_REGISTRY_STATE_JSON": wasm_state},
-                           check=True, capture_output=True)
+            subprocess.run(
+                ["bash", "-e", "-o", "pipefail", "-c", shell],
+                cwd=directory,
+                env={
+                    **os.environ,
+                    "GITHUB_SHA": "a" * 40,
+                    "GITHUB_OUTPUT": str(directory / "output"),
+                    "WASM_ARTIFACT_DIGEST_JSON": wasm_digest,
+                    "WASM_REGISTRY_STATE_JSON": wasm_state,
+                },
+                check=True,
+                capture_output=True,
+            )
             manifest = json.loads((directory / "manifest.json").read_text())
             self.assertEqual(manifest["registry_state"]["npm:@redact-secret/wasm"], "published")
-            self.assertEqual(
-                manifest["artifact_digests"]["npm:@redact-secret/wasm"][0]["note"], note
-            )
+            self.assertEqual(manifest["artifact_digests"]["npm:@redact-secret/wasm"][0]["note"], note)
 
 
 if __name__ == "__main__":

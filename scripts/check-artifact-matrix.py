@@ -52,8 +52,9 @@ import argparse
 import json
 import re
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 WORKFLOWS = Path(".github") / "workflows"
 WORKFLOW = WORKFLOWS / "artifact-qualification.yml"
@@ -166,14 +167,17 @@ def compare(label: str, declared, found, where: str) -> list[str]:
     if missing:
         errors.append(f"{where}: {label} omits {', '.join(missing)}")
     if extra:
-        errors.append(
-            f"{where}: {label} names {', '.join(extra)}, which Cargo.toml does not declare"
-        )
+        errors.append(f"{where}: {label} names {', '.join(extra)}, which Cargo.toml does not declare")
     return errors
 
 
 def check_job_matrix(
-    *, label: str, declared: list[str], workflow: str, job_name: str, key: str,
+    *,
+    label: str,
+    declared: list[str],
+    workflow: str,
+    job_name: str,
+    key: str,
     path: Path = WORKFLOW,
 ) -> list[str]:
     body = job_body(workflow, job_name)
@@ -208,8 +212,11 @@ def check_addon_targets(root: Path, policy: dict, workflow: str) -> list[str]:
 
     errors.extend(
         check_job_matrix(
-            label="addon", declared=declared, workflow=workflow,
-            job_name="node-addon", key="target",
+            label="addon",
+            declared=declared,
+            workflow=workflow,
+            job_name="node-addon",
+            key="target",
         )
     )
 
@@ -219,9 +226,7 @@ def check_addon_targets(root: Path, policy: dict, workflow: str) -> list[str]:
     else:
         known = re.findall(r'^\s*"([a-z0-9_]+-[a-z0-9-]+)":\s*"', qualifier, re.M)
         for target in sorted(set(declared) - set(known)):
-            errors.append(
-                f"{ADDON_QUALIFIER.as_posix()}: no platform file name for {target}"
-            )
+            errors.append(f"{ADDON_QUALIFIER.as_posix()}: no platform file name for {target}")
     return errors
 
 
@@ -243,10 +248,7 @@ def check_node_publish_targets(root: Path, policy: dict) -> list[str]:
     errors: list[str] = []
     addon = policy.get("node-addon-targets") or []
     for extra in sorted(set(declared) - set(addon)):
-        errors.append(
-            f"Cargo.toml: node-publish-targets names {extra}, which "
-            "node-addon-targets does not"
-        )
+        errors.append(f"Cargo.toml: node-publish-targets names {extra}, which node-addon-targets does not")
 
     qualifier = read_text(root, ADDON_QUALIFIER)
     if qualifier is None:
@@ -258,10 +260,10 @@ def check_node_publish_targets(root: Path, policy: dict) -> list[str]:
     expected_packages = {f"@redact-secret/node-{platform}" for platform in expected_platforms}
 
     directory = root / NATIVE_NPM_DIR
-    found_platforms = (
-        {child.name for child in directory.iterdir() if child.is_dir()} if directory.is_dir() else set()
+    found_platforms = {child.name for child in directory.iterdir() if child.is_dir()} if directory.is_dir() else set()
+    errors.extend(
+        compare("published platform packages", expected_platforms, found_platforms, NATIVE_NPM_DIR.as_posix())
     )
-    errors.extend(compare("published platform packages", expected_platforms, found_platforms, NATIVE_NPM_DIR.as_posix()))
     for platform in sorted(expected_platforms & found_platforms):
         manifest = read_json(root, NATIVE_NPM_DIR / platform / "package.json")
         expected_name = f"@redact-secret/node-{platform}"
@@ -300,8 +302,12 @@ def check_node_publish_targets(root: Path, policy: dict) -> list[str]:
             continue
         errors.extend(
             check_job_matrix(
-                label="publish", declared=declared, workflow=workflow,
-                job_name=job_name, key="target", path=path,
+                label="publish",
+                declared=declared,
+                workflow=workflow,
+                job_name=job_name,
+                key="target",
+                path=path,
             )
         )
 
@@ -325,16 +331,17 @@ def check_cli_targets(root: Path, policy: dict, workflow: str) -> list[str]:
         return ["Cargo.toml: cli-release-targets must declare the CLI matrix"]
 
     errors = check_job_matrix(
-        label="cli", declared=declared, workflow=workflow, job_name="cli", key="target",
+        label="cli",
+        declared=declared,
+        workflow=workflow,
+        job_name="cli",
+        key="target",
     )
     # The CLI ships no musl variant, so its matrix is a subset of the
     # addon's; an entry here that the addon does not build is a mistake.
     addon = policy.get("node-addon-targets") or []
     for extra in sorted(set(declared) - set(addon)):
-        errors.append(
-            f"Cargo.toml: cli-release-targets names {extra}, which "
-            "node-addon-targets does not"
-        )
+        errors.append(f"Cargo.toml: cli-release-targets names {extra}, which node-addon-targets does not")
 
     qualifier = read_text(root, CLI_QUALIFIER)
     if qualifier is None:
@@ -352,8 +359,11 @@ def check_browser_engines(root: Path, policy: dict, workflow: str) -> list[str]:
         return ["Cargo.toml: browser-engines must declare the browser matrix"]
 
     errors = check_job_matrix(
-        label="browser", declared=declared, workflow=workflow,
-        job_name="browser", key="engine",
+        label="browser",
+        declared=declared,
+        workflow=workflow,
+        job_name="browser",
+        key="engine",
     )
     errors.extend(
         check_job_matrix(
@@ -398,11 +408,7 @@ def check_node_support(root: Path, policy: dict, workflow: str) -> list[str]:
     # host runner and from the musl loop that mirrors them.
     smoked = re.findall(r"^\s*- name: Qualify the addon on Node (\d+)\s*$", workflow, re.M)
     musl = re.search(r"^\s*for major in ([\d ]+); do\s*$", workflow, re.M)
-    errors.extend(
-        compare(
-            "the addon smoke-test majors", declared_strings, smoked, WORKFLOW.as_posix()
-        )
-    )
+    errors.extend(compare("the addon smoke-test majors", declared_strings, smoked, WORKFLOW.as_posix()))
     errors.extend(
         compare(
             "the musl smoke-test majors",
@@ -475,9 +481,7 @@ def check_workflow_hygiene(root: Path) -> list[str]:
             if reference.startswith("./"):
                 continue
             if not PINNED.match(reference):
-                errors.append(
-                    f"{relative}: uses {reference}, which is not pinned to a commit SHA"
-                )
+                errors.append(f"{relative}: uses {reference}, which is not pinned to a commit SHA")
     return errors
 
 

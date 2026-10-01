@@ -62,9 +62,7 @@ function parseArgs(argv) {
     }
   }
   if (!options.packageDir) {
-    throw new Error(
-      "usage: publish-dependency-package.mjs --package-dir <dir> [--tag <tag>] [--dry-run]",
-    );
+    throw new Error("usage: publish-dependency-package.mjs --package-dir <dir> [--tag <tag>] [--dry-run]");
   }
   options.packageDir = resolve(options.packageDir);
   return options;

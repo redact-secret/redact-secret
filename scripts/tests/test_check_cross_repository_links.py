@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-cross-repository-links.py"
 SPEC = importlib.util.spec_from_file_location("check_cross_repository_links", SCRIPT)
 assert SPEC and SPEC.loader

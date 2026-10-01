@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-json-path-citations.py"
 SPEC = importlib.util.spec_from_file_location("check_json_path_citations", SCRIPT)
 assert SPEC and SPEC.loader
@@ -57,18 +56,14 @@ class CheckJsonPathCitationsTest(unittest.TestCase):
             "conformance/fixtures/synchronous-corpus.json",
             '{"fixtures": [{"note": "Moved to docs/audits/evidence/367/precision-contracts.json."}]}\n',
         )
-        self.assertOneError(
-            "dangling path citation 'docs/audits/evidence/367/precision-contracts.json'"
-        )
+        self.assertOneError("dangling path citation 'docs/audits/evidence/367/precision-contracts.json'")
 
     def test_a_dangling_citation_under_reference_is_rejected(self) -> None:
         self.repo.write(
             "docs/coverage/precision-context-matrix.json",
             '{"reference": "docs/contracts/precision/does-not-exist.json"}\n',
         )
-        self.assertOneError(
-            "dangling path citation 'docs/contracts/precision/does-not-exist.json'"
-        )
+        self.assertOneError("dangling path citation 'docs/contracts/precision/does-not-exist.json'")
 
     def test_a_citation_outside_note_or_reference_is_ignored(self) -> None:
         self.repo.write(

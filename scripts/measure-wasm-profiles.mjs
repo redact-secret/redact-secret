@@ -99,10 +99,16 @@ export function modulePacks(source) {
   const imported = Object.fromEntries(
     [...source.matchAll(/^use ([a-z0-9_]+)::([A-Za-z0-9_]+);$/gm)].map((match) => [match[2], match[1]]),
   );
-  const list = source.match(/fn built_in_detectors\(\) -> &'static \[BuiltInRow\] \{\s*(?:#\[rustfmt::skip\]\s*)?static DETECTORS: &\[BuiltInRow\] = &\[([\s\S]*?)\n\s*\];\n\s*DETECTORS\n\}/);
+  const list = source.match(
+    /fn built_in_detectors\(\) -> &'static \[BuiltInRow\] \{\s*(?:#\[rustfmt::skip\]\s*)?static DETECTORS: &\[BuiltInRow\] = &\[([\s\S]*?)\n\s*\];\n\s*DETECTORS\n\}/,
+  );
   const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
-  if (list === null || table === null) throw new Error("detectors/mod.rs: built_in_detectors() or BUILT_IN_PACKS not found");
-  const entries = list[1].split("\n").map((line) => line.trim()).filter((line) => line && !line.startsWith("//"));
+  if (list === null || table === null)
+    throw new Error("detectors/mod.rs: built_in_detectors() or BUILT_IN_PACKS not found");
+  const entries = list[1]
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("//"));
   const modules = entries.map((entry) => {
     const path = entry.match(/\b([a-z_][a-z0-9_]*)::/);
     if (path !== null) return path[1];
@@ -122,7 +128,11 @@ export function modulePacks(source) {
   for (const [module, set] of byModule) {
     if (set.size > 1) throw new Error(`detectors/mod.rs: ${module} holds both common and provider detectors`);
   }
-  const of = (pack) => [...byModule].filter(([, set]) => set.has(pack)).map(([module]) => module).sort();
+  const of = (pack) =>
+    [...byModule]
+      .filter(([, set]) => set.has(pack))
+      .map(([module]) => module)
+      .sort();
   return {
     common: of("Common"),
     provider: of("Provider"),
@@ -169,7 +179,8 @@ export function detectorModules(nameSection) {
  */
 export function detectorImplementations(nameSection) {
   const modules = new Set();
-  const pattern = /<redact_secret\[[0-9a-f]+\]::detectors::([a-z0-9_]+)::[A-Za-z0-9_]+(?:<[^>]*>)? as redact_secret\[[0-9a-f]+\]::types::Detector>::/g;
+  const pattern =
+    /<redact_secret\[[0-9a-f]+\]::detectors::([a-z0-9_]+)::[A-Za-z0-9_]+(?:<[^>]*>)? as redact_secret\[[0-9a-f]+\]::types::Detector>::/g;
   for (const match of nameSection.matchAll(pattern)) modules.add(match[1]);
   return [...modules].sort();
 }
@@ -186,7 +197,8 @@ export function piiRuntime(nameSection) {
   const parts = new Set();
   const adapter = /<redact_secret\[[0-9a-f]+\]::pii::PiiDomain as redact_secret\[[0-9a-f]+\]::types::Detector>::/;
   if (adapter.test(nameSection)) parts.add("PiiDomain");
-  const family = /<redact_secret\[[0-9a-f]+\]::pii::(?:[a-z0-9_]+::)*([A-Za-z0-9_]+) as redact_secret\[[0-9a-f]+\]::pii::PiiFamily>::/g;
+  const family =
+    /<redact_secret\[[0-9a-f]+\]::pii::(?:[a-z0-9_]+::)*([A-Za-z0-9_]+) as redact_secret\[[0-9a-f]+\]::pii::PiiFamily>::/g;
   for (const match of nameSection.matchAll(family)) parts.add(match[1]);
   if (/unicode_normalization\[[0-9a-f]+\]::/.test(nameSection)) parts.add("unicode_normalization");
   return [...parts].sort();
@@ -313,9 +325,13 @@ export function guardFailures(full, common, packs, names = { full: "full", commo
         `(COMMON_PROVIDER_HELPER_MODULES): ${unreviewedHelpers.join(", ")}`,
     );
   }
-  for (const [profile, artifact] of [[names.full, full], [names.common, common]]) {
+  for (const [profile, artifact] of [
+    [names.full, full],
+    [names.common, common],
+  ]) {
     const { undeclared } = artifact.implementationClassification;
-    if (undeclared.length > 0) failures.push(`${profile} links detectors of undeclared modules: ${undeclared.join(", ")}`);
+    if (undeclared.length > 0)
+      failures.push(`${profile} links detectors of undeclared modules: ${undeclared.join(", ")}`);
   }
   if (full.implementationClassification.provider.length === 0) {
     failures.push(`${names.full} links no provider detector implementation: the name-section inventory is not working`);
@@ -340,11 +356,17 @@ export function guardFailures(full, common, packs, names = { full: "full", commo
  */
 export function piiGuardFailures({ full, common, "full-pii": fullPii, "common-pii": commonPii }, packs) {
   const failures = [];
-  for (const [name, artifact] of [["full", full], ["common", common]]) {
+  for (const [name, artifact] of [
+    ["full", full],
+    ["common", common],
+  ]) {
     const linkedPii = artifact.piiRuntime ?? [];
     if (linkedPii.length > 0) failures.push(`${name} links the PII runtime: ${linkedPii.join(", ")}`);
   }
-  for (const [name, artifact] of [["full-pii", fullPii], ["common-pii", commonPii]]) {
+  for (const [name, artifact] of [
+    ["full-pii", fullPii],
+    ["common-pii", commonPii],
+  ]) {
     const parts = artifact.piiRuntime ?? [];
     const families = parts.filter((part) => part !== "PiiDomain" && part !== "unicode_normalization");
     if (!parts.includes("PiiDomain") || !parts.includes("unicode_normalization") || families.length === 0) {
@@ -352,12 +374,20 @@ export function piiGuardFailures({ full, common, "full-pii": fullPii, "common-pi
     }
   }
   failures.push(...guardFailures(fullPii, commonPii, packs, { full: "full-pii", common: "common-pii" }));
-  for (const [name, base, variant] of [["full", full, fullPii], ["common", common, commonPii]]) {
+  for (const [name, base, variant] of [
+    ["full", full, fullPii],
+    ["common", common, commonPii],
+  ]) {
     if (base.sizes.wasmRawBytes >= variant.sizes.wasmRawBytes) {
-      failures.push(`${name} .wasm (${base.sizes.wasmRawBytes} B) is not smaller than ${name}-pii (${variant.sizes.wasmRawBytes} B)`);
+      failures.push(
+        `${name} .wasm (${base.sizes.wasmRawBytes} B) is not smaller than ${name}-pii (${variant.sizes.wasmRawBytes} B)`,
+      );
     }
   }
-  for (const [name, artifact] of [["full-pii", fullPii], ["common-pii", commonPii]]) {
+  for (const [name, artifact] of [
+    ["full-pii", fullPii],
+    ["common-pii", commonPii],
+  ]) {
     if (JSON.stringify(artifact.exports) !== JSON.stringify(full.exports)) {
       failures.push(`${name} exports a different surface than full`);
     }
@@ -372,12 +402,18 @@ function measurePerformance(profile, directory, engine, workload, rawDir, runs) 
   // reproducible from any checkout.
   run(process.execPath, [
     join(REPO_ROOT, "scripts", "assessment-browser-performance.mjs"),
-    "--engine", engine,
-    "--detector-profile", profile,
-    "--artifact-dir", relative(REPO_ROOT, directory),
-    "--profile", workload,
-    "--runs", String(runs),
-    "--json-out", relative(REPO_ROOT, jsonOut),
+    "--engine",
+    engine,
+    "--detector-profile",
+    profile,
+    "--artifact-dir",
+    relative(REPO_ROOT, directory),
+    "--profile",
+    workload,
+    "--runs",
+    String(runs),
+    "--json-out",
+    relative(REPO_ROOT, jsonOut),
   ]);
   const result = JSON.parse(readFileSync(jsonOut, "utf8"));
   const { initialization, processing, throughput } = result.performance;
@@ -450,8 +486,10 @@ function main() {
     directories[`${profile}-pii`] = directories[profile];
     run(process.execPath, [
       join(REPO_ROOT, "scripts", "build-browser-artifact.mjs"),
-      "--detector-profile", profile,
-      "--out-dir", directories[profile],
+      "--detector-profile",
+      profile,
+      "--out-dir",
+      directories[profile],
     ]);
     for (const [variant] of profileBuilds(profile)) {
       const artifact = variant === "pii" ? `${profile}-pii` : profile;
@@ -463,7 +501,8 @@ function main() {
   const summary =
     "[measure-wasm-profiles] " +
     ARTIFACTS.map(
-      (name) => `${name} ${artifacts[name].sizes.wasmRawBytes} B raw / ${artifacts[name].sizes.wasmGzipBytes} B gzip / ${artifacts[name].sizes.wasmBrotliBytes} B brotli`,
+      (name) =>
+        `${name} ${artifacts[name].sizes.wasmRawBytes} B raw / ${artifacts[name].sizes.wasmGzipBytes} B gzip / ${artifacts[name].sizes.wasmBrotliBytes} B brotli`,
     ).join("; ") +
     `; common detectors: ${common.implementationClassification.common.join(", ")}; ` +
     `provider helper modules in common: ${common.classification.provider.join(", ") || "none"}; ` +
@@ -481,21 +520,22 @@ function main() {
     bytes: full.sizes[key] - common.sizes[key],
     percent: -percentChange(common.sizes[key], full.sizes[key]),
   });
-  const baseline = existsSync(BASELINE_378)
-    ? JSON.parse(readFileSync(BASELINE_378, "utf8")).variants
-    : undefined;
-  const versus378 = baseline === undefined ? undefined : {
-    full: {
-      baselineVariant: "full",
-      wasmRawBytes: full.sizes.wasmRawBytes - baseline.full.wasmRawBytes,
-      wasmBrotliBytes: full.sizes.wasmBrotliBytes - baseline.full.wasmBrotliBytes,
-    },
-    common: {
-      baselineVariant: "tiny-common",
-      wasmRawBytes: common.sizes.wasmRawBytes - baseline["tiny-common"].wasmRawBytes,
-      wasmBrotliBytes: common.sizes.wasmBrotliBytes - baseline["tiny-common"].wasmBrotliBytes,
-    },
-  };
+  const baseline = existsSync(BASELINE_378) ? JSON.parse(readFileSync(BASELINE_378, "utf8")).variants : undefined;
+  const versus378 =
+    baseline === undefined
+      ? undefined
+      : {
+          full: {
+            baselineVariant: "full",
+            wasmRawBytes: full.sizes.wasmRawBytes - baseline.full.wasmRawBytes,
+            wasmBrotliBytes: full.sizes.wasmBrotliBytes - baseline.full.wasmBrotliBytes,
+          },
+          common: {
+            baselineVariant: "tiny-common",
+            wasmRawBytes: common.sizes.wasmRawBytes - baseline["tiny-common"].wasmRawBytes,
+            wasmBrotliBytes: common.sizes.wasmBrotliBytes - baseline["tiny-common"].wasmBrotliBytes,
+          },
+        };
 
   writeJson(join(outDir, "artifact-sizes.json"), {
     source,
@@ -537,7 +577,12 @@ function main() {
         performance[engine] ??= {};
         performance[engine][workload] ??= {};
         performance[engine][workload][profile] = measurePerformance(
-          profile, directories[profile], engine, workload, rawDir, options.runs,
+          profile,
+          directories[profile],
+          engine,
+          workload,
+          rawDir,
+          options.runs,
         );
       }
     }
@@ -545,7 +590,8 @@ function main() {
   writeJson(join(outDir, "performance.json"), {
     source,
     runs: options.runs,
-    protocol: "scripts/assessment-browser-performance.mjs through @redact-secret/core, one fresh browser context per run",
+    protocol:
+      "scripts/assessment-browser-performance.mjs through @redact-secret/core, one fresh browser context per run",
     engines: performance,
   });
 

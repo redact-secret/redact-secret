@@ -31,15 +31,12 @@ import { WebStreamSanitizer } from "./web-stream-core.js";
  * Requires a successful `await initialize()` from
  * `@redact-secret/core/common`; it throws `NOT_INITIALIZED` otherwise.
  */
-export function createWebStreamSanitizer(
-  options: IncrementalSanitizerOptions,
-): WebStreamSanitizer {
+export function createWebStreamSanitizer(options: IncrementalSanitizerOptions): WebStreamSanitizer {
   return new WebStreamSanitizer(runtime.createIncrementalSanitizer(options));
 }
 
-export { WebStreamSanitizer } from "./web-stream-core.js";
-export { SecretScanError } from "../errors.js";
 export type { SecretScanErrorCode } from "../errors.js";
+export { SecretScanError } from "../errors.js";
 export type {
   IncrementalLimits,
   IncrementalSanitizer,
@@ -47,3 +44,4 @@ export type {
   IncrementalSecretPolicy,
   SecretFinding,
 } from "../types.js";
+export { WebStreamSanitizer } from "./web-stream-core.js";

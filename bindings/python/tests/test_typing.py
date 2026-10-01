@@ -67,9 +67,7 @@ def test_functions_carry_introspectable_signatures() -> None:
 
 
 def test_finding_and_context_types_expose_documented_attributes() -> None:
-    findings = redact_secret.scan(
-        "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
-    )
+    findings = redact_secret.scan("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000")
     assert findings
     finding = findings[0]
     for attribute in (
@@ -97,9 +95,7 @@ def test_incremental_session_methods_carry_introspectable_signatures() -> None:
         "abort": {"self"},
     }
     for name, params in expected.items():
-        signature = inspect.signature(
-            getattr(redact_secret.IncrementalSanitizer, name)
-        )
+        signature = inspect.signature(getattr(redact_secret.IncrementalSanitizer, name))
         assert set(signature.parameters) == params, name
 
 

@@ -34,29 +34,23 @@
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cp, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-
+import { qualifyBrowser, qualifyNode, WASM_SPECIFIER } from "./consumer-harness.mjs";
 import {
   CANONICAL_FIXTURE_ID,
-  REPO_ROOT_PATH,
   loadCanonicalFixture,
   packageVersion,
+  REPO_ROOT_PATH,
 } from "./qualify-runtime-fixture.mjs";
-import { WASM_SPECIFIER, qualifyBrowser, qualifyNode } from "./consumer-harness.mjs";
 
 const JS_PACKAGE_ROOT = join(REPO_ROOT_PATH, "packages/javascript");
 const NODE_PLATFORM_ROOT = join(REPO_ROOT_PATH, "bindings/node");
 const WASM_PACKAGE_ROOT = join(REPO_ROOT_PATH, "bindings/wasm/npm");
 const SAFE_INTEGRATION_ROOT = join(REPO_ROOT_PATH, "examples/safe-integration");
-const INCREMENTAL_CORPUS_PATH = join(
-  REPO_ROOT_PATH,
-  "conformance",
-  "fixtures",
-  "incremental-corpus.json",
-);
+const INCREMENTAL_CORPUS_PATH = join(REPO_ROOT_PATH, "conformance", "fixtures", "incremental-corpus.json");
 const INTEGRATION_FIXTURE_IDS = Object.freeze({
   redact: CANONICAL_FIXTURE_ID,
   warn: "contextual-positive-minimum-length-is-medium-confidence",
@@ -87,7 +81,9 @@ function parseArgs(argv) {
 }
 
 async function sha256(path) {
-  return createHash("sha256").update(await readFile(path)).digest("hex");
+  return createHash("sha256")
+    .update(await readFile(path))
+    .digest("hex");
 }
 
 async function loadIncrementalCorpus() {
@@ -111,11 +107,10 @@ function sourceCommit() {
 }
 
 function npmPack(cwd) {
-  const output = execFileSync(
-    process.platform === "win32" ? "npm.cmd" : "npm",
-    ["pack", "--json"],
-    { cwd, encoding: "utf8" },
-  );
+  const output = execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["pack", "--json"], {
+    cwd,
+    encoding: "utf8",
+  });
   const [result] = JSON.parse(output);
   if (result === undefined) throw new Error(`npm pack produced no result in ${cwd}`);
   return join(cwd, result.filename);
@@ -123,22 +118,15 @@ function npmPack(cwd) {
 
 /** This host's platform package directory, with the built addon copied in. */
 async function assembleNodePlatformPackage() {
-  const { resolveAddonSpecifier } = await import(
-    pathToFileURL(join(JS_PACKAGE_ROOT, "dist/runtime/node.js")).href
-  );
+  const { resolveAddonSpecifier } = await import(pathToFileURL(join(JS_PACKAGE_ROOT, "dist/runtime/node.js")).href);
   const specifier = resolveAddonSpecifier();
   if (specifier === undefined) {
-    throw new Error(
-      `no platform package is mapped for ${process.platform}/${process.arch}`,
-    );
+    throw new Error(`no platform package is mapped for ${process.platform}/${process.arch}`);
   }
   const suffix = specifier.split("/")[1].replace("node-", "");
   const dir = join(NODE_PLATFORM_ROOT, "npm", suffix);
   const manifest = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
-  await cp(
-    join(NODE_PLATFORM_ROOT, manifest.main),
-    join(dir, manifest.main),
-  );
+  await cp(join(NODE_PLATFORM_ROOT, manifest.main), join(dir, manifest.main));
   return { specifier, dir };
 }
 
@@ -168,11 +156,10 @@ async function buildConsumerProject(tarballs) {
     },
   };
   await writeFile(join(root, "package.json"), JSON.stringify(manifest, null, 2));
-  execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", [
-    "install",
-    "--no-audit",
-    "--no-fund",
-  ], { cwd: root, stdio: "inherit" });
+  execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["install", "--no-audit", "--no-fund"], {
+    cwd: root,
+    stdio: "inherit",
+  });
   await cp(SAFE_INTEGRATION_ROOT, join(root, "safe-integration"), {
     recursive: true,
   });
@@ -184,17 +171,13 @@ async function main() {
   const fixture = await loadCanonicalFixture(CANONICAL_FIXTURE_ID);
   const integrationFixtures = Object.fromEntries(
     await Promise.all(
-      Object.entries(INTEGRATION_FIXTURE_IDS).map(async ([kind, id]) => [
-        kind,
-        await loadCanonicalFixture(id),
-      ]),
+      Object.entries(INTEGRATION_FIXTURE_IDS).map(async ([kind, id]) => [kind, await loadCanonicalFixture(id)]),
     ),
   );
   const expectedVersion = await packageVersion();
   const incrementalCorpus = await loadIncrementalCorpus();
 
-  const { specifier: nodeSpecifier, dir: nodePlatformDir } =
-    await assembleNodePlatformPackage();
+  const { specifier: nodeSpecifier, dir: nodePlatformDir } = await assembleNodePlatformPackage();
   const wasmPackageDir = await assembleWasmPackage(wasmDir);
 
   const tarballs = {
@@ -209,13 +192,7 @@ async function main() {
     consumerRoot = await buildConsumerProject(tarballs);
     const results =
       lane === "node"
-        ? qualifyNode(
-            consumerRoot,
-            fixture,
-            expectedVersion,
-            integrationFixtures,
-            incrementalCorpus.corpus,
-          )
+        ? qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures, incrementalCorpus.corpus)
         : await qualifyBrowser(
             consumerRoot,
             fixture,
@@ -268,20 +245,8 @@ async function main() {
           ],
           operations:
             lane === "node"
-              ? [
-                  "initialize",
-                  "scan",
-                  "createIncrementalSanitizer",
-                  "createNodeStreamSanitizer",
-                  "safeIntegration",
-                ]
-              : [
-                  "initialize",
-                  "scan",
-                  "createIncrementalSanitizer",
-                  "createWebStreamSanitizer",
-                  "safeIntegration",
-                ],
+              ? ["initialize", "scan", "createIncrementalSanitizer", "createNodeStreamSanitizer", "safeIntegration"]
+              : ["initialize", "scan", "createIncrementalSanitizer", "createWebStreamSanitizer", "safeIntegration"],
           results,
         },
         null,
@@ -293,7 +258,9 @@ async function main() {
     await rm(tarballs.node, { force: true });
     await rm(tarballs.wasm, { force: true });
     await mkdir(nodePlatformDir, { recursive: true });
-    await rm(join(nodePlatformDir, JSON.parse(await readFile(join(nodePlatformDir, "package.json"), "utf8")).main), { force: true });
+    await rm(join(nodePlatformDir, JSON.parse(await readFile(join(nodePlatformDir, "package.json"), "utf8")).main), {
+      force: true,
+    });
     // The default build and its `pii` build (issue #937), both copied in by
     // `assembleWasmPackage`.
     for (const outName of ["redact_secret_wasm", "redact_secret_wasm_pii"]) {

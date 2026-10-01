@@ -17,10 +17,7 @@ import { describe, expect, it } from "vitest";
 import { NATIVE_HANDLE } from "../src/native.js";
 import { createRedactSecretRuntime } from "../src/runtime.js";
 import { VERSION } from "../src/version.js";
-import {
-  createWasmShapedBinding,
-  sampleWasmFinding,
-} from "./wasm-shaped-binding.js";
+import { createWasmShapedBinding, sampleWasmFinding } from "./wasm-shaped-binding.js";
 
 const LIMITS = {
   maxInputCodeUnits: 1_024,
@@ -43,11 +40,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
     const wasm = createWasmShapedBinding();
     const runtime = createRedactSecretRuntime(wasm.load, "full");
 
-    await Promise.all([
-      runtime.initialize(),
-      runtime.initialize(),
-      runtime.initialize(),
-    ]);
+    await Promise.all([runtime.initialize(), runtime.initialize(), runtime.initialize()]);
     await runtime.initialize();
 
     expect(wasm.calls).toEqual(["default", "initialize"]);
@@ -57,9 +50,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
     const wasm = createWasmShapedBinding({ version: "0.0.0-other" });
     const runtime = createRedactSecretRuntime(wasm.load, "full");
 
-    await expect(runtime.initialize()).rejects.toThrowError(
-      expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
-    );
+    await expect(runtime.initialize()).rejects.toThrowError(expect.objectContaining({ code: "INITIALIZATION_FAILED" }));
     expect(() => runtime.scan("SYNTHETIC_REVOKED_VALUE")).toThrowError(
       expect.objectContaining({ code: "NOT_INITIALIZED" }),
     );
@@ -87,9 +78,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
     const wasm = createWasmShapedBinding({ profile: "common" });
     const runtime = createRedactSecretRuntime(wasm.load, "full");
 
-    await expect(runtime.initialize()).rejects.toThrowError(
-      expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
-    );
+    await expect(runtime.initialize()).rejects.toThrowError(expect.objectContaining({ code: "INITIALIZATION_FAILED" }));
     expect(() => runtime.scan("SYNTHETIC_REVOKED_VALUE")).toThrowError(
       expect.objectContaining({ code: "NOT_INITIALIZED" }),
     );
@@ -118,9 +107,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
       () => runtime.scanAndRedact("SYNTHETIC_REVOKED_VALUE"),
       () => runtime.createIncrementalSanitizer({ limits: LIMITS }),
     ]) {
-      expect(call).toThrowError(
-        expect.objectContaining({ code: "NOT_INITIALIZED" }),
-      );
+      expect(call).toThrowError(expect.objectContaining({ code: "NOT_INITIALIZED" }));
     }
   });
 });
@@ -143,9 +130,7 @@ describe("WebAssembly-shaped binding: finding normalization", () => {
     const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
-    const [finding] = runtime.scan(
-      "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE",
-    );
+    const [finding] = runtime.scan("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE");
 
     expect(finding).toEqual({
       id: "finding-1",
@@ -168,9 +153,7 @@ describe("WebAssembly-shaped binding: finding normalization", () => {
     const input = "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE";
     const findings = runtime.scan(input);
 
-    expect(
-      (findings[0] as unknown as Record<symbol, unknown>)[NATIVE_HANDLE],
-    ).toBe(sampleWasmFinding);
+    expect((findings[0] as unknown as Record<symbol, unknown>)[NATIVE_HANDLE]).toBe(sampleWasmFinding);
     expect(runtime.redact(input, findings)).toBe("<SECRET_1>");
   });
 });
@@ -245,9 +228,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
 
     expect(session.state).toBe("accepting");
-    expect(wasm.calls).toContain(
-      `createIncrementalSanitizer:${LIMITS.maxInputCodeUnits}`,
-    );
+    expect(wasm.calls).toContain(`createIncrementalSanitizer:${LIMITS.maxInputCodeUnits}`);
   });
 
   it("moves through the lifecycle and rejects an operation once it is not accepting", async () => {
@@ -278,12 +259,8 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     session.abort();
 
     expect(session.state).toBe("aborted");
-    expect(() => session.abort()).toThrowError(
-      expect.objectContaining({ code: "INVALID_STATE" }),
-    );
-    expect(() => session.finalize()).toThrowError(
-      expect.objectContaining({ code: "INVALID_STATE" }),
-    );
+    expect(() => session.abort()).toThrowError(expect.objectContaining({ code: "INVALID_STATE" }));
+    expect(() => session.finalize()).toThrowError(expect.objectContaining({ code: "INVALID_STATE" }));
   });
 
   it("frees each incremental result handle exactly once and flows start/end through", async () => {
@@ -399,8 +376,6 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     const runtime = createRedactSecretRuntime(wasm.load, "full");
 
     await expect(runtime.initialize()).resolves.toBeUndefined();
-    expect(() =>
-      runtime.createIncrementalSanitizer({ limits: LIMITS }),
-    ).not.toThrow();
+    expect(() => runtime.createIncrementalSanitizer({ limits: LIMITS })).not.toThrow();
   });
 });

@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "validate-decisions.py"
 REPO_ROOT = SCRIPT.parents[1]
 SPEC = importlib.util.spec_from_file_location("validate_decisions", SCRIPT)
@@ -227,7 +226,10 @@ class AliasTests(unittest.TestCase):
             add_record(
                 root,
                 "2026-09-09-use-rust.md",
-                record(extra_frontmatter="aliases: decision-old-merged-in\n", body_extra=folded_row("decision-old-merged-in")),
+                record(
+                    extra_frontmatter="aliases: decision-old-merged-in\n",
+                    body_extra=folded_row("decision-old-merged-in"),
+                ),
             )
             ensure_all_specs_exist(root)
             errors, _warnings = VALIDATOR.validate(root)
@@ -247,7 +249,9 @@ class AliasTests(unittest.TestCase):
             add_record(
                 root,
                 "2026-09-09-use-rust.md",
-                record(extra_frontmatter="aliases: decision-old, decision-older\n", body_extra=folded_row("decision-old")),
+                record(
+                    extra_frontmatter="aliases: decision-old, decision-older\n", body_extra=folded_row("decision-old")
+                ),
             )
             ensure_all_specs_exist(root)
             errors, _warnings = VALIDATOR.validate(root)

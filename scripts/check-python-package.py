@@ -104,9 +104,9 @@ def targets_for_platform(platform: str, declared: Iterable[str]) -> list[str]:
     return [
         target
         for target in declared
-        if target in TARGET_PLATFORM_TAGS
-        and all(TARGET_PLATFORM_TAGS[target].match(part) for part in parts)
+        if target in TARGET_PLATFORM_TAGS and all(TARGET_PLATFORM_TAGS[target].match(part) for part in parts)
     ]
+
 
 # The maturin floor that understands PEP 639 `license-files`, so the license
 # actually travels with the wheel.
@@ -135,9 +135,7 @@ def check_identity(binding: Path, project: dict, build_system: dict, policy: dic
     if project.get("name") != expected:
         errors.append(f"{BINDING}/pyproject.toml: name {project.get('name')!r} must be {expected!r}")
     if project.get("dynamic") != ["version"]:
-        errors.append(
-            f"{BINDING}/pyproject.toml: version must stay dynamic so maturin reads the workspace version"
-        )
+        errors.append(f"{BINDING}/pyproject.toml: version must stay dynamic so maturin reads the workspace version")
     if "version" in project:
         errors.append(f"{BINDING}/pyproject.toml: must not pin its own version")
     if project.get("license") != "MIT":
@@ -346,9 +344,7 @@ class RegistryUnreachable(Exception):
 
 
 def distribution_exists(name: str) -> bool:
-    request = urllib.request.Request(
-        f"https://pypi.org/pypi/{name}/json", headers={"User-Agent": USER_AGENT}
-    )
+    request = urllib.request.Request(f"https://pypi.org/pypi/{name}/json", headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return json.load(response) is not None

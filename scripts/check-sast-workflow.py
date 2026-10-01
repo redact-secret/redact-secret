@@ -37,9 +37,7 @@ from pathlib import Path
 SAST_WORKFLOW = Path(".github") / "workflows" / "sast.yml"
 JOB_NAME = "opengrep"
 SARIF_PATH = "sast/reports/ci-latest.sarif"
-DISMISS_ALERTS_ACTION = (
-    "advanced-security/dismiss-alerts@a18f986bdb40edba0dd7a74382c15d4a3d50a1c8"
-)
+DISMISS_ALERTS_ACTION = "advanced-security/dismiss-alerts@a18f986bdb40edba0dd7a74382c15d4a3d50a1c8"
 
 # A named top-level job block: `  <job-name>:` through the line before the
 # next top-level job (or end of file).
@@ -134,9 +132,7 @@ def validate(root: Path) -> list[str]:
             if not declares_continue_on_error(step):
                 errors.append(f"{relative}: step {name!r} (id: scan) must declare continue-on-error: true")
             if f"--sarif-out {SARIF_PATH}" not in step:
-                errors.append(
-                    f"{relative}: step {name!r} (id: scan) must generate SARIF at {SARIF_PATH!r}"
-                )
+                errors.append(f"{relative}: step {name!r} (id: scan) must generate SARIF at {SARIF_PATH!r}")
 
     enforce_steps = [(name, step) for name, step in steps.items() if "steps.scan.outcome" in step]
     if not enforce_steps:
@@ -148,9 +144,7 @@ def validate(root: Path) -> list[str]:
                 "'success' -- check steps.scan.outcome instead"
             )
 
-    sarif_upload_steps = [
-        (name, step) for name, step in steps.items() if "codeql-action/upload-sarif" in step
-    ]
+    sarif_upload_steps = [(name, step) for name, step in steps.items() if "codeql-action/upload-sarif" in step]
     if not sarif_upload_steps:
         errors.append(f"{relative}: no step uploads SARIF via github/codeql-action/upload-sarif")
     for name, step in sarif_upload_steps:
@@ -165,56 +159,30 @@ def validate(root: Path) -> list[str]:
         if not re.search(r"^ {8}id:\s*upload\s*$", step, re.M):
             errors.append(f"{relative}: step {name!r} uploads SARIF but lacks id: upload")
         if not declares_line(upload_inputs, "sarif_file", SARIF_PATH):
-            errors.append(
-                f"{relative}: step {name!r} must upload the generated SARIF path {SARIF_PATH!r}"
-            )
+            errors.append(f"{relative}: step {name!r} must upload the generated SARIF path {SARIF_PATH!r}")
         if not declares_line(upload_inputs, "wait-for-processing", "true"):
-            errors.append(
-                f"{relative}: step {name!r} must declare wait-for-processing: true"
-            )
+            errors.append(f"{relative}: step {name!r} must declare wait-for-processing: true")
 
-    dismissal_steps = [
-        (name, step) for name, step in steps.items() if "advanced-security/dismiss-alerts@" in step
-    ]
+    dismissal_steps = [(name, step) for name, step in steps.items() if "advanced-security/dismiss-alerts@" in step]
     if not dismissal_steps:
-        errors.append(
-            f"{relative}: no step synchronizes SARIF suppressions via "
-            "advanced-security/dismiss-alerts"
-        )
+        errors.append(f"{relative}: no step synchronizes SARIF suppressions via advanced-security/dismiss-alerts")
     for name, step in dismissal_steps:
         dismissal_inputs = mapping_body(step, "with")
         dismissal_environment = mapping_body(step, "env")
         if not declares_action(step, DISMISS_ALERTS_ACTION):
-            errors.append(
-                f"{relative}: step {name!r} must pin dismiss-alerts to {DISMISS_ALERTS_ACTION}"
-            )
+            errors.append(f"{relative}: step {name!r} must pin dismiss-alerts to {DISMISS_ALERTS_ACTION}")
         if not declares_continue_on_error(step):
-            errors.append(
-                f"{relative}: step {name!r} synchronizes suppressions but lacks "
-                "continue-on-error: true"
-            )
+            errors.append(f"{relative}: step {name!r} synchronizes suppressions but lacks continue-on-error: true")
         condition = step_condition(step) or ""
         if "github.ref == 'refs/heads/main'" not in condition:
-            errors.append(
-                f"{relative}: step {name!r} must run only on refs/heads/main"
-            )
+            errors.append(f"{relative}: step {name!r} must run only on refs/heads/main")
         if "steps.upload.outcome == 'success'" not in condition:
-            errors.append(
-                f"{relative}: step {name!r} must require a successful processed SARIF upload"
-            )
-        if not declares_line(
-            dismissal_inputs, "sarif-id", "${{ steps.upload.outputs.sarif-id }}"
-        ):
-            errors.append(
-                f"{relative}: step {name!r} must consume steps.upload.outputs.sarif-id"
-            )
+            errors.append(f"{relative}: step {name!r} must require a successful processed SARIF upload")
+        if not declares_line(dismissal_inputs, "sarif-id", "${{ steps.upload.outputs.sarif-id }}"):
+            errors.append(f"{relative}: step {name!r} must consume steps.upload.outputs.sarif-id")
         if not declares_line(dismissal_inputs, "sarif-file", SARIF_PATH):
-            errors.append(
-                f"{relative}: step {name!r} must read the generated SARIF path {SARIF_PATH!r}"
-            )
-        if not declares_line(
-            dismissal_environment, "GITHUB_TOKEN", "${{ github.token }}"
-        ):
+            errors.append(f"{relative}: step {name!r} must read the generated SARIF path {SARIF_PATH!r}")
+        if not declares_line(dismissal_environment, "GITHUB_TOKEN", "${{ github.token }}"):
             errors.append(f"{relative}: step {name!r} must receive GITHUB_TOKEN")
 
     return errors

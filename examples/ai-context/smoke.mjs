@@ -58,7 +58,10 @@ const checks = [];
 async function scenario(name, { policy, turn }, expect) {
   const audit = [];
   const toolRequests = [];
-  const boundary = await createAppBoundary({ policy, onFinding: (finding, context) => audit.push({ finding, context }) });
+  const boundary = await createAppBoundary({
+    policy,
+    onFinding: (finding, context) => audit.push({ finding, context }),
+  });
   const result = await buildSafeContext({
     boundary,
     callTool: async (request) => {
@@ -70,7 +73,7 @@ async function scenario(name, { policy, turn }, expect) {
     ...turn,
   });
   // What reaches the model, the tool, and the audit path: all of it checked.
-  const serialized = assertNoSynthetic(name, { result, toolRequests, audit });
+  assertNoSynthetic(name, { result, toolRequests, audit });
   expect(result, { audit, toolRequests });
   checks.push({ name, serialized: JSON.stringify(result) });
 }
@@ -98,10 +101,11 @@ await scenario(
   },
   (result) => assert.deepEqual({ ...result }, { outcome: "blocked", reason: "policy", stage: "tool" }),
 );
-await scenario(
-  "whole-input limit",
-  { turn: { userInput: `${"x".repeat(300_000)} ${SYNTHETIC.awsKeyId}` } },
-  (result) => assert.deepEqual({ ...result }, { outcome: "blocked", reason: "limit_exceeded", code: "INPUT_LIMIT_EXCEEDED", stage: "input" }),
+await scenario("whole-input limit", { turn: { userInput: `${"x".repeat(300_000)} ${SYNTHETIC.awsKeyId}` } }, (result) =>
+  assert.deepEqual(
+    { ...result },
+    { outcome: "blocked", reason: "limit_exceeded", code: "INPUT_LIMIT_EXCEEDED", stage: "input" },
+  ),
 );
 await scenario("core failure fails closed", { policy: failingPolicy }, (result) => {
   assert.equal(result.outcome, "blocked");
@@ -180,7 +184,10 @@ await scenario(
   const mcpResult = {
     content: [
       { type: "text", text: `stdout: exported AWS_ACCESS_KEY_ID=${SYNTHETIC.awsKeyId}` },
-      { type: "resource", resource: { uri: "file:///synthetic/.env", mimeType: "text/plain", text: `API_KEY=${SYNTHETIC.apiKey}` } },
+      {
+        type: "resource",
+        resource: { uri: "file:///synthetic/.env", mimeType: "text/plain", text: `API_KEY=${SYNTHETIC.apiKey}` },
+      },
     ],
     structuredContent: { deploy: { steps: [{ env: [`Authorization: Bearer ${SYNTHETIC.bearer}`] }] } },
   };
@@ -259,11 +266,15 @@ await scenario(
   assert.deepEqual(blocked, {
     error: {
       code: -32603,
-      message: "This MCP resource read was blocked by secret-redaction policy. No content, URI, or error detail is included.",
+      message:
+        "This MCP resource read was blocked by secret-redaction policy. No content, URI, or error detail is included.",
     },
   });
   deliver("resources/read blob", blocked);
-  checks.push({ name: "resources/read reaches model, log, and store only after the boundary", serialized: JSON.stringify({ safe, blocked }) });
+  checks.push({
+    name: "resources/read reaches model, log, and store only after the boundary",
+    serialized: JSON.stringify({ safe, blocked }),
+  });
 }
 
 for (const { name, serialized } of checks) console.log(`ok - ${name}: ${serialized.slice(0, 160)}`);

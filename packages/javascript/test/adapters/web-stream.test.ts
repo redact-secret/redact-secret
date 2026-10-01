@@ -2,13 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { WebStreamSanitizer } from "../../src/adapters/web-stream.js";
 import { SecretScanError } from "../../src/errors.js";
-import {
-  bytes,
-  LIMITS,
-  openSession,
-  oracle,
-  partitionCorpus,
-} from "./support.js";
+import { bytes, LIMITS, openSession, oracle, partitionCorpus } from "./support.js";
 
 const FINALIZED_INPUT = "api_key=SYNTHETIC_REVOKED_WEB_FINALIZED\n";
 const FINALIZED_OUTPUT = "api_key=<SECRET_1>\n";
@@ -52,12 +46,8 @@ describe("Web stream adapter", () => {
       const expected = await oracle(fixture.input);
       const encoded = bytes(fixture.input);
       for (let boundary = 0; boundary <= encoded.length; boundary += 1) {
-        const result = await sanitize([
-          encoded.slice(0, boundary),
-          encoded.slice(boundary),
-        ]);
-        expect({ ...result, findings: [...result.findings] }, `${fixture.id}@${boundary}`)
-          .toEqual(expected);
+        const result = await sanitize([encoded.slice(0, boundary), encoded.slice(boundary)]);
+        expect({ ...result, findings: [...result.findings] }, `${fixture.id}@${boundary}`).toEqual(expected);
       }
     }
   });
@@ -65,11 +55,7 @@ describe("Web stream adapter", () => {
   it("carries one decoder across chunks that split a character", async () => {
     const encoded = bytes("🔑");
 
-    const result = await sanitize([
-      encoded.slice(0, 1),
-      encoded.slice(1, 3),
-      encoded.slice(3),
-    ]);
+    const result = await sanitize([encoded.slice(0, 1), encoded.slice(1, 3), encoded.slice(3)]);
 
     expect(result.text).toBe("🔑");
   });
@@ -89,16 +75,11 @@ describe("Web stream adapter", () => {
     const encoded = bytes(input);
     const split = encoded.indexOf(0x0a) + 1;
 
-    const { findings } = await sanitize([
-      encoded.slice(0, split),
-      encoded.slice(split),
-    ]);
+    const { findings } = await sanitize([encoded.slice(0, split), encoded.slice(split)]);
 
     const [finding] = findings;
     expect(finding).toBeDefined();
-    expect(input.slice(finding?.start, finding?.end)).toBe(
-      "SYNTHETIC_REVOKED_ABSOLUTE",
-    );
+    expect(input.slice(finding?.start, finding?.end)).toBe("SYNTHETIC_REVOKED_ABSOLUTE");
   });
 
   it("stalls writes at readable backpressure and resumes after a pull", async () => {
@@ -153,11 +134,7 @@ describe("Web stream adapter", () => {
     const transform = new WebStreamSanitizer(session);
     const writer = transform.writable.getWriter();
     const reader = transform.readable.getReader();
-    const output = await writeAndRead(
-      writer,
-      reader,
-      FINALIZED_INPUT + UNRESOLVED_INPUT,
-    );
+    const output = await writeAndRead(writer, reader, FINALIZED_INPUT + UNRESOLVED_INPUT);
     const pendingRead = reader.read();
 
     await reader.cancel(new Error("Synthetic readable cancellation."));
@@ -178,11 +155,7 @@ describe("Web stream adapter", () => {
     const transform = new WebStreamSanitizer(session);
     const writer = transform.writable.getWriter();
     const reader = transform.readable.getReader();
-    const output = await writeAndRead(
-      writer,
-      reader,
-      FINALIZED_INPUT + UNRESOLVED_INPUT,
-    );
+    const output = await writeAndRead(writer, reader, FINALIZED_INPUT + UNRESOLVED_INPUT);
     const pendingRead = reader.read();
     const reason = new Error("Synthetic writable abort.");
 
@@ -209,9 +182,7 @@ describe("Web stream adapter", () => {
     await expect(closing).rejects.toBeInstanceOf(SecretScanError);
     await expect(reading).rejects.toSatisfy(
       (error: unknown) =>
-        error instanceof SecretScanError &&
-        error.code === "INVALID_STATE" &&
-        !error.message.includes(UNRESOLVED_INPUT),
+        error instanceof SecretScanError && error.code === "INVALID_STATE" && !error.message.includes(UNRESOLVED_INPUT),
     );
     expect(transform.findings).toEqual([]);
     expect(session.state).toBe("aborted");
@@ -257,9 +228,7 @@ describe("Web stream adapter", () => {
     await expect(writer.close()).rejects.toBeInstanceOf(SecretScanError);
     await expect(reading).resolves.toSatisfy(
       (error: unknown) =>
-        error instanceof SecretScanError &&
-        error.code === "PLACEHOLDER_FAILURE" &&
-        !String(error).includes(input),
+        error instanceof SecretScanError && error.code === "PLACEHOLDER_FAILURE" && !String(error).includes(input),
     );
   });
 
@@ -269,28 +238,18 @@ describe("Web stream adapter", () => {
     const invalidReader = invalid.readable.getReader();
     const invalidReading = invalidReader.read().catch((error: unknown) => error);
 
-    await expect(
-      invalidWriter.write(Uint8Array.of(0xc3, 0x28)),
-    ).rejects.toSatisfy(
-      (error: unknown) =>
-        error instanceof SecretScanError &&
-        error.code === "INVALID_UTF8" &&
-        !("cause" in error),
+    await expect(invalidWriter.write(Uint8Array.of(0xc3, 0x28))).rejects.toSatisfy(
+      (error: unknown) => error instanceof SecretScanError && error.code === "INVALID_UTF8" && !("cause" in error),
     );
     await expect(invalidReading).resolves.toBeInstanceOf(SecretScanError);
 
     const wrongType = new WebStreamSanitizer(await openSession());
     const wrongTypeWriter = wrongType.writable.getWriter();
     const wrongTypeReader = wrongType.readable.getReader();
-    const wrongTypeReading = wrongTypeReader
-      .read()
-      .catch((error: unknown) => error);
+    const wrongTypeReading = wrongTypeReader.read().catch((error: unknown) => error);
 
-    await expect(
-      wrongTypeWriter.write("plain text" as unknown as Uint8Array),
-    ).rejects.toSatisfy(
-      (error: unknown) =>
-        error instanceof SecretScanError && error.code === "INVALID_CHUNK",
+    await expect(wrongTypeWriter.write("plain text" as unknown as Uint8Array)).rejects.toSatisfy(
+      (error: unknown) => error instanceof SecretScanError && error.code === "INVALID_CHUNK",
     );
     await expect(wrongTypeReading).resolves.toBeInstanceOf(SecretScanError);
   });
@@ -299,16 +258,11 @@ describe("Web stream adapter", () => {
     const transform = new WebStreamSanitizer(await openSession());
     const writer = transform.writable.getWriter();
     const reader = transform.readable.getReader();
-    const output = await writeAndRead(
-      writer,
-      reader,
-      FINALIZED_INPUT + UNRESOLVED_INPUT,
-    );
+    const output = await writeAndRead(writer, reader, FINALIZED_INPUT + UNRESOLVED_INPUT);
     const reading = reader.read();
 
     await expect(writer.write(Uint8Array.of(0xc3, 0x28))).rejects.toSatisfy(
-      (error: unknown) =>
-        error instanceof SecretScanError && error.code === "INVALID_UTF8",
+      (error: unknown) => error instanceof SecretScanError && error.code === "INVALID_UTF8",
     );
     await expect(reading).rejects.toBeInstanceOf(SecretScanError);
     expect(output).toBe(FINALIZED_OUTPUT);
@@ -323,19 +277,15 @@ describe("Web stream adapter", () => {
 
     await expect(writer.write(bytes("🔑").slice(0, 2))).resolves.toBeUndefined();
     await expect(writer.close()).rejects.toSatisfy(
-      (error: unknown) =>
-        error instanceof SecretScanError && error.code === "INVALID_UTF8",
+      (error: unknown) => error instanceof SecretScanError && error.code === "INVALID_UTF8",
     );
     await expect(reading).resolves.toSatisfy(
-      (error: unknown) =>
-        error instanceof SecretScanError && error.code === "INVALID_UTF8",
+      (error: unknown) => error instanceof SecretScanError && error.code === "INVALID_UTF8",
     );
   });
 
   it("refuses to open a stream before initialize succeeds", async () => {
-    const { createWebStreamSanitizer } = await import(
-      "../../src/adapters/web-stream.js"
-    );
+    const { createWebStreamSanitizer } = await import("../../src/adapters/web-stream.js");
 
     expect(() => createWebStreamSanitizer({ limits: LIMITS })).toThrowError(
       expect.objectContaining({

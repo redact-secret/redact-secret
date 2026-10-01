@@ -51,10 +51,12 @@ function redact(result) {
 
 // Never print the unscanned result: no example logs raw input before scanning
 // (issue #587), even a synthetic one. Only its shape is shown.
-console.log(`Synthetic tool result: ${syntheticToolResult.content.length} content item(s), not printed before scanning\n`);
+console.log(
+  `Synthetic tool result: ${syntheticToolResult.content.length} content item(s), not printed before scanning\n`,
+);
 
 console.log("=== block-all (Docker MCP Gateway --block-secrets style) ===");
-console.log(JSON.stringify(blockAll(syntheticToolResult), null, 2) + "\n");
+console.log(`${JSON.stringify(blockAll(syntheticToolResult), null, 2)}\n`);
 
 console.log("=== redact (examples/mcp-redact) ===");
 console.log(JSON.stringify(redact(syntheticToolResult), null, 2));

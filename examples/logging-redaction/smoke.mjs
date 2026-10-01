@@ -64,12 +64,9 @@ await scenario(
 // `login failed: password=...` is detected from core #812 on; the pinned
 // released beta.8 predates it, so this keeps the `with` form until the core
 // pin moves past beta.8 (see README "Detection gaps").
-await scenario(
-  "error",
-  {},
-  (log) => log.error(new Error(`login failed with password=${SYNTHETIC.password}`)),
-  ["login failed with password=<SECRET_1>"],
-);
+await scenario("error", {}, (log) => log.error(new Error(`login failed with password=${SYNTHETIC.password}`)), [
+  "login failed with password=<SECRET_1>",
+]);
 // `hooks.logMethod` never sees these two; `hooks.streamWrite` (0.1.1) does.
 await scenario(
   "child-logger bindings",

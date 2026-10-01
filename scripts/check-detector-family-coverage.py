@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -104,7 +103,9 @@ def main(argv: list[str] | None = None) -> int:
         note = "" if detector in new_stale else " (allowlisted)"
         print(f"{status}: support-matrix.json lists detector `{detector}` that detector-inventory.json does not{note}")
     if unmapped:
-        print(f"report: {len(unmapped)} detector(s) have no family in the pinned support matrix, {len(new_unmapped)} not allowlisted:")
+        print(
+            f"report: {len(unmapped)} detector(s) have no family in the pinned support matrix, {len(new_unmapped)} not allowlisted:"
+        )
         for detector, types in unmapped.items():
             mark = "NEW " if detector in new_unmapped else ""
             print(f"  {mark}{detector} ({', '.join(types)})")
