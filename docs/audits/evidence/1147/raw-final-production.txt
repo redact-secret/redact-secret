@@ -1,0 +1,46 @@
+17:28  up 20 days, 27 mins, 83 users, load averages: 8.77 19.89 17.02
+RUN 4
+sparse-ascii           A  pre-change                                 60.61 us   +0.0%
+sparse-ascii           A2 pre-change (A/A control)                   59.96 us   -1.1%
+sparse-ascii           P  production (byte scan + ascii nfc)         39.48 us  -34.9%
+sparse-unicode         A  pre-change                                 47.59 us   +0.0%
+sparse-unicode         A2 pre-change (A/A control)                   47.35 us   -0.5%
+sparse-unicode         P  production (byte scan + ascii nfc)         40.27 us  -15.4%
+dense-ascii            A  pre-change                                544.83 us   +0.0%
+dense-ascii            A2 pre-change (A/A control)                  544.55 us   -0.1%
+dense-ascii            P  production (byte scan + ascii nfc)        217.23 us  -60.1%
+dense-unicode          A  pre-change                                369.25 us   +0.0%
+dense-unicode          A2 pre-change (A/A control)                  377.06 us   +2.1%
+dense-unicode          P  production (byte scan + ascii nfc)        367.97 us   -0.3%
+dense-unicode-local    A  pre-change                                684.92 us   +0.0%
+dense-unicode-local    A2 pre-change (A/A control)                  677.95 us   -1.0%
+dense-unicode-local    P  production (byte scan + ascii nfc)        674.74 us   -1.5%
+at-noise               A  pre-change                                 95.43 us   +0.0%
+at-noise               A2 pre-change (A/A control)                   96.39 us   +1.0%
+at-noise               P  production (byte scan + ascii nfc)         86.46 us   -9.4%
+at-noise-mixed         A  pre-change                                121.90 us   +0.0%
+at-noise-mixed         A2 pre-change (A/A control)                  122.88 us   +0.8%
+at-noise-mixed         P  production (byte scan + ascii nfc)        118.04 us   -3.2%
+RUN 5
+sparse-ascii           A  pre-change                                 48.73 us   +0.0%
+sparse-ascii           A2 pre-change (A/A control)                   47.20 us   -3.1%
+sparse-ascii           P  production (byte scan + ascii nfc)         31.52 us  -35.3%
+sparse-unicode         A  pre-change                                 56.10 us   +0.0%
+sparse-unicode         A2 pre-change (A/A control)                   56.40 us   +0.6%
+sparse-unicode         P  production (byte scan + ascii nfc)         47.87 us  -14.7%
+dense-ascii            A  pre-change                                692.12 us   +0.0%
+dense-ascii            A2 pre-change (A/A control)                  710.45 us   +2.6%
+dense-ascii            P  production (byte scan + ascii nfc)        262.35 us  -62.1%
+dense-unicode          A  pre-change                                452.28 us   +0.0%
+dense-unicode          A2 pre-change (A/A control)                  443.09 us   -2.0%
+dense-unicode          P  production (byte scan + ascii nfc)        441.07 us   -2.5%
+dense-unicode-local    A  pre-change                               1167.05 us   +0.0%
+dense-unicode-local    A2 pre-change (A/A control)                 1162.89 us   -0.4%
+dense-unicode-local    P  production (byte scan + ascii nfc)       1134.78 us   -2.8%
+at-noise               A  pre-change                                108.86 us   +0.0%
+at-noise               A2 pre-change (A/A control)                  109.20 us   +0.3%
+at-noise               P  production (byte scan + ascii nfc)         98.47 us   -9.5%
+at-noise-mixed         A  pre-change                                105.34 us   +0.0%
+at-noise-mixed         A2 pre-change (A/A control)                  106.08 us   +0.7%
+at-noise-mixed         P  production (byte scan + ascii nfc)        100.41 us   -4.7%
+17:30  up 20 days, 29 mins, 83 users, load averages: 7.06 14.89 15.47

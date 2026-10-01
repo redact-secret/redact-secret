@@ -42,11 +42,31 @@ impl PiiFamily for EmailFamily {
 }
 
 fn detect_email_candidates(input: &str) -> Vec<Alternative> {
+    detect_email_candidates_with(input, at_offsets(input), is_nfc)
+}
+
+/// Byte offsets of every `@`, found on bytes instead of decoded characters.
+/// `@` is ASCII, so each offset is a character boundary (#1147). A
+/// `match_indices` or probe-then-jump search is faster on sparse input but
+/// 60% to 95% slower on `@`-dense input, so the plain byte walk is kept.
+fn at_offsets(input: &str) -> impl Iterator<Item = usize> + '_ {
+    input
+        .as_bytes()
+        .iter()
+        .enumerate()
+        .filter_map(|(offset, byte)| (*byte == b'@').then_some(offset))
+}
+
+/// The detector, parameterized by its `@` discovery and NFC predicate so a
+/// test can run the pre-#1147 character walk and predicate as an oracle over
+/// the same extraction code.
+fn detect_email_candidates_with(
+    input: &str,
+    ats: impl Iterator<Item = usize>,
+    is_nfc: impl Fn(&str) -> bool,
+) -> Vec<Alternative> {
     let mut output = Vec::new();
-    for (at, character) in input.char_indices() {
-        if character != '@' {
-            continue;
-        }
+    for at in ats {
         let Some(start) = scan_local_start(input, at) else {
             continue;
         };
@@ -300,7 +320,14 @@ fn is_domain_alphanumeric(character: char) -> bool {
     character.is_ascii_alphanumeric()
 }
 
+/// ASCII is NFC by definition (every ASCII scalar is its own NFC form and
+/// none composes with a neighbour), so the normalizer runs only for a
+/// candidate that contains a non-ASCII local-part character (#1147).
 fn is_nfc(value: &str) -> bool {
+    value.is_ascii() || is_nfc_normalizing(value)
+}
+
+fn is_nfc_normalizing(value: &str) -> bool {
     value.nfc().eq(value.chars())
 }
 
@@ -621,5 +648,277 @@ mod case_insensitive_differential_tests {
             hits += usize::from(old);
         }
         assert!(hits > 20, "the generator must reach the positive cases");
+    }
+}
+
+/// Issue #1147: the ASCII fast path of `is_nfc`, and the whole detector,
+/// against the pre-change predicate (always normalize).
+#[cfg(test)]
+mod nfc_fast_path_tests {
+    use super::*;
+    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
+
+    const PIECES: &[&str] = &[
+        "a",
+        "Z",
+        "7",
+        ".",
+        "-",
+        "_",
+        "+",
+        "@",
+        "=",
+        "|",
+        " ",
+        "\n",
+        "<",
+        ">",
+        ":",
+        "//",
+        "mail.example",
+        "example.com",
+        "fixture",
+        "xn--bcher-kva.test",
+        "e\u{301}",
+        "\u{e9}",
+        "\u{ac00}",
+        "\u{1100}\u{1161}",
+        "\u{ffa1}",
+        "\u{fb01}",
+        "\u{212b}",
+        "\u{1f600}",
+        "\u{200b}",
+        "\u{3a3}",
+        "\u{2126}",
+        "\u{1e9b}\u{323}",
+        "고객",
+        "\u{ff21}",
+        "\u{0344}",
+    ];
+
+    /// The detector before #1147: the character walk for `@`, with a
+    /// caller-supplied NFC predicate.
+    fn old_detect(input: &str, is_nfc: impl Fn(&str) -> bool) -> Vec<Alternative> {
+        let ats = input
+            .char_indices()
+            .filter_map(|(index, character)| (character == '@').then_some(index));
+        detect_email_candidates_with(input, ats, is_nfc)
+    }
+
+    fn corpus() -> Vec<String> {
+        let mut pieces: Vec<&str> = PIECES.to_vec();
+        pieces.extend_from_slice(BOUNDARY_PIECES);
+        let mut rng = XorShift32::new(0x1147_0001);
+        let mut inputs: Vec<String> = vec![String::new(), "@".to_owned()];
+        for _ in 0..6000 {
+            inputs.push(rng.text(&pieces, 9));
+        }
+        // Well-formed candidates around a non-ASCII local part.
+        for local in [
+            "fixture",
+            "fixture.876+tag",
+            "e\u{301}x",
+            "\u{e9}x",
+            "고객876",
+            "\u{fb01}x",
+            "\u{212b}",
+            "\u{1100}\u{1161}x",
+            "x\u{323}\u{307}",
+            "\u{1e9b}\u{323}",
+        ] {
+            for domain in ["q7m9z2x4.synthetic", "example.com", "a.b", "localhost"] {
+                for (left, right) in [("", ""), (" ", " "), ("email=", ""), ("\u{301}", "")] {
+                    inputs.push(format!("{left}{local}@{domain}{right}"));
+                }
+            }
+        }
+        // Long local parts at, below and above the 64-byte limit, and
+        // candidates at the 254-byte limit.
+        for len in [62usize, 63, 64, 65, 66] {
+            inputs.push(format!("{}@q7m9z2x4.synthetic", "a".repeat(len)));
+            inputs.push(format!("{}\u{e9}@q7m9z2x4.synthetic", "a".repeat(len - 2)));
+            inputs.push(format!(
+                "{}e\u{301}@q7m9z2x4.synthetic",
+                "a".repeat(len - 3)
+            ));
+        }
+        let label = "d".repeat(63);
+        inputs.push(format!("u@{label}.{label}.{label}.{label}"));
+        inputs.push(format!("u@{label}.{label}.{label}.{}", "d".repeat(60)));
+        inputs.push(format!(
+            "{}@{label}.{label}.{label}.{}",
+            "a".repeat(64),
+            "d".repeat(56)
+        ));
+        inputs
+    }
+
+    #[test]
+    fn at_offsets_equal_the_character_walk() {
+        for input in corpus() {
+            let walked: Vec<usize> = input
+                .char_indices()
+                .filter_map(|(index, character)| (character == '@').then_some(index))
+                .collect();
+            let scanned: Vec<usize> = at_offsets(&input).collect();
+            assert_eq!(scanned, walked, "{input:?}");
+            assert!(scanned.iter().all(|at| input.is_char_boundary(*at)));
+        }
+    }
+
+    #[test]
+    fn is_nfc_equals_the_normalizing_predicate() {
+        let (mut non_ascii, mut rejected) = (0, 0);
+        for input in corpus() {
+            assert_eq!(is_nfc(&input), is_nfc_normalizing(&input), "{input:?}");
+            non_ascii += usize::from(!input.is_ascii());
+            rejected += usize::from(!is_nfc_normalizing(&input));
+        }
+        assert!(non_ascii > 1000 && rejected > 100, "{non_ascii} {rejected}");
+    }
+
+    #[test]
+    fn candidates_equal_the_always_normalizing_detector() {
+        let (mut found, mut rejected_by_nfc) = (0usize, 0usize);
+        for input in corpus() {
+            let new = detect_email_candidates(&input);
+            let old = old_detect(&input, is_nfc_normalizing);
+            assert_eq!(format!("{new:?}"), format!("{old:?}"), "{input:?}");
+            found += old.len();
+            let accept_all = old_detect(&input, |_| true);
+            rejected_by_nfc += accept_all.len() - old.len();
+        }
+        assert!(found > 50, "only {found} candidates");
+        assert!(rejected_by_nfc > 20, "NFC rejection not exercised");
+    }
+
+    struct OldEmailFamily;
+
+    impl PiiFamily for OldEmailFamily {
+        fn id(&self) -> &'static str {
+            FAMILY_ID
+        }
+        fn context_requirement(&self) -> ContextRequirement {
+            EmailFamily.context_requirement()
+        }
+        fn occurrence_exclusions(&self) -> &'static [&'static str] {
+            OCCURRENCE_EXCLUSIONS
+        }
+        fn reject_invisible_normalization(&self) -> bool {
+            true
+        }
+        fn detect(&self, input: &str) -> Vec<Alternative> {
+            old_detect(input, is_nfc_normalizing)
+        }
+    }
+
+    fn registry(old: bool) -> crate::DetectorRegistry {
+        let ids = ["pii:global:email"];
+        let selectors = ["pii:family:global:email"];
+        let selection =
+            super::super::PiiSelection::parse_with_catalog(&selectors, &ids, &ids).unwrap();
+        let family: Box<dyn PiiFamily> = if old {
+            Box::new(OldEmailFamily)
+        } else {
+            Box::new(EmailFamily)
+        };
+        crate::DetectorRegistry::with_internal_test_detector(Box::new(
+            super::super::PiiDomain::new(selection, vec![family]),
+        ))
+    }
+
+    type Summary = (String, Vec<String>);
+
+    fn summarize<'a>(findings: impl Iterator<Item = &'a crate::Finding>) -> Vec<String> {
+        findings
+            .map(|f| {
+                format!(
+                    "{:?}|{}|{}|{:?}|{:?}|{:?}",
+                    f.id(),
+                    f.type_name(),
+                    f.detector(),
+                    f.confidence(),
+                    f.action(),
+                    f.range()
+                )
+            })
+            .collect()
+    }
+
+    fn whole(input: &str, old: bool) -> Summary {
+        let result = crate::scan_and_redact(
+            input,
+            &registry(old),
+            &crate::DefaultPolicy,
+            &crate::default_placeholder_formatter,
+        )
+        .unwrap();
+        (
+            result.text().to_owned(),
+            summarize(result.findings().iter()),
+        )
+    }
+
+    fn incremental(input: &str, splits: &[usize], old: bool) -> Summary {
+        let limits = crate::IncrementalLimits::new(4_096, 2_048, 512, 1_024).unwrap();
+        let policy: Box<dyn crate::IncrementalPolicy> = Box::new(crate::DefaultPolicy);
+        let formatter: Box<dyn crate::PlaceholderFormatter> =
+            Box::new(crate::default_placeholder_formatter);
+        let mut session =
+            crate::IncrementalSanitizer::from_registry(registry(old), limits, policy, formatter);
+        let mut text = String::new();
+        let mut findings = Vec::new();
+        let mut previous = 0;
+        for &split in splits.iter().chain(std::iter::once(&input.len())) {
+            let part = session.append(&input[previous..split]).unwrap();
+            text.push_str(part.text());
+            findings.extend(summarize(part.findings().iter()));
+            previous = split;
+        }
+        let last = session.finalize().unwrap();
+        text.push_str(last.text());
+        findings.extend(summarize(last.findings().iter()));
+        (text, findings)
+    }
+
+    #[test]
+    fn whole_and_incremental_scans_equal_the_old_predicate() {
+        let inputs = [
+            "email: fixture.876+tag@q7m9z2x4.synthetic\nemail: \u{e9}x@q7m9z2x4.synthetic.",
+            "email: e\u{301}x@q7m9z2x4.synthetic\nemail: \u{fb01}x@q7m9z2x4.synthetic\nemail: \u{ac00}@a.test",
+            "email: 고객876@x4z8v2n6.synthetic\nemail: \u{1100}\u{1161}x@a.test\nemail: \u{212b}@a.test",
+            "email=fixture@q7m9z2x4.synthetic\nemail: x\u{323}\u{307}@a.test\nemail: e\u{301}@a.test",
+        ];
+        let mut with_findings = 0;
+        for input in inputs {
+            let expected = whole(input, true);
+            assert_eq!(whole(input, false), expected, "{input:?}");
+            with_findings += usize::from(!expected.1.is_empty());
+            let boundaries: Vec<usize> = input
+                .char_indices()
+                .map(|(index, _)| index)
+                .chain(std::iter::once(input.len()))
+                .collect();
+            for &split in &boundaries {
+                assert_eq!(
+                    incremental(input, &[split], false),
+                    incremental(input, &[split], true),
+                    "{input:?} split {split}"
+                );
+            }
+            let mut rng = XorShift32::new(0x1147_0002);
+            for _ in 0..40 {
+                let mut cuts: Vec<usize> = (0..3)
+                    .map(|_| boundaries[rng.below(boundaries.len())])
+                    .collect();
+                cuts.sort_unstable();
+                assert_eq!(
+                    incremental(input, &cuts, false),
+                    incremental(input, &cuts, true),
+                    "{input:?} cuts {cuts:?}"
+                );
+            }
+        }
+        assert!(with_findings >= 4);
     }
 }

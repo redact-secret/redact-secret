@@ -1,0 +1,109 @@
+diff --git a/crates/secret-scan-core/src/pii/pii_email.rs b/crates/secret-scan-core/src/pii/pii_email.rs
+index 895aeeb4..6ee43390 100644
+--- a/crates/secret-scan-core/src/pii/pii_email.rs
++++ b/crates/secret-scan-core/src/pii/pii_email.rs
+@@ -922,3 +922,104 @@ mod nfc_fast_path_tests {
+         assert!(with_findings >= 4);
+     }
+ }
++
++#[cfg(test)]
++mod timing_1147 {
++    use super::*;
++    use std::time::Instant;
++
++    fn old_detect(input: &str, is_nfc: impl Fn(&str) -> bool) -> Vec<Alternative> {
++        let ats = input
++            .char_indices()
++            .filter_map(|(index, character)| (character == '@').then_some(index));
++        detect_email_candidates_with(input, ats, is_nfc)
++    }
++    fn workloads() -> Vec<(&'static str, String)> {
++        let filler = "The quick brown fox jumps over the lazy dog while the build runs. ";
++        let ufiller = "고객 이메일 안내문입니다 \u{1f600} 계속 읽어 주세요. ";
++        let sparse = |f: &str, n: usize| {
++            let mut s = f.repeat(n);
++            let mid = s.len() / 2;
++            let mid = (mid..).find(|i| s.is_char_boundary(*i)).unwrap();
++            s.insert_str(mid, " email: fixture876@q7m9z2x4.synthetic ");
++            s
++        };
++        let dense = |f: &str, n: usize| {
++            (0..n)
++                .map(|i| format!("{f}email: user{i}.tag@q7m9z2x4.synthetic "))
++                .collect::<String>()
++        };
++        vec![
++            ("sparse-ascii", sparse(filler, 1100)),
++            ("sparse-unicode", sparse(ufiller, 1500)),
++            ("dense-ascii", dense("x ", 1000)),
++            (
++                "dense-unicode",
++                (0..1000)
++                    .map(|i| format!("고객 e\u{301}{i}.tag@q7m9z2x4.synthetic \u{e9}{i}@a.test "))
++                    .collect::<String>(),
++            ),
++            (
++                "dense-unicode-local",
++                (0..1000)
++                    .map(|i| format!("email: 고객{i}.tag@q7m9z2x4.synthetic "))
++                    .collect::<String>(),
++            ),
++            ("at-noise", "@@ a@ @b @@@ x@ @ ".repeat(1400)),
++            ("at-noise-mixed", "a@@b @ c@d@ e@@ ".repeat(1600)),
++        ]
++    }
++    fn time(f: &dyn Fn() -> usize) -> f64 {
++        let mut reps = 1usize;
++        loop {
++            let t = Instant::now();
++            let mut sink = 0;
++            for _ in 0..reps {
++                sink += std::hint::black_box(f());
++            }
++            let e = t.elapsed();
++            std::hint::black_box(sink);
++            if e.as_millis() >= 20 || reps >= 1_000_000 {
++                return e.as_secs_f64() * 1e6 / reps as f64;
++            }
++            reps *= 2;
++        }
++    }
++    fn median(mut v: Vec<f64>) -> f64 {
++        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
++        v[v.len() / 2]
++    }
++
++    #[test]
++    #[ignore]
++    fn measure_1147() {
++        for (name, input) in workloads() {
++            assert_eq!(
++                format!("{:?}", old_detect(&input, is_nfc_normalizing)),
++                format!("{:?}", detect_email_candidates(&input))
++            );
++            let i = &input;
++            let variants: Vec<(&str, Box<dyn Fn() -> usize + '_>)> = vec![
++                ("A  pre-change", Box::new(move || old_detect(i, is_nfc_normalizing).len())),
++                ("A2 pre-change (A/A control)", Box::new(move || old_detect(i, is_nfc_normalizing).len())),
++                ("P  production (byte scan + ascii nfc)", Box::new(move || detect_email_candidates(i).len())),
++            ];
++            let mut samples: Vec<Vec<f64>> = vec![Vec::new(); variants.len()];
++            for round in 0..41 {
++                let order: Vec<usize> = if round % 2 == 0 {
++                    (0..variants.len()).collect()
++                } else {
++                    (0..variants.len()).rev().collect()
++                };
++                for k in order {
++                    samples[k].push(time(&variants[k].1));
++                }
++            }
++            let base = median(samples[0].clone());
++            for (k, (label, _)) in variants.iter().enumerate() {
++                let m = median(samples[k].clone());
++                println!("{name:22} {label:40} {m:10.2} us {:+6.1}%", (m / base - 1.0) * 100.0);
++            }
++        }
++    }
++}
