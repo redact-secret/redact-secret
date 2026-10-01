@@ -18,6 +18,7 @@
 //! (Supabase legacy-anon-JWT row) for the full rationale, including the accepted false-negative risk of
 //! trusting an unverified payload claim.
 
+use crate::detectors::pattern::{LeadBytes, find_literal_with};
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -302,11 +303,13 @@ impl Detector for JwtDetector {
         let mut candidates = Vec::new();
         let mut cursor = 0usize;
 
-        while cursor + HEADER_LEAD.len() <= bytes.len() {
-            if &bytes[cursor..cursor + HEADER_LEAD.len()] != HEADER_LEAD.as_bytes() {
-                cursor += 1;
-                continue;
-            }
+        // Jump to the next exact `eyJ` (issue #1164). A per-byte scan that
+        // advances by one on a miss visits precisely the offsets this search
+        // returns, so the failure cursor (+1) and the raw-match-end
+        // resumption below are unchanged.
+        let lead = LeadBytes::of(std::iter::once(HEADER_LEAD.as_bytes()));
+        while let Some(at) = find_literal_with(&lead, bytes, HEADER_LEAD.as_bytes(), cursor) {
+            cursor = at;
 
             let Some(JwtMatch { end, payload }) = match_jwt_at(bytes, cursor) else {
                 cursor += 1;
@@ -726,5 +729,195 @@ mod tests {
             }
             assert_decoded_matches_oracle(&raw);
         }
+    }
+
+    // --- #1164: exact `eyJ` discovery against the per-byte scan -----------
+
+    /// The pre-#1164 scan: test the three lead bytes at every offset and
+    /// advance by one on a miss. Kept as the oracle for the jump search.
+    fn detect_per_byte_oracle(input: &str) -> Vec<Candidate> {
+        let bytes = input.as_bytes();
+        let mut candidates = Vec::new();
+        let mut cursor = 0usize;
+        while cursor + HEADER_LEAD.len() <= bytes.len() {
+            if &bytes[cursor..cursor + HEADER_LEAD.len()] != HEADER_LEAD.as_bytes() {
+                cursor += 1;
+                continue;
+            }
+            let Some(JwtMatch { end, payload }) = match_jwt_at(bytes, cursor) else {
+                cursor += 1;
+                continue;
+            };
+            let before_is_token = cursor > 0 && is_token_byte(bytes[cursor - 1]);
+            let after_is_token = end < bytes.len() && is_token_byte(bytes[end]);
+            if !before_is_token
+                && !after_is_token
+                && !is_supabase_legacy_anon_claim(&bytes[payload])
+                && let Some(range) = ByteRange::new(cursor, end)
+            {
+                candidates.push(
+                    Candidate::built_in("jwt", Confidence::High, range)
+                        .with_specificity(Specificity::Structural)
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "three-segments",
+                            "encoded-json-prefixes"
+                        )),
+                );
+            }
+            cursor = end;
+        }
+        candidates
+    }
+
+    fn assert_matches_per_byte(input: &str) {
+        assert_eq!(
+            detect(input),
+            detect_per_byte_oracle(input),
+            "{:?}",
+            input.get(..input.len().min(200))
+        );
+    }
+
+    const SIG: &str = "SYNTHETIC_REVOKED_SIGNATURE";
+
+    fn token(header_tail: &str, payload_tail: &str, signature: &str) -> String {
+        format!("eyJ{header_tail}.eyJ{payload_tail}.{signature}")
+    }
+
+    #[test]
+    fn named_shapes_match_the_per_byte_scan() {
+        let good = token("TYNTH", "SYNTHETIC", SIG);
+        let anon = jwt(r#"{"iss":"supabase","role":"anon"}"#);
+        let service = jwt(r#"{"iss":"supabase","role":"service_role"}"#);
+        let shapes = vec![
+            String::new(),
+            "e".to_owned(),
+            "eyJ".to_owned(),
+            "eyJ.".to_owned(),
+            "eyJeyJeyJ".to_owned(),
+            good.clone(),
+            format!("{good}x"),
+            format!("x{good}"),
+            format!("{good}."),
+            format!(".{good}"),
+            format!("-{good}"),
+            format!("{good}-"),
+            format!("{good}\n{good}"),
+            format!("{good} {good}"),
+            format!("{good}{good}"),
+            format!("{good}.{good}"),
+            format!("eyJ{good}"),
+            format!("eyJTYNTH.{good}"),
+            format!("eyJTYNTH.eyJ{good}"),
+            token("TYN", "SYNTHETIC", SIG),
+            token("TYNTH", "SYN", SIG),
+            token("TYNTH", "SYNTHETIC", "SHORTSIG"),
+            token("TYNTH", "SYNTHETIC", &SIG[..16]),
+            token("TYNTH", "SYNTHETIC", &SIG[..15]),
+            format!("\u{20ac}{good}\u{20ac}"),
+            format!("\u{1f600}{good}\u{1f600}{good}"),
+            format!("{anon} {good} {anon}"),
+            format!("{anon}.{service}"),
+            format!("x{anon} {service}"),
+            service.clone(),
+            anon.clone(),
+            format!("{anon}{anon}"),
+            format!("eyJ eyJ eyJ{good}"),
+            "eyJ.eyJ.eyJ.eyJ.eyJ.eyJ".to_owned(),
+            format!("eyJ{}.missing", "A".repeat(300)),
+        ];
+        for shape in &shapes {
+            assert_matches_per_byte(shape);
+        }
+        assert_eq!(detect(&shapes[5]).len(), 1);
+        assert!(detect(&anon).is_empty());
+        assert_eq!(detect(&service).len(), 1);
+    }
+
+    #[test]
+    fn a_blocked_match_still_resumes_at_its_raw_end() {
+        // The first token is glued to a preceding token byte (blocked); the
+        // scan must resume at its raw end, so the second one is still found.
+        let good = token("TYNTH", "SYNTHETIC", SIG);
+        let input = format!("x{good} {good}");
+        assert_eq!(detect(&input).len(), 1);
+        assert_matches_per_byte(&input);
+        // A failed attempt advances by one byte: the inner `eyJ` is retried.
+        let nested = format!("eyJTYNTH.eyJTYNTH.{good}");
+        assert_matches_per_byte(&nested);
+    }
+
+    #[test]
+    fn generated_inputs_and_every_window_match_the_per_byte_scan() {
+        let good = token("TYNTH", "SYNTHETIC", SIG);
+        let anon = jwt(r#"{"iss":"supabase","role":"anon"}"#);
+        let pieces: [&str; 22] = [
+            "eyJ",
+            "eyJ",
+            "ey",
+            "J",
+            "e",
+            ".",
+            ".",
+            "-",
+            "_",
+            "TYNTH",
+            "AAAAAAAAAAAAAAAAAAAA",
+            "x",
+            " ",
+            "\n",
+            "\u{20ac}",
+            "\u{1f600}",
+            "\u{212a}",
+            "Bearer ",
+            "=",
+            SIG,
+            &good,
+            &anon,
+        ];
+        let mut state = 0x1164_u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        let mut found = 0usize;
+        for _ in 0..4000 {
+            let count = usize::try_from(next() % 24).unwrap_or(0);
+            let input: String = (0..count)
+                .map(|_| pieces[usize::try_from(next()).unwrap_or(0) % pieces.len()])
+                .collect();
+            assert_matches_per_byte(&input);
+            found += detect(&input).len();
+        }
+        assert!(found > 100, "generator must reach real candidates: {found}");
+        // Every window (start and end on a char boundary) of one dense input.
+        let dense = format!("x{good} eyJ.{good}.{anon}\u{20ac}{good}-{good}.eyJa.eyJb.");
+        for start in 0..=dense.len() {
+            if !dense.is_char_boundary(start) {
+                continue;
+            }
+            for end in start..=dense.len() {
+                if dense.is_char_boundary(end) {
+                    assert_matches_per_byte(&dense[start..end]);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn long_and_dense_inputs_match_the_per_byte_scan() {
+        let good = token("TYNTH", "SYNTHETIC", SIG);
+        let filler = "The quick brown fox, request id 12345, status ok; /var/log/app.log\n";
+        let sparse = format!("{}{good}{}", filler.repeat(500), filler.repeat(500));
+        let dense = format!("{good}\n").repeat(500);
+        let prefix_noise = "eyJ ".repeat(5000);
+        let long_run = format!("eyJ{}", "A".repeat(100_000));
+        let tail_run = format!("{}{good}", "eyJ.".repeat(2000));
+        for input in [sparse, dense, prefix_noise, long_run, tail_run] {
+            assert_matches_per_byte(&input);
+        }
+        assert_eq!(detect(&format!("{good}\n").repeat(500)).len(), 500);
     }
 }
