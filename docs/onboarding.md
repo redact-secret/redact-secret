@@ -34,6 +34,30 @@ convenience: CI runs the full suite below on every pull request, so you are
 not expected to reproduce the platform matrix, the wheel build, or the
 artifact qualifiers locally to open one.
 
+### Measure statement coverage
+
+CI fails any layer under 80% statement coverage (OpenSSF Silver
+`test_statement_coverage80`). Run the same commands locally:
+
+```bash
+# Rust lines: the `rust-coverage` job (needs cargo-llvm-cov)
+eval "$(cargo llvm-cov show-env --sh)" && cargo test --workspace --locked
+cargo llvm-cov report --summary-only --fail-under-lines 80
+
+# JavaScript wrapper: packages/javascript/src, from the js:test suite
+npm run js:coverage
+
+# Python wrapper: the pure-Python redact_secret package, against a local build
+python -m venv .venv && . .venv/bin/activate
+python -m pip install --require-hashes --only-binary :all: -r .github/requirements/python-coverage.txt
+maturin develop --locked --manifest-path bindings/python/Cargo.toml
+python -m pytest bindings/python/tests --cov=redact_secret --cov-report=term-missing --cov-fail-under=80
+```
+
+The JavaScript tests import `src/*.ts` directly, so coverage is already
+source-level; only `.d.ts` files are excluded. The Python number covers the
+wrapper module, not the Rust extension, which `rust-coverage` measures.
+
 ### Full suite
 
 The complete local sequence, and what CI enforces before merge:
