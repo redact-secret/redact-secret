@@ -121,21 +121,20 @@ fn validate_candidate<'a>(
     // Removal is order-preserving, so a range aligned in the scan copy
     // translates to one aligned in the input; re-asserted because every
     // later stage slices `input` with it.
-    let range = normalized
-        .to_original(scanned_range)
-        .filter(|range| range.is_char_aligned_in(input))
+    let (range, contains_removed_run) = normalized
+        .translate(scanned_range)
+        .filter(|(range, _)| range.is_char_aligned_in(input))
         .ok_or(SecretScanErrorCode::InvalidCandidate)?;
 
     // Either source claiming obfuscation is enough: a detector's own signal
     // is honored even though none currently sets one, and the pipeline's own
     // check is independent of it.
-    let obfuscation = if candidate.obfuscation() == Obfuscation::InvisibleCharacters
-        || normalized.contains_removed_run(scanned_range)
-    {
-        Obfuscation::InvisibleCharacters
-    } else {
-        Obfuscation::None
-    };
+    let obfuscation =
+        if candidate.obfuscation() == Obfuscation::InvisibleCharacters || contains_removed_run {
+            Obfuscation::InvisibleCharacters
+        } else {
+            Obfuscation::None
+        };
 
     let confidence = candidate.confidence();
     let resolved_severity = default_action_for(type_name, confidence).overlap_resolution_severity();

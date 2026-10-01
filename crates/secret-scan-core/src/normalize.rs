@@ -139,8 +139,21 @@ impl<'a> NormalizedInput<'a> {
     /// translated span, while a run merely adjacent to either boundary is
     /// not absorbed.
     pub(crate) fn to_original(&self, range: ByteRange) -> Option<ByteRange> {
+        self.translate(range).map(|(original, _)| original)
+    }
+
+    /// [`to_original`](Self::to_original) and
+    /// [`contains_removed_run`](Self::contains_removed_run) from one pair of
+    /// seam searches: the translated range, and whether a removed run lies
+    /// strictly inside `range`.
+    ///
+    /// Both questions partition the seams at the same two points (`<= start`
+    /// and `< end`), so the second is the difference of the two counts. This
+    /// is not [`touches_removed_run`](Self::touches_removed_run), which uses
+    /// different boundaries and stays separate (issue #1133).
+    pub(crate) fn translate(&self, range: ByteRange) -> Option<(ByteRange, bool)> {
         if self.seams.is_empty() {
-            return Some(range);
+            return Some((range, false));
         }
         // A run removed exactly at `start` precedes the first character, so
         // it counts; one removed exactly at `end` follows the last, so it
@@ -151,10 +164,11 @@ impl<'a> NormalizedInput<'a> {
         let before_end = self
             .seams
             .partition_point(|seam| seam.normalized < range.end());
-        ByteRange::new(
+        let original = ByteRange::new(
             range.start() + self.removed_before(through_start),
             range.end() + self.removed_before(before_end),
-        )
+        )?;
+        Some((original, before_end > through_start))
     }
 
     /// Translates `original`, an offset in the original input that is not
@@ -165,24 +179,6 @@ impl<'a> NormalizedInput<'a> {
             .seams
             .partition_point(|seam| seam.original_after <= original);
         original - self.removed_before(runs_before)
-    }
-
-    /// Whether a removed run lies strictly inside `range` (of
-    /// [`text`](Self::text)): the same "interior" definition
-    /// [`to_original`](Self::to_original) uses to fold a run into a
-    /// translated span. A run merely adjacent to either boundary does not
-    /// count.
-    pub(crate) fn contains_removed_run(&self, range: ByteRange) -> bool {
-        if self.seams.is_empty() {
-            return false;
-        }
-        let through_start = self
-            .seams
-            .partition_point(|seam| seam.normalized <= range.start());
-        let before_end = self
-            .seams
-            .partition_point(|seam| seam.normalized < range.end());
-        before_end > through_start
     }
 
     /// Whether a removed run lies inside `range` or immediately touches
@@ -220,6 +216,170 @@ mod tests {
         let original = view.to_original(normalized).unwrap();
         assert!(original.is_char_aligned_in(input));
         &input[original.start()..original.end()]
+    }
+
+    /// The pre-#1133 `to_original`: its own pair of seam searches. Kept as the
+    /// oracle for [`NormalizedInput::translate`].
+    fn oracle_to_original(view: &NormalizedInput<'_>, range: ByteRange) -> Option<ByteRange> {
+        if view.seams.is_empty() {
+            return Some(range);
+        }
+        let through_start = view
+            .seams
+            .partition_point(|seam| seam.normalized <= range.start());
+        let before_end = view
+            .seams
+            .partition_point(|seam| seam.normalized < range.end());
+        ByteRange::new(
+            range.start() + view.removed_before(through_start),
+            range.end() + view.removed_before(before_end),
+        )
+    }
+
+    /// The pre-#1133 `contains_removed_run`, likewise an independent oracle.
+    fn oracle_contains_removed_run(view: &NormalizedInput<'_>, range: ByteRange) -> bool {
+        if view.seams.is_empty() {
+            return false;
+        }
+        let through_start = view
+            .seams
+            .partition_point(|seam| seam.normalized <= range.start());
+        let before_end = view
+            .seams
+            .partition_point(|seam| seam.normalized < range.end());
+        before_end > through_start
+    }
+
+    fn contained(view: &NormalizedInput<'_>, range: ByteRange) -> bool {
+        view.translate(range).unwrap().1
+    }
+
+    #[test]
+    fn translate_equals_the_two_separate_searches_for_every_range() {
+        let inputs = [
+            String::new(),
+            "plain text".to_owned(),
+            format!("{ZWSP}"),
+            format!("{ZWSP}ab{ZWNJ}cd{ZWSP}"),
+            format!("x={ZWSP}abcd{ZWSP};"),
+            format!("a{ZWSP}{ZWNJ}{ZWSP}b{ZWSP}c{ZWNJ}"),
+            format!("é{ZWSP}한\u{E0067}😀{ZWNJ}\u{FE0F}z\u{00AD}"),
+            format!("{ZWSP}가🙂\u{2060}abc{ZWNJ}끝"),
+            "naïve café 한국어 😀".to_owned(),
+        ];
+        let mut checked = 0;
+        for input in &inputs {
+            let view = NormalizedInput::new(input);
+            let text = view.text().to_owned();
+            for start in 0..=text.len() {
+                for end in start..=text.len() {
+                    let Some(candidate) = ByteRange::new(start, end) else {
+                        continue;
+                    };
+                    let fused = view.translate(candidate);
+                    assert_eq!(
+                        fused.map(|pair| pair.0),
+                        oracle_to_original(&view, candidate),
+                        "{input:?} {start}..{end}"
+                    );
+                    assert_eq!(
+                        fused.map(|pair| pair.1),
+                        Some(oracle_contains_removed_run(&view, candidate)),
+                        "{input:?} {start}..{end}"
+                    );
+                    assert_eq!(view.to_original(candidate), fused.map(|pair| pair.0));
+                    checked += 1;
+                }
+            }
+        }
+        assert!(checked > 300);
+    }
+
+    #[test]
+    fn the_pipeline_boundary_rules_keep_their_distinct_search_points() {
+        // `touches_removed_run` (`< start`, `<= end`) is deliberately not
+        // part of the fused result: a run exactly at a boundary touches but
+        // is neither interior nor absorbed.
+        let input = format!("x={ZWSP}abcd{ZWSP};");
+        let view = NormalizedInput::new(&input);
+        let boundary = range(2, 6);
+        assert!(view.touches_removed_run(boundary));
+        assert_eq!(view.translate(boundary).map(|pair| pair.1), Some(false));
+    }
+
+    /// Median nanoseconds per call of `f`, over `samples` batches of `reps`.
+    fn median_ns(samples: usize, reps: usize, mut f: impl FnMut() -> usize) -> f64 {
+        use std::hint::black_box;
+        use std::time::Instant;
+        let mut times: Vec<f64> = (0..samples)
+            .map(|_| {
+                let started = Instant::now();
+                for _ in 0..reps {
+                    black_box(f());
+                }
+                started.elapsed().as_secs_f64() * 1e9 / reps as f64
+            })
+            .collect();
+        times.sort_by(f64::total_cmp);
+        times[times.len() / 2]
+    }
+
+    /// Stage measurement for #1133 (maintainer-only):
+    /// `cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_translate`.
+    /// Translates 4,096 ranges per call with the old pair of searches and the
+    /// fused one, alternating A/B.
+    #[test]
+    #[ignore = "timing harness, run with --release --nocapture"]
+    fn measure_translate_1133() {
+        use std::hint::black_box;
+        for (name, text) in [
+            ("no-seams", "a".repeat(32_768)),
+            ("4096-seams", format!("ab{ZWSP}cdEFGH").repeat(4096)),
+        ] {
+            let view = NormalizedInput::new(&text);
+            let ranges: Vec<ByteRange> = (0..4096)
+                .map(|i| {
+                    let start = i * 7 % (view.text().len() - 8);
+                    range(start, start + 8)
+                })
+                .collect();
+            let old = || {
+                let mut sum = 0;
+                for &r in black_box(&ranges) {
+                    let original = black_box(oracle_to_original(&view, r).unwrap());
+                    let interior = black_box(oracle_contains_removed_run(&view, r));
+                    sum += original.start() + original.end() + usize::from(interior);
+                }
+                sum
+            };
+            let fused = || {
+                let mut sum = 0;
+                for &r in black_box(&ranges) {
+                    let (original, interior) = black_box(view.translate(r).unwrap());
+                    sum += original.start() + original.end() + usize::from(interior);
+                }
+                sum
+            };
+            assert_eq!(old(), fused());
+            let (mut olds, mut news) = (Vec::new(), Vec::new());
+            for round in 0..15 {
+                if round % 2 == 0 {
+                    olds.push(median_ns(1, 200, old));
+                    news.push(median_ns(1, 200, fused));
+                } else {
+                    news.push(median_ns(1, 200, fused));
+                    olds.push(median_ns(1, 200, old));
+                }
+            }
+            olds.sort_by(f64::total_cmp);
+            news.sort_by(f64::total_cmp);
+            eprintln!(
+                "{name}: {:.1} -> {:.1} us per 4096 ranges ({:+.1}%)",
+                olds[7] / 1e3,
+                news[7] / 1e3,
+                (news[7] / olds[7] - 1.0) * 100.0
+            );
+        }
     }
 
     #[test]
@@ -354,20 +514,20 @@ mod tests {
     fn contains_removed_run_matches_the_interior_definition() {
         let input = format!("x=ab{ZWNJ}{ZWSP}cd;");
         let view = NormalizedInput::new(&input);
-        assert!(view.contains_removed_run(range(2, 6)));
-        assert!(!view.contains_removed_run(range(0, 2)));
+        assert!(contained(&view, range(2, 6)));
+        assert!(!contained(&view, range(0, 2)));
         // The run sits exactly at this range's start, so it is adjacent, not
         // interior.
-        assert!(!view.contains_removed_run(range(4, 6)));
+        assert!(!contained(&view, range(4, 6)));
 
         let input = format!("x={ZWSP}abcd{ZWSP};");
         let view = NormalizedInput::new(&input);
         // Both runs are adjacent to this range's boundaries, not interior.
-        assert!(!view.contains_removed_run(range(2, 6)));
-        assert!(view.contains_removed_run(range(0, 7)));
+        assert!(!contained(&view, range(2, 6)));
+        assert!(contained(&view, range(0, 7)));
 
         let view = NormalizedInput::new("plain");
-        assert!(!view.contains_removed_run(range(1, 4)));
+        assert!(!contained(&view, range(1, 4)));
     }
 
     #[test]
