@@ -1,0 +1,10 @@
+real-alphabetic          len   33 old   4642.83ns | new   2043.89 (-56.0%) | A/A   4429.93 (-4.6%)
+placeholder              len   21 old  10523.94ns | new   4829.65 (-54.1%) | A/A  11578.56 (+10.0%)
+placeholder-accept       len   20 old   5001.53ns | new   2783.74 (-44.3%) | A/A   4971.53 (-0.6%)
+ambiguous                len   25 old   9278.57ns | new   5472.68 (-41.0%) | A/A   8085.00 (-12.9%)
+accept-medium            len   64 old  26004.41ns | new  12802.21 (-50.8%) | A/A  26448.10 (+1.7%)
+accept-at-bound          len  256 old  85034.76ns | new  39375.20 (-53.7%) | A/A  87822.45 (+3.3%)
+long-fallback            len  304 old  95716.15ns | new  98899.89 (+3.3%) | A/A  90897.21 (-5.0%)
+not-alpha                len   12 old      5.67ns | new      7.23 (+27.6%) | A/A      5.20 (-8.3%)
+no-lead                  len   22 old     96.89ns | new     21.23 (-78.1%) | A/A     87.48 (-9.7%)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1819 filtered out; finished in 546.25s
