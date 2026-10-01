@@ -3,6 +3,7 @@
 //! Production PII families are registered here only after their family
 //! contract has been reviewed. The adapter remains the single detector slot.
 
+use std::borrow::Cow;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
 
@@ -452,9 +453,12 @@ impl Detector for PiiDomain {
             }
 
             let type_name = if alternatives.len() == 1 {
-                public_type(alternatives[0].family_id)
+                public_type_name(alternatives[0].family_id)
             } else {
-                format!("pii_ambiguous_{}", domain.as_str().replace('-', "_"))
+                Cow::Owned(format!(
+                    "pii_ambiguous_{}",
+                    domain.as_str().replace('-', "_")
+                ))
             };
             if type_name.len() > crate::MAX_IDENTIFIER_LENGTH || !is_identifier(&type_name) {
                 return Err(DetectorFailure);
@@ -496,9 +500,12 @@ impl Detector for PiiDomain {
             } else {
                 Obfuscation::None
             };
-            let mut candidate = Candidate::new(type_name, confidence, range)
-                .with_specificity(specificity)
-                .with_obfuscation(obfuscation);
+            let mut candidate = match type_name {
+                Cow::Borrowed(name) => Candidate::built_in(name, confidence, range),
+                Cow::Owned(name) => Candidate::new(name, confidence, range),
+            }
+            .with_specificity(specificity)
+            .with_obfuscation(obfuscation);
             if alternatives
                 .iter()
                 .any(|alternative| alternative.reject_invisible_normalization)
@@ -674,6 +681,22 @@ impl IdentityEvaluator {
                 },
             })
     }
+}
+
+/// The public type name of `family_id`: a borrowed static for the six
+/// built-in families, the owned [`public_type`] derivation for any other id
+/// (custom, test-registered, or malformed), so a built-in candidate does not
+/// allocate its name (#1166). Equal to `public_type` for every id.
+fn public_type_name(family_id: &str) -> Cow<'static, str> {
+    Cow::Borrowed(match family_id {
+        "pii:global:email" => "pii_global_email",
+        "pii:global:iban" => "pii_global_iban",
+        "pii:global:network-address" => "pii_global_network_address",
+        "pii:global:payment-card" => "pii_global_payment_card",
+        "pii:global:phone" => "pii_global_phone",
+        "pii:us:ssn" => "pii_jurisdiction_us_ssn",
+        _ => return Cow::Owned(public_type(family_id)),
+    })
 }
 
 fn public_type(family_id: &str) -> String {
@@ -2826,5 +2849,126 @@ mod tests {
         let sorted = context_candidate_keys(keys.iter().copied());
         assert_eq!(sorted.len(), IdentityDomain::ALL.len());
         assert_eq!(sorted, oracle_context_candidate_keys(&keys));
+    }
+
+    const BUILT_IN_FAMILY_IDS: [&str; 6] = [
+        "pii:global:email",
+        "pii:global:iban",
+        "pii:global:network-address",
+        "pii:global:payment-card",
+        "pii:global:phone",
+        "pii:us:ssn",
+    ];
+
+    #[test]
+    fn built_in_public_type_names_borrow_and_equal_the_derivation() {
+        for id in BUILT_IN_FAMILY_IDS {
+            let name = public_type_name(id);
+            assert!(matches!(name, Cow::Borrowed(_)), "{id}");
+            assert_eq!(name, public_type(id), "{id}");
+            assert!(is_identifier(&name) && name.len() <= crate::MAX_IDENTIFIER_LENGTH);
+            // One static per family: a second lookup returns the same bytes.
+            let again = public_type_name(id);
+            assert!(std::ptr::eq(name.as_ref(), again.as_ref()), "{id}");
+        }
+        // Anything else keeps the owned derivation, byte for byte, including
+        // known-but-unbuilt ids, custom ids, near misses and malformed ids.
+        for id in KNOWN_FAMILIES
+            .iter()
+            .copied()
+            .filter(|id| !BUILT_IN_FAMILY_IDS.contains(id))
+            .chain([
+                "pii:kr:rrn",
+                "pii:global:Email",
+                "pii:global:email ",
+                "pii:global:email:x",
+                "pii:us:ssn:extra",
+                "pii:global:ssn",
+                "pii::",
+                "pii:ünï:çødé",
+                "pii:global:",
+                "pii",
+                "",
+                "email",
+            ])
+        {
+            let name = public_type_name(id);
+            assert!(matches!(name, Cow::Owned(_)), "{id:?}");
+            assert_eq!(name, public_type(id), "{id:?}");
+        }
+    }
+
+    fn sensitive_family(id: &'static str) -> Box<dyn PiiFamily> {
+        family(
+            id,
+            ContextRequirement::None,
+            &[],
+            vec![alt(
+                id,
+                SensitivityState::Sensitive,
+                Confidence::High,
+                Confidence::High,
+            )],
+        )
+    }
+
+    #[test]
+    fn built_in_candidates_borrow_their_names_and_custom_or_ambiguous_stay_owned() {
+        let domain = production_domain(
+            PiiSelection::parse_with_catalog(&["pii"], KNOWN_FAMILIES, AVAILABLE_FAMILIES).unwrap(),
+        );
+        let input = "email: alice.smith@acme-corp.net\n\
+                     card number 4242424242424242\n\
+                     IBAN GB82WEST12345698765432\n\
+                     SSN 219-09-9999\n\
+                     phone +1 202 555 0143\n";
+        let context = DetectorContext::new(input.len());
+        let first = domain.detect(input, &context).unwrap();
+        let second = domain.detect(input, &context).unwrap();
+        assert_eq!(first, second);
+        let mut seen = BTreeSet::new();
+        for (a, b) in first.iter().zip(&second) {
+            assert!(
+                matches!(a.type_name_cow(), Cow::Borrowed(_)),
+                "{}",
+                a.type_name()
+            );
+            assert!(std::ptr::eq(a.type_name(), b.type_name()));
+            // A clone shares the borrowed name.
+            assert!(std::ptr::eq(a.clone().type_name(), a.type_name()));
+            seen.insert(a.type_name().to_owned());
+        }
+        assert!(seen.len() >= 3, "{seen:?}");
+        for name in &seen {
+            assert!(
+                BUILT_IN_FAMILY_IDS
+                    .iter()
+                    .any(|id| public_type(id) == *name),
+                "{name}"
+            );
+        }
+
+        // An ambiguous join and a custom family id keep owned names.
+        let ambiguous = PiiDomain::new(
+            selected(&["pii:us:ssn", "pii:global:us-ssn"]),
+            vec![
+                sensitive_family("pii:us:ssn"),
+                sensitive_family("pii:global:us-ssn"),
+            ],
+        )
+        .detect("TEST", &DetectorContext::new(4))
+        .unwrap();
+        assert_eq!(ambiguous.len(), 1);
+        assert_eq!(ambiguous[0].type_name(), "pii_ambiguous_national_id");
+        assert!(matches!(ambiguous[0].type_name_cow(), Cow::Owned(_)));
+
+        let custom = PiiDomain::new(
+            selected(&["pii:global:us-ssn"]),
+            vec![sensitive_family("pii:global:us-ssn")],
+        )
+        .detect("TEST", &DetectorContext::new(4))
+        .unwrap();
+        assert_eq!(custom[0].type_name(), "pii_global_us_ssn");
+        assert!(matches!(custom[0].type_name_cow(), Cow::Owned(_)));
     }
 }

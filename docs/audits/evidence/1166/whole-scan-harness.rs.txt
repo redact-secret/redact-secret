@@ -1,0 +1,53 @@
+// Temporary integration test (crates/secret-scan-core/tests/zz_whole.rs), run with
+// `cargo test --release -p redact-secret --test zz_whole -- --ignored --nocapture`
+// once per build (base, new), then deleted. Synthetic inputs only.
+use redact_secret::{DefaultPolicy, DetectorRegistry, PiiSelection, scan};
+use std::time::Instant;
+
+fn text(lines: &[&str], n: usize, prefix: &str) -> String {
+    let mut out = String::new();
+    for i in 0..n {
+        out.push_str(prefix);
+        out.push_str(lines[i % lines.len()]);
+        out.push_str(" and some ordinary prose follows here.\n");
+    }
+    out
+}
+
+#[test]
+#[ignore]
+fn whole_scan() {
+    let selection = PiiSelection::parse(&["pii"]).unwrap();
+    let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+    let mut sparse = text(&["nothing here"], 2000, "");
+    sparse.push_str("email: a.b@acme-corp.net ok\n");
+    let cases = [
+        ("sparse", sparse),
+        ("dense-email", text(&["alice.smith@acme-corp.net", "bob.jones@acme-corp.net"], 2000, "email: ")),
+        (
+            "dense-mixed",
+            text(
+                &["email alice.smith@acme-corp.net", "card number 4242424242424242", "IBAN GB82WEST12345698765432", "SSN 219-09-9999", "phone +1 202 555 0143"],
+                2000,
+                "x ",
+            ),
+        ),
+        ("prose", text(&["nothing here"], 2000, "")),
+    ];
+    for (name, input) in &cases {
+        let mut v = Vec::new();
+        let mut found = 0;
+        for _ in 0..61 {
+            let t = Instant::now();
+            found = scan(input, &registry, &DefaultPolicy).unwrap().len();
+            v.push(t.elapsed().as_micros() as f64);
+        }
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        eprintln!(
+            "WHOLE {name:12} bytes {:7} findings {found:5} median {:9.1}us min {:9.1}us",
+            input.len(),
+            v[30],
+            v[0]
+        );
+    }
+}
