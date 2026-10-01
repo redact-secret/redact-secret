@@ -214,7 +214,11 @@ side-effect free, on top of the dependency boundary above:
   `common` is not smaller than `full`, links a `provider` detector
   implementation, misses a `common` one, or exports a different surface. It
   reads each detector module's pack from `detectors/mod.rs`, so a new
-  provider module needs no script change (#929).
+  provider module needs no script change (#929). It also fails when a
+  `common` artifact carries code of a `provider` module outside the reviewed
+  helper list `COMMON_PROVIDER_HELPER_MODULES` in the script: those seven
+  modules supply only the incremental session's retention predicates, never a
+  registered detector (#1127).
 
   A second, off-by-default feature, `pii`, links the PII domain runtime
   (#937). Each build script run emits both builds of its profile side by

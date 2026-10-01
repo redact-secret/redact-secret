@@ -95,7 +95,13 @@ the default and compatibility baseline. `DetectorRegistry::with_common_built_in`
 builds the smaller, opt-in `common` profile — only the structural and
 contextual detectors — for size- or latency-sensitive preventive use.
 `IncrementalSanitizer::with_common_built_in` builds the equivalent incremental
-session. Both profile constructors report their identity through `profile()`,
+session. The linker keeps only the constructors a program references, so call
+`with_common_built_in` directly to get the smaller binary: with a `Profile`
+value only known at run time, `sanitize_with_profile` references both
+constructors and links every detector (a minimal program measured 517,872 B
+with `with_common_built_in` and 734,816 B through `sanitize_with_profile` with
+a run-time `Profile`; see [evidence](../audits/evidence/1127/README.md)).
+Both profile constructors report their identity through `profile()`,
 which returns `Some(Profile::Full)`, `Some(Profile::Common)`, or `None` for a
 registry assembled through `DetectorRegistry::new()`.
 
