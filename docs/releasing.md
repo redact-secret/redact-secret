@@ -319,8 +319,9 @@ gitsign. A tag is not what binds a release to its source. These records do:
 - npm packages are published with provenance (`NPM_CONFIG_PROVENANCE`), a
   Sigstore attestation that binds each tarball to the workflow run and commit.
   PyPI publication uses trusted publishing through the pinned
-  `pypa/gh-action-pypi-publish`; this workflow does not set its `attestations`
-  input, so attestations follow that action's default behavior.
+  `pypa/gh-action-pypi-publish` (v1.14.2), whose `attestations` input
+  defaults to `true`, so every uploaded file carries a PEP 740 attestation
+  signed with the same workflow identity.
 
 Signing tags, for example with gitsign (Sigstore keyless signing from the
 workflow's OIDC identity), is a possible future step. It would change the
