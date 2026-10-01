@@ -1,0 +1,149 @@
+
+#[cfg(test)]
+mod zz_bench {
+    use super::ValidationFailure as F;
+    use std::hint::black_box;
+    use std::time::Instant;
+    type R = Result<(), F>;
+
+    fn luhn_base(c: &str) -> R {
+        super::validate_luhn_v1(c)
+    }
+    const T: [u16; 10] = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9];
+    // B: lexical precheck kept, table contribution.
+    fn luhn_pre_table(c: &str) -> R {
+        if c.len() < 2 || !c.bytes().all(|b| b.is_ascii_digit()) {
+            return Err(F::Malformed);
+        }
+        let mut sum = 0u16;
+        let parity = c.len() % 2;
+        for (i, b) in c.bytes().enumerate() {
+            let d = u16::from(b - b'0');
+            sum += if i % 2 == parity { T[d as usize] } else { d };
+        }
+        if sum % 10 == 0 { Ok(()) } else { Err(F::ChecksumMismatch) }
+    }
+    // C: fused (issue prototype).
+    fn luhn_fused(c: &str) -> R {
+        if c.len() < 2 {
+            return Err(F::Malformed);
+        }
+        let mut sum = 0u16;
+        let parity = c.len() % 2;
+        for (i, b) in c.bytes().enumerate() {
+            let d = b.wrapping_sub(b'0');
+            if d > 9 {
+                return Err(F::Malformed);
+            }
+            sum += if i % 2 == parity { T[d as usize] } else { u16::from(d) };
+        }
+        if sum % 10 == 0 { Ok(()) } else { Err(F::ChecksumMismatch) }
+    }
+    // D: fused, branch-free validity accumulation.
+    fn luhn_fused_acc(c: &str) -> R {
+        if c.len() < 2 {
+            return Err(F::Malformed);
+        }
+        let mut sum = 0u16;
+        let parity = c.len() % 2;
+        let mut bad = 0u8;
+        for (i, b) in c.bytes().enumerate() {
+            let d = b.wrapping_sub(b'0');
+            bad |= u8::from(d > 9);
+            let d = d.min(9);
+            sum += if i % 2 == parity { T[d as usize] } else { u16::from(d) };
+        }
+        if bad != 0 {
+            return Err(F::Malformed);
+        }
+        if sum % 10 == 0 { Ok(()) } else { Err(F::ChecksumMismatch) }
+    }
+
+    fn timeit(f: fn(&str) -> R, inputs: &[&str], reps: u32) -> f64 {
+        let t = Instant::now();
+        for _ in 0..reps {
+            for s in inputs {
+                let _ = black_box(f(black_box(s)));
+            }
+        }
+        t.elapsed().as_nanos() as f64 / (f64::from(reps) * inputs.len() as f64)
+    }
+    fn med(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+
+    fn compare(name: &str, fs: &[(&str, fn(&str) -> R)], inputs: &[&str]) {
+        let reps = 20_000;
+        let n = fs.len();
+        let mut res: Vec<Vec<f64>> = vec![vec![]; n + 1];
+        for round in 0..31 {
+            for k in 0..=n {
+                let idx = if round % 2 == 0 { k } else { n - k };
+                let f = if idx == n { fs[0].1 } else { fs[idx].1 };
+                res[idx].push(timeit(f, inputs, reps));
+            }
+        }
+        let base = med(res[0].clone());
+        let mut line = format!("{name:22} base {base:7.2}ns");
+        for (i, (nm, _)) in fs.iter().enumerate().skip(1) {
+            let m = med(res[i].clone());
+            line += &format!(" | {nm} {m:7.2} ({:+.1}%)", (m / base - 1.0) * 100.0);
+        }
+        let aa = med(res[n].clone());
+        line += &format!(" | A/A {aa:7.2} ({:+.1}%)", (aa / base - 1.0) * 100.0);
+        eprintln!("{line}");
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_luhn() {
+        let fs: [(&str, fn(&str) -> R); 4] = [
+            ("base", luhn_base),
+            ("pre_table", luhn_pre_table),
+            ("fused", luhn_fused),
+            ("fused_acc", luhn_fused_acc),
+        ];
+        compare("pan16-valid", &fs, &["4242424242424242", "4111111111111111", "5555555555554444"]);
+        compare("pan16-checksum-bad", &fs, &["4242424242424243", "4111111111111112"]);
+        compare("pan19-valid", &fs, &["6011000000000000004"]);
+        compare("early-malformed", &fs, &["x242424242424242"]);
+        compare("late-malformed", &fs, &["424242424242424x"]);
+    }
+
+    fn iban_base(c: &str) -> R {
+        super::validate_iban_mod97_v1(c)
+    }
+    fn iban_fused(c: &str) -> R {
+        let bytes = c.as_bytes();
+        if !(15..=34).contains(&bytes.len())
+            || !bytes[0..2].iter().all(u8::is_ascii_uppercase)
+            || !bytes[2..4].iter().all(u8::is_ascii_digit)
+            || !bytes[4..]
+                .iter()
+                .all(|b| b.is_ascii_uppercase() || b.is_ascii_digit())
+        {
+            return Err(F::Malformed);
+        }
+        let mut r = 0u16;
+        for b in bytes[4..].iter().chain(&bytes[..4]) {
+            r = if b.is_ascii_digit() {
+                (r * 10 + u16::from(b - b'0')) % 97
+            } else {
+                (r * 100 + u16::from(b - b'A' + 10)) % 97
+            };
+        }
+        if r == 1 { Ok(()) } else { Err(F::ChecksumMismatch) }
+    }
+    #[test]
+    #[ignore]
+    fn bench_iban() {
+        let fs: [(&str, fn(&str) -> R); 2] = [("base", iban_base), ("fused", iban_fused)];
+        compare("iban22-mixed", &fs, &["GB82WEST12345698765432", "DE89370400440532013000"]);
+        compare("iban34-alpha", &fs, &["ZZ25SYNTHETICABCDEFGHIJKLMNOPQRST", "ZZ25ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"]);
+        compare("iban34-numeric", &fs, &["ZZ25000000000000000000000000000000"]);
+        compare("iban-checksum-bad", &fs, &["GB83WEST12345698765432"]);
+        compare("iban-malformed-late", &fs, &["GB82WEST1234569876543x"]);
+        compare("iban-short", &fs, &["GB82WEST"]);
+    }
+}
