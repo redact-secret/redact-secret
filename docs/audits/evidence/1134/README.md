@@ -139,3 +139,7 @@ change (`build(input, false)` in `new`).
 cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_normalize
 cargo bench -p redact-secret --bench scan_cost -- --no-detectors --runs 21 unicode-invisible mixed-10m
 ```
+
+## Reproducing the timing
+
+The `measure_normalize_1134` harness shares `normalize.rs` with #1133 and was removed with it; see `../1133/removed-timing-harness.patch.txt` (restore with `git apply -R`, local only).

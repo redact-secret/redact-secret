@@ -85,3 +85,7 @@ removes the per-anchor `Vec<AzureField>` and repeated parse the same way.
 Adopt. Same-segment repetition gets a large, consistent reduction; single and
 independent-line workloads move only slightly. No general connection-detector
 speedup is claimed. Observable behavior is unchanged, so no changelog entry.
+
+## Reproducing the timing
+
+The ignored timing test(s) named above were removed before merge: `npm run rust:check` forbids clock and stdout names (`std::time`, `println!`) anywhere in `secret-scan-core/src`, test modules included. The removed code is kept verbatim as `removed-timing-harness.patch.txt` (a reverse patch: apply it to a checkout of the merged commit with `git apply -R` to restore the harness locally, then run the `cargo test --release ... --ignored --nocapture` command quoted above). Do not commit it back into `src/`.

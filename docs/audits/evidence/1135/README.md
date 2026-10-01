@@ -125,3 +125,7 @@ unchanged.
 cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_overlap
 cargo bench -p redact-secret --bench scan_cost -- --no-detectors --runs 21 scale-logs-64k provider-tables-64k
 ```
+
+## Reproducing the timing
+
+The ignored timing test(s) named above were removed before merge: `npm run rust:check` forbids clock and stdout names (`std::time`, `println!`) anywhere in `secret-scan-core/src`, test modules included. The removed code is kept verbatim as `removed-timing-harness.patch.txt` (a reverse patch: apply it to a checkout of the merged commit with `git apply -R` to restore the harness locally, then run the `cargo test --release ... --ignored --nocapture` command quoted above). Do not commit it back into `src/`.
