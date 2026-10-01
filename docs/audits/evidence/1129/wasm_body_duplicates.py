@@ -47,7 +47,7 @@ def main():
         sz, i = leb(b, i); bodies.append(b[i:i+sz]); i += sz
     total = sum(len(x) for x in bodies)
     ex = collections.defaultdict(list)
-    for k, x in enumerate(bodies): ex[hashlib.sha1(x).hexdigest()].append(k)
+    for k, x in enumerate(bodies): ex[hashlib.sha256(x).hexdigest()].append(k)
     dup = {h: v for h, v in ex.items() if len(v) > 1}
     waste = sum(len(bodies[v[0]]) * (len(v) - 1) for v in dup.values())
     print(f"functions {cnt} code bytes {total}")
