@@ -26,7 +26,7 @@ Use `current`, `planned`, `proposed`, or `unknown` when a state label makes the 
 - `proposed` is an idea that is not committed; and
 - `unknown` needs more information.
 
-Prefer links over copied detail. The source code, repository architecture, and planning records remain authoritative. Do not create separate architecture, resource, requirements, or roadmap documents for every feature; add another file only when the single page genuinely becomes difficult to use.
+Prefer links over copied detail. The source code, repository architecture, and planning records remain authoritative. Do not create separate architecture, resource, requirements, or roadmap documents for every feature; add another file only when the single page genuinely becomes difficult to use. The project-wide [ROADMAP.md](ROADMAP.md) is not a feature document and is the one roadmap the repository keeps.
 
 ## Governed convention records
 

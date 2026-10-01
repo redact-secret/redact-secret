@@ -1,0 +1,71 @@
+version: 2
+
+# Dependency monitoring (OpenSSF Best Practices `dependency_monitoring`).
+# Dependabot opens update PRs against `main`; every update still passes the
+# full CI gate, including `rust-msrv` (Rust 1.88) and the Node 20/22/24 matrix,
+# so an update that breaks a supported floor fails there instead of landing.
+# Security advisories for these manifests are also raised by Dependabot
+# alerts independently of this schedule.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Cargo.lock covers the core, CLI, and native/wasm/Python binding crates.
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      cargo-minor-patch:
+        update-types:
+          - minor
+          - patch
+
+  # Root package-lock.json covers the npm workspaces (packages/javascript).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    groups:
+      npm-minor-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # @types/node tracks the lowest Node in `engines` (20.x); move the major
+      # only when the engines floor moves.
+      - dependency-name: "@types/node"
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: npm
+    directory: /bindings/node
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: pip
+    directory: /bindings/python
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "chore(deps)"

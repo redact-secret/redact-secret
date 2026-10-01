@@ -29,6 +29,54 @@ Use unmistakably synthetic or revoked examples and include:
 Do not publicly disclose the issue until a fix and disclosure timeline have
 been coordinated with the maintainers.
 
+## How reports are handled
+
+The project has a small maintainer team ([GOVERNANCE.md](GOVERNANCE.md#roles)),
+so the times below are targets, not guarantees.
+
+1. **Acknowledge** the report in the advisory thread, targeting 7 days.
+2. **Triage**: reproduce it with synthetic data, decide whether it is in
+   scope under the [security model](#security-model), and assess severity
+   (CVSS where it helps). The reporter is told the outcome. Reports judged
+   out of scope are explained, and may be moved to a public issue with the
+   reporter's agreement.
+3. **Fix** in a private fork of the advisory. The fix carries a deterministic
+   regression test, as every bug fix does ([CONTRIBUTION.md](CONTRIBUTION.md)).
+4. **Release** the fix through the normal qualified release path
+   ([release runbook](docs/releasing.md)) and request a CVE through the
+   GitHub advisory when the issue affects a published version.
+5. **Disclose** by publishing the GitHub security advisory and a `Security`
+   entry in [CHANGELOG.md](CHANGELOG.md). The target is public disclosure
+   within 90 days of the report, sooner once a fix is released, or later only
+   by agreement with the reporter.
+
+## Credit
+
+Reporters are credited by name or handle in the published advisory and its
+changelog entry unless they ask to stay anonymous. The advisory list on the
+[security page](https://github.com/redact-secret/redact-secret/security/advisories)
+records every credited report.
+
+## Verifying releases
+
+Releases are signed by the registries' keyless signing, not by a long-lived
+project key, so there is no public key to download:
+
+- **npm**: every `@redact-secret/*` package is published from the release
+  workflow with an npm provenance attestation, signed through Sigstore with
+  the workflow's GitHub OIDC identity. After installing, run
+  `npm audit signatures`; it verifies the registry signatures and each
+  package's provenance attestation. The package page on npmjs.com links the
+  attestation to the exact workflow run and source commit.
+- **PyPI**: `redact-secret` is uploaded with Trusted Publishing, which
+  attaches PEP 740 attestations signed with the same workflow identity. They
+  are shown on each file's page on pypi.org and can be checked with
+  `pypi-attestations verify pypi --repository https://github.com/redact-secret/redact-secret <file-url>`.
+- **crates.io and all registries**: the SHA-256 digests of every published
+  artifact are recorded in each version's release manifest under
+  [`docs/releases/`](docs/releases/status.md), alongside the annotated
+  `v{version}` tag that names the exact source commit.
+
 ## Security model
 
 The library detects and redacts likely credentials in untrusted text. It does

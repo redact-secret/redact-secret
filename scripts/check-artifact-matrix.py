@@ -76,12 +76,18 @@ BROWSER_QUALIFIER = Path("scripts") / "qualify-browser-artifact.mjs"
 
 # The only write scopes any job in this repository is allowed to take, and
 # the job that may take each. `Release` needs `contents: write` to create the
-# annotated tag its own workflow documents, and `id-token: write` for PyPI
+# annotated tag its own workflow documents, `id-token: write` for PyPI
 # Trusted Publishing, which mints a short-lived OIDC token instead of holding
-# a long-lived API token as a secret. Every other job is read-only.
+# a long-lived API token as a secret, and `id-token: write` on the npm publish
+# jobs for npm provenance attestations. Every other job is read-only.
 WRITE_SCOPE_ALLOWLIST = {
     ("release.yml", "tag-release", "contents"),
     ("release.yml", "publish-pypi", "id-token"),
+    # npm provenance: each npm publish job mints an OIDC token so npm can
+    # sign a Sigstore provenance attestation for the tarball it publishes.
+    ("release.yml", "publish-native-dependencies", "id-token"),
+    ("release.yml", "publish-wasm-dependency", "id-token"),
+    ("release.yml", "publish", "id-token"),
     ("reconcile-release.yml", "reconcile", "contents"),
     ("reconcile-release.yml", "tag-reconciled-release", "contents"),
     ("reconcile-release.yml", "reconcile", "id-token"),

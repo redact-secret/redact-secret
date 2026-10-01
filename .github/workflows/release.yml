@@ -100,6 +100,9 @@ jobs:
       name: release
     permissions:
       contents: read
+      # npm provenance: the OIDC token signs a Sigstore attestation that
+      # links each published tarball to this workflow run and commit.
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -187,6 +190,7 @@ jobs:
         run: node scripts/publish-dependency-package.mjs --package-dir "bindings/node/npm/${{ matrix.platform }}" --tag "${{ steps.tag.outputs.tag }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
 
       # `needs.<job>.outputs` on a matrix job carries only the last leg's
       # value, not all eight (GitHub Actions does not merge matrix outputs), so
@@ -275,6 +279,9 @@ jobs:
       name: release
     permissions:
       contents: read
+      # npm provenance: the OIDC token signs a Sigstore attestation that
+      # links each published tarball to this workflow run and commit.
+      id-token: write
     outputs:
       registry_state_json: ${{ steps.state.outputs.registry_state_json }}
       artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
@@ -442,6 +449,7 @@ jobs:
         run: node scripts/publish-dependency-package.mjs --package-dir bindings/wasm/npm --tag "${{ steps.tag.outputs.tag }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
 
       - name: Report registry state
         id: state
@@ -508,6 +516,9 @@ jobs:
       name: release
     permissions:
       contents: read
+      # npm provenance: the OIDC token signs a Sigstore attestation that
+      # links each published tarball to this workflow run and commit.
+      id-token: write
     outputs:
       package_version: ${{ steps.release.outputs.package_version }}
       registry_state_json: ${{ steps.state.outputs.registry_state_json }}
@@ -618,6 +629,7 @@ jobs:
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
           NPM_TAG: ${{ steps.release.outputs.npm_tag }}
           WRAPPER_TARBALL: ${{ steps.pack.outputs.tarball }}
         run: npm publish --access public --tag "$NPM_TAG" "$WRAPPER_TARBALL"

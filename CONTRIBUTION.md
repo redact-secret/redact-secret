@@ -90,12 +90,20 @@ items are enforced by CI on every pull request; the rest are checked in review.
 - **Coding standard.** Follow [CONVENTIONS.md](CONVENTIONS.md). Rust code is
   formatted with `rustfmt` (`rustfmt.toml`) and must pass `cargo clippy` with
   warnings denied (`clippy.toml`, `RUSTFLAGS=-D warnings`); TypeScript must
-  type-check. Do not silence a warning to make CI pass; fix its cause.
+  type-check under `strict`. Python binding code follows
+  [PEP 8](https://peps.python.org/pep-0008/). Do not silence a warning to make
+  CI pass; fix its cause.
 - **Tests.** Every behavior change to a detector, redaction, overlap
   resolution, or policy comes with deterministic automated tests in the same
   pull request, in the shared [conformance corpus](conformance/README.md) or
   the package's own test suite. A pull request that changes behavior without a
-  test is not ready to merge.
+  test is not ready to merge. New functionality is accepted only with tests
+  that exercise it, and Rust line coverage must stay at or above 80% (the
+  `rust-coverage` CI job).
+- **Regression tests for bug fixes.** A bug fix includes a test that fails
+  without the fix. A confirmed false positive or false negative becomes a
+  permanent synthetic regression fixture
+  ([convention](conventions/synthetic-secret-regressions.md)).
 - **Synthetic data only.** Fixtures, logs, snapshots, and documentation use
   unmistakably synthetic or revoked examples. Never commit a real credential.
 - **Boundaries.** Keep the core side-effect free (no runtime network access,
@@ -108,8 +116,14 @@ items are enforced by CI on every pull request; the rest are checked in review.
   must pass. A new finding is fixed, or dispositioned in
   `sast/baseline.json` with a reason a reviewer can check.
 - **Changelog.** Follow [Changelog coverage](#changelog-coverage) below.
-- **License.** Contributions are licensed under the repository's
-  [MIT License](LICENSE).
+- **License and origin.** Contributions are licensed under the repository's
+  [MIT License](LICENSE). By opening a pull request you certify the
+  [Developer Certificate of Origin 1.1](https://developercertificate.org/):
+  you wrote the change or otherwise have the right to submit it under that
+  license. The pull request template asks you to confirm this; a
+  `Signed-off-by` trailer is welcome but not required.
+- **Conduct.** Follow the [code of conduct](CODE_OF_CONDUCT.md). How changes
+  are decided is described in [GOVERNANCE.md](GOVERNANCE.md).
 
 ### Changelog coverage
 

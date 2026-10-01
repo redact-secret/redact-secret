@@ -383,9 +383,21 @@ node --no-warnings scripts/wasi-run.mjs \
 node scripts/shadow-determinism.mjs compare native=native.jsonl wasm32=wasm32.jsonl
 ```
 
+Statement coverage (the `rust-coverage` CI job, which fails below 80% of
+lines; the workspace measured 95.15% of lines when the job was added):
+
+```bash
+rustup component add llvm-tools-preview
+cargo install cargo-llvm-cov --locked
+eval "$(cargo llvm-cov show-env --sh)"
+cargo build --workspace --locked --examples   # integration tests run these
+cargo test --workspace --locked
+cargo llvm-cov report --summary-only --fail-under-lines 80
+```
+
 Toolchain setup: `rustup toolchain install 1.88 --profile minimal`,
 `rustup target add wasm32-unknown-unknown`, and `cargo install cargo-deny`.
-The CI jobs `rust-policy`, `rust-native`, `rust-msrv`, `rust-wasm`, and
+The CI jobs `rust-policy`, `rust-native`, `rust-coverage`, `rust-msrv`, `rust-wasm`, and
 `shadow-determinism` run the same commands. `cargo test --workspace` includes the doctests on the core
 crate's public API; `cargo doc` fails on a broken intra-doc link because the
 crate root denies `rustdoc::broken_intra_doc_links` and

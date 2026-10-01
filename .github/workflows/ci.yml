@@ -196,6 +196,51 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  # Statement coverage for the Rust workspace (OpenSSF Best Practices
+  # `test_statement_coverage80`). The integration tests that run the
+  # `pii_identity_evaluation` and `shadow_evaluation` examples need those
+  # binaries built first, so the job instruments the shell with `show-env`,
+  # builds the examples, runs the suite, and then reports. The 80% line floor
+  # is the badge's bar, not the current level (about 95%); a drop below it
+  # fails the job. No build cache: stale `.profraw` files would skew the report.
+  rust-coverage:
+    name: Rust statement coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up stable Rust
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
+        with:
+          toolchain: stable
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@83ac0ad63c0167e6f06796fab0fce28db1bf3db0 # v2.87.22
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Measure and enforce line coverage
+        shell: bash
+        run: |
+          eval "$(cargo llvm-cov show-env --sh)"
+          cargo build --workspace --locked --examples
+          cargo test --workspace --locked
+          mkdir -p target/coverage
+          cargo llvm-cov report --summary-only --fail-under-lines 80 | tee target/coverage/summary.txt
+          {
+            echo '### Rust statement coverage'
+            echo '```'
+            tail -n 1 target/coverage/summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   rust-msrv:
     name: Rust MSRV
     runs-on: ubuntu-latest
