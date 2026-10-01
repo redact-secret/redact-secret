@@ -5,7 +5,6 @@ agreement, and determinism (`decision-define-runtime-bindings`:
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 SYNTHETIC_INPUT = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
@@ -32,12 +31,8 @@ def test_scan_and_redact_agrees_with_separate_scan_and_redact_calls() -> None:
 
     assert result.text == redacted
     assert [
-        (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end)
-        for f in result.findings
-    ] == [
-        (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end)
-        for f in findings
-    ]
+        (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end) for f in result.findings
+    ] == [(f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end) for f in findings]
 
 
 @pytest.mark.parametrize(
@@ -51,10 +46,7 @@ def test_scan_and_redact_agrees_with_separate_scan_and_redact_calls() -> None:
 )
 def test_repeated_scan_and_redact_is_deterministic(text: str) -> None:
     def summary(findings: list[redact_secret.Finding]) -> list[tuple]:
-        return [
-            (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end)
-            for f in findings
-        ]
+        return [(f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end) for f in findings]
 
     first = redact_secret.scan(text)
     second = redact_secret.scan(text)
@@ -91,9 +83,7 @@ def test_scan_reports_invisible_character_obfuscation() -> None:
     assert len(clean) == 1
     assert clean[0].obfuscation == "none"
 
-    obfuscated_input = SYNTHETIC_INPUT.replace(
-        "ghp_SYNTHETICREVOKED", "ghp_SYNTHETIC‌REVOKED"
-    )
+    obfuscated_input = SYNTHETIC_INPUT.replace("ghp_SYNTHETICREVOKED", "ghp_SYNTHETIC‌REVOKED")
     findings = redact_secret.scan(obfuscated_input)
     assert len(findings) == 1
     assert findings[0].obfuscation == "invisible-characters"
@@ -127,9 +117,7 @@ def test_scan_result_text_is_stable_across_reads() -> None:
     result = redact_secret.scan_and_redact(SYNTHETIC_INPUT)
 
     assert result.text == result.text
-    assert result.text == redact_secret.redact(
-        SYNTHETIC_INPUT, redact_secret.scan(SYNTHETIC_INPUT)
-    )
+    assert result.text == redact_secret.redact(SYNTHETIC_INPUT, redact_secret.scan(SYNTHETIC_INPUT))
     with pytest.raises(AttributeError):
         result.text = "x"  # type: ignore[misc]
     with pytest.raises(AttributeError):

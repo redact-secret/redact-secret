@@ -90,17 +90,14 @@ def verify(artifacts: list[Path], qualified: dict[str, str]) -> list[str]:
             )
     for missing in sorted(set(qualified) - seen):
         errors.append(
-            f"{missing}: qualified by artifact-qualification.yml but not present "
-            "among the artifacts about to publish"
+            f"{missing}: qualified by artifact-qualification.yml but not present among the artifacts about to publish"
         )
     return errors
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument(
-        "artifacts", nargs="+", type=Path, help="the artifact file(s) about to publish"
-    )
+    parser.add_argument("artifacts", nargs="+", type=Path, help="the artifact file(s) about to publish")
     parser.add_argument(
         "--inventory",
         required=True,
@@ -137,10 +134,7 @@ def main() -> int:
 
     for error in errors:
         print(f"ERROR {error}")
-    print(
-        f"Artifact digest verification complete: {len(args.artifacts)} artifact(s) checked, "
-        f"{len(errors)} error(s)"
-    )
+    print(f"Artifact digest verification complete: {len(args.artifacts)} artifact(s) checked, {len(errors)} error(s)")
     return 1 if errors else 0
 
 

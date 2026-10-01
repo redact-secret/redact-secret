@@ -37,14 +37,22 @@ COMMITTED_DETECTORS = [
     "vercel-token",
 ]
 COMMITTED_ISSUES = [
-    f"https://github.com/redact-secret/redact-secret/issues/{n}"
-    for n in (316, 317, 318, 320, 323, 324, 325, 370, 513)
+    f"https://github.com/redact-secret/redact-secret/issues/{n}" for n in (316, 317, 318, 320, 323, 324, 325, 370, 513)
 ]
 
 
 def fixture(id_: str, detector: str, *, kind: str, contexts: list[str] | None = None) -> dict:
     expected = (
-        [{"detector": detector, "type": f"{detector}_type", "confidence": "high", "specificity": "provider", "start": 0, "end": 1}]
+        [
+            {
+                "detector": detector,
+                "type": f"{detector}_type",
+                "confidence": "high",
+                "specificity": "provider",
+                "start": 0,
+                "end": 1,
+            }
+        ]
         if kind == "positive"
         else []
     )
@@ -88,7 +96,9 @@ class BuildDetectorRowTests(unittest.TestCase):
 
     def test_negative_fixture_with_non_empty_expected_is_rejected(self) -> None:
         broken = fixture("widget-negative-a", "widget", kind="negative")
-        broken["expected"] = [{"detector": "widget", "type": "x", "confidence": "high", "specificity": "provider", "start": 0, "end": 1}]
+        broken["expected"] = [
+            {"detector": "widget", "type": "x", "confidence": "high", "specificity": "provider", "start": 0, "end": 1}
+        ]
         with self.assertRaises(ValueError):
             GEN.build_detector_row("widget", [broken])
 

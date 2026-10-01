@@ -281,11 +281,7 @@ def check_pinned_version(manifest: dict, product_version: str) -> list[str]:
 
 def collect_benchmark_commits(ledger: dict) -> list[str]:
     """Every distinct benchmarkCommit named in the ledger, deduplicated and sorted."""
-    commits = {
-        record["benchmarkCommit"]
-        for record in ledger.get("records", [])
-        if record.get("benchmarkCommit")
-    }
+    commits = {record["benchmarkCommit"] for record in ledger.get("records", []) if record.get("benchmarkCommit")}
     return sorted(commits)
 
 
@@ -316,8 +312,7 @@ def check_ancestry(
     source_revision = manifest.get("pins", {}).get("sourceRevision", "<unknown>")
     if not source_revision_is_ancestor:
         findings.errors.append(
-            f"pins.sourceRevision ({source_revision}) is not an ancestor of this repository's "
-            f"{PRODUCT_BRANCH}"
+            f"pins.sourceRevision ({source_revision}) is not an ancestor of this repository's {PRODUCT_BRANCH}"
         )
     if detectors_changed_since_source_revision:
         findings.warnings.append(
@@ -418,9 +413,7 @@ def check_vendored_file_drift(
 def check_schema_drift(local_content: str, live_content: str, *, live_source: str) -> list[str]:
     """Check 5: the vendored support-matrix schema must be byte-identical to
     redact-secret-benchmarks' own current copy."""
-    return check_vendored_file_drift(
-        SUPPORT_MATRIX_SCHEMA_PATH, local_content, live_content, live_source=live_source
-    )
+    return check_vendored_file_drift(SUPPORT_MATRIX_SCHEMA_PATH, local_content, live_content, live_source=live_source)
 
 
 def check_manifest_provenance(
@@ -482,20 +475,14 @@ def resolve_ancestry_facts(root: Path, manifest: dict, ledger: dict) -> dict:
     }
 
 
-def resolve_manifest_provenance_facts(
-    root: Path, manifest: dict, pinned_commit: str, benchmark_branch: str
-) -> dict:
+def resolve_manifest_provenance_facts(root: Path, manifest: dict, pinned_commit: str, benchmark_branch: str) -> dict:
     revision = manifest["revision"]
     is_ancestor = gh_compare_is_ancestor(BENCHMARKS_REPO, revision, pinned_commit)
-    has_manifest = (
-        gh_path_exists(BENCHMARKS_REPO, revision, BENCHMARKS_MANIFEST_PATH) if is_ancestor else False
-    )
+    has_manifest = gh_path_exists(BENCHMARKS_REPO, revision, BENCHMARKS_MANIFEST_PATH) if is_ancestor else False
     return {
         "pinned_commit": pinned_commit,
         "benchmark_branch": benchmark_branch,
-        "pinned_commit_is_ancestor": gh_compare_is_ancestor(
-            BENCHMARKS_REPO, pinned_commit, benchmark_branch
-        ),
+        "pinned_commit_is_ancestor": gh_compare_is_ancestor(BENCHMARKS_REPO, pinned_commit, benchmark_branch),
         "revision_is_ancestor": is_ancestor,
         "revision_has_manifest": has_manifest,
         "local_content": (root / MANIFEST_PATH).read_text(encoding="utf-8"),
@@ -583,8 +570,7 @@ def main(argv: list[str] | None = None) -> int:
         warnings += findings.warnings
 
         live_source = (
-            f"{BENCHMARKS_REPO}@{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF}:"
-            f"{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH}"
+            f"{BENCHMARKS_REPO}@{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF}:{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH}"
         )
         local_schema = (root / SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8")
         live_schema = gh_fetch_file(
@@ -596,9 +582,7 @@ def main(argv: list[str] | None = None) -> int:
 
         errors += check_manifest_provenance(
             manifest,
-            **resolve_manifest_provenance_facts(
-                root, manifest, pinned_commit, args.benchmark_branch
-            ),
+            **resolve_manifest_provenance_facts(root, manifest, pinned_commit, args.benchmark_branch),
         )
 
     for warning in warnings:

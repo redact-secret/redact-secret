@@ -33,9 +33,7 @@ export function defaultCliBinaryPath() {
 export function resolveCliBinary(explicitPath) {
   const binary = explicitPath === undefined ? defaultCliBinaryPath() : resolve(REPO_ROOT, explicitPath);
   if (!existsSync(binary)) {
-    throw new Error(
-      `${binary}: missing; build it first with \`cargo build --release -p redact-secret-cli\``,
-    );
+    throw new Error(`${binary}: missing; build it first with \`cargo build --release -p redact-secret-cli\``);
   }
   return binary;
 }
@@ -105,7 +103,9 @@ export function scanStdinJson(invoke, stdinBuffer) {
     throw new Error(`redact-secret reported an unexpected range unit: ${report.rangeUnit}`);
   }
   if (!Array.isArray(report.failures) || report.failures.length > 0) {
-    const codes = Array.isArray(report.failures) ? report.failures.map((failure) => failure.code).join(", ") : "unknown";
+    const codes = Array.isArray(report.failures)
+      ? report.failures.map((failure) => failure.code).join(", ")
+      : "unknown";
     throw new Error(`redact-secret reported source failure(s) before completing: ${codes}`);
   }
   if (!Array.isArray(report.sources) || report.sources.length !== 1) {

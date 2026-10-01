@@ -100,7 +100,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.check:
         if new_text != doc_text:
-            print(f"error: {args.doc} detector block drifted from {args.inventory}; regenerate with {REGENERATE}", file=sys.stderr)
+            print(
+                f"error: {args.doc} detector block drifted from {args.inventory}; regenerate with {REGENERATE}",
+                file=sys.stderr,
+            )
             return 1
         return 0
 

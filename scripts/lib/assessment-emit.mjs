@@ -7,9 +7,8 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-
-import { loadTsModule } from "./load-ts-module.mjs";
 import { writeJsonResult, writeMarkdownReport, writeMismatches } from "./assessment-output.mjs";
+import { loadTsModule } from "./load-ts-module.mjs";
 
 const SCRIPTS_LIB_DIR = dirname(fileURLToPath(import.meta.url));
 const ASSESSMENT_DIR = join(SCRIPTS_LIB_DIR, "..", "..", "assessment");

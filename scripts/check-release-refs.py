@@ -16,7 +16,14 @@ import sys
 from pathlib import Path
 
 RELEASE_WORKFLOW = Path(".github") / "workflows" / "release.yml"
-RELEASE_JOBS = ("publish", "publish-crates", "publish-pypi", "publish-native-dependencies", "publish-wasm-dependency", "tag-release")
+RELEASE_JOBS = (
+    "publish",
+    "publish-crates",
+    "publish-pypi",
+    "publish-native-dependencies",
+    "publish-wasm-dependency",
+    "tag-release",
+)
 
 RECONCILE_WORKFLOW = Path(".github") / "workflows" / "reconcile-release.yml"
 RECONCILE_JOBS = ("reconcile", "tag-reconciled-release")
@@ -66,9 +73,7 @@ def _check_workflow(root: Path, workflow: Path, jobs: tuple[str, ...]) -> list[s
             errors.append(f"{workflow.as_posix()}: missing job {job_name!r}")
             continue
         if not requires_main(body):
-            errors.append(
-                f"{workflow.as_posix()}: job {job_name!r} does not require main"
-            )
+            errors.append(f"{workflow.as_posix()}: job {job_name!r} does not require main")
         if CANDIDATE_CHECK not in body:
             errors.append(f"{workflow.as_posix()}: job {job_name!r} lacks candidate version validation")
     return errors

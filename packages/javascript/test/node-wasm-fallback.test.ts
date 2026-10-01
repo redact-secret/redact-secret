@@ -17,22 +17,16 @@ import { loadNativeBinding, loadWasmFallback } from "../src/runtime/node.js";
  */
 describe("Node WebAssembly fallback: unavailable artifact", () => {
   it("fails with INITIALIZATION_FAILED, not a raw import error, when the wasm package cannot be resolved", async () => {
-    await expect(loadWasmFallback("full")).rejects.toThrowError(
-      new SecretScanError("INITIALIZATION_FAILED"),
-    );
+    await expect(loadWasmFallback("full")).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
   });
 
   it("fails the same way for the common profile", async () => {
-    await expect(loadWasmFallback("common")).rejects.toThrowError(
-      new SecretScanError("INITIALIZATION_FAILED"),
-    );
+    await expect(loadWasmFallback("common")).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
   });
 
   it("fails the same way for each profile's pii artifact (#937)", async () => {
     for (const profile of ["full", "common"] as const) {
-      await expect(loadWasmFallback(profile, true)).rejects.toThrowError(
-        new SecretScanError("INITIALIZATION_FAILED"),
-      );
+      await expect(loadWasmFallback(profile, true)).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
     }
   });
 
@@ -43,9 +37,7 @@ describe("Node WebAssembly fallback: unavailable artifact", () => {
     // outcome for: it must still fail cleanly, not throw a different error
     // or hang.
     for (const pii of [false, true]) {
-      await expect(loadNativeBinding({ pii })).rejects.toThrowError(
-        new SecretScanError("INITIALIZATION_FAILED"),
-      );
+      await expect(loadNativeBinding({ pii })).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
     }
   });
 });

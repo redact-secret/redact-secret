@@ -39,9 +39,7 @@ OWNER = "redact-secret"
 REPOS = ("redact-secret", "redact-secret-benchmarks")
 DEFAULT_LOCAL_REPO = f"{OWNER}/redact-secret"
 
-LINK = re.compile(
-    r"https://github\.com/" + OWNER + r"/([A-Za-z0-9._-]+)/blob/([^/\s)>\]`\"'#?]+)/([^\s)>\]`\"'#?\\]+)"
-)
+LINK = re.compile(r"https://github\.com/" + OWNER + r"/([A-Za-z0-9._-]+)/blob/([^/\s)>\]`\"'#?]+)/([^\s)>\]`\"'#?\\]+)")
 SHA = re.compile(r"[0-9a-f]{40}")
 RELEASE_TAG = re.compile(r"v\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?")
 PLACEHOLDER = re.compile(r"[{}<>*$]")
@@ -80,10 +78,14 @@ EXCLUDED_PREFIXES = ("scripts/tests/",)
 
 
 def tracked_files(root: Path) -> list[Path]:
-    out = subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z"], capture_output=True, check=True
-    ).stdout.decode("utf-8")
-    return [root / name for name in out.split("\0") if name and not name.startswith(EXCLUDED_PREFIXES) and (root / name).is_file()]
+    out = subprocess.run(["git", "-C", str(root), "ls-files", "-z"], capture_output=True, check=True).stdout.decode(
+        "utf-8"
+    )
+    return [
+        root / name
+        for name in out.split("\0")
+        if name and not name.startswith(EXCLUDED_PREFIXES) and (root / name).is_file()
+    ]
 
 
 def walk_files(directory: Path) -> list[Path]:
@@ -157,7 +159,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("root", nargs="?", default=Path.cwd(), type=Path)
     parser.add_argument("--local-repo", default=DEFAULT_LOCAL_REPO, help="OWNER/NAME of the repository at ROOT")
-    parser.add_argument("--scan-dir", type=Path, help="scan every file under this directory (e.g. a wiki checkout) instead of git-tracked files")
+    parser.add_argument(
+        "--scan-dir",
+        type=Path,
+        help="scan every file under this directory (e.g. a wiki checkout) instead of git-tracked files",
+    )
     args = parser.parse_args(argv)
     root = args.root.resolve()
     if args.scan_dir:

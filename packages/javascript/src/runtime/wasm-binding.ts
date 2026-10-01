@@ -27,11 +27,7 @@ import {
   type NativeIncrementalResult,
   type NativePolicyCallback,
 } from "../native.js";
-import type {
-  IncrementalSanitizerState,
-  PlaceholderContext,
-  PolicyContext,
-} from "../types.js";
+import type { IncrementalSanitizerState, PlaceholderContext, PolicyContext } from "../types.js";
 
 /** One opaque finding handle, as `scan`/`redact`/`scanAndRedact` return it. */
 export interface WasmFinding {
@@ -81,15 +77,9 @@ export interface WasmFindingMetadata extends WasmDetectedFindingMetadata {
   readonly action: string;
 }
 
-type WasmPolicyCallback = (
-  finding: WasmDetectedFindingMetadata,
-  context: PolicyContext,
-) => string;
+type WasmPolicyCallback = (finding: WasmDetectedFindingMetadata, context: PolicyContext) => string;
 
-type WasmFormatterCallback = (
-  finding: WasmFindingMetadata,
-  context: PlaceholderContext,
-) => string;
+type WasmFormatterCallback = (finding: WasmFindingMetadata, context: PlaceholderContext) => string;
 
 /** The position information an incremental policy callback receives. */
 export interface WasmIncrementalPolicyContext {
@@ -132,9 +122,7 @@ export interface WasmModule {
    * `tsconfig.json` deliberately excludes `dom`, so no runtime file's
    * type-checking depends on browser-only globals.
    */
-  default(source?: {
-    module_or_path: Uint8Array | object;
-  }): Promise<unknown>;
+  default(source?: { module_or_path: Uint8Array | object }): Promise<unknown>;
   version(): string;
   profile(): string;
   initialize(pii: readonly string[]): void;
@@ -189,9 +177,7 @@ const REQUIRED_WASM_EXPORTS = [
 ] as const;
 
 /** Throws `INITIALIZATION_FAILED` unless every required export is present. */
-export function assertWasmModuleShape(
-  module: Partial<WasmModule>,
-): asserts module is WasmModule {
+export function assertWasmModuleShape(module: Partial<WasmModule>): asserts module is WasmModule {
   for (const name of REQUIRED_WASM_EXPORTS) {
     if (typeof module[name] !== "function") {
       throw new SecretScanError("INITIALIZATION_FAILED");
@@ -230,9 +216,7 @@ function toWasmFinding(finding: NativeFinding): WasmFinding {
  * actually invoked with, so a callback crossing this boundary sees the same
  * numeric `start`/`end` fields it sees on Node, matching `types.ts`.
  */
-function toNativeDetectedFinding(
-  finding: WasmDetectedFindingMetadata,
-): NativeDetectedFinding {
+function toNativeDetectedFinding(finding: WasmDetectedFindingMetadata): NativeDetectedFinding {
   const { start, end } = finding.range;
   return Object.freeze({
     id: finding.id,
@@ -246,9 +230,7 @@ function toNativeDetectedFinding(
 }
 
 /** As {@link toNativeDetectedFinding}, plus the `action` a formatter sees. */
-function toNativeFormatterMetadata(
-  finding: WasmFindingMetadata,
-): NativeFinding {
+function toNativeFormatterMetadata(finding: WasmFindingMetadata): NativeFinding {
   const { start, end } = finding.range;
   return Object.freeze({
     id: finding.id,
@@ -262,33 +244,24 @@ function toNativeFormatterMetadata(
   });
 }
 
-function toWasmPolicyCallback(
-  policy: NativePolicyCallback | undefined,
-): WasmPolicyCallback | undefined {
+function toWasmPolicyCallback(policy: NativePolicyCallback | undefined): WasmPolicyCallback | undefined {
   if (policy === undefined) return undefined;
-  return (finding, context) =>
-    policy(toNativeDetectedFinding(finding), context);
+  return (finding, context) => policy(toNativeDetectedFinding(finding), context);
 }
 
-function toWasmFormatterCallback(
-  formatter: NativeFormatterCallback | undefined,
-): WasmFormatterCallback | undefined {
+function toWasmFormatterCallback(formatter: NativeFormatterCallback | undefined): WasmFormatterCallback | undefined {
   if (formatter === undefined) return undefined;
-  return (finding, context) =>
-    formatter(toNativeFormatterMetadata(finding), context);
+  return (finding, context) => formatter(toNativeFormatterMetadata(finding), context);
 }
 
 function toWasmIncrementalPolicyCallback(
   policy: NativeIncrementalPolicyCallback | undefined,
 ): WasmIncrementalPolicyCallback | undefined {
   if (policy === undefined) return undefined;
-  return (finding, context) =>
-    policy(toNativeDetectedFinding(finding), context);
+  return (finding, context) => policy(toNativeDetectedFinding(finding), context);
 }
 
-function toNativeIncrementalResult(
-  result: WasmIncrementalResult,
-): NativeIncrementalResult {
+function toNativeIncrementalResult(result: WasmIncrementalResult): NativeIncrementalResult {
   try {
     return {
       text: result.takeText(),
@@ -319,13 +292,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
     piiActivation: () => wasm.piiActivation(),
     scan: (input, policy, limits, ruleset) =>
       wasm
-        .scan(
-          input,
-          toWasmPolicyCallback(policy),
-          limits?.maxInputBytes,
-          limits?.maxFindings,
-          ruleset,
-        )
+        .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset)
         .map(toNativeFinding),
     redact: (input, findings, formatter, limits) =>
       wasm.redact(

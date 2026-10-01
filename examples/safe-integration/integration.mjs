@@ -30,17 +30,15 @@ export const serverPolicy = Object.freeze({
 });
 
 function safeFindings(findings) {
-  return findings.map(
-    ({ id, type, detector, confidence, action, start, end }) => ({
-      id,
-      type,
-      detector,
-      confidence,
-      action,
-      start,
-      end,
-    }),
-  );
+  return findings.map(({ id, type, detector, confidence, action, start, end }) => ({
+    id,
+    type,
+    detector,
+    confidence,
+    action,
+    start,
+    end,
+  }));
 }
 
 function checkedLimits(overrides = {}) {
@@ -86,12 +84,7 @@ export function prepareBrowserSubmissionWith(scanAndRedact, content) {
  * Authoritative server boundary. `forward` is reached only with scanned,
  * policy-approved text; `record` receives safe event metadata only.
  */
-export function createServerHandlerWith({
-  scanAndRedact,
-  forward,
-  record = () => {},
-  limits: limitOverrides,
-}) {
+export function createServerHandlerWith({ scanAndRedact, forward, record = () => {}, limits: limitOverrides }) {
   if (typeof scanAndRedact !== "function" || typeof forward !== "function") {
     throw new TypeError("scanAndRedact and forward must be functions");
   }

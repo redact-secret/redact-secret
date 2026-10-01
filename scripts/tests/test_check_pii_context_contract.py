@@ -59,7 +59,10 @@ class RepositoryContract(unittest.TestCase):
                 for association in fixture["expectedAssociations"]
                 if association["matches"]
             }
-            self.assertEqual(effects, {"positive-evidence", "negative-evidence", "neutral-evidence", "not-established-without-identity"})
+            self.assertEqual(
+                effects,
+                {"positive-evidence", "negative-evidence", "neutral-evidence", "not-established-without-identity"},
+            )
             self.assertTrue(
                 all(
                     match in entries
@@ -154,9 +157,7 @@ class SchemaAndSemantics(unittest.TestCase):
             "phone",
         )
         natural = dict(occurrence, entry={"kind": "natural-language-label", "domains": ["phone"]})
-        self.assertIsNone(
-            CHECK.associate_occurrence(natural, view, {"email": 4, "phone": 11}, candidates)
-        )
+        self.assertIsNone(CHECK.associate_occurrence(natural, view, {"email": 4, "phone": 11}, candidates))
 
     def test_korean_ascii_case_folding_is_part_of_the_versioned_schema(self) -> None:
         changed = copy.deepcopy(CONTRACT)

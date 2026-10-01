@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-audits-index.py"
 SPEC = importlib.util.spec_from_file_location("check_audits_index", SCRIPT)
 assert SPEC and SPEC.loader
@@ -29,11 +28,7 @@ class CheckAuditsIndexTest(unittest.TestCase):
     def test_a_fully_indexed_tree_passes(self) -> None:
         self.write("beta4-release-readiness-review.md", "# Beta.4\n")
         self.write("evidence/144/README.md", "# 144\n")
-        index = (
-            "# Audit archive\n\n"
-            "[Beta.4](beta4-release-readiness-review.md)\n\n"
-            "[#144](evidence/144/README.md)\n"
-        )
+        index = "# Audit archive\n\n[Beta.4](beta4-release-readiness-review.md)\n\n[#144](evidence/144/README.md)\n"
         self.assertEqual(CHECK.validate(self.audits_dir, index), [])
 
     def test_an_unindexed_standalone_doc_is_rejected(self) -> None:

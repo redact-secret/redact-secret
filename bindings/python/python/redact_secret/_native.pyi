@@ -6,8 +6,8 @@ are re-exported there.
 
 from __future__ import annotations
 
-from types import TracebackType
 from collections.abc import Sequence
+from types import TracebackType
 from typing import Callable
 
 # ---------------------------------------------------------------------
@@ -87,10 +87,13 @@ class InvalidRulesetError(SecretScanError):
 
 class PiiSelectorInvalidError(SecretScanError):
     code: str
+
 class PiiSelectorUnsupportedError(SecretScanError):
     code: str
+
 class PiiSelectorUnavailableError(SecretScanError):
     code: str
+
 class PiiActivationConflictError(SecretScanError):
     code: str
 
@@ -180,9 +183,7 @@ class IncrementalLimits:
         max_multiline_bytes: int,
     ) -> None: ...
     @staticmethod
-    def minimum_buffered_bytes(
-        max_token_bytes: int, max_multiline_bytes: int
-    ) -> int:
+    def minimum_buffered_bytes(max_token_bytes: int, max_multiline_bytes: int) -> int:
         """The smallest ``max_buffered_bytes`` this class accepts alongside
         these construct limits."""
 
@@ -260,12 +261,6 @@ def scan_and_redact(
     ruleset: bytes | bytearray | str | None = None,
 ) -> ScanResult: ...
 def default_policy(finding: DetectedFinding, context: PolicyContext) -> str: ...
-def default_placeholder_formatter(
-    finding: Finding, context: PlaceholderContext
-) -> str: ...
-def typed_placeholder_formatter(
-    finding: Finding, context: PlaceholderContext
-) -> str: ...
-def default_incremental_policy(
-    finding: DetectedFinding, context: IncrementalPolicyContext
-) -> str: ...
+def default_placeholder_formatter(finding: Finding, context: PlaceholderContext) -> str: ...
+def typed_placeholder_formatter(finding: Finding, context: PlaceholderContext) -> str: ...
+def default_incremental_policy(finding: DetectedFinding, context: IncrementalPolicyContext) -> str: ...

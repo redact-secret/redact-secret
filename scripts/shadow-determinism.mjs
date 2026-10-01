@@ -106,12 +106,8 @@ function fill(unit, bytes) {
  */
 export function hostileValues() {
   const random = lcgValue(0x772, MAX_CONTEXT_VALUE_BYTES);
-  const astral = Array.from({ length: MAX_ANALYSED_CHARS }, (_, i) =>
-    String.fromCodePoint(0x20000 + i),
-  ).join("");
-  const invisible = Array.from(fill(BLOCK_32, 3200), (ch, i) =>
-    i % 4 === 3 ? `${ch}​` : ch,
-  ).join("");
+  const astral = Array.from({ length: MAX_ANALYSED_CHARS }, (_, i) => String.fromCodePoint(0x20000 + i)).join("");
+  const invisible = Array.from(fill(BLOCK_32, 3200), (ch, i) => (i % 4 === 3 ? `${ch}​` : ch)).join("");
   return [
     ["period-32", fill(BLOCK_32, MAX_CONTEXT_VALUE_BYTES)],
     ["period-33", fill(`${BLOCK_32}X`, MAX_CONTEXT_VALUE_BYTES)],
@@ -140,7 +136,7 @@ const CONTEXTS = [
 
 /** Two lowercase letters naming `i`: `generic-token` rejects digit suffixes. */
 function letters(i) {
-  return String.fromCharCode(97 + Math.floor(i / 26) % 26, 97 + (i % 26));
+  return String.fromCharCode(97 + (Math.floor(i / 26) % 26), 97 + (i % 26));
 }
 
 /** The generated hostile battery, as `[id, text]` pairs. */
@@ -153,12 +149,15 @@ export function hostileBattery() {
   }
   // Many maximum-length contextual candidates in one input.
   const many = [];
-  for (let i = 0; i < 64; i += 1) many.push(`service_${letters(i)}_api_key=${lcgValue(i + 1, MAX_CONTEXT_VALUE_BYTES)}`);
+  for (let i = 0; i < 64; i += 1)
+    many.push(`service_${letters(i)}_api_key=${lcgValue(i + 1, MAX_CONTEXT_VALUE_BYTES)}`);
   cases.push(["hostile/many-max-length", `${many.join("\n")}\n`]);
   // Many short periodic candidates in one input.
   const periodic = [];
   for (let i = 0; i < 1024; i += 1) {
-    periodic.push(`app_${letters(i)}_secret = ${fill(BLOCK_32.slice(i % 16) + BLOCK_32.slice(0, i % 16), 32 + (i % 97))}`);
+    periodic.push(
+      `app_${letters(i)}_secret = ${fill(BLOCK_32.slice(i % 16) + BLOCK_32.slice(0, i % 16), 32 + (i % 97))}`,
+    );
   }
   cases.push(["hostile/many-periodic", `${periodic.join("\n")}\n`]);
   return cases;

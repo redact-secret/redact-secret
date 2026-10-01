@@ -8,26 +8,17 @@
  * or a matched value; both read `assessment/fixtures/accuracy-corpus.json`
  * through this one path.
  */
-import { createHash } from "node:crypto";
+
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { release } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-export const ACCURACY_CORPUS_PATH = join(
-  REPO_ROOT,
-  "assessment",
-  "fixtures",
-  "accuracy-corpus.json",
-);
-export const WORKLOAD_PROFILES_PATH = join(
-  REPO_ROOT,
-  "assessment",
-  "fixtures",
-  "workload-profiles.json",
-);
+export const ACCURACY_CORPUS_PATH = join(REPO_ROOT, "assessment", "fixtures", "accuracy-corpus.json");
+export const WORKLOAD_PROFILES_PATH = join(REPO_ROOT, "assessment", "fixtures", "workload-profiles.json");
 
 export function gitCommit() {
   return execFileSync("git", ["rev-parse", "HEAD"], {
@@ -79,6 +70,9 @@ export function resolvedNodeArtifact(kind) {
 /** The one resolved artifact every sample of a run agrees on; throws when samples differ or none exist. */
 export function agreedResolvedArtifact(kinds) {
   const resolved = new Set(kinds.map(resolvedNodeArtifact));
-  if (resolved.size !== 1) throw new Error(`samples resolved ${resolved.size === 0 ? "no" : [...resolved].join(" and ")} artifact(s); expected exactly one`);
+  if (resolved.size !== 1)
+    throw new Error(
+      `samples resolved ${resolved.size === 0 ? "no" : [...resolved].join(" and ")} artifact(s); expected exactly one`,
+    );
   return [...resolved][0];
 }

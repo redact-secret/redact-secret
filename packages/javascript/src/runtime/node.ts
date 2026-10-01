@@ -29,11 +29,7 @@ import type {
   NativeScanAndRedactResult,
   NativeWholeInputLimits,
 } from "../native.js";
-import {
-  assertWasmModuleShape,
-  createBindingFromWasmModule,
-  type WasmModule,
-} from "./wasm-binding.js";
+import { assertWasmModuleShape, createBindingFromWasmModule, type WasmModule } from "./wasm-binding.js";
 
 /**
  * The addon's own exported shape. `scanAndRedact` names its text `redacted`,
@@ -70,9 +66,7 @@ interface NodeAddon {
     limits?: NativeWholeInputLimits,
     ruleset?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
-  createIncrementalSanitizer(
-    options: NativeIncrementalOptions,
-  ): NativeIncrementalSanitizer;
+  createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
 }
 
 /**
@@ -107,9 +101,7 @@ interface CommonNodeAddon {
     limits?: NativeWholeInputLimits,
     ruleset?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
-  createIncrementalSanitizerCommon(
-    options: NativeIncrementalOptions,
-  ): NativeIncrementalSanitizer;
+  createIncrementalSanitizerCommon(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
   profileCommon(): string;
 }
 
@@ -125,9 +117,7 @@ interface CommonNodeAddon {
  * covers both the glibc and musl triples `napi.targets` builds and
  * qualifies (`decision-publish-musl-node-addons`).
  */
-const PLATFORM_PACKAGES: Readonly<
-  Partial<Record<string, Readonly<Partial<Record<string, string>>>>>
-> = {
+const PLATFORM_PACKAGES: Readonly<Partial<Record<string, Readonly<Partial<Record<string, string>>>>>> = {
   darwin: {
     arm64: "@redact-secret/node-darwin-arm64",
     x64: "@redact-secret/node-darwin-x64",
@@ -143,9 +133,7 @@ const PLATFORM_PACKAGES: Readonly<
  * since Linux is the one platform this package publishes two addons per
  * architecture for (`decision-publish-musl-node-addons`).
  */
-const LINUX_PLATFORM_PACKAGES: Readonly<
-  Partial<Record<string, Readonly<Record<"gnu" | "musl", string>>>>
-> = {
+const LINUX_PLATFORM_PACKAGES: Readonly<Partial<Record<string, Readonly<Record<"gnu" | "musl", string>>>>> = {
   arm64: {
     gnu: "@redact-secret/node-linux-arm64-gnu",
     musl: "@redact-secret/node-linux-arm64-musl",
@@ -224,10 +212,7 @@ function requireAddon(): Partial<NodeAddon> & Partial<CommonNodeAddon> {
  * {@link loadAddon} and {@link loadCommonAddon} apply to their own required
  * export lists.
  */
-function requireExports<T>(
-  addon: Partial<NodeAddon> & Partial<CommonNodeAddon>,
-  names: readonly (keyof T)[],
-): T {
+function requireExports<T>(addon: Partial<NodeAddon> & Partial<CommonNodeAddon>, names: readonly (keyof T)[]): T {
   for (const name of names) {
     if (typeof (addon as Record<string, unknown>)[name as string] !== "function") {
       throw new SecretScanError("INITIALIZATION_FAILED");
@@ -291,9 +276,7 @@ interface ProfiledAddonMethods {
     limits?: NativeWholeInputLimits,
     ruleset?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
-  createIncrementalSanitizer(
-    options: NativeIncrementalOptions,
-  ): NativeIncrementalSanitizer;
+  createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
 }
 
 /**
@@ -302,10 +285,7 @@ interface ProfiledAddonMethods {
  * itself for {@link createBindingFromAddon}, or a `CommonNodeAddon` view
  * onto its `*Common` exports for {@link createBindingFromCommonAddon}.
  */
-function buildBinding(
-  addon: Pick<NodeAddon, "version" | "redact">,
-  methods: ProfiledAddonMethods,
-): NativeBinding {
+function buildBinding(addon: Pick<NodeAddon, "version" | "redact">, methods: ProfiledAddonMethods): NativeBinding {
   return {
     version: () => addon.version(),
     profile: () => methods.profile(),
@@ -314,28 +294,13 @@ function buildBinding(
       methods.initialize(pii);
     },
     piiActivation: () => methods.piiActivation(),
-    scan: (input, policy, limits, ruleset) =>
-      methods.scan(input, policy, limits, ruleset),
-    redact: (input, findings, formatter, limits) =>
-      addon.redact(input, findings, formatter, limits),
-    scanAndRedact: (
-      input,
-      policy,
-      formatter,
-      limits,
-      ruleset,
-    ): NativeScanAndRedactResult => {
-      const result = methods.scanAndRedact(
-        input,
-        policy,
-        formatter,
-        limits,
-        ruleset,
-      );
+    scan: (input, policy, limits, ruleset) => methods.scan(input, policy, limits, ruleset),
+    redact: (input, findings, formatter, limits) => addon.redact(input, findings, formatter, limits),
+    scanAndRedact: (input, policy, formatter, limits, ruleset): NativeScanAndRedactResult => {
+      const result = methods.scanAndRedact(input, policy, formatter, limits, ruleset);
       return { text: result.redacted, findings: result.findings };
     },
-    createIncrementalSanitizer: (options) =>
-      methods.createIncrementalSanitizer(options),
+    createIncrementalSanitizer: (options) => methods.createIncrementalSanitizer(options),
   };
 }
 
@@ -353,13 +318,12 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
       if (addon.initializePii !== undefined) addon.initializePii(pii);
       else addon.initialize();
     },
-    piiActivation: () => addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
-    scan: (input, policy, limits, ruleset) =>
-      addon.scan(input, policy, limits, ruleset),
+    piiActivation: () =>
+      addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
+    scan: (input, policy, limits, ruleset) => addon.scan(input, policy, limits, ruleset),
     scanAndRedact: (input, policy, formatter, limits, ruleset) =>
       addon.scanAndRedact(input, policy, formatter, limits, ruleset),
-    createIncrementalSanitizer: (options) =>
-      addon.createIncrementalSanitizer(options),
+    createIncrementalSanitizer: (options) => addon.createIncrementalSanitizer(options),
   });
 }
 
@@ -372,22 +336,19 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
  * Exported so a test double can exercise this exact normalization without
  * loading the real addon.
  */
-export function createBindingFromCommonAddon(
-  addon: CommonNodeAddon,
-): NativeBinding {
+export function createBindingFromCommonAddon(addon: CommonNodeAddon): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profileCommon(),
     initialize: (pii) => {
       if (addon.initializeCommonPii !== undefined) addon.initializeCommonPii(pii);
       else addon.initializeCommon();
     },
-    piiActivation: () => addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
-    scan: (input, policy, limits, ruleset) =>
-      addon.scanCommon(input, policy, limits, ruleset),
+    piiActivation: () =>
+      addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
+    scan: (input, policy, limits, ruleset) => addon.scanCommon(input, policy, limits, ruleset),
     scanAndRedact: (input, policy, formatter, limits, ruleset) =>
       addon.scanAndRedactCommon(input, policy, formatter, limits, ruleset),
-    createIncrementalSanitizer: (options) =>
-      addon.createIncrementalSanitizerCommon(options),
+    createIncrementalSanitizer: (options) => addon.createIncrementalSanitizerCommon(options),
   });
 }
 
@@ -403,10 +364,7 @@ export function createBindingFromCommonAddon(
 const WASM_PACKAGE = "@redact-secret/wasm";
 type WasmFallbackArtifact = Readonly<{ specifier: string; binaryName: string }>;
 const WASM_FALLBACK: Readonly<
-  Record<
-    "full" | "common",
-    Readonly<{ default: WasmFallbackArtifact; pii: WasmFallbackArtifact }>
-  >
+  Record<"full" | "common", Readonly<{ default: WasmFallbackArtifact; pii: WasmFallbackArtifact }>>
 > = {
   full: {
     default: { specifier: WASM_PACKAGE, binaryName: "redact_secret_wasm_bg.wasm" },
@@ -469,10 +427,7 @@ function readWasmBytes(binaryName: string): Uint8Array {
  * Exported so a test double can force this path the way `loadAddon` is
  * forced, without depending on the real artifact being present.
  */
-export async function loadWasmFallback(
-  profile: "full" | "common",
-  pii = false,
-): Promise<NativeBinding> {
+export async function loadWasmFallback(profile: "full" | "common", pii = false): Promise<NativeBinding> {
   const { specifier, binaryName } = WASM_FALLBACK[profile][pii ? "pii" : "default"];
   let wasmModule: Partial<WasmModule>;
   try {

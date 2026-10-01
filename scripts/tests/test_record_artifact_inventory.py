@@ -10,7 +10,6 @@ import unittest
 import unittest.mock
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "record-artifact-inventory.py"
 SPEC = importlib.util.spec_from_file_location("record_artifact_inventory", SCRIPT)
 assert SPEC and SPEC.loader
@@ -195,20 +194,14 @@ class Artifacts:
             ],
             "installed-javascript-node-20": ["installed-javascript-node-20.json"],
             "installed-javascript-node-22": ["installed-javascript-node-22.json"],
-            "installed-javascript-browser-chromium": [
-                "installed-javascript-browser-chromium.json"
-            ],
-            "installed-javascript-browser-webkit": [
-                "installed-javascript-browser-webkit.json"
-            ],
+            "installed-javascript-browser-chromium": ["installed-javascript-browser-chromium.json"],
+            "installed-javascript-browser-webkit": ["installed-javascript-browser-webkit.json"],
             "clean-install-node": ["clean-install-node.json"],
             "clean-install-python": ["clean-install-python.json"],
             "clean-install-browser": ["clean-install-browser.json"],
             "golden-path-node": ["golden-path-node.json"],
         }
-        self.clean_install = {
-            lane: clean_install_report(lane) for lane in RECORD.CLEAN_INSTALL_CHECKS
-        }
+        self.clean_install = {lane: clean_install_report(lane) for lane in RECORD.CLEAN_INSTALL_CHECKS}
         self.golden_path = {lane: golden_path_report(lane) for lane in RECORD.GOLDEN_PATH_CHECKS}
 
     def build(self) -> Path:
@@ -263,9 +256,7 @@ class InventoryTests(unittest.TestCase):
 
     def test_every_file_is_recorded_with_a_family_size_and_digest(self) -> None:
         collected = self.collect()
-        entry = next(
-            item for item in collected if item["file"] == "redact-secret.darwin-arm64.node"
-        )
+        entry = next(item for item in collected if item["file"] == "redact-secret.darwin-arm64.node")
         self.assertEqual(entry["family"], "node-addon")
         self.assertEqual(entry["target"], "aarch64-apple-darwin")
         self.assertEqual(entry["bytes"], len(b"redact-secret.darwin-arm64.node"))
@@ -284,17 +275,13 @@ class InventoryTests(unittest.TestCase):
         def configure(artifacts: Artifacts) -> None:
             del artifacts.files["cli-x86_64-pc-windows-msvc"]
 
-        self.assertEqual(
-            self.errors(configure), ["cli: no artifact for x86_64-pc-windows-msvc"]
-        )
+        self.assertEqual(self.errors(configure), ["cli: no artifact for x86_64-pc-windows-msvc"])
 
     def test_a_missing_wheel_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:
             del artifacts.files["python-wheel-aarch64-apple-darwin"]
 
-        self.assertEqual(
-            self.errors(configure), ["python-wheel: no artifact for aarch64-apple-darwin"]
-        )
+        self.assertEqual(self.errors(configure), ["python-wheel: no artifact for aarch64-apple-darwin"])
 
     def test_a_missing_sdist_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:
@@ -318,22 +305,14 @@ class InventoryTests(unittest.TestCase):
         )
 
     def test_a_common_browser_artifact_is_recorded_with_its_own_family(self) -> None:
-        entry = next(
-            item
-            for item in self.collect()
-            if item["file"] == "redact_secret_wasm_common_bg.wasm"
-        )
+        entry = next(item for item in self.collect() if item["file"] == "redact_secret_wasm_common_bg.wasm")
         self.assertEqual(entry["family"], "browser-common")
         self.assertIsNone(entry["target"])
 
     def test_each_profiles_pii_build_is_recorded_with_its_profile_family(self) -> None:
         # Issue #937: each profile's `pii` build ships in the same upload as
         # its default build, so it is inventoried under the same family.
-        families = {
-            item["file"]: item["family"]
-            for item in self.collect()
-            if item["file"].endswith("_pii_bg.wasm")
-        }
+        families = {item["file"]: item["family"] for item in self.collect() if item["file"].endswith("_pii_bg.wasm")}
         self.assertEqual(
             families,
             {
@@ -346,17 +325,13 @@ class InventoryTests(unittest.TestCase):
         def configure(artifacts: Artifacts) -> None:
             del artifacts.files["wasm-web-common"]
 
-        self.assertEqual(
-            self.errors(configure), ["browser-common: no artifact was produced"]
-        )
+        self.assertEqual(self.errors(configure), ["browser-common: no artifact was produced"])
 
     def test_an_unrecognized_artifact_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:
             artifacts.files["something-else"] = ["file"]
 
-        self.assertEqual(
-            self.errors(configure), ["unrecognized artifact(s): something-else"]
-        )
+        self.assertEqual(self.errors(configure), ["unrecognized artifact(s): something-else"])
 
     def test_shadow_determinism_records_are_not_unrecognized_artifacts(self) -> None:
         def configure(artifacts: Artifacts) -> None:
@@ -365,9 +340,7 @@ class InventoryTests(unittest.TestCase):
             artifacts.files["shadow-determinism-report"] = ["report-full.json", "report-common.json"]
 
         self.assertEqual(self.errors(configure), [])
-        self.assertFalse(
-            any(entry["artifact"].startswith("shadow-determinism-") for entry in self.collect(configure))
-        )
+        self.assertFalse(any(entry["artifact"].startswith("shadow-determinism-") for entry in self.collect(configure)))
 
     def test_the_support_matrix_drift_record_is_not_an_unrecognized_artifact(self) -> None:
         def configure(artifacts: Artifacts) -> None:
@@ -394,21 +367,13 @@ class InventoryTests(unittest.TestCase):
     def test_failed_installed_stream_result_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Artifacts(Path(directory)).build()
-            path = (
-                root
-                / "installed-javascript-browser-webkit"
-                / "installed-javascript-browser-webkit.json"
-            )
+            path = root / "installed-javascript-browser-webkit" / "installed-javascript-browser-webkit.json"
             report = json.loads(path.read_text(encoding="utf-8"))
             report["results"]["stream"] = "failed"
             path.write_text(json.dumps(report), encoding="utf-8")
             results, errors = RECORD.collect_installed_javascript_qualification(root)
-            errors += RECORD.require_installed_javascript_qualification(
-                MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
-            )
-        self.assertEqual(
-            errors, ["installed JavaScript browser webkit: stream did not pass"]
-        )
+            errors += RECORD.require_installed_javascript_qualification(MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION)
+        self.assertEqual(errors, ["installed JavaScript browser webkit: stream did not pass"])
 
     def test_missing_installed_mcp_boundary_result_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -418,9 +383,7 @@ class InventoryTests(unittest.TestCase):
             del report["results"]["mcpBoundary"]
             path.write_text(json.dumps(report), encoding="utf-8")
             results, errors = RECORD.collect_installed_javascript_qualification(root)
-            errors += RECORD.require_installed_javascript_qualification(
-                MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
-            )
+            errors += RECORD.require_installed_javascript_qualification(MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION)
         self.assertEqual(errors, ["installed JavaScript node 22: mcpBoundary did not pass"])
 
     def test_missing_installed_mcp_resources_read_result_fails(self) -> None:
@@ -431,27 +394,19 @@ class InventoryTests(unittest.TestCase):
             del report["results"]["mcpResourcesRead"]
             path.write_text(json.dumps(report), encoding="utf-8")
             results, errors = RECORD.collect_installed_javascript_qualification(root)
-            errors += RECORD.require_installed_javascript_qualification(
-                MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
-            )
+            errors += RECORD.require_installed_javascript_qualification(MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION)
         self.assertEqual(errors, ["installed JavaScript node 22: mcpResourcesRead did not pass"])
 
     def test_missing_installed_incremental_corpus_result_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Artifacts(Path(directory)).build()
-            path = (
-                root
-                / "installed-javascript-node-20"
-                / "installed-javascript-node-20.json"
-            )
+            path = root / "installed-javascript-node-20" / "installed-javascript-node-20.json"
             report = json.loads(path.read_text(encoding="utf-8"))
             del report["results"]["incrementalCorpus"]
             del report["incrementalCorpus"]
             path.write_text(json.dumps(report), encoding="utf-8")
             results, errors = RECORD.collect_installed_javascript_qualification(root)
-            errors += RECORD.require_installed_javascript_qualification(
-                MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
-            )
+            errors += RECORD.require_installed_javascript_qualification(MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION)
         self.assertEqual(
             errors,
             [
@@ -519,9 +474,7 @@ class InventoryTests(unittest.TestCase):
             artifacts.clean_install["node"]["loadedArtifact"] = "wasm"
 
         errors = self.clean_install_errors(registry)
-        self.assertIn(
-            "clean install browser: must qualify candidate artifacts (published=false)", errors
-        )
+        self.assertIn("clean install browser: must qualify candidate artifacts (published=false)", errors)
         self.assertIn("clean install node: did not load the addon artifact", errors)
 
     def golden_path_errors(self, configure=None) -> list[str]:
@@ -593,7 +546,10 @@ class InventoryTests(unittest.TestCase):
             artifacts.golden_path["node"]["adapters"]["packages"][0]["integrity"] = "sha512-" + "A" * 86 + "=="
 
         def old_pin(artifacts: Artifacts) -> None:
-            artifacts.golden_path["node"]["adapters"] = {"repository": "redact-secret/redact-secret-adapters", "commit": "b" * 40}
+            artifacts.golden_path["node"]["adapters"] = {
+                "repository": "redact-secret/redact-secret-adapters",
+                "commit": "b" * 40,
+            }
 
         for configure in (other_version, other_bytes, old_pin):
             self.assertIn(expected, self.golden_path_errors(configure))
@@ -631,19 +587,13 @@ class InventoryTests(unittest.TestCase):
         """On a pull request `GITHUB_SHA` is the synthesized merge commit,
         which no clone can resolve; `SOURCE_COMMIT` carries the head."""
         head, merge = "a" * 40, "b" * 40
-        with unittest.mock.patch.dict(
-            os.environ, {"SOURCE_COMMIT": head, "GITHUB_SHA": merge}, clear=False
-        ):
+        with unittest.mock.patch.dict(os.environ, {"SOURCE_COMMIT": head, "GITHUB_SHA": merge}, clear=False):
             self.assertEqual(RECORD.source_commit(), head)
-        with unittest.mock.patch.dict(
-            os.environ, {"SOURCE_COMMIT": "", "GITHUB_SHA": merge}, clear=False
-        ):
+        with unittest.mock.patch.dict(os.environ, {"SOURCE_COMMIT": "", "GITHUB_SHA": merge}, clear=False):
             self.assertEqual(RECORD.source_commit(), merge)
 
     def test_the_source_commit_falls_back_to_the_checked_out_head(self) -> None:
-        with unittest.mock.patch.dict(
-            os.environ, {"SOURCE_COMMIT": "", "GITHUB_SHA": ""}, clear=False
-        ):
+        with unittest.mock.patch.dict(os.environ, {"SOURCE_COMMIT": "", "GITHUB_SHA": ""}, clear=False):
             commit = RECORD.source_commit()
         self.assertRegex(commit, r"^[0-9a-f]{40}$")
 
@@ -671,9 +621,7 @@ class InventoryTests(unittest.TestCase):
             review["currentPublicApiReview"]["path"],
             "docs/audits/beta12-candidate-public-contract-review.md",
         )
-        self.assertRegex(
-            review["currentPublicApiReview"]["sha256"], r"^[0-9a-f]{64}$"
-        )
+        self.assertRegex(review["currentPublicApiReview"]["sha256"], r"^[0-9a-f]{64}$")
         self.assertEqual(
             review["publicApiReview"]["path"],
             "docs/audits/candidate-public-contract-review.md",
@@ -688,9 +636,7 @@ class InventoryTests(unittest.TestCase):
         registry = record["registryInstallVerification"]
         self.assertEqual(registry["status"], "post-publication-release-workflow")
         self.assertEqual(registry["verifier"], "scripts/verify-registry-install.mjs")
-        self.assertEqual(
-            registry["authorization"], "separate release approval required"
-        )
+        self.assertEqual(registry["authorization"], "separate release approval required")
 
 
 class CratePackageDigestTests(unittest.TestCase):

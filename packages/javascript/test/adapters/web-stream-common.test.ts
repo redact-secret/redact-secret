@@ -13,17 +13,13 @@ import { LIMITS } from "./support.js";
  */
 describe("Web stream adapter (common profile)", () => {
   it("re-exports the identical WebStreamSanitizer class as the full-profile module", async () => {
-    const { WebStreamSanitizer } = await import(
-      "../../src/adapters/web-stream-common.js"
-    );
+    const { WebStreamSanitizer } = await import("../../src/adapters/web-stream-common.js");
 
     expect(WebStreamSanitizer).toBe(FullWebStreamSanitizer);
   });
 
   it("refuses to open a stream before initialize succeeds", async () => {
-    const { createWebStreamSanitizer } = await import(
-      "../../src/adapters/web-stream-common.js"
-    );
+    const { createWebStreamSanitizer } = await import("../../src/adapters/web-stream-common.js");
 
     expect(() => createWebStreamSanitizer({ limits: LIMITS })).toThrowError(
       expect.objectContaining({

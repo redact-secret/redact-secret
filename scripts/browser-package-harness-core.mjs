@@ -88,13 +88,7 @@ function expectedTuples(text, expected) {
 }
 
 function actualTuples(findings) {
-  return findings.map((finding) => [
-    finding.detector,
-    finding.type,
-    finding.confidence,
-    finding.start,
-    finding.end,
-  ]);
+  return findings.map((finding) => [finding.detector, finding.type, finding.confidence, finding.start, finding.end]);
 }
 
 /**
@@ -164,16 +158,7 @@ export async function qualify(fixtures, api) {
     assert(Object.isFrozen(finding), "the package returned a mutable finding");
     assertEqual(
       Object.keys(finding).sort(),
-      [
-        "action",
-        "confidence",
-        "detector",
-        "end",
-        "id",
-        "obfuscation",
-        "start",
-        "type",
-      ],
+      ["action", "confidence", "detector", "end", "id", "obfuscation", "start", "type"],
       "published finding keys",
     );
   });
@@ -208,11 +193,7 @@ export async function qualify(fixtures, api) {
         cursor = finding.end;
       }
       pieces.push(fixture.input.slice(cursor));
-      assertEqual(
-        text,
-        pieces.join(""),
-        `fixture ${fixture.id} did not produce the exact expected redacted output`,
-      );
+      assertEqual(text, pieces.join(""), `fixture ${fixture.id} did not produce the exact expected redacted output`);
     }
   });
 
@@ -256,11 +237,7 @@ export async function qualify(fixtures, api) {
     assertEqual(session.state, "accepting", "a fresh session's state");
 
     let sanitized = "";
-    for (const chunk of [
-      `api_key=${MARKER.slice(0, 10)}`,
-      `${MARKER.slice(10)}\n`,
-      "tail",
-    ]) {
+    for (const chunk of [`api_key=${MARKER.slice(0, 10)}`, `${MARKER.slice(10)}\n`, "tail"]) {
       sanitized += session.append(chunk).text;
     }
     sanitized += session.finalize().text;
@@ -313,10 +290,7 @@ export async function qualify(fixtures, api) {
   };
   const streamEncoder = new TextEncoder();
   const streamFixture = synchronous.find((entry) => entry.expected.length === 1);
-  assert(
-    streamFixture !== undefined,
-    "no single-finding fixture available for the stream adapter checks",
-  );
+  assert(streamFixture !== undefined, "no single-finding fixture available for the stream adapter checks");
 
   function openStreamSession() {
     return createIncrementalSanitizer({ limits: STREAM_LIMITS });
@@ -368,16 +342,10 @@ export async function qualify(fixtures, api) {
   await checkAsync(
     "the Web stream adapter matches the whole-input result at every byte boundary on the real artifact",
     async () => {
-      assert(
-        expectedWrapped.text !== wrapped,
-        "the real artifact left a known secret unredacted",
-      );
+      assert(expectedWrapped.text !== wrapped, "the real artifact left a known secret unredacted");
       const diverged = [];
       for (let boundary = 0; boundary <= wrappedBytes.length; boundary += 1) {
-        const actual = await sanitizeChunks([
-          wrappedBytes.slice(0, boundary),
-          wrappedBytes.slice(boundary),
-        ]);
+        const actual = await sanitizeChunks([wrappedBytes.slice(0, boundary), wrappedBytes.slice(boundary)]);
         if (
           actual.text !== expectedWrapped.text ||
           JSON.stringify(actual.findings) !== JSON.stringify(expectedWrapped.findings)
@@ -395,20 +363,13 @@ export async function qualify(fixtures, api) {
   await checkAsync(
     "the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact",
     async () => {
-      const bomCases = [
-        "\uFEFF",
-        `\uFEFF${FINALIZED}`,
-        `ordinary prefix \uFEFF ${FINALIZED}`,
-      ];
+      const bomCases = ["\uFEFF", `\uFEFF${FINALIZED}`, `ordinary prefix \uFEFF ${FINALIZED}`];
       const diverged = [];
       for (const bomCase of bomCases) {
         const bomBytes = streamEncoder.encode(bomCase);
         const bomExpected = oracle(bomCase);
         for (let boundary = 0; boundary <= bomBytes.length; boundary += 1) {
-          const actual = await sanitizeChunks([
-            bomBytes.slice(0, boundary),
-            bomBytes.slice(boundary),
-          ]);
+          const actual = await sanitizeChunks([bomBytes.slice(0, boundary), bomBytes.slice(boundary)]);
           if (
             actual.text !== bomExpected.text ||
             JSON.stringify(actual.findings) !== JSON.stringify(bomExpected.findings)
@@ -424,21 +385,12 @@ export async function qualify(fixtures, api) {
     },
   );
 
-  await checkAsync(
-    "the Web stream adapter's findings are frozen on the real artifact",
-    async () => {
-      const { findings } = await sanitizeChunks([wrappedBytes]);
-      assert(
-        Object.isFrozen(findings),
-        "the real artifact returned a mutable findings array through the stream adapter",
-      );
-      assert(findings.length > 0, "expected at least one finding from the wrapped fixture");
-      assert(
-        Object.isFrozen(findings[0]),
-        "the real artifact returned a mutable finding through the stream adapter",
-      );
-    },
-  );
+  await checkAsync("the Web stream adapter's findings are frozen on the real artifact", async () => {
+    const { findings } = await sanitizeChunks([wrappedBytes]);
+    assert(Object.isFrozen(findings), "the real artifact returned a mutable findings array through the stream adapter");
+    assert(findings.length > 0, "expected at least one finding from the wrapped fixture");
+    assert(Object.isFrozen(findings[0]), "the real artifact returned a mutable finding through the stream adapter");
+  });
 
   await checkAsync(
     "an explicit abort() on the real artifact discards retained plaintext and wins over a later close",
@@ -460,10 +412,7 @@ export async function qualify(fixtures, api) {
       } catch (error) {
         closeRejection = error;
       }
-      assert(
-        closeRejection instanceof SecretScanError,
-        "close() did not reject after an explicit abort()",
-      );
+      assert(closeRejection instanceof SecretScanError, "close() did not reject after an explicit abort()");
 
       let readRejection;
       try {
@@ -477,11 +426,7 @@ export async function qualify(fixtures, api) {
           !readRejection.message.includes(UNRESOLVED),
         "the reader did not observe an input-free INVALID_STATE after abort()",
       );
-      assertEqual(
-        [...transform.findings],
-        [],
-        "abort() reported a finding that was never finalized",
-      );
+      assertEqual([...transform.findings], [], "abort() reported a finding that was never finalized");
       assertEqual(session.state, "aborted", "abort() did not abort the real artifact's session");
     },
   );
@@ -510,95 +455,72 @@ export async function qualify(fixtures, api) {
       } catch (error) {
         readRejection = error;
       }
-      assert(
-        readRejection instanceof SecretScanError,
-        "the reader did not observe the malformed UTF-8 failure",
-      );
-      assertEqual(
-        output,
-        finalizedOracle,
-        "output flushed before malformed UTF-8 diverged from the oracle",
-      );
-      assertEqual(
-        transform.findings.length,
-        1,
-        "expected exactly one finalized finding before the failure",
-      );
+      assert(readRejection instanceof SecretScanError, "the reader did not observe the malformed UTF-8 failure");
+      assertEqual(output, finalizedOracle, "output flushed before malformed UTF-8 diverged from the oracle");
+      assertEqual(transform.findings.length, 1, "expected exactly one finalized finding before the failure");
     },
   );
 
-  await checkAsync(
-    "truncated UTF-8 on the real artifact rejects with INVALID_UTF8",
-    async () => {
-      const transform = new WebStreamSanitizer(openStreamSession());
-      const writer = transform.writable.getWriter();
-      const reader = transform.readable.getReader();
-      const reading = reader.read().catch((error) => error);
+  await checkAsync("truncated UTF-8 on the real artifact rejects with INVALID_UTF8", async () => {
+    const transform = new WebStreamSanitizer(openStreamSession());
+    const writer = transform.writable.getWriter();
+    const reader = transform.readable.getReader();
+    const reading = reader.read().catch((error) => error);
 
-      await writer.write(streamEncoder.encode("🔑").slice(0, 2));
-      let thrown;
-      try {
-        await writer.close();
-      } catch (error) {
-        thrown = error;
-      }
-      assert(thrown instanceof SecretScanError, "close() accepted truncated UTF-8");
-      assertEqual(thrown.code, "INVALID_UTF8", "truncated UTF-8 error code");
+    await writer.write(streamEncoder.encode("🔑").slice(0, 2));
+    let thrown;
+    try {
+      await writer.close();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof SecretScanError, "close() accepted truncated UTF-8");
+    assertEqual(thrown.code, "INVALID_UTF8", "truncated UTF-8 error code");
 
-      const readOutcome = await reading;
-      assert(
-        readOutcome instanceof SecretScanError,
-        "the reader did not observe the truncated UTF-8 failure",
-      );
-      assertEqual(readOutcome.code, "INVALID_UTF8", "truncated UTF-8 error code");
-    },
-  );
+    const readOutcome = await reading;
+    assert(readOutcome instanceof SecretScanError, "the reader did not observe the truncated UTF-8 failure");
+    assertEqual(readOutcome.code, "INVALID_UTF8", "truncated UTF-8 error code");
+  });
 
-  await checkAsync(
-    "readable backpressure on the real artifact stalls a write until a pull resumes it",
-    async () => {
-      const transform = new WebStreamSanitizer(openStreamSession());
-      const writer = transform.writable.getWriter();
-      const reader = transform.readable.getReader();
-      let settled = false;
-      const writing = writer.write(streamEncoder.encode("ordinary line\n")).then(() => {
-        settled = true;
-      });
+  await checkAsync("readable backpressure on the real artifact stalls a write until a pull resumes it", async () => {
+    const transform = new WebStreamSanitizer(openStreamSession());
+    const writer = transform.writable.getWriter();
+    const reader = transform.readable.getReader();
+    let settled = false;
+    const writing = writer.write(streamEncoder.encode("ordinary line\n")).then(() => {
+      settled = true;
+    });
 
-      await Promise.resolve();
-      await Promise.resolve();
-      assert(!settled, "the write settled before the readable side was ever read");
+    await Promise.resolve();
+    await Promise.resolve();
+    assert(!settled, "the write settled before the readable side was ever read");
 
-      const pulled = await reader.read();
-      assertEqual(pulled.value, "ordinary line\n", "the pulled value");
-      await writing;
-      assert(settled, "the write never settled after a pull");
+    const pulled = await reader.read();
+    assertEqual(pulled.value, "ordinary line\n", "the pulled value");
+    await writing;
+    assert(settled, "the write never settled after a pull");
 
-      const closing = writer.close();
-      const closingRead = await reader.read();
-      assertEqual(closingRead.done, true, "the readable side did not close with the writable side");
-      await closing;
-    },
-  );
+    const closing = writer.close();
+    const closingRead = await reader.read();
+    assertEqual(closingRead.done, true, "the readable side did not close with the writable side");
+    await closing;
+  });
 
-  await checkAsync(
-    "cancelling the readable side on the real artifact discards retained plaintext",
-    async () => {
-      const session = openStreamSession();
-      const transform = new WebStreamSanitizer(session);
-      const writer = transform.writable.getWriter();
-      const reader = transform.readable.getReader();
-      const pendingRead = reader.read();
+  await checkAsync("cancelling the readable side on the real artifact discards retained plaintext", async () => {
+    const session = openStreamSession();
+    const transform = new WebStreamSanitizer(session);
+    const writer = transform.writable.getWriter();
+    const reader = transform.readable.getReader();
+    const pendingRead = reader.read();
 
-      await writer.write(streamEncoder.encode(UNRESOLVED));
-      await reader.cancel();
+    await writer.write(streamEncoder.encode(UNRESOLVED));
+    await reader.cancel();
 
-      const settled = await pendingRead;
-      assertEqual(settled.done, true, "the pending read did not resolve with done after cancellation");
-      assertEqual([...transform.findings], [], "cancellation reported a finding that was never finalized");
-      assertEqual(session.state, "aborted", "cancellation did not abort the real artifact's session");
-    },
-  );
+    const settled = await pendingRead;
+    assertEqual(settled.done, true, "the pending read did not resolve with done after cancellation");
+    assertEqual([...transform.findings], [], "cancellation reported a finding that was never finalized");
+    assertEqual(session.state, "aborted", "cancellation did not abort the real artifact's session");
+  });
 
   await checkAsync(
     "aborting the writable side on the real artifact keeps finalized output but discards retained plaintext",
@@ -651,22 +573,13 @@ export async function qualify(fixtures, api) {
       } catch (error) {
         thrown = error;
       }
-      assert(
-        thrown instanceof SecretScanError,
-        "no operation rejected on a formatter failure",
-      );
+      assert(thrown instanceof SecretScanError, "no operation rejected on a formatter failure");
       assertEqual(thrown.code, "PLACEHOLDER_FAILURE", "formatter failure code");
 
       const readOutcome = await reading;
-      assert(
-        readOutcome instanceof SecretScanError,
-        "the reader did not observe the formatter failure",
-      );
+      assert(readOutcome instanceof SecretScanError, "the reader did not observe the formatter failure");
       assertEqual(readOutcome.code, "PLACEHOLDER_FAILURE", "formatter failure code");
-      assert(
-        !String(readOutcome).includes(FULL),
-        "the formatter failure leaked the plaintext value",
-      );
+      assert(!String(readOutcome).includes(FULL), "the formatter failure leaked the plaintext value");
     },
   );
 

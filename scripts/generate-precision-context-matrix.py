@@ -86,10 +86,7 @@ RUNTIME_CONSUMERS = {
 }
 
 ENFORCED_BY = {
-    "synchronous": (
-        "crates/secret-scan-core/tests/canonical_corpus.rs"
-        "::scan_matches_the_canonical_synchronous_corpus"
-    ),
+    "synchronous": ("crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus"),
     "incremental": (
         "crates/secret-scan-core/tests/incremental_partitions.rs"
         "::every_fixture_reproduces_the_canonical_whole_input_reference"
@@ -147,24 +144,24 @@ def beta4_twin_baseline_rows(baseline: dict, detectors: list[str]) -> list[dict]
             continue
         for side in ("negative", "positive"):
             leaf = pair[side]
-            rows.append({
-                "auditId": leaf["id"],
-                "detector": pair["family"],
-                "variant": pair["variant"],
-                "context": pair["context"],
-                "side": side,
-                "mutation": pair["mutation"],
-                "beforeResult": "flagged" if leaf["actualBeta4"] else "silent",
-                "afterResult": "flagged" if leaf["expected"] else "silent",
-                "contractView": pair["contractView"],
-            })
+            rows.append(
+                {
+                    "auditId": leaf["id"],
+                    "detector": pair["family"],
+                    "variant": pair["variant"],
+                    "context": pair["context"],
+                    "side": side,
+                    "mutation": pair["mutation"],
+                    "beforeResult": "flagged" if leaf["actualBeta4"] else "silent",
+                    "afterResult": "flagged" if leaf["expected"] else "silent",
+                    "contractView": pair["contractView"],
+                }
+            )
     rows.sort(key=lambda r: (r["detector"], r["variant"], r["side"], r["auditId"]))
     return rows
 
 
-def build_matrix(
-    sync_corpus: dict, incremental_corpus: dict, baseline: dict, detectors: list[str]
-) -> dict:
+def build_matrix(sync_corpus: dict, incremental_corpus: dict, baseline: dict, detectors: list[str]) -> dict:
     sync_fixtures = [f for f in sync_corpus["fixtures"] if f["detector"] in detectors]
     known = {f["detector"] for f in sync_corpus["fixtures"]}
     missing = sorted(set(detectors) - known)

@@ -15,7 +15,6 @@
  * value in every fixture is synthetic.
  */
 
-import { VERSION } from "../src/version.js";
 import type {
   NativeBinding,
   NativeFinding,
@@ -24,6 +23,7 @@ import type {
   NativeIncrementalSanitizer,
 } from "../src/native.js";
 import type { IncrementalSanitizerState } from "../src/types.js";
+import { VERSION } from "../src/version.js";
 
 const MARKER = "api_key=";
 const TOKEN_CHARACTERS = /^[A-Za-z0-9_]*$/;
@@ -52,9 +52,7 @@ function settledBoundary(text: string): number {
 }
 
 export function createSanitizingBinding(): NativeBinding {
-  function session(
-    options: NativeIncrementalOptions,
-  ): NativeIncrementalSanitizer {
+  function session(options: NativeIncrementalOptions): NativeIncrementalSanitizer {
     const { limits, policy, formatter } = options;
     let state: IncrementalSanitizerState = "accepting";
     let pending = "";
@@ -66,10 +64,7 @@ export function createSanitizingBinding(): NativeBinding {
 
     function requireAccepting(): void {
       if (state !== "accepting") {
-        throw coded(
-          "INVALID_STATE",
-          "The incremental sanitizer is no longer accepting input.",
-        );
+        throw coded("INVALID_STATE", "The incremental sanitizer is no longer accepting input.");
       }
     }
 
@@ -97,10 +92,7 @@ export function createSanitizingBinding(): NativeBinding {
           start,
           end: start + value.length,
         };
-        const action =
-          policy === undefined
-            ? "redact"
-            : policy(finding, { findingIndex: findings.length });
+        const action = policy === undefined ? "redact" : policy(finding, { findingIndex: findings.length });
         const decided = { ...finding, action };
         findings.push(decided);
         text += settled.slice(cursor, index + MARKER.length);
@@ -141,18 +133,12 @@ export function createSanitizingBinding(): NativeBinding {
         requireAccepting();
         inputCodeUnits += chunk.length;
         if (inputCodeUnits > limits.maxInputCodeUnits) {
-          fail(
-            "INPUT_LIMIT_EXCEEDED",
-            "Incremental sanitizer input limit exceeded.",
-          );
+          fail("INPUT_LIMIT_EXCEEDED", "Incremental sanitizer input limit exceeded.");
         }
         pending += chunk;
         const result = drain(settledBoundary(pending));
         if (pending.length > limits.maxBufferedCodeUnits) {
-          fail(
-            "BUFFER_LIMIT_EXCEEDED",
-            "Incremental sanitizer buffer limit exceeded.",
-          );
+          fail("BUFFER_LIMIT_EXCEEDED", "Incremental sanitizer buffer limit exceeded.");
         }
         return result;
       },

@@ -17,11 +17,7 @@
  */
 
 import { SecretScanError } from "../errors.js";
-import type {
-  IncrementalSanitizer,
-  IncrementalSanitizerResult,
-  SecretFinding,
-} from "../types.js";
+import type { IncrementalSanitizer, IncrementalSanitizerResult, SecretFinding } from "../types.js";
 
 /** One incremental session wrapped as a byte sink. */
 export interface StreamSanitizerRuntime {
@@ -38,9 +34,7 @@ export interface StreamSanitizerRuntime {
   abort(): void;
 }
 
-export function createStreamSanitizerRuntime(
-  session: IncrementalSanitizer,
-): StreamSanitizerRuntime {
+export function createStreamSanitizerRuntime(session: IncrementalSanitizer): StreamSanitizerRuntime {
   const decoder = new TextDecoder("utf-8", {
     fatal: true,
     ignoreBOM: true,
@@ -102,10 +96,7 @@ export function createStreamSanitizerRuntime(
     accumulateFindings(finalResult.findings);
     return Object.freeze({
       text: decodedResult.text + finalResult.text,
-      findings: Object.freeze([
-        ...decodedResult.findings,
-        ...finalResult.findings,
-      ]),
+      findings: Object.freeze([...decodedResult.findings, ...finalResult.findings]),
     });
   }
 

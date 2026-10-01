@@ -65,12 +65,11 @@ import argparse
 import json
 import re
 import subprocess
-import sys
-import tomllib
 import urllib.error
 import urllib.request
 from pathlib import Path, PurePosixPath
 
+import tomllib
 
 CI_WORKFLOW = Path(".github") / "workflows" / "ci.yml"
 CI_MSRV = re.compile(r"^\s*MSRV:\s*[\"']?(\d+\.\d+(?:\.\d+)?)[\"']?\s*$", re.M)
@@ -269,9 +268,7 @@ def check_version_lockstep(root: Path, metadata: dict, root_manifest: dict) -> l
         for field in ("dependencies", "optionalDependencies"):
             for name, pinned in sorted((manifest.get(field) or {}).items()):
                 if name.startswith("@redact-secret/") and pinned != version:
-                    errors.append(
-                        f"{relative}: {field} pins {name} to {pinned}, not workspace version {version}"
-                    )
+                    errors.append(f"{relative}: {field} pins {name} to {pinned}, not workspace version {version}")
     return errors
 
 
@@ -351,7 +348,9 @@ def check_msrv(root: Path, metadata: dict, root_manifest: dict) -> list[str]:
         return ["Cargo.toml: [workspace.package] must declare rust-version"]
     for package in workspace_members(metadata).values():
         if package.get("rust_version") != declared:
-            errors.append(f"{package['name']}: rust-version {package.get('rust_version')} differs from workspace MSRV {declared}")
+            errors.append(
+                f"{package['name']}: rust-version {package.get('rust_version')} differs from workspace MSRV {declared}"
+            )
 
     derived, culprits = derived_msrv(metadata)
     if derived is not None and version_key(derived) > version_key(declared):
@@ -642,9 +641,7 @@ def validate(root: Path, metadata: dict, package_lister=None) -> list[str]:
 
 
 def crate_exists(name: str) -> bool:
-    request = urllib.request.Request(
-        f"https://crates.io/api/v1/crates/{name}", headers={"User-Agent": USER_AGENT}
-    )
+    request = urllib.request.Request(f"https://crates.io/api/v1/crates/{name}", headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=30):
             return True
@@ -669,7 +666,9 @@ def recheck_crate_name(policy: dict) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("root", nargs="?", default=Path.cwd(), type=Path)
-    parser.add_argument("--recheck-crate-name", action="store_true", help="query crates.io for the preferred crate name")
+    parser.add_argument(
+        "--recheck-crate-name", action="store_true", help="query crates.io for the preferred crate name"
+    )
     args = parser.parse_args()
 
     metadata = load_metadata(args.root)

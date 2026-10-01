@@ -98,9 +98,7 @@ def normalize_artifact_digests(raw: dict) -> tuple[dict, list[str]]:
                 distinct = set(present.values())
                 if len(distinct) > 1:
                     pairs = ", ".join(f"{stage}={value}" for stage, value in present.items())
-                    errors.append(
-                        f"{identity} ({file_name}): digest mismatch across stages -- {pairs}"
-                    )
+                    errors.append(f"{identity} ({file_name}): digest mismatch across stages -- {pairs}")
             normalized_records.append(
                 {
                     "file": file_name,
@@ -259,8 +257,7 @@ def main(argv: list[str] | None = None) -> int:
         for error in all_errors:
             print(f"ERROR {error}", file=sys.stderr)
         print(
-            f"Recorded release manifest for {manifest['version']} at {args.out} "
-            f"({len(all_errors)} error(s))",
+            f"Recorded release manifest for {manifest['version']} at {args.out} ({len(all_errors)} error(s))",
             file=sys.stderr,
         )
         return 1

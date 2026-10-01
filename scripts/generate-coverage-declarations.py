@@ -70,7 +70,12 @@ CONTEXTUAL_TYPES = {"contextual_secret", "authorization_credential"}
 REPRESENTATIVE_CLASSES = {
     "structured-data-kv": {"dotenv", "json", "yaml", "toml"},
     "shell-invocation": {
-        "shell", "powershell", "docker-compose", "github-actions", "terraform", "kubernetes",
+        "shell",
+        "powershell",
+        "docker-compose",
+        "github-actions",
+        "terraform",
+        "kubernetes",
     },
     "source-code": {"javascript", "typescript", "python"},
     "wire-and-log": {"http", "curl", "log", "terminal", "stack-trace"},
@@ -137,9 +142,7 @@ def kind_evidence(
     )
 
 
-def boundary_evidence(
-    detector_fixtures: list[dict], type_name: str, *, ambiguous_keyword: str | None
-) -> list[str]:
+def boundary_evidence(detector_fixtures: list[dict], type_name: str, *, ambiguous_keyword: str | None) -> list[str]:
     return kind_evidence(
         detector_fixtures,
         type_name,
@@ -149,9 +152,7 @@ def boundary_evidence(
     )
 
 
-def malformed_evidence(
-    detector_fixtures: list[dict], type_name: str, *, ambiguous_keyword: str | None
-) -> list[str]:
+def malformed_evidence(detector_fixtures: list[dict], type_name: str, *, ambiguous_keyword: str | None) -> list[str]:
     return sorted(
         fixture["id"]
         for fixture in detector_fixtures
@@ -175,9 +176,7 @@ def near_miss_negative_evidence(
     )
 
 
-def own_contexts(
-    detector_fixtures: list[dict], type_name: str, *, ambiguous_keyword: str | None
-) -> set[str]:
+def own_contexts(detector_fixtures: list[dict], type_name: str, *, ambiguous_keyword: str | None) -> set[str]:
     contexts: set[str] = set()
     for fixture in detector_fixtures:
         if fixture.get("support") != "supported":
@@ -267,9 +266,7 @@ def build_type_row(
         dim("boundary", supported(boundary_ids) if boundary_ids else pending(f"{slug(type_name)}-boundary"))
     )
 
-    near_miss_ids = near_miss_negative_evidence(
-        detector_fixtures, type_name, ambiguous_keyword=ambiguous_keyword
-    )
+    near_miss_ids = near_miss_negative_evidence(detector_fixtures, type_name, ambiguous_keyword=ambiguous_keyword)
     dimensions.append(
         dim(
             "near-miss-negative",
@@ -351,8 +348,7 @@ def resolve_shared_family(rows_by_type: dict[str, dict], type_names: list[str]) 
                 continue
             for sibling_name in siblings:
                 sibling_dim = next(
-                    d for d in rows_by_type[sibling_name]["dimensions"]
-                    if d["dimension"] == dimension["dimension"]
+                    d for d in rows_by_type[sibling_name]["dimensions"] if d["dimension"] == dimension["dimension"]
                 )
                 if sibling_dim["state"] == "supported" and "exception" not in sibling_dim:
                     dimension["state"] = "supported"
@@ -455,7 +451,14 @@ def build_binding_edge_rows(
     return rows
 
 
-def build_declarations(manifest: dict, corpus: dict, incremental_corpus: dict, lifecycle_corpus: dict, unicode_corpus: dict, error_codes_doc: dict) -> dict:
+def build_declarations(
+    manifest: dict,
+    corpus: dict,
+    incremental_corpus: dict,
+    lifecycle_corpus: dict,
+    unicode_corpus: dict,
+    error_codes_doc: dict,
+) -> dict:
     fixtures = corpus["fixtures"]
     unicode_ids = sorted(fixture["id"] for fixture in unicode_corpus["fixtures"])
 
@@ -476,13 +479,10 @@ def build_declarations(manifest: dict, corpus: dict, incremental_corpus: dict, l
         if behavior_class not in representative_owner_by_class:
             continue
         detector_fixtures = INVENTORY.fixtures_for_detector(fixtures, entry["detector"])
-        ambiguous_keyword = (
-            type_name.split("_")[0] if types_per_detector[entry["detector"]] > 1 else None
-        )
+        ambiguous_keyword = type_name.split("_")[0] if types_per_detector[entry["detector"]] > 1 else None
         contexts = own_contexts(detector_fixtures, type_name, ambiguous_keyword=ambiguous_keyword)
-        if (
-            representative_owner_by_class[behavior_class] is None
-            and len(representative_buckets(contexts)) == len(REPRESENTATIVE_CLASSES)
+        if representative_owner_by_class[behavior_class] is None and len(representative_buckets(contexts)) == len(
+            REPRESENTATIVE_CLASSES
         ):
             representative_owner_by_class[behavior_class] = type_name
 
@@ -490,9 +490,7 @@ def build_declarations(manifest: dict, corpus: dict, incremental_corpus: dict, l
         type_name = entry["type"]
         detector = entry["detector"]
         behavior_class = behavior_class_for(type_name)
-        ambiguous_keyword = (
-            type_name.split("_")[0] if types_per_detector[detector] > 1 else None
-        )
+        ambiguous_keyword = type_name.split("_")[0] if types_per_detector[detector] > 1 else None
         owner = representative_owner_by_class.get(behavior_class)
         row = build_type_row(
             entry,
@@ -519,9 +517,7 @@ def build_declarations(manifest: dict, corpus: dict, incremental_corpus: dict, l
 
     declarations = [rows_by_type[entry["type"]] for entry in manifest["types"]]
     declarations.append(
-        build_incremental_row(
-            incremental_corpus["fixtures"], lifecycle_corpus["fixtures"], unicode_ids, fixtures
-        )
+        build_incremental_row(incremental_corpus["fixtures"], lifecycle_corpus["fixtures"], unicode_ids, fixtures)
     )
     declarations.extend(
         build_binding_edge_rows(
@@ -554,9 +550,7 @@ def main(argv: list[str] | None = None) -> int:
     unicode_corpus = INVENTORY.load_json(args.unicode_corpus)
     error_codes_doc = INVENTORY.load_json(args.error_codes)
 
-    report = build_declarations(
-        manifest, corpus, incremental_corpus, lifecycle_corpus, unicode_corpus, error_codes_doc
-    )
+    report = build_declarations(manifest, corpus, incremental_corpus, lifecycle_corpus, unicode_corpus, error_codes_doc)
     text = json.dumps(report, indent=2, sort_keys=True) + "\n"
 
     if args.out is not None:

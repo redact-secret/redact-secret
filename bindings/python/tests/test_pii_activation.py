@@ -45,12 +45,8 @@ def test_pii_runtime_fixture() -> None:
             expected = []
             for finding in case["expected"]:
                 converted = dict(finding)
-                converted["start"] = byte_offset_to_char_offset_reference(
-                    input_text, finding["start"]
-                )
-                converted["end"] = byte_offset_to_char_offset_reference(
-                    input_text, finding["end"]
-                )
+                converted["start"] = byte_offset_to_char_offset_reference(input_text, finding["start"])
+                converted["end"] = byte_offset_to_char_offset_reference(input_text, finding["end"])
                 expected.append(converted)
             assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
 
@@ -75,9 +71,7 @@ def test_pii_runtime_fixture() -> None:
     network_fixture = load_corpus("pii-network-address-v1.json")
     for case in network_fixture["cases"]:
         findings = [
-            finding
-            for finding in redact_secret.scan(case["input"])
-            if finding.type == "pii_global_network_address"
+            finding for finding in redact_secret.scan(case["input"]) if finding.type == "pii_global_network_address"
         ]
         assert len(findings) == len(case["expected"]), case["id"]
         for finding, expected in zip(findings, case["expected"], strict=True):
@@ -93,12 +87,8 @@ def test_pii_runtime_fixture() -> None:
         expected = []
         for finding in case["expected"]:
             converted = dict(finding)
-            converted["start"] = byte_offset_to_char_offset_reference(
-                input_text, finding["start"]
-            )
-            converted["end"] = byte_offset_to_char_offset_reference(
-                input_text, finding["end"]
-            )
+            converted["start"] = byte_offset_to_char_offset_reference(input_text, finding["start"])
+            converted["end"] = byte_offset_to_char_offset_reference(input_text, finding["end"])
             expected.append(converted)
         assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
 
@@ -197,9 +187,7 @@ print(json.dumps({
         text=True,
     )
     actual = json.loads(completed.stdout)
-    assert actual["activation"] == (
-        "credentials=full;selectors=off;families=;vocabulary=pii-context/v2"
-    )
+    assert actual["activation"] == ("credentials=full;selectors=off;families=;vocabulary=pii-context/v2")
     assert actual["wholeTypes"] == []
     assert all(row == {"textEqual": True, "types": []} for row in actual["partitions"])
 
@@ -245,8 +233,7 @@ print(json.dumps({
     cases = [
         (
             "pii:family:global:phone",
-            "credentials=full;selectors=pii:family:global:phone;families="
-            "pii:global:phone;vocabulary=pii-context/v2",
+            "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v2",
             ["pii_global_phone"],
         ),
         (
@@ -269,10 +256,7 @@ print(json.dumps({
         assert actual["activation"] == activation
         assert actual["types"] == types
         assert actual["actions"] == (["redact"] if types else [])
-        assert all(
-            row == {"textEqual": True, "types": types}
-            for row in actual["partitions"]
-        )
+        assert all(row == {"textEqual": True, "types": types} for row in actual["partitions"])
 
 
 def test_different_selection_conflicts_without_echoing_input() -> None:

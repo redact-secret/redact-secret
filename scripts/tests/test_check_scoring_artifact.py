@@ -100,7 +100,12 @@ class Schema(unittest.TestCase):
         self.assertEqual(self.errors(ARTIFACT), [])
 
     def test_a_public_or_enforcing_claim_is_rejected(self) -> None:
-        for key, value in (("publicApi", True), ("enforcing", True), ("loadedAtRuntime", True), ("findingFields", ["score"])):
+        for key, value in (
+            ("publicApi", True),
+            ("enforcing", True),
+            ("loadedAtRuntime", True),
+            ("findingFields", ["score"]),
+        ):
             artifact = copy.deepcopy(ARTIFACT)
             artifact["use"][key] = value
             self.assertTrue(self.errors(artifact), key)
@@ -162,7 +167,7 @@ class Drift(unittest.TestCase):
         body = '{"a": "#"}'
         source = f'const REVIEWED_MODEL_JSON: &str = r##"{body}"##;'
         self.assertEqual(check.reviewed_literal(source), ({"a": "#"}, None))
-        self.assertIsNotNone(check.reviewed_literal("const OTHER: &str = \"\";")[1])
+        self.assertIsNotNone(check.reviewed_literal('const OTHER: &str = "";')[1])
 
 
 class BaseComparison(unittest.TestCase):

@@ -15,32 +15,18 @@
  */
 
 import type { NativeBindingLoader } from "../native.js";
-import {
-  assertWasmModuleShape,
-  createBindingFromWasmModule,
-  type WasmModule,
-} from "./wasm-binding.js";
+import { assertWasmModuleShape, createBindingFromWasmModule, type WasmModule } from "./wasm-binding.js";
 
 /** As `runtime/workerd.ts`'s loader, for the `common` build and its `pii` build (issue #937). */
-async function loadCompiledWasmModule(
-  pii: boolean,
-): Promise<readonly [WasmModule, object]> {
+async function loadCompiledWasmModule(pii: boolean): Promise<readonly [WasmModule, object]> {
   const [module, artifact] = pii
     ? await Promise.all([
-        import("@redact-secret/wasm/common/pii") as unknown as Promise<
-          Partial<WasmModule>
-        >,
-        import(
-          "@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm"
-        ) as unknown as Promise<{ default: object }>,
+        import("@redact-secret/wasm/common/pii") as unknown as Promise<Partial<WasmModule>>,
+        import("@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm") as unknown as Promise<{ default: object }>,
       ])
     : await Promise.all([
-        import("@redact-secret/wasm/common") as unknown as Promise<
-          Partial<WasmModule>
-        >,
-        import(
-          "@redact-secret/wasm/redact_secret_wasm_common_bg.wasm"
-        ) as unknown as Promise<{ default: object }>,
+        import("@redact-secret/wasm/common") as unknown as Promise<Partial<WasmModule>>,
+        import("@redact-secret/wasm/redact_secret_wasm_common_bg.wasm") as unknown as Promise<{ default: object }>,
       ]);
   assertWasmModuleShape(module);
   return [module, artifact.default];

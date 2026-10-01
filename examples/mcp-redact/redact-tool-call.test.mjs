@@ -160,7 +160,13 @@ test("#610: more values than traversalLimits.maxNodes block the whole call", () 
 
 test("#612: traversalLimits.maxNodes counts from the result root, content blocks included", () => {
   const tight = createGoldenPathBoundaryWith(fakeCore, { traversalLimits: { maxDepth: 8, maxNodes: 8 } });
-  const input = { content: [{ type: "text", text: "a" }, { type: "text", text: "b" }, { type: "text", text: "c" }] };
+  const input = {
+    content: [
+      { type: "text", text: "a" },
+      { type: "text", text: "b" },
+      { type: "text", text: "c" },
+    ],
+  };
   assert.deepEqual(redactToolResult(tight, input), { outcome: "blocked", reason: "limit_exceeded" });
   assert.equal(redactToolResult(tight, { content: [{ type: "text", text: "a" }] }).outcome, "ok");
 });

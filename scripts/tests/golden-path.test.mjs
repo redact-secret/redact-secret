@@ -8,18 +8,18 @@ import { fileURLToPath } from "node:url";
 import {
   ENTRY,
   EXAMPLE_DIR,
+  importClosure,
   LANES,
   LOCKFILE,
+  localImports,
+  lockedAdapters,
   NPM_REGISTRY,
+  realCoreTests,
+  requireSanitized,
   TOOL_PREFIX,
   TOOL_SECRET,
   USER_INPUT,
   USER_SECRET,
-  importClosure,
-  localImports,
-  lockedAdapters,
-  realCoreTests,
-  requireSanitized,
 } from "../qualify-golden-path.mjs";
 
 const exampleRoot = fileURLToPath(new URL(`../../${EXAMPLE_DIR}/`, import.meta.url));
@@ -34,7 +34,9 @@ test("the Node closure is the golden path and the modules it imports, never test
 test("the Python MCP twins and their lane are retired (#810)", async () => {
   assert.deepEqual(LANES, ["node"]);
   assert.deepEqual(Object.keys(ENTRY), ["node"]);
-  await assert.rejects(readFile(new URL(`../../${EXAMPLE_DIR}/python/agent_context.py`, import.meta.url)), { code: "ENOENT" });
+  await assert.rejects(readFile(new URL(`../../${EXAMPLE_DIR}/python/agent_context.py`, import.meta.url)), {
+    code: "ENOENT",
+  });
 });
 
 test("localImports follows relative ESM specifiers only", () => {
@@ -46,7 +48,12 @@ test("localImports follows relative ESM specifiers only", () => {
     'import pkg from "@redact-secret/core";',
     ' * @param {import("./not-an-import.mjs").T} x',
   ].join("\n");
-  assert.deepEqual(localImports("sub/entry.mjs", esm).sort(), ["b.mjs", "sub/a.mjs", "sub/d.mjs", "sub/side-effect.mjs"]);
+  assert.deepEqual(localImports("sub/entry.mjs", esm).sort(), [
+    "b.mjs",
+    "sub/a.mjs",
+    "sub/d.mjs",
+    "sub/side-effect.mjs",
+  ]);
 });
 
 test("importClosure fails closed on an import that is not in the example", async () => {
@@ -99,10 +106,16 @@ test("artifact qualification runs the golden-path driver for the Node lane, and 
   assert.ok(start >= 0, "no golden-path job");
   const next = workflow.slice(start + 1).search(/\n {2}[a-z][a-z0-9-]*:\n/);
   const job = workflow.slice(start, start + 1 + next);
-  assert.deepEqual([...job.matchAll(/^ {10}- (node|python)$/gm)].map((match) => match[1]), ["node"]);
+  assert.deepEqual(
+    [...job.matchAll(/^ {10}- (node|python)$/gm)].map((match) => match[1]),
+    ["node"],
+  );
   assert.match(job, /needs: \[plan, node-addon, browser\]/);
   assert.doesNotMatch(job, /adapter-pins|python-wheel/);
-  assert.match(job, /node scripts\/qualify-golden-path\.mjs \\\n\s+--lane "\$\{\{ matrix\.lane \}\}" \\\n\s+--candidate-dir candidate/);
+  assert.match(
+    job,
+    /node scripts\/qualify-golden-path\.mjs \\\n\s+--lane "\$\{\{ matrix\.lane \}\}" \\\n\s+--candidate-dir candidate/,
+  );
   assert.match(job, /name: golden-path-\$\{\{ matrix\.lane \}\}/);
   assert.match(workflow, /\n {6}- golden-path\n/);
   assert.match(workflow, /"\$GOLDEN_PATH_RESULT"/);
@@ -146,7 +159,8 @@ test("the example locks its adapters from the registry at exactly the versions i
   const adapters = lockedAdapters(manifest, lock);
   assert.ok(adapters.some((entry) => entry.name === "@redact-secret/adapter-mcp"));
   assert.ok(adapters.every((entry) => entry.name !== "@redact-secret/core"));
-  for (const spec of Object.values(manifest.dependencies)) assert.match(spec, /^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/, "not an exact version");
+  for (const spec of Object.values(manifest.dependencies))
+    assert.match(spec, /^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/, "not an exact version");
 });
 
 test("lockedAdapters fails closed on a lockfile that is not the registry versions the example declares", () => {
@@ -154,11 +168,36 @@ test("lockedAdapters fails closed on a lockfile that is not the registry version
   const good = { "node_modules/@redact-secret/adapter-mcp": locked("@redact-secret/adapter-mcp", "1.0.0") };
   assert.equal(lockedAdapters(manifest, lockWith(good)).length, 1);
   const cases = [
-    [{ "node_modules/@redact-secret/adapter-mcp": locked("@redact-secret/adapter-mcp", "1.0.1") }, /does not lock exactly/],
-    [{ ...good, "node_modules/@redact-secret/core": locked("@redact-secret/core", "1.0.0") }, /the candidate supplies it/],
-    [{ ...good, "node_modules/x/node_modules/@redact-secret/adapter": locked("@redact-secret/adapter", "1.0.0") }, /at the top level/],
-    [{ "node_modules/@redact-secret/adapter-mcp": { ...good["node_modules/@redact-secret/adapter-mcp"], resolved: "file:../x.tgz" } }, /does not resolve/],
-    [{ "node_modules/@redact-secret/adapter-mcp": { ...good["node_modules/@redact-secret/adapter-mcp"], integrity: undefined } }, /no sha512 integrity/],
+    [
+      { "node_modules/@redact-secret/adapter-mcp": locked("@redact-secret/adapter-mcp", "1.0.1") },
+      /does not lock exactly/,
+    ],
+    [
+      { ...good, "node_modules/@redact-secret/core": locked("@redact-secret/core", "1.0.0") },
+      /the candidate supplies it/,
+    ],
+    [
+      { ...good, "node_modules/x/node_modules/@redact-secret/adapter": locked("@redact-secret/adapter", "1.0.0") },
+      /at the top level/,
+    ],
+    [
+      {
+        "node_modules/@redact-secret/adapter-mcp": {
+          ...good["node_modules/@redact-secret/adapter-mcp"],
+          resolved: "file:../x.tgz",
+        },
+      },
+      /does not resolve/,
+    ],
+    [
+      {
+        "node_modules/@redact-secret/adapter-mcp": {
+          ...good["node_modules/@redact-secret/adapter-mcp"],
+          integrity: undefined,
+        },
+      },
+      /no sha512 integrity/,
+    ],
     [{}, /locks no @redact-secret adapter/],
   ];
   for (const [packages, pattern] of cases) assert.throws(() => lockedAdapters(manifest, lockWith(packages)), pattern);

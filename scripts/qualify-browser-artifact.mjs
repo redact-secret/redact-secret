@@ -52,21 +52,13 @@
  * this script prints carries an input, a matched value, or a placeholder.
  */
 
+import { copyFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
-import {
-  copyFileSync,
-  existsSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-
-import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
 import { DETECTOR_PROFILES as WASM_PROFILES } from "./lib/detector-profiles.mjs";
+import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
 
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(SCRIPTS_DIR, "..");
@@ -93,18 +85,10 @@ const DETECTOR_PROFILES = Object.fromEntries(
 const COMMON_EXPECTATIONS = "common-profile-expectations.json";
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
 const PACKAGE_COMMON_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "common.js");
-const PACKAGE_WEB_STREAM_ENTRY = join(
-  REPO_ROOT,
-  "packages",
-  "javascript",
-  "dist",
-  "adapters",
-  "web-stream.js",
-);
+const PACKAGE_WEB_STREAM_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "adapters", "web-stream.js");
 
 /** The engines this artifact is qualified in, in the order they run. */
 const ENGINES = ["chromium", "firefox", "webkit"];
-
 
 const CONTENT_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -261,9 +245,7 @@ function loadCorpus(name) {
 function buildFixtures(detectorProfile) {
   const synchronous = loadCorpus("synchronous-corpus.json");
   if (synchronous.offsetUnit !== "utf8-byte") {
-    fail(
-      `synchronous-corpus.json: offsetUnit is ${synchronous.offsetUnit}, not utf8-byte`,
-    );
+    fail(`synchronous-corpus.json: offsetUnit is ${synchronous.offsetUnit}, not utf8-byte`);
   }
   // "not-yet-evaluated" fixtures carry no expectation and document a
   // future gap, not a current behavioral contract.
@@ -300,16 +282,12 @@ function buildFixtures(detectorProfile) {
     fail("pii-payment-card-v1.json: representative positive is missing");
   }
   const phone = loadCorpus("pii-phone-v1.json");
-  const phonePositive = phone.cases.find(
-    ({ id }) => id === "phone-sensitive-national-hyphen-exact-selector",
-  );
+  const phonePositive = phone.cases.find(({ id }) => id === "phone-sensitive-national-hyphen-exact-selector");
   if (phonePositive === undefined) {
     fail("pii-phone-v1.json: representative positive is missing");
   }
   const usSsn = loadCorpus("pii-us-ssn-v1.json");
-  const usSsnPositive = usSsn.cases.find(
-    ({ id }) => id === "us-ssn-sensitive-compact-exact-selector",
-  );
+  const usSsnPositive = usSsn.cases.find(({ id }) => id === "us-ssn-sensitive-compact-exact-selector");
   if (usSsnPositive === undefined) {
     fail("pii-us-ssn-v1.json: representative positive is missing");
   }
@@ -320,9 +298,7 @@ function buildFixtures(detectorProfile) {
       family: phone.family,
       positive: phonePositive,
     },
-    version: JSON.parse(
-      readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8"),
-    ).version,
+    version: JSON.parse(readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8")).version,
     profile: detectorProfile,
     detectors,
     synchronous: fixtures,
@@ -405,9 +381,7 @@ async function bundlePackageHarness(artifactDir, outFile, detectorProfile, pii =
 async function stageServeDirectory(artifactDir, detectorProfile, pages) {
   const profile = DETECTOR_PROFILES[detectorProfile];
   const requiredEntries =
-    detectorProfile === "common"
-      ? [PACKAGE_COMMON_ENTRY]
-      : [PACKAGE_ENTRY, PACKAGE_WEB_STREAM_ENTRY];
+    detectorProfile === "common" ? [PACKAGE_COMMON_ENTRY] : [PACKAGE_ENTRY, PACKAGE_WEB_STREAM_ENTRY];
   for (const entry of requiredEntries) {
     if (!existsSync(entry)) {
       fail(`${entry}: missing; build the package with \`npm run js:build\``);
@@ -419,44 +393,23 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
       copyFileSync(join(artifactDir, name), join(directory, name));
     } catch {
       rmSync(directory, { recursive: true, force: true });
-      fail(
-        `${join(artifactDir, name)}: missing; build it with ` +
-          `\`${profile.buildCommand}\``,
-      );
+      fail(`${join(artifactDir, name)}: missing; build it with ` + `\`${profile.buildCommand}\``);
     }
   }
-  for (const [shim, glue] of [["artifact.js", profile.glue], ["artifact-pii.js", profile.piiGlue]]) {
-    writeFileSync(
-      join(directory, shim),
-      `export * from "./${glue}";\nexport { default } from "./${glue}";\n`,
-    );
+  for (const [shim, glue] of [
+    ["artifact.js", profile.glue],
+    ["artifact-pii.js", profile.piiGlue],
+  ]) {
+    writeFileSync(join(directory, shim), `export * from "./${glue}";\nexport { default } from "./${glue}";\n`);
   }
-  copyFileSync(
-    join(SCRIPTS_DIR, "browser-harness.mjs"),
-    join(directory, "browser-harness.mjs"),
-  );
-  copyFileSync(
-    join(SCRIPTS_DIR, "browser-pii-harness.mjs"),
-    join(directory, "browser-pii-harness.mjs"),
-  );
-  await bundlePackageHarness(
-    artifactDir,
-    join(directory, "package-harness.js"),
-    detectorProfile,
-  );
-  await bundlePackageHarness(
-    artifactDir,
-    join(directory, "package-pii-harness.js"),
-    detectorProfile,
-    true,
-  );
+  copyFileSync(join(SCRIPTS_DIR, "browser-harness.mjs"), join(directory, "browser-harness.mjs"));
+  copyFileSync(join(SCRIPTS_DIR, "browser-pii-harness.mjs"), join(directory, "browser-pii-harness.mjs"));
+  await bundlePackageHarness(artifactDir, join(directory, "package-harness.js"), detectorProfile);
+  await bundlePackageHarness(artifactDir, join(directory, "package-pii-harness.js"), detectorProfile, true);
   for (const { file, module, selector, fixtureKey, exportName } of pages) {
     writeFileSync(join(directory, file), renderPage(module, selector, fixtureKey, exportName));
   }
-  writeFileSync(
-    join(directory, "fixtures.json"),
-    JSON.stringify(buildFixtures(detectorProfile)),
-  );
+  writeFileSync(join(directory, "fixtures.json"), JSON.stringify(buildFixtures(detectorProfile)));
   return directory;
 }
 
@@ -528,11 +481,7 @@ async function runEngine(playwright, engine, origin, pages) {
         if (path.endsWith(".wasm")) fetched.push(path.slice(1));
       });
       await tab.goto(`${origin}/${file}`, { waitUntil: "load" });
-      await tab.waitForFunction(
-        () => globalThis.__qualification !== undefined,
-        undefined,
-        { timeout: 120_000 },
-      );
+      await tab.waitForFunction(() => globalThis.__qualification !== undefined, undefined, { timeout: 120_000 });
       runs.push({
         page: name,
         report: await tab.evaluate(() => globalThis.__qualification),
@@ -556,17 +505,12 @@ async function main() {
     playwright = await import("playwright");
   } catch {
     fail(
-      "playwright is not installed; run `npm ci` and " +
-        "`npx playwright install --with-deps chromium firefox webkit`",
+      "playwright is not installed; run `npm ci` and " + "`npx playwright install --with-deps chromium firefox webkit`",
     );
     return;
   }
 
-  const directory = await stageServeDirectory(
-    options.artifactDir,
-    options.detectorProfile,
-    PAGES,
-  );
+  const directory = await stageServeDirectory(options.artifactDir, options.detectorProfile, PAGES);
   const { server, origin } = await serve(directory);
   let failed = 0;
   try {
@@ -584,18 +528,17 @@ async function main() {
       let engineFailed = false;
       for (const { page: name, report: pageReport, diagnostics, wasm, fetched } of runs) {
         const fetchFailure = wasmFetchCheck(DETECTOR_PROFILES[options.detectorProfile], wasm, fetched);
-        const report = fetchFailure === undefined
-          ? pageReport
-          : {
-              ...pageReport,
-              ok: false,
-              failures: pageReport.failures + 1,
-              checks: [...pageReport.checks, fetchFailure],
-            };
+        const report =
+          fetchFailure === undefined
+            ? pageReport
+            : {
+                ...pageReport,
+                ok: false,
+                failures: pageReport.failures + 1,
+                checks: [...pageReport.checks, fetchFailure],
+              };
         for (const entry of report.checks) {
-          console.log(
-            `${entry.ok ? "ok" : "not ok"} - ${engine} · ${name} · ${entry.name}`,
-          );
+          console.log(`${entry.ok ? "ok" : "not ok"} - ${engine} · ${name} · ${entry.name}`);
           if (!entry.ok) console.error(`    ${entry.detail}`);
         }
         for (const line of diagnostics) console.error(`    ${engine}: ${line}`);

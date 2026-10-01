@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "verify-crate-digest.py"
 SPEC = importlib.util.spec_from_file_location("verify_crate_digest", SCRIPT)
 assert SPEC and SPEC.loader

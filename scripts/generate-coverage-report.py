@@ -84,9 +84,7 @@ def by_finding_type(inventory_rows: list[dict], declarations_by_type: dict[str, 
                 "behaviorClass": declaration["behaviorClass"] if declaration is not None else None,
                 "state": row["state"],
                 "schemeStates": (
-                    sorted(
-                        {s["state"] for s in row["schemeRows"]}
-                    )
+                    sorted({s["state"] for s in row["schemeRows"]})
                     if row["schemeRows"] != "not-applicable"
                     else "not-applicable"
                 ),
@@ -117,14 +115,9 @@ def by_evidence_dimension(declarations: list[dict]) -> list[dict]:
     counts: dict[str, dict[str, int]] = {}
     for row in declarations:
         for dimension in row["dimensions"]:
-            entry = counts.setdefault(
-                dimension["dimension"], {state: 0 for state in DIMENSION_STATES}
-            )
+            entry = counts.setdefault(dimension["dimension"], {state: 0 for state in DIMENSION_STATES})
             entry[dimension["state"]] += 1
-    return [
-        {"dimension": name, **counts[name]}
-        for name in sorted(counts)
-    ]
+    return [{"dimension": name, **counts[name]} for name in sorted(counts)]
 
 
 def unresolved(inventory_rows: list[dict], declarations: list[dict]) -> dict:
@@ -253,11 +246,7 @@ def render_markdown(report: dict) -> str:
             row["detector"],
             row["behaviorClass"] or "(undeclared)",
             row["state"],
-            (
-                "not-applicable"
-                if row["schemeStates"] == "not-applicable"
-                else ", ".join(row["schemeStates"])
-            ),
+            ("not-applicable" if row["schemeStates"] == "not-applicable" else ", ".join(row["schemeStates"])),
             (
                 "(no declaration)"
                 if row["pendingDimensions"] is None
@@ -277,9 +266,7 @@ def render_markdown(report: dict) -> str:
     lines.append("## Coverage by scheme")
     lines.append("")
     if report["byScheme"]:
-        scheme_rows = [
-            [row["detector"], row["type"], row["scheme"], row["state"]] for row in report["byScheme"]
-        ]
+        scheme_rows = [[row["detector"], row["type"], row["scheme"], row["state"]] for row in report["byScheme"]]
         lines.append(_markdown_table(["Detector", "Type", "Scheme", "State"], scheme_rows))
     else:
         lines.append("No finding type declares an accepted-scheme dimension.")
@@ -296,9 +283,7 @@ def render_markdown(report: dict) -> str:
         ]
         for entry in report["byEvidenceDimension"]
     ]
-    lines.append(
-        _markdown_table(["Dimension", "Supported", "Not applicable", "Pending"], dimension_rows)
-    )
+    lines.append(_markdown_table(["Dimension", "Supported", "Not applicable", "Pending"], dimension_rows))
     lines.append("")
 
     lines.append("## Unresolved and pending coverage")
@@ -313,22 +298,17 @@ def render_markdown(report: dict) -> str:
     lines.append("")
     lines.append("### Unresolved finding types")
     lines.append("")
-    lines.append(
-        "\n".join(f"- {t}" for t in report["unresolved"]["types"]) or "None."
-    )
+    lines.append("\n".join(f"- {t}" for t in report["unresolved"]["types"]) or "None.")
     lines.append("")
     lines.append("### Unresolved schemes")
     lines.append("")
-    lines.append(
-        "\n".join(f"- {s}" for s in report["unresolved"]["schemes"]) or "None."
-    )
+    lines.append("\n".join(f"- {s}" for s in report["unresolved"]["schemes"]) or "None.")
     lines.append("")
     lines.append("### Pending evidence dimensions")
     lines.append("")
     lines.append(
         "\n".join(
-            f"- {dimension} (`{backlog_id}`)"
-            for dimension, backlog_id in report["unresolved"]["pendingDimensions"]
+            f"- {dimension} (`{backlog_id}`)" for dimension, backlog_id in report["unresolved"]["pendingDimensions"]
         )
         or "None."
     )

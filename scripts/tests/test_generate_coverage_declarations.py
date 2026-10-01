@@ -20,16 +20,34 @@ ROOT = SCRIPT.resolve().parents[1]
 # generator output shape without a Node/TypeScript toolchain.
 REQUIRED_DIMENSIONS = {
     "provider": {
-        "positive", "near-miss-negative", "boundary", "malformed", "overlap",
-        "host-context", "range", "adversarial",
+        "positive",
+        "near-miss-negative",
+        "boundary",
+        "malformed",
+        "overlap",
+        "host-context",
+        "range",
+        "adversarial",
     },
     "structural": {
-        "positive", "near-miss-negative", "boundary", "malformed", "overlap",
-        "host-context", "range", "adversarial",
+        "positive",
+        "near-miss-negative",
+        "boundary",
+        "malformed",
+        "overlap",
+        "host-context",
+        "range",
+        "adversarial",
     },
     "contextual": {
-        "positive", "near-miss-negative", "boundary", "malformed", "overlap",
-        "host-context", "range", "adversarial",
+        "positive",
+        "near-miss-negative",
+        "boundary",
+        "malformed",
+        "overlap",
+        "host-context",
+        "range",
+        "adversarial",
     },
     "incremental": {"malformed", "range", "incremental", "adversarial"},
     "binding-edge": {"malformed", "range", "incremental", "adversarial"},
@@ -279,9 +297,7 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
             self.unicode_corpus,
             self.error_codes_doc,
         )
-        self.assertEqual(
-            json.dumps(self.report, sort_keys=True), json.dumps(second, sort_keys=True)
-        )
+        self.assertEqual(json.dumps(self.report, sort_keys=True), json.dumps(second, sort_keys=True))
 
     def test_declares_exactly_one_row_per_declared_type_plus_incremental_plus_consumers(self) -> None:
         declared_types = {row["type"] for row in self.report["declarations"]}
@@ -309,9 +325,7 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
         for row in self.report["declarations"]:
             for dimension in row["dimensions"]:
                 for evidence_id in dimension["evidenceFixtureIds"]:
-                    self.assertIn(
-                        evidence_id, known_ids, f"{row['type']}.{dimension['dimension']}"
-                    )
+                    self.assertIn(evidence_id, known_ids, f"{row['type']}.{dimension['dimension']}")
 
     def test_every_pending_dimension_carries_a_bounded_backlog_id(self) -> None:
         for row in self.report["declarations"]:
@@ -340,11 +354,7 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
             "otpauth_secret",
         }
         structural = {
-            row["type"]: next(
-                dimension
-                for dimension in row["dimensions"]
-                if dimension["dimension"] == "host-context"
-            )
+            row["type"]: next(dimension for dimension in row["dimensions"] if dimension["dimension"] == "host-context")
             for row in self.report["declarations"]
             if row["type"] in structural_types
         }
@@ -378,18 +388,14 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
         claimed (see `generate-coverage-declarations.py`'s
         `apply_known_exceptions`). Issue #190 independently closes that
         host-context gap with type-owned canonical evidence."""
-        auth = next(
-            row for row in self.report["declarations"] if row["type"] == "authorization_credential"
-        )
+        auth = next(row for row in self.report["declarations"] if row["type"] == "authorization_credential")
         by_dimension = {d["dimension"]: d for d in auth["dimensions"]}
         self.assertEqual(by_dimension["positive"]["state"], "supported")
         self.assertEqual(by_dimension["boundary"]["state"], "supported")
         self.assertEqual(by_dimension["near-miss-negative"]["state"], "supported")
 
     def test_authorization_credential_owns_host_context_breadth(self) -> None:
-        auth = next(
-            row for row in self.report["declarations"] if row["type"] == "authorization_credential"
-        )
+        auth = next(row for row in self.report["declarations"] if row["type"] == "authorization_credential")
         host_context = next(d for d in auth["dimensions"] if d["dimension"] == "host-context")
         self.assertEqual(host_context["state"], "supported")
         self.assertNotIn("classLevel", host_context)
@@ -404,9 +410,7 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
         )
 
     def test_authorization_credential_overlap_is_supported_by_its_own_fixture(self) -> None:
-        auth = next(
-            row for row in self.report["declarations"] if row["type"] == "authorization_credential"
-        )
+        auth = next(row for row in self.report["declarations"] if row["type"] == "authorization_credential")
         overlap = next(d for d in auth["dimensions"] if d["dimension"] == "overlap")
         self.assertEqual(overlap["state"], "supported")
         self.assertIn(

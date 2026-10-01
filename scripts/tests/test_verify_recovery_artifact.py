@@ -19,7 +19,16 @@ SPEC.loader.exec_module(CHECK)
 class RecoveryArtifactTests(unittest.TestCase):
     def test_missing_extra_and_changed_bytes_are_rejected(self):
         payload = b"synthetic qualified artifact"
-        inventory = {"artifacts": [{"artifact": "addon", "file": "addon.node", "bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}]}
+        inventory = {
+            "artifacts": [
+                {
+                    "artifact": "addon",
+                    "file": "addon.node",
+                    "bytes": len(payload),
+                    "sha256": hashlib.sha256(payload).hexdigest(),
+                }
+            ]
+        }
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             with self.assertRaises(ValueError):
@@ -35,7 +44,12 @@ class RecoveryArtifactTests(unittest.TestCase):
                 CHECK.verify_files(inventory, "addon", root)
 
     def test_pypi_distinguishes_complete_partial_absent_and_conflict(self):
-        inventory = {"artifacts": [{"file": "synthetic.whl", "sha256": "a" * 64}, {"file": "synthetic.tar.gz", "sha256": "b" * 64}]}
+        inventory = {
+            "artifacts": [
+                {"file": "synthetic.whl", "sha256": "a" * 64},
+                {"file": "synthetic.tar.gz", "sha256": "b" * 64},
+            ]
+        }
         files = [{"filename": item["file"], "digests": {"sha256": item["sha256"]}} for item in inventory["artifacts"]]
 
         complete = CHECK.verify_pypi(inventory, {"urls": files})
@@ -128,9 +142,7 @@ class RecoveryArtifactTests(unittest.TestCase):
                 self.assertEqual(state.reason, f"PyPI returned HTTP {status}")
         self.assertEqual(
             with_urlopen(
-                lambda *_args, **_kwargs: (_ for _ in ()).throw(
-                    CHECK.URLError("synthetic transport failure")
-                )
+                lambda *_args, **_kwargs: (_ for _ in ()).throw(CHECK.URLError("synthetic transport failure"))
             ).status,
             "unobservable",
         )

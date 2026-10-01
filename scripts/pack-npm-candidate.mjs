@@ -25,7 +25,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, readFile, readdir, rm } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -46,8 +46,7 @@ function parseArgs(argv) {
   const required = ["addon-dir", "wasm-dir", "wasm-common-dir", "out-dir"];
   if (values.invalid || required.some((key) => values[key] === undefined)) {
     throw new Error(
-      "usage: pack-npm-candidate.mjs --addon-dir <dir> --wasm-dir <dir> " +
-        "--wasm-common-dir <dir> --out-dir <dir>",
+      "usage: pack-npm-candidate.mjs --addon-dir <dir> --wasm-dir <dir> " + "--wasm-common-dir <dir> --out-dir <dir>",
     );
   }
   return Object.fromEntries(required.map((key) => [key, resolve(values[key])]));
@@ -74,9 +73,7 @@ async function stage(sourceDir, packageDir, files) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const { resolveAddonSpecifier } = await import(
-    pathToFileURL(join(JS_PACKAGE_ROOT, "dist/runtime/node.js")).href
-  );
+  const { resolveAddonSpecifier } = await import(pathToFileURL(join(JS_PACKAGE_ROOT, "dist/runtime/node.js")).href);
   const specifier = resolveAddonSpecifier();
   if (specifier === undefined) {
     throw new Error(`no platform package is mapped for ${process.platform}/${process.arch}`);

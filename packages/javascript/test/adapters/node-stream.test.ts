@@ -5,13 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { NodeStreamSanitizer } from "../../src/adapters/node-stream.js";
 import { SecretScanError } from "../../src/errors.js";
-import {
-  bytes,
-  LIMITS,
-  openSession,
-  oracle,
-  partitionCorpus,
-} from "./support.js";
+import { bytes, LIMITS, openSession, oracle, partitionCorpus } from "./support.js";
 
 const FINALIZED_INPUT = "api_key=SYNTHETIC_REVOKED_NODE_FINALIZED\n";
 const FINALIZED_OUTPUT = "api_key=<SECRET_1>\n";
@@ -35,23 +29,15 @@ describe("Node stream adapter", () => {
       const expected = await oracle(fixture.input);
       const encoded = bytes(fixture.input);
       for (let boundary = 0; boundary <= encoded.length; boundary += 1) {
-        const result = await sanitize([
-          encoded.slice(0, boundary),
-          encoded.slice(boundary),
-        ]);
-        expect({ ...result, findings: [...result.findings] }, `${fixture.id}@${boundary}`)
-          .toEqual(expected);
+        const result = await sanitize([encoded.slice(0, boundary), encoded.slice(boundary)]);
+        expect({ ...result, findings: [...result.findings] }, `${fixture.id}@${boundary}`).toEqual(expected);
       }
     }
   });
 
   it("carries one decoder across chunks that split a character", async () => {
     const encoded = bytes("🔑");
-    const result = await sanitize([
-      encoded.slice(0, 1),
-      encoded.slice(1, 3),
-      encoded.slice(3),
-    ]);
+    const result = await sanitize([encoded.slice(0, 1), encoded.slice(1, 3), encoded.slice(3)]);
 
     expect(result.text).toBe("🔑");
   });
@@ -74,16 +60,11 @@ describe("Node stream adapter", () => {
     const encoded = bytes(input);
     const split = encoded.indexOf(0x0a) + 1;
 
-    const { findings } = await sanitize([
-      encoded.slice(0, split),
-      encoded.slice(split),
-    ]);
+    const { findings } = await sanitize([encoded.slice(0, split), encoded.slice(split)]);
 
     const [finding] = findings;
     expect(finding).toBeDefined();
-    expect(input.slice(finding?.start, finding?.end)).toBe(
-      "SYNTHETIC_REVOKED_ABSOLUTE",
-    );
+    expect(input.slice(finding?.start, finding?.end)).toBe("SYNTHETIC_REVOKED_ABSOLUTE");
   });
 
   it("stalls the producer at backpressure and resumes on drain", async () => {
@@ -150,9 +131,7 @@ describe("Node stream adapter", () => {
       },
     });
 
-    await expect(pipeline(source, transform, sink)).rejects.toBe(
-      downstreamError,
-    );
+    await expect(pipeline(source, transform, sink)).rejects.toBe(downstreamError);
 
     expect(Buffer.concat(output).toString("utf8")).toBe(FINALIZED_OUTPUT);
     expect(transform.destroyed).toBe(true);
@@ -240,9 +219,7 @@ describe("Node stream adapter", () => {
   });
 
   it("refuses to open a stream before initialize succeeds", async () => {
-    const { createNodeStreamSanitizer } = await import(
-      "../../src/adapters/node-stream.js"
-    );
+    const { createNodeStreamSanitizer } = await import("../../src/adapters/node-stream.js");
 
     expect(() => createNodeStreamSanitizer({ limits: LIMITS })).toThrowError(
       expect.objectContaining({

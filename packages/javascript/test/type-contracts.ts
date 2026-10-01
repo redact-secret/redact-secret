@@ -8,31 +8,11 @@
  * write the documented calls without reaching for `any`.
  */
 
-import * as publicApi from "../src/index.js";
-import {
-  createNodeStreamSanitizer,
-  NodeStreamSanitizer,
-} from "../src/adapters/node-stream.js";
+import { createNodeStreamSanitizer, NodeStreamSanitizer } from "../src/adapters/node-stream.js";
 import { createNodeStreamSanitizer as createCommonNodeStreamSanitizer } from "../src/adapters/node-stream-common.js";
-import {
-  createWebStreamSanitizer,
-  WebStreamSanitizer,
-} from "../src/adapters/web-stream.js";
+import { createWebStreamSanitizer, WebStreamSanitizer } from "../src/adapters/web-stream.js";
 import { createWebStreamSanitizer as createCommonWebStreamSanitizer } from "../src/adapters/web-stream-common.js";
-import {
-  artifact,
-  createIncrementalSanitizer,
-  defaultPlaceholderFormatter,
-  initialize,
-  PROFILE,
-  RANGE_UNIT,
-  redact,
-  scan,
-  scanAndRedact,
-  SecretScanError,
-  typedPlaceholderFormatter,
-  VERSION,
-} from "../src/index.js";
+import type * as publicApi from "../src/index.js";
 import type {
   ArtifactKind,
   DetectedSecretFinding,
@@ -54,31 +34,34 @@ import type {
   SecretScanErrorCode,
   WholeInputLimits,
 } from "../src/index.js";
+import {
+  artifact,
+  createIncrementalSanitizer,
+  defaultPlaceholderFormatter,
+  initialize,
+  type PROFILE,
+  RANGE_UNIT,
+  redact,
+  SecretScanError,
+  scan,
+  scanAndRedact,
+  typedPlaceholderFormatter,
+  VERSION,
+} from "../src/index.js";
 
 type Expect<T extends true> = T;
-type IsAbsent<Key extends string> = Key extends keyof typeof publicApi
-  ? false
-  : true;
-type Equal<A, B> =
-  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
-    ? true
-    : false;
+type IsAbsent<Key extends string> = Key extends keyof typeof publicApi ? false : true;
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 
 /** Findings are immutable, and carry no plaintext value. */
 type FindingIsImmutable = Expect<Equal<SecretFinding, Readonly<SecretFinding>>>;
 type ScanResultIsImmutable = Expect<Equal<ScanResult, Readonly<ScanResult>>>;
-type FindingHasNoValue = Expect<
-  "value" extends keyof SecretFinding ? false : true
->;
-type FindingsAreImmutable = Expect<
-  Equal<ScanResult["findings"], readonly SecretFinding[]>
->;
+type FindingHasNoValue = Expect<"value" extends keyof SecretFinding ? false : true>;
+type FindingsAreImmutable = Expect<Equal<ScanResult["findings"], readonly SecretFinding[]>>;
 
 /** Offsets are UTF-16 code units, and the unit is stated in the type. */
 type OffsetsAreNumbers = Expect<
-  Equal<SecretFinding["start"], number> extends true
-    ? Equal<SecretFinding["end"], number>
-    : false
+  Equal<SecretFinding["start"], number> extends true ? Equal<SecretFinding["end"], number> : false
 >;
 type RangeUnitIsUtf16 = Expect<Equal<RangeUnit, "utf16-code-units">>;
 
@@ -92,36 +75,25 @@ type NoBuiltInDetectors = Expect<IsAbsent<"builtInDetectors">>;
 type NoEntropyHelper = Expect<IsAbsent<"calculateShannonEntropy">>;
 type NoNativeHandle = Expect<IsAbsent<"NATIVE_HANDLE">>;
 type NoRuntimeFactory = Expect<IsAbsent<"createRedactSecretRuntime">>;
-type NoImplementationLookaround = Expect<
-  IsAbsent<"INCREMENTAL_LOOKAROUND_CODE_UNITS">
->;
+type NoImplementationLookaround = Expect<IsAbsent<"INCREMENTAL_LOOKAROUND_CODE_UNITS">>;
 
 /** Synchronous operations stay synchronous; only initialize is awaited. */
 type InitializeIsAsync = Expect<Equal<ReturnType<typeof initialize>, Promise<void>>>;
-type ScanIsSync = Expect<
-  Equal<ReturnType<typeof scan>, readonly SecretFinding[]>
->;
+type ScanIsSync = Expect<Equal<ReturnType<typeof scan>, readonly SecretFinding[]>>;
 type RedactIsSync = Expect<Equal<ReturnType<typeof redact>, string>>;
-type ScanAndRedactIsSync = Expect<
-  Equal<ReturnType<typeof scanAndRedact>, ScanResult>
->;
+type ScanAndRedactIsSync = Expect<Equal<ReturnType<typeof scanAndRedact>, ScanResult>>;
 
 const policy: SecretPolicy = {
   evaluate(finding: DetectedSecretFinding, context: PolicyContext): SecretAction {
     const confidence: SecretConfidence = finding.confidence;
     const obfuscation: SecretObfuscation = finding.obfuscation;
     void obfuscation;
-    return context.findingIndex + 1 === context.findingCount &&
-      confidence === "high"
-      ? "block"
-      : "warn";
+    return context.findingIndex + 1 === context.findingCount && confidence === "high" ? "block" : "warn";
   },
 };
 
-const formatter: PlaceholderFormatter = (
-  finding: SecretFinding,
-  context: PlaceholderContext,
-) => `<${finding.type}_${context.placeholderIndex}>`;
+const formatter: PlaceholderFormatter = (finding: SecretFinding, context: PlaceholderContext) =>
+  `<${finding.type}_${context.placeholderIndex}>`;
 
 const wholeInputLimits: WholeInputLimits = {
   maxInputBytes: 64 * 1024 * 1024,
@@ -142,8 +114,7 @@ const incrementalOptions: IncrementalSanitizerOptions = {
     maxMultilineCodeUnits: 2_048,
   },
   policy: {
-    evaluate: (_finding, context) =>
-      context.findingIndex === 0 ? "redact" : "warn",
+    evaluate: (_finding, context) => (context.findingIndex === 0 ? "redact" : "warn"),
   },
   placeholderFormatter: typedPlaceholderFormatter,
 };
@@ -158,9 +129,7 @@ async function documentedUsage(input: string): Promise<void> {
   });
   const result: ScanResult = scanAndRedact(input, scanAndRedactOptions);
 
-  const session: IncrementalSanitizer = createIncrementalSanitizer(
-    incrementalOptions,
-  );
+  const session: IncrementalSanitizer = createIncrementalSanitizer(incrementalOptions);
   const appended: IncrementalSanitizerResult = session.append(input);
   const finalized: IncrementalSanitizerResult = session.finalize();
 
@@ -169,17 +138,7 @@ async function documentedUsage(input: string): Promise<void> {
   const unit: RangeUnit = RANGE_UNIT;
   const version: string = VERSION;
 
-  void [
-    loaded,
-    text,
-    result,
-    appended,
-    finalized,
-    code,
-    unit,
-    version,
-    session.state,
-  ];
+  void [loaded, text, result, appended, finalized, code, unit, version, session.state];
 }
 
 void documentedUsage;
@@ -190,12 +149,8 @@ void documentedUsage;
  * resolves `node:stream` and `./web-stream` resolving nothing Node-only.
  */
 
-type NodeSanitizerFindings = Expect<
-  Equal<NodeStreamSanitizer["findings"], readonly SecretFinding[]>
->;
-type WebSanitizerFindings = Expect<
-  Equal<WebStreamSanitizer["findings"], readonly SecretFinding[]>
->;
+type NodeSanitizerFindings = Expect<Equal<NodeStreamSanitizer["findings"], readonly SecretFinding[]>>;
+type WebSanitizerFindings = Expect<Equal<WebStreamSanitizer["findings"], readonly SecretFinding[]>>;
 type WebSanitizerReadsStrings = Expect<
   Equal<ReturnType<typeof createWebStreamSanitizer>["readable"], ReadableStream<string>>
 >;
@@ -203,9 +158,7 @@ type WebSanitizerReadsStrings = Expect<
 /** Each adapter owns exactly one session, and takes it as its constructor. */
 function documentedStreamUsage(session: IncrementalSanitizer): void {
   const fromSession: NodeStreamSanitizer = new NodeStreamSanitizer(session);
-  const fromOptions: NodeStreamSanitizer = createNodeStreamSanitizer(
-    incrementalOptions,
-  );
+  const fromOptions: NodeStreamSanitizer = createNodeStreamSanitizer(incrementalOptions);
   const web: WebStreamSanitizer = createWebStreamSanitizer(incrementalOptions);
   const wrapped: WebStreamSanitizer = new WebStreamSanitizer(session);
 
@@ -224,12 +177,8 @@ void documentedStreamUsage;
  * only which runtime the factory opens a session against differs.
  */
 function documentedCommonStreamUsage(): void {
-  const commonNode: NodeStreamSanitizer = createCommonNodeStreamSanitizer(
-    incrementalOptions,
-  );
-  const commonWeb: WebStreamSanitizer = createCommonWebStreamSanitizer(
-    incrementalOptions,
-  );
+  const commonNode: NodeStreamSanitizer = createCommonNodeStreamSanitizer(incrementalOptions);
+  const commonWeb: WebStreamSanitizer = createCommonWebStreamSanitizer(incrementalOptions);
 
   void [commonNode, commonWeb];
 }

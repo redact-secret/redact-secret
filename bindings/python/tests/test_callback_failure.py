@@ -12,7 +12,6 @@ Every raised exception is a fixed, documented `SecretScanError` subclass.
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 SYNTHETIC_INPUT = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
@@ -26,9 +25,7 @@ def findings() -> list[redact_secret.Finding]:
 def test_policy_exception_becomes_policy_failure_error(
     findings: list[redact_secret.Finding],
 ) -> None:
-    def raising_policy(
-        finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext
-    ) -> str:
+    def raising_policy(finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext) -> str:
         raise ValueError(f"leak: {SYNTHETIC_INPUT}")
 
     with pytest.raises(redact_secret.PolicyFailureError) as excinfo:
@@ -40,9 +37,7 @@ def test_policy_exception_becomes_policy_failure_error(
 
 
 def test_policy_non_string_return_becomes_invalid_policy_action_error() -> None:
-    def bad_return_type(
-        finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext
-    ) -> int:
+    def bad_return_type(finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext) -> int:
         return 1
 
     with pytest.raises(redact_secret.InvalidPolicyActionError) as excinfo:
@@ -54,9 +49,7 @@ def test_policy_non_string_return_becomes_invalid_policy_action_error() -> None:
 def test_policy_unrecognized_action_becomes_invalid_policy_action_error(
     action: str,
 ) -> None:
-    def unrecognized_action(
-        finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext
-    ) -> str:
+    def unrecognized_action(finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext) -> str:
         return action
 
     with pytest.raises(redact_secret.InvalidPolicyActionError):
@@ -68,9 +61,7 @@ def test_policy_callback_only_receives_safe_metadata(
 ) -> None:
     seen: dict = {}
 
-    def inspecting_policy(
-        finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext
-    ) -> str:
+    def inspecting_policy(finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext) -> str:
         seen["finding"] = finding
         seen["context"] = context
         return "warn"
@@ -89,9 +80,7 @@ def test_policy_callback_only_receives_safe_metadata(
 def test_policy_can_delegate_to_default_policy(
     findings: list[redact_secret.Finding],
 ) -> None:
-    def wraps_default(
-        finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext
-    ) -> str:
+    def wraps_default(finding: redact_secret.DetectedFinding, context: redact_secret.PolicyContext) -> str:
         return redact_secret.default_policy(finding, context)
 
     delegated = redact_secret.scan(SYNTHETIC_INPUT, policy=wraps_default)
@@ -102,9 +91,7 @@ def test_policy_can_delegate_to_default_policy(
 def test_formatter_exception_becomes_placeholder_failure_error(
     findings: list[redact_secret.Finding],
 ) -> None:
-    def raising_formatter(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def raising_formatter(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         raise ValueError(f"leak: {SYNTHETIC_INPUT}")
 
     with pytest.raises(redact_secret.PlaceholderFailureError) as excinfo:
@@ -118,14 +105,14 @@ def test_formatter_exception_becomes_placeholder_failure_error(
 def test_formatter_non_string_return_becomes_placeholder_failure_error(
     findings: list[redact_secret.Finding],
 ) -> None:
-    def bad_return_type(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> int:
+    def bad_return_type(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> int:
         return 42
 
     with pytest.raises(redact_secret.PlaceholderFailureError):
         redact_secret.redact(
-            SYNTHETIC_INPUT, findings, formatter=bad_return_type  # type: ignore[arg-type]
+            SYNTHETIC_INPUT,
+            findings,
+            formatter=bad_return_type,  # type: ignore[arg-type]
         )
 
 
@@ -134,9 +121,7 @@ def test_formatter_callback_only_receives_safe_metadata(
 ) -> None:
     seen: dict = {}
 
-    def inspecting_formatter(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def inspecting_formatter(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         seen["finding"] = finding
         seen["context"] = context
         return "<REDACTED>"
@@ -153,13 +138,9 @@ def test_formatter_callback_only_receives_safe_metadata(
 def test_formatter_can_delegate_to_default_formatters(
     findings: list[redact_secret.Finding],
 ) -> None:
-    def wraps_typed(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def wraps_typed(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         return redact_secret.typed_placeholder_formatter(finding, context)
 
     delegated = redact_secret.redact(SYNTHETIC_INPUT, findings, formatter=wraps_typed)
-    direct = redact_secret.redact(
-        SYNTHETIC_INPUT, findings, formatter=redact_secret.typed_placeholder_formatter
-    )
+    direct = redact_secret.redact(SYNTHETIC_INPUT, findings, formatter=redact_secret.typed_placeholder_formatter)
     assert delegated == direct

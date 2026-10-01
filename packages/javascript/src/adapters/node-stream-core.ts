@@ -13,8 +13,8 @@
  * module itself imports neither `../session.js` nor `../session-common.js`.
  */
 
-import { Transform } from "node:stream";
 import type { TransformCallback } from "node:stream";
+import { Transform } from "node:stream";
 
 import type { IncrementalSanitizer, SecretFinding } from "../types.js";
 
@@ -42,11 +42,7 @@ export class NodeStreamSanitizer extends Transform {
     return this.#runtime.findings;
   }
 
-  override _transform(
-    chunk: Uint8Array,
-    _encoding: BufferEncoding,
-    callback: TransformCallback,
-  ): void {
+  override _transform(chunk: Uint8Array, _encoding: BufferEncoding, callback: TransformCallback): void {
     try {
       const { text } = this.#runtime.append(chunk);
       if (text.length > 0) this.push(text, "utf8");
@@ -66,10 +62,7 @@ export class NodeStreamSanitizer extends Transform {
     }
   }
 
-  override _destroy(
-    error: Error | null,
-    callback: (error?: Error | null) => void,
-  ): void {
+  override _destroy(error: Error | null, callback: (error?: Error | null) => void): void {
     this.#runtime.abort();
     callback(error);
   }

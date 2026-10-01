@@ -11,14 +11,14 @@
  */
 
 import {
-  RANGE_UNIT,
-  SecretScanError,
-  VERSION,
   createIncrementalSanitizer,
   initialize,
+  RANGE_UNIT,
   redact,
+  SecretScanError,
   scan,
   scanAndRedact,
+  VERSION,
 } from "@redact-secret/core";
 import { WebStreamSanitizer } from "@redact-secret/core/web-stream";
 

@@ -1,5 +1,14 @@
 # Redact Secret
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15000/badge)](https://www.bestpractices.dev/projects/15000)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/redact-secret/redact-secret/badge)](https://scorecard.dev/viewer/?uri=github.com/redact-secret/redact-secret)
+[![SAST](https://github.com/redact-secret/redact-secret/actions/workflows/sast.yml/badge.svg?branch=main)](https://github.com/redact-secret/redact-secret/actions/workflows/sast.yml)
+[![License: MIT](https://img.shields.io/github/license/redact-secret/redact-secret)](./LICENSE)
+[![npm: @redact-secret/core](https://img.shields.io/npm/v/@redact-secret/core/beta?label=%40redact-secret%2Fcore)](https://www.npmjs.com/package/@redact-secret/core)
+[![PyPI: redact-secret](https://img.shields.io/pypi/v/redact-secret?include_prereleases&label=redact-secret)](https://pypi.org/project/redact-secret/)
+[![crates.io: redact-secret](https://img.shields.io/crates/v/redact-secret?label=crates.io)](https://crates.io/crates/redact-secret)
+[![docs.rs](https://img.shields.io/docsrs/redact-secret)](https://docs.rs/redact-secret)
+
 Deterministic secret detection and redaction for runtime data and AI context.
 
 Your application handles text it does not fully control: user input, pasted
@@ -435,10 +444,22 @@ npm run ci
 artifact qualification commands and the repository layout; the
 [contribution guide](CONTRIBUTION.md) covers pull requests and review.
 
+## Project governance
+
+- [GOVERNANCE.md](GOVERNANCE.md): roles, how decisions are made, and access
+  continuity.
+- [ROADMAP.md](ROADMAP.md): what the next year is expected to bring, and what
+  is out of scope.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md): expected behavior in every
+  project space.
+- [Security assurance case](docs/assurance-case.md): why the security
+  requirements are met, with evidence.
+
 ## Security and release process
 
 See [SECURITY.md](./SECURITY.md) for private vulnerability reporting and the
-security model. Never submit active credentials in a report, issue, fixture,
+security model, how reports are handled, and how to verify signed releases.
+Never submit active credentials in a report, issue, fixture,
 snapshot, log, or diagnostic. For a false positive or missed detection, use
 the [reporting guide](docs/guides/reporting-detection-issues.md) instead.
 

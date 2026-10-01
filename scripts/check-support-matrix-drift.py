@@ -136,9 +136,7 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
             if basis not in evidence_bases:
                 errors.append(f"{label}: {name}: evidence basis {basis!r} is not in {evidence_bases}")
             if profile not in qualification_profiles:
-                errors.append(
-                    f"{label}: {name}: qualification profile {profile!r} is not in {qualification_profiles}"
-                )
+                errors.append(f"{label}: {name}: qualification profile {profile!r} is not in {qualification_profiles}")
             if status == "stable" and profile is None:
                 errors.append(f"{label}: {name}: stable carries no qualification profile")
             if status != "stable" and profile is not None:
@@ -156,8 +154,7 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
     if "stableDistribution" in matrix:
         actual = {
             profile: sum(
-                entry.get("status") == "stable" and entry.get("qualificationProfile") == profile
-                for entry in families
+                entry.get("status") == "stable" and entry.get("qualificationProfile") == profile for entry in families
             )
             for profile in QUALIFICATION_PROFILES
         }
@@ -165,9 +162,7 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
         if isinstance(recorded, dict) and not set(recorded) - set(QUALIFICATION_PROFILES):
             recorded = {profile: recorded.get(profile, 0) for profile in QUALIFICATION_PROFILES}
         if recorded != actual:
-            errors.append(
-                f"{label}: stableDistribution {matrix.get('stableDistribution')} does not match {actual}"
-            )
+            errors.append(f"{label}: stableDistribution {matrix.get('stableDistribution')} does not match {actual}")
     return errors
 
 
@@ -276,7 +271,11 @@ def check_regressions(regressions: list[dict], acknowledgements: dict) -> list[s
 def build_record(*, baseline: dict, candidate: dict, drift: dict[str, list[dict]]) -> dict:
     def source_report(matrix: dict) -> dict:
         report = matrix.get("sourceReport", {})
-        return {"generatedAt": report.get("generatedAt"), "runId": report.get("runId"), "revision": report.get("revision")}
+        return {
+            "generatedAt": report.get("generatedAt"),
+            "runId": report.get("runId"),
+            "revision": report.get("revision"),
+        }
 
     return {
         "schemaVersion": 1,

@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-legacy-identifiers.py"
 SPEC = importlib.util.spec_from_file_location("check_legacy_identifiers", SCRIPT)
 assert SPEC and SPEC.loader
@@ -72,8 +71,7 @@ class CheckLegacyIdentifiersTest(unittest.TestCase):
     def test_a_preserved_core_directory_path_is_not_flagged(self) -> None:
         self.repo.write(
             "docs/note.md",
-            "See `crates/secret-scan-core/src/lib.rs` and "
-            "`crates/secret-scan-cli/src/main.rs`.\n",
+            "See `crates/secret-scan-core/src/lib.rs` and `crates/secret-scan-cli/src/main.rs`.\n",
         )
         self.assertEqual(self.validate(), [])
 
@@ -98,7 +96,9 @@ class CheckLegacyIdentifiersTest(unittest.TestCase):
         self.assertOneError("legacy identifier 'secret-scan' outside the allowlist")
 
     def test_a_hit_on_an_allowlisted_path_passes(self) -> None:
-        self.repo.write("docs/decisions/2026-09-10-adopt-redact-secret-naming-contract.md", "Previous identity: secret-scan.\n")
+        self.repo.write(
+            "docs/decisions/2026-09-10-adopt-redact-secret-naming-contract.md", "Previous identity: secret-scan.\n"
+        )
         self.assertEqual(self.validate(), [])
 
     def test_candidate_changelog_cannot_reintroduce_legacy_identity(self) -> None:

@@ -50,28 +50,19 @@
 
 import { execFileSync } from "node:child_process";
 import { once } from "node:events";
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-  symlinkSync,
-} from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { Readable, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
-
+import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
 import {
-  CANONICAL_FIXTURE_ID,
   assertMatchesFixture,
+  CANONICAL_FIXTURE_ID,
   loadCanonicalFixture,
   packageVersion,
 } from "./qualify-runtime-fixture.mjs";
-import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
 
 /**
  * The package-integration and stream-adapter fixture for `common`
@@ -208,9 +199,7 @@ function parseArguments(argv) {
       index += 1;
       const value = argv[index];
       if (value === undefined || !(value in TARGET_PLATFORM_NAMES)) {
-        console.error(
-          `--target must be one of ${Object.keys(TARGET_PLATFORM_NAMES).join(", ")}`,
-        );
+        console.error(`--target must be one of ${Object.keys(TARGET_PLATFORM_NAMES).join(", ")}`);
         process.exit(1);
       }
       options.target = value;
@@ -218,9 +207,7 @@ function parseArguments(argv) {
       index += 1;
       const value = argv[index];
       if (!Object.hasOwn(DETECTOR_PROFILES, value ?? "")) {
-        console.error(
-          `--detector-profile must be one of ${Object.keys(DETECTOR_PROFILES).join(", ")}`,
-        );
+        console.error(`--detector-profile must be one of ${Object.keys(DETECTOR_PROFILES).join(", ")}`);
         process.exit(1);
       }
       options.detectorProfile = value;
@@ -245,18 +232,11 @@ function byteOffsetToCodeUnitOffset(text, byteOffset) {
 }
 
 function loadSynchronousCorpus() {
-  const corpus = JSON.parse(
-    readFileSync(join(FIXTURES_DIR, "synchronous-corpus.json"), "utf8"),
-  );
-  assert(
-    corpus.offsetUnit === "utf8-byte",
-    `synchronous-corpus.json: offsetUnit is ${corpus.offsetUnit}`,
-  );
+  const corpus = JSON.parse(readFileSync(join(FIXTURES_DIR, "synchronous-corpus.json"), "utf8"));
+  assert(corpus.offsetUnit === "utf8-byte", `synchronous-corpus.json: offsetUnit is ${corpus.offsetUnit}`);
   // "not-yet-evaluated" fixtures carry no expectation and document a future
   // gap, not a current behavioral contract.
-  return corpus.fixtures.filter(
-    (fixture) => fixture.support !== "not-yet-evaluated",
-  );
+  return corpus.fixtures.filter((fixture) => fixture.support !== "not-yet-evaluated");
 }
 
 /**
@@ -267,9 +247,7 @@ function loadSynchronousCorpus() {
  * reviewed set of expected findings rather than two.
  */
 function loadCommonExpectations() {
-  const common = JSON.parse(
-    readFileSync(join(FIXTURES_DIR, COMMON_EXPECTATIONS_FILE), "utf8"),
-  );
+  const common = JSON.parse(readFileSync(join(FIXTURES_DIR, COMMON_EXPECTATIONS_FILE), "utf8"));
   assert(
     common.profile === "common" && common.offsetUnit === "utf8-byte",
     `${COMMON_EXPECTATIONS_FILE}: not a utf8-byte common expectation set`,
@@ -278,9 +256,7 @@ function loadCommonExpectations() {
 }
 
 function inspectAddon(target) {
-  const entries = readdirSync(ADDON_DIR).filter(
-    (name) => name !== "node_modules" && name !== "src",
-  );
+  const entries = readdirSync(ADDON_DIR).filter((name) => name !== "node_modules" && name !== "src");
   console.log(`# ${ADDON_DIR}`);
   for (const name of entries.sort()) {
     const { size } = statSync(join(ADDON_DIR, name));
@@ -309,18 +285,9 @@ function runSmokeTest() {
     assert(fixture !== undefined, `${name}: ${id} is missing`);
     return fixture.input;
   };
-  const paymentCard = representative(
-    "pii-payment-card-v1.json",
-    "payment-card-sensitive-compact-exact-selector",
-  );
-  const phone = representative(
-    "pii-phone-v1.json",
-    "phone-sensitive-national-hyphen-exact-selector",
-  );
-  const usSsn = representative(
-    "pii-us-ssn-v1.json",
-    "us-ssn-sensitive-compact-exact-selector",
-  );
+  const paymentCard = representative("pii-payment-card-v1.json", "payment-card-sensitive-compact-exact-selector");
+  const phone = representative("pii-phone-v1.json", "phone-sensitive-national-hyphen-exact-selector");
+  const usSsn = representative("pii-us-ssn-v1.json", "us-ssn-sensitive-compact-exact-selector");
   for (const row of [
     { input: usSsn, type: "pii_jurisdiction_us_ssn" },
     {
@@ -372,22 +339,16 @@ function conformAddon(fixtures, detectorProfile, commonExpectations) {
     commonExpectations === undefined
       ? undefined
       : new Map(commonExpectations.fixtures.map(({ id, expected }) => [id, expected]));
-  const allowed = new Set(
-    commonExpectations === undefined ? fullDetectorIds() : commonExpectations.detectors,
-  );
+  const allowed = new Set(commonExpectations === undefined ? fullDetectorIds() : commonExpectations.detectors);
 
   const mismatched = [];
   const foreign = new Set();
   for (const fixture of fixtures) {
     const expectedSource = expectationsById?.get(fixture.id) ?? fixture.expected;
     if (expectationsById !== undefined) {
-      assert(
-        expectationsById.has(fixture.id),
-        `${COMMON_EXPECTATIONS_FILE}: no entry for ${fixture.id}`,
-      );
+      assert(expectationsById.has(fixture.id), `${COMMON_EXPECTATIONS_FILE}: no entry for ${fixture.id}`);
     }
-    const findings =
-      detectorProfile === "common" ? addon.scanCommon(fixture.input) : addon.scan(fixture.input);
+    const findings = detectorProfile === "common" ? addon.scanCommon(fixture.input) : addon.scan(fixture.input);
     const actual = findings.map((finding) => [
       finding.detector,
       finding.type,
@@ -435,10 +396,7 @@ async function linkAddon() {
     pathToFileURL(join(JS_PACKAGE_DIR, "dist", "runtime", "node.js")).href
   );
   const specifier = resolveAddonSpecifier();
-  assert(
-    specifier !== undefined,
-    `no platform package is mapped for ${process.platform}/${process.arch}`,
-  );
+  assert(specifier !== undefined, `no platform package is mapped for ${process.platform}/${process.arch}`);
   const scope = join(JS_PACKAGE_DIR, "node_modules", "@redact-secret");
   const link = join(scope, specifier.split("/")[1]);
   mkdirSync(scope, { recursive: true });
@@ -489,15 +447,8 @@ function assertMatchesCommonExpectation(finding, commonExpectations, fixtureId) 
  * `commonExpectations` instead of `fixture`'s own `full` expectation.
  */
 async function integrateWithPackage(detectorProfile, commonExpectations) {
-  const entry = join(
-    JS_PACKAGE_DIR,
-    "dist",
-    detectorProfile === "common" ? "common.js" : "index.js",
-  );
-  assert(
-    existsSync(entry),
-    `${entry}: missing; build the package with \`npm run js:build\``,
-  );
+  const entry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
+  assert(existsSync(entry), `${entry}: missing; build the package with \`npm run js:build\``);
 
   const fixture = await loadCanonicalFixture(
     detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID,
@@ -546,11 +497,7 @@ async function integrateWithPackage(detectorProfile, commonExpectations) {
     const session = api.createIncrementalSanitizer({ limits: GENEROUS_LIMITS });
     assertEqual(session.state, "accepting", "a fresh session's state");
     let sanitized = "";
-    for (const chunk of [
-      `api_key=${MARKER.slice(0, 10)}`,
-      `${MARKER.slice(10)}\n`,
-      "tail",
-    ]) {
+    for (const chunk of [`api_key=${MARKER.slice(0, 10)}`, `${MARKER.slice(10)}\n`, "tail"]) {
       sanitized += session.append(chunk).text;
     }
     sanitized += session.finalize().text;
@@ -567,10 +514,7 @@ async function integrateWithPackage(detectorProfile, commonExpectations) {
       thrown = error;
     }
     assert(thrown !== undefined, "a finalized session accepted another append");
-    assert(
-      thrown instanceof api.SecretScanError,
-      "a foreign error escaped the package",
-    );
+    assert(thrown instanceof api.SecretScanError, "a foreign error escaped the package");
     assertEqual(thrown.code, "INVALID_STATE", "post-finalize append code");
   } finally {
     rmSync(link, { recursive: true, force: true });
@@ -600,21 +544,12 @@ async function integrateWithPackage(detectorProfile, commonExpectations) {
  */
 async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
   const entry = join(JS_PACKAGE_DIR, "dist", "adapters", "node-stream.js");
-  assert(
-    existsSync(entry),
-    `${entry}: missing; build the package with \`npm run js:build\``,
-  );
+  assert(existsSync(entry), `${entry}: missing; build the package with \`npm run js:build\``);
 
   const link = await linkAddon();
   try {
-    const packageEntry = join(
-      JS_PACKAGE_DIR,
-      "dist",
-      detectorProfile === "common" ? "common.js" : "index.js",
-    );
-    const { createIncrementalSanitizer, initialize, scanAndRedact } = await import(
-      pathToFileURL(packageEntry).href
-    );
+    const packageEntry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
+    const { createIncrementalSanitizer, initialize, scanAndRedact } = await import(pathToFileURL(packageEntry).href);
     const { NodeStreamSanitizer } = await import(pathToFileURL(entry).href);
     await initialize();
 
@@ -651,14 +586,8 @@ async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
 
     const diverged = [];
     for (let boundary = 0; boundary <= encoded.length; boundary += 1) {
-      const actual = await sanitize([
-        encoded.subarray(0, boundary),
-        encoded.subarray(boundary),
-      ]);
-      if (
-        actual.text !== expected.text ||
-        JSON.stringify(actual.findings) !== JSON.stringify(expected.findings)
-      ) {
+      const actual = await sanitize([encoded.subarray(0, boundary), encoded.subarray(boundary)]);
+      if (actual.text !== expected.text || JSON.stringify(actual.findings) !== JSON.stringify(expected.findings)) {
         diverged.push(boundary);
       }
     }
@@ -672,20 +601,13 @@ async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
     const finalizedOracle = oracle(FINALIZED).text;
 
     {
-      const bomCases = [
-        "\uFEFF",
-        `\uFEFF${FINALIZED}`,
-        `ordinary prefix \uFEFF ${FINALIZED}`,
-      ];
+      const bomCases = ["\uFEFF", `\uFEFF${FINALIZED}`, `ordinary prefix \uFEFF ${FINALIZED}`];
       for (const bomCase of bomCases) {
         const bomBytes = Buffer.from(bomCase, "utf8");
         const bomExpected = oracle(bomCase);
         const bomDiverged = [];
         for (let boundary = 0; boundary <= bomBytes.length; boundary += 1) {
-          const actual = await sanitize([
-            bomBytes.subarray(0, boundary),
-            bomBytes.subarray(boundary),
-          ]);
+          const actual = await sanitize([bomBytes.subarray(0, boundary), bomBytes.subarray(boundary)]);
           if (
             actual.text !== bomExpected.text ||
             JSON.stringify(actual.findings) !== JSON.stringify(bomExpected.findings)
@@ -704,15 +626,9 @@ async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
 
     {
       const { findings } = await sanitize([encoded]);
-      assert(
-        Object.isFrozen(findings),
-        "the real addon returned a mutable findings array through the stream adapter",
-      );
+      assert(Object.isFrozen(findings), "the real addon returned a mutable findings array through the stream adapter");
       assert(findings.length > 0, "expected at least one finding from the wrapped fixture");
-      assert(
-        Object.isFrozen(findings[0]),
-        "the real addon returned a mutable finding through the stream adapter",
-      );
+      assert(Object.isFrozen(findings[0]), "the real addon returned a mutable finding through the stream adapter");
     }
 
     {
@@ -724,15 +640,8 @@ async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
       const [error] = await once(transform, "error");
       assertEqual(error?.code, "INVALID_UTF8", "malformed UTF-8 error code");
       const flushed = Buffer.concat(output).toString("utf8");
-      assertEqual(
-        flushed,
-        finalizedOracle,
-        "output flushed before malformed UTF-8 diverged from the oracle",
-      );
-      assert(
-        !flushed.includes(UNRESOLVED),
-        "malformed UTF-8 leaked retained plaintext",
-      );
+      assertEqual(flushed, finalizedOracle, "output flushed before malformed UTF-8 diverged from the oracle");
+      assert(!flushed.includes(UNRESOLVED), "malformed UTF-8 leaked retained plaintext");
     }
 
     {
@@ -750,15 +659,8 @@ async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
       transform.write(Buffer.from(UNRESOLVED));
       transform.destroy();
       await once(transform, "close");
-      assert(
-        Buffer.concat(output).length === 0,
-        "destroy() flushed retained plaintext",
-      );
-      assertEqual(
-        transform.findings,
-        [],
-        "destroy() reported a finding that was never finalized",
-      );
+      assert(Buffer.concat(output).length === 0, "destroy() flushed retained plaintext");
+      assertEqual(transform.findings, [], "destroy() reported a finding that was never finalized");
       assertEqual(session.state, "aborted", "destroy() did not abort the real addon's session");
     }
 
@@ -815,20 +717,13 @@ async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
       } catch (error) {
         rejected = error;
       }
-      assert(
-        rejected === downstreamError,
-        "pipeline() did not propagate the downstream failure",
-      );
+      assert(rejected === downstreamError, "pipeline() did not propagate the downstream failure");
       assertEqual(
         Buffer.concat(output).toString("utf8"),
         finalizedOracle,
         "finalized output was not preserved on downstream failure",
       );
-      assertEqual(
-        session.state,
-        "aborted",
-        "downstream failure did not abort the real addon's session",
-      );
+      assertEqual(session.state, "aborted", "downstream failure did not abort the real addon's session");
     }
   } finally {
     rmSync(link, { recursive: true, force: true });
@@ -841,8 +736,7 @@ async function main() {
   const fixtures = loadSynchronousCorpus();
   assert(fixtures.length >= 100, `only ${fixtures.length} corpus fixtures`);
 
-  const commonExpectations =
-    detectorProfile === "common" ? loadCommonExpectations() : undefined;
+  const commonExpectations = detectorProfile === "common" ? loadCommonExpectations() : undefined;
   if (commonExpectations !== undefined) {
     assert(
       commonExpectations.fixtures.length === fixtures.length,
@@ -852,12 +746,9 @@ async function main() {
   }
 
   console.log(
-    `# node ${process.version} on ${process.platform}-${process.arch} ` +
-      `(detector profile: ${detectorProfile})`,
+    `# node ${process.version} on ${process.platform}-${process.arch} ` + `(detector profile: ${detectorProfile})`,
   );
-  report("the addon directory holds exactly one compiled artifact", () =>
-    inspectAddon(options.target),
-  );
+  report("the addon directory holds exactly one compiled artifact", () => inspectAddon(options.target));
   report("the addon passes its own consumer smoke test", runSmokeTest);
   report(`the addon matches the canonical synchronous corpus (${detectorProfile})`, () =>
     conformAddon(fixtures, detectorProfile, commonExpectations),
@@ -868,18 +759,15 @@ async function main() {
     assertEqual(addon.profileCommon(), "common", "addon.profileCommon()");
   });
 
-  await reportAsync(
-    `the JavaScript package's public API runs on the real addon (${detectorProfile})`,
-    () => integrateWithPackage(detectorProfile, commonExpectations),
+  await reportAsync(`the JavaScript package's public API runs on the real addon (${detectorProfile})`, () =>
+    integrateWithPackage(detectorProfile, commonExpectations),
   );
 
-  const streamFixtureId =
-    detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
+  const streamFixtureId = detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
   const streamFixture = fixtures.find((fixture) => fixture.id === streamFixtureId);
   assert(streamFixture !== undefined, `no ${streamFixtureId} fixture in the synchronous corpus`);
-  await reportAsync(
-    `the Node stream adapter runs on the real addon (${detectorProfile})`,
-    () => qualifyNodeStreamAdapter(streamFixture, detectorProfile),
+  await reportAsync(`the Node stream adapter runs on the real addon (${detectorProfile})`, () =>
+    qualifyNodeStreamAdapter(streamFixture, detectorProfile),
   );
 
   if (failures.length > 0) {

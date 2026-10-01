@@ -12,12 +12,19 @@ import sys
 from pathlib import Path
 
 EXPECTED_ARTIFACTS = {
-    "crate:redact-secret", "crate:redact-secret-cli", "npm:@redact-secret/core",
-    "npm:@redact-secret/wasm", "npm:@redact-secret/node-darwin-arm64",
-    "npm:@redact-secret/node-darwin-x64", "npm:@redact-secret/node-linux-arm64-gnu",
-    "npm:@redact-secret/node-linux-arm64-musl", "npm:@redact-secret/node-linux-x64-gnu",
-    "npm:@redact-secret/node-linux-x64-musl", "npm:@redact-secret/node-win32-arm64-msvc",
-    "npm:@redact-secret/node-win32-x64-msvc", "pypi:redact-secret",
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/wasm",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "pypi:redact-secret",
 }
 MUSL_ARTIFACTS = {"npm:@redact-secret/node-linux-arm64-musl", "npm:@redact-secret/node-linux-x64-musl"}
 # Every release published before `decision-publish-musl-node-addons` shipped
@@ -95,9 +102,7 @@ def validate_artifact_digests(artifact_digests: object, label: str) -> None:
                 )
             elif comparable is True:
                 present = {
-                    stage: record.get(stage)
-                    for stage in ("built", "qualified", "published")
-                    if record.get(stage)
+                    stage: record.get(stage) for stage in ("built", "qualified", "published") if record.get(stage)
                 }
                 require(
                     len(set(present.values())) <= 1,
@@ -112,22 +117,29 @@ def validate_evidence(manifest: dict, inventory: dict, label: str) -> None:
     version = manifest["version"]
     artifacts = expected_artifacts(version)
     registries = evidence.get("registries")
-    require(isinstance(registries, dict) and set(registries) == artifacts,
-            f"{label}: registry evidence artifact set mismatch")
+    require(
+        isinstance(registries, dict) and set(registries) == artifacts,
+        f"{label}: registry evidence artifact set mismatch",
+    )
     for artifact, record in registries.items():
         require(isinstance(record, dict), f"{label}: {artifact} evidence must be an object")
         if artifact.startswith("npm:"):
-            require(bool(record.get("shasum")) and bool(record.get("integrity")),
-                    f"{label}: {artifact} missing npm checksums")
+            require(
+                bool(record.get("shasum")) and bool(record.get("integrity")),
+                f"{label}: {artifact} missing npm checksums",
+            )
         elif artifact.startswith("crate:"):
-            require(SHA64.fullmatch(str(record.get("checksum", ""))) is not None,
-                    f"{label}: {artifact} missing checksum")
+            require(
+                SHA64.fullmatch(str(record.get("checksum", ""))) is not None, f"{label}: {artifact} missing checksum"
+            )
         else:
             files = record.get("files")
-            require(isinstance(files, list) and len(files) == 9,
-                    f"{label}: PyPI evidence must contain nine files")
-            inventory_python = {item["file"]: item["sha256"] for item in inventory.get("artifacts", [])
-                                if item.get("family") in {"python-wheel", "python-sdist"}}
+            require(isinstance(files, list) and len(files) == 9, f"{label}: PyPI evidence must contain nine files")
+            inventory_python = {
+                item["file"]: item["sha256"]
+                for item in inventory.get("artifacts", [])
+                if item.get("family") in {"python-wheel", "python-sdist"}
+            }
             observed = {item.get("filename"): item.get("sha256") for item in files}
             require(observed == inventory_python, f"{label}: PyPI hashes do not match artifact inventory")
 
@@ -139,8 +151,10 @@ def validate_evidence(manifest: dict, inventory: dict, label: str) -> None:
     runs = evidence.get("runs") or evidence.get("recovery_runs")
     require(isinstance(runs, list) and runs, f"{label}: missing workflow run references")
     for run in runs:
-        require(isinstance(run, dict) and isinstance(run.get("id"), int) and bool(run.get("result")),
-                f"{label}: invalid workflow run reference")
+        require(
+            isinstance(run, dict) and isinstance(run.get("id"), int) and bool(run.get("result")),
+            f"{label}: invalid workflow run reference",
+        )
     verification = evidence.get("verification")
     require(isinstance(verification, dict), f"{label}: missing clean-install verification")
     lanes = expected_node_lanes(version)
@@ -152,10 +166,13 @@ def validate_no_loose_records(root: Path) -> None:
     for directory in (root / "docs", root / "docs/releases"):
         if not directory.is_dir():
             continue
-        loose = sorted(path.name for path in directory.iterdir()
-                       if path.is_file() and LOOSE_RELEASE_FILE.search(path.name))
-        require(not loose, f"{directory.relative_to(root)}: release record files outside a version "
-                           f"directory: {', '.join(loose)}")
+        loose = sorted(
+            path.name for path in directory.iterdir() if path.is_file() and LOOSE_RELEASE_FILE.search(path.name)
+        )
+        require(
+            not loose,
+            f"{directory.relative_to(root)}: release record files outside a version directory: {', '.join(loose)}",
+        )
 
 
 def validate_record(root: Path, directory: Path, changelog: str) -> None:
@@ -167,18 +184,20 @@ def validate_record(root: Path, directory: Path, changelog: str) -> None:
     inventory, manifest = load_json(inventory_path), load_json(directory / "manifest.json")
     source = manifest.get("source_revision")
     require(SHA40.fullmatch(str(source or "")) is not None, f"{label}: invalid source revision")
-    require(manifest.get("version") == version and inventory.get("productVersion") == version,
-            f"{label}: version mismatch")
+    require(
+        manifest.get("version") == version and inventory.get("productVersion") == version, f"{label}: version mismatch"
+    )
     require(inventory.get("sourceCommit") == source, f"{label}: source revision mismatch")
     artifacts = expected_artifacts(version)
     require(set(manifest.get("artifact_set", [])) == artifacts, f"{label}: artifact set mismatch")
     state = manifest.get("registry_state")
-    require(isinstance(state, dict) and set(state) == artifacts,
-            f"{label}: registry state artifact set mismatch")
+    require(isinstance(state, dict) and set(state) == artifacts, f"{label}: registry state artifact set mismatch")
     require(set(state.values()) == {"published"}, f"{label}: final registry state must be complete and published")
     fixtures = inventory.get("conformanceFixtures")
-    require(isinstance(fixtures, dict) and fixtures and all(SHA64.fullmatch(str(v)) for v in fixtures.values()),
-            f"{label}: invalid conformance fixture hashes")
+    require(
+        isinstance(fixtures, dict) and fixtures and all(SHA64.fullmatch(str(v)) for v in fixtures.values()),
+        f"{label}: invalid conformance fixture hashes",
+    )
     local_identity = conformance_identity(root, source)
     if local_identity is not None:
         require(manifest.get("conformance_identity") == local_identity, f"{label}: conformance identity mismatch")
@@ -190,8 +209,10 @@ def validate_record(root: Path, directory: Path, changelog: str) -> None:
         # legacy shape. Newly reconstructed records must embed the partial
         # workflow manifest instead of silently replacing its state.
         if manifest.get("record_kind") == "reconstructed":
-            require(isinstance(evidence.get("original_manifest"), dict),
-                    f"{label}: reconstructed record missing original manifest provenance")
+            require(
+                isinstance(evidence.get("original_manifest"), dict),
+                f"{label}: reconstructed record missing original manifest provenance",
+            )
     if "artifact_inventory_sha256" in manifest:
         digest = hashlib.sha256(inventory_path.read_bytes()).hexdigest()
         require(manifest["artifact_inventory_sha256"] == digest, f"{label}: artifact inventory digest mismatch")
@@ -201,8 +222,7 @@ def validate_record(root: Path, directory: Path, changelog: str) -> None:
     if "artifact_digests" in manifest:
         validate_artifact_digests(manifest["artifact_digests"], label)
     validate_evidence(manifest, inventory, label)
-    require(f"docs/releases/{version}/README.md" in changelog,
-            f"{label}: CHANGELOG.md lacks publication-evidence link")
+    require(f"docs/releases/{version}/README.md" in changelog, f"{label}: CHANGELOG.md lacks publication-evidence link")
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -4,9 +4,9 @@ import { test } from "node:test";
 
 import {
   LANES,
-  SYNTHETIC_INPUT,
   parseQuickstart,
   requirePinnedVersion,
+  SYNTHETIC_INPUT,
   scenarioCommands,
   versionSpellings,
 } from "../clean-install-doc.mjs";
@@ -55,8 +55,14 @@ test("CI runs the quickstart driver for every lane and the qualification guide n
   const start = workflow.indexOf("\n  clean-install:\n");
   const next = workflow.slice(start + 1).search(/\n {2}[a-z][a-z0-9-]*:\n/);
   const job = workflow.slice(start, start + 1 + next);
-  assert.deepEqual([...job.matchAll(/^ {10}- (node|python|browser)$/gm)].map((match) => match[1]), LANES);
-  assert.match(job, /node scripts\/qualify-clean-install\.mjs \\\n\s+--lane "\$\{\{ matrix\.lane \}\}" \\\n\s+--candidate-dir candidate/);
+  assert.deepEqual(
+    [...job.matchAll(/^ {10}- (node|python|browser)$/gm)].map((match) => match[1]),
+    LANES,
+  );
+  assert.match(
+    job,
+    /node scripts\/qualify-clean-install\.mjs \\\n\s+--lane "\$\{\{ matrix\.lane \}\}" \\\n\s+--candidate-dir candidate/,
+  );
   assert.match(workflow, /\n {6}- clean-install\n/);
   const guide = await read("docs/qualification.md");
   assert.match(guide, /node scripts\/qualify-clean-install\.mjs --lane <node\|python\|browser> --candidate-dir <dir>/);
@@ -74,20 +80,36 @@ test("a minimal three-lane page parses", () => {
 
 test("a page a reader could not follow literally is rejected", () => {
   assert.throws(() => parseQuickstart(minimal({ python: "" })), /python has no setup block/);
-  assert.throws(() => parseQuickstart(minimal({ node: lane("node", { serve: true }) })), /only the browser lane has a serve block/);
-  assert.throws(() => parseQuickstart(minimal({ node: lane("node", { input: "API_KEY=abc" }) })), /does not redact the synthetic input/);
-  assert.throws(() => parseQuickstart(minimal() + fence("sh qualify=node:run", "node other.js")), /node declares run twice/);
+  assert.throws(
+    () => parseQuickstart(minimal({ node: lane("node", { serve: true }) })),
+    /only the browser lane has a serve block/,
+  );
+  assert.throws(
+    () => parseQuickstart(minimal({ node: lane("node", { input: "API_KEY=abc" }) })),
+    /does not redact the synthetic input/,
+  );
+  assert.throws(
+    () => parseQuickstart(minimal() + fence("sh qualify=node:run", "node other.js")),
+    /node declares run twice/,
+  );
   assert.throws(() => parseQuickstart(minimal() + fence("sh qualify=ruby:run", "ruby x.rb")), /unknown lane ruby/);
   assert.throws(() => parseQuickstart(minimal() + fence("js qualify=node:file:../escape.js", "x")), /plain file name/);
 });
 
 test("a stale version pin or expected version is reported per lane", () => {
   const scenarios = parseQuickstart(minimal());
-  assert.deepEqual(requirePinnedVersion(scenarios, "0.1.0-beta.1").filter((error) => !error.startsWith("python")), []);
+  assert.deepEqual(
+    requirePinnedVersion(scenarios, "0.1.0-beta.1").filter((error) => !error.startsWith("python")),
+    [],
+  );
   const errors = requirePinnedVersion(scenarios, "0.1.0-beta.2");
-  assert.ok(errors.some((error) => error.startsWith("node: setup must install exactly @redact-secret/core@0.1.0-beta.2")));
+  assert.ok(
+    errors.some((error) => error.startsWith("node: setup must install exactly @redact-secret/core@0.1.0-beta.2")),
+  );
   assert.ok(errors.some((error) => error.startsWith("python: setup must install exactly redact-secret==0.1.0b2")));
-  assert.ok(errors.some((error) => error.startsWith('browser: expected output must start with "redact-secret 0.1.0-beta.2"')));
+  assert.ok(
+    errors.some((error) => error.startsWith('browser: expected output must start with "redact-secret 0.1.0-beta.2"')),
+  );
 });
 
 test("npm and PyPI version spellings", () => {

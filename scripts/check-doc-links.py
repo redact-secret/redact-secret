@@ -51,9 +51,7 @@ BAD_SLUG_CHARS_RE = re.compile(r"[^\w\s-]", re.UNICODE)
 
 
 def list_tracked_markdown_files(root: Path) -> list[str]:
-    output = subprocess.run(
-        ["git", "ls-files", "*.md"], cwd=root, check=True, capture_output=True, text=True
-    ).stdout
+    output = subprocess.run(["git", "ls-files", "*.md"], cwd=root, check=True, capture_output=True, text=True).stdout
     return [line for line in output.splitlines() if line]
 
 
@@ -78,10 +76,7 @@ def strip_fences(text: str) -> list[str]:
 def strip_fences_and_code_spans(text: str) -> list[str]:
     """`strip_fences` plus inline code spans blanked out, so a link written
     as a worked example inside backticks is never read as a real link."""
-    return [
-        INLINE_CODE_RE.sub(lambda m: " " * len(m.group(0)), line)
-        for line in strip_fences(text)
-    ]
+    return [INLINE_CODE_RE.sub(lambda m: " " * len(m.group(0)), line) for line in strip_fences(text)]
 
 
 def slugify(heading_text: str) -> str:

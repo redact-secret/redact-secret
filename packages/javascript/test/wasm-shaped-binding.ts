@@ -37,9 +37,7 @@ export interface WasmShapedBindingOptions {
 
 /** Builds the fixed `INVALID_STATE` error the real artifact throws. */
 function invalidStateError(): Error {
-  const error = new Error(
-    "The incremental sanitizer is no longer accepting input.",
-  );
+  const error = new Error("The incremental sanitizer is no longer accepting input.");
   error.name = "SecretScanError";
   Object.assign(error, { code: "INVALID_STATE" });
   return error;
@@ -52,9 +50,7 @@ export interface WasmShapedBinding {
 }
 
 /** Strips `action`, mirroring `metadata.rs`'s `policy_finding`. */
-function toDetectedFindingMetadata(
-  finding: WasmFinding,
-): WasmDetectedFindingMetadata {
+function toDetectedFindingMetadata(finding: WasmFinding): WasmDetectedFindingMetadata {
   return {
     id: finding.id,
     type: finding.type,
@@ -65,9 +61,7 @@ function toDetectedFindingMetadata(
   };
 }
 
-export function createWasmShapedBinding(
-  options: WasmShapedBindingOptions = {},
-): WasmShapedBinding {
+export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}): WasmShapedBinding {
   const calls: string[] = [];
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
@@ -87,12 +81,16 @@ export function createWasmShapedBinding(
         throw Object.assign(new Error("PII selector is invalid."), { code: "PII_SELECTOR_INVALID" });
       }
       if (pii.includes("pii:kr")) {
-        throw Object.assign(new Error("PII jurisdiction or family is unsupported."), { code: "PII_SELECTOR_UNSUPPORTED" });
+        throw Object.assign(new Error("PII jurisdiction or family is unsupported."), {
+          code: "PII_SELECTOR_UNSUPPORTED",
+        });
       }
       if (pii.includes("pii:family:global:ambiguous-national-id")) {
-        throw Object.assign(new Error("PII selection is unavailable in this artifact."), { code: "PII_SELECTOR_UNAVAILABLE" });
+        throw Object.assign(new Error("PII selection is unavailable in this artifact."), {
+          code: "PII_SELECTOR_UNAVAILABLE",
+        });
       }
-      const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
+      const selectors = [...new Set(pii.map((value) => (value === "pii" ? "pii:global" : value)))].sort();
       const jurisdiction = selectors.includes("pii:us");
       const global = selectors.includes("pii:global") || jurisdiction;
       const families = [
@@ -119,9 +117,7 @@ export function createWasmShapedBinding(
       return findings;
     },
     redact: (input, given, formatter) => {
-      calls.push(
-        `redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`,
-      );
+      calls.push(`redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`);
       if (formatter !== undefined) {
         given.forEach((finding, index) => {
           formatter(finding, { placeholderIndex: index + 1 });
@@ -166,10 +162,7 @@ export function createWasmShapedBinding(
       const incrementalFindings = options.incrementalFindings ?? [];
       let state: WasmIncrementalSanitizer["state"] = "accepting";
 
-      function incrementalResult(
-        text: string,
-        found: readonly WasmFinding[],
-      ): WasmIncrementalResult {
+      function incrementalResult(text: string, found: readonly WasmFinding[]): WasmIncrementalResult {
         return {
           takeText: () => text,
           takeFindings: () => found,

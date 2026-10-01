@@ -23,11 +23,7 @@ const COMMON_NODE_STREAM_CONSUMER =
  * wasm glue below it is never a statically resolvable specifier for a
  * bundler to see — nothing here needs to mark it external.
  */
-async function bundle(
-  platform: "browser" | "node",
-  contents: string = ROOT_CONSUMER,
-  conditions?: readonly string[],
-) {
+async function bundle(platform: "browser" | "node", contents: string = ROOT_CONSUMER, conditions?: readonly string[]) {
   const result = await build({
     bundle: true,
     format: "esm",
@@ -70,12 +66,8 @@ describe("bundler conditions", () => {
   it("routes a browser build through the WebAssembly adapter only", async () => {
     const { inputs, output } = await bundle("browser");
 
-    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
-      true,
-    );
-    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
-      false,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(false);
     expect(inputs.some((path) => path.startsWith("node:"))).toBe(false);
     expect(output).not.toContain("node:module");
     expect(output).not.toContain("createRequire");
@@ -84,12 +76,8 @@ describe("bundler conditions", () => {
   it("routes a Node build through the N-API adapter only", async () => {
     const { inputs } = await bundle("node");
 
-    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
-      true,
-    );
-    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
-      false,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(false);
   });
 
   it("does not statically inline the WebAssembly fallback into a Node build (decision-add-node-wasm-fallback)", async () => {
@@ -108,18 +96,10 @@ describe("bundler conditions", () => {
   it("routes the Web adapter through the WebAssembly adapter only", async () => {
     const { inputs, output } = await bundle("browser", WEB_STREAM_CONSUMER);
 
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/web-stream.js")),
-    ).toBe(true);
-    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
-      true,
-    );
-    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
-      false,
-    );
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/node-stream.js")),
-    ).toBe(false);
+    expect(inputs.some((path) => path.endsWith("dist/adapters/web-stream.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(false);
+    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream.js"))).toBe(false);
     expect(inputs.some((path) => path.startsWith("node:"))).toBe(false);
     expect(output).not.toContain("node:stream");
   });
@@ -130,34 +110,20 @@ describe("bundler conditions", () => {
       'import { createNodeStreamSanitizer } from "@redact-secret/core/node-stream"; globalThis.secretScanEntry = [createNodeStreamSanitizer];',
     );
 
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/node-stream.js")),
-    ).toBe(true);
-    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
-      true,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(true);
   });
 
   it("routes a /common Web adapter build through the common WebAssembly adapter only", async () => {
     const { inputs, output } = await bundle("browser", COMMON_WEB_STREAM_CONSUMER);
 
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/web-stream-common.js")),
-    ).toBe(true);
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/web-stream-core.js")),
-    ).toBe(true);
-    expect(
-      inputs.some((path) => path.endsWith("dist/runtime/browser-common.js")),
-    ).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/adapters/web-stream-common.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/adapters/web-stream-core.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser-common.js"))).toBe(true);
     // The whole point of a `/common` subpath: it never reaches the `full`
     // runtime loader or the root `@redact-secret/wasm` artifact specifier.
-    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
-      false,
-    );
-    expect(inputs.some((path) => path.endsWith("dist/adapters/web-stream.js"))).toBe(
-      false,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(false);
+    expect(inputs.some((path) => path.endsWith("dist/adapters/web-stream.js"))).toBe(false);
     expect(inputs.some((path) => path.startsWith("node:"))).toBe(false);
     expect(output).not.toContain('import("@redact-secret/wasm")');
     expect(output).not.toContain('import("@redact-secret/wasm/pii")');
@@ -168,22 +134,14 @@ describe("bundler conditions", () => {
   it("bundles the /common Node adapter for Node, through node-stream-common only", async () => {
     const { inputs } = await bundle("node", COMMON_NODE_STREAM_CONSUMER);
 
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/node-stream-common.js")),
-    ).toBe(true);
-    expect(
-      inputs.some((path) => path.endsWith("dist/adapters/node-stream-core.js")),
-    ).toBe(true);
-    expect(inputs.some((path) => path.endsWith("dist/runtime/node-common.js"))).toBe(
-      true,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream-common.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream-core.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node-common.js"))).toBe(true);
     // Unlike the browser WASM artifacts, one compiled Node addon serves both
     // profiles (`runtime/node-common.ts` imports `runtime/node.ts` directly),
     // so `dist/runtime/node.js` legitimately appears here too; only the
     // adapter's own factory module differs by profile.
-    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream.js"))).toBe(
-      false,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream.js"))).toBe(false);
   });
 
   it("keeps the platform artifacts out of the module graph until initialize", async () => {
@@ -205,21 +163,11 @@ describe("bundler conditions", () => {
   });
 
   it("routes a Cloudflare Workers build through the workerd adapter, not browser or node (decision-verify-edge-runtimes)", async () => {
-    const { inputs, output } = await bundle(
-      "browser",
-      ROOT_CONSUMER,
-      WORKERD_CONDITIONS,
-    );
+    const { inputs, output } = await bundle("browser", ROOT_CONSUMER, WORKERD_CONDITIONS);
 
-    expect(
-      inputs.some((path) => path.endsWith("dist/runtime/workerd.js")),
-    ).toBe(true);
-    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
-      false,
-    );
-    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
-      false,
-    );
+    expect(inputs.some((path) => path.endsWith("dist/runtime/workerd.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(false);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(false);
     // The `.wasm` binary is imported by its own literal specifier, the same
     // way the browser adapter's `@redact-secret/wasm` specifier stays
     // discoverable to a bundler.
@@ -229,27 +177,13 @@ describe("bundler conditions", () => {
   });
 
   it("routes a /common Cloudflare Workers build through the workerd-common adapter only", async () => {
-    const { inputs, output } = await bundle(
-      "browser",
-      COMMON_WEB_STREAM_CONSUMER,
-      WORKERD_CONDITIONS,
-    );
+    const { inputs, output } = await bundle("browser", COMMON_WEB_STREAM_CONSUMER, WORKERD_CONDITIONS);
 
-    expect(
-      inputs.some((path) => path.endsWith("dist/runtime/workerd-common.js")),
-    ).toBe(true);
-    expect(
-      inputs.some((path) => path.endsWith("dist/runtime/browser-common.js")),
-    ).toBe(false);
-    expect(
-      inputs.some((path) => path.endsWith("dist/runtime/workerd.js")),
-    ).toBe(false);
-    expect(output).toContain(
-      '"@redact-secret/wasm/redact_secret_wasm_common_bg.wasm"',
-    );
-    expect(output).toContain(
-      '"@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm"',
-    );
+    expect(inputs.some((path) => path.endsWith("dist/runtime/workerd-common.js"))).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser-common.js"))).toBe(false);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/workerd.js"))).toBe(false);
+    expect(output).toContain('"@redact-secret/wasm/redact_secret_wasm_common_bg.wasm"');
+    expect(output).toContain('"@redact-secret/wasm/redact_secret_wasm_common_pii_bg.wasm"');
     expect(output).not.toContain('"@redact-secret/wasm/redact_secret_wasm_bg.wasm"');
     expect(output).not.toContain('"@redact-secret/wasm/redact_secret_wasm_pii_bg.wasm"');
   });

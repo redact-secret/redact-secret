@@ -23,7 +23,7 @@ scan, maintain, and later adapt to the selected public delivery platform than
 a multi-document feature system. Links prevent the temporary notes from
 becoming a competing source of truth.
 
-Separate architecture, resource, requirements, or roadmap documents are not expected. Add another file only when the feature page genuinely becomes difficult to use.
+Separate architecture, resource, requirements, or roadmap documents are not expected. Add another file only when the feature page genuinely becomes difficult to use. This applies to per-feature documents; the project-wide `ROADMAP.md` is separate.
 
 ## Guidance
 

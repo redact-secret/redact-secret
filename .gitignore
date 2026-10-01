@@ -73,3 +73,5 @@ __pycache__/
 /bindings/wasm/npm/*.js
 /bindings/wasm/npm/*.wasm
 /bindings/wasm/npm/*.d.ts
+.coverage
+/coverage/

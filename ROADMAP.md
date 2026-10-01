@@ -1,0 +1,63 @@
+# Roadmap
+
+What Redact Secret intends to do over the next year, and what it intends
+not to do. Dates are targets, not promises. Issues and milestones are the
+authoritative tracking; this page summarizes them and is reviewed at every
+release. Last reviewed: 2026-10-01 (after `0.1.0-beta.12`).
+
+## Near term: stable `v0.1.0` (Q4 2026)
+
+The Beta.13 epic ([#1065](https://github.com/redact-secret/redact-secret/issues/1065))
+freezes the contract and proves stable-release readiness:
+
+- Freeze the stable public API, behavior, and extension contracts
+  ([#1066](https://github.com/redact-secret/redact-secret/issues/1066)) and
+  the declarative ruleset v1 contract
+  ([#1072](https://github.com/redact-secret/redact-secret/issues/1072)).
+- Close detection qualification debt and publish the `v0.1.0` reliability
+  contract ([#1067](https://github.com/redact-secret/redact-secret/issues/1067)).
+- Freeze and meet performance, memory, and artifact-size budgets
+  ([#1068](https://github.com/redact-secret/redact-secret/issues/1068)).
+- Qualify and rehearse the exact `v0.1.0` artifact and release path
+  ([#1069](https://github.com/redact-secret/redact-secret/issues/1069)).
+- Finish stable user documentation and five-minute adoption paths
+  ([#1070](https://github.com/redact-secret/redact-secret/issues/1070)).
+- A final go/no-go review
+  ([#1071](https://github.com/redact-secret/redact-secret/issues/1071)).
+
+## Next: detector coverage (Beta.14 and after)
+
+Add provider families researched under
+[#1014](https://github.com/redact-secret/redact-secret/issues/1014) and
+[#860](https://github.com/redact-secret/redact-secret/issues/860) — Buildkite,
+Fly, Mapbox, Ory, Pydantic Logfire, Sourcegraph, Square, Unkey, Xata, and
+others — each with synthetic conformance fixtures and stated false-positive
+and false-negative trade-offs. Move opt-in structured PII families from
+`provisional` toward `stable` as their evidence qualifies.
+
+## Later in the year
+
+- **Contribution funnel** ([#999](https://github.com/redact-secret/redact-secret/issues/999)):
+  role-based contribution docs, a detector scaffolding command, and guided
+  contribution-readiness output in CI, without weakening evidence gates.
+- **Edge runtimes** ([#1000](https://github.com/redact-secret/redact-secret/issues/1000)):
+  qualify and harden the WebAssembly build for edge and worker runtimes.
+- **Deployment modes** ([#1001](https://github.com/redact-secret/redact-secret/issues/1001)):
+  research a sidecar or proxy mode for runtime redaction.
+- **Vault contract** ([#1002](https://github.com/redact-secret/redact-secret/issues/1002)):
+  define a persistent vault contract without coupling the core to a database
+  or KMS.
+- **Supply chain**: keep OpenSSF Best Practices and Scorecard results current,
+  sign every published artifact, and publish SBOMs with releases.
+
+## Not planned
+
+These stay out of scope (see [ARCHITECTURE.md](ARCHITECTURE.md#deliberate-exclusions)):
+checking whether a credential is live, network access or telemetry in the
+core, storing secrets, and acting as a complete data-loss-prevention product.
+
+## Proposing changes
+
+Open an [idea discussion](https://github.com/redact-secret/redact-secret/discussions)
+or an issue. Roadmap changes are decided as described in
+[GOVERNANCE.md](GOVERNANCE.md#how-decisions-are-made).

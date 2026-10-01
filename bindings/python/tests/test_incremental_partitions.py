@@ -18,7 +18,6 @@ binding under test. Every fixture input is synthetic or explicitly revoked.
 from __future__ import annotations
 
 import pytest
-
 import redact_secret
 
 from .conftest import (
@@ -48,10 +47,7 @@ FIXTURES = _fixtures()
 
 
 def _summary(findings: list[redact_secret.Finding]) -> list[tuple]:
-    return [
-        (f.id, f.detector, f.type, f.confidence, f.action, f.obfuscation, f.start, f.end)
-        for f in findings
-    ]
+    return [(f.id, f.detector, f.type, f.confidence, f.action, f.obfuscation, f.start, f.end) for f in findings]
 
 
 def _canonical_summary(fixture: dict) -> list[tuple]:
@@ -87,10 +83,9 @@ def test_whole_input_reference_matches_the_canonical_expectation(
     corpus, so a drifting binding cannot agree with itself and pass."""
     result = redact_secret.scan_and_redact(fixture["input"])
     assert result.text == fixture["text"]
-    assert [
-        (f.id, f.detector, f.type, f.confidence, f.start, f.end)
-        for f in result.findings
-    ] == _canonical_summary(fixture)
+    assert [(f.id, f.detector, f.type, f.confidence, f.start, f.end) for f in result.findings] == _canonical_summary(
+        fixture
+    )
 
 
 @pytest.mark.parametrize("fixture", FIXTURES, ids=lambda fixture: fixture["id"])
@@ -151,9 +146,7 @@ def test_placeholder_numbering_continues_across_calls(fixture: dict) -> None:
     text = fixture["input"]
     indices: list[int] = []
 
-    def formatter(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def formatter(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         indices.append(context.placeholder_index)
         return redact_secret.default_placeholder_formatter(finding, context)
 

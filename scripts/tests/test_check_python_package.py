@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-python-package.py"
 SPEC = importlib.util.spec_from_file_location("check_python_package", SCRIPT)
 assert SPEC and SPEC.loader
@@ -235,11 +234,7 @@ class CheckPythonPackageTest(unittest.TestCase):
         self.assertOneError("must trigger on every pull_request")
 
     def test_wheel_workflow_rejects_pull_request_path_filters(self) -> None:
-        self.binding.pull_request_trigger = (
-            "  pull_request:\n"
-            "    paths:\n"
-            "      - bindings/python/**\n"
-        )
+        self.binding.pull_request_trigger = "  pull_request:\n    paths:\n      - bindings/python/**\n"
         self.assertOneError("pull_request trigger must not use path filters")
 
     def test_an_unmappable_target_is_reported(self) -> None:
@@ -286,9 +281,7 @@ class CheckPythonPackageTest(unittest.TestCase):
         """Every element has to name the same target, so this claims neither."""
         declared = list(CHECK.TARGET_PLATFORM_TAGS)
         self.assertEqual(CHECK.targets_for_platform("manylinux_2_17_x86_64.win_amd64", declared), [])
-        self.assertEqual(
-            CHECK.targets_for_platform("manylinux_2_17_x86_64.musllinux_1_2_x86_64", declared), []
-        )
+        self.assertEqual(CHECK.targets_for_platform("manylinux_2_17_x86_64.musllinux_1_2_x86_64", declared), [])
 
     def test_an_unknown_tag_matches_nothing(self) -> None:
         declared = list(CHECK.TARGET_PLATFORM_TAGS)

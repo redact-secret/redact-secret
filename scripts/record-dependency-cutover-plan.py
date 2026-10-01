@@ -34,8 +34,9 @@ import json
 import os
 import subprocess
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 NATIVE_NPM_DIR = Path("bindings") / "node" / "npm"
@@ -58,9 +59,7 @@ def _load_check_artifact_matrix():
     place the addon-target-triple to platform-directory-name mapping is
     spelled out -- rather than re-deriving it here and risking the two
     falling out of agreement."""
-    spec = importlib.util.spec_from_file_location(
-        "check_artifact_matrix", CHECK_ARTIFACT_MATRIX
-    )
+    spec = importlib.util.spec_from_file_location("check_artifact_matrix", CHECK_ARTIFACT_MATRIX)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
@@ -181,10 +180,7 @@ def plan_errors(plan: dict, artifacts: Path) -> list[str]:
             f"{entry['companionArtifact']}: no qualified companion artifact in {artifacts}"
             for entry in missing_companions
         ]
-        + [
-            f"{entry['expectedArtifact']}: no dependency package manifest resolved for it"
-            for entry in unresolved
-        ]
+        + [f"{entry['expectedArtifact']}: no dependency package manifest resolved for it" for entry in unresolved]
     )
 
 
@@ -214,9 +210,7 @@ def render_summary(plan: dict) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument(
-        "--artifacts", type=Path, required=True, help="directory of downloaded qualification artifacts"
-    )
+    parser.add_argument("--artifacts", type=Path, required=True, help="directory of downloaded qualification artifacts")
     parser.add_argument("--out", type=Path, required=True, help="plan JSON to write")
     parser.add_argument("--summary", type=Path, help="markdown summary to append to")
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="repository root")

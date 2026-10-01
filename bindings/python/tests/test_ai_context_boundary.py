@@ -22,7 +22,6 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 import pytest
-
 import redact_secret
 
 from .conftest import load_corpus
@@ -43,11 +42,15 @@ ABORTED = {"outcome": "aborted"}
 
 
 def _blocked(reason: str, code: str | None = None) -> dict:
-    return {"outcome": "blocked", "reason": reason} if code is None else {
-        "outcome": "blocked",
-        "reason": reason,
-        "code": code,
-    }
+    return (
+        {"outcome": "blocked", "reason": reason}
+        if code is None
+        else {
+            "outcome": "blocked",
+            "reason": reason,
+            "code": code,
+        }
+    )
 
 
 def _failure_from(error: BaseException) -> dict:
@@ -123,7 +126,9 @@ class Boundary:
         findings: list[dict] = []
         for finding in context:
             if finding["start"] >= len(prefix) and finding["end"] <= leaf_end:
-                findings.append({**finding, "start": finding["start"] - len(prefix), "end": finding["end"] - len(prefix)})
+                findings.append(
+                    {**finding, "start": finding["start"] - len(prefix), "end": finding["end"] - len(prefix)}
+                )
             elif finding["action"] in ("redact", "block"):
                 return _blocked("policy"), "", []
         if not _redacts_or_blocks(findings) and alone:
@@ -165,8 +170,10 @@ class Boundary:
                 if any(finding["action"] == "block" for finding in leaf):
                     return _blocked("policy"), None
                 return None, text
-            if node is None or isinstance(node, bool) or (
-                isinstance(node, (int, float)) and node == node and node not in (float("inf"), float("-inf"))
+            if (
+                node is None
+                or isinstance(node, bool)
+                or (isinstance(node, (int, float)) and node == node and node not in (float("inf"), float("-inf")))
             ):
                 return None, node
             if type(node) not in (list, dict):
@@ -246,9 +253,7 @@ class Stream:
             self._fail(ABORTED)
             return
         try:
-            self.session = redact_secret.IncrementalSanitizer(
-                self.owner.incremental_limits, policy=self.owner.policy
-            )
+            self.session = redact_secret.IncrementalSanitizer(self.owner.incremental_limits, policy=self.owner.policy)
         except Exception as error:  # noqa: BLE001
             self._fail(_failure_from(error))
 
@@ -462,7 +467,9 @@ def test_ai_context_boundary_case(case: dict) -> None:
     if operation == "sanitizeText" and case.get("incrementalEquivalence", True) and "signal" not in case:
         text = _materialize(case["input"])
         step = 1 if len(text) <= 256 else -(-len(text) // 64)
-        partitions = [[text[:index], text[index:]] for index in range(0, len(text) + 1) if index % step == 0 or index == len(text)]
+        partitions = [
+            [text[:index], text[index:]] for index in range(0, len(text) + 1) if index % step == 0 or index == len(text)
+        ]
         if len(text) <= 256:
             partitions.append(list(text))
         for chunks in partitions:

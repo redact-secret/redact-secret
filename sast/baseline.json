@@ -70,9 +70,9 @@
       "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "bd6f826f125bd4aa": {
+    "e59ba1065557f649": {
       "classification": "false_positive",
-      "line": 353,
+      "line": 349,
       "path": "scripts/check-python-package.py",
       "rationale": "The URL is built from a fixed, hardcoded registry host (pypi.org, crates.io, or registry.npmjs.org) with only a package/crate name path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
@@ -84,16 +84,16 @@
       "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
     },
-    "55e7b6ff6cd88ba2": {
+    "f4b07a66e5ef62d5": {
       "classification": "false_positive",
-      "line": 319,
+      "line": 301,
       "path": "scripts/browser-harness.mjs",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     },
-    "0b2637154a7d6950": {
+    "fbc842a935b677b1": {
       "classification": "false_positive",
-      "line": 649,
+      "line": 646,
       "path": "scripts/check-rust-workspace.py",
       "rationale": "The URL is built from a fixed, hardcoded registry host (pypi.org, crates.io, or registry.npmjs.org) with only a package/crate name path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
@@ -133,9 +133,9 @@
       "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
     },
-    "26cc88d0b2f418ad": {
+    "9fe26c5315fa48dc": {
       "classification": "false_positive",
-      "line": 290,
+      "line": 259,
       "path": "scripts/qualify-cli-binary.mjs",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
@@ -245,9 +245,9 @@
       "rationale": "Every argument list passed to this subprocess call is built entirely from this script's own internal logic (interpreter paths, pinned tool names, static flags) as a list -- never `shell=True` and never externally- or network-controlled data -- so there is no command-injection surface for this generic audit rule to flag.",
       "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
     },
-    "e7acd9e8d80c2913": {
+    "2d660f669fa08eff": {
       "classification": "false_positive",
-      "line": 330,
+      "line": 325,
       "path": "scripts/qualify-python-wheel.py",
       "rationale": "Every argument list passed to this subprocess call is built entirely from this script's own internal logic (interpreter paths, pinned tool names, static flags) as a list -- never `shell=True` and never externally- or network-controlled data -- so there is no command-injection surface for this generic audit rule to flag.",
       "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
@@ -301,9 +301,9 @@
       "rationale": "Recovery tooling reads only the fixed https://pypi.org registry authority; the project/version path is derived from the original approved source after its run and inventory identity checks. It sends no credentials, has a bounded timeout, and verifies exact filenames and SHA-256 hashes before accepting an existing publication. This is intentional release-time registry verification, not a runtime core network operation or an attacker-selected URL authority.",
       "line": 47
     },
-    "e5330565a5235757": {
+    "985dcb3471128682": {
       "classification": "false_positive",
-      "line": 124,
+      "line": 130,
       "path": "scripts/verify-recovery-artifact.py",
       "rationale": "Recovery tooling reads only the fixed https://pypi.org registry authority; the project/version path is derived from the original approved source after its run and inventory identity checks. It sends no credentials, has a bounded timeout, and verifies exact filenames and SHA-256 hashes before accepting an existing publication. This is intentional release-time registry verification, not a runtime core network operation or an attacker-selected URL authority.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
@@ -378,10 +378,10 @@
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
-    "157f6252412ceb22": {
+    "0ddc07cac75f67ab": {
       "classification": "false_positive",
       "path": "scripts/qualify-node-addon.mjs",
-      "line": 196,
+      "line": 187,
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
@@ -497,10 +497,10 @@
       "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
     },
-    "360f48b699b6f2d8": {
+    "7e170dd713c76fd3": {
       "classification": "false_positive",
       "path": "scripts/browser-package-harness-core.mjs",
-      "line": 207,
+      "line": 192,
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
@@ -518,17 +518,17 @@
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic lookup selects a lane function from a literal three-entry object (`node`/`python`/`browser`); `options.lane` is validated against the fixed `LANES` list during argument parsing, before this call, so the invoked function is always one of the three lane functions defined in this file, never externally controlled. This is a local qualification script, not a network-facing service."
     },
-    "1069b02b1d7cc6e1": {
+    "33109d3a53487fd7": {
       "classification": "false_positive",
-      "line": 176,
+      "line": 175,
       "path": "scripts/rehearsal-version.py",
       "rationale": "The URL is built from a fixed, hardcoded registry host (registry.npmjs.org, crates.io, or pypi.org) with only a package name and the throwaway version path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
     },
-    "9f0b69bc3aeaed52": {
+    "d9eb2b7115201b31": {
       "classification": "false_positive",
       "path": "scripts/qualify-clean-install.mjs",
-      "line": 392,
+      "line": 429,
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic lookup selects a lane function from a literal three-entry object (`node`/`python`/`browser`); `options.lane` is validated against the fixed `LANES` list during argument parsing, before this call, so the invoked function is always one of the three lane functions defined in this file, never externally controlled. This is a local qualification script, not a network-facing service."
     },
@@ -745,22 +745,22 @@
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "0bbfde62b05e55e2": {
+    "b3099afe5d8ea286": {
       "type": "PartialParsing",
       "path": ".github/workflows/reconcile-release.yml",
-      "line": 269,
+      "line": 271,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "0093b1570bc4e57e": {
+    "58571abac6124a7f": {
       "type": "PartialParsing",
       "path": ".github/workflows/reconcile-release.yml",
-      "line": 357,
+      "line": 359,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "c9a6218a1bcd1505": {
+    "cb29222d2642d609": {
       "type": "PartialParsing",
       "path": ".github/workflows/reconcile-release.yml",
-      "line": 429,
+      "line": 431,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
     "0d7514c06bb664ee": {
@@ -865,10 +865,10 @@
       "line": 625,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "30f0d3a8513d43b8": {
+    "ebcf12f4e3e05b85": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 149,
+      "line": 152,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
     "3975b594eba68682": {
@@ -913,40 +913,40 @@
       "line": 655,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "e351f899a944c110": {
+    "64e7ee55f00f3ff8": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 173,
+      "line": 176,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "7772d84607681f60": {
+    "326f26f8fb382316": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 183,
+      "line": 186,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "b69571fadfac488a": {
+    "e2831e198a7a29b9": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 187,
+      "line": 190,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "698a5b272ad68d26": {
+    "fe8802afcf74ec24": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 198,
+      "line": 202,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "b09057d1710f18f3": {
+    "5c9279f60f847719": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 229,
+      "line": 233,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "7efb95265efd9a11": {
+    "6c24adf6844d4ad0": {
       "type": "PartialParsing",
       "path": ".github/workflows/release.yml",
-      "line": 358,
+      "line": 365,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses this `run:` step's shell snippet as Bash. The step's body is a `node --input-type=module <<'NODE_VERIFY' ... NODE_VERIFY` heredoc with a quoted delimiter, so real Bash never interprets the heredoc's JavaScript body; the embedded backtick-delimited JS template literals (e.g. the `${reportedCommon}` interpolation at line 356) are read by the Bash sub-parser as legacy command-substitution syntax, which is not valid Bash, and it reports a partial-parsing error once it cannot recover. This is an upstream rule/tool limitation against non-Bash content inside a heredoc, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
     "1cdac6691525f229": {
@@ -1075,14 +1075,14 @@
       "line": 30,
       "rationale": "OpenGrep 1.30.0's TypeScript parser does not yet support the `unique symbol` type annotation; this is a parser limitation in the pinned tool version, not a defect in this file. Tracked for re-check on the next reviewed OpenGrep version bump."
     },
-    "ce4142ee6680b912": {
-      "line": 639,
+    "ddf99ac75592b8e1": {
+      "line": 651,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "f98f758eae8691d5": {
-      "line": 672,
+    "c7d8145385d981e1": {
+      "line": 684,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
@@ -1093,44 +1093,44 @@
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "b0627442aafe8069": {
-      "line": 789,
+    "a9150a4fc9f3edf4": {
+      "line": 801,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "e34d89a772d529f2": {
-      "line": 805,
+    "341bccb94948cdaa": {
+      "line": 817,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "8035568fb6bea56c": {
-      "line": 818,
+    "d9c24162fabdb039": {
+      "line": 830,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "96cf52e7076d2805": {
-      "line": 829,
+    "d3257ecfd1dd2ce9": {
+      "line": 841,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "14c344e8aa78d8e4": {
-      "line": 860,
+    "29491970a9d7c0c5": {
+      "line": 872,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "c0bc7deaeaa7b14c": {
-      "line": 979,
+    "b58931eeac561a7b": {
+      "line": 991,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "4b78bd5df6904b11": {
-      "line": 1001,
+    "61915790b9db4153": {
+      "line": 1013,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"

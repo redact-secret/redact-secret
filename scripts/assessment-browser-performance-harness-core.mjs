@@ -9,10 +9,9 @@
  * artifact — and hand the resulting bindings to `measure` here
  * (`decision-define-detector-profile-and-pack-contract`).
  */
+
+import { measureAsyncOperation, measureOperation, partitionInput } from "../assessment/adapters/performance.js";
 import { generateWorkloadInput } from "../assessment/generate.js";
-import {
-  measureAsyncOperation, measureOperation, partitionInput,
-} from "../assessment/adapters/performance.js";
 
 function processInput(api, input, chunks, chunkProfile, inputLimit) {
   const { createIncrementalSanitizer, scanAndRedact } = api;
@@ -67,9 +66,12 @@ export async function measure(profile, api) {
     initializationMs: initialization.elapsedMs,
     processingMs: processing.elapsedMs,
     throughputBytesPerSecond: inputBytes / (processing.elapsedMs / 1000),
-    browserHeap: baselineHeap === undefined || afterHeap === undefined ? undefined : {
-      baselineBytes: baselineHeap,
-      maximumObservedBytes: Math.max(baselineHeap, afterHeap),
-    },
+    browserHeap:
+      baselineHeap === undefined || afterHeap === undefined
+        ? undefined
+        : {
+            baselineBytes: baselineHeap,
+            maximumObservedBytes: Math.max(baselineHeap, afterHeap),
+          },
   };
 }

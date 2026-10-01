@@ -196,9 +196,7 @@ def job_blocks(text: str) -> dict[str, str]:
     headers = [
         (offset, line[len(JOB_HEADER_PREFIX) : -1])
         for offset, line in lines
-        if line.startswith(JOB_HEADER_PREFIX)
-        and not line.startswith(ATTRIBUTE_PREFIX)
-        and line.endswith(":")
+        if line.startswith(JOB_HEADER_PREFIX) and not line.startswith(ATTRIBUTE_PREFIX) and line.endswith(":")
     ]
     blocks: dict[str, str] = {}
     for index, (offset, job_id) in enumerate(headers):
@@ -305,9 +303,7 @@ def validate(root: Path) -> list[str]:
                 f"{RELEASE_WORKFLOW.as_posix()}: job '{gate}' must call {expected_uses}, found {actual_uses!r}"
             )
         called_workflow = root / Path(expected_uses.removeprefix("./"))
-        if called_workflow.is_file() and not has_workflow_call_trigger(
-            called_workflow.read_text(encoding="utf-8")
-        ):
+        if called_workflow.is_file() and not has_workflow_call_trigger(called_workflow.read_text(encoding="utf-8")):
             errors.append(f"{called_workflow.as_posix()}: does not expose workflow_call")
 
     for publish_job in PUBLISH_JOBS:
@@ -318,9 +314,7 @@ def validate(root: Path) -> list[str]:
         needs = set(extract_needs(publish))
         missing = sorted(set(REQUIRED_GATES) - needs)
         if missing:
-            errors.append(
-                f"{RELEASE_WORKFLOW.as_posix()}: {publish_job} job does not need {', '.join(missing)}"
-            )
+            errors.append(f"{RELEASE_WORKFLOW.as_posix()}: {publish_job} job does not need {', '.join(missing)}")
 
     for dependency_job in NPM_DEPENDENCY_GATES:
         if dependency_job not in jobs:
@@ -338,17 +332,11 @@ def validate(root: Path) -> list[str]:
 
     wasm_job = jobs.get(WASM_DEPENDENCY_JOB)
     if wasm_job is None:
-        errors.append(
-            f"{RELEASE_WORKFLOW.as_posix()}: missing job '{WASM_DEPENDENCY_JOB}'"
-        )
+        errors.append(f"{RELEASE_WORKFLOW.as_posix()}: missing job '{WASM_DEPENDENCY_JOB}'")
     else:
         steps = extract_step_blocks(wasm_job)
-        verify_step = next(
-            (step for step in steps if step[1] == PROFILE_VERIFICATION_STEP), None
-        )
-        publish_step = next(
-            (step for step in steps if step[1] == WASM_PUBLISH_STEP), None
-        )
+        verify_step = next((step for step in steps if step[1] == PROFILE_VERIFICATION_STEP), None)
+        publish_step = next((step for step in steps if step[1] == WASM_PUBLISH_STEP), None)
         if verify_step is None:
             errors.append(
                 f"{RELEASE_WORKFLOW.as_posix()}: job '{WASM_DEPENDENCY_JOB}' is missing "
@@ -356,8 +344,7 @@ def validate(root: Path) -> list[str]:
             )
         if publish_step is None:
             errors.append(
-                f"{RELEASE_WORKFLOW.as_posix()}: job '{WASM_DEPENDENCY_JOB}' is missing "
-                f"the '{WASM_PUBLISH_STEP}' step"
+                f"{RELEASE_WORKFLOW.as_posix()}: job '{WASM_DEPENDENCY_JOB}' is missing the '{WASM_PUBLISH_STEP}' step"
             )
         if verify_step is not None and publish_step is not None and verify_step[0] > publish_step[0]:
             errors.append(
@@ -402,9 +389,7 @@ def validate(root: Path) -> list[str]:
         }
         for name, step in found.items():
             if step is None:
-                errors.append(
-                    f"{RELEASE_WORKFLOW.as_posix()}: job '{WRAPPER_JOB}' is missing the '{name}' step"
-                )
+                errors.append(f"{RELEASE_WORKFLOW.as_posix()}: job '{WRAPPER_JOB}' is missing the '{name}' step")
         registry_install, build, identity, publish = (
             found[name]
             for name in (
@@ -414,19 +399,12 @@ def validate(root: Path) -> list[str]:
                 WRAPPER_PUBLISH_STEP,
             )
         )
-        if (
-            registry_install is not None
-            and build is not None
-            and registry_install[0] > build[0]
-        ):
+        if registry_install is not None and build is not None and registry_install[0] > build[0]:
             errors.append(
                 f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_REGISTRY_INSTALL_STEP}' must precede "
                 f"'{WRAPPER_BUILD_STEP}' in job '{WRAPPER_JOB}'"
             )
-        if (
-            registry_install is not None
-            and WRAPPER_REGISTRY_INSTALL_COMMAND not in registry_install[2]
-        ):
+        if registry_install is not None and WRAPPER_REGISTRY_INSTALL_COMMAND not in registry_install[2]:
             errors.append(
                 f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_REGISTRY_INSTALL_STEP}' does not run "
                 f"{WRAPPER_REGISTRY_INSTALL_COMMAND}"
@@ -461,25 +439,16 @@ def validate(root: Path) -> list[str]:
         digest_step = next((step for step in steps if step[1] == PYPI_DIGEST_STEP), None)
         publish_step = next((step for step in steps if step[1] == PYPI_PUBLISH_STEP), None)
         if digest_step is None:
-            errors.append(
-                f"{RELEASE_WORKFLOW.as_posix()}: job '{PYPI_JOB}' is missing "
-                f"the '{PYPI_DIGEST_STEP}' step"
-            )
+            errors.append(f"{RELEASE_WORKFLOW.as_posix()}: job '{PYPI_JOB}' is missing the '{PYPI_DIGEST_STEP}' step")
         if publish_step is None:
-            errors.append(
-                f"{RELEASE_WORKFLOW.as_posix()}: job '{PYPI_JOB}' is missing "
-                f"the '{PYPI_PUBLISH_STEP}' step"
-            )
+            errors.append(f"{RELEASE_WORKFLOW.as_posix()}: job '{PYPI_JOB}' is missing the '{PYPI_PUBLISH_STEP}' step")
         if digest_step is not None and publish_step is not None and digest_step[0] > publish_step[0]:
             errors.append(
                 f"{RELEASE_WORKFLOW.as_posix()}: '{PYPI_DIGEST_STEP}' must precede "
                 f"'{PYPI_PUBLISH_STEP}' in job '{PYPI_JOB}'"
             )
         if digest_step is not None and PYPI_DIGEST_SCRIPT not in digest_step[2]:
-            errors.append(
-                f"{RELEASE_WORKFLOW.as_posix()}: '{PYPI_DIGEST_STEP}' does not run "
-                f"{PYPI_DIGEST_SCRIPT}"
-            )
+            errors.append(f"{RELEASE_WORKFLOW.as_posix()}: '{PYPI_DIGEST_STEP}' does not run {PYPI_DIGEST_SCRIPT}")
 
     crates_job = jobs.get(CRATES_JOB)
     if crates_job is None:
@@ -491,13 +460,11 @@ def validate(root: Path) -> list[str]:
             digest_step = next((step for step in steps if step[1] == digest_step_name), None)
             if publish_step is None:
                 errors.append(
-                    f"{RELEASE_WORKFLOW.as_posix()}: job '{CRATES_JOB}' is missing "
-                    f"the '{publish_step_name}' step"
+                    f"{RELEASE_WORKFLOW.as_posix()}: job '{CRATES_JOB}' is missing the '{publish_step_name}' step"
                 )
             if digest_step is None:
                 errors.append(
-                    f"{RELEASE_WORKFLOW.as_posix()}: job '{CRATES_JOB}' is missing "
-                    f"the '{digest_step_name}' step"
+                    f"{RELEASE_WORKFLOW.as_posix()}: job '{CRATES_JOB}' is missing the '{digest_step_name}' step"
                 )
             if publish_step is not None and digest_step is not None and digest_step[0] < publish_step[0]:
                 errors.append(
@@ -506,10 +473,7 @@ def validate(root: Path) -> list[str]:
                     "before that crate is published"
                 )
             if digest_step is not None and CRATE_DIGEST_SCRIPT not in digest_step[2]:
-                errors.append(
-                    f"{RELEASE_WORKFLOW.as_posix()}: '{digest_step_name}' does not run "
-                    f"{CRATE_DIGEST_SCRIPT}"
-                )
+                errors.append(f"{RELEASE_WORKFLOW.as_posix()}: '{digest_step_name}' does not run {CRATE_DIGEST_SCRIPT}")
 
     for workflow in INLINE_NEEDS_WORKFLOWS:
         path = root / workflow
@@ -518,15 +482,13 @@ def validate(root: Path) -> list[str]:
         for number in inline_needs_in_run(path.read_text(encoding="utf-8")):
             errors.append(
                 f"{workflow.as_posix()}:{number}: a `run:` script substitutes a "
-                "`${{ needs.* }}` job output inline -- pass it through `env:` and read it as \"$VAR\""
+                '`${{ needs.* }}` job output inline -- pass it through `env:` and read it as "$VAR"'
             )
 
     reconcile_path = root / ".github/workflows/reconcile-release.yml"
     if reconcile_path.is_file():
         reconcile = reconcile_path.read_text(encoding="utf-8")
-        if not re.search(
-            r'^\s+chmod 0644 "\$package_dir"/\$asset_glob\s*$', reconcile, re.M
-        ):
+        if not re.search(r'^\s+chmod 0644 "\$package_dir"/\$asset_glob\s*$', reconcile, re.M):
             errors.append(
                 f"{reconcile_path.relative_to(root).as_posix()}: recovered npm package assets "
                 "must be normalized to mode 0644 before packing"

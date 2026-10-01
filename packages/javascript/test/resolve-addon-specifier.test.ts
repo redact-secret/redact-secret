@@ -11,18 +11,14 @@ import { resolveAddonSpecifier } from "../src/runtime/node.js";
  * test exists to catch. `linux` cases also carry the libc the host must
  * report to select that entry (`decision-publish-musl-node-addons`).
  */
-const NON_LINUX: ReadonlyArray<
-  readonly [platform: string, arch: string, specifier: string]
-> = [
+const NON_LINUX: ReadonlyArray<readonly [platform: string, arch: string, specifier: string]> = [
   ["darwin", "arm64", "@redact-secret/node-darwin-arm64"],
   ["darwin", "x64", "@redact-secret/node-darwin-x64"],
   ["win32", "arm64", "@redact-secret/node-win32-arm64-msvc"],
   ["win32", "x64", "@redact-secret/node-win32-x64-msvc"],
 ];
 
-const LINUX: ReadonlyArray<
-  readonly [arch: string, libc: "gnu" | "musl", specifier: string]
-> = [
+const LINUX: ReadonlyArray<readonly [arch: string, libc: "gnu" | "musl", specifier: string]> = [
   ["arm64", "gnu", "@redact-secret/node-linux-arm64-gnu"],
   ["arm64", "musl", "@redact-secret/node-linux-arm64-musl"],
   ["x64", "gnu", "@redact-secret/node-linux-x64-gnu"],
@@ -50,8 +46,7 @@ function withHost<T>(platform: string, arch: string, fn: () => T): T {
  */
 function withLibc<T>(libc: "gnu" | "musl", fn: () => T): T {
   const original = process.report.getReport;
-  process.report.getReport = () =>
-    libc === "gnu" ? { header: { glibcVersionRuntime: "2.31" } } : { header: {} };
+  process.report.getReport = () => (libc === "gnu" ? { header: { glibcVersionRuntime: "2.31" } } : { header: {} });
   try {
     return fn();
   } finally {
@@ -65,9 +60,7 @@ describe("resolveAddonSpecifier", () => {
   });
 
   it.each(LINUX)("maps linux/%s on %s libc to %s", (arch, libc, specifier) => {
-    expect(
-      withHost("linux", arch, () => withLibc(libc, () => resolveAddonSpecifier())),
-    ).toBe(specifier);
+    expect(withHost("linux", arch, () => withLibc(libc, () => resolveAddonSpecifier()))).toBe(specifier);
   });
 
   it("has one non-linux entry per bindings/node/package.json napi.target", () => {

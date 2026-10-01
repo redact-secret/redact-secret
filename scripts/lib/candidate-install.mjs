@@ -21,8 +21,8 @@
 
 import { execFileSync, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
+import { mkdir, mkdtemp, readdir, readFile, realpath } from "node:fs/promises";
 import { createServer } from "node:http";
-import { mkdir, mkdtemp, readFile, readdir, realpath } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join, relative, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -135,7 +135,11 @@ export async function loadNpmTarballs(paths, scratch, label) {
 /** Every `.tgz` in `candidateDir`, which must include `@redact-secret/core`. */
 export async function loadNpmCandidate(candidateDir, scratch, label) {
   const files = (await readdir(candidateDir)).filter((name) => name.endsWith(".tgz")).sort();
-  const packages = await loadNpmTarballs(files.map((file) => join(candidateDir, file)), scratch, label);
+  const packages = await loadNpmTarballs(
+    files.map((file) => join(candidateDir, file)),
+    scratch,
+    label,
+  );
   makeAssert(label)(packages.has("@redact-secret/core"), `${candidateDir} holds no @redact-secret/core tarball`);
   return packages;
 }
@@ -225,7 +229,10 @@ export async function verifyNpmInstall(project, version, candidate, registryUrl,
     const manifest = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
     const locked = lock.packages?.[`node_modules/${name}`];
     const expectedVersion = product.includes(name) ? version : candidate?.get(name)?.manifest.version;
-    assert(manifest.version === expectedVersion && locked?.version === expectedVersion, `${name} is not ${expectedVersion}`);
+    assert(
+      manifest.version === expectedVersion && locked?.version === expectedVersion,
+      `${name} is not ${expectedVersion}`,
+    );
     assert(String(locked.resolved).startsWith(registryUrl), `${name} was not resolved from ${registryUrl}`);
     const contents = await fileDigests(dir);
     const required =
@@ -255,7 +262,10 @@ export async function verifyNpmInstall(project, version, candidate, registryUrl,
     });
   }
   const binaries = [];
-  for (const [name, dir] of [[hostAddon, hostAddon.split("/")[1]], ["@redact-secret/wasm", "wasm"]]) {
+  for (const [name, dir] of [
+    [hostAddon, hostAddon.split("/")[1]],
+    ["@redact-secret/wasm", "wasm"],
+  ]) {
     const contents = await fileDigests(join(scopeDir, dir));
     for (const [file, digest] of contents) {
       if (file.endsWith(".node") || file.endsWith(".wasm")) binaries.push({ package: name, file, sha256: digest });

@@ -217,6 +217,8 @@ jobs:
           RUN_ID: ${{ steps.locate.outputs.run_id }}
           SOURCE_REVISION: ${{ steps.guard.outputs.source_revision }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Same provenance as `release.yml`; `id-token: write` is already granted.
+          NPM_CONFIG_PROVENANCE: "true"
         run: |
           set -euo pipefail
           declare -A PLATFORM_TARGETS=(
@@ -454,6 +456,8 @@ jobs:
         env:
           SOURCE_REVISION: ${{ steps.guard.outputs.source_revision }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Same provenance as `release.yml`; `id-token: write` is already granted.
+          NPM_CONFIG_PROVENANCE: "true"
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           set -euo pipefail

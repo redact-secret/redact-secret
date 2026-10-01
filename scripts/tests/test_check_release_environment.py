@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-release-environment.py"
 SPEC = importlib.util.spec_from_file_location("check_release_environment", SCRIPT)
 assert SPEC and SPEC.loader

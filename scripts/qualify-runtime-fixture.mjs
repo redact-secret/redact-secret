@@ -10,8 +10,8 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 export const REPO_ROOT_PATH = fileURLToPath(new URL("..", import.meta.url));
 
@@ -26,15 +26,10 @@ export const CANONICAL_FIXTURE_ID = "host-dotenv-github";
 
 export async function loadCanonicalFixture(id) {
   const corpus = JSON.parse(
-    await readFile(
-      join(REPO_ROOT_PATH, "conformance/fixtures/synchronous-corpus.json"),
-      "utf8",
-    ),
+    await readFile(join(REPO_ROOT_PATH, "conformance/fixtures/synchronous-corpus.json"), "utf8"),
   );
   if (corpus.offsetUnit !== "utf8-byte") {
-    throw new Error(
-      `conformance/fixtures/synchronous-corpus.json: unexpected offsetUnit ${corpus.offsetUnit}`,
-    );
+    throw new Error(`conformance/fixtures/synchronous-corpus.json: unexpected offsetUnit ${corpus.offsetUnit}`);
   }
   const fixture = corpus.fixtures.find((entry) => entry.id === id);
   if (!fixture) {

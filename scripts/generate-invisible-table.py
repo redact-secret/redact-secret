@@ -176,9 +176,7 @@ def render_table(ranges: list[tuple[int, int]], version: str) -> str:
 
 
 def extract(name: str, text: str, keep, kept_description: str) -> str:
-    header = EXTRACT_HEADER.format(
-        name=name, version=UCD_VERSION, sha256=UCD_SHA256[name], kept=kept_description
-    )
+    header = EXTRACT_HEADER.format(name=name, version=UCD_VERSION, sha256=UCD_SHA256[name], kept=kept_description)
     kept = [line for line in text.splitlines() if keep(line)]
     if not kept:
         raise TableError(f"{name}: no matching lines")

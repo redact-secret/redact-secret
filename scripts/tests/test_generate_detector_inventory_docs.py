@@ -20,7 +20,13 @@ ROOT = SCRIPT.resolve().parents[1]
 
 
 def row(detector, type_, policy="always-redact", schemes=None):
-    return {"type": type_, "detector": detector, "policyClass": policy, "reconciliationTrigger": "x", "schemes": schemes}
+    return {
+        "type": type_,
+        "detector": detector,
+        "policyClass": policy,
+        "reconciliationTrigger": "x",
+        "schemes": schemes,
+    }
 
 
 INVENTORY = {

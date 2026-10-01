@@ -44,17 +44,17 @@
  */
 
 import { createHash } from "node:crypto";
-import { readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, posix, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  REPO_ROOT,
   cleanEnvironment,
   freshWorkspace,
   loadNpmCandidate,
   loadNpmTarballs,
   makeAssert,
+  REPO_ROOT,
   runShell,
   sha256,
   sourceCommit,
@@ -78,9 +78,14 @@ const REAL_CORE_SCRIPT = "examples:real-core:test";
  */
 export function realCoreTests(scripts) {
   const command = String(scripts?.[REAL_CORE_SCRIPT] ?? "");
-  const tests = [...command.matchAll(/(?:^|\s)examples\/mcp-redact\/(\S+\.test\.mjs)(?=\s|$)/g)].map((match) => match[1]);
+  const tests = [...command.matchAll(/(?:^|\s)examples\/mcp-redact\/(\S+\.test\.mjs)(?=\s|$)/g)].map(
+    (match) => match[1],
+  );
   assert(tests.length > 0, `the ${REAL_CORE_SCRIPT} script names no ${EXAMPLE_DIR} test file`);
-  assert(tests.every((test) => !test.includes("/")), `the ${REAL_CORE_SCRIPT} tests must sit in ${EXAMPLE_DIR}`);
+  assert(
+    tests.every((test) => !test.includes("/")),
+    `the ${REAL_CORE_SCRIPT} tests must sit in ${EXAMPLE_DIR}`,
+  );
   return tests;
 }
 
@@ -166,16 +171,23 @@ export function lockedAdapters(manifest, lock) {
     assert(name !== "@redact-secret/core", `${LOCKFILE} locks @redact-secret/core; the candidate supplies it`);
     assert(entry.link !== true, `${LOCKFILE} links ${name} instead of locking a registry version`);
     assert(
-      typeof entry.version === "string" && entry.resolved === `${NPM_REGISTRY}${name}/-/${name.split("/")[1]}-${entry.version}.tgz`,
+      typeof entry.version === "string" &&
+        entry.resolved === `${NPM_REGISTRY}${name}/-/${name.split("/")[1]}-${entry.version}.tgz`,
       `${LOCKFILE} does not resolve ${name} from ${NPM_REGISTRY}`,
     );
-    assert(/^sha512-[A-Za-z0-9+/]+={0,2}$/.test(String(entry.integrity)), `${LOCKFILE} has no sha512 integrity for ${name}`);
+    assert(
+      /^sha512-[A-Za-z0-9+/]+={0,2}$/.test(String(entry.integrity)),
+      `${LOCKFILE} has no sha512 integrity for ${name}`,
+    );
     locked.push({ name, version: entry.version, resolved: entry.resolved, integrity: entry.integrity });
   }
   assert(locked.length > 0, `${LOCKFILE} locks no @redact-secret adapter`);
   const byName = new Map(locked.map((entry) => [entry.name, entry]));
   for (const [name, spec] of Object.entries(manifest.dependencies ?? {})) {
-    assert(byName.get(name)?.version === spec, `${EXAMPLE_DIR} declares ${name} ${spec}, which ${LOCKFILE} does not lock exactly`);
+    assert(
+      byName.get(name)?.version === spec,
+      `${EXAMPLE_DIR} declares ${name} ${spec}, which ${LOCKFILE} does not lock exactly`,
+    );
   }
   return locked.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
 }
@@ -202,7 +214,10 @@ async function loadRegistryAdapters(scratch) {
   }
   const tarballs = await loadNpmTarballs(paths, scratch, LABEL);
   for (const entry of locked) {
-    assert(tarballs.get(entry.name)?.manifest.version === entry.version, `${entry.name}'s tarball is not ${entry.version}`);
+    assert(
+      tarballs.get(entry.name)?.manifest.version === entry.version,
+      `${entry.name}'s tarball is not ${entry.version}`,
+    );
   }
   return {
     tarballs,
@@ -217,16 +232,28 @@ async function loadRegistryAdapters(scratch) {
 
 /** The checks every lane makes on what the driver printed. */
 export function requireSanitized(printed) {
-  assert(printed.outcome === "ok", `the turn ended ${printed.outcome}${printed.stage ? ` at the ${printed.stage} stage` : ""}`);
-  assert(JSON.stringify(printed.roles) === JSON.stringify(["user", "tool"]), "the safe context is not one user and one tool message");
+  assert(
+    printed.outcome === "ok",
+    `the turn ended ${printed.outcome}${printed.stage ? ` at the ${printed.stage} stage` : ""}`,
+  );
+  assert(
+    JSON.stringify(printed.roles) === JSON.stringify(["user", "tool"]),
+    "the safe context is not one user and one tool message",
+  );
   assert(printed.toolSawRawInput === false, "the tool was dispatched with unsanitized user input");
   const value = printed.modelFacing;
   assert(typeof value === "string" && value.length > 0, "the driver reported no model-facing value");
   assert(!value.includes(USER_SECRET), "the model-facing value carries the user-input credential");
   assert(!value.includes(TOOL_SECRET), "the model-facing value carries the tool-result credential");
   assert(value.includes("<SECRET_"), "the model-facing value carries no placeholder");
-  assert(value.includes("look up the owner of") && value.includes(TOOL_PREFIX), "the model-facing value lost its non-secret text");
-  assert(Number.isInteger(printed.findings) && printed.findings >= 2, `expected a finding per credential, got ${printed.findings}`);
+  assert(
+    value.includes("look up the owner of") && value.includes(TOOL_PREFIX),
+    "the model-facing value lost its non-secret text",
+  );
+  assert(
+    Number.isInteger(printed.findings) && printed.findings >= 2,
+    `expected a finding per credential, got ${printed.findings}`,
+  );
 }
 
 async function runDriver(command, project, env) {
@@ -307,7 +334,10 @@ async function nodeLane(context) {
     requireSanitized(printed);
     const tests = await runShell(`node --test ${context.realCoreTests.join(" ")}`, project, env);
     if (tests.code !== 0) process.stderr.write(tests.stdout + tests.stderr);
-    assert(tests.code === 0, `the example's real-core tests (${context.realCoreTests.join(", ")}) failed on the installed core`);
+    assert(
+      tests.code === 0,
+      `the example's real-core tests (${context.realCoreTests.join(", ")}) failed on the installed core`,
+    );
     assert(
       fileURLToPath(printed.core).startsWith(join(project, "node_modules") + sep),
       "@redact-secret/core does not resolve inside the clean project",
@@ -335,11 +365,19 @@ async function main() {
   const exampleRoot = join(REPO_ROOT, EXAMPLE_DIR);
   const closure = await importClosure(exampleRoot, ENTRY[options.lane]);
   const tests = realCoreTests(JSON.parse(await readFile(join(REPO_ROOT, "package.json"), "utf8")).scripts);
-  for (const test of tests) for (const [path, bytes] of await importClosure(exampleRoot, test)) closure.set(path, bytes);
+  for (const test of tests)
+    for (const [path, bytes] of await importClosure(exampleRoot, test)) closure.set(path, bytes);
 
   const { parent, project } = await freshWorkspace(`redact-secret-golden-path-${options.lane}-`, LABEL);
   try {
-    const outcome = await nodeLane({ project, parent, version, closure, realCoreTests: tests, candidateDir: options.candidateDir });
+    const outcome = await nodeLane({
+      project,
+      parent,
+      version,
+      closure,
+      realCoreTests: tests,
+      candidateDir: options.candidateDir,
+    });
     const report = {
       // 2: `adapters` records the registry packages the example's lockfile
       // locks (#810 retired the Python lane and the tarball pin).

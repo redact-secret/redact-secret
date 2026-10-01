@@ -101,12 +101,8 @@ def matrix(families):
         "familyCount": len(families),
         "distribution": distribution,
         "stableDistribution": {
-            "documented": sum(
-                f["status"] == "stable" and f["qualificationProfile"] == "documented" for f in families
-            ),
-            "empirical": sum(
-                f["status"] == "stable" and f["qualificationProfile"] == "empirical" for f in families
-            ),
+            "documented": sum(f["status"] == "stable" and f["qualificationProfile"] == "documented" for f in families),
+            "empirical": sum(f["status"] == "stable" and f["qualificationProfile"] == "empirical" for f in families),
         },
         "families": families,
     }
@@ -184,17 +180,23 @@ class ValidateMatrixTests(unittest.TestCase):
         policy_schema = {
             "properties": {
                 **SCHEMA["properties"],
-                "families": {"items": {"properties": {
-                    **SCHEMA["properties"]["families"]["items"]["properties"],
-                    "qualificationProfile": {"enum": ["documented", "empirical", "policy-qualified", None]},
-                }}},
+                "families": {
+                    "items": {
+                        "properties": {
+                            **SCHEMA["properties"]["families"]["items"]["properties"],
+                            "qualificationProfile": {"enum": ["documented", "empirical", "policy-qualified", None]},
+                        }
+                    }
+                },
             }
         }
         self.assertEqual(GEN.validate_matrix(m, policy_schema), [])
         m["families"][0]["evidenceTier"] = "T1"
         self.assertTrue(any("policy-qualified" in e for e in GEN.validate_matrix(m, policy_schema)))
         # A beta.8-contract matrix has no policy-qualified key; it reads as zero.
-        self.assertEqual(GEN.validate_matrix(matrix([family("widget", "widget:token", "Widget token", "stable")]), schema), [])
+        self.assertEqual(
+            GEN.validate_matrix(matrix([family("widget", "widget:token", "Widget token", "stable")]), schema), []
+        )
 
     def test_accepts_t2_corroborated_empirical_stable(self) -> None:
         # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration.
@@ -284,7 +286,7 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         self.assertIn("### `pending` (1)", text)
         self.assertIn("### `unsupported` (1)", text)
         # Provisional's meaning must state it is not "almost stable" (issue #510 acceptance criterion).
-        self.assertIn("not \"almost stable\"", text)
+        self.assertIn('not "almost stable"', text)
         # An unsupported family is shown with its reason, never silently absent.
         self.assertIn("Legacy token", text)
         self.assertIn("superseded by sprocket:token", text)
@@ -389,7 +391,9 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         m = matrix(
             [
                 family("widget", "widget:token", "Widget token", "stable"),
-                family("gadget", "gadget:token", "Gadget token", "provisional", reason="more evidence needed", tier="T2"),
+                family(
+                    "gadget", "gadget:token", "Gadget token", "provisional", reason="more evidence needed", tier="T2"
+                ),
             ]
         )
         text = GEN.render_matrix_markdown(m)
@@ -409,7 +413,15 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
                     basis="empirically-observed",
                     profile="empirical",
                 ),
-                family("policy", "policy:token", "Policy token", "provisional", reason="policy only", tier="T3", basis="project-policy"),
+                family(
+                    "policy",
+                    "policy:token",
+                    "Policy token",
+                    "provisional",
+                    reason="policy only",
+                    tier="T3",
+                    basis="project-policy",
+                ),
             ]
         )
         text = GEN.render_matrix_markdown(m)
@@ -450,7 +462,9 @@ class ReleaseNoteTests(unittest.TestCase):
         self.assertIn("No previous pinned matrix was given to diff against.", text)
 
     def test_reports_a_moved_family(self) -> None:
-        current = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        current = matrix(
+            [family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")]
+        )
         previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
         text = GEN.render_release_note(current, previous)
         self.assertIn("`widget:token`: stable -> provisional", text)
@@ -469,20 +483,28 @@ class ReleaseNoteTests(unittest.TestCase):
         self.assertIn("Stable: 2 (+1 from 1).", text)
 
     def test_a_family_leaving_stable_is_tagged_a_regression(self) -> None:
-        current = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        current = matrix(
+            [family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")]
+        )
         previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
         text = GEN.render_release_note(current, previous)
         self.assertIn("`widget:token`: stable -> provisional (regression)", text)
 
     def test_a_family_reaching_stable_is_tagged_an_improvement(self) -> None:
         current = matrix([family("widget", "widget:token", "Widget token", "stable")])
-        previous = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        previous = matrix(
+            [family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")]
+        )
         text = GEN.render_release_note(current, previous)
         self.assertIn("`widget:token`: provisional -> stable (improvement)", text)
 
     def test_a_move_between_non_stable_statuses_is_untagged(self) -> None:
-        current = matrix([family("widget", "widget:token", "Widget token", "pending", reason="no positive contract yet")])
-        previous = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        current = matrix(
+            [family("widget", "widget:token", "Widget token", "pending", reason="no positive contract yet")]
+        )
+        previous = matrix(
+            [family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")]
+        )
         text = GEN.render_release_note(current, previous)
         self.assertIn("`widget:token`: provisional -> pending\n", text)
 
@@ -501,7 +523,9 @@ class ReleaseNoteTests(unittest.TestCase):
 
     def test_a_different_benchmarks_revision_is_not_comparable(self) -> None:
         current = matrix([family("widget", "widget:token", "Widget token", "stable")])
-        previous = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        previous = matrix(
+            [family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")]
+        )
         previous["sourceReport"]["revision"] = "1" * 40
         text = GEN.render_release_note(current, previous)
         self.assertIn("The previous pinned matrix is not comparable", text)
@@ -577,7 +601,12 @@ class UnmeasuredDetectorTests(unittest.TestCase):
             GEN.built_in_detector_ids("fn nothing() {}")
 
     def test_detectors_no_family_lists_are_unmeasured(self) -> None:
-        m = matrix([family("widget", "widget:key", "Key", "stable"), family("jwt", "jwt:token", "Token", "stable", detectors=("jwt",))])
+        m = matrix(
+            [
+                family("widget", "widget:key", "Key", "stable"),
+                family("jwt", "jwt:token", "Token", "stable", detectors=("jwt",)),
+            ]
+        )
         self.assertEqual(GEN.unmeasured_detectors(m, GEN.built_in_detector_ids(MOD_RS)), ["gadget-key"])
 
     def test_unmeasured_section_is_rendered_and_readme_names_them(self) -> None:
@@ -758,8 +787,7 @@ class UserFacingReasonTests(unittest.TestCase):
         )
         self.assertEqual(
             text,
-            "Not yet stable: needs independent corroboration of its format "
-            "(several sources, or provider-issued keys).",
+            "Not yet stable: needs independent corroboration of its format (several sources, or provider-issued keys).",
         )
         self.assert_plain(text)
 
@@ -794,8 +822,15 @@ class UserFacingReasonTests(unittest.TestCase):
             GEN.user_facing_reason("fixtureProfile stable-empirical: requires T2 evidence, the contract is T1")
 
     def test_rendering_changes_only_the_reason_cell(self) -> None:
-        fam = family("gadget", "gadget:token", "Gadget token", "provisional", reason=DOCUMENTED_REASON, tier="T1",
-                     basis="provider-documented")
+        fam = family(
+            "gadget",
+            "gadget:token",
+            "Gadget token",
+            "provisional",
+            reason=DOCUMENTED_REASON,
+            tier="T1",
+            basis="provider-documented",
+        )
         m = matrix([fam])
         before = repr(m)
         doc = GEN.render_matrix_markdown(m)

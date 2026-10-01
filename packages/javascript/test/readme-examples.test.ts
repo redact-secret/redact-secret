@@ -6,10 +6,7 @@ import { describe, expect, it } from "vitest";
 
 const PACKAGE_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const README = readFileSync(join(PACKAGE_ROOT, "README.md"), "utf8");
-const STREAMING_GUIDE = readFileSync(
-  join(PACKAGE_ROOT, "..", "..", "docs", "guides", "streaming.md"),
-  "utf8",
-);
+const STREAMING_GUIDE = readFileSync(join(PACKAGE_ROOT, "..", "..", "docs", "guides", "streaming.md"), "utf8");
 const TSC = join(PACKAGE_ROOT, "..", "..", "node_modules", "typescript", "bin", "tsc");
 
 /** Runs `tsc` over `project` and returns its diagnostics, empty when clean. */
@@ -28,9 +25,7 @@ function typeCheck(project: string): string {
 
 /** Every fenced ` ```ts ` block in the README, in document order. */
 function typeScriptExamples(document = README): readonly string[] {
-  return [...document.matchAll(/```ts\n([\s\S]*?)```/g)].map(
-    ([, body]) => body ?? "",
-  );
+  return [...document.matchAll(/```ts\n([\s\S]*?)```/g)].map(([, body]) => body ?? "");
 }
 
 /**
@@ -46,14 +41,10 @@ function declaredText(declarationPath: string, seen = new Set<string>()): string
 
   const absolute = join(PACKAGE_ROOT, "dist", declarationPath);
   const text = readFileSync(absolute, "utf8");
-  const directory = declarationPath.includes("/")
-    ? declarationPath.slice(0, declarationPath.lastIndexOf("/") + 1)
-    : "";
+  const directory = declarationPath.includes("/") ? declarationPath.slice(0, declarationPath.lastIndexOf("/") + 1) : "";
 
   let combined = text;
-  for (const [, specifier] of text.matchAll(
-    /export \* from "\.\/([^"]+)\.js"/g,
-  )) {
+  for (const [, specifier] of text.matchAll(/export \* from "\.\/([^"]+)\.js"/g)) {
     combined += declaredText(`${directory}${specifier}.d.ts`, seen);
   }
   return combined;
@@ -62,10 +53,7 @@ function declaredText(declarationPath: string, seen = new Set<string>()): string
 /** Every name a README example imports from `subpath` of the package. */
 function importedNames(example: string, subpath = ""): readonly string[] {
   const names: string[] = [];
-  const pattern = new RegExp(
-    `import(?:\\s+type)?\\s+\\{([^}]*)\\}\\s+from\\s+"@redact-secret/core${subpath}"`,
-    "g",
-  );
+  const pattern = new RegExp(`import(?:\\s+type)?\\s+\\{([^}]*)\\}\\s+from\\s+"@redact-secret/core${subpath}"`, "g");
   for (const [, clause] of example.matchAll(pattern)) {
     for (const name of (clause ?? "").split(",")) {
       const trimmed = name.trim();
@@ -78,9 +66,7 @@ function importedNames(example: string, subpath = ""): readonly string[] {
 describe("README examples", () => {
   it("documents examples for supported whole-input capabilities", () => {
     const examples = typeScriptExamples();
-    const imported = new Set(
-      examples.flatMap((example) => importedNames(example)),
-    );
+    const imported = new Set(examples.flatMap((example) => importedNames(example)));
 
     expect(examples.length).toBeGreaterThan(0);
     for (const name of [
@@ -130,11 +116,7 @@ describe("README examples", () => {
       const publicApi = (await import(module)) as Record<string, unknown>;
       const declared = declaredText(declarations ?? "");
 
-      for (const name of new Set(
-        typeScriptExamples().flatMap((example) =>
-          importedNames(example, subpath),
-        ),
-      )) {
+      for (const name of new Set(typeScriptExamples().flatMap((example) => importedNames(example, subpath)))) {
         const exported = name in publicApi || declared.includes(name);
         expect(exported, `${module} imports "${name}"`).toBe(true);
       }
@@ -150,10 +132,7 @@ describe("README examples", () => {
       const sources: string[] = [];
       [...typeScriptExamples(), ...typeScriptExamples(STREAMING_GUIDE)].forEach((example, index) => {
         const name = `example-${index}.ts`;
-        writeFileSync(
-          join(scratch, name),
-          `${example}\nexport {};\n`,
-        );
+        writeFileSync(join(scratch, name), `${example}\nexport {};\n`);
         sources.push(name);
       });
       writeFileSync(

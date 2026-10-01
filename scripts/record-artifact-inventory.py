@@ -47,8 +47,9 @@ import os
 import re
 import subprocess
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "conformance" / "fixtures"
@@ -211,9 +212,7 @@ def require_installed_javascript_qualification(
         lane = result.get("lane")
         runtime = result.get("runtime") or {}
         target = (
-            str(runtime.get("version", "")).removeprefix("v").split(".")[0]
-            if lane == "node"
-            else runtime.get("name")
+            str(runtime.get("version", "")).removeprefix("v").split(".")[0] if lane == "node" else runtime.get("name")
         )
         if lane not in found or not target:
             errors.append(f"{result.get('artifact', 'installed JavaScript')}: invalid lane/runtime")
@@ -233,7 +232,16 @@ def require_installed_javascript_qualification(
         if not result.get("commands"):
             errors.append(f"{label}: records no commands")
         checks = result.get("results") or {}
-        for check in ("initialize", "scan", "incremental", "incrementalCorpus", "stream", "aiContextBoundary", "mcpBoundary", "mcpResourcesRead"):
+        for check in (
+            "initialize",
+            "scan",
+            "incremental",
+            "incrementalCorpus",
+            "stream",
+            "aiContextBoundary",
+            "mcpBoundary",
+            "mcpResourcesRead",
+        ):
             if checks.get(check) != "passed":
                 errors.append(f"{label}: {check} did not pass")
         corpus = result.get("incrementalCorpus") or {}
@@ -272,9 +280,7 @@ def require_installed_javascript_qualification(
         for missing in sorted(declared - found[lane]):
             errors.append(f"installed JavaScript {lane}: no qualification for {missing}")
         for extra in sorted(found[lane] - declared):
-            errors.append(
-                f"installed JavaScript {lane}: qualified {extra}, which Cargo.toml does not declare"
-            )
+            errors.append(f"installed JavaScript {lane}: qualified {extra}, which Cargo.toml does not declare")
     return errors
 
 
@@ -368,9 +374,7 @@ def require_clean_install_qualification(
             or budget > CLEAN_INSTALL_MAX_BUDGET_SECONDS
             or elapsed > budget
         ):
-            errors.append(
-                f"{label}: documented path did not finish within {CLEAN_INSTALL_MAX_BUDGET_SECONDS}s"
-            )
+            errors.append(f"{label}: documented path did not finish within {CLEAN_INSTALL_MAX_BUDGET_SECONDS}s")
         binaries = result.get("binaries") or []
         suffixes = sorted(Path(str(binary.get("file", ""))).suffix for binary in binaries)
         expected_suffixes = [".whl"] if lane == "python" else [".node", ".wasm", ".wasm", ".wasm", ".wasm"]
@@ -416,11 +420,7 @@ def require_matrix(matrix: dict, collected: list[dict]) -> list[str]:
         ("cli", lambda f: f in ("redact-secret", "redact-secret.exe"), "executable"),
     ):
         for target in sorted(families[family]):
-            files = [
-                entry["file"]
-                for entry in collected
-                if entry["family"] == family and entry["target"] == target
-            ]
+            files = [entry["file"] for entry in collected if entry["family"] == family and entry["target"] == target]
             # A target with no artifact at all is already reported above.
             if files and not any(predicate(name) for name in files):
                 errors.append(f"{family} {target}: carries no {description}")
@@ -501,10 +501,7 @@ def require_crates(crate_entries: list[dict]) -> list[str]:
 
 
 def corpus_identity() -> dict[str, str]:
-    return {
-        path.name: digest(path)
-        for path in sorted(FIXTURES.glob("*.json"))
-    }
+    return {path.name: digest(path) for path in sorted(FIXTURES.glob("*.json"))}
 
 
 def incremental_corpus_fixture_count() -> int:
@@ -563,7 +560,11 @@ def require_golden_path_qualification(
         "lockfile": GOLDEN_PATH_LOCKFILE.as_posix(),
         "packages": sorted(
             (
-                {"name": key.removeprefix("node_modules/"), "version": entry["version"], "integrity": entry["integrity"]}
+                {
+                    "name": key.removeprefix("node_modules/"),
+                    "version": entry["version"],
+                    "integrity": entry["integrity"],
+                }
                 for key, entry in (lock.get("packages") or {}).items()
                 if key.startswith("node_modules/@redact-secret/")
             ),
@@ -604,9 +605,7 @@ def require_golden_path_qualification(
         if not real_core_tests or not set(real_core_tests) <= set(paths):
             errors.append(f"{label}: did not run this revision's real-core example tests")
         if not locked_adapters["packages"] or result.get("adapters") != locked_adapters:
-            errors.append(
-                f"{label}: did not install the registry adapters {GOLDEN_PATH_LOCKFILE.as_posix()} locks"
-            )
+            errors.append(f"{label}: did not install the registry adapters {GOLDEN_PATH_LOCKFILE.as_posix()} locks")
         if result.get("loadedArtifact") != GOLDEN_PATH_ARTIFACT[lane]:
             errors.append(f"{label}: did not load the {GOLDEN_PATH_ARTIFACT[lane]} artifact")
         checks = result.get("results") or {}
@@ -725,9 +724,7 @@ def render_summary(inventory: dict) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--artifacts", type=Path, required=True, help="directory of downloaded artifacts"
-    )
+    parser.add_argument("--artifacts", type=Path, required=True, help="directory of downloaded artifacts")
     parser.add_argument("--out", type=Path, required=True, help="inventory JSON to write")
     parser.add_argument("--summary", type=Path, help="markdown summary to append to")
     arguments = parser.parse_args()
@@ -740,20 +737,14 @@ def main() -> int:
     collected = collect(arguments.artifacts)
     crate_entries = crate_package_digests()
     collected = collected + crate_entries
-    qualification, qualification_errors = collect_installed_javascript_qualification(
-        arguments.artifacts
-    )
+    qualification, qualification_errors = collect_installed_javascript_qualification(arguments.artifacts)
     revision = source_commit()
     with (ROOT / NPM_PACKAGE / "package.json").open(encoding="utf-8") as handle:
         product_version = json.load(handle)["version"]
     errors = require_matrix(matrix, collected)
     errors.extend(require_crates(crate_entries))
     errors.extend(qualification_errors)
-    errors.extend(
-        require_installed_javascript_qualification(
-            matrix, qualification, revision, product_version
-        )
-    )
+    errors.extend(require_installed_javascript_qualification(matrix, qualification, revision, product_version))
     clean_install, clean_install_errors = collect_clean_install_qualification(arguments.artifacts)
     errors.extend(clean_install_errors)
     errors.extend(
@@ -763,9 +754,7 @@ def main() -> int:
     )
     golden_path, golden_path_errors = collect_golden_path_qualification(arguments.artifacts)
     errors.extend(golden_path_errors)
-    errors.extend(
-        require_golden_path_qualification(golden_path, collected, revision, product_version)
-    )
+    errors.extend(require_golden_path_qualification(golden_path, collected, revision, product_version))
 
     inventory = {
         "sourceCommit": revision,

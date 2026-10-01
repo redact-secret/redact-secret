@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-decision-permalinks.py"
 SPEC = importlib.util.spec_from_file_location("check_decision_permalinks", SCRIPT)
 assert SPEC and SPEC.loader
@@ -17,13 +16,7 @@ SPEC.loader.exec_module(CHECK)
 
 
 def record(full_record: str | None) -> str:
-    frontmatter = (
-        "decision_id: decision-example\n"
-        "status: accepted\n"
-        "scope: workspace\n"
-        "title: Example\n"
-        "spec: engine\n"
-    )
+    frontmatter = "decision_id: decision-example\nstatus: accepted\nscope: workspace\ntitle: Example\nspec: engine\n"
     if full_record is not None:
         frontmatter += f"full_record: {full_record}\n"
     return f"---\n{frontmatter}---\n\n# Example\n\n## Decision\n\nExample.\n"

@@ -7,5 +7,4 @@ import { createIncrementalSanitizer, initialize, scanAndRedact } from "@redact-s
 
 import { measure as measureCore } from "./assessment-browser-performance-harness-core.mjs";
 
-export const measure = (profile) =>
-  measureCore(profile, { createIncrementalSanitizer, initialize, scanAndRedact });
+export const measure = (profile) => measureCore(profile, { createIncrementalSanitizer, initialize, scanAndRedact });

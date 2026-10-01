@@ -9,10 +9,7 @@
  */
 
 import { createRedactSecretRuntime } from "../../src/runtime.js";
-import type {
-  IncrementalSanitizer,
-  IncrementalSanitizerOptions,
-} from "../../src/types.js";
+import type { IncrementalSanitizer, IncrementalSanitizerOptions } from "../../src/types.js";
 import { createSanitizingBinding } from "../sanitizing-binding.js";
 
 export const LIMITS = Object.freeze({
@@ -23,13 +20,8 @@ export const LIMITS = Object.freeze({
 });
 
 /** Opens one session on a freshly initialized runtime. */
-export async function openSession(
-  options: Partial<IncrementalSanitizerOptions> = {},
-): Promise<IncrementalSanitizer> {
-  const runtime = createRedactSecretRuntime(
-    async () => createSanitizingBinding(),
-    "full",
-  );
+export async function openSession(options: Partial<IncrementalSanitizerOptions> = {}): Promise<IncrementalSanitizer> {
+  const runtime = createRedactSecretRuntime(async () => createSanitizingBinding(), "full");
   await runtime.initialize();
   return runtime.createIncrementalSanitizer({ limits: LIMITS, ...options });
 }
@@ -80,9 +72,7 @@ export const partitionCorpus = Object.freeze([
 ]);
 
 /** The whole-input result the same session produces in one shot. */
-export async function oracle(
-  input: string,
-): Promise<{ text: string; findings: readonly unknown[] }> {
+export async function oracle(input: string): Promise<{ text: string; findings: readonly unknown[] }> {
   const session = await openSession();
   const appended = session.append(input);
   const finalized = session.finalize();

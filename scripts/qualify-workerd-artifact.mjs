@@ -49,11 +49,11 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 import {
-  CANONICAL_FIXTURE_ID,
-  REPO_ROOT_PATH,
   assertMatchesFixture,
+  CANONICAL_FIXTURE_ID,
   loadCanonicalFixture,
   packageVersion,
+  REPO_ROOT_PATH,
 } from "./qualify-runtime-fixture.mjs";
 
 const JS_PACKAGE_DIR = join(REPO_ROOT_PATH, "packages", "javascript");
@@ -89,9 +89,7 @@ function parseArguments(argv) {
     }
   }
   if (options.wasmDir === undefined) {
-    throw new Error(
-      "usage: qualify-workerd-artifact.mjs --wasm-dir <dir> [--detector-profile full|common] [--pii]",
-    );
+    throw new Error("usage: qualify-workerd-artifact.mjs --wasm-dir <dir> [--detector-profile full|common] [--pii]");
   }
   if (options.detectorProfile !== "full" && options.detectorProfile !== "common") {
     throw new Error("--detector-profile must be full or common");
@@ -129,8 +127,7 @@ async function linkWasmPackage(wasmDir) {
  * response body instead of an opaque `workerd` 500.
  */
 function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
-  const entry =
-    detectorProfile === "common" ? "@redact-secret/core/common" : "@redact-secret/core";
+  const entry = detectorProfile === "common" ? "@redact-secret/core/common" : "@redact-secret/core";
   return `
     import { initialize, artifact, piiActivation, scan, redact, scanAndRedact, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
 
@@ -234,10 +231,7 @@ async function stageWorkerProject(detectorProfile, fixture, expectedVersion, pii
   const scope = join(directory, "node_modules", "@redact-secret");
   await mkdir(scope, { recursive: true });
   symlinkSync(JS_PACKAGE_DIR, join(scope, "core"), "junction");
-  await writeFile(
-    join(directory, "worker.mjs"),
-    renderWorkerSource(detectorProfile, fixture, expectedVersion, pii),
-  );
+  await writeFile(join(directory, "worker.mjs"), renderWorkerSource(detectorProfile, fixture, expectedVersion, pii));
   await writeFile(
     join(directory, "wrangler.toml"),
     [
@@ -328,18 +322,10 @@ async function stopWrangler(child) {
 
 async function main() {
   const { wasmDir, detectorProfile, pii: piiMode } = parseArguments(process.argv.slice(2));
-  const packageEntry = join(
-    JS_PACKAGE_DIR,
-    "dist",
-    detectorProfile === "common" ? "common.js" : "index.js",
-  );
-  assert(
-    existsSync(packageEntry),
-    `${packageEntry}: missing; build the package with \`npm run js:build\``,
-  );
+  const packageEntry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
+  assert(existsSync(packageEntry), `${packageEntry}: missing; build the package with \`npm run js:build\``);
 
-  const fixtureId =
-    detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
+  const fixtureId = detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
   const expectedVersion = await packageVersion();
   // With `--pii`, a synthetic phone fixture replaces the canonical one: its
   // one expected finding comes from the PII runtime only the `pii` build
@@ -380,9 +366,7 @@ async function main() {
         assert(body.findings.length === 1, `expected exactly one finding, got ${body.findings.length}`);
         assertMatchesFixture(body.findings[0], fixture);
       }
-      console.log(
-        `qualified the Cloudflare Workers runtime path (${label} profile) against a real workerd sandbox.`,
-      );
+      console.log(`qualified the Cloudflare Workers runtime path (${label} profile) against a real workerd sandbox.`);
     } finally {
       await stopWrangler(child);
     }

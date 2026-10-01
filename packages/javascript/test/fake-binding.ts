@@ -8,7 +8,6 @@
  * change to that contract breaks these tests rather than passing silently.
  */
 
-import { VERSION } from "../src/version.js";
 import type {
   NativeBinding,
   NativeFinding,
@@ -16,6 +15,7 @@ import type {
   NativeWholeInputLimits,
 } from "../src/native.js";
 import type { IncrementalSanitizerState } from "../src/types.js";
+import { VERSION } from "../src/version.js";
 
 export interface FakeBindingOptions {
   readonly version?: string;
@@ -50,9 +50,7 @@ export interface FakeBinding extends NativeBinding {
   readonly lastRuleset: Uint8Array | undefined;
 }
 
-export function createFakeBinding(
-  options: FakeBindingOptions = {},
-): FakeBinding {
+export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding {
   const calls: string[] = [];
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
@@ -64,10 +62,9 @@ export function createFakeBinding(
     let state: IncrementalSanitizerState = "accepting";
     function requireAccepting(): void {
       if (state !== "accepting") {
-        throw Object.assign(
-          new Error("The incremental sanitizer is no longer accepting input."),
-          { code: "INVALID_STATE" },
-        );
+        throw Object.assign(new Error("The incremental sanitizer is no longer accepting input."), {
+          code: "INVALID_STATE",
+        });
       }
     }
     return {
@@ -112,7 +109,7 @@ export function createFakeBinding(
       if (rejected !== undefined) {
         throw Object.assign(new Error(rejected[1]), { code: rejected[0] });
       }
-      const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
+      const selectors = [...new Set(pii.map((value) => (value === "pii" ? "pii:global" : value)))].sort();
       const jurisdiction = selectors.includes("pii:us");
       const global = selectors.includes("pii:global") || jurisdiction;
       const families = [
@@ -144,9 +141,7 @@ export function createFakeBinding(
     },
     redact: (input, given, formatter, limits) => {
       lastLimits = limits;
-      calls.push(
-        `redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`,
-      );
+      calls.push(`redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`);
       return redacted;
     },
     scanAndRedact: (input, policy, formatter, limits, ruleset) => {
@@ -158,9 +153,7 @@ export function createFakeBinding(
       return { text: redacted, findings };
     },
     createIncrementalSanitizer: (incrementalOptions) => {
-      calls.push(
-        `createIncrementalSanitizer:${incrementalOptions.limits.maxInputCodeUnits}`,
-      );
+      calls.push(`createIncrementalSanitizer:${incrementalOptions.limits.maxInputCodeUnits}`);
       return session();
     },
     get lastLimits() {

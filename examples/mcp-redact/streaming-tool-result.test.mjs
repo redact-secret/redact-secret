@@ -85,7 +85,12 @@ test("a block finding in a streamed result blocks the turn with no value and no 
 
 test("a limit failure mid-stream blocks the whole result and releases no staged text", async () => {
   const { boundary } = setup({
-    incrementalLimits: { maxInputCodeUnits: 1000, maxBufferedCodeUnits: 16, maxTokenCodeUnits: 16, maxMultilineCodeUnits: 16 },
+    incrementalLimits: {
+      maxInputCodeUnits: 1000,
+      maxBufferedCodeUnits: 16,
+      maxTokenCodeUnits: 16,
+      maxMultilineCodeUnits: 16,
+    },
   });
   const outcome = await redactStreamedToolResult(boundary, ["safe chunk ", "and one that goes over the buffer"]);
   assert.deepEqual(outcome, { outcome: "blocked", reason: "limit_exceeded", code: "BUFFER_LIMIT_EXCEEDED" });
@@ -93,7 +98,12 @@ test("a limit failure mid-stream blocks the whole result and releases no staged 
 
 test("#612: an early failure stops pulling at once and closes the producer", async () => {
   const { boundary } = setup({
-    incrementalLimits: { maxInputCodeUnits: 1000, maxBufferedCodeUnits: 16, maxTokenCodeUnits: 16, maxMultilineCodeUnits: 16 },
+    incrementalLimits: {
+      maxInputCodeUnits: 1000,
+      maxBufferedCodeUnits: 16,
+      maxTokenCodeUnits: 16,
+      maxMultilineCodeUnits: 16,
+    },
   });
   const { state, chunks } = producer(["safe chunk ", "and one that goes over the buffer", "never pulled", "nor this"]);
   const outcome = await redactStreamedToolResult(boundary, chunks);

@@ -19,7 +19,6 @@ from __future__ import annotations
 import gc
 
 import pytest
-
 import redact_secret
 
 from .conftest import GENEROUS_LIMITS, generous_limits, load_corpus
@@ -67,9 +66,7 @@ def test_limits_expose_what_they_were_given() -> None:
     assert limits.max_buffered_bytes == GENEROUS_LIMITS["max_buffered_bytes"]
     assert limits.max_token_bytes == GENEROUS_LIMITS["max_token_bytes"]
     assert limits.max_multiline_bytes == GENEROUS_LIMITS["max_multiline_bytes"]
-    assert redact_secret.IncrementalSanitizer(limits).limits.max_input_bytes == (
-        GENEROUS_LIMITS["max_input_bytes"]
-    )
+    assert redact_secret.IncrementalSanitizer(limits).limits.max_input_bytes == (GENEROUS_LIMITS["max_input_bytes"])
 
 
 def test_limits_are_read_only() -> None:
@@ -143,14 +140,10 @@ def _limits_for(fixture: dict) -> redact_secret.IncrementalLimits:
     declared = fixture.get("limits")
     if declared is None:
         return redact_secret.IncrementalLimits(**DEFAULT_LIFECYCLE_LIMITS)
-    return redact_secret.IncrementalLimits(
-        **{LIMIT_NAMES[key]: value for key, value in declared.items()}
-    )
+    return redact_secret.IncrementalLimits(**{LIMIT_NAMES[key]: value for key, value in declared.items()})
 
 
-@pytest.mark.parametrize(
-    "fixture", LIFECYCLE_FIXTURES, ids=lambda fixture: fixture["id"]
-)
+@pytest.mark.parametrize("fixture", LIFECYCLE_FIXTURES, ids=lambda fixture: fixture["id"])
 def test_lifecycle_matches_the_canonical_corpus(fixture: dict) -> None:
     session = redact_secret.IncrementalSanitizer(_limits_for(fixture))
     outcome = fixture["outcome"]
@@ -411,9 +404,7 @@ def test_a_policy_override_changes_the_emitted_text() -> None:
 def test_formatter_receives_only_safe_metadata_with_absolute_offsets() -> None:
     seen: list[tuple] = []
 
-    def formatter(
-        finding: redact_secret.Finding, context: redact_secret.PlaceholderContext
-    ) -> str:
+    def formatter(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
         seen.append((type(finding).__name__, finding.start, context.placeholder_index))
         assert not hasattr(finding, "value")
         return redact_secret.typed_placeholder_formatter(finding, context)
@@ -424,9 +415,7 @@ def test_formatter_receives_only_safe_metadata_with_absolute_offsets() -> None:
     text += session.finalize().text
 
     joined = "".join(chunks)
-    assert text == redact_secret.scan_and_redact(
-        joined, formatter=redact_secret.typed_placeholder_formatter
-    ).text
+    assert text == redact_secret.scan_and_redact(joined, formatter=redact_secret.typed_placeholder_formatter).text
     assert [entry[0] for entry in seen] == ["Finding", "Finding"]
     assert [entry[1] for entry in seen] == [f.start for f in redact_secret.scan(joined)]
     assert [entry[2] for entry in seen] == [1, 2]
@@ -436,9 +425,7 @@ def test_formatter_receives_only_safe_metadata_with_absolute_offsets() -> None:
     ("policy", "expected", "code"),
     [
         pytest.param(
-            lambda finding, context: (_ for _ in ()).throw(
-                ValueError(f"leak: {RETENTION_MARKER}")
-            ),
+            lambda finding, context: (_ for _ in ()).throw(ValueError(f"leak: {RETENTION_MARKER}")),
             "PolicyFailureError",
             "POLICY_FAILURE",
             id="raises",
@@ -457,9 +444,7 @@ def test_formatter_receives_only_safe_metadata_with_absolute_offsets() -> None:
         ),
     ],
 )
-def test_a_failing_policy_fails_the_session_without_leaking(
-    policy, expected: str, code: str
-) -> None:
+def test_a_failing_policy_fails_the_session_without_leaking(policy, expected: str, code: str) -> None:
     session = redact_secret.IncrementalSanitizer(generous_limits(), policy)
     with pytest.raises(getattr(redact_secret, expected)) as excinfo:
         session.append(f"{OPEN_CONSTRUCT}\n")
@@ -474,9 +459,7 @@ def test_a_failing_policy_fails_the_session_without_leaking(
     ("formatter", "expected", "code"),
     [
         pytest.param(
-            lambda finding, context: (_ for _ in ()).throw(
-                ValueError(f"leak: {RETENTION_MARKER}")
-            ),
+            lambda finding, context: (_ for _ in ()).throw(ValueError(f"leak: {RETENTION_MARKER}")),
             "PlaceholderFailureError",
             "PLACEHOLDER_FAILURE",
             id="raises",
@@ -501,9 +484,7 @@ def test_a_failing_policy_fails_the_session_without_leaking(
         ),
     ],
 )
-def test_a_failing_formatter_fails_the_session_without_leaking(
-    formatter, expected: str, code: str
-) -> None:
+def test_a_failing_formatter_fails_the_session_without_leaking(formatter, expected: str, code: str) -> None:
     session = redact_secret.IncrementalSanitizer(generous_limits(), None, formatter)
     with pytest.raises(getattr(redact_secret, expected)) as excinfo:
         session.append(f"{OPEN_CONSTRUCT}\n")
@@ -526,9 +507,7 @@ def _live_marker_strings() -> int:
     return sum(
         1
         for obj in gc.get_objects()
-        if isinstance(obj, str)
-        and RETENTION_MARKER in obj
-        and obj not in (RETENTION_MARKER, OPEN_CONSTRUCT)
+        if isinstance(obj, str) and RETENTION_MARKER in obj and obj not in (RETENTION_MARKER, OPEN_CONSTRUCT)
     )
 
 
@@ -547,9 +526,7 @@ def test_a_failure_leaves_no_marker_bearing_text_reachable() -> None:
     exact = len(OPEN_CONSTRUCT)
     limits = redact_secret.IncrementalLimits(
         max_input_bytes=exact,
-        max_buffered_bytes=redact_secret.IncrementalLimits.minimum_buffered_bytes(
-            exact, exact
-        ),
+        max_buffered_bytes=redact_secret.IncrementalLimits.minimum_buffered_bytes(exact, exact),
         max_token_bytes=exact,
         max_multiline_bytes=exact,
     )

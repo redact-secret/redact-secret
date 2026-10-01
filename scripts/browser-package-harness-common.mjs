@@ -23,14 +23,14 @@
  */
 
 import {
-  RANGE_UNIT,
-  SecretScanError,
-  VERSION,
   createIncrementalSanitizer,
   initialize,
+  RANGE_UNIT,
   redact,
+  SecretScanError,
   scan,
   scanAndRedact,
+  VERSION,
 } from "@redact-secret/core/common";
 
 import { qualify as qualifyCore } from "./browser-package-harness-core.mjs";

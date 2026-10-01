@@ -5,7 +5,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "verify-release-governance.py"
 SPEC = importlib.util.spec_from_file_location("verify_release_governance", SCRIPT)
 assert SPEC and SPEC.loader
@@ -199,9 +198,7 @@ class GitHubRepoTests(unittest.TestCase):
     def test_nonexistent_repo_is_not_a_reservation(self) -> None:
         reader = FakeReader({"repos/redact-secret/redact-secret": None})
         result = VERIFY.check_github_repo(reader, "redact-secret/redact-secret")
-        self.assertEqual(
-            result, {"check": "github-repo", "repo": "redact-secret/redact-secret", "exists": False}
-        )
+        self.assertEqual(result, {"check": "github-repo", "repo": "redact-secret/redact-secret", "exists": False})
 
     def test_existing_repo_reports_visibility(self) -> None:
         reader = FakeReader({"repos/redact-secret/redact-secret": {"private": False}})

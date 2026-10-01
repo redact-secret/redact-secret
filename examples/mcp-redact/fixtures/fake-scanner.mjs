@@ -38,7 +38,7 @@ export function fakeScanAndRedact(text) {
   }
   const match = /SECRET_TOKEN_\d+/.exec(text);
   if (match) {
-    const redacted = text.slice(0, match.index) + "<SECRET_1>" + text.slice(match.index + match[0].length);
+    const redacted = `${text.slice(0, match.index)}<SECRET_1>${text.slice(match.index + match[0].length)}`;
     return { text: redacted, findings: [finding("redact")] };
   }
   if (text.includes("WARN_ME")) {

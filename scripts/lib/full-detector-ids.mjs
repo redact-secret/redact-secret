@@ -20,10 +20,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
  * canonical order.
  */
 export function fullDetectorIds() {
-  const source = readFileSync(
-    join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs"),
-    "utf8",
-  );
+  const source = readFileSync(join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs"), "utf8");
   const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
   if (table === null) {
     throw new Error("detectors/mod.rs: BUILT_IN_PACKS not found");

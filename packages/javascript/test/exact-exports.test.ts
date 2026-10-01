@@ -33,26 +33,10 @@ const PUBLIC_RUNTIME_EXPORTS = [
  * `create*StreamSanitizer` opens differs.
  */
 const PUBLIC_ADAPTER_EXPORTS = {
-  "@redact-secret/core/node-stream": [
-    "NodeStreamSanitizer",
-    "SecretScanError",
-    "createNodeStreamSanitizer",
-  ],
-  "@redact-secret/core/web-stream": [
-    "SecretScanError",
-    "WebStreamSanitizer",
-    "createWebStreamSanitizer",
-  ],
-  "@redact-secret/core/common/node-stream": [
-    "NodeStreamSanitizer",
-    "SecretScanError",
-    "createNodeStreamSanitizer",
-  ],
-  "@redact-secret/core/common/web-stream": [
-    "SecretScanError",
-    "WebStreamSanitizer",
-    "createWebStreamSanitizer",
-  ],
+  "@redact-secret/core/node-stream": ["NodeStreamSanitizer", "SecretScanError", "createNodeStreamSanitizer"],
+  "@redact-secret/core/web-stream": ["SecretScanError", "WebStreamSanitizer", "createWebStreamSanitizer"],
+  "@redact-secret/core/common/node-stream": ["NodeStreamSanitizer", "SecretScanError", "createNodeStreamSanitizer"],
+  "@redact-secret/core/common/web-stream": ["SecretScanError", "WebStreamSanitizer", "createWebStreamSanitizer"],
 };
 
 describe("exact exports", () => {
@@ -102,9 +86,7 @@ describe("exact exports", () => {
       "@redact-secret/core/runtime/node-common",
       "@redact-secret/core/runtime/browser-common",
     ]) {
-      await expect(import(subpath)).rejects.toThrowError(
-        /is not exported|ERR_PACKAGE_PATH_NOT_EXPORTED|Cannot find/,
-      );
+      await expect(import(subpath)).rejects.toThrowError(/is not exported|ERR_PACKAGE_PATH_NOT_EXPORTED|Cannot find/);
     }
   });
 });

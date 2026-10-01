@@ -70,30 +70,20 @@ LEGACY_IDENTIFIER_ALLOWLIST: dict[str, str] = {
         "rationale cite the old identity as the decision's own record of "
         "what changed, not a missed rename"
     ),
-    "docs/audits/ci-release-automation-supply-chain-review.md": (
-        "a closed, dated, commit-pinned independent review"
-    ),
+    "docs/audits/ci-release-automation-supply-chain-review.md": ("a closed, dated, commit-pinned independent review"),
     "docs/audits/closed-issue-acceptance-evidence-ledger.md": (
         "a closed-issue acceptance-evidence ledger, dated and commit-pinned"
     ),
-    "docs/audits/core-conformance-cli-boundary-review.md": (
-        "a closed, dated, commit-pinned independent review"
-    ),
-    "docs/audits/detection-assurance-closeout-audit.md": (
-        "a closed, dated, commit-pinned closeout audit"
-    ),
+    "docs/audits/core-conformance-cli-boundary-review.md": ("a closed, dated, commit-pinned independent review"),
+    "docs/audits/detection-assurance-closeout-audit.md": ("a closed, dated, commit-pinned closeout audit"),
     "docs/audits/javascript-python-bindings-package-contracts-review.md": (
         "a closed, dated, commit-pinned independent review"
     ),
     "docs/audits/release-approval-and-registry-publisher-evidence.md": (
         "a closed, dated, commit-pinned evidence record"
     ),
-    "docs/audits/release-gap-disposition.md": (
-        "a closed, dated disposition of four independent reviews' findings"
-    ),
-    "docs/audits/release-readiness-audit.md": (
-        "a closed, dated, commit-pinned independent review"
-    ),
+    "docs/audits/release-gap-disposition.md": ("a closed, dated disposition of four independent reviews' findings"),
+    "docs/audits/release-readiness-audit.md": ("a closed, dated, commit-pinned independent review"),
     "docs/audits/repository-transfer-evidence.md": (
         "a dated pre/post transfer evidence record that must identify the former path"
     ),
@@ -131,9 +121,7 @@ BINARY_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".wasm", ".node", 
 
 
 def list_tracked_files(root: Path) -> list[str]:
-    output = subprocess.run(
-        ["git", "ls-files"], cwd=root, check=True, capture_output=True, text=True
-    ).stdout
+    output = subprocess.run(["git", "ls-files"], cwd=root, check=True, capture_output=True, text=True).stdout
     return [line for line in output.splitlines() if line]
 
 

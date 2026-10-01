@@ -28,7 +28,9 @@ def load_module(name: str, path: Path):
 
 
 _SCHEMA_SUPPORT = load_module("pii_context_schema_support", Path(__file__).with_name("check-scoring-artifact.py"))
-_INVISIBLE_SUPPORT = load_module("pii_context_invisible_support", Path(__file__).with_name("generate-invisible-table.py"))
+_INVISIBLE_SUPPORT = load_module(
+    "pii_context_invisible_support", Path(__file__).with_name("generate-invisible-table.py")
+)
 _TABLE_SUPPORT = load_module("pii_context_table_support", Path(__file__).with_name("generate-pii-context-table.py"))
 
 
@@ -89,7 +91,9 @@ def pipe_bounds(entry: dict) -> bool:
     return entry["kind"] == "field-label" and entry.get("class") == "positive"
 
 
-def vocabulary_occurrences(contract: dict, language: str, view: str, domains: set[str], ranges: list[tuple[int, int]]) -> list[dict]:
+def vocabulary_occurrences(
+    contract: dict, language: str, view: str, domains: set[str], ranges: list[tuple[int, int]]
+) -> list[dict]:
     """Find and resolve overlapping vocabulary forms by declared precedence."""
     occurrences: list[dict] = []
     for entry in contract["entries"]:
@@ -135,7 +139,9 @@ def occurrence_distance(occurrence: dict, candidate_position: int) -> int:
     return 0
 
 
-def associate_occurrence(occurrence: dict, view: str, positions: dict[str, int], candidates: dict[str, dict]) -> str | None:
+def associate_occurrence(
+    occurrence: dict, view: str, positions: dict[str, int], candidates: dict[str, dict]
+) -> str | None:
     """Honor domain, direction, bounds, intervening candidates, and ties."""
     entry = occurrence["entry"]
     limit = 16 if entry["kind"] == "field-label" else 64
@@ -189,7 +195,9 @@ def expected_effect(entries: dict[str, dict], candidate: dict, matches: list[str
     return "neutral-evidence"
 
 
-def fixture_associations(contract: dict, fixture: dict, ranges: list[tuple[int, int]]) -> tuple[dict[str, dict], list[str]]:
+def fixture_associations(
+    contract: dict, fixture: dict, ranges: list[tuple[int, int]]
+) -> tuple[dict[str, dict], list[str]]:
     candidates = {candidate["id"]: candidate for candidate in fixture["candidates"]}
     views, errors = line_views(fixture, ranges)
     matches: dict[str, set[str]] = {candidate_id: set() for candidate_id in candidates}
@@ -214,7 +222,10 @@ def check_contract(contract: dict, ranges: list[tuple[int, int]]) -> list[str]:
     if contract.get("languages") != ["en", "ko"]:
         errors.append(f"{ARTIFACT}: languages must be exactly ['en', 'ko']")
     if contract.get("precedence") != [
-        "longest-token-span", "high-signal-first", "negative-positive-neutral", "entry-id-bytewise"
+        "longest-token-span",
+        "high-signal-first",
+        "negative-positive-neutral",
+        "entry-id-bytewise",
     ]:
         errors.append(f"{ARTIFACT}: precedence must be the reviewed deterministic order")
 

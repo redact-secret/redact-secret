@@ -36,19 +36,11 @@
  * without holding one long-lived process.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { brotliCompressSync, constants as zlibConstants, gzipSync } from "node:zlib";
+import { brotliCompressSync, gzipSync, constants as zlibConstants } from "node:zlib";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs");
@@ -63,21 +55,89 @@ const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors",
  * of silently mismatching.
  */
 export const CANONICAL_IDS = [
-  "private-key", "aws-access-key", "aws-secret-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "github-token", "gitlab-token", "openai-token",
-  "anthropic-token", "shopify-token", "vault-token", "stripe-token", "slack-token",
-  "pypi-token", "huggingface-token", "docker-token", "cloudflare-token", "digitalocean-token",
-  "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key", "google-oauth-client-secret",
-  "sendgrid-token", "microsoft-entra-client-secret", "azure-devops-personal-access-token",
-  "notion-token", "atlassian-api-token", "twilio-auth-token", "twilio-api-key-secret",
-  "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
-  "datadog-api-key", "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token",
-  "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
-  "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
-  "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "replicate-api-token", "groq-api-key", "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "pinecone-api-key", "gitlab-runner-authentication-token", "databricks-personal-access-token",
-  "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
-  "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
-  "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
-  "doppler-token", "trigger-dev-token", "e2b-api-key", "posthog-token", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
+  "private-key",
+  "aws-access-key",
+  "aws-secret-access-key",
+  "aws-bedrock-long-term-api-key",
+  "aws-bedrock-short-term-api-key",
+  "github-token",
+  "gitlab-token",
+  "openai-token",
+  "anthropic-token",
+  "shopify-token",
+  "vault-token",
+  "stripe-token",
+  "slack-token",
+  "pypi-token",
+  "huggingface-token",
+  "docker-token",
+  "cloudflare-token",
+  "digitalocean-token",
+  "linear-token",
+  "supabase-token",
+  "supabase-management-token",
+  "vercel-token",
+  "npm-token",
+  "google-api-key",
+  "google-oauth-client-secret",
+  "sendgrid-token",
+  "microsoft-entra-client-secret",
+  "azure-devops-personal-access-token",
+  "notion-token",
+  "atlassian-api-token",
+  "twilio-auth-token",
+  "twilio-api-key-secret",
+  "telegram-bot-token",
+  "discord-bot-token",
+  "sentry-user-auth-token",
+  "sentry-org-auth-token",
+  "datadog-api-key",
+  "datadog-application-key",
+  "datadog-application-key-legacy",
+  "grafana-service-account-token",
+  "grafana-cloud-access-policy-token",
+  "new-relic-user-api-key",
+  "new-relic-license-key",
+  "mailchimp-api-key",
+  "mailgun-api-key",
+  "okta-api-token",
+  "firebase-server-key",
+  "terraform-cloud-token",
+  "pulumi-access-token",
+  "replicate-api-token",
+  "groq-api-key",
+  "xai-api-key",
+  "openrouter-api-key",
+  "perplexity-api-key",
+  "fireworks-ai-api-key",
+  "elevenlabs-api-key",
+  "together-ai-api-key",
+  "tavily-api-key",
+  "pinecone-api-key",
+  "gitlab-runner-authentication-token",
+  "databricks-personal-access-token",
+  "confluent-cloud-api-secret",
+  "confluent-cloud-api-secret-legacy",
+  "netlify-token",
+  "neon-api-key",
+  "langsmith-api-key",
+  "langfuse-secret-key",
+  "postman-api-key",
+  "postman-collection-access-key",
+  "heroku-api-key",
+  "heroku-api-key-legacy",
+  "travisci-api-token",
+  "mistral-api-key",
+  "cohere-api-key",
+  "ai21-api-key",
+  "deepgram-api-key",
+  "doppler-token",
+  "trigger-dev-token",
+  "e2b-api-key",
+  "posthog-token",
+  "helicone-api-key",
+  "firecrawl-api-key",
+  "composio-api-key",
   "convex-deployment-key",
   "onepassword-service-account-token",
   "inngest-signing-key",
@@ -100,7 +160,11 @@ export const CANONICAL_IDS = [
   "paddle-api-key",
   "honeycomb-api-key",
   "axiom-token",
-  "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
+  "jwt",
+  "bearer-token",
+  "connection-string",
+  "otpauth-uri",
+  "generic-token",
 ];
 
 /**
@@ -110,25 +174,76 @@ export const CANONICAL_IDS = [
  * entry (asserted by `scripts/tests/measure-detector-cost.test.mjs`).
  */
 export const STRUCTURAL_IDS = [
-  "private-key", "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
+  "private-key",
+  "jwt",
+  "bearer-token",
+  "connection-string",
+  "otpauth-uri",
+  "generic-token",
 ];
 export const GROUPS = {
   ai: [
-    "openai-token", "anthropic-token", "huggingface-token", "replicate-api-token", "groq-api-key",
-    "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "langsmith-api-key",
-    "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key", "e2b-api-key", "helicone-api-key", "firecrawl-api-key", "composio-api-key",
+    "openai-token",
+    "anthropic-token",
+    "huggingface-token",
+    "replicate-api-token",
+    "groq-api-key",
+    "xai-api-key",
+    "openrouter-api-key",
+    "perplexity-api-key",
+    "fireworks-ai-api-key",
+    "elevenlabs-api-key",
+    "together-ai-api-key",
+    "tavily-api-key",
+    "langsmith-api-key",
+    "langfuse-secret-key",
+    "mistral-api-key",
+    "cohere-api-key",
+    "ai21-api-key",
+    "deepgram-api-key",
+    "e2b-api-key",
+    "helicone-api-key",
+    "firecrawl-api-key",
+    "composio-api-key",
     "wandb-api-key",
     "nvidia-api-key",
     "cerebras-api-key",
   ],
   cloud: [
-    "aws-access-key", "aws-secret-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
-    "supabase-management-token", "vercel-token", "google-api-key", "google-oauth-client-secret", "microsoft-entra-client-secret", "datadog-api-key",
-    "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
-    "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
-    "pulumi-access-token", "pinecone-api-key", "databricks-personal-access-token",
-    "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "postman-api-key", "postman-collection-access-key",
-    "heroku-api-key", "heroku-api-key-legacy", "doppler-token",
+    "aws-access-key",
+    "aws-secret-access-key",
+    "aws-bedrock-long-term-api-key",
+    "aws-bedrock-short-term-api-key",
+    "vault-token",
+    "cloudflare-token",
+    "digitalocean-token",
+    "supabase-token",
+    "supabase-management-token",
+    "vercel-token",
+    "google-api-key",
+    "google-oauth-client-secret",
+    "microsoft-entra-client-secret",
+    "datadog-api-key",
+    "datadog-application-key",
+    "datadog-application-key-legacy",
+    "grafana-service-account-token",
+    "grafana-cloud-access-policy-token",
+    "new-relic-user-api-key",
+    "new-relic-license-key",
+    "firebase-server-key",
+    "terraform-cloud-token",
+    "pulumi-access-token",
+    "pinecone-api-key",
+    "databricks-personal-access-token",
+    "confluent-cloud-api-secret",
+    "confluent-cloud-api-secret-legacy",
+    "netlify-token",
+    "neon-api-key",
+    "postman-api-key",
+    "postman-collection-access-key",
+    "heroku-api-key",
+    "heroku-api-key-legacy",
+    "doppler-token",
     "convex-deployment-key",
     "onepassword-service-account-token",
     "daytona-api-key",
@@ -140,16 +255,41 @@ export const GROUPS = {
     "axiom-token",
   ],
   devtools: [
-    "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
-    "atlassian-api-token", "linear-token", "travisci-api-token", "trigger-dev-token",
+    "github-token",
+    "gitlab-token",
+    "gitlab-runner-authentication-token",
+    "azure-devops-personal-access-token",
+    "notion-token",
+    "atlassian-api-token",
+    "linear-token",
+    "travisci-api-token",
+    "trigger-dev-token",
     "inngest-signing-key",
     "sonarqube-token",
   ],
-  "pkg-registry": ["pypi-token", "docker-token", "npm-token", "rubygems-api-key", "clojars-deploy-token", "crates-io-token"],
+  "pkg-registry": [
+    "pypi-token",
+    "docker-token",
+    "npm-token",
+    "rubygems-api-key",
+    "clojars-deploy-token",
+    "crates-io-token",
+  ],
   saas: [
-    "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
-    "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
-    "sentry-org-auth-token", "mailchimp-api-key", "mailgun-api-key", "okta-api-token", "posthog-token",
+    "shopify-token",
+    "stripe-token",
+    "slack-token",
+    "sendgrid-token",
+    "twilio-auth-token",
+    "twilio-api-key-secret",
+    "telegram-bot-token",
+    "discord-bot-token",
+    "sentry-user-auth-token",
+    "sentry-org-auth-token",
+    "mailchimp-api-key",
+    "mailgun-api-key",
+    "okta-api-token",
+    "posthog-token",
     "resend-api-key",
     "apify-api-token",
     "browserbase-api-key",
@@ -204,7 +344,7 @@ export function buildPatchedSource(source, excludeIds) {
     const indent = line.match(/^(\s*)/)[1];
     return `${indent}// excluded by scripts/measure-detector-cost.mjs (${id})`;
   });
-  return source.slice(0, bodyStart) + "\n" + patchedLines.join("\n") + source.slice(vecEnd);
+  return `${source.slice(0, bodyStart)}\n${patchedLines.join("\n")}${source.slice(vecEnd)}`;
 }
 
 function run(command, args, options = {}) {
@@ -300,24 +440,36 @@ async function runVariant(name, outDir, scratchRoot) {
 
   runMeasurementScript([
     join(REPO_ROOT, "scripts", "assessment-cli-performance.mjs"),
-    "--binary", stableBinary,
-    "--profile", "scale-logs-small-whole",
-    "--runs", "10",
-    "--json-out", join(rawDir, "cli-whole.json"),
+    "--binary",
+    stableBinary,
+    "--profile",
+    "scale-logs-small-whole",
+    "--runs",
+    "10",
+    "--json-out",
+    join(rawDir, "cli-whole.json"),
   ]);
   runMeasurementScript([
     join(REPO_ROOT, "scripts", "assessment-browser-performance.mjs"),
-    "--artifact-dir", wasmDir,
-    "--profile", "scale-logs-small-whole",
-    "--runs", "10",
-    "--json-out", join(rawDir, "wasm-whole.json"),
+    "--artifact-dir",
+    wasmDir,
+    "--profile",
+    "scale-logs-small-whole",
+    "--runs",
+    "10",
+    "--json-out",
+    join(rawDir, "wasm-whole.json"),
   ]);
   runMeasurementScript([
     join(REPO_ROOT, "scripts", "assessment-browser-performance.mjs"),
-    "--artifact-dir", wasmDir,
-    "--profile", "scale-logs-medium-fixed4096",
-    "--runs", "10",
-    "--json-out", join(rawDir, "wasm-fixed4096.json"),
+    "--artifact-dir",
+    wasmDir,
+    "--profile",
+    "scale-logs-medium-fixed4096",
+    "--runs",
+    "10",
+    "--json-out",
+    join(rawDir, "wasm-fixed4096.json"),
   ]);
 
   const includedIds = CANONICAL_IDS.filter((id) => !definition.exclude.includes(id));
@@ -334,16 +486,16 @@ async function runVariant(name, outDir, scratchRoot) {
     },
   };
   writeFileSync(join(rawDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
-  console.log(`[measure-detector-cost] ${name}: ${includedIds.length} detectors, wasm raw ${sizes.wasmRawBytes}B / gzip ${sizes.wasmGzipBytes}B / brotli ${sizes.wasmBrotliBytes}B, native ${sizes.nativeRawBytes}B`);
+  console.log(
+    `[measure-detector-cost] ${name}: ${includedIds.length} detectors, wasm raw ${sizes.wasmRawBytes}B / gzip ${sizes.wasmGzipBytes}B / brotli ${sizes.wasmBrotliBytes}B, native ${sizes.nativeRawBytes}B`,
+  );
   return summary;
 }
 
 function aggregate(outDir) {
   const rawRoot = join(outDir, "raw");
   if (!existsSync(rawRoot)) fail(`${rawRoot}: missing; run --variant first`);
-  const variantNames = readdirSync(rawRoot).filter((name) =>
-    existsSync(join(rawRoot, name, "summary.json")),
-  );
+  const variantNames = readdirSync(rawRoot).filter((name) => existsSync(join(rawRoot, name, "summary.json")));
   if (variantNames.length === 0) fail(`${rawRoot}: no variant summaries found`);
 
   const summaries = variantNames
@@ -374,7 +526,9 @@ function aggregate(outDir) {
     ),
   };
   writeFileSync(join(outDir, "artifact-sizes.json"), `${JSON.stringify(artifactSizes, null, 2)}\n`);
-  console.log(`[measure-detector-cost] aggregated ${summaries.length} variant(s) into ${outDir}/compositions.json and artifact-sizes.json`);
+  console.log(
+    `[measure-detector-cost] aggregated ${summaries.length} variant(s) into ${outDir}/compositions.json and artifact-sizes.json`,
+  );
 }
 
 function parseArguments(argv) {
@@ -402,9 +556,8 @@ async function main() {
     return;
   }
 
-  const scratchRoot = options.scratchDir !== undefined
-    ? resolve(options.scratchDir)
-    : join(tmpdir(), "redact-secret-detector-cost");
+  const scratchRoot =
+    options.scratchDir !== undefined ? resolve(options.scratchDir) : join(tmpdir(), "redact-secret-detector-cost");
   mkdirSync(scratchRoot, { recursive: true });
   await runVariant(options.variant, outDir, scratchRoot);
 }

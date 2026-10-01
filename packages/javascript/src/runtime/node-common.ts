@@ -10,12 +10,8 @@
  * condition, resolved by `@redact-secret/core/common`.
  */
 
-import {
-  createBindingFromCommonAddon,
-  loadCommonAddon,
-  loadWasmFallback,
-} from "./node.js";
 import type { NativeBindingLoader } from "../native.js";
+import { createBindingFromCommonAddon, loadCommonAddon, loadWasmFallback } from "./node.js";
 
 export const loadNativeBinding: NativeBindingLoader = async ({ pii }) => {
   try {

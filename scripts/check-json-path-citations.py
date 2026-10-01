@@ -58,15 +58,11 @@ TOP_LEVEL_DIRS = (
     "scripts",
     "sast",
 )
-PATH_RE = re.compile(
-    r"\b(?:" + "|".join(TOP_LEVEL_DIRS) + r")(?:/[\w.-]+)+\.[A-Za-z0-9]+\b"
-)
+PATH_RE = re.compile(r"\b(?:" + "|".join(TOP_LEVEL_DIRS) + r")(?:/[\w.-]+)+\.[A-Za-z0-9]+\b")
 
 
 def list_tracked_json_files(root: Path) -> list[str]:
-    output = subprocess.run(
-        ["git", "ls-files", "*.json"], cwd=root, check=True, capture_output=True, text=True
-    ).stdout
+    output = subprocess.run(["git", "ls-files", "*.json"], cwd=root, check=True, capture_output=True, text=True).stdout
     return [line for line in output.splitlines() if line]
 
 

@@ -43,7 +43,6 @@ import venv
 import zipfile
 from pathlib import Path
 
-
 # This tool qualifies wheels for CPython 3.10 and up, so it has to run there
 # too: `tomllib` is 3.11+, and `tomli` is the same parser under its old name.
 try:
@@ -63,9 +62,7 @@ CHECK = importlib.util.module_from_spec(_SPEC)
 sys.modules[_SPEC.name] = CHECK
 _SPEC.loader.exec_module(CHECK)
 
-WHEEL_NAME = re.compile(
-    r"^(?P<distribution>[^-]+)-(?P<version>[^-]+)-(?P<tag>[^-]+-[^-]+)-(?P<platform>.+)\.whl$"
-)
+WHEEL_NAME = re.compile(r"^(?P<distribution>[^-]+)-(?P<version>[^-]+)-(?P<tag>[^-]+-[^-]+)-(?P<platform>.+)\.whl$")
 # `0.1.0-beta.1` is the Cargo spelling of the PEP 440 version `0.1.0b1`.
 SEMVER_PRERELEASE = re.compile(r"^(?P<release>\d+\.\d+\.\d+)-(?P<kind>alpha|beta|rc)\.(?P<number>\d+)$")
 PRERELEASE_TAG = {"alpha": "a", "beta": "b", "rc": "rc"}
@@ -74,7 +71,7 @@ PRERELEASE_TAG = {"alpha": "a", "beta": "b", "rc": "rc"}
 CARGO_FAILURE = re.compile(r"cargo", re.I)
 
 # Run in a temporary directory, against the installed wheel only.
-SMOKE = '''
+SMOKE = """
 import redact_secret
 from pathlib import Path
 
@@ -135,7 +132,7 @@ else:
     raise AssertionError("scan(None) must raise a SecretScanError")
 
 print("smoke ok:", redact_secret.VERSION, redact_secret.RANGE_UNIT)
-'''
+"""
 
 
 def policy() -> dict:
@@ -186,9 +183,7 @@ def inspect_wheel(path: Path, rules: dict) -> list[str]:
     platform = match.group("platform")
     targets = CHECK.targets_for_platform(platform, rules["python-wheel-targets"])
     if len(targets) != 1:
-        errors.append(
-            f"{path.name}: platform tag {platform} matches {targets or 'no'} declared wheel target"
-        )
+        errors.append(f"{path.name}: platform tag {platform} matches {targets or 'no'} declared wheel target")
 
     with zipfile.ZipFile(path) as archive:
         names = sorted(archive.namelist())
@@ -231,9 +226,7 @@ def inspect_wheel(path: Path, rules: dict) -> list[str]:
             if not metadata.get("License-File"):
                 errors.append(f"{path.name}: METADATA declares no License-File")
             required = [
-                requirement
-                for requirement in metadata.get_all("Requires-Dist") or []
-                if "extra ==" not in requirement
+                requirement for requirement in metadata.get_all("Requires-Dist") or [] if "extra ==" not in requirement
             ]
             if required:
                 errors.append(f"{path.name}: the runtime must have no dependency, found {required}")
@@ -260,14 +253,16 @@ def inspect_wheel(path: Path, rules: dict) -> list[str]:
             stray_libs = [name for name in vendored if ".so" not in name]
             if stray_libs:
                 errors.append(f"{path.name}: {libs} may only hold shared objects, found {stray_libs}")
-            print(f"{path.name}: vendors {', '.join(name[len(libs):] for name in vendored)}")
+            print(f"{path.name}: vendors {', '.join(name[len(libs) :] for name in vendored)}")
         natives = [name for name in payload if name.endswith((".so", ".pyd", ".dylib"))]
         # maturin names the limited-API extension `_native.abi3.so` everywhere
         # but Windows, where the suffix is a plain `.pyd`; there the abi3 claim
         # rests on the filename and WHEEL tags checked above. The expected name
         # follows from the platform tag, so a wheel carrying the wrong
         # platform's extension is a mismatch rather than an accepted variant.
-        expected_native = f"{import_name}/_native.pyd" if platform.startswith("win") else f"{import_name}/_native.abi3.so"
+        expected_native = (
+            f"{import_name}/_native.pyd" if platform.startswith("win") else f"{import_name}/_native.abi3.so"
+        )
         if natives != [expected_native]:
             errors.append(f"{path.name}: expected exactly {[expected_native]}, found {natives}")
         expected_payload = sorted(
@@ -365,8 +360,16 @@ def qualify_wheel(path: Path, rules: dict, pythons: list[str | None], conformanc
             # succeeds here needed neither the network nor a Rust toolchain.
             install = run(
                 [
-                    str(interpreter), "-m", "pip", "install", "--no-index", "--no-deps",
-                    "--only-binary", ":all:", "--disable-pip-version-check", str(path),
+                    str(interpreter),
+                    "-m",
+                    "pip",
+                    "install",
+                    "--no-index",
+                    "--no-deps",
+                    "--only-binary",
+                    ":all:",
+                    "--disable-pip-version-check",
+                    str(path),
                 ],
                 capture_output=True,
             )
@@ -416,9 +419,7 @@ def run_conformance(path: Path, interpreter: Path, version: str) -> list[str]:
     environment = interpreter.parent.parent.resolve()
     resolved = Path(located.stdout.strip()).resolve() if located.returncode == 0 else None
     if resolved is None or environment not in resolved.parents:
-        return [
-            f"{path.name}: the conformance run would import {resolved} instead of the installed wheel"
-        ]
+        return [f"{path.name}: the conformance run would import {resolved} instead of the installed wheel"]
 
     result = run(
         [str(interpreter), "-m", "pytest", "-q", str(BINDING / "tests")],
@@ -461,8 +462,14 @@ def install_sdist(interpreter: Path, path: Path, rules: dict, env: dict[str, str
     """
     return run(
         [
-            str(interpreter), "-m", "pip", "install", "--disable-pip-version-check",
-            "--no-binary", rules["python-distribution"], str(path),
+            str(interpreter),
+            "-m",
+            "pip",
+            "install",
+            "--disable-pip-version-check",
+            "--no-binary",
+            rules["python-distribution"],
+            str(path),
         ],
         capture_output=True,
         env=env,
@@ -511,7 +518,9 @@ def qualify_sdist(path: Path, rules: dict, base_python: str | None, build: bool)
 
         result = install_sdist(interpreter, path, rules, None)
         if result.returncode != 0:
-            return errors + [f"{path.name}: does not build with a Rust toolchain\n{(result.stdout + result.stderr).strip()}"]
+            return errors + [
+                f"{path.name}: does not build with a Rust toolchain\n{(result.stdout + result.stderr).strip()}"
+            ]
         smoke = run(
             [str(interpreter), "-c", SMOKE.format(version=workspace_version())],
             cwd=scratch,
@@ -542,7 +551,9 @@ def check_matrix(artifacts: list[Path], rules: dict) -> list[str]:
             found[target].append(artifact.name)
 
     errors = [
-        f"wheel matrix: no wheel for {target}" if not names else f"wheel matrix: {len(names)} wheels for {target}: {names}"
+        f"wheel matrix: no wheel for {target}"
+        if not names
+        else f"wheel matrix: {len(names)} wheels for {target}: {names}"
         for target, names in found.items()
         if len(names) != 1
     ]

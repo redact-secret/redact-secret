@@ -18,7 +18,7 @@
  * an input or a matched value.
  */
 
-import { initialize, piiActivation, scan, SecretScanError } from "@redact-secret/core";
+import { initialize, piiActivation, SecretScanError, scan } from "@redact-secret/core";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -54,16 +54,8 @@ export async function qualify(fixtures) {
   });
 
   await check("a PII selection scans through the package entry", () => {
-    const actual = scan(positive.input).map((finding) => [
-      finding.detector,
-      finding.type,
-      finding.action,
-    ]);
-    const expected = positive.expected.map((finding) => [
-      finding.detector,
-      finding.type,
-      finding.action,
-    ]);
+    const actual = scan(positive.input).map((finding) => [finding.detector, finding.type, finding.action]);
+    const expected = positive.expected.map((finding) => [finding.detector, finding.type, finding.action]);
     assert(JSON.stringify(actual) === JSON.stringify(expected), "finding metadata disagreed");
   });
 

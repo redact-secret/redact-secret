@@ -28,15 +28,12 @@ import { NodeStreamSanitizer } from "./node-stream-core.js";
  * Requires a successful `await initialize()` from
  * `@redact-secret/core/common`; it throws `NOT_INITIALIZED` otherwise.
  */
-export function createNodeStreamSanitizer(
-  options: IncrementalSanitizerOptions,
-): NodeStreamSanitizer {
+export function createNodeStreamSanitizer(options: IncrementalSanitizerOptions): NodeStreamSanitizer {
   return new NodeStreamSanitizer(runtime.createIncrementalSanitizer(options));
 }
 
-export { NodeStreamSanitizer } from "./node-stream-core.js";
-export { SecretScanError } from "../errors.js";
 export type { SecretScanErrorCode } from "../errors.js";
+export { SecretScanError } from "../errors.js";
 export type {
   IncrementalLimits,
   IncrementalSanitizer,
@@ -44,3 +41,4 @@ export type {
   IncrementalSecretPolicy,
   SecretFinding,
 } from "../types.js";
+export { NodeStreamSanitizer } from "./node-stream-core.js";

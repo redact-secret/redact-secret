@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-artifact-matrix.py"
 SPEC = importlib.util.spec_from_file_location("check_artifact_matrix", SCRIPT)
 assert SPEC and SPEC.loader
@@ -61,9 +60,7 @@ class Repository:
         self.consumer_majors = list(MAJORS)
         self.engines_node = ">=20"
         self.qualification_permissions = "    permissions:\n      contents: read\n"
-        self.checkout = (
-            "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0"
-        )
+        self.checkout = "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0"
 
     def write(self, relative: str, content: str) -> None:
         path = self.root / relative
@@ -88,15 +85,11 @@ class Repository:
             json.dumps({"engines": {"node": self.engines_node}}, indent=2) + "\n",
         )
 
-        platform_map = {
-            target: f"platform-{index}" for index, target in enumerate(self.qualifier_addon_targets)
-        }
+        platform_map = {target: f"platform-{index}" for index, target in enumerate(self.qualifier_addon_targets)}
         publish_platforms = [platform_map[target] for target in self.publish_targets if target in platform_map]
         default_packages = [f"@redact-secret/node-{platform}" for platform in publish_platforms]
         optional_deps = self.js_optional_deps if self.js_optional_deps is not None else default_packages
-        runtime_packages = (
-            self.runtime_node_packages if self.runtime_node_packages is not None else default_packages
-        )
+        runtime_packages = self.runtime_node_packages if self.runtime_node_packages is not None else default_packages
 
         self.write(
             "packages/javascript/package.json",
@@ -126,8 +119,7 @@ class Repository:
         )
 
         platform_names = "".join(
-            f'  "{target}": "platform-{index}",\n'
-            for index, target in enumerate(self.qualifier_addon_targets)
+            f'  "{target}": "platform-{index}",\n' for index, target in enumerate(self.qualifier_addon_targets)
         )
         self.write(
             "scripts/qualify-node-addon.mjs",
@@ -141,9 +133,7 @@ class Repository:
                 f"bindings/node/npm/{platform}/package.json",
                 json.dumps({"name": name, "version": "0.0.0"}, indent=2) + "\n",
             )
-        suffixes = "".join(
-            f'    "{target}": "",\n' for target in self.qualifier_cli_targets
-        )
+        suffixes = "".join(f'    "{target}": "",\n' for target in self.qualifier_cli_targets)
         self.write(
             "scripts/qualify-cli-binary.mjs",
             f"TARGET_SUFFIXES = {{\n{suffixes}}}\n",
@@ -159,9 +149,7 @@ class Repository:
             "name: CI\non:\n  pull_request:\npermissions: {}\njobs:\n"
             "  test:\n    runs-on: ubuntu-latest\n    permissions:\n"
             "      contents: read\n    strategy:\n      matrix:\n"
-            "        node-version:\n"
-            + "".join(f"          - {major}\n" for major in self.ci_majors)
-            + "    steps:\n"
+            "        node-version:\n" + "".join(f"          - {major}\n" for major in self.ci_majors) + "    steps:\n"
             f"      - uses: {self.checkout}\n",
         )
         self.write(
@@ -171,7 +159,9 @@ class Repository:
         self.write(".github/workflows/release.yml", self._release())
         self.write(
             ".github/workflows/reconcile-release.yml",
-            self._reconcile({target: platform_map[target] for target in self.publish_targets if target in platform_map}),
+            self._reconcile(
+                {target: platform_map[target] for target in self.publish_targets if target in platform_map}
+            ),
         )
         return self.root
 
@@ -224,19 +214,13 @@ class Repository:
             for target in self.workflow_addon_targets
         )
         cli = "".join(
-            f"          - target: {target}\n            runner: ubuntu-latest\n"
-            for target in self.workflow_cli_targets
+            f"          - target: {target}\n            runner: ubuntu-latest\n" for target in self.workflow_cli_targets
         )
         engines = "".join(f"          - {engine}\n" for engine in self.workflow_engines)
-        consumer_engines = "".join(
-            f"          - {engine}\n" for engine in self.consumer_engines
-        )
-        consumer_majors = "".join(
-            f"          - {major}\n" for major in self.consumer_majors
-        )
+        consumer_engines = "".join(f"          - {engine}\n" for engine in self.consumer_engines)
+        consumer_majors = "".join(f"          - {major}\n" for major in self.consumer_majors)
         smoke = "".join(
-            f"      - name: Qualify the addon on Node {major}\n"
-            f"        run: node scripts/qualify-node-addon.mjs\n"
+            f"      - name: Qualify the addon on Node {major}\n        run: node scripts/qualify-node-addon.mjs\n"
             for major in self.smoke_majors
         )
         musl = " ".join(str(major) for major in self.musl_majors)
@@ -390,9 +374,7 @@ class MatrixTests(unittest.TestCase):
         def configure(repository: Repository) -> None:
             # Known to the qualifier (so only the addon-membership check
             # fires) but never added to `node-addon-targets` itself.
-            repository.qualifier_addon_targets = repository.qualifier_addon_targets + [
-                "x86_64-pc-windows-msvc"
-            ]
+            repository.qualifier_addon_targets = repository.qualifier_addon_targets + ["x86_64-pc-windows-msvc"]
             repository.publish_targets.append("x86_64-pc-windows-msvc")
 
         self.assertOneError(
@@ -449,9 +431,7 @@ class MatrixTests(unittest.TestCase):
         def configure(repository: Repository) -> None:
             repository.runtime_node_packages = []
 
-        self.assertOneError(
-            configure, "the platform-package mapping omits @redact-secret/node-platform-0"
-        )
+        self.assertOneError(configure, "the platform-package mapping omits @redact-secret/node-platform-0")
 
     def test_the_runtime_resolver_naming_an_unpublished_package_fails(self) -> None:
         """`runtime/node.ts` mapping a host to a package with no publication
@@ -466,8 +446,7 @@ class MatrixTests(unittest.TestCase):
 
         self.assertOneError(
             configure,
-            "the platform-package mapping names @redact-secret/node-platform-1, "
-            "which Cargo.toml does not declare",
+            "the platform-package mapping names @redact-secret/node-platform-1, which Cargo.toml does not declare",
         )
 
     def test_a_publish_target_the_release_does_not_publish_fails(self) -> None:
@@ -532,9 +511,7 @@ class MatrixTests(unittest.TestCase):
             repository.js_optional_deps = []
             repository.runtime_node_packages = []
 
-        self.assertOneError(
-            configure, "node-publish-targets must declare the published platform-package matrix"
-        )
+        self.assertOneError(configure, "node-publish-targets must declare the published platform-package matrix")
 
     # --- Browser engines -----------------------------------------------
 
@@ -562,9 +539,7 @@ class MatrixTests(unittest.TestCase):
         def configure(repository: Repository) -> None:
             repository.consumer_engines.pop()
 
-        self.assertOneError(
-            configure, "job 'package-consumer-browser''s engine matrix omits webkit"
-        )
+        self.assertOneError(configure, "job 'package-consumer-browser''s engine matrix omits webkit")
 
     # --- Node.js support -------------------------------------------------
 
@@ -610,9 +585,7 @@ class MatrixTests(unittest.TestCase):
 
     def test_a_job_taking_an_unlisted_write_scope_fails(self) -> None:
         def configure(repository: Repository) -> None:
-            repository.qualification_permissions = (
-                "    permissions:\n      contents: write\n"
-            )
+            repository.qualification_permissions = "    permissions:\n      contents: write\n"
 
         self.assertOneError(configure, "takes contents: write")
 

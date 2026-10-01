@@ -74,9 +74,7 @@ def validate(root: Path) -> list[str]:
         return [f"{RELEASE_WORKFLOW.as_posix()}: missing job {RELEASE_JOB!r}"]
     release_environment = job_environment_name(release_text, RELEASE_JOB)
     if not release_environment:
-        errors.append(
-            f"{RELEASE_WORKFLOW.as_posix()}: job {RELEASE_JOB!r} declares no environment"
-        )
+        errors.append(f"{RELEASE_WORKFLOW.as_posix()}: job {RELEASE_JOB!r} declares no environment")
 
     reconcile_path = root / RECONCILE_WORKFLOW
     if not reconcile_path.is_file():
@@ -86,9 +84,7 @@ def validate(root: Path) -> list[str]:
         return errors + [f"{RECONCILE_WORKFLOW.as_posix()}: missing job {RECONCILE_JOB!r}"]
     reconcile_environment = job_environment_name(reconcile_text, RECONCILE_JOB)
     if not reconcile_environment:
-        errors.append(
-            f"{RECONCILE_WORKFLOW.as_posix()}: job {RECONCILE_JOB!r} declares no environment"
-        )
+        errors.append(f"{RECONCILE_WORKFLOW.as_posix()}: job {RECONCILE_JOB!r} declares no environment")
     elif release_environment and reconcile_environment != release_environment:
         errors.append(
             f"{RECONCILE_WORKFLOW.as_posix()}: job {RECONCILE_JOB!r} declares environment "

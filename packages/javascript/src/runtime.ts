@@ -8,11 +8,7 @@
  * inspects the host, imports a `node:` module, or touches a global.
  */
 
-import {
-  SecretScanError,
-  toSecretScanError,
-  type SecretScanErrorCode,
-} from "./errors.js";
+import { SecretScanError, type SecretScanErrorCode, toSecretScanError } from "./errors.js";
 import { defaultPlaceholderFormatter } from "./formatters.js";
 import {
   NATIVE_HANDLE,
@@ -27,7 +23,6 @@ import {
   type NativePolicyCallback,
   type NativeWholeInputLimits,
 } from "./native.js";
-import { VERSION } from "./version.js";
 import type {
   ArtifactKind,
   DetectedSecretFinding,
@@ -42,11 +37,10 @@ import type {
   ScanResult,
   SecretFinding,
 } from "./types.js";
+import { VERSION } from "./version.js";
 
 /** Freezes the six documented fields a policy callback is allowed to see. */
-function toDetectedSecretFinding(
-  finding: NativeDetectedFinding,
-): DetectedSecretFinding {
+function toDetectedSecretFinding(finding: NativeDetectedFinding): DetectedSecretFinding {
   return Object.freeze({
     id: finding.id,
     type: finding.type,
@@ -82,9 +76,7 @@ function toSecretFinding(finding: NativeFinding): SecretFinding {
   return Object.freeze(published);
 }
 
-function toSecretFindings(
-  findings: readonly NativeFinding[],
-): readonly SecretFinding[] {
+function toSecretFindings(findings: readonly NativeFinding[]): readonly SecretFinding[] {
   return Object.freeze(findings.map(toSecretFinding));
 }
 
@@ -109,8 +101,7 @@ function toNativeFinding(finding: SecretFinding): NativeFinding {
  * has no UTF-8 representation, so it cannot cross into either binding's Rust
  * `&str` (`errors.ts`'s `UNPAIRED_SURROGATE` documentation).
  */
-const LONE_SURROGATE =
-  /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
 
 function requireString(value: unknown): string {
   if (typeof value !== "string") throw new SecretScanError("INVALID_INPUT");
@@ -120,15 +111,12 @@ function requireString(value: unknown): string {
   return value;
 }
 
-function toPolicyCallback(
-  policy: ScanOptions["policy"],
-): NativePolicyCallback | undefined {
+function toPolicyCallback(policy: ScanOptions["policy"]): NativePolicyCallback | undefined {
   if (policy === undefined) return undefined;
   if (typeof policy !== "object" || typeof policy.evaluate !== "function") {
     throw new SecretScanError("INVALID_OPTIONS");
   }
-  return (finding, context) =>
-    policy.evaluate(toDetectedSecretFinding(finding), context);
+  return (finding, context) => policy.evaluate(toDetectedSecretFinding(finding), context);
 }
 
 /**
@@ -136,9 +124,7 @@ function toPolicyCallback(
  * rather than calling across the boundary for every placeholder, so the
  * default path stays exactly the core's.
  */
-function toFormatterCallback(
-  formatter: PlaceholderFormatter | undefined,
-): NativeFormatterCallback | undefined {
+function toFormatterCallback(formatter: PlaceholderFormatter | undefined): NativeFormatterCallback | undefined {
   if (formatter === undefined || formatter === defaultPlaceholderFormatter) {
     return undefined;
   }
@@ -158,12 +144,7 @@ const MAX_NATIVE_LIMIT = 0xffff_ffff;
  * binding, which rejects it with the same `INVALID_LIMITS`.
  */
 function toNativeLimit(value: unknown): number {
-  if (
-    typeof value !== "number" ||
-    !Number.isInteger(value) ||
-    value < 0 ||
-    value > MAX_NATIVE_LIMIT
-  ) {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > MAX_NATIVE_LIMIT) {
     throw new SecretScanError("INVALID_LIMITS");
   }
   return value;
@@ -178,9 +159,7 @@ function toNativeLimit(value: unknown): number {
  * outside the native range throws `INVALID_LIMITS` ({@link toNativeLimit});
  * zero is left to the binding, which reports the same `INVALID_LIMITS`.
  */
-function toNativeWholeInputLimits(
-  limits: ScanOptions["limits"],
-): NativeWholeInputLimits | undefined {
+function toNativeWholeInputLimits(limits: ScanOptions["limits"]): NativeWholeInputLimits | undefined {
   if (limits === undefined) return undefined;
   if (
     typeof limits !== "object" ||
@@ -205,18 +184,14 @@ function toNativeWholeInputLimits(
  * native call; a malformed ruleset's own grammar is rejected by the core with
  * `INVALID_RULESET`.
  */
-function toNativeRuleset(
-  ruleset: ScanOptions["ruleset"],
-): Uint8Array | undefined {
+function toNativeRuleset(ruleset: ScanOptions["ruleset"]): Uint8Array | undefined {
   if (ruleset === undefined) return undefined;
   if (typeof ruleset === "string") return new TextEncoder().encode(ruleset);
   if (ruleset instanceof Uint8Array) return ruleset;
   throw new SecretScanError("INVALID_OPTIONS");
 }
 
-function toNativeIncrementalOptions(
-  options: IncrementalSanitizerOptions,
-): NativeIncrementalOptions {
+function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): NativeIncrementalOptions {
   if (typeof options !== "object" || options === null) {
     throw new SecretScanError("INVALID_OPTIONS");
   }
@@ -225,17 +200,11 @@ function toNativeIncrementalOptions(
     throw new SecretScanError("INVALID_LIMITS");
   }
   const formatter = toFormatterCallback(placeholderFormatter);
-  if (
-    policy !== undefined &&
-    (typeof policy !== "object" || typeof policy.evaluate !== "function")
-  ) {
+  if (policy !== undefined && (typeof policy !== "object" || typeof policy.evaluate !== "function")) {
     throw new SecretScanError("INVALID_OPTIONS");
   }
   const policyCallback: NativeIncrementalPolicyCallback | undefined =
-    policy === undefined
-      ? undefined
-      : (finding, context) =>
-          policy.evaluate(toDetectedSecretFinding(finding), context);
+    policy === undefined ? undefined : (finding, context) => policy.evaluate(toDetectedSecretFinding(finding), context);
   return {
     limits: {
       maxInputCodeUnits: toNativeLimit(limits.maxInputCodeUnits),
@@ -253,15 +222,9 @@ export interface RedactSecretRuntime {
   piiActivation(): string;
   artifact(): ArtifactKind;
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
-  redact(
-    input: string,
-    findings: readonly SecretFinding[],
-    options?: RedactOptions,
-  ): string;
+  redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string;
   scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult;
-  createIncrementalSanitizer(
-    options: IncrementalSanitizerOptions,
-  ): IncrementalSanitizer;
+  createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer;
 }
 
 /**
@@ -295,8 +258,7 @@ export function createRedactSecretRuntime(
       typeof options !== "object" ||
       options === null ||
       Array.isArray(options) ||
-      (Object.getPrototypeOf(options) !== Object.prototype &&
-        Object.getPrototypeOf(options) !== null) ||
+      (Object.getPrototypeOf(options) !== Object.prototype && Object.getPrototypeOf(options) !== null) ||
       Object.keys(options).some((key) => key !== "pii")
     ) {
       throw new SecretScanError("INVALID_OPTIONS");
@@ -313,9 +275,7 @@ export function createRedactSecretRuntime(
   }
 
   function selectorKey(pii: readonly string[]): string {
-    return [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))]
-      .sort()
-      .join(",");
+    return [...new Set(pii.map((value) => (value === "pii" ? "pii:global" : value)))].sort().join(",");
   }
 
   async function load(pii: readonly string[]): Promise<void> {
@@ -381,13 +341,12 @@ export function createRedactSecretRuntime(
 
   function piiActivation(): string {
     const native = active();
-    return native.piiActivation?.() ?? `credentials=${expectedProfile};selectors=off;families=;vocabulary=pii-context/v2`;
+    return (
+      native.piiActivation?.() ?? `credentials=${expectedProfile};selectors=off;families=;vocabulary=pii-context/v2`
+    );
   }
 
-  function scan(
-    input: string,
-    options?: ScanOptions,
-  ): readonly SecretFinding[] {
+  function scan(input: string, options?: ScanOptions): readonly SecretFinding[] {
     const native = active();
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
@@ -400,11 +359,7 @@ export function createRedactSecretRuntime(
     }
   }
 
-  function redact(
-    input: string,
-    findings: readonly SecretFinding[],
-    options?: RedactOptions,
-  ): string {
+  function redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string {
     const native = active();
     const text = requireString(input);
     if (!Array.isArray(findings)) {
@@ -413,21 +368,13 @@ export function createRedactSecretRuntime(
     const formatter = toFormatterCallback(options?.placeholderFormatter);
     const limits = toNativeWholeInputLimits(options?.limits);
     try {
-      return native.redact(
-        text,
-        findings.map(toNativeFinding),
-        formatter,
-        limits,
-      );
+      return native.redact(text, findings.map(toNativeFinding), formatter, limits);
     } catch (thrown) {
       throw toSecretScanError(thrown, "INVALID_FINDINGS");
     }
   }
 
-  function scanAndRedact(
-    input: string,
-    options?: ScanAndRedactOptions,
-  ): ScanResult {
+  function scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult {
     const native = active();
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
@@ -446,15 +393,11 @@ export function createRedactSecretRuntime(
     });
   }
 
-  function createIncrementalSanitizer(
-    options: IncrementalSanitizerOptions,
-  ): IncrementalSanitizer {
+  function createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer {
     const native = active();
     let session: NativeIncrementalSanitizer;
     try {
-      session = native.createIncrementalSanitizer(
-        toNativeIncrementalOptions(options),
-      );
+      session = native.createIncrementalSanitizer(toNativeIncrementalOptions(options));
     } catch (thrown) {
       throw toSecretScanError(thrown, "INVALID_LIMITS");
     }

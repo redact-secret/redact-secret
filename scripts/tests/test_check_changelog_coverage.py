@@ -60,9 +60,7 @@ class Guarded(unittest.TestCase):
 
     def test_policy_file_is_guarded_but_its_neighbours_are_not(self) -> None:
         self.assertEqual(
-            check.guarded(
-                ["crates/secret-scan-core/src/policy.rs", "crates/secret-scan-core/src/lib.rs"]
-            ),
+            check.guarded(["crates/secret-scan-core/src/policy.rs", "crates/secret-scan-core/src/lib.rs"]),
             ["crates/secret-scan-core/src/policy.rs"],
         )
 

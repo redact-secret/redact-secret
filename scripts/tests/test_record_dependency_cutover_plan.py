@@ -9,7 +9,6 @@ import unittest
 import unittest.mock
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "record-dependency-cutover-plan.py"
 SPEC = importlib.util.spec_from_file_location("record_dependency_cutover_plan", SCRIPT)
 assert SPEC and SPEC.loader
@@ -46,12 +45,9 @@ class Repository:
         targets_toml = "[" + ", ".join(json.dumps(t) for t in self.targets) + "]"
         self.write(
             "Cargo.toml",
-            "[workspace]\n[workspace.metadata.redact-secret]\n"
-            f"node-publish-targets = {targets_toml}\n",
+            f"[workspace]\n[workspace.metadata.redact-secret]\nnode-publish-targets = {targets_toml}\n",
         )
-        mapping = "\n".join(
-            f'  "{target}": "{platform}",' for target, platform in self.platforms.items()
-        )
+        mapping = "\n".join(f'  "{target}": "{platform}",' for target, platform in self.platforms.items())
         self.write(
             "scripts/qualify-node-addon.mjs",
             "const TARGET_PLATFORM_NAMES = {\n" + mapping + "\n};\n",
@@ -73,18 +69,12 @@ class Repository:
         if self.include_wasm_manifest:
             self.write(
                 "bindings/wasm/npm/package.json",
-                json.dumps(
-                    {"name": "@redact-secret/wasm", "version": "0.1.0-beta.1"}, indent=2
-                )
-                + "\n",
+                json.dumps({"name": "@redact-secret/wasm", "version": "0.1.0-beta.1"}, indent=2) + "\n",
             )
         if self.include_wrapper_manifest:
             self.write(
                 "packages/javascript/package.json",
-                json.dumps(
-                    {"name": "@redact-secret/core", "version": self.wrapper_version}, indent=2
-                )
-                + "\n",
+                json.dumps({"name": "@redact-secret/core", "version": self.wrapper_version}, indent=2) + "\n",
             )
         return self.root
 
@@ -112,9 +102,7 @@ class PlanTests(unittest.TestCase):
                 configure(repository)
             root = repository.build()
             artifacts = repository.artifacts(Path(artifacts_dir), artifact_names)
-            with unittest.mock.patch.dict(
-                os.environ, {"SOURCE_COMMIT": "abc123", "GITHUB_SHA": ""}, clear=False
-            ):
+            with unittest.mock.patch.dict(os.environ, {"SOURCE_COMMIT": "abc123", "GITHUB_SHA": ""}, clear=False):
                 return RECORD.build_plan(root, artifacts), artifacts
 
     def test_a_complete_repository_resolves_every_dependency(self) -> None:
@@ -129,9 +117,7 @@ class PlanTests(unittest.TestCase):
 
     def test_each_native_entry_carries_its_declared_package_and_version(self) -> None:
         plan, _ = self.build_plan()
-        entry = next(
-            e for e in plan["dependencies"] if e["target"] == "aarch64-apple-darwin"
-        )
+        entry = next(e for e in plan["dependencies"] if e["target"] == "aarch64-apple-darwin")
         self.assertEqual(entry["package"], "@redact-secret/node-darwin-arm64")
         self.assertEqual(entry["version"], "0.1.0-beta.1")
         self.assertEqual(entry["expectedArtifact"], "node-addon-aarch64-apple-darwin")
@@ -169,16 +155,12 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(errors, [f"wasm-web: no qualified artifact in {artifacts}"])
 
     def test_a_missing_wasm_common_companion_artifact_is_reported_as_an_error(self) -> None:
-        plan, artifacts = self.build_plan(
-            artifact_names={f"node-addon-{target}" for target in TARGETS} | {"wasm-web"}
-        )
+        plan, artifacts = self.build_plan(artifact_names={f"node-addon-{target}" for target in TARGETS} | {"wasm-web"})
         entry = next(e for e in plan["dependencies"] if e["kind"] == "wasm")
         self.assertEqual(entry["companionArtifact"], "wasm-web-common")
         self.assertFalse(entry["companionArtifactPresent"])
         errors = RECORD.plan_errors(plan, artifacts)
-        self.assertEqual(
-            errors, [f"wasm-web-common: no qualified companion artifact in {artifacts}"]
-        )
+        self.assertEqual(errors, [f"wasm-web-common: no qualified companion artifact in {artifacts}"])
 
     def test_the_wasm_entry_carries_its_companion_artifact_name(self) -> None:
         plan, _ = self.build_plan()
@@ -204,9 +186,7 @@ class PlanTests(unittest.TestCase):
         def configure(repository: Repository) -> None:
             repository.targets = []
 
-        plan, artifacts = self.build_plan(
-            configure, artifact_names={"wasm-web", "wasm-web-common"}
-        )
+        plan, artifacts = self.build_plan(configure, artifact_names={"wasm-web", "wasm-web-common"})
         self.assertEqual(len(plan["dependencies"]), 1)
         self.assertEqual(plan["dependencies"][0]["kind"], "wasm")
         self.assertEqual(RECORD.plan_errors(plan, artifacts), [])

@@ -49,10 +49,7 @@ def wheel_file_tags(name: str) -> set[str]:
         return set()
     python, abi, platform = parts[-3], parts[-2], parts[-1]
     return {
-        f"{one}-{two}-{three}"
-        for one in python.split(".")
-        for two in abi.split(".")
-        for three in platform.split(".")
+        f"{one}-{two}-{three}" for one in python.split(".") for two in abi.split(".") for three in platform.split(".")
     }
 
 
@@ -64,18 +61,14 @@ def select_wheel(installed_tags: list[str], names: list[str]) -> str | None:
 
 def installed_tags(wheel_metadata: str) -> list[str]:
     """The `Tag:` values of an installed distribution's `WHEEL` metadata."""
-    return [
-        line.split(": ", 1)[1]
-        for line in wheel_metadata.splitlines()
-        if line.startswith("Tag: ")
-    ]
+    return [line.split(": ", 1)[1] for line in wheel_metadata.splitlines() if line.startswith("Tag: ")]
 
 
 def probe(wheel_paths: list[str]) -> dict:
     """Describe the installed `redact-secret` against the candidate wheels."""
+    import importlib.metadata as metadata
     import sysconfig
     import zipfile
-    import importlib.metadata as metadata
 
     dist = metadata.distribution("redact-secret")
     site = pathlib.Path(sysconfig.get_paths()["purelib"]).resolve()
@@ -107,9 +100,7 @@ def probe(wheel_paths: list[str]) -> dict:
                 continue
             count += 1
             digest = (
-                base64.urlsafe_b64encode(
-                    hashlib.new(entry.hash.mode, entry.locate().read_bytes()).digest()
-                )
+                base64.urlsafe_b64encode(hashlib.new(entry.hash.mode, entry.locate().read_bytes()).digest())
                 .rstrip(b"=")
                 .decode()
             )

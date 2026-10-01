@@ -82,7 +82,7 @@ ALPHABETS = {
 SEED_FORMAT = "secret-benchmark:never-issued:v2:{label}:{block}"
 CONTEXTS = {
     "plain": {"before": "", "after": "\n"},
-    "unicode-crlf": {"before": "# \U0001F511 reviewed format\r\n", "after": "\r\n"},
+    "unicode-crlf": {"before": "# \U0001f511 reviewed format\r\n", "after": "\r\n"},
 }
 
 
@@ -103,9 +103,7 @@ def synthetic(label: str, length: int, alphabet: str = "alnum") -> str:
     value = ""
     block = 0
     while len(value) < length:
-        digest = hashlib.sha256(
-            SEED_FORMAT.format(label=label, block=block).encode("utf-8")
-        ).digest()
+        digest = hashlib.sha256(SEED_FORMAT.format(label=label, block=block).encode("utf-8")).digest()
         value += "".join(chars[byte % len(chars)] for byte in digest)
         block += 1
     return value[:length]
@@ -166,11 +164,7 @@ def family_patterns(contracts: dict) -> dict[str, re.Pattern[str]]:
     fixtures against yet; it is omitted here rather than compiled into an
     empty alternation, which would match everywhere with no named group.
     """
-    return {
-        family["detector"]: compile_family(family)
-        for family in contracts["families"]
-        if family["variants"]
-    }
+    return {family["detector"]: compile_family(family) for family in contracts["families"] if family["variants"]}
 
 
 # --- beta.4 twin baseline -----------------------------------------------------
@@ -213,12 +207,13 @@ def derive_baseline(baseline: dict, contracts: dict) -> tuple[dict, list[str]]:
                     )
                 actual = [{"start": a["start"], "end": a["end"]} for a in fixture["actualBeta4"]]
                 if actual != [token_range]:
-                    errors.append(f"{fixture['id']}: recorded beta.4 range {actual} does not equal the constructed token range")
+                    errors.append(
+                        f"{fixture['id']}: recorded beta.4 range {actual} does not equal the constructed token range"
+                    )
                 pair["contractView"] = {
                     "positiveVariant": matches[0]["variant"] if len(matches) == 1 else None,
-                    "positiveMatchesExpectedRange": [
-                        {"start": m["start"], "end": m["end"]} for m in matches
-                    ] == expected_ranges,
+                    "positiveMatchesExpectedRange": [{"start": m["start"], "end": m["end"]} for m in matches]
+                    == expected_ranges,
                 }
             else:
                 if fixture["expected"]:
@@ -271,9 +266,7 @@ def _per_family_counts(pairs: list[dict]) -> dict:
 
 def _expected_for(fixture: dict, detector: str) -> list[dict]:
     return [
-        {"start": e["start"], "end": e["end"]}
-        for e in fixture.get("expected", [])
-        if e.get("detector") == detector
+        {"start": e["start"], "end": e["end"]} for e in fixture.get("expected", []) if e.get("detector") == detector
     ]
 
 
@@ -346,16 +339,18 @@ def audit_corpora(contracts: dict) -> dict:
             [{"start": 0, "end": len(trigger.encode("utf-8"))}],
             patterns[row["detector"]],
         )
-        rows.append({
-            "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
-            "id": row["type"],
-            "detector": row["detector"],
-            "kind": "reconciliation-trigger",
-            "support": None,
-            "tier": None,
-            "contexts": [],
-            **audit,
-        })
+        rows.append(
+            {
+                "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+                "id": row["type"],
+                "detector": row["detector"],
+                "kind": "reconciliation-trigger",
+                "support": None,
+                "tier": None,
+                "contexts": [],
+                **audit,
+            }
+        )
 
     rows.sort(key=lambda r: (r["corpus"], r["detector"], r["id"]))
     summary: dict[str, dict] = {}
@@ -410,7 +405,18 @@ def print_fixture(fixture_id: str) -> int:
             fixture = pair[role]
             if fixture["id"] == fixture_id:
                 content, start, end = render_fixture(fixture["construction"])
-                sys.stdout.write(json.dumps({"id": fixture_id, "content": content, "tokenRange": {"start": start, "end": end}, "contentSha256": sha256_hex(content)}, ensure_ascii=False) + "\n")
+                sys.stdout.write(
+                    json.dumps(
+                        {
+                            "id": fixture_id,
+                            "content": content,
+                            "tokenRange": {"start": start, "end": end},
+                            "contentSha256": sha256_hex(content),
+                        },
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
                 return 0
     sys.stderr.write(f"unknown fixture id {fixture_id}\n")
     return 1
@@ -419,9 +425,15 @@ def print_fixture(fixture_id: str) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--check", action="store_true", help="verify the committed evidence files are consistent with the contracts (default)")
+    mode.add_argument(
+        "--check",
+        action="store_true",
+        help="verify the committed evidence files are consistent with the contracts (default)",
+    )
     mode.add_argument("--write", action="store_true", help="rewrite the derived evidence files")
-    mode.add_argument("--print-fixture", metavar="ID", help="reconstruct one frozen fixture's literal content on stdout")
+    mode.add_argument(
+        "--print-fixture", metavar="ID", help="reconstruct one frozen fixture's literal content on stdout"
+    )
     args = parser.parse_args(argv)
 
     if args.print_fixture:

@@ -23,10 +23,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-
-PERMALINK = re.compile(
-    r"https://github\.com/redact-secret/redact-secret/blob/([0-9a-f]{40})/([^\s)>\]`\"']+)"
-)
+PERMALINK = re.compile(r"https://github\.com/redact-secret/redact-secret/blob/([0-9a-f]{40})/([^\s)>\]`\"']+)")
 
 
 def collect_permalinks(decision_dir: Path) -> dict[tuple[str, str], list[Path]]:

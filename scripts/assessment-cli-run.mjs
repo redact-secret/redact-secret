@@ -41,14 +41,16 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-
-import { buildAndEmitAccuracyResult, loadAssessmentSchema, loadAssessmentScoring } from "./lib/assessment-emit.mjs";
 import {
-  accuracyCorpusHash, gitCommit, hostCpu, hostOs, loadAccuracyCorpus,
-} from "./lib/assessment-provenance.mjs";
-import {
-  buildCliForSelfTest, cliVersion, resolveCliBinary, runCliProcess, rustcVersion, scanStdinJson,
+  buildCliForSelfTest,
+  cliVersion,
+  resolveCliBinary,
+  runCliProcess,
+  rustcVersion,
+  scanStdinJson,
 } from "./lib/assessment-cli.mjs";
+import { buildAndEmitAccuracyResult, loadAssessmentSchema, loadAssessmentScoring } from "./lib/assessment-emit.mjs";
+import { accuracyCorpusHash, gitCommit, hostCpu, hostOs, loadAccuracyCorpus } from "./lib/assessment-provenance.mjs";
 
 const PROFILE_ID = "accuracy-corpus";
 const REDACTED_ACTIONS = new Set(["redact", "block"]);
@@ -60,8 +62,12 @@ function fail(message) {
 
 function parseArguments(argv) {
   const options = {
-    binary: undefined, jsonOut: "-", markdownOut: undefined, mismatchesOut: undefined,
-    strict: false, selfTest: false,
+    binary: undefined,
+    jsonOut: "-",
+    markdownOut: undefined,
+    mismatchesOut: undefined,
+    strict: false,
+    selfTest: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -78,8 +84,12 @@ function parseArguments(argv) {
 
 function normalizeFinding(finding) {
   return {
-    type: finding.type, detector: finding.detector, confidence: finding.confidence,
-    action: finding.action, start: finding.start, end: finding.end,
+    type: finding.type,
+    detector: finding.detector,
+    confidence: finding.confidence,
+    action: finding.action,
+    start: finding.start,
+    end: finding.end,
   };
 }
 
@@ -260,13 +270,21 @@ async function main() {
     artifactIdentity: `redact-secret@${version.version}`,
     corpusVersion: String(corpus.corpusVersion),
     corpusHash: accuracyCorpusHash(),
-    os: hostOs(), cpu: hostCpu(), runtime: rustcVersion(),
+    os: hostOs(),
+    cpu: hostCpu(),
+    runtime: rustcVersion(),
     command: `node scripts/assessment-cli-run.mjs ${process.argv.slice(2).join(" ")}`.trim(),
   };
 
   const result = await buildAndEmitAccuracyResult({
-    surface: "cli", profileId: PROFILE_ID, metrics, mismatches, provenance,
-    jsonOut: options.jsonOut, markdownOut: options.markdownOut, mismatchesOut: options.mismatchesOut,
+    surface: "cli",
+    profileId: PROFILE_ID,
+    metrics,
+    mismatches,
+    provenance,
+    jsonOut: options.jsonOut,
+    markdownOut: options.markdownOut,
+    mismatchesOut: options.mismatchesOut,
   });
 
   const { accuracy } = result;
@@ -275,10 +293,7 @@ async function main() {
       `${accuracy.falseNegatives} false negative(s), ${accuracy.policyMismatches} policy mismatch(es) across ${fixtures.length} fixture(s)`,
   );
 
-  if (
-    options.strict &&
-    (accuracy.falsePositives > 0 || accuracy.falseNegatives > 0 || accuracy.policyMismatches > 0)
-  ) {
+  if (options.strict && (accuracy.falsePositives > 0 || accuracy.falseNegatives > 0 || accuracy.policyMismatches > 0)) {
     fail("--strict: at least one mismatch was found");
   }
 }

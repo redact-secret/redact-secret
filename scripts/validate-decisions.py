@@ -8,14 +8,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 DECISION_ID = re.compile(r"^decision-[a-z0-9]+(?:-[a-z0-9]+)*$")
 DECISION_HEADING = re.compile(r"(?im)^#{1,6}\s+Decision(?:\s*:.*)?\s*$")
 CURRENT_APPLICATION_HEADING = re.compile(r"(?im)^#{1,6}\s+Current application\b")
 LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
-FULL_RECORD = re.compile(
-    r"^https://github\.com/redact-secret/redact-secret/blob/[0-9a-f]{40}/.+$"
-)
+FULL_RECORD = re.compile(r"^https://github\.com/redact-secret/redact-secret/blob/[0-9a-f]{40}/.+$")
 BLOB_PERMALINK = re.compile(r"https://github\.com/redact-secret/redact-secret/blob/[0-9a-f]{40}/\S+")
 ID_WITH_MD_SUFFIX = re.compile(r"(?<![\w./-])(decision-[a-z0-9]+(?:-[a-z0-9]+)*)\.md\b")
 VALID_STATUSES = {"proposed", "accepted", "rejected", "superseded"}
@@ -27,7 +24,6 @@ SPEC_NAMES = {
     "evidence-and-gates",
 }
 SIZE_WARNING_BYTES = 12_000
-
 
 
 def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, list[str]]:
@@ -52,7 +48,7 @@ def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, list[str]]:
         key, value = match.groups()
         if key in fields:
             errors.append(f"{path}:{number}: duplicate field {key}")
-        fields[key] = value.strip().strip('"\'')
+        fields[key] = value.strip().strip("\"'")
     return fields, "\n".join(lines[end + 1 :]), errors
 
 
@@ -95,9 +91,7 @@ def parse_spec_routing(root: Path) -> tuple[dict[str, set[Path]], list[str]]:
     return routing, errors
 
 
-def check_spec_routing(
-    root: Path, records: list[Path], fields_by_record: dict[Path, dict[str, str]]
-) -> list[str]:
+def check_spec_routing(root: Path, records: list[Path], fields_by_record: dict[Path, dict[str, str]]) -> list[str]:
     errors: list[str] = []
     routing, routing_errors = parse_spec_routing(root)
     errors.extend(routing_errors)
@@ -113,13 +107,10 @@ def check_spec_routing(
         resolved = record.resolve()
         routing_specs = routed_from.get(resolved, [])
         if len(routing_specs) != 1:
-            errors.append(
-                f"{record}: routed from {len(routing_specs)} spec file(s), expected exactly 1"
-            )
+            errors.append(f"{record}: routed from {len(routing_specs)} spec file(s), expected exactly 1")
         elif declared_spec and routing_specs[0] != declared_spec:
             errors.append(
-                f"{record}: spec: {declared_spec} does not match the spec file that "
-                f"routes it ({routing_specs[0]})"
+                f"{record}: spec: {declared_spec} does not match the spec file that routes it ({routing_specs[0]})"
             )
     return errors
 
@@ -143,18 +134,17 @@ def check_supersession(
                 errors.append(f"{record}: {direction} references unknown decision_id {target_id}")
                 continue
             target_fields = fields_by_record[target_record]
-            reverse_values = {
-                value.strip() for value in target_fields.get(reverse, "").split(",") if value.strip()
-            }
+            reverse_values = {value.strip() for value in target_fields.get(reverse, "").split(",") if value.strip()}
             if own_id not in reverse_values:
                 errors.append(
-                    f"{record}: {direction}: {target_id} is not reciprocated by "
-                    f"{target_record}'s {reverse} field"
+                    f"{record}: {direction}: {target_id} is not reciprocated by {target_record}'s {reverse} field"
                 )
     return errors
 
 
-def check_aliases(records: list[Path], fields_by_record: dict[Path, dict[str, str]], identities: dict[str, Path]) -> list[str]:
+def check_aliases(
+    records: list[Path], fields_by_record: dict[Path, dict[str, str]], identities: dict[str, Path]
+) -> list[str]:
     errors: list[str] = []
     seen: dict[str, Path] = {}
     for record in records:
@@ -208,9 +198,7 @@ def check_folded_permalinks(
 
 
 def markdown_files(root: Path) -> list[Path]:
-    result = subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z", "--", "*.md"], capture_output=True, check=False
-    )
+    result = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.md"], capture_output=True, check=False)
     if result.returncode == 0 and result.stdout:
         return [root / name for name in result.stdout.decode("utf-8").split("\0") if name]
     return sorted((root / "docs").rglob("*.md"))
@@ -240,16 +228,12 @@ def validate(root: Path) -> tuple[list[str], list[str]]:
     warnings: list[str] = []
 
     if legacy_workspace_dir.is_dir() and decision_dir.is_dir():
-        errors.append(
-            "multiple workspace decision locations exist; use docs/decisions only"
-        )
+        errors.append("multiple workspace decision locations exist; use docs/decisions only")
     if not decision_dir.is_dir():
         return errors, warnings
 
     index = decision_dir / "DECISIONS.md"
-    records = sorted(
-        path for path in decision_dir.glob("*.md") if path.name != "DECISIONS.md"
-    )
+    records = sorted(path for path in decision_dir.glob("*.md") if path.name != "DECISIONS.md")
     if records and not index.is_file():
         errors.append(f"{index}: missing decision index")
         return errors, warnings

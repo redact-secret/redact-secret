@@ -18,7 +18,6 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
-import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -73,8 +72,7 @@ def evaluate(
             return GuardResult(
                 False,
                 None,
-                "no release manifest record was found for the requested version, "
-                "and no source_commit input was given",
+                "no release manifest record was found for the requested version, and no source_commit input was given",
             )
         if manifest.get("version") != version:
             return GuardResult(

@@ -16,8 +16,8 @@
  * authoritative scan point for this process's logs.
  */
 
-import pino from "pino";
 import { createRedactingLogMethod, createRedactingStreamWrite } from "@redact-secret/adapter-pino";
+import pino from "pino";
 
 /**
  * Creates the application's logger. `destination` is any pino destination

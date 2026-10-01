@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SCRIPT = Path(__file__).resolve().parents[1] / "check-docs-reachability.py"
 SPEC = importlib.util.spec_from_file_location("check_docs_reachability", SCRIPT)
 assert SPEC and SPEC.loader

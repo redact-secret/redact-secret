@@ -56,9 +56,7 @@ def fixture(
 
 class RowStateTests(unittest.TestCase):
     def test_positive_supported_fixture_yields_supported(self) -> None:
-        fixtures = [
-            fixture("pos-1", "widget", kind="positive", support="supported", expected_types=["widget_token"])
-        ]
+        fixtures = [fixture("pos-1", "widget", kind="positive", support="supported", expected_types=["widget_token"])]
         state, ids = GEN.row_state(fixtures, "widget_token")
         self.assertEqual(state, "supported")
         self.assertEqual(ids, ["pos-1"])
@@ -103,9 +101,7 @@ class RowStateTests(unittest.TestCase):
                 note="Contextual assignment below the minimum length is ignored.",
             )
         ]
-        state, _ids = GEN.row_state(
-            fixtures, "authorization_credential", ambiguous_keyword="authorization"
-        )
+        state, _ids = GEN.row_state(fixtures, "authorization_credential", ambiguous_keyword="authorization")
         self.assertEqual(state, "unresolved")
 
         state, ids = GEN.row_state(fixtures, "contextual_secret", ambiguous_keyword="contextual")
@@ -189,9 +185,7 @@ class BuildReportTests(unittest.TestCase):
     def test_one_row_per_declared_type(self) -> None:
         report = GEN.build_report(self.manifest, self.corpus, ROOT)
         self.assertEqual(len(report["rows"]), 3)
-        self.assertEqual(
-            {row["type"] for row in report["rows"]}, {"widget_token", "gadget_a", "gadget_b"}
-        )
+        self.assertEqual({row["type"] for row in report["rows"]}, {"widget_token", "gadget_a", "gadget_b"})
 
     def test_states_are_restricted_to_the_declared_four(self) -> None:
         report = GEN.build_report(self.manifest, self.corpus, ROOT)
@@ -233,9 +227,7 @@ class BuildReportTests(unittest.TestCase):
     def test_missing_consumer_path_is_reported_but_still_recorded(self) -> None:
         report = GEN.build_report(self.manifest, self.corpus, ROOT)
         missing = next(c for c in report["consumers"] if c["path"] == "scripts/does-not-exist.py")
-        present = next(
-            c for c in report["consumers"] if c["path"] == "scripts/generate-coverage-inventory.py"
-        )
+        present = next(c for c in report["consumers"] if c["path"] == "scripts/generate-coverage-inventory.py")
         self.assertFalse(missing["exists"])
         self.assertTrue(present["exists"])
 
@@ -245,9 +237,7 @@ class BuildReportTests(unittest.TestCase):
         self.assertTrue(any("does-not-exist.py" in error for error in errors))
 
     def test_declared_detector_missing_from_corpus_is_structural_drift(self) -> None:
-        corpus_without_gadget = {
-            "fixtures": [f for f in self.corpus["fixtures"] if f["detector"] != "gadget"]
-        }
+        corpus_without_gadget = {"fixtures": [f for f in self.corpus["fixtures"] if f["detector"] != "gadget"]}
         report = GEN.build_report(self.manifest, corpus_without_gadget, ROOT)
         self.assertIn("gadget", report["reconciliation"]["declaredDetectorsMissingFromCorpus"])
         errors = GEN.structural_errors(report)

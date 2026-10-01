@@ -9,14 +9,14 @@
  * scan, sanitize incrementally, and stream correctly" does not.
  */
 
-import { build } from "esbuild";
-import { createServer } from "node:http";
 import { execFileSync } from "node:child_process";
 import { copyFileSync, readFileSync } from "node:fs";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
 
 import { assertMatchesFixture } from "./qualify-runtime-fixture.mjs";
 
@@ -46,10 +46,7 @@ const MCP_BOUNDARY_RUNNER = "conformance/mcp-boundary.mjs";
 const MCP_BOUNDARY_STAGED = "mcp-boundary.mjs";
 
 function stageAiContextBoundary(consumerRoot) {
-  copyFileSync(
-    join(REPOSITORY_ROOT, AI_CONTEXT_BOUNDARY_RUNNER),
-    join(consumerRoot, AI_CONTEXT_BOUNDARY_STAGED),
-  );
+  copyFileSync(join(REPOSITORY_ROOT, AI_CONTEXT_BOUNDARY_RUNNER), join(consumerRoot, AI_CONTEXT_BOUNDARY_STAGED));
   return JSON.parse(readFileSync(join(REPOSITORY_ROOT, AI_CONTEXT_BOUNDARY_FIXTURE), "utf8"));
 }
 
@@ -285,13 +282,7 @@ async function qualifyIncrementalCorpus(api, corpus, sanitizeByteChunks, limits)
 }
 `;
 
-export function qualifyNode(
-  consumerRoot,
-  fixture,
-  expectedVersion,
-  integrationFixtures,
-  incrementalCorpus,
-) {
+export function qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures, incrementalCorpus) {
   const source = [
     "const { Readable } = await import('node:stream');",
     "const { artifact, createIncrementalSanitizer, initialize, scan, scanAndRedact, VERSION } = await import('@redact-secret/core');",
@@ -354,62 +345,46 @@ export function qualifyNode(
   const aiContextBoundaryFixture = stageAiContextBoundary(consumerRoot);
   const mcpBoundaryFixture = stageMcpBoundary(consumerRoot);
   const mcpResourcesReadFixture = stageMcpResourcesRead(consumerRoot);
-  const output = execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", source],
-    {
-      cwd: consumerRoot,
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        REDACT_SECRET_QUALIFICATION_INPUT: fixture.input,
-        REDACT_SECRET_INTEGRATION_FIXTURES: JSON.stringify(
-          Object.fromEntries(
-            Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.input]),
-          ),
-        ),
-        REDACT_SECRET_INCREMENTAL_CORPUS: JSON.stringify(incrementalCorpus),
-        REDACT_SECRET_AI_CONTEXT_BOUNDARY: JSON.stringify(aiContextBoundaryFixture),
-        REDACT_SECRET_MCP_BOUNDARY: JSON.stringify(mcpBoundaryFixture),
-        REDACT_SECRET_MCP_RESOURCES_READ: JSON.stringify(mcpResourcesReadFixture),
-      },
+  const output = execFileSync(process.execPath, ["--input-type=module", "--eval", source], {
+    cwd: consumerRoot,
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      REDACT_SECRET_QUALIFICATION_INPUT: fixture.input,
+      REDACT_SECRET_INTEGRATION_FIXTURES: JSON.stringify(
+        Object.fromEntries(Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.input])),
+      ),
+      REDACT_SECRET_INCREMENTAL_CORPUS: JSON.stringify(incrementalCorpus),
+      REDACT_SECRET_AI_CONTEXT_BOUNDARY: JSON.stringify(aiContextBoundaryFixture),
+      REDACT_SECRET_MCP_BOUNDARY: JSON.stringify(mcpBoundaryFixture),
+      REDACT_SECRET_MCP_RESOURCES_READ: JSON.stringify(mcpResourcesReadFixture),
     },
-  );
+  });
   const result = JSON.parse(output);
   if (result.version !== expectedVersion) {
-    throw new Error(
-      `Node lane version mismatch: reports ${result.version}, expected ${expectedVersion}`,
-    );
+    throw new Error(`Node lane version mismatch: reports ${result.version}, expected ${expectedVersion}`);
   }
   // The WebAssembly fallback (`decision-add-node-wasm-fallback`) would let
   // every check below pass on a host whose native addon never installed or
   // loaded, so this lane only qualifies the addon if the addon is what ran.
   if (result.artifact !== "addon") {
-    throw new Error(
-      `Node lane: expected the native addon to load, but artifact() reports ${result.artifact}`,
-    );
+    throw new Error(`Node lane: expected the native addon to load, but artifact() reports ${result.artifact}`);
   }
   if (result.findings.length !== 1) {
-    throw new Error(
-      `Node lane: expected exactly one finding for fixture ${fixture.id}, got ${result.findings.length}`,
-    );
+    throw new Error(`Node lane: expected exactly one finding for fixture ${fixture.id}, got ${result.findings.length}`);
   }
   assertMatchesFixture(result.findings[0], fixture);
   if (!result.incremental || !result.stream || result.streamFindings < 1) {
     throw new Error("Node lane: installed incremental or stream API diverged");
   }
   if (result.incrementalCorpus?.fixtures !== incrementalCorpus.fixtures.length) {
-    throw new Error(
-      `Node lane: incremental corpus replay was incomplete: ${JSON.stringify(result.incrementalCorpus)}`,
-    );
+    throw new Error(`Node lane: incremental corpus replay was incomplete: ${JSON.stringify(result.incrementalCorpus)}`);
   }
   if (
     Object.values(result.safeIntegration ?? {}).length !== 8 ||
     !Object.values(result.safeIntegration).every(Boolean)
   ) {
-    throw new Error(
-      `Node lane: safe integration example diverged: ${JSON.stringify(result.safeIntegration)}`,
-    );
+    throw new Error(`Node lane: safe integration example diverged: ${JSON.stringify(result.safeIntegration)}`);
   }
   assertAiContextBoundary("Node lane", result.aiContextBoundary, aiContextBoundaryFixture);
   assertMcpBoundary("Node lane", result.mcpBoundary, mcpBoundaryFixture);
@@ -438,15 +413,7 @@ async function bundleForBrowser(consumerRoot) {
     platform: "browser",
     conditions: ["browser", "import"],
     alias: {
-      "#native": join(
-        consumerRoot,
-        "node_modules",
-        "@redact-secret",
-        "core",
-        "dist",
-        "runtime",
-        "browser.js",
-      ),
+      "#native": join(consumerRoot, "node_modules", "@redact-secret", "core", "dist", "runtime", "browser.js"),
     },
     external: [WASM_SPECIFIER],
     stdin: {
@@ -549,9 +516,7 @@ async function writeHarness(
       }
       const incrementalCorpusSummary = await qualifyIncrementalCorpus(window.__secretScan, incrementalCorpus, sanitizeByteChunks, limits);
       const integrationInputs = ${JSON.stringify(
-        Object.fromEntries(
-          Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.input]),
-        ),
+        Object.fromEntries(Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.input])),
       )};
       const clean = await window.__secretScan.prepareBrowserSubmission("ordinary text");
       const redacted = await window.__secretScan.prepareBrowserSubmission(integrationInputs.redact);
@@ -659,9 +624,7 @@ export async function qualifyBrowser(
       throw new Error(`Browser lane harness failed: ${result.error}`);
     }
     if (result.version !== expectedVersion) {
-      throw new Error(
-        `Browser lane version mismatch: reports ${result.version}, expected ${expectedVersion}`,
-      );
+      throw new Error(`Browser lane version mismatch: reports ${result.version}, expected ${expectedVersion}`);
     }
     if (result.findings.length !== 1) {
       throw new Error(
@@ -670,9 +633,7 @@ export async function qualifyBrowser(
     }
     assertMatchesFixture(result.findings[0], fixture);
     if (!result.incremental || !result.stream || result.streamFindings < 1) {
-      throw new Error(
-        `Browser lane (${engine}): installed incremental or stream API diverged`,
-      );
+      throw new Error(`Browser lane (${engine}): installed incremental or stream API diverged`);
     }
     if (result.incrementalCorpus?.fixtures !== incrementalCorpus.fixtures.length) {
       throw new Error(
