@@ -774,7 +774,7 @@
         "detector-coverage--openai-token-shape-3-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "e762020b345d5ee2d85662f2a735b40dc392bdb9",
       "canonicalFixtures": {
@@ -804,7 +804,7 @@
         "detector-coverage--slack-token-shape-1-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "c4326c779ebe2f4f9720cbf0b5fdb12f99e6f2c3",
       "canonicalFixtures": {
@@ -834,7 +834,7 @@
         "detector-coverage--docker-token-shape-1-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "8e7c5032cb7c3477833ee806bcab61c03036230a",
       "canonicalFixtures": {
@@ -864,7 +864,7 @@
         "detector-coverage--cloudflare-token-shape-1-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "a8dc90c65fcfde9009b07855d2c5820893962a95",
       "canonicalFixtures": {
@@ -895,7 +895,7 @@
         "detector-coverage--slack-token-rotation-dash-identifier-embedding"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "86577d8e5b7db7a5a6c4ecfd6fc6ee8ab215909a",
       "canonicalFixtures": {
@@ -925,7 +925,7 @@
         "detector-coverage--generic-token-client-secret-markdown-inline-code-boundary"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "11dba979d98a5c91420bf82a66e86eb6a9d5c559",
       "canonicalFixtures": {
@@ -960,7 +960,7 @@
         "detector-coverage--discord-bot-token-three-segments-current-reset-bot-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "c053505335844d763491a85eb57826cbb7aeee8a",
       "canonicalFixtures": {
@@ -994,7 +994,7 @@
         "detector-coverage--datadog-application-key-prefixed-env-marker-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "2ca56a29ea19f93ec111370a5d4a8115cb8ddf33",
       "canonicalFixtures": {
@@ -1039,7 +1039,7 @@
         "detector-coverage--new-relic-license-key-current-format-unicode-crlf"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "0c3228926a01d44945a82a41d291fd98fd1a8b99",
       "canonicalFixtures": {
@@ -1067,7 +1067,7 @@
         "detector-coverage--heroku-api-key-legacy-public-id"
       ],
       "corpusHashes": [
-        "3b7fc0bdbb483df5051376e53b3935f477aa233e3808561a7ab8294e50c2fbfe"
+        "b8cf090f3fab51822aec4a46286f1ca603d02ab817edaa5908b2bbc14e5432c8"
       ],
       "fixingCommit": "6a2dca04b9f88b82f1b88a7acfeeb93a82510c21",
       "canonicalFixtures": {

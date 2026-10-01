@@ -1,6 +1,6 @@
 {
   "schemaVersion": "redact-secret.site-feed/v1",
-  "generatedAt": "2026-10-01T01:51:54Z",
+  "generatedAt": "2026-10-01T10:49:11Z",
   "sources": [
     {
       "role": "release-manifest",
@@ -10,7 +10,7 @@
     {
       "role": "support-matrix",
       "path": "benchmarks/support-matrix.json",
-      "sha256": "6701a1e73b11e25ce2ccdd5acd81f5cdb18395feffa01dabb76ecadbe4dfe1e5"
+      "sha256": "3af544c8b1d3312d4c7ee59fbb4919562da7ccb0813eb835ce687dc3087f798f"
     }
   ],
   "release": {
@@ -87,11 +87,11 @@
     ]
   },
   "supportMatrix": {
-    "benchmarksRevision": "f35037073a3cd9bc1269f62e4c51b7d9f457515e",
-    "generatedAt": "2026-10-01T01:51:54Z",
-    "measuredProductVersion": "0.1.0-beta.11",
-    "measuredProductRevision": "bfc608cce75f79f6a5cab037d7e558ba629777f6",
-    "gatedLatestRelease": true,
+    "benchmarksRevision": "e8f73bfd7241845ef9fb75574a72b135aa777ba6",
+    "generatedAt": "2026-10-01T10:49:11Z",
+    "measuredProductVersion": "0.1.0-beta.12",
+    "measuredProductRevision": "4227160c4dac402d7add53d3f8fe990f693912c1",
+    "gatedLatestRelease": false,
     "providerCount": 92,
     "familyCount": 173,
     "distribution": {
