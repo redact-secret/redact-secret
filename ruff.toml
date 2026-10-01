@@ -1,0 +1,13 @@
+# Coding standard for the repository's Python: bindings/python and scripts/.
+# Enforced by the `lint` job in .github/workflows/ci.yml with the Ruff version
+# pinned by hash in .github/requirements/python-lint.txt.
+# Run: ruff check bindings/python scripts && ruff format --check bindings/python scripts
+line-length = 120
+target-version = "py310"
+extend-exclude = ["target", "node_modules", "dist"]
+
+[lint]
+select = ["E", "F", "I", "W"]
+# E501: `ruff format` owns line wrapping; the lines it cannot wrap (long
+# string literals, URLs, regexes) are not worth hand-splitting.
+ignore = ["E501"]

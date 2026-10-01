@@ -90,9 +90,16 @@ items are enforced by CI on every pull request; the rest are checked in review.
 - **Coding standard.** Follow [CONVENTIONS.md](CONVENTIONS.md). Rust code is
   formatted with `rustfmt` (`rustfmt.toml`) and must pass `cargo clippy` with
   warnings denied (`clippy.toml`, `RUSTFLAGS=-D warnings`); TypeScript must
-  type-check under `strict`. Python binding code follows
-  [PEP 8](https://peps.python.org/pep-0008/). Do not silence a warning to make
-  CI pass; fix its cause.
+  type-check under `strict`. JavaScript and TypeScript are formatted and
+  linted with [Biome](https://biomejs.dev/) (`biome.json`; run `npm run lint`,
+  and `npm run format` to apply fixes). Python in `bindings/python` and
+  `scripts/` is formatted and linted with [Ruff](https://docs.astral.sh/ruff/)
+  (`ruff.toml`, version pinned by hash in
+  `.github/requirements/python-lint.txt`; run
+  `ruff check bindings/python scripts` and
+  `ruff format --check bindings/python scripts`). The `lint` job in CI fails
+  the pull request on any violation. Do not silence a warning to make CI pass;
+  fix its cause.
 - **Tests.** Every behavior change to a detector, redaction, overlap
   resolution, or policy comes with deterministic automated tests in the same
   pull request, in the shared [conformance corpus](conformance/README.md) or

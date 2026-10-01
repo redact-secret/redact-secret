@@ -1,0 +1,42 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": [
+      "packages/javascript/src/**",
+      "packages/javascript/test/**",
+      "scripts/**/*.mjs",
+      "examples/**/*.mjs",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/target",
+      "!**/pkg",
+      "!**/pkg-common",
+      "!bindings/wasm/npm",
+      "!**/*.json"
+    ]
+  },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noAssignInExpressions": "off",
+        "noImplicitAnyLet": "off",
+        "noTemplateCurlyInString": "off",
+        "noProto": "off",
+        "noControlCharactersInRegex": "off"
+      },
+      "correctness": { "noUnsafeFinally": "off" }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/javascript/test/type-contracts.ts"],
+      "linter": { "rules": { "correctness": { "noUnusedVariables": "off" } } }
+    }
+  ],
+  "json": { "formatter": { "enabled": false }, "linter": { "enabled": false } },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+}

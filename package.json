@@ -12,6 +12,8 @@
   },
   "type": "module",
   "scripts": {
+    "lint": "biome check .",
+    "format": "biome check --write .",
     "js:build": "tsc --project packages/javascript/tsconfig.json",
     "js:typecheck": "npm run js:build && tsc --noEmit --project packages/javascript/test/tsconfig.json",
     "js:test": "npm run js:build && vitest run --root packages/javascript",
@@ -108,6 +110,7 @@
     "examples:python": "python3 -B -m unittest discover -s examples/tracing-masking/python -p 'test_*.py' && python3 -B -m unittest discover -s examples/logging-redaction/python -p 'test_*.py'"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.14",
     "@types/node": "^24.3.0",
     "@vitest/coverage-v8": "4.1.11",
     "esbuild": "^0.25.9",

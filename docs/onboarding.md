@@ -41,7 +41,9 @@ CI fails any layer under 80% statement coverage (OpenSSF Silver
 
 ```bash
 # Rust lines: the `rust-coverage` job (needs cargo-llvm-cov)
-eval "$(cargo llvm-cov show-env --sh)" && cargo test --workspace --locked
+eval "$(cargo llvm-cov show-env --sh)"
+cargo build --workspace --locked --examples   # integration tests run these
+cargo test --workspace --locked
 cargo llvm-cov report --summary-only --fail-under-lines 80
 
 # JavaScript wrapper: packages/javascript/src, from the js:test suite
@@ -57,6 +59,25 @@ python -m pytest bindings/python/tests --cov=redact_secret --cov-report=term-mis
 The JavaScript tests import `src/*.ts` directly, so coverage is already
 source-level; only `.d.ts` files are excluded. The Python number covers the
 wrapper module, not the Rust extension, which `rust-coverage` measures.
+
+### Formatting and lint
+
+CI's `lint` job enforces the coding standard for the languages `cargo fmt` and
+`cargo clippy` do not cover. Run the same checks before you push:
+
+```bash
+npm ci --ignore-scripts
+npm run lint      # Biome: packages/javascript, scripts/**/*.mjs, examples/
+npm run format    # apply Biome's fixes and formatting
+
+python -m pip install --require-hashes -r .github/requirements/python-lint.txt
+ruff check bindings/python scripts
+ruff format --check bindings/python scripts   # drop --check to apply
+```
+
+Biome's rules are in `biome.json` and Ruff's in `ruff.toml`; Ruff's version is
+pinned by hash in `.github/requirements/python-lint.txt` and Biome's exactly in
+`package.json`.
 
 ### Full suite
 
