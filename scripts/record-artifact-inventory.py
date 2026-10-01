@@ -517,7 +517,7 @@ def incremental_corpus_fixture_count() -> int:
 def release_readiness_record() -> dict:
     """Record the non-artifact review and post-publication boundaries."""
     return {
-        "issue": 1006,
+        "issue": 1112,
         "publicApiAndChangelogReview": {
             "status": "required-before-release-approval",
             "currentPublicApiReview": {

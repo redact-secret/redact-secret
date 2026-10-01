@@ -2,9 +2,8 @@
 
 [Documentation home](../README.md) · [Audit archive](README.md)
 
-- Release tracking issue: none filed at review time. The artifact inventory's
-  `issue` field (`scripts/record-artifact-inventory.py`) still names #1006, the
-  beta.11 tracking issue; update it when a beta.12 issue exists.
+- Release tracking issue: #1112. The artifact inventory's `issue` field
+  (`scripts/record-artifact-inventory.py`) names it.
 - Reviewed on: 2026-09-30.
 - Approved version: `0.1.0-beta.12` (PEP 440 `0.1.0b12`), approved by the
   maintainer on 2026-09-30 for rehearsal, Release and Reconcile. The npm
