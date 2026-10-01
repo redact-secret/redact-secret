@@ -143,9 +143,7 @@ fn validate_iban_mod97_v1(candidate: &str) -> Result<(), ValidationFailure> {
         if byte.is_ascii_digit() {
             remainder = push_decimal_digit(remainder, byte - b'0');
         } else {
-            let expanded = byte - b'A' + 10;
-            remainder = push_decimal_digit(remainder, expanded / 10);
-            remainder = push_decimal_digit(remainder, expanded % 10);
+            remainder = push_letter_value(remainder, byte - b'A' + 10);
         }
     }
     if remainder == 1 {
@@ -181,11 +179,19 @@ const fn push_decimal_digit(remainder: u16, digit: u8) -> u16 {
     (remainder * 10 + digit as u16) % 97
 }
 
+/// Appends one letter's two-digit expansion (`value` in 10..=35) in a single
+/// modulo step. `(r * 10 + tens) % 97` followed by `(. * 10 + ones) % 97` is
+/// `(r * 100 + value) % 97`; with `r <= 96` the operand is at most 9,635.
+const fn push_letter_value(remainder: u16, value: u8) -> u16 {
+    (remainder * 100 + value as u16) % 97
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         IBAN_MOD97_V1, LUHN_V1, StructuredValidatorRegistry, US_SSN_ALLOCATION_V1,
-        ValidationFailure, ValidatorProvenance,
+        ValidationFailure, ValidatorProvenance, push_decimal_digit, push_letter_value,
+        validate_iban_mod97_v1,
     };
 
     fn validate(
@@ -376,5 +382,173 @@ mod tests {
                 assert_eq!(validate(provenance, candidate), first);
             }
         }
+    }
+
+    /// The IBAN validator exactly as shipped before #1149 (two modulo steps per
+    /// letter). Kept only as the differential oracle.
+    fn iban_two_step_oracle(candidate: &str) -> Result<(), ValidationFailure> {
+        let bytes = candidate.as_bytes();
+        if !(15..=34).contains(&bytes.len())
+            || !bytes[0..2].iter().all(u8::is_ascii_uppercase)
+            || !bytes[2..4].iter().all(u8::is_ascii_digit)
+            || !bytes[4..]
+                .iter()
+                .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit())
+        {
+            return Err(ValidationFailure::Malformed);
+        }
+        let mut remainder = 0_u16;
+        for byte in bytes[4..].iter().chain(&bytes[..4]) {
+            if byte.is_ascii_digit() {
+                remainder = push_decimal_digit(remainder, byte - b'0');
+            } else {
+                let expanded = byte - b'A' + 10;
+                remainder = push_decimal_digit(remainder, expanded / 10);
+                remainder = push_decimal_digit(remainder, expanded % 10);
+            }
+        }
+        if remainder == 1 {
+            Ok(())
+        } else {
+            Err(ValidationFailure::ChecksumMismatch)
+        }
+    }
+
+    fn assert_iban_equivalent(candidate: &str) {
+        assert_eq!(
+            validate_iban_mod97_v1(candidate),
+            iban_two_step_oracle(candidate),
+            "candidate length {}",
+            candidate.len()
+        );
+        // Through the registry the bound and identity gates precede the
+        // algorithm, and they are untouched.
+        let registry = StructuredValidatorRegistry::validate("iban-mod97", 1, candidate);
+        if candidate.len() > 34 {
+            assert_eq!(registry, Err(ValidationFailure::CandidateTooLong));
+        } else {
+            assert_eq!(registry.map(|_| ()), iban_two_step_oracle(candidate));
+        }
+    }
+
+    #[test]
+    fn iban_letter_fusion_is_exact_for_every_remainder_and_letter() {
+        // The only arithmetic that changed: every reachable remainder (0..=96)
+        // times every letter value (10..=35), including the u16 bound.
+        for remainder in 0_u16..97 {
+            for value in 10_u8..=35 {
+                let two_step =
+                    push_decimal_digit(push_decimal_digit(remainder, value / 10), value % 10);
+                assert_eq!(push_letter_value(remainder, value), two_step);
+            }
+        }
+        assert!(u16::try_from(96_u32 * 100 + 35).is_ok());
+    }
+
+    #[test]
+    fn iban_fusion_matches_the_two_step_oracle_over_every_check_value() {
+        // For each body and country prefix, all 100 check-digit pairs: one or two
+        // validate (mod 97), and old and new agree on every pair.
+        let alphabet: Vec<u8> = (b'0'..=b'9').chain(b'A'..=b'Z').collect();
+        let mut state = 0x9e37_79b9_7f4a_7c15_u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        let mut valid_seen = 0;
+        for length in 15..=34_usize {
+            for round in 0..60 {
+                let body: String = (0..length - 4)
+                    .map(|index| {
+                        let pick = usize::try_from(next() >> 33).unwrap();
+                        match round % 4 {
+                            // letter-heavy, digit-heavy, mixed, boundary letters
+                            0 => char::from(b'A' + u8::try_from(pick % 26).unwrap()),
+                            1 => char::from(b'0' + u8::try_from(pick % 10).unwrap()),
+                            2 => char::from(alphabet[pick % alphabet.len()]),
+                            _ => char::from(if (index + pick).is_multiple_of(2) {
+                                b'A'
+                            } else {
+                                b'Z'
+                            }),
+                        }
+                    })
+                    .collect();
+                let mut valid_for_body = 0;
+                for check in 0..100_u8 {
+                    let candidate = format!("ZZ{}{}{}", check / 10, check % 10, body);
+                    assert_eq!(candidate.len(), length);
+                    assert_iban_equivalent(&candidate);
+                    if validate_iban_mod97_v1(&candidate).is_ok() {
+                        valid_for_body += 1;
+                    }
+                }
+                // Check pairs 00..=99 hold each residue once, plus 97..=99 again as
+                // 00..=02, so a body admits one or two valid pairs.
+                assert!((1..=2).contains(&valid_for_body));
+                valid_seen += valid_for_body;
+            }
+        }
+        assert!(valid_seen >= 20 * 60);
+    }
+
+    #[test]
+    fn iban_fusion_matches_the_oracle_on_malformed_and_out_of_range_inputs() {
+        // Every length 0..=40 over a spread of byte classes at every position.
+        let probes: [&str; 11] = [
+            "A", "Z", "0", "9", "a", "z", "-", " ", "\u{ff10}", "\u{e9}", "\0",
+        ];
+        for length in 0..=40_usize {
+            let base: String = (0..length)
+                .map(|index| match index {
+                    0 | 1 => 'Z',
+                    2 | 3 => '5',
+                    _ if index % 3 == 0 => 'A',
+                    _ if index % 3 == 1 => 'Z',
+                    _ => '7',
+                })
+                .collect();
+            assert_iban_equivalent(&base);
+            for position in 0..length {
+                for probe in probes {
+                    let mut chars: Vec<char> = base.chars().collect();
+                    chars.splice(position..=position, probe.chars());
+                    let candidate: String = chars.into_iter().collect();
+                    assert_iban_equivalent(&candidate);
+                }
+            }
+        }
+        for candidate in [
+            "",
+            "ZZ",
+            "ZZ50SYNTHETIC",
+            "ZZ50SYNTHETIC00000000000000000000000000000",
+        ] {
+            assert_iban_equivalent(candidate);
+        }
+    }
+
+    #[test]
+    fn iban_fusion_keeps_published_example_outcomes() {
+        // Widely published documentation examples (synthetic, not accounts).
+        for valid in [
+            "GB82WEST12345698765432",
+            "DE89370400440532013000",
+            "FR1420041010050500013M02606",
+            "MT84MALT011000012345MTLCAST001S",
+        ] {
+            assert_eq!(validate(IBAN_MOD97_V1, valid), Ok(IBAN_MOD97_V1));
+            assert_iban_equivalent(valid);
+        }
+        assert_eq!(
+            validate(IBAN_MOD97_V1, "GB83WEST12345698765432"),
+            Err(ValidationFailure::ChecksumMismatch)
+        );
+        assert_eq!(
+            validate(IBAN_MOD97_V1, "GB82WEST1234569876543x"),
+            Err(ValidationFailure::Malformed)
+        );
     }
 }
