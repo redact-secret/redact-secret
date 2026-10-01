@@ -1,0 +1,3986 @@
+{
+  "artifact_digests": {
+    "crate:redact-secret": [
+      {
+        "built": "2cc951e8b991e9ec27343a872627f53a25b252cc8148cb4ec7160192ed9d856d",
+        "comparable": true,
+        "file": "redact-secret-0.1.0-beta.12.crate",
+        "note": null,
+        "published": "2cc951e8b991e9ec27343a872627f53a25b252cc8148cb4ec7160192ed9d856d",
+        "qualified": "2cc951e8b991e9ec27343a872627f53a25b252cc8148cb4ec7160192ed9d856d"
+      }
+    ],
+    "crate:redact-secret-cli": [
+      {
+        "built": "a2169c5c72002c32170e367f2cf922af9a85691c7df5d4ab04fa2b8b08a9ddb8",
+        "comparable": true,
+        "file": "redact-secret-cli-0.1.0-beta.12.crate",
+        "note": null,
+        "published": "a2169c5c72002c32170e367f2cf922af9a85691c7df5d4ab04fa2b8b08a9ddb8",
+        "qualified": "a2169c5c72002c32170e367f2cf922af9a85691c7df5d4ab04fa2b8b08a9ddb8"
+      }
+    ],
+    "npm:@redact-secret/core": [
+      {
+        "built": "8e7dd164c425eaa4850baf836ef254fd0c3eda32",
+        "comparable": true,
+        "file": "packages/javascript",
+        "note": null,
+        "published": "8e7dd164c425eaa4850baf836ef254fd0c3eda32",
+        "qualified": "8e7dd164c425eaa4850baf836ef254fd0c3eda32"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-arm64": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\nfc693c823541cdf5b80d883270dbea8adf251ab2f8b9fde831313cbeee1911cb",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-arm64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "77674b19c3e9f1c76e4dce3df6537ac48b897fbe",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\nfc693c823541cdf5b80d883270dbea8adf251ab2f8b9fde831313cbeee1911cb"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-x64": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n30357978d3616993b737ab5ac3387c72c5ee676ac1c8d09571c4ef311a82bf12",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-x64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "db404c51a67c5df6d3ebcce68ecd1799e05ec812",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n30357978d3616993b737ab5ac3387c72c5ee676ac1c8d09571c4ef311a82bf12"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-gnu": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n8b5c052138cf968bf9907ef399723fc50e915154aa6f9295ffa7b50fa9e2025d",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "e78850afefff0e835724847c8efc95a3c0bf0993",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n8b5c052138cf968bf9907ef399723fc50e915154aa6f9295ffa7b50fa9e2025d"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-musl": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\nbd91c231bad23023571747884bf2ab45568b954f95d008c428a03f9b94a2c6e4",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3520c1ba26c9b1f4edb451d0d131f6cbd717d051",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\nbd91c231bad23023571747884bf2ab45568b954f95d008c428a03f9b94a2c6e4"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-gnu": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\na2befc59099e9554e405a907fc51745630463dedd8d9cea3d2e2ec09dfd49eb1",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "943c938b46b1c43797302a8f4d8b916bbf910835",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\na2befc59099e9554e405a907fc51745630463dedd8d9cea3d2e2ec09dfd49eb1"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-musl": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n2c4b6c8bde6a14e2ae96499e42490e96a2ff79ff1b344dc4f737e03141635a5f",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "76ff6f942e2c12c89575c942ea3b1a44744ec3a9",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n2c4b6c8bde6a14e2ae96499e42490e96a2ff79ff1b344dc4f737e03141635a5f"
+      }
+    ],
+    "npm:@redact-secret/node-win32-arm64-msvc": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\nbbab5883df5409632883a0b5666f539bb68c1f352e5a2e8f91ca2d752d1e7fa7",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-arm64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "481beb56e4cb3f94e7ad7e3d3606edec150af5fa",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\nbbab5883df5409632883a0b5666f539bb68c1f352e5a2e8f91ca2d752d1e7fa7"
+      }
+    ],
+    "npm:@redact-secret/node-win32-x64-msvc": [
+      {
+        "built": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n56f0a4ce12f8a0c11ea783a7384b37a89e62654fe8b660836040711e43c4be50",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-x64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "603c97eb6acbbbc43bc83e715175a2388bfba2da",
+        "qualified": "dcb7a3ebe1179fc2b200c055f4a26bf4e0b57f29426da9906eb2deb76ceac928\n2c3d7280d687e83a886df12f4341dc2c4ccf62da4c40fa40eff2953dc097ca7d\n56f0a4ce12f8a0c11ea783a7384b37a89e62654fe8b660836040711e43c4be50"
+      }
+    ],
+    "npm:@redact-secret/wasm": [
+      {
+        "built": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749",
+        "comparable": false,
+        "file": "redact_secret_wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749"
+      },
+      {
+        "built": "601048bc412cc1a6f21e00f42f34af6792e4dd6f94b1f151e026874772f2d4f4",
+        "comparable": false,
+        "file": "redact_secret_wasm.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "601048bc412cc1a6f21e00f42f34af6792e4dd6f94b1f151e026874772f2d4f4"
+      },
+      {
+        "built": "53a20c055f82dbce42276dedb422cf479e75ca0d528684a3f5f57db31457bab6",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "53a20c055f82dbce42276dedb422cf479e75ca0d528684a3f5f57db31457bab6"
+      },
+      {
+        "built": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c"
+      },
+      {
+        "built": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749"
+      },
+      {
+        "built": "82986b0380099527fb45bba31a0c7948fe4041dc9c892e36f39df7299c4f06f0",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "82986b0380099527fb45bba31a0c7948fe4041dc9c892e36f39df7299c4f06f0"
+      },
+      {
+        "built": "dc36e7cff37d4ad4b91a72e707949fe0cb558d9ab9153e43cfeb2de083e39c7d",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "dc36e7cff37d4ad4b91a72e707949fe0cb558d9ab9153e43cfeb2de083e39c7d"
+      },
+      {
+        "built": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c"
+      },
+      {
+        "built": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749"
+      },
+      {
+        "built": "3e91a4c9f2cd1fa209fd27a12d875023a8a9c1c9041e33892e4392206bf1f1e4",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "3e91a4c9f2cd1fa209fd27a12d875023a8a9c1c9041e33892e4392206bf1f1e4"
+      },
+      {
+        "built": "36be6a2d0a046b2046ea97b606b4155a6d29f19520cc5d2f3011e69969c38f3c",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "36be6a2d0a046b2046ea97b606b4155a6d29f19520cc5d2f3011e69969c38f3c"
+      },
+      {
+        "built": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c"
+      },
+      {
+        "built": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "3572d70b543b339a78c42ac0f00de635ce18d3f6ee1e2a56cf75f6c84230c749"
+      },
+      {
+        "built": "0c1d16d57bed0339cdfe97d4fe248a3a7451c975580f42efc6cbb2eb7fbe53f7",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "0c1d16d57bed0339cdfe97d4fe248a3a7451c975580f42efc6cbb2eb7fbe53f7"
+      },
+      {
+        "built": "b3c139618aad3d97b3577da4a2c92d3c4b1995561141bcd3362cf568a3543f4d",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "b3c139618aad3d97b3577da4a2c92d3c4b1995561141bcd3362cf568a3543f4d"
+      },
+      {
+        "built": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "67896b386f1141feabd29afef71c270c578a9a81",
+        "qualified": "d8d9722911f64cfc18d789ea7da84f72d791b9183b4d56e85ff0d8f67a9c554c"
+      }
+    ],
+    "pypi:redact-secret": [
+      {
+        "built": "eeb7a664887d03a14b19d73143682a5943a29c42d6ba25612d4062a9a7fdeced",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12.tar.gz",
+        "note": null,
+        "published": "eeb7a664887d03a14b19d73143682a5943a29c42d6ba25612d4062a9a7fdeced",
+        "qualified": "eeb7a664887d03a14b19d73143682a5943a29c42d6ba25612d4062a9a7fdeced"
+      },
+      {
+        "built": "294e72ec7346e7828bc2413f8de725315c6c48bd1f341c5f24ee340b1bb89b90",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-macosx_11_0_arm64.whl",
+        "note": null,
+        "published": "294e72ec7346e7828bc2413f8de725315c6c48bd1f341c5f24ee340b1bb89b90",
+        "qualified": "294e72ec7346e7828bc2413f8de725315c6c48bd1f341c5f24ee340b1bb89b90"
+      },
+      {
+        "built": "a46491828eedfa074b37b1ffc9f520eb1e2fef66e2aeb10b63526b8569d8976a",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-win_arm64.whl",
+        "note": null,
+        "published": "a46491828eedfa074b37b1ffc9f520eb1e2fef66e2aeb10b63526b8569d8976a",
+        "qualified": "a46491828eedfa074b37b1ffc9f520eb1e2fef66e2aeb10b63526b8569d8976a"
+      },
+      {
+        "built": "59a2715ad809e3128568b413e626bbb3200d43cd3ba713034d16edcd11e06e79",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "note": null,
+        "published": "59a2715ad809e3128568b413e626bbb3200d43cd3ba713034d16edcd11e06e79",
+        "qualified": "59a2715ad809e3128568b413e626bbb3200d43cd3ba713034d16edcd11e06e79"
+      },
+      {
+        "built": "6e1a8aca8d221894847a10ea22c0e1875660c285c8a7c5c24c51a9167345b311",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-musllinux_1_2_aarch64.whl",
+        "note": null,
+        "published": "6e1a8aca8d221894847a10ea22c0e1875660c285c8a7c5c24c51a9167345b311",
+        "qualified": "6e1a8aca8d221894847a10ea22c0e1875660c285c8a7c5c24c51a9167345b311"
+      },
+      {
+        "built": "54f9580af234bddbaab0e068cc2d89871759a5f794778f6bfd77cfc6b1e4164c",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-macosx_10_12_x86_64.whl",
+        "note": null,
+        "published": "54f9580af234bddbaab0e068cc2d89871759a5f794778f6bfd77cfc6b1e4164c",
+        "qualified": "54f9580af234bddbaab0e068cc2d89871759a5f794778f6bfd77cfc6b1e4164c"
+      },
+      {
+        "built": "f7ff295ba1781fadbb4b92a1658a0ea2d33f061886ff9215234f80707dd53d97",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-win_amd64.whl",
+        "note": null,
+        "published": "f7ff295ba1781fadbb4b92a1658a0ea2d33f061886ff9215234f80707dd53d97",
+        "qualified": "f7ff295ba1781fadbb4b92a1658a0ea2d33f061886ff9215234f80707dd53d97"
+      },
+      {
+        "built": "a3d6f831b146636c74681f89d146987e6b1d3750effefd8e8e662054217912c8",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "note": null,
+        "published": "a3d6f831b146636c74681f89d146987e6b1d3750effefd8e8e662054217912c8",
+        "qualified": "a3d6f831b146636c74681f89d146987e6b1d3750effefd8e8e662054217912c8"
+      },
+      {
+        "built": "c568eff39481a552752a1fc063193ec6cbb854ba5fba278775a237fbf4241ae2",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b12-cp310-abi3-musllinux_1_2_x86_64.whl",
+        "note": null,
+        "published": "c568eff39481a552752a1fc063193ec6cbb854ba5fba278775a237fbf4241ae2",
+        "qualified": "c568eff39481a552752a1fc063193ec6cbb854ba5fba278775a237fbf4241ae2"
+      }
+    ]
+  },
+  "artifact_inventory_sha256": "ffc637183a1bebea9f913d3fd4cadb7af89d62a95a60e03073ae3a35aee3917c",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "conformance_identity": "3abcd2462072c88efefba56e2112d94cdbc6c263",
+  "record_kind": "reconstructed",
+  "record_schema_version": 1,
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-arm64-musl": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-musl": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "observed_at": "2026-10-01",
+    "original_manifest": {
+      "artifact_set": null,
+      "provenance": "None. Run 36844232498's 'Record release manifest' step failed before writing manifest.json (python3: Argument list too long, exit code 126), so no release-manifest-0.1.0-beta.12 artifact exists for this version.",
+      "registry_state": null
+    },
+    "original_run": 36844232498,
+    "reason": "Release run 36844232498 published every artifact, passed registry-install verification on all eight Node targets and Chromium, and created annotated tag v0.1.0-beta.12, but its Record release manifest job failed: 'Build and record the manifest' died with 'python3: Argument list too long' (exit code 126) because release.yml passes the merged artifact digests to scripts/release-manifest.py as a single command-line argument that exceeded the Linux per-argument limit, the same defect as beta.8 (#799); the follow-on upload step then found no manifest.json. Issue #1115 tracks it. There is therefore no original manifest to preserve. This record rebuilds it with the repository's own scripts/release-manifest.py from the inputs the run did preserve: the registry-state and artifact-digest values printed in the failed job's log for the npm core, wasm, crates and PyPI publishers, the registry-state-native-* and artifact-digest-native-* artifacts, and the support-matrix-drift artifact, all from run 36844232498. It adds the release_evidence this repository's manifest job does not itself populate (tag, per-registry checksums, workflow run references, clean-install verification), assembled from the run's own jobs plus registries independently checked live on 2026-10-01. No registry_state value is corrected: every entry is the run's own recorded value.",
+    "registries": {
+      "crate:redact-secret": {
+        "checksum": "2cc951e8b991e9ec27343a872627f53a25b252cc8148cb4ec7160192ed9d856d"
+      },
+      "crate:redact-secret-cli": {
+        "checksum": "a2169c5c72002c32170e367f2cf922af9a85691c7df5d4ab04fa2b8b08a9ddb8"
+      },
+      "npm:@redact-secret/core": {
+        "integrity": "sha512-fDVwt2U7VFSKb/0ixSuU5e+TOGVaUnyR1sIYwgS4S6gMndFnaq0M7ikaqac8wnTMYfYO/LS12JayXXeKbhE4aw==",
+        "shasum": "8e7dd164c425eaa4850baf836ef254fd0c3eda32"
+      },
+      "npm:@redact-secret/node-darwin-arm64": {
+        "integrity": "sha512-xAA09sFA0bX1+4Ab7fT8Irgf3eLL0+SWB0hvVZ61xuR5WOGhKxpSFOgU1Gteyp/EmvX2RksqYEySijXYiRd+PA==",
+        "shasum": "77674b19c3e9f1c76e4dce3df6537ac48b897fbe"
+      },
+      "npm:@redact-secret/node-darwin-x64": {
+        "integrity": "sha512-0R4AsXsXg5HDrYWCPC1dwIeNj+21oF2FN0K3QawStTieEVPKt1gu/dYpgl9zmYAfddgzGUeEaPyOS3KenIrF7A==",
+        "shasum": "db404c51a67c5df6d3ebcce68ecd1799e05ec812"
+      },
+      "npm:@redact-secret/node-linux-arm64-gnu": {
+        "integrity": "sha512-ONmz+lCrQhZo63+o0ny7Cpm+e5RoQnOuDa15djEor7jLFMytHBP7Zwf77kY8m6S8r9/MuglYtrXY7uvcqAl6Xg==",
+        "shasum": "e78850afefff0e835724847c8efc95a3c0bf0993"
+      },
+      "npm:@redact-secret/node-linux-arm64-musl": {
+        "integrity": "sha512-AesR9/xWVYDFKnyhF+Z76oN06z6u+CXxaGCwh6u0ViIgMTlxdEdy7H7/IHhXzybu/+QMjO5+KK9gAXAGdV6yUQ==",
+        "shasum": "3520c1ba26c9b1f4edb451d0d131f6cbd717d051"
+      },
+      "npm:@redact-secret/node-linux-x64-gnu": {
+        "integrity": "sha512-uf66fX2ngvXO9itiettZjrMvUKHbTa9zGRX4ZB9JfGsY+m1EWm2sWqtwtff07P/ajaF3Ioe0Vt6ktJz/I69b3w==",
+        "shasum": "943c938b46b1c43797302a8f4d8b916bbf910835"
+      },
+      "npm:@redact-secret/node-linux-x64-musl": {
+        "integrity": "sha512-TbMkRyyHYpVN5kL8IkiF0mpZe+KBo7TG52WwMOHK5TwFBKccNRuaFjGu8WkyMZt9HAoLsEato98OLuXCZrLDbA==",
+        "shasum": "76ff6f942e2c12c89575c942ea3b1a44744ec3a9"
+      },
+      "npm:@redact-secret/node-win32-arm64-msvc": {
+        "integrity": "sha512-oH2E5owPI9vyMGdnqbKLywAiD/lC5ZKdociHXqbKMRqplTKcULd7op9p8na3ZSLLXbMO9/yntahFM8A51gfu9A==",
+        "shasum": "481beb56e4cb3f94e7ad7e3d3606edec150af5fa"
+      },
+      "npm:@redact-secret/node-win32-x64-msvc": {
+        "integrity": "sha512-fqa29XtVahqQbakik+/Y57GKe91witJHiPPk8+3m5usytrz+AP6v+AWny80X5Pssj5HzBzFuMHXiSKAWevKlTA==",
+        "shasum": "603c97eb6acbbbc43bc83e715175a2388bfba2da"
+      },
+      "npm:@redact-secret/wasm": {
+        "integrity": "sha512-i9XV+P0j92z+00jujDe9MQdnniYGirSf3VJkqWe9iUwcn8T4e0++euDqxthIWXRQykIYPoHduM7AVyeUwo6iKg==",
+        "shasum": "67896b386f1141feabd29afef71c270c578a9a81"
+      },
+      "pypi:redact-secret": {
+        "files": [
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-macosx_10_12_x86_64.whl",
+            "sha256": "54f9580af234bddbaab0e068cc2d89871759a5f794778f6bfd77cfc6b1e4164c"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-macosx_11_0_arm64.whl",
+            "sha256": "294e72ec7346e7828bc2413f8de725315c6c48bd1f341c5f24ee340b1bb89b90"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "sha256": "59a2715ad809e3128568b413e626bbb3200d43cd3ba713034d16edcd11e06e79"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "sha256": "a3d6f831b146636c74681f89d146987e6b1d3750effefd8e8e662054217912c8"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-musllinux_1_2_aarch64.whl",
+            "sha256": "6e1a8aca8d221894847a10ea22c0e1875660c285c8a7c5c24c51a9167345b311"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-musllinux_1_2_x86_64.whl",
+            "sha256": "c568eff39481a552752a1fc063193ec6cbb854ba5fba278775a237fbf4241ae2"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-win_amd64.whl",
+            "sha256": "f7ff295ba1781fadbb4b92a1658a0ea2d33f061886ff9215234f80707dd53d97"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12-cp310-abi3-win_arm64.whl",
+            "sha256": "a46491828eedfa074b37b1ffc9f520eb1e2fef66e2aeb10b63526b8569d8976a"
+          },
+          {
+            "filename": "redact_secret-0.1.0b12.tar.gz",
+            "sha256": "eeb7a664887d03a14b19d73143682a5943a29c42d6ba25612d4062a9a7fdeced"
+          }
+        ]
+      }
+    },
+    "runs": [
+      {
+        "id": 36805154806,
+        "result": "SAST passed at the frozen source revision."
+      },
+      {
+        "id": 36805155123,
+        "result": "Artifact qualification passed at the frozen source revision (push)."
+      },
+      {
+        "id": 36808558300,
+        "result": "Package Release Rehearsal passed at the frozen source revision."
+      },
+      {
+        "id": 36841178285,
+        "result": "First Release dispatch failed in CI's Benchmark pin drift ancestry check before publishing anything: benchmarks main did not contain the pinned benchmarkCommit c1e1fb32. Fixed by promoting benchmarks develop to main (benchmarks PR #597, main 68dacc4c); no source change."
+      },
+      {
+        "id": 36844232498,
+        "result": "Release re-ran qualification, published both crates, all nine PyPI files and all ten npm packages (including the facade), passed registry-install verification on all eight Node targets and Chromium, and created annotated tag v0.1.0-beta.12 at the frozen source revision. Record release manifest failed (Argument list too long, #1115); no publication was partial."
+      },
+      {
+        "id": 36847025200,
+        "result": "Reconcile Release dry run (source_commit 4227160c, source_run 36844232498): every npm package, both crates, and every PyPI file already published and matching this source revision; nothing published, tag step skipped."
+      }
+    ],
+    "tag": {
+      "name": "v0.1.0-beta.12",
+      "object": "8973ab50e068058693bcac9a0b2b8343bd327e85",
+      "target": "4227160c4dac402d7add53d3f8fe990f693912c1"
+    },
+    "verification": {
+      "browser": "chromium",
+      "independent": "On 2026-10-01 every registry was checked directly, without relying on the workflow's own reports: all ten npm packages are at 0.1.0-beta.12 with shasums equal to this manifest's published digests where comparable (dist-tag beta=0.1.0-beta.12; latest remains 0.1.0-beta.11); both crate checksums equal the inventory's crate digests and neither is yanked; all nine PyPI file hashes equal the inventory's Python entries; git tag v0.1.0-beta.12 resolves on origin to annotated object 8973ab50e068058693bcac9a0b2b8343bd327e85 targeting 4227160c4dac402d7add53d3f8fe990f693912c1.",
+      "node": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "x86_64-unknown-linux-musl",
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc"
+      ],
+      "run": 36844232498
+    }
+  },
+  "source_revision": "4227160c4dac402d7add53d3f8fe990f693912c1",
+  "support_matrix_drift": {
+    "baseline": {
+      "generatedAt": "2026-09-29T17:18:37.076Z",
+      "revision": "ec9ffbecb06a9411ec5e9e4490cd0d59511043e0",
+      "runId": "02b5a600-3120-4cb4-a544-2729a08228ce"
+    },
+    "candidate": {
+      "generatedAt": "2026-10-01T01:51:54.844Z",
+      "revision": "f35037073a3cd9bc1269f62e4c51b7d9f457515e",
+      "runId": "dbbeea5b-c769-43dc-853f-4c0f5484c7c0"
+    },
+    "familyCount": 173,
+    "generatedAt": "2026-10-01T09:43:25.552019+00:00",
+    "improvements": [
+      {
+        "baselineStatus": "pending",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "LLM-Runner-Router (independent implementation)",
+            "Vulnetix vnx-sec-315",
+            "keychecker (independent implementation)"
+          ],
+          "detectors": [
+            "ai21-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 3,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-implementation",
+              "independent-research",
+              "peer-scanner-rule"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "AI21Client(api_key=...), ChatAI21(api_key=...), new AI21({ apiKey }) and a litellm ai21/ model api_key",
+              "Authorization: Bearer on a curl line naming api.ai21.com, and a gateway log line naming the host",
+              "JSON ai21ApiKey field",
+              "same line as AI21_API_KEY (dotenv, shell export, compose, CI env, docker run -e, tool-call export)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "AI21 states no prefix, length or alphabet, and its SDK does no validation. The 32-alphanumeric shape rests on one peer rule (Vulnetix vnx-sec-315) and two independent implementations (keychecker, LLM-Runner-Router) that accept exactly [A-Za-z0-9]{32}, plus a ten-sample maintainer observation (#784). AI21 staff committed six key literals to public example code (2023-2025), each 32 mixed alphanumerics and none a UUID; their validity is unknown, and whether a provider-committed literal counts as a provider example is maintainer ruling Q-AI (redact-secret#1013), pending, so they are not counted. The value has no marker of its own, so it is claimed only beside a same-line AI21 name, host or SDK constructor. No pinned scanner has an AI21 rule, and no provider-issued key has been measured."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 26,
+            "confusionAxes": 8,
+            "contextTwinPairs": 12,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 17,
+            "totalFixtures": 60,
+            "twinPairs": 17
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 17,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "ai21:api-key",
+        "familyName": "API key (unprefixed)",
+        "provider": "ai21"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "betterleaks",
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "anthropic-admin01-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 8,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 15,
+            "positiveCases": 15,
+            "totalFixtures": 39,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "the provider documents sk-ant-admin01- as the Admin API key prefix, created by organization admins and shown once; the 93-character body and AA tail are tool-corroborated",
+            "formatVersion": "Key prefix table: sk-ant-admin01-... (Console Admin API key)",
+            "observedAt": "2026-09-26",
+            "url": "https://platform.claude.com/docs/en/manage-claude/admin-api-keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "anthropic:admin-api-key",
+        "familyName": "Admin API key (sk-ant-admin01-)",
+        "provider": "anthropic"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "anthropic-api01-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 8,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 15,
+            "positiveCases": 15,
+            "totalFixtures": 37,
+            "twinPairs": 7
+          },
+          "providerSource": {
+            "covers": "the provider documents sk-ant-api01- as the prefix of a Claude Enterprise key and quotes \"sk-ant-api01- is a Compliance Access Key\"; it states no body length, alphabet or tail",
+            "formatVersion": "Key type table: Compliance Access Key (sk-ant-api01-...)",
+            "observedAt": "2026-09-26",
+            "url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 7,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "anthropic:compliance-access-key",
+        "familyName": "Enterprise organization key (sk-ant-api01-)",
+        "provider": "anthropic"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "anthropic-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 6,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 9,
+            "positiveCases": 12,
+            "totalFixtures": 26,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "the provider identifies sk-ant-api03- as the Claude API key prefix; the 93-character body, alphabet and AA suffix remain tool-corroborated",
+            "formatVersion": "Claude API key prefix table",
+            "observedAt": "2026-09-23",
+            "url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "anthropic:secret-api-key",
+        "familyName": "Secret API key",
+        "provider": "anthropic"
+      },
+      {
+        "baselineStatus": "unsupported",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "awslabs/ferret-scan (AWS-authored, R2 not applied)",
+            "awslabs/git-secrets (AWS-authored, R2 not applied)",
+            "noseyparker",
+            "osv-scalibr",
+            "trufflehog (HEAD)"
+          ],
+          "detectors": [
+            "aws-secret-access-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 5,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "\"SecretAccessKey\": \"...\" JSON and CloudFormation/SDK responses",
+              "AWS_SECRET_ACCESS_KEY= / aws_secret_access_key = assignments in env, INI credentials files and shell",
+              "a value on the line of, or directly below, an AKIA access key ID"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "AWS states no length or alphabet for the secret access key in prose (IAM AccessKey and STS Credentials type it as String). The 40-character [A-Za-z0-9/+] shape rests on the STS GetAccessKeyInfo documentation example and on AWS-owned scanner rules (git-secrets, ferret-scan), which R2 has not been applied to, plus independent peer rules. The value has no prefix, so the family is claimed only under an AWS secret-key name or next to an AKIA/ASIA ID; AWS Macie also requires a keyword. The temporary (ASIA-paired) secret example is 41 characters and is scoped out. Research: redact-secret docs/audits/evidence/1012/aws-iam-user-secret-access-key.md at product main 4fb7882. Peer and AWS-owned rules are cited at tag or short-commit permalinks whose paths carry no 40-character [A-Za-z0-9/] run, so the record passes its own credential-shape guard."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 23,
+            "confusionAxes": 9,
+            "contextTwinPairs": 13,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 17,
+            "totalFixtures": 60,
+            "twinPairs": 20
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 20,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "aws:iam-user-secret-access-key",
+        "familyName": "IAM user secret access key",
+        "provider": "aws"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "azure-devops-personal-access-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 7,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 10,
+            "positiveCases": 12,
+            "totalFixtures": 29,
+            "twinPairs": 9
+          },
+          "providerSource": {
+            "covers": "tokens are 84 characters long with a fixed AZDO signature at positions 76-80; Microsoft Purview separately supplies the alphanumeric detail used by the pattern",
+            "formatVersion": "84-character PAT with AZDO signature",
+            "observedAt": "2026-09-23",
+            "url": "https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate#pat-format"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "azure-devops:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "azure-devops"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1"
+          ],
+          "detectors": [
+            "cohere-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "cohere.ClientV2(api_key=...) and Authorization: Bearer on a line naming the Cohere API host",
+              "same line as the word cohere or CO_API_KEY, COHERE_API_KEY"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "No Cohere page or SDK code states a prefix, length or alphabet; the 40-alphanumeric shape is one gitleaks rule's inference, and GitGuardian's detector reports the key as unprefixed with no length. The value has no marker, so it is claimed only beside a same-line cohere name or CO_API_KEY. A blog's co- prefix contradicts both scanner sources. No provider-issued key has been captured through #205 intake."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 31,
+            "confusionAxes": 8,
+            "contextTwinPairs": 14,
+            "controlAxes": 6,
+            "positiveAxes": 17,
+            "positiveCases": 27,
+            "totalFixtures": 78,
+            "twinPairs": 20
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 20,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "cohere:api-key",
+        "familyName": "API key (unprefixed)",
+        "provider": "cohere"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "confluent-cloud-api-secret-legacy"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 2,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 6,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "CONFLUENT_CLOUD_API_SECRET=<secret> in env, shell export, CI/k8s YAML",
+              "confluent api-key store <key-id> <secret>",
+              "confluent_cloud_api_secret = \"<secret>\" (tfvars), confluentApiSecret JS constant",
+              "curl -u <key-id>:<secret> https://api.confluent.cloud/...",
+              "librdkafka config line carrying a *.confluent.cloud bootstrap host and sasl.password",
+              "same line as a case-insensitive confluent keyword",
+              "schema.registry.url=https://<key-id>:<secret>@psrc-....confluent.cloud"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Confluent documents no grammar for the unprefixed pre-2025-07-30 secret: the 64-character [A-Za-z0-9+/] shape rests on provider examples, the provider's Terraform test data and two peer rules, while one provider Basic-auth example is shorter (about 60) and no new legacy secret can be issued to re-check. A bare 64-byte base64-alphabet run has no marker of its own (a 64-hex digest fits it too), so the value is only claimed beside a confluent keyword."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 23,
+            "confusionAxes": 9,
+            "contextTwinPairs": 12,
+            "controlAxes": 6,
+            "positiveAxes": 17,
+            "positiveCases": 19,
+            "totalFixtures": 60,
+            "twinPairs": 18
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 18,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "confluent:cloud-api-secret-legacy",
+        "familyName": "Cloud API secret (unprefixed, pre-2025-07-30)",
+        "provider": "confluent"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "betterleaks",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "deepgram-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 2,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "DeepgramClient(api_key=...) and Authorization: Token on a line naming the Deepgram API host",
+              "same line as the word deepgram, e.g. DEEPGRAM_API_KEY=, api.deepgram.com"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "No Deepgram page or SDK code states a prefix, length or alphabet, and the docs' 32-hex example is an ascending-digit placeholder. trufflehog admits [0-9a-z]{40} and betterleaks [a-f0-9]{40}; the contract keeps lowercase hex, which both admit. The value has no marker, so it is claimed only beside a same-line Deepgram name, host or constructor. No provider-issued key has been captured through #205 intake."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 30,
+            "confusionAxes": 8,
+            "contextTwinPairs": 16,
+            "controlAxes": 6,
+            "positiveAxes": 18,
+            "positiveCases": 29,
+            "totalFixtures": 81,
+            "twinPairs": 22
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 22,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "deepgram:api-key",
+        "familyName": "API key (unprefixed)",
+        "provider": "deepgram"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "noseyparker",
+            "secretlint",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "github-fine-grained-pat"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 4,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-implementation",
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 8,
+            "corroborationReferences": 11,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              ".env / shell export / CI or compose environment assignment (GH_TOKEN, GITHUB_PAT, RENOVATE_TOKEN)",
+              "Authorization: Bearer header and an octokit debug log 'token ' header value",
+              "JSON (composer auth.json) and Terraform provider token string",
+              "bare github_pat_ value anywhere on a line (the prefix is the marker)",
+              "gh auth login --with-token stdin",
+              "git remote URL userinfo and git credential fill output",
+              "values with and without a leading '11' in segment 1 (neither is asserted)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "GitHub documents only the github_pat_ prefix (docs 'GitHub's token formats'); no GitHub page states the 22 + '_' + 59 body. The grammar is corroborated by three GitHub-owned redaction and DLP rules (which redact, never generate or validate), one full-length value in GitHub's own REST 'Revoke a list of credentials' example, two pinned peer rules (osv-scalibr, trivy) and four independent validators. A GitHub product manager endorsed the exact regex in community discussion 36441 (2022-10-24); whether that staff reply (R3) or the GitHub-owned code (R1/R9) is a T1 grammar statement is maintainer ruling Q-GH (redact-secret#1013), pending, so the family stays T2. No checksum, fixed '11' lead or GHES parity is claimed, and peer rules that admit other widths (trufflehog 36-255, CredSweeper 80-255, \\w{82}) are recorded as supersets. No provider-issued token has been measured."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 13,
+            "positiveCases": 17,
+            "totalFixtures": 40,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "github:fine-grained-personal-access-token",
+        "familyName": "Fine-grained personal access token",
+        "provider": "github"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "mailchimp-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 7,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 6,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "same-line mailchimp keyword assignment (e.g. MAILCHIMP_API_KEY=<value>), bare, double-quoted, or after a CRLF comment line",
+              "suffix -us + one or two digits (no other data-center literal is claimed)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Mailchimp states the shape only by examples: its fundamentals page shows a 31-hex-character body with -us6, and its own WordPress plugin shows 32 hex with -us19, matching every tool and 111 of 115 public-code candidates (redact-secret#699); the contract follows the 32-byte example. The fundamentals page says the data center is always appended as key-dc. Hex case and the data-center alphabet (only us<N> is ever shown) are not stated by the provider. The only staff statement (2009) advises against regex validation because keys may change. Non-us data-center literals and g-z body letters are outside the claim since 2026-09-24 (docs/decisions/2026-09-24-stop-asserting-provider-undecided-format-properties.md): no scored fixture asserts them either way, so the product's handling of them is unmeasured."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 19,
+            "positiveCases": 24,
+            "totalFixtures": 50,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "mailchimp:marketing-api-key",
+        "familyName": "Marketing API key",
+        "provider": "mailchimp"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "betterleaks",
+            "osv-scalibr",
+            "pleno-dlp"
+          ],
+          "detectors": [
+            "mistral-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 2,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-implementation",
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example"
+            ],
+            "corroborationOwners": 7,
+            "corroborationReferences": 8,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "Authorization: Bearer on a line naming the Mistral API host",
+              "same line as the word mistral, e.g. MISTRAL_API_KEY=, api.mistral.ai, Mistral(api_key=...)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Mistral states no prefix, length or alphabet in prose and its SDK does no validation. Its own Admin API OpenAPI schema (APIKeyExtendedOUT, synced to the docs 2026-07-24) shows one full-length example key: 32 alphanumeric characters, no prefix. Three tool rules (osv-scalibr, betterleaks, pleno-dlp) read as one assertion of 32 alphanumerics beside a Mistral name, and three independent client validators (GitLens, GPTPortal, NeuroLink) accept exactly ^[A-Za-z0-9]{32}$. The value has no marker of its own, so it is claimed only beside a same-line Mistral name, host or constructor. GitGuardian lists a second, prefixed 'Mistral AI API Key v2' with an undisclosed prefix that no Mistral source mentions. No pinned scanner has a Mistral rule. No provider-issued key has been captured through #205 intake."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 26,
+            "confusionAxes": 8,
+            "contextTwinPairs": 12,
+            "controlAxes": 6,
+            "positiveAxes": 12,
+            "positiveCases": 25,
+            "totalFixtures": 68,
+            "twinPairs": 17
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 17,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "mistral:api-key",
+        "familyName": "Studio API key (unprefixed)",
+        "provider": "mistral"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4",
+            "trufflehog issue 4698 (admin-key request)"
+          ],
+          "detectors": [
+            "openai-admin-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 2,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 6,
+            "corroborationReferences": 6,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              ".env / shell export / compose environment assignment (OPENAI_ADMIN_KEY)",
+              "58 + T3BlbkFJ + 58 bodies only; a 74/74 body is outside the claim and not asserted either way",
+              "Authorization: Bearer header on a curl command line",
+              "CLI flag argument and a Python requests Authorization header dict",
+              "JSON / TOML / tfvars config value, CI variables (GitHub Actions, GitLab) and tool-call JSON argument",
+              "OpenAI SDK constructor argument (Python admin_api_key=, TypeScript adminAPIKey)",
+              "application log line",
+              "bare sk-admin- value with the T3BlbkFJ marker anywhere on a line (the prefix and marker are the markers)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "No OpenAI page states a length or alphabet for sk-admin- keys; OpenAI's OpenAPI spec shows only short placeholders. openai/codex (provider code, a recognizer that neither generates nor validates a width) fixes the sk-admin- prefix and the T3BlbkFJ watermark. The 58 + T3BlbkFJ + 58 width (133 characters) rests on four peer owners: trufflehog 3.97.4's dedicated openaiadmin detector, gitleaks 8.30.1 (whose three admin vectors are 58/58), nuclei-templates and poltergeist. No source anywhere shows a 74/74 admin value, which gitleaks admits only through the width union shared with sk-proj-/sk-svcacct-; the benchmark claim is 58/58 and 74/74 is outside it (bounded below), while the product keeps accepting 74/74. A marker-less body is out of contract. No provider-issued key has been measured."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 17,
+            "positiveCases": 19,
+            "totalFixtures": 43,
+            "twinPairs": 9
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "openai:admin-api-key",
+        "familyName": "Admin API key (sk-admin-)",
+        "provider": "openai"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "slack-user-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 11,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 11,
+            "totalFixtures": 27,
+            "twinPairs": 5
+          },
+          "providerSource": {
+            "covers": "the provider states user tokens begin with xoxp-, that tokens are dash-separated sections with the secret last, and shows a three-numeric-section example; it states no section widths or secret alphabet, says pre-August-2016 user tokens may carry 6- or 10-character secrets, and the 2016 token-lengthening changelog warns against relying on perceived token semantics",
+            "formatVersion": "xoxp- user token, dash-separated sections, secret last",
+            "observedAt": "2026-09-24",
+            "url": "https://docs.slack.dev/authentication/tokens"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "slack:user-token",
+        "familyName": "User token",
+        "provider": "slack"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "stripe-webhook-signing-secret"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 10,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 11,
+            "totalFixtures": 26,
+            "twinPairs": 5
+          },
+          "providerSource": {
+            "covers": "the whsec_ prefix and the per-endpoint configuration context; no body length or alphabet",
+            "formatVersion": "whsec_ webhook endpoint signing secret",
+            "observedAt": "2026-09-24",
+            "url": "https://docs.stripe.com/webhooks"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "stripe:webhook-signing-secret",
+        "familyName": "Webhook signing secret",
+        "provider": "stripe"
+      },
+      {
+        "baselineStatus": "pending",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "betterleaks",
+            "kingfisher"
+          ],
+          "detectors": [
+            "vercel-app-access-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 5,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "Authorization: Bearer headers and JSON token fields",
+              "VERCEL_TOKEN= / --token and other env or CLI assignments",
+              "bare value on a line"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "Vercel documents the vca_ prefix; the exact 56-character [A-Za-z0-9] body rests on one provider documentation value and peer rules (T2). Research: https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1013/vercel.md."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 14,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 11,
+            "positiveCases": 18,
+            "totalFixtures": 40,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "vercel:app-access-token",
+        "familyName": "App access token",
+        "provider": "vercel"
+      },
+      {
+        "baselineStatus": "pending",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "betterleaks",
+            "kingfisher"
+          ],
+          "detectors": [
+            "vercel-app-refresh-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "peer-scanner-rule",
+              "provider-example"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "Authorization: Bearer headers and JSON token fields",
+              "VERCEL_TOKEN= / --token and other env or CLI assignments",
+              "bare value on a line"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "Vercel documents the vcr_ prefix; the body width is shared with the vca_ documentation value (T2) and corroborated by peer rules only. Research: https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1013/vercel.md."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 14,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 10,
+            "positiveCases": 18,
+            "totalFixtures": 40,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "vercel:app-refresh-token",
+        "familyName": "App refresh token",
+        "provider": "vercel"
+      },
+      {
+        "baselineStatus": "pending",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "CredSweeper",
+            "betterleaks",
+            "kingfisher"
+          ],
+          "detectors": [
+            "vercel-personal-access-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "peer-scanner-rule",
+              "provider-example"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 5,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "Authorization: Bearer headers and JSON token fields",
+              "VERCEL_TOKEN= / --token and other env or CLI assignments",
+              "bare value on a line"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "Vercel documents the vcp_ prefix and states the body is opaque. The exact 56-character [A-Za-z0-9] body rests on one hand-written provider CLI example and peer rules (T2); the CRC32 base62 tail is corroboration only and never rejects. Research: https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1013/vercel.md."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 14,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 9,
+            "positiveCases": 18,
+            "totalFixtures": 40,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "vercel:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "vercel"
+      }
+    ],
+    "newAndUnclassified": [
+      {
+        "family": "axiom:api-token",
+        "familyName": "API token (xaat-)",
+        "provider": "axiom",
+        "status": "stable"
+      },
+      {
+        "family": "axiom:personal-token",
+        "familyName": "Personal access token (xapt-)",
+        "provider": "axiom",
+        "status": "stable"
+      },
+      {
+        "family": "bitwarden:secrets-manager-access-token",
+        "familyName": "Secrets Manager access token (0. + UUID layout)",
+        "provider": "bitwarden",
+        "status": "stable"
+      },
+      {
+        "family": "browserbase:api-key",
+        "familyName": "API key (bb_live_)",
+        "provider": "browserbase",
+        "status": "stable"
+      },
+      {
+        "family": "cerebras:inference-api-key",
+        "familyName": "Inference API key (csk-)",
+        "provider": "cerebras",
+        "status": "stable"
+      },
+      {
+        "family": "clickhouse-cloud:api-key",
+        "familyName": "API key secret (4b1d)",
+        "provider": "clickhouse-cloud",
+        "status": "stable"
+      },
+      {
+        "family": "clojars:deploy-token",
+        "familyName": "Deploy token (CLOJARS_)",
+        "provider": "clojars",
+        "status": "stable"
+      },
+      {
+        "family": "crates-io:api-token",
+        "familyName": "API token (cio)",
+        "provider": "crates-io",
+        "status": "stable"
+      },
+      {
+        "family": "crates-io:trusted-publishing-token",
+        "familyName": "Trusted-publishing token (cio_tp_)",
+        "provider": "crates-io",
+        "status": "stable"
+      },
+      {
+        "family": "daytona:api-key",
+        "familyName": "API key (dtn_)",
+        "provider": "daytona",
+        "status": "stable"
+      },
+      {
+        "family": "dynatrace:api-token",
+        "familyName": "Access and platform token (dt0c01, dt0s..)",
+        "provider": "dynatrace",
+        "status": "stable"
+      },
+      {
+        "family": "google:oauth-client-secret",
+        "familyName": "OAuth client secret",
+        "provider": "google",
+        "status": "stable"
+      },
+      {
+        "family": "honeycomb:ingest-key",
+        "familyName": "Ingest key (hcXik_, hcXic_)",
+        "provider": "honeycomb",
+        "status": "stable"
+      },
+      {
+        "family": "nvidia:ngc-api-key",
+        "familyName": "API key (nvapi-)",
+        "provider": "nvidia",
+        "status": "stable"
+      },
+      {
+        "family": "paddle:api-key",
+        "familyName": "Billing API key (pdl_live_/pdl_sdbx_apikey_)",
+        "provider": "paddle",
+        "status": "stable"
+      },
+      {
+        "family": "polar:api-credential",
+        "familyName": "API credentials (polar_pat_, polar_at_, polar_rt_, polar_cs_, polar_crt_)",
+        "provider": "polar",
+        "status": "stable"
+      },
+      {
+        "family": "polar:organization-access-token",
+        "familyName": "Organization access token (polar_oat_)",
+        "provider": "polar",
+        "status": "stable"
+      },
+      {
+        "family": "rubygems:api-key",
+        "familyName": "API key (rubygems_)",
+        "provider": "rubygems",
+        "status": "stable"
+      },
+      {
+        "family": "runpod:api-key",
+        "familyName": "API key (rpa_)",
+        "provider": "runpod",
+        "status": "stable"
+      },
+      {
+        "family": "sonarqube:analysis-token",
+        "familyName": "Analysis tokens (sqa_, sqp_)",
+        "provider": "sonarqube",
+        "status": "stable"
+      },
+      {
+        "family": "sonarqube:user-token",
+        "familyName": "User token (squ_)",
+        "provider": "sonarqube",
+        "status": "stable"
+      }
+    ],
+    "regressions": [],
+    "schemaVersion": 1,
+    "staleProviderProvenance": [
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "composio-org-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 10,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 7,
+            "positiveCases": 13,
+            "totalFixtures": 33,
+            "twinPairs": 10
+          },
+          "providerSource": {
+            "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes oak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-org-api-key header",
+            "formatVersion": "provider staff statement of 2026-09-17 (oak_ + 20 nanoid)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes oak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-org-api-key header",
+          "formatVersion": "provider staff statement of 2026-09-17 (oak_ + 20 nanoid)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "composio-org-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 10,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 16,
+            "totalFixtures": 36,
+            "twinPairs": 10
+          },
+          "providerSource": {
+            "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes oak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-org-api-key header",
+            "formatVersion": "provider staff statement of 2026-09-17 (oak_ + 20 nanoid)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes oak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-org-api-key header",
+          "formatVersion": "provider staff statement of 2026-09-17 (oak_ + 20 nanoid)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+        },
+        "candidateStatus": "stable",
+        "family": "composio:org-api-key",
+        "familyName": "Org API key (oak_)",
+        "provider": "composio"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "composio-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 8,
+            "positiveCases": 16,
+            "totalFixtures": 45,
+            "twinPairs": 14
+          },
+          "providerSource": {
+            "covers": "a dated statement by Composio's Head of Security (ruling R3) and the provider OpenAPI example fix ak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-api-key header",
+            "formatVersion": "provider staff statement of 2026-09-17 (ak_ + 20 nanoid) and the provider OpenAPI example (ak_ + 20)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "a dated statement by Composio's Head of Security (ruling R3) and the provider OpenAPI example fix ak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-api-key header",
+          "formatVersion": "provider staff statement of 2026-09-17 (ak_ + 20 nanoid) and the provider OpenAPI example (ak_ + 20)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "composio-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 10,
+            "positiveCases": 19,
+            "totalFixtures": 48,
+            "twinPairs": 14
+          },
+          "providerSource": {
+            "covers": "a dated statement by Composio's Head of Security (ruling R3) and the provider OpenAPI example fix ak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-api-key header",
+            "formatVersion": "provider staff statement of 2026-09-17 (ak_ + 20 nanoid) and the provider OpenAPI example (ak_ + 20)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "a dated statement by Composio's Head of Security (ruling R3) and the provider OpenAPI example fix ak_ + exactly 20 [A-Za-z0-9_-]; the docs name the prefix and the x-api-key header",
+          "formatVersion": "provider staff statement of 2026-09-17 (ak_ + 20 nanoid) and the provider OpenAPI example (ak_ + 20)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+        },
+        "candidateStatus": "stable",
+        "family": "composio:project-api-key",
+        "familyName": "Project API key (ak_)",
+        "provider": "composio"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "composio-user-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 10,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 7,
+            "positiveCases": 13,
+            "totalFixtures": 33,
+            "twinPairs": 10
+          },
+          "providerSource": {
+            "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes uak_ + exactly 43 [A-Za-z0-9_-]; a CLI code comment showing uak_ + 20 is T2 under ruling R6 and does not override it",
+            "formatVersion": "provider staff statement of 2026-09-17 (uak_ + 43 nanoid); the SDK constant names uak_",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes uak_ + exactly 43 [A-Za-z0-9_-]; a CLI code comment showing uak_ + 20 is T2 under ruling R6 and does not override it",
+          "formatVersion": "provider staff statement of 2026-09-17 (uak_ + 43 nanoid); the SDK constant names uak_",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "composio-user-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 10,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 16,
+            "totalFixtures": 36,
+            "twinPairs": 10
+          },
+          "providerSource": {
+            "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes uak_ + exactly 43 [A-Za-z0-9_-]; a CLI code comment showing uak_ + 20 is T2 under ruling R6 and does not override it",
+            "formatVersion": "provider staff statement of 2026-09-17 (uak_ + 43 nanoid); the SDK constant names uak_",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "a dated statement by Composio's Head of Security (ruling R3) fixes uak_ + exactly 43 [A-Za-z0-9_-]; a CLI code comment showing uak_ + 20 is T2 under ruling R6 and does not override it",
+          "formatVersion": "provider staff statement of 2026-09-17 (uak_ + 43 nanoid); the SDK constant names uak_",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/trufflesecurity/trufflehog/issues/5321"
+        },
+        "candidateStatus": "stable",
+        "family": "composio:user-api-key",
+        "familyName": "User API key (uak_)",
+        "provider": "composio"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "e2b-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 10,
+            "positiveCases": 16,
+            "totalFixtures": 42,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "provider code (ruling R1): e2b_ + exactly 40 lowercase hex (20 random bytes, Go hex encoding), 44 in all, no separator or checksum; the local-dev seed test asserts len(prefix) + 2*20",
+            "formatVersion": "e2b-dev/infra keys: ApiKeyPrefix = \"e2b_\", keyLength = 20 random bytes, hex.EncodeToString (re-checked 2026-09-28)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/e2b-dev/infra/blob/132dadd2ef55bbac301528500e8a4538caf4b163/packages/shared/pkg/keys/key.go#L15-L74"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "provider code (ruling R1): e2b_ + exactly 40 lowercase hex (20 random bytes, Go hex encoding), 44 in all, no separator or checksum; the local-dev seed test asserts len(prefix) + 2*20",
+          "formatVersion": "e2b-dev/infra keys: ApiKeyPrefix = \"e2b_\", keyLength = 20 random bytes, hex.EncodeToString (re-checked 2026-09-28)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/e2b-dev/infra/blob/132dadd2ef55bbac301528500e8a4538caf4b163/packages/shared/pkg/keys/key.go#L15-L74"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "e2b-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 10,
+            "positiveCases": 17,
+            "totalFixtures": 43,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "provider code (ruling R1): e2b_ + exactly 40 lowercase hex (20 random bytes, Go hex encoding), 44 in all, no separator or checksum; the local-dev seed test asserts len(prefix) + 2*20",
+            "formatVersion": "e2b-dev/infra keys: ApiKeyPrefix = \"e2b_\", keyLength = 20 random bytes, hex.EncodeToString (re-checked 2026-09-28)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/e2b-dev/infra/blob/132dadd2ef55bbac301528500e8a4538caf4b163/packages/shared/pkg/keys/key.go#L15-L74"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "provider code (ruling R1): e2b_ + exactly 40 lowercase hex (20 random bytes, Go hex encoding), 44 in all, no separator or checksum; the local-dev seed test asserts len(prefix) + 2*20",
+          "formatVersion": "e2b-dev/infra keys: ApiKeyPrefix = \"e2b_\", keyLength = 20 random bytes, hex.EncodeToString (re-checked 2026-09-28)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/e2b-dev/infra/blob/132dadd2ef55bbac301528500e8a4538caf4b163/packages/shared/pkg/keys/key.go#L15-L74"
+        },
+        "candidateStatus": "stable",
+        "family": "e2b:api-key",
+        "familyName": "Team API key (e2b_)",
+        "provider": "e2b"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "firecrawl-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 10,
+            "positiveCases": 16,
+            "totalFixtures": 45,
+            "twinPairs": 14
+          },
+          "providerSource": {
+            "covers": "the docs and SDK document the fc- prefix; provider server code (ruling R1) makes the body a dashless lowercase random UUIDv4 (32 hex, version nibble 4, variant 8/9/a/b), 35 in all",
+            "formatVersion": "parseApi.ts strips fc- and re-inserts the 8-4-4-4-12 dashes (last changed 2026-05-15, re-checked 2026-09-28); api_keys.key is uuid().defaultRandom()",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/firecrawl/firecrawl/blob/f75a8d40b103129f56f947418bfa06a04a9ad5b0/apps/api/src/lib/parseApi.ts"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "the docs and SDK document the fc- prefix; provider server code (ruling R1) makes the body a dashless lowercase random UUIDv4 (32 hex, version nibble 4, variant 8/9/a/b), 35 in all",
+          "formatVersion": "parseApi.ts strips fc- and re-inserts the 8-4-4-4-12 dashes (last changed 2026-05-15, re-checked 2026-09-28); api_keys.key is uuid().defaultRandom()",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/firecrawl/firecrawl/blob/f75a8d40b103129f56f947418bfa06a04a9ad5b0/apps/api/src/lib/parseApi.ts"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "firecrawl-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 19,
+            "totalFixtures": 48,
+            "twinPairs": 14
+          },
+          "providerSource": {
+            "covers": "the docs and SDK document the fc- prefix; provider server code (ruling R1) makes the body a dashless lowercase random UUIDv4 (32 hex, version nibble 4, variant 8/9/a/b), 35 in all",
+            "formatVersion": "parseApi.ts strips fc- and re-inserts the 8-4-4-4-12 dashes (last changed 2026-05-15, re-checked 2026-09-28); api_keys.key is uuid().defaultRandom()",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/firecrawl/firecrawl/blob/f75a8d40b103129f56f947418bfa06a04a9ad5b0/apps/api/src/lib/parseApi.ts"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "the docs and SDK document the fc- prefix; provider server code (ruling R1) makes the body a dashless lowercase random UUIDv4 (32 hex, version nibble 4, variant 8/9/a/b), 35 in all",
+          "formatVersion": "parseApi.ts strips fc- and re-inserts the 8-4-4-4-12 dashes (last changed 2026-05-15, re-checked 2026-09-28); api_keys.key is uuid().defaultRandom()",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/firecrawl/firecrawl/blob/f75a8d40b103129f56f947418bfa06a04a9ad5b0/apps/api/src/lib/parseApi.ts"
+        },
+        "candidateStatus": "stable",
+        "family": "firecrawl:api-key",
+        "familyName": "API key (fc-)",
+        "provider": "firecrawl"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "generic-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 76,
+            "confusionAxes": 5,
+            "contextTwinPairs": 10,
+            "controlAxes": 4,
+            "positiveAxes": 30,
+            "positiveCases": 71,
+            "totalFixtures": 157,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "generic-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 76,
+            "confusionAxes": 5,
+            "contextTwinPairs": 10,
+            "controlAxes": 4,
+            "positiveAxes": 36,
+            "positiveCases": 79,
+            "totalFixtures": 165,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "generic:unclassified-assignment-literal",
+        "familyName": "Unclassified assignment literal",
+        "provider": null
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "helicone-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 7,
+            "positiveCases": 14,
+            "totalFixtures": 43,
+            "twinPairs": 14
+          },
+          "providerSource": {
+            "covers": "provider validator regexes (ruling R1): sk-helicone- with optional -eu and -rl, then four 7-byte [a-z0-9] groups (43/46/49 in all); the server generator builds sk-helicone-proxy- + the same groups + - + a lowercase UUID (86 in all)",
+            "formatVersion": "worker apiKeyRegex.ts (last changed 2025-04-29, re-checked 2026-09-28) and KeyManager.ts proxy-key builder",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/Helicone/helicone/blob/067d9290acb4f1fc9320e902fc67b4b399b50363/worker/src/lib/util/apiKeyRegex.ts"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "provider validator regexes (ruling R1): sk-helicone- with optional -eu and -rl, then four 7-byte [a-z0-9] groups (43/46/49 in all); the server generator builds sk-helicone-proxy- + the same groups + - + a lowercase UUID (86 in all)",
+          "formatVersion": "worker apiKeyRegex.ts (last changed 2025-04-29, re-checked 2026-09-28) and KeyManager.ts proxy-key builder",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/Helicone/helicone/blob/067d9290acb4f1fc9320e902fc67b4b399b50363/worker/src/lib/util/apiKeyRegex.ts"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "helicone-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 16,
+            "totalFixtures": 45,
+            "twinPairs": 14
+          },
+          "providerSource": {
+            "covers": "provider validator regexes (ruling R1): sk-helicone- with optional -eu and -rl, then four 7-byte [a-z0-9] groups (43/46/49 in all); the server generator builds sk-helicone-proxy- + the same groups + - + a lowercase UUID (86 in all)",
+            "formatVersion": "worker apiKeyRegex.ts (last changed 2025-04-29, re-checked 2026-09-28) and KeyManager.ts proxy-key builder",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/Helicone/helicone/blob/067d9290acb4f1fc9320e902fc67b4b399b50363/worker/src/lib/util/apiKeyRegex.ts"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "provider validator regexes (ruling R1): sk-helicone- with optional -eu and -rl, then four 7-byte [a-z0-9] groups (43/46/49 in all); the server generator builds sk-helicone-proxy- + the same groups + - + a lowercase UUID (86 in all)",
+          "formatVersion": "worker apiKeyRegex.ts (last changed 2025-04-29, re-checked 2026-09-28) and KeyManager.ts proxy-key builder",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/Helicone/helicone/blob/067d9290acb4f1fc9320e902fc67b4b399b50363/worker/src/lib/util/apiKeyRegex.ts"
+        },
+        "candidateStatus": "stable",
+        "family": "helicone:api-key",
+        "familyName": "Read-write key (sk-helicone-)",
+        "provider": "helicone"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "okta-api-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 4,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 6,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "Authorization: SSWS <value> header",
+              "either context bare, double-quoted, or after a CRLF comment line",
+              "same-line okta keyword assignment (e.g. OKTA_API_TOKEN=<value>)",
+              "token values that do not end in '-' (a trailing '-' is outside the benchmark claim)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Okta shows the token only as an elided SSWS example beginning 00, and its only staff statement (2023) says not to assume a set structure; the 40-byte body and alphabet rest on tools and a 2019 community answer. Tools disagree on '=' in the body and GitGuardian does not treat 00 as a prefix; no issued token has been measured."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 16,
+            "totalFixtures": 40,
+            "twinPairs": 9
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "okta-api-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 4,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 8,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "Authorization: SSWS <value> header",
+              "either context bare, double-quoted, or after a CRLF comment line",
+              "same-line okta keyword assignment (e.g. OKTA_API_TOKEN=<value>)",
+              "token values that do not end in '-' (a trailing '-' is outside the benchmark claim)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Okta states no length or alphabet in prose. It shows the token as an elided SSWS example beginning 00, and three dated, distinct full-length examples in its own repositories (developer docs guide, management OpenAPI spec 2025-2026, an API-security book page 2019), all 00 + 40 alphanumeric. A 2019 devforum answer ('always 42 characters', regex 00 + 40 [a-zA-Z0-9-_]) comes from an account whose staff status is not confirmed on the forum. Both 2023 items in this record come from one devforum thread (2023-09-21): an Okta team reply saying not to assume a set structure (and that there are no plans to change it) and a customer's alphabet reading. gitleaks' '=' comes from its generic AlphaNumericExtended helper, not from Okta evidence, and GitGuardian does not treat 00 as a prefix. The four open contradictions below carry the dispositions redact-secret#1013 proposes, pending maintainer ruling Q-OK; until ruled they stay unresolved. No issued token has been measured."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 16,
+            "totalFixtures": 40,
+            "twinPairs": 9
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "okta:api-token",
+        "familyName": "Management API token (SSWS)",
+        "provider": "okta"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "pinecone-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "bare value (pcsk_ plus a 5-6 character label and a 63-character secret)",
+              "double-quoted assignment value",
+              "value on the line after an unrelated comment line (CRLF)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "The pcsk_<label>_<secret> layout is provider code (Pinecone CLI and SDK tests); the 5-6 character label and exact 63-character secret are tool-corroborated. Pinecone's Admin API docs describe an unobserved pckey_ prefix that contradicts every pcsk_ observation, and the legacy bare-UUID key is a separate context-gated family. No provider-issued key has been captured through #205 intake."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 16,
+            "positiveCases": 18,
+            "totalFixtures": 42,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "pinecone-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "bare value (pcsk_ plus a 5-6 character label and a 63-character secret)",
+              "double-quoted assignment value",
+              "value on the line after an unrelated comment line (CRLF)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "The pcsk_<label>_<secret> layout is provider code (Pinecone CLI and SDK tests); the 5-6 character label and exact 63-character secret are tool-corroborated. Pinecone's Admin API docs describe an unobserved pckey_ prefix that contradicts every pcsk_ observation, and the legacy bare-UUID key is a separate context-gated family. No provider-issued key has been captured through #205 intake."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 17,
+            "positiveCases": 19,
+            "totalFixtures": 43,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "stable",
+        "family": "pinecone:api-key",
+        "familyName": "API key (pcsk_)",
+        "provider": "pinecone"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "posthog-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 14,
+            "totalFixtures": 41,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "the docs document the phx_ personal API key; provider code and unit tests (ruling R1) fix the base57/base62 alphabet and the algorithm from which the 42\u201349 band is derived",
+            "formatVersion": "PERSONAL_API_KEY_PREFIX = \"phx_\" and generate_random_token_personal() at 658715d (re-checked 2026-09-28); docs name phx_",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "the docs document the phx_ personal API key; provider code and unit tests (ruling R1) fix the base57/base62 alphabet and the algorithm from which the 42\u201349 band is derived",
+          "formatVersion": "PERSONAL_API_KEY_PREFIX = \"phx_\" and generate_random_token_personal() at 658715d (re-checked 2026-09-28); docs name phx_",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "posthog-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 10,
+            "positiveCases": 17,
+            "totalFixtures": 44,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "the docs document the phx_ personal API key; provider code and unit tests (ruling R1) fix the base57/base62 alphabet and the algorithm from which the 42\u201349 band is derived",
+            "formatVersion": "PERSONAL_API_KEY_PREFIX = \"phx_\" and generate_random_token_personal() at 658715d (re-checked 2026-09-28); docs name phx_",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "the docs document the phx_ personal API key; provider code and unit tests (ruling R1) fix the base57/base62 alphabet and the algorithm from which the 42\u201349 band is derived",
+          "formatVersion": "PERSONAL_API_KEY_PREFIX = \"phx_\" and generate_random_token_personal() at 658715d (re-checked 2026-09-28); docs name phx_",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+        },
+        "candidateStatus": "stable",
+        "family": "posthog:personal-api-key",
+        "familyName": "Personal API key (phx_)",
+        "provider": "posthog"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "posthog-project-secret-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 11,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 8,
+            "positiveCases": 11,
+            "totalFixtures": 33,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "the docs document phs_ as a project-scoped secret for feature-flag evaluation; provider code (ruling R1) gives it the phx_ generator and body",
+            "formatVersion": "phs_ project secret API key: same generator and body as phx_ at 658715d (re-checked 2026-09-28); docs name phs_ as a secret",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "the docs document phs_ as a project-scoped secret for feature-flag evaluation; provider code (ruling R1) gives it the phx_ generator and body",
+          "formatVersion": "phs_ project secret API key: same generator and body as phx_ at 658715d (re-checked 2026-09-28); docs name phs_ as a secret",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "posthog-project-secret-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 11,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 14,
+            "totalFixtures": 36,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "the docs document phs_ as a project-scoped secret for feature-flag evaluation; provider code (ruling R1) gives it the phx_ generator and body",
+            "formatVersion": "phs_ project secret API key: same generator and body as phx_ at 658715d (re-checked 2026-09-28); docs name phs_ as a secret",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "the docs document phs_ as a project-scoped secret for feature-flag evaluation; provider code (ruling R1) gives it the phx_ generator and body",
+          "formatVersion": "phs_ project secret API key: same generator and body as phx_ at 658715d (re-checked 2026-09-28); docs name phs_ as a secret",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/PostHog/posthog/blob/658715dd3b434e0a5ada471981d4053b70e72034/posthog/models/utils.py"
+        },
+        "candidateStatus": "stable",
+        "family": "posthog:project-secret-api-key",
+        "familyName": "Project secret API key (phs_)",
+        "provider": "posthog"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "resend-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 14,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 10,
+            "positiveCases": 16,
+            "totalFixtures": 41,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "re_ + 8 alphanumerics + _ + 24 alphanumerics, 36 in all; full_access and sending_access keys share the shape",
+            "formatVersion": "resend-cli login rejects a key that does not start with re_; the create-API-key response example is re_ + 8 + _ + 24 (re-checked 2026-09-28: 36 characters, no 0/O/I/l)",
+            "observedAt": "2026-09-28",
+            "url": "https://resend.com/docs/api-reference/api-keys/create-api-key"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "re_ + 8 alphanumerics + _ + 24 alphanumerics, 36 in all; full_access and sending_access keys share the shape",
+          "formatVersion": "resend-cli login rejects a key that does not start with re_; the create-API-key response example is re_ + 8 + _ + 24 (re-checked 2026-09-28: 36 characters, no 0/O/I/l)",
+          "observedAt": "2026-09-28",
+          "url": "https://resend.com/docs/api-reference/api-keys/create-api-key"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "resend-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 14,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 11,
+            "positiveCases": 17,
+            "totalFixtures": 42,
+            "twinPairs": 11
+          },
+          "providerSource": {
+            "covers": "re_ + 8 alphanumerics + _ + 24 alphanumerics, 36 in all; full_access and sending_access keys share the shape",
+            "formatVersion": "resend-cli login rejects a key that does not start with re_; the create-API-key response example is re_ + 8 + _ + 24 (re-checked 2026-09-28: 36 characters, no 0/O/I/l)",
+            "observedAt": "2026-09-28",
+            "url": "https://resend.com/docs/api-reference/api-keys/create-api-key"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "re_ + 8 alphanumerics + _ + 24 alphanumerics, 36 in all; full_access and sending_access keys share the shape",
+          "formatVersion": "resend-cli login rejects a key that does not start with re_; the create-API-key response example is re_ + 8 + _ + 24 (re-checked 2026-09-28: 36 characters, no 0/O/I/l)",
+          "observedAt": "2026-09-28",
+          "url": "https://resend.com/docs/api-reference/api-keys/create-api-key"
+        },
+        "candidateStatus": "stable",
+        "family": "resend:api-key",
+        "familyName": "API key (re_)",
+        "provider": "resend"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "osv-scalibr veles"
+          ],
+          "detectors": [
+            "slack-app-level-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 9,
+            "confusionAxes": 8,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 10,
+            "positiveCases": 11,
+            "totalFixtures": 25,
+            "twinPairs": 5
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 1,
+            "metamorphic": 0,
+            "mutation": 3
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "osv-scalibr veles"
+          ],
+          "detectors": [
+            "slack-app-level-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 12,
+            "positiveCases": 17,
+            "totalFixtures": 40,
+            "twinPairs": 8
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "slack:app-level-token",
+        "familyName": "App-level token",
+        "provider": "slack"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 31,
+            "totalFixtures": 54,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:restricted-key-live",
+        "familyName": "Live restricted key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 31,
+            "totalFixtures": 54,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:restricted-key-test",
+        "familyName": "Test restricted key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 31,
+            "totalFixtures": 54,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:secret-key-live",
+        "familyName": "Live secret key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 15,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 31,
+            "totalFixtures": 54,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:secret-key-test",
+        "familyName": "Test secret key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "betterleaks"
+          ],
+          "detectors": [
+            "together-ai-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule"
+            ],
+            "corroborationOwners": 2,
+            "corroborationReferences": 2,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "bare value (the tgp_v1_ prefix plus exactly 43 base64url characters is the only marker)",
+              "double-quoted assignment value",
+              "value on the line after an unrelated comment line (CRLF)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "No Together page, staff statement or SDK code states the tgp_v1_ prefix, a length or an alphabet. The shape rests on one scanner rule (betterleaks; Kingfisher aliases it, so it is one lineage, not two) and a four-sample maintainer observation (#783). No pinned scanner (trufflehog 3.97.4, gitleaks 8.30.1) has a Together rule. No provider-issued key has been captured through #205 intake. A 2026-09-27 re-check of the broad-discovery sources for #783 (Reddit, Stack Overflow, GitHub code and issue search, Hacker News, and the scanner repos trufflehog main, gitleaks master, GitGuardian ggshield, osv-scalibr, secretlint, pleno-dlp and two general leak-scanner projects) found no new source for the tgp_v1_ shape itself; betterleaks/Kingfisher and #783 remain the only two owners. It did find that pleno-dlp (github.com/plenoai/pleno-dlp, tag v0.66.4, commit b3cd17fa41953a98aaafaa61aa8ab3e05882bf66) ships a Together detector for a different, sibling shape (a bare 64-character lowercase-hex string, keyword-gated on 'together'), which the corroboration decision's own rule ('a rule for a sibling shape does not count') excludes from this family's corroboration count; it is recorded below as evidence toward the open legacy-key contradiction instead."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 24,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 17,
+            "positiveCases": 22,
+            "totalFixtures": 56,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "betterleaks"
+          ],
+          "detectors": [
+            "together-ai-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 1,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule"
+            ],
+            "corroborationOwners": 4,
+            "corroborationReferences": 4,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "bare value (the tgp_v1_ prefix plus exactly 43 base64url characters is the only marker)",
+              "double-quoted assignment value",
+              "value on the line after an unrelated comment line (CRLF)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "No Together page, staff statement or SDK code states the tgp_v1_ prefix, a length or an alphabet. The exact width rests on three peer scanner rules from three owners (betterleaks; Kingfisher's native rule, added 2025-08-27 and replaced by a betterleaks alias only on 2026-08-21, so its own lineage, not an alias as recorded earlier; CredSweeper since 2026-05-11, per redact-secret#1013) and a four-sample maintainer observation (#783). Together's own CLI redactor (together-py, 2026-04-27) confirms the tgp_ prefix and a [A-Za-z0-9_-] body but states no length; whether provider code that corroborates prefix and alphabet but not the width may supply the second corroboration class is maintainer ruling Q-TG (redact-secret#1013), pending, so it is not recorded as a reference here. No pinned scanner (trufflehog 3.97.4, gitleaks 8.30.1) has a Together rule. No provider-issued key has been captured through #205 intake. A 2026-09-27 re-check of the broad-discovery sources for #783 (Reddit, Stack Overflow, GitHub code and issue search, Hacker News, and the scanner repos trufflehog main, gitleaks master, GitGuardian ggshield, osv-scalibr, secretlint, pleno-dlp and two general leak-scanner projects) found no new source for the tgp_v1_ shape itself; betterleaks/Kingfisher and #783 remained the only two owners at that date (the 2026-09-29 #1013 pass found the Kingfisher native rule and CredSweeper). It did find that pleno-dlp (github.com/plenoai/pleno-dlp, tag v0.66.4, commit b3cd17fa41953a98aaafaa61aa8ab3e05882bf66) ships a Together detector for a different, sibling shape (a bare 64-character lowercase-hex string, keyword-gated on 'together'), which the corroboration decision's own rule ('a rule for a sibling shape does not count') excludes from this family's corroboration count; it is recorded below as evidence toward the open legacy-key contradiction instead."
+          },
+          "evidenceBasis": "independently-corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 24,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 17,
+            "positiveCases": 22,
+            "totalFixtures": 56,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "together:api-key",
+        "familyName": "Project API key (tgp_v1_)",
+        "provider": "together"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "trigger-dev-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 9,
+            "positiveCases": 15,
+            "totalFixtures": 47,
+            "twinPairs": 16
+          },
+          "providerSource": {
+            "covers": "provider code (ruling R1): tr_ + one of dev|stg|prod|preview + _sk_ + exactly 24 [0-9A-Za-z] for an additional key, tr_<env>_ + 24 for a current root key and tr_<env>_ + 20 for a legacy root key; the docs corroborate the prefixes",
+            "formatVersion": "ADDITIONAL_API_KEY_PATTERN in the published SDK core, the webapp customAlphabet([0-9a-zA-Z], 24) generator and the legacy 20-byte root generator at trigger.dev@4.0.0 (re-checked 2026-09-28)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/triggerdotdev/trigger.dev/blob/c2b7a72180bbb2dcbc31caa8539e0ca8f8e9e9b8/packages/core/src/v3/apiKeys.ts"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 16,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "provider code (ruling R1): tr_ + one of dev|stg|prod|preview + _sk_ + exactly 24 [0-9A-Za-z] for an additional key, tr_<env>_ + 24 for a current root key and tr_<env>_ + 20 for a legacy root key; the docs corroborate the prefixes",
+          "formatVersion": "ADDITIONAL_API_KEY_PATTERN in the published SDK core, the webapp customAlphabet([0-9a-zA-Z], 24) generator and the legacy 20-byte root generator at trigger.dev@4.0.0 (re-checked 2026-09-28)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/triggerdotdev/trigger.dev/blob/c2b7a72180bbb2dcbc31caa8539e0ca8f8e9e9b8/packages/core/src/v3/apiKeys.ts"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "trigger-dev-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 16,
+            "confusionAxes": 10,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 18,
+            "totalFixtures": 50,
+            "twinPairs": 16
+          },
+          "providerSource": {
+            "covers": "provider code (ruling R1): tr_ + one of dev|stg|prod|preview + _sk_ + exactly 24 [0-9A-Za-z] for an additional key, tr_<env>_ + 24 for a current root key and tr_<env>_ + 20 for a legacy root key; the docs corroborate the prefixes",
+            "formatVersion": "ADDITIONAL_API_KEY_PATTERN in the published SDK core, the webapp customAlphabet([0-9a-zA-Z], 24) generator and the legacy 20-byte root generator at trigger.dev@4.0.0 (re-checked 2026-09-28)",
+            "observedAt": "2026-09-28",
+            "url": "https://github.com/triggerdotdev/trigger.dev/blob/c2b7a72180bbb2dcbc31caa8539e0ca8f8e9e9b8/packages/core/src/v3/apiKeys.ts"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 16,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "provider code (ruling R1): tr_ + one of dev|stg|prod|preview + _sk_ + exactly 24 [0-9A-Za-z] for an additional key, tr_<env>_ + 24 for a current root key and tr_<env>_ + 20 for a legacy root key; the docs corroborate the prefixes",
+          "formatVersion": "ADDITIONAL_API_KEY_PATTERN in the published SDK core, the webapp customAlphabet([0-9a-zA-Z], 24) generator and the legacy 20-byte root generator at trigger.dev@4.0.0 (re-checked 2026-09-28)",
+          "observedAt": "2026-09-28",
+          "url": "https://github.com/triggerdotdev/trigger.dev/blob/c2b7a72180bbb2dcbc31caa8539e0ca8f8e9e9b8/packages/core/src/v3/apiKeys.ts"
+        },
+        "candidateStatus": "stable",
+        "family": "trigger-dev:secret-api-key",
+        "familyName": "Environment secret key (tr_ENV_ / tr_ENV_sk_)",
+        "provider": "trigger-dev"
+      }
+    ],
+    "summary": {
+      "improvements": 18,
+      "newAndUnclassified": 21,
+      "regressions": 0,
+      "staleProviderProvenance": 19
+    },
+    "taxonomySchemaVersion": 1
+  },
+  "version": "0.1.0-beta.12"
+}
