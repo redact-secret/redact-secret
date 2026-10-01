@@ -788,16 +788,26 @@ fn is_gcp_secret_version(value: &str) -> bool {
 /// the Secret Manager client libraries accept in place of a resolved secret
 /// value.
 fn is_gcp_secret_manager_reference(value: &str) -> bool {
-    let segments: Vec<&str> = value.split('/').collect();
-    let (project, name) = match segments.as_slice() {
-        ["projects", project, "secrets", name] => (project, name),
-        ["projects", project, "secrets", name, "versions", version]
-            if is_gcp_secret_version(version) =>
-        {
-            (project, name)
-        }
-        _ => return false,
+    // Every accepted shape starts `projects/`, so any other value is
+    // rejected before it is walked (#1121). The walk is an iterator, not a
+    // collected `Vec`: exactly 4 segments, or exactly 6 with a valid version.
+    if !value.starts_with("projects/") {
+        return false;
+    }
+    let mut segments = value.split('/');
+    let (Some("projects"), Some(project), Some("secrets"), Some(name)) = (
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+    ) else {
+        return false;
     };
+    match (segments.next(), segments.next(), segments.next()) {
+        (None, _, _) => {}
+        (Some("versions"), Some(version), None) if is_gcp_secret_version(version) => {}
+        _ => return false,
+    }
     is_gcp_project_id(project) && is_segment(name)
 }
 
@@ -833,11 +843,16 @@ fn is_bank_vaults_reference(value: &str) -> bool {
     let Some(rest) = value.strip_prefix("vault:") else {
         return false;
     };
-    let parts: Vec<&str> = rest.split('#').collect();
-    if !(2..=3).contains(&parts.len()) {
+    // Two or three `#` parts; a fourth is rejected without collecting (#1121).
+    let mut parts = rest.split('#');
+    let (Some(path), Some(key)) = (parts.next(), parts.next()) else {
+        return false;
+    };
+    let version = parts.next();
+    if parts.next().is_some() {
         return false;
     }
-    is_path(parts[0]) && parts[1..].iter().all(|part| is_segment(part))
+    is_path(path) && is_segment(key) && version.is_none_or(is_segment)
 }
 
 fn is_aws_secretsmanager_partition(value: &str) -> bool {
@@ -867,25 +882,33 @@ fn is_secretsmanager_secret_name(value: &str) -> bool {
 /// the resource identifier IAM policies, Secrets Manager clients, and
 /// `CloudFormation` templates reference in place of a resolved secret value.
 fn is_aws_secretsmanager_arn(value: &str) -> bool {
-    let segments: Vec<&str> = value.splitn(7, ':').collect();
-    let [
-        arn,
-        partition,
-        service,
-        region,
-        account,
-        secret_literal,
-        name,
-    ] = segments.as_slice()
+    // `splitn(7)` keeps the final remainder (the name, colons included) as
+    // its 7th item and never yields an 8th, so no trailing-item check is
+    // needed; fewer than 7 items is a rejection (#1121).
+    let mut segments = value.splitn(7, ':');
+    let (
+        Some("arn"),
+        Some(partition),
+        Some("secretsmanager"),
+        Some(region),
+        Some(account),
+        Some("secret"),
+        Some(name),
+    ) = (
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+    )
     else {
         return false;
     };
-    *arn == "arn"
-        && is_aws_secretsmanager_partition(partition)
-        && *service == "secretsmanager"
+    is_aws_secretsmanager_partition(partition)
         && is_aws_region(region)
         && is_aws_account_id(account)
-        && *secret_literal == "secret"
         && is_secretsmanager_secret_name(name)
 }
 
@@ -916,8 +939,12 @@ fn is_https_hostname(host: &str) -> bool {
     if host.is_empty() || host.len() > 255 {
         return false;
     }
-    let labels: Vec<&str> = host.split('.').collect();
-    labels.len() >= 2 && labels.into_iter().all(is_dns_label)
+    let mut count = 0usize;
+    let all_labels = host.split('.').all(|label| {
+        count += 1;
+        is_dns_label(label)
+    });
+    all_labels && count >= 2
 }
 
 /// `true` for `https://<host>/secrets/<name>(/<version>)?`, the Key Vault
@@ -1614,14 +1641,16 @@ const CREDENTIAL_PHRASE_TAIL_WORDS: &[&str] = &[
 /// `your-fal-key-secret`). Used only for the secret part of a composite
 /// value ([`is_composite_with_placeholder_secret_part`]).
 fn is_credential_noun_phrase(value: &str) -> bool {
-    let words: Vec<&str> = value.split(['-', '_']).collect();
-    words.len() >= 2
-        && words
-            .iter()
-            .all(|word| !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_lowercase()))
-        && words
-            .last()
-            .is_some_and(|tail| CREDENTIAL_PHRASE_TAIL_WORDS.contains(tail))
+    let mut count = 0usize;
+    let mut tail = "";
+    let all_words = value.split(['-', '_']).all(|word| {
+        count += 1;
+        tail = word;
+        !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_lowercase())
+    });
+    // `all` stops at the first bad word, so `tail` is read only when every
+    // word passed and it is therefore the last one (#1121).
+    all_words && count >= 2 && CREDENTIAL_PHRASE_TAIL_WORDS.contains(&tail)
 }
 
 /// `true` for a composite value, runs joined by `|` or `:` such as a Convex
@@ -1719,18 +1748,26 @@ fn is_html_escaped_angle_reference(value: &str) -> bool {
 /// resource and never contains its secret (issue #817). The Secrets Manager
 /// ARN rule above is the narrower case of the same fact.
 fn is_aws_arn(value: &str) -> bool {
-    let segments: Vec<&str> = value.splitn(6, ':').collect();
-    let [arn, partition, service, region, account, resource] = segments.as_slice() else {
+    // `splitn(6)` keeps the resource remainder whole and yields no 7th item
+    // (#1121).
+    let mut segments = value.splitn(6, ':');
+    let (Some("arn"), Some(partition), Some(service), Some(region), Some(account), Some(resource)) = (
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+    ) else {
         return false;
     };
-    *arn == "arn"
-        && is_aws_secretsmanager_partition(partition)
+    is_aws_secretsmanager_partition(partition)
         && !service.is_empty()
         && service
             .bytes()
             .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
         && (region.is_empty() || is_aws_region(region))
-        && (account.is_empty() || *account == "aws" || is_aws_account_id(account))
+        && (account.is_empty() || account == "aws" || is_aws_account_id(account))
         && !resource.is_empty()
         && !resource.bytes().any(|byte| byte.is_ascii_whitespace())
 }
@@ -1799,18 +1836,28 @@ fn is_prefixed_filler(value: &str) -> bool {
 /// (`0.xxxxxxxx-xxxx-....xxxx:xxxx==`, a Bitwarden Secrets Manager access
 /// token) reads as filler. Padding counts only at the end.
 fn is_prefixed_filler_body(value: &str) -> bool {
-    let body: Vec<u8> = value
+    // One streaming pass over the layout-stripped body (#1121): it must be
+    // all ASCII alphanumeric, and some suffix of at least `MIN_FILLER_LEN`
+    // bytes that is one repeated byte must start within the first
+    // `MAX_FILLER_PREFIX_LEN` bytes. The longest such suffix is the trailing
+    // run of equal bytes, so the test is "trailing run >= MIN and everything
+    // before it <= MAX".
+    let mut len = 0usize;
+    let mut run = 0usize;
+    let mut last = 0u8;
+    for byte in value
         .trim_end_matches('=')
         .bytes()
         .filter(|byte| !matches!(byte, b'-' | b'_' | b'.' | b':'))
-        .collect();
-    if !body.iter().all(u8::is_ascii_alphanumeric) {
-        return false;
+    {
+        if !byte.is_ascii_alphanumeric() {
+            return false;
+        }
+        run = if len > 0 && byte == last { run + 1 } else { 1 };
+        last = byte;
+        len += 1;
     }
-    (0..=MAX_FILLER_PREFIX_LEN.min(body.len())).any(|split| {
-        let filler = &body[split..];
-        filler.len() >= MIN_FILLER_LEN && filler.iter().all(|&byte| byte == filler[0])
-    })
+    run >= MIN_FILLER_LEN && len - run <= MAX_FILLER_PREFIX_LEN
 }
 
 /// The longest vendor prefix [`is_vendor_prefixed_placeholder`] strips.
@@ -6835,5 +6882,353 @@ mod assignment_anchor_tests {
         assert_eq!(next_assignment_position("abc\nxyz", 4), 4);
         assert_eq!(next_assignment_position("a\u{2028}b", 1), 1);
         assert_eq!(next_assignment_position("a\u{2028}b c", 4), 4);
+    }
+}
+
+/// Differential tests for #1121: the iterator-based structural reference
+/// helpers must agree with the collecting implementations they replaced,
+/// including empty segments, extra separators and the `splitn` remainder.
+#[cfg(test)]
+mod residual_allocation_tests {
+    use super::*;
+    use crate::test_rng::XorShift32;
+
+    const PIECES: &[&str] = &[
+        "projects",
+        "secrets",
+        "versions",
+        "latest",
+        "3",
+        "arn",
+        "aws",
+        "aws-cn",
+        "secretsmanager",
+        "secret",
+        "us-east-1",
+        "123456789012",
+        "12345",
+        "vault",
+        "ref+",
+        "://",
+        "#",
+        "/",
+        ":",
+        "|",
+        ".",
+        "-",
+        "_",
+        "=",
+        "x",
+        "xx",
+        "xxxxxxxx",
+        "XXXXXXXX",
+        "0",
+        "00000000",
+        "ab",
+        "key",
+        "your",
+        "super",
+        "https://",
+        "kv",
+        "vault.azure.net",
+        "name",
+        " ",
+        "\u{e9}",
+        "+",
+        "@",
+    ];
+
+    fn old_gcp(value: &str) -> bool {
+        let segments: Vec<&str> = value.split('/').collect();
+        let (project, name) = match segments.as_slice() {
+            ["projects", project, "secrets", name] => (project, name),
+            ["projects", project, "secrets", name, "versions", version]
+                if is_gcp_secret_version(version) =>
+            {
+                (project, name)
+            }
+            _ => return false,
+        };
+        is_gcp_project_id(project) && is_segment(name)
+    }
+
+    fn old_bank_vaults(value: &str) -> bool {
+        let Some(rest) = value.strip_prefix("vault:") else {
+            return false;
+        };
+        let parts: Vec<&str> = rest.split('#').collect();
+        if !(2..=3).contains(&parts.len()) {
+            return false;
+        }
+        is_path(parts[0]) && parts[1..].iter().all(|part| is_segment(part))
+    }
+
+    fn old_sm_arn(value: &str) -> bool {
+        let segments: Vec<&str> = value.splitn(7, ':').collect();
+        let [
+            arn,
+            partition,
+            service,
+            region,
+            account,
+            secret_literal,
+            name,
+        ] = segments.as_slice()
+        else {
+            return false;
+        };
+        *arn == "arn"
+            && is_aws_secretsmanager_partition(partition)
+            && *service == "secretsmanager"
+            && is_aws_region(region)
+            && is_aws_account_id(account)
+            && *secret_literal == "secret"
+            && is_secretsmanager_secret_name(name)
+    }
+
+    fn old_aws_arn(value: &str) -> bool {
+        let segments: Vec<&str> = value.splitn(6, ':').collect();
+        let [arn, partition, service, region, account, resource] = segments.as_slice() else {
+            return false;
+        };
+        *arn == "arn"
+            && is_aws_secretsmanager_partition(partition)
+            && !service.is_empty()
+            && service
+                .bytes()
+                .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+            && (region.is_empty() || is_aws_region(region))
+            && (account.is_empty() || *account == "aws" || is_aws_account_id(account))
+            && !resource.is_empty()
+            && !resource.bytes().any(|byte| byte.is_ascii_whitespace())
+    }
+
+    fn old_hostname(host: &str) -> bool {
+        if host.is_empty() || host.len() > 255 {
+            return false;
+        }
+        let labels: Vec<&str> = host.split('.').collect();
+        labels.len() >= 2 && labels.into_iter().all(is_dns_label)
+    }
+
+    fn old_noun_phrase(value: &str) -> bool {
+        let words: Vec<&str> = value.split(['-', '_']).collect();
+        words.len() >= 2
+            && words
+                .iter()
+                .all(|word| !word.is_empty() && word.bytes().all(|byte| byte.is_ascii_lowercase()))
+            && words
+                .last()
+                .is_some_and(|tail| CREDENTIAL_PHRASE_TAIL_WORDS.contains(tail))
+    }
+
+    fn old_filler_body(value: &str) -> bool {
+        let body: Vec<u8> = value
+            .trim_end_matches('=')
+            .bytes()
+            .filter(|byte| !matches!(byte, b'-' | b'_' | b'.' | b':'))
+            .collect();
+        if !body.iter().all(u8::is_ascii_alphanumeric) {
+            return false;
+        }
+        (0..=MAX_FILLER_PREFIX_LEN.min(body.len())).any(|split| {
+            let filler = &body[split..];
+            filler.len() >= MIN_FILLER_LEN && filler.iter().all(|&byte| byte == filler[0])
+        })
+    }
+
+    /// Runs `new` against `old` over seeded strings, half of them behind
+    /// `prefix` so the structured branches are reached, and requires the
+    /// generator to produce rejections (acceptance is covered by the fixed
+    /// cases, since the strict grammars accept sparsely at random).
+    fn compare(name: &str, seed: u32, prefix: &str, new: fn(&str) -> bool, old: fn(&str) -> bool) {
+        let mut rng = XorShift32::new(seed);
+        let mut rejected = 0;
+        for round in 0..40_000 {
+            let tail = rng.text(PIECES, 12);
+            let value = if round % 2 == 0 {
+                tail
+            } else {
+                format!("{prefix}{tail}")
+            };
+            let expected = old(&value);
+            rejected += usize::from(!expected);
+            assert_eq!(new(&value), expected, "{name}: {value:?}");
+        }
+        assert!(rejected > 100, "{name}: generator never rejects");
+    }
+
+    #[test]
+    fn gcp_matches_collecting_form() {
+        compare(
+            "gcp",
+            0x1121_0011,
+            "projects/",
+            is_gcp_secret_manager_reference,
+            old_gcp,
+        );
+        for ok in [
+            "projects/my-proj/secrets/db",
+            "projects/my-proj/secrets/db/versions/3",
+            "projects/my-proj/secrets/db/versions/latest",
+        ] {
+            assert!(is_gcp_secret_manager_reference(ok) && old_gcp(ok), "{ok}");
+        }
+        for bad in [
+            "",
+            "projects/my-proj/secrets",
+            "projects/my-proj/secrets/db/",
+            "projects/my-proj/secrets/db/versions",
+            "projects/my-proj/secrets/db/versions/x",
+            "projects/my-proj/secrets/db/versions/3/",
+            "projects/my-proj/secrets/db/other/3",
+            "x/my-proj/secrets/db",
+            "projects//secrets/db",
+        ] {
+            assert_eq!(is_gcp_secret_manager_reference(bad), old_gcp(bad), "{bad}");
+        }
+    }
+
+    #[test]
+    fn bank_vaults_matches_collecting_form() {
+        compare(
+            "vault",
+            0x1121_0012,
+            "vault:",
+            is_bank_vaults_reference,
+            old_bank_vaults,
+        );
+        for fixed in [
+            "vault:secret/data/db#password",
+            "vault:secret/data/db#password#3",
+            "vault:secret/data/db#password#3#4",
+            "vault:secret/data/db",
+            "vault:#",
+            "vault:a#b#",
+            "vault:",
+        ] {
+            assert_eq!(
+                is_bank_vaults_reference(fixed),
+                old_bank_vaults(fixed),
+                "{fixed}"
+            );
+        }
+        assert!(is_bank_vaults_reference("vault:secret/data/db#password#3"));
+    }
+
+    #[test]
+    fn arns_match_collecting_forms() {
+        compare(
+            "sm-arn",
+            0x1121_0013,
+            "arn:aws:secretsmanager:",
+            is_aws_secretsmanager_arn,
+            old_sm_arn,
+        );
+        compare("arn", 0x1121_0014, "arn:aws:", is_aws_arn, old_aws_arn);
+        for fixed in [
+            "arn:aws:secretsmanager:us-east-1:123456789012:secret:db/pass-AbCdEf",
+            "arn:aws:secretsmanager:us-east-1:123456789012:secret:a:b:c",
+            "arn:aws:secretsmanager:us-east-1:123456789012:secret:",
+            "arn:aws:secretsmanager:us-east-1:123456789012:secret",
+            "arn:aws:iam::aws:policy/IAMUserChangePassword",
+            "arn:aws:iam::aws:policy/a:b:c",
+            "arn:aws:iam::123456789012:",
+            "arn:aws:iam:::x",
+            "arn:aws:iam:::x y",
+            "arn:aws:iam::aws",
+            "",
+        ] {
+            assert_eq!(
+                is_aws_secretsmanager_arn(fixed),
+                old_sm_arn(fixed),
+                "{fixed}"
+            );
+            assert_eq!(is_aws_arn(fixed), old_aws_arn(fixed), "{fixed}");
+        }
+        assert!(is_aws_secretsmanager_arn(
+            "arn:aws:secretsmanager:us-east-1:123456789012:secret:db/pass-AbCdEf"
+        ));
+        assert!(!is_aws_secretsmanager_arn(
+            "arn:aws:secretsmanager:us-east-1:123456789012:secret:a:b:c"
+        ));
+        assert!(is_aws_arn("arn:aws:iam::aws:policy/a:b:c"));
+    }
+
+    #[test]
+    fn hostname_noun_phrase_and_filler_match_collecting_forms() {
+        compare("host", 0x1121_0015, "", is_https_hostname, old_hostname);
+        compare(
+            "noun",
+            0x1121_0016,
+            "your-",
+            is_credential_noun_phrase,
+            old_noun_phrase,
+        );
+        compare(
+            "filler",
+            0x1121_0017,
+            "",
+            is_prefixed_filler_body,
+            old_filler_body,
+        );
+        for fixed in ["", ".", "a.", ".a", "a.b", "a..b", "a.b.c", "-a.b"] {
+            assert_eq!(is_https_hostname(fixed), old_hostname(fixed), "{fixed}");
+        }
+        for fixed in [
+            "",
+            "-",
+            "key",
+            "your-key",
+            "your--key",
+            "your-key-",
+            "a_b_secret",
+            "A-key",
+        ] {
+            assert_eq!(
+                is_credential_noun_phrase(fixed),
+                old_noun_phrase(fixed),
+                "{fixed}"
+            );
+        }
+        for fixed in [
+            "",
+            "xxxxxxxx",
+            "xxxxxxx",
+            "abcdefghxxxxxxxx",
+            "abcdefghixxxxxxxx",
+            "abcdefghxxxxxxxxy",
+            "0.xxxxxxxx-xxxx:xxxx==",
+            "xxxxxxxx==",
+            "xxxxxxxx=x",
+            "xxxxxxxx!",
+            "aaaaaaaaaaaaaaaaaaaa",
+            "abcdefgh00000000",
+            "abcdefghi00000000",
+            "-_.:=",
+        ] {
+            assert_eq!(
+                is_prefixed_filler_body(fixed),
+                old_filler_body(fixed),
+                "{fixed}"
+            );
+        }
+        // Every lead/run combination around the 8/8 boundaries.
+        for lead in 0..=11usize {
+            for run in 0..=11usize {
+                let value = format!(
+                    "{}{}",
+                    "abcdefghijk".get(..lead).unwrap_or(""),
+                    "z".repeat(run)
+                );
+                assert_eq!(
+                    is_prefixed_filler_body(&value),
+                    old_filler_body(&value),
+                    "{value}"
+                );
+            }
+        }
+        assert!(is_prefixed_filler_body("abcdefghzzzzzzzz"));
+        assert!(!is_prefixed_filler_body("abcdefghizzzzzzzz"));
     }
 }

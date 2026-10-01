@@ -1,0 +1,207 @@
+{
+  "issue": 1128,
+  "source": "44382b3f3006a3a34a2bab917711d00e2e53284a",
+  "toolchain": {
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "wasmBindgen": "0.2.128",
+    "node": "v22.16.0",
+    "host": "macOS 26.5.2 arm64",
+    "releaseProfile": [
+      "codegen-units = 1",
+      "lto = \"fat\""
+    ],
+    "wasmOpt": "not invoked"
+  },
+  "method": {
+    "shippedArtifacts": [
+      "full",
+      "common"
+    ],
+    "patchedVariants": "Not shipped, never committed. For each variant the DETECTORS table of built_in_detectors() was patched with buildPatchedSource from scripts/measure-detector-cost.mjs (excluded rows commented out), redact-secret-wasm was built with default features for wasm32-unknown-unknown --release --locked and bound with wasm-bindgen --target web, then mod.rs was restored. Native: a minimal stdin program referencing DetectorRegistry::with_built_in, strip = true.",
+    "groups": "GROUPS in scripts/measure-detector-cost.mjs (ai 25, cloud 43, devtools 11, pkg-registry 6, saas 19 = 104 provider detectors); structural = the 6 common detectors",
+    "timing": "Fresh node process per sample: initSync compile, then initialize([]) registry build, then warm scan medians of 11 batches; 9 rounds interleaved across variants, median of rounds; run under /tmp/rs-bench.lock. Workloads: 64 KiB clean log; 256 KiB log with a synthetic secret-shaped line about every 1.3 KiB (148 findings in every variant including common, so the workload does not separate profiles by findings)."
+  },
+  "variants": {
+    "full": {
+      "detectors": 110,
+      "wasmRaw": 594960,
+      "wasmGzip9": 205081,
+      "wasmBrotli11": 159403,
+      "nativeRaw": 734688,
+      "shipped": true
+    },
+    "common": {
+      "detectors": 6,
+      "wasmRaw": 406687,
+      "wasmGzip9": 142547,
+      "wasmBrotli11": 113995,
+      "nativeRaw": 517872,
+      "shipped": true
+    },
+    "engine-only": {
+      "detectors": 0,
+      "excluded": 110,
+      "wasmRaw": 366356,
+      "wasmGzip9": 127660,
+      "wasmBrotli11": 102070,
+      "sha256": "b7903e1a64ff402578dfb7a8ae2ab5db5956c29c44e969252e96a68178eafc65",
+      "nativeRaw": 368944
+    },
+    "ai-agent": {
+      "detectors": 31,
+      "excluded": 79,
+      "wasmRaw": 474285,
+      "wasmGzip9": 165947,
+      "wasmBrotli11": 132040,
+      "sha256": "525ba7e495cc7611d5bd939be0bb6f9a2d24655a72da780715102447566c5cdf",
+      "nativeRaw": 601728
+    },
+    "cloud-infra": {
+      "detectors": 49,
+      "excluded": 61,
+      "wasmRaw": 503451,
+      "wasmGzip9": 174989,
+      "wasmBrotli11": 138225,
+      "sha256": "37e78310881d2b953089ba53a170d1e0427fc360480f726fe34a48ac84140920"
+    },
+    "devtools-ci": {
+      "detectors": 23,
+      "excluded": 87,
+      "wasmRaw": 455550,
+      "wasmGzip9": 158611,
+      "wasmBrotli11": 126852,
+      "sha256": "1074da78d58d8f7f15be1a6d5589eff8eb2052343d8b337f5113dbd3faa62948"
+    },
+    "saas": {
+      "detectors": 25,
+      "excluded": 85,
+      "wasmRaw": 488704,
+      "wasmGzip9": 169777,
+      "wasmBrotli11": 134376,
+      "sha256": "8d4c514d4547ac385e5aa12bc7da92bb16350181e04376141ccba2e30d50d620"
+    },
+    "mainstream-42": {
+      "detectors": 42,
+      "excluded": 68,
+      "wasmRaw": 505657,
+      "wasmGzip9": 175203,
+      "wasmBrotli11": 138642,
+      "sha256": "1e01d46aa0ffcc9599c3b045ef3b3356b6a6006e14fe03efedb116574d02c234",
+      "nativeRaw": 618368
+    },
+    "minus-ai": {
+      "detectors": 85,
+      "excluded": 25,
+      "wasmRaw": 559065,
+      "wasmGzip9": 192568,
+      "wasmBrotli11": 149905,
+      "sha256": "b72523405f5613cb0b7eb0d50ce66da51c24dfd27163b0434a138b6f17fa2669"
+    },
+    "minus-cloud": {
+      "detectors": 67,
+      "excluded": 43,
+      "wasmRaw": 540859,
+      "wasmGzip9": 188384,
+      "wasmBrotli11": 147478,
+      "sha256": "afda2c511ca9053a54c50b386db4f47ee7595b2c90826ce909931fbc7c67e2cd"
+    },
+    "minus-devtools": {
+      "detectors": 99,
+      "excluded": 11,
+      "wasmRaw": 579004,
+      "wasmGzip9": 199467,
+      "wasmBrotli11": 155912,
+      "sha256": "726385c0fb9cfd8db2eee7d21f3fa55522a5031b7247960a23675ed4eb58bc86"
+    },
+    "minus-pkg-registry": {
+      "detectors": 104,
+      "excluded": 6,
+      "wasmRaw": 594688,
+      "wasmGzip9": 204973,
+      "wasmBrotli11": 159211,
+      "sha256": "01be658b69e0e0733967d9f2df183eef0125cc175c7ac6c4c5d4e0b9b192a480"
+    },
+    "minus-saas": {
+      "detectors": 91,
+      "excluded": 19,
+      "wasmRaw": 556067,
+      "wasmGzip9": 193561,
+      "wasmBrotli11": 151415,
+      "sha256": "2f54fa9d0d809b8106be2b03e4fbf7bee104643f072f3b5533943d99214ef01e"
+    }
+  },
+  "timing": {
+    "full": {
+      "compileMs": 1.746,
+      "registryMs": 1.569,
+      "clean64KiBMs": 1.985,
+      "clean64KiBMinMs": 1.838,
+      "mixed256KiBMs": 11.781,
+      "mixed256KiBMinMs": 10.642,
+      "mixedFindings": 148
+    },
+    "common": {
+      "compileMs": 1.409,
+      "registryMs": 1.061,
+      "clean64KiBMs": 1.581,
+      "clean64KiBMinMs": 1.555,
+      "mixed256KiBMs": 6.612,
+      "mixed256KiBMinMs": 6.024,
+      "mixedFindings": 148
+    },
+    "engine-only": {
+      "compileMs": 1.461,
+      "registryMs": 0.836,
+      "clean64KiBMs": 0.265,
+      "clean64KiBMinMs": 0.264,
+      "mixed256KiBMs": 1.05,
+      "mixed256KiBMinMs": 1.046,
+      "mixedFindings": 0
+    },
+    "ai-agent": {
+      "compileMs": 1.613,
+      "registryMs": 1.416,
+      "clean64KiBMs": 1.509,
+      "clean64KiBMinMs": 1.442,
+      "mixed256KiBMs": 6.926,
+      "mixed256KiBMinMs": 6.68,
+      "mixedFindings": 148
+    },
+    "cloud-infra": {
+      "compileMs": 1.41,
+      "registryMs": 1.186,
+      "clean64KiBMs": 1.432,
+      "clean64KiBMinMs": 1.42,
+      "mixed256KiBMs": 6.823,
+      "mixed256KiBMinMs": 6.4,
+      "mixedFindings": 148
+    },
+    "devtools-ci": {
+      "compileMs": 1.42,
+      "registryMs": 1.285,
+      "clean64KiBMs": 1.372,
+      "clean64KiBMinMs": 1.267,
+      "mixed256KiBMs": 6.411,
+      "mixed256KiBMinMs": 5.867,
+      "mixedFindings": 148
+    },
+    "saas": {
+      "compileMs": 1.354,
+      "registryMs": 1.283,
+      "clean64KiBMs": 1.683,
+      "clean64KiBMinMs": 1.662,
+      "mixed256KiBMs": 7.567,
+      "mixed256KiBMinMs": 7.003,
+      "mixedFindings": 148
+    },
+    "mainstream-42": {
+      "compileMs": 1.405,
+      "registryMs": 1.326,
+      "clean64KiBMs": 1.589,
+      "clean64KiBMinMs": 1.576,
+      "mixed256KiBMs": 7.753,
+      "mixed256KiBMinMs": 7.139,
+      "mixedFindings": 148
+    }
+  }
+}

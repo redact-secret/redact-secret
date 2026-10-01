@@ -1,0 +1,74 @@
+{
+  "full": {
+    "compileMs": 1.746,
+    "registryMs": 1.569,
+    "clean64KiBMs": 1.985,
+    "clean64KiBMinMs": 1.838,
+    "mixed256KiBMs": 11.781,
+    "mixed256KiBMinMs": 10.642,
+    "mixedFindings": 148
+  },
+  "common": {
+    "compileMs": 1.409,
+    "registryMs": 1.061,
+    "clean64KiBMs": 1.581,
+    "clean64KiBMinMs": 1.555,
+    "mixed256KiBMs": 6.612,
+    "mixed256KiBMinMs": 6.024,
+    "mixedFindings": 148
+  },
+  "engine-only": {
+    "compileMs": 1.461,
+    "registryMs": 0.836,
+    "clean64KiBMs": 0.265,
+    "clean64KiBMinMs": 0.264,
+    "mixed256KiBMs": 1.05,
+    "mixed256KiBMinMs": 1.046,
+    "mixedFindings": 0
+  },
+  "ai-agent": {
+    "compileMs": 1.613,
+    "registryMs": 1.416,
+    "clean64KiBMs": 1.509,
+    "clean64KiBMinMs": 1.442,
+    "mixed256KiBMs": 6.926,
+    "mixed256KiBMinMs": 6.68,
+    "mixedFindings": 148
+  },
+  "cloud-infra": {
+    "compileMs": 1.41,
+    "registryMs": 1.186,
+    "clean64KiBMs": 1.432,
+    "clean64KiBMinMs": 1.42,
+    "mixed256KiBMs": 6.823,
+    "mixed256KiBMinMs": 6.4,
+    "mixedFindings": 148
+  },
+  "devtools-ci": {
+    "compileMs": 1.42,
+    "registryMs": 1.285,
+    "clean64KiBMs": 1.372,
+    "clean64KiBMinMs": 1.267,
+    "mixed256KiBMs": 6.411,
+    "mixed256KiBMinMs": 5.867,
+    "mixedFindings": 148
+  },
+  "saas": {
+    "compileMs": 1.354,
+    "registryMs": 1.283,
+    "clean64KiBMs": 1.683,
+    "clean64KiBMinMs": 1.662,
+    "mixed256KiBMs": 7.567,
+    "mixed256KiBMinMs": 7.003,
+    "mixedFindings": 148
+  },
+  "mainstream-42": {
+    "compileMs": 1.405,
+    "registryMs": 1.326,
+    "clean64KiBMs": 1.589,
+    "clean64KiBMinMs": 1.576,
+    "mixed256KiBMs": 7.753,
+    "mixed256KiBMinMs": 7.139,
+    "mixedFindings": 148
+  }
+}

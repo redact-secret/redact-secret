@@ -11,6 +11,7 @@ import {
   detectorModules,
   ARTIFACTS,
   artifactBuild,
+  COMMON_PROVIDER_HELPER_MODULES,
   guardFailures,
   loadModulePacks,
   modulePacks,
@@ -140,7 +141,7 @@ test("detectorImplementations reads Detector impls only", () => {
   assert.deepEqual(detectorImplementations(section), ["jwt", "pattern"]);
 });
 
-const PACKS = { common: ["jwt", "private_key"], provider: ["aws", "datadog", "github"], sharedEngine: ["pattern", "text"] };
+const PACKS = { common: ["jwt", "private_key"], provider: ["datadog", "github", ...COMMON_PROVIDER_HELPER_MODULES], sharedEngine: ["pattern", "text"] };
 
 test("classifyModules separates common, shared engine, provider and undeclared code", () => {
   assert.deepEqual(classifyModules(["datadog", "jwt", "mystery", "pattern", "text"], PACKS), {
@@ -173,10 +174,27 @@ test("guardFailures accepts a smaller common artifact with only common detectors
   assert.deepEqual(guardFailures(full, common, PACKS), []);
 });
 
-test("guardFailures tolerates provider helper symbols without a provider detector", () => {
+test("guardFailures tolerates reviewed provider helper symbols without a provider detector", () => {
   const full = artifact(280_000, [...COMMON_MODULES, "aws", "datadog"]);
-  const common = artifact(220_000, COMMON_MODULES, [...COMMON_MODULES, "datadog"]);
+  const common = artifact(220_000, COMMON_MODULES, [...COMMON_MODULES, ...COMMON_PROVIDER_HELPER_MODULES]);
   assert.deepEqual(guardFailures(full, common, PACKS), []);
+});
+
+test("guardFailures rejects provider helper code outside the reviewed list (#1127)", () => {
+  const full = artifact(280_000, [...COMMON_MODULES, "aws", "datadog"]);
+  const common = artifact(220_000, COMMON_MODULES, [...COMMON_MODULES, "twilio", "datadog", "github"]);
+  const failures = guardFailures(full, common, PACKS);
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /outside the reviewed helper list/);
+  assert.match(failures[0], /datadog, github/);
+  assert.doesNotMatch(failures[0], /twilio/);
+});
+
+test("every reviewed provider helper module is a declared provider module (#1127)", () => {
+  for (const module of COMMON_PROVIDER_HELPER_MODULES) {
+    assert.ok(loadModulePacks().provider.includes(module),`${module} is not a provider module of the core`);
+  }
+  assert.deepEqual([...COMMON_PROVIDER_HELPER_MODULES].sort(), [...COMMON_PROVIDER_HELPER_MODULES]);
 });
 
 test("guardFailures rejects a common artifact that links a provider detector or is not smaller", () => {

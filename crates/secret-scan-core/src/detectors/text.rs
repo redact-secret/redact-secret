@@ -368,16 +368,26 @@ pub(super) fn matches_placeholder_vocabulary(
         }
     };
 
-    let tokens: Vec<&str> = value
-        .split(|ch: char| !ch.is_ascii_alphanumeric())
-        .filter(|token| !token.is_empty())
-        .collect();
-    if tokens.is_empty() {
+    // Streaming over the tokens instead of collecting them and a joined
+    // `String` (#1121): the joined word is compared byte-wise against each
+    // listed word without being built.
+    let tokens = || {
+        value
+            .split(|ch: char| !ch.is_ascii_alphanumeric())
+            .filter(|token| !token.is_empty())
+    };
+    let joined_len: usize = tokens().map(str::len).sum();
+    if joined_len == 0 {
         return false;
     }
-
-    let joined: String = tokens.concat();
-    is_listed(&joined, exact_words) || tokens.iter().all(|token| token_is_placeholder(token))
+    let joined_is_listed = exact_words.iter().any(|word| {
+        word.len() == joined_len
+            && word
+                .bytes()
+                .zip(tokens().flat_map(str::bytes))
+                .all(|(a, b)| a.eq_ignore_ascii_case(&b))
+    });
+    joined_is_listed || tokens().all(token_is_placeholder)
 }
 
 /// `true` for a value made of the same character repeated three or more
@@ -565,7 +575,6 @@ pub(super) fn is_glued_instructional_placeholder(value: &str) -> bool {
 /// bare value. A digit, a mixed-case word, or a missing lead word or noun
 /// keeps the value detected.
 pub(super) fn is_lead_word_phrase_placeholder(value: &str) -> bool {
-    let words: Vec<&str> = value.split(['_', '-']).collect();
     let one_case = |word: &str| {
         !word.is_empty()
             && (word.bytes().all(|byte| byte.is_ascii_lowercase())
@@ -573,12 +582,24 @@ pub(super) fn is_lead_word_phrase_placeholder(value: &str) -> bool {
     };
     let listed =
         |word: &str, words: &[&str]| words.iter().any(|listed| word.eq_ignore_ascii_case(listed));
-    words.len() >= 2
-        && words.iter().all(|word| one_case(word))
-        && listed(words[0], PLACEHOLDER_LEAD_WORDS)
-        && words[1..]
-            .iter()
-            .any(|word| listed(word, PLACEHOLDER_CREDENTIAL_NOUNS))
+    // One pass over the words, no collected `Vec` (#1121).
+    let mut words = value.split(['_', '-']);
+    let Some(lead) = words.next() else {
+        return false;
+    };
+    if !one_case(lead) || !listed(lead, PLACEHOLDER_LEAD_WORDS) {
+        return false;
+    }
+    let mut later = 0usize;
+    let mut has_noun = false;
+    for word in words {
+        if !one_case(word) {
+            return false;
+        }
+        later += 1;
+        has_noun |= listed(word, PLACEHOLDER_CREDENTIAL_NOUNS);
+    }
+    later >= 1 && has_noun
 }
 
 /// `true` for a documentation placeholder glued as `my` + credential words
@@ -673,11 +694,18 @@ const DIGEST_ALGORITHM_LABELS: &[&str] = &[
 /// `=`, optionally behind `hmac-` (`hmac-sha256:<hex>`, `sha256:<hex>`): an
 /// audit-log HMAC or content digest, not a credential (issue #702).
 pub(super) fn starts_with_digest_label(value: &str) -> bool {
-    let lower = value.to_ascii_lowercase();
-    let rest = lower.strip_prefix("hmac-").unwrap_or(&lower);
+    // Case-insensitive byte comparison; no lowercased copy (#1121).
+    let bytes = value.as_bytes();
+    let rest = match bytes.split_at_checked("hmac-".len()) {
+        Some((head, rest)) if head.eq_ignore_ascii_case(b"hmac-") => rest,
+        _ => bytes,
+    };
     DIGEST_ALGORITHM_LABELS.iter().any(|label| {
-        rest.strip_prefix(label)
-            .is_some_and(|after| after.starts_with(':') || after.starts_with('='))
+        rest.split_at_checked(label.len())
+            .is_some_and(|(head, after)| {
+                head.eq_ignore_ascii_case(label.as_bytes())
+                    && matches!(after.first(), Some(b':' | b'='))
+            })
     })
 }
 
@@ -1745,5 +1773,196 @@ mod find_ci_tests {
         assert_eq!(find_ci(b"ab", 5, b"a"), None);
         assert_eq!(find_ci(b"xxxxxxxxxxxxxxxKEY", 0, b"key"), Some(15));
         assert_eq!(find_ci(b"xxxxxxxxxxxxxxxKE", 0, b"key"), None);
+    }
+}
+
+/// Differential tests for #1121: the allocation-free forms of the placeholder
+/// and digest-label checks must agree with the collecting implementations
+/// they replaced, on seeded strings with repeated, empty and extra separators.
+#[cfg(test)]
+mod residual_allocation_tests {
+    use super::*;
+    use crate::test_rng::XorShift32;
+
+    const PIECES: &[&str] = &[
+        "your",
+        "insert",
+        "enter",
+        "paste",
+        "replace",
+        "key",
+        "secret",
+        "token",
+        "jwt",
+        "api",
+        "KEY",
+        "YOUR",
+        "Token",
+        "example",
+        "EXAMPLE",
+        "changeme",
+        "change",
+        "me",
+        "redacted",
+        "password",
+        "12",
+        "7",
+        "_",
+        "-",
+        "_",
+        "-",
+        "__",
+        ".",
+        ":",
+        "=",
+        " ",
+        "md5",
+        "sha256",
+        "SHA-256",
+        "hmac-",
+        "HMAC-",
+        "sha3-512",
+        "blake3",
+        "\u{e9}",
+        "\u{212a}",
+        "\u{1f600}",
+        "x",
+    ];
+
+    fn old_vocabulary(value: &str, exact: &[&str], digit: &[&str]) -> bool {
+        fn strip(token: &str) -> &str {
+            token.trim_end_matches(|ch: char| ch.is_ascii_digit())
+        }
+        let is_listed =
+            |token: &str, words: &[&str]| words.iter().any(|word| token.eq_ignore_ascii_case(word));
+        let token_is_placeholder = |token: &str| {
+            is_listed(token, exact) || {
+                let core = strip(token);
+                core.len() < token.len() && is_listed(core, digit)
+            }
+        };
+        let tokens: Vec<&str> = value
+            .split(|ch: char| !ch.is_ascii_alphanumeric())
+            .filter(|token| !token.is_empty())
+            .collect();
+        if tokens.is_empty() {
+            return false;
+        }
+        let joined: String = tokens.concat();
+        is_listed(&joined, exact) || tokens.iter().all(|token| token_is_placeholder(token))
+    }
+
+    fn old_digest_label(value: &str) -> bool {
+        let lower = value.to_ascii_lowercase();
+        let rest = lower.strip_prefix("hmac-").unwrap_or(&lower);
+        DIGEST_ALGORITHM_LABELS.iter().any(|label| {
+            rest.strip_prefix(label)
+                .is_some_and(|after| after.starts_with(':') || after.starts_with('='))
+        })
+    }
+
+    fn old_lead_phrase(value: &str) -> bool {
+        let words: Vec<&str> = value.split(['_', '-']).collect();
+        let one_case = |word: &str| {
+            !word.is_empty()
+                && (word.bytes().all(|byte| byte.is_ascii_lowercase())
+                    || word.bytes().all(|byte| byte.is_ascii_uppercase()))
+        };
+        let listed = |word: &str, words: &[&str]| {
+            words.iter().any(|listed| word.eq_ignore_ascii_case(listed))
+        };
+        words.len() >= 2
+            && words.iter().all(|word| one_case(word))
+            && listed(words[0], PLACEHOLDER_LEAD_WORDS)
+            && words[1..]
+                .iter()
+                .any(|word| listed(word, PLACEHOLDER_CREDENTIAL_NOUNS))
+    }
+
+    #[test]
+    fn vocabulary_matches_collecting_form() {
+        let exact = [
+            "example",
+            "replaceme",
+            "changeme",
+            "redacted",
+            "yourkey",
+            "password",
+        ];
+        let digit = ["example", "changeme", "redacted"];
+        let mut rng = XorShift32::new(0x1121_0001);
+        let mut matched = 0;
+        for _ in 0..20_000 {
+            let value = rng.text(PIECES, 6);
+            let expected = old_vocabulary(&value, &exact, &digit);
+            matched += usize::from(expected);
+            assert_eq!(
+                matches_placeholder_vocabulary(&value, &exact, &digit),
+                expected,
+                "{value:?}"
+            );
+        }
+        assert!(matched > 100, "generator must reach the accepting branch");
+    }
+
+    #[test]
+    fn digest_label_matches_lowercasing_form() {
+        let mut rng = XorShift32::new(0x1121_0002);
+        let mut matched = 0;
+        for _ in 0..20_000 {
+            let lead = ["", "hmac-", "HMAC-", "Hmac-"][rng.below(4)];
+            let label = ["md5", "SHA256", "sha-256", "sha3-512", "Blake3", "shax"][rng.below(6)];
+            let sep = [":", "=", "-", " ", ""][rng.below(5)];
+            let value = format!("{lead}{label}{sep}{}", rng.text(PIECES, 3));
+            let expected = old_digest_label(&value);
+            matched += usize::from(expected);
+            assert_eq!(starts_with_digest_label(&value), expected, "{value:?}");
+        }
+        assert!(matched > 100, "generator must reach the accepting branch");
+        for fixed in [
+            "", "hmac", "hmac-", "sha256", "sha256:", "SHA256=", "xsha256:",
+        ] {
+            assert_eq!(
+                starts_with_digest_label(fixed),
+                old_digest_label(fixed),
+                "{fixed:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn lead_phrase_matches_collecting_form() {
+        let mut rng = XorShift32::new(0x1121_0003);
+        let mut matched = 0;
+        for _ in 0..30_000 {
+            let lead = ["your", "YOUR", "Insert", "paste", "x"][rng.below(5)];
+            let sep = ["_", "-", "", "__"][rng.below(4)];
+            let noun = ["key", "KEY", "secret", "Token", "jwt", "api", "id"][rng.below(7)];
+            let value = format!("{lead}{sep}{noun}{}", rng.text(PIECES, 4));
+            let expected = old_lead_phrase(&value);
+            matched += usize::from(expected);
+            assert_eq!(
+                is_lead_word_phrase_placeholder(&value),
+                expected,
+                "{value:?}"
+            );
+        }
+        assert!(matched > 50, "generator must reach the accepting branch");
+        for fixed in [
+            "",
+            "_",
+            "your",
+            "your_key",
+            "your__key",
+            "your_key_",
+            "YOUR-KEY",
+            "Your_key",
+        ] {
+            assert_eq!(
+                is_lead_word_phrase_placeholder(fixed),
+                old_lead_phrase(fixed),
+                "{fixed:?}"
+            );
+        }
     }
 }

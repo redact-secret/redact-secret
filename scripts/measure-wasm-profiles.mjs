@@ -259,6 +259,35 @@ function inspectArtifact(artifact, directory, packs) {
 }
 
 /**
+ * The `provider` modules whose non-detector helper functions a `common`
+ * artifact is reviewed to carry (issue #1127). The incremental session's
+ * retention rules ask these modules whether a line leaves a provider
+ * context open (`has_open_*_in`, `ends_inside_*`, CLI-table and header
+ * predicates), and they do so in every profile, because retention only
+ * affects memory and emission timing, never output
+ * (`decision-define-detector-profile-and-pack-contract`, admission rule 3).
+ * None of them registers a detector in `common`; the `Detector`
+ * implementation guard in {@link guardFailures} still forbids that. Measured
+ * at the Beta.13 candidate, these helpers are about 21 KB of the 406,687 B
+ * `common` module (5.2% raw), as listed by `twiggy top`.
+ *
+ * A `provider` module outside this list in a `common` artifact means new
+ * provider code became reachable from the `common` constructor or its
+ * session without a `Detector` implementation, which the implementation
+ * guard cannot see. Extend the list only with a reviewed reason and the
+ * measured size of the new helper.
+ */
+export const COMMON_PROVIDER_HELPER_MODULES = [
+  "aws",
+  "confluent",
+  "heroku",
+  "keyword_gated_keys",
+  "sentry",
+  "trigger_dev",
+  "twilio",
+];
+
+/**
  * Every failed guard, as a message. An empty list means every guard held.
  * `names` labels the two artifacts in messages; {@link piiGuardFailures}
  * reuses the same checks for the `full-pii`/`common-pii` pair.
@@ -274,6 +303,15 @@ export function guardFailures(full, common, packs, names = { full: "full", commo
   const linked = common.implementationClassification;
   if (linked.provider.length > 0) {
     failures.push(`${names.common} links provider detector implementations: ${linked.provider.join(", ")}`);
+  }
+  const unreviewedHelpers = common.classification.provider.filter(
+    (module) => !COMMON_PROVIDER_HELPER_MODULES.includes(module),
+  );
+  if (unreviewedHelpers.length > 0) {
+    failures.push(
+      `${names.common} links code of provider modules outside the reviewed helper list ` +
+        `(COMMON_PROVIDER_HELPER_MODULES): ${unreviewedHelpers.join(", ")}`,
+    );
   }
   for (const [profile, artifact] of [[names.full, full], [names.common, common]]) {
     const { undeclared } = artifact.implementationClassification;
