@@ -47,6 +47,10 @@ unused_must_use = "deny"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
+# Clippy 1.99 added this to `pedantic`. The suite states emptiness as `assert!(x.is_empty())` in
+# hundreds of places, and the replacement (`assert_eq!(x, [])`) needs a type annotation on
+# every empty collection of findings, so it is allowed rather than rewritten.
+assert_is_empty = "allow"
 unwrap_used = "deny"
 expect_used = "deny"
 panic = "deny"
