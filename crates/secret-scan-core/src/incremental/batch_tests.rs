@@ -14,8 +14,8 @@ use std::fmt::Write as _;
 use std::rc::Rc;
 
 use super::*;
-use crate::error::DetectorFailure;
-use crate::types::{Candidate, Confidence, Detector, DetectorContext};
+use crate::error::{DetectorFailure, FormatterFailure};
+use crate::types::{Candidate, Confidence, Detector, DetectorContext, PlaceholderContext};
 
 type Outcome = Result<(String, Vec<Finding>), SecretScanErrorCode>;
 

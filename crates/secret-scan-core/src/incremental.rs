@@ -79,7 +79,7 @@ use crate::detectors::{
     has_open_heroku_legacy_context, has_open_list_item_pair, has_open_provider_sibling,
     has_open_twilio_cli_table,
 };
-use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
+use crate::error::{PolicyFailure, SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
 use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
@@ -88,11 +88,11 @@ use crate::pii::PiiSelection;
 use crate::pipeline::detect;
 use crate::pipeline::detect_units;
 use crate::policy::DefaultPolicy;
-use crate::redact::{default_placeholder_formatter, redact_into};
+use crate::redact::{default_placeholder_formatter, redact_shifted_into};
 use crate::registry::{DetectorRegistry, Profile};
 use crate::types::{
-    Action, ByteRange, DetectedFinding, Finding, PlaceholderContext, PlaceholderFormatter, Policy,
-    PolicyContext, ScanResult,
+    Action, ByteRange, DetectedFinding, Finding, PlaceholderFormatter, Policy, PolicyContext,
+    ScanResult,
 };
 
 /// Reserve in bytes for the longest built-in fixed match and its boundary
@@ -1217,11 +1217,13 @@ impl IncrementalSanitizer {
     /// batch (offsets after the lead in `retained`), given its findings with
     /// ranges in batch coordinates, and appends the result to `released`.
     ///
-    /// Global and unit-local findings are built together in one pass; the
-    /// placeholder formatter reaches a finding's global form by its position,
-    /// since both lists are ordered by start. Each detected finding is moved
-    /// into its global form and cloned once for its local one: only the id
-    /// and the range change, so nothing is revalidated (issue #1060).
+    /// Each detected finding is moved into its global form (issue #1060),
+    /// straight into `released` (issue #1095). Redaction then takes that tail
+    /// of `released.findings` as it is, with the unit's global start as the
+    /// shift between the findings' ranges and the unit's text, and the
+    /// placeholders issued so far as the numbering base (issue #1125): the
+    /// formatter is handed the global findings themselves, so no unit-local
+    /// copy of them is built and no callback is mapped back to its finding.
     fn finalize_unit(
         &mut self,
         begin: usize,
@@ -1233,7 +1235,6 @@ impl IncrementalSanitizer {
         // Global findings go straight into `released`: they are the unit's
         // tail there (issue #1095).
         let first_global = released.findings.len();
-        let mut local_findings: Vec<Finding> = Vec::new();
         for found in detected {
             let range = found.range();
             let global_range =
@@ -1246,16 +1247,12 @@ impl IncrementalSanitizer {
                 .policy
                 .evaluate(&global_detected, &context)
                 .map_err(|_| SecretScanError::from(SecretScanErrorCode::PolicyFailure))?;
-            let local_range = ByteRange::new(range.start() - begin, range.end() - begin)
-                .ok_or(SecretScanErrorCode::InvalidCandidate)?;
-            let local_detected = global_detected.relocated_without_id(local_range);
-            local_findings.push(local_detected.with_action(action));
             released.findings.push(global_detected.with_action(action));
             self.finding_count += 1;
         }
 
         let base = self.lead_len;
-        if local_findings.is_empty() {
+        if first_global == released.findings.len() {
             // Nothing to replace: `redact` would check the input limit, find
             // no forbidden text to build, and return the unit unchanged, so
             // skip the copy it makes (issue #1074).
@@ -1265,33 +1262,16 @@ impl IncrementalSanitizer {
             return Ok(());
         }
 
-        let placeholder_offset = self.placeholder_count;
-        let formatter = self.formatter.as_ref();
-        let global_findings = &released.findings[first_global..];
-        let wrapped = |local_finding: &Finding, local_context: &PlaceholderContext| {
-            let Ok(index) = local_findings
-                .binary_search_by_key(&local_finding.range().start(), |finding| {
-                    finding.range().start()
-                })
-            else {
-                return Err(FormatterFailure);
-            };
-            let global_context =
-                PlaceholderContext::new(placeholder_offset + local_context.placeholder_index());
-            formatter.format(&global_findings[index], &global_context)
-        };
-        redact_into(
+        let replaced = redact_shifted_into(
             &self.retained[base + begin..base + end],
-            &local_findings,
-            &wrapped,
+            &released.findings[first_global..],
+            input_offset + begin,
+            self.placeholder_count,
+            self.formatter.as_ref(),
             &WholeInputLimits::default(),
             &mut released.text,
         )?;
-
-        self.placeholder_count += released.findings[first_global..]
-            .iter()
-            .filter(|finding| finding.action().replaces_text())
-            .count();
+        self.placeholder_count += replaced;
         Ok(())
     }
 
@@ -1432,6 +1412,7 @@ mod batch_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{FormatterFailure, PlaceholderContext};
 
     /// Marker for a retained, unresolved value. It is not credential-shaped
     /// on its own; the surrounding assignment is what a detector matches.
