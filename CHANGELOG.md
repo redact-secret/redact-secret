@@ -9,7 +9,8 @@ evidence is linked from each published version.
 
 - Every `@redact-secret/*` npm package is now published with an npm
   provenance attestation signed through Sigstore, so `npm audit signatures`
-  verifies which workflow run and source commit built it. See
+  verifies which workflow run and source commit built it, including versions
+  published by `Reconcile Release`. See
   [Verifying releases](SECURITY.md#verifying-releases).
 
 ## 0.1.0-beta.12 — 2026-10-01

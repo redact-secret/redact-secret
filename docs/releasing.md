@@ -367,6 +367,19 @@ before any recovery action.
 Preserve all recovery run IDs and verification outcomes; the recovery workflow
 does not write a replacement durable release manifest.
 
+Packages that `Reconcile Release` publishes to npm carry the same npm
+provenance attestation as `Release` (`NPM_CONFIG_PROVENANCE`, signed with the
+reconcile run's OIDC identity). The attestation identifies the reconcile
+workflow run as the builder and the commit that run checked out as its source:
+the checkout is `main` at the dispatch tip (`github.sha`), because the job
+checks out its own ref and then reads the recorded release source commit
+through `git show` (dependency package manifests) and a detached worktree (npm
+facade). The attested source commit is therefore the `main` tip at dispatch,
+not the recorded release source; the recorded source commit stays authoritative
+and is named in the reconcile run's plan and logs. Registry content equality
+with the recorded source is enforced by the shasum checks, not by the
+attestation. Dry runs publish nothing and sign nothing.
+
 ## Close out
 
 Preserve evidence under `docs/releases/<version>/`, following the
