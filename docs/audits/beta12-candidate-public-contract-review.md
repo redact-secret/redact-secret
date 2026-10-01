@@ -17,8 +17,9 @@
   30 lines, checked with `git diff --stat bfc608cc..HEAD`), plus
   documentation and the artifact-inventory review path.
 - Status: public API and compatibility review is complete for this baseline.
-  Exact-SHA artifact qualification, the rehearsal, SAST as a CI run and the
-  support-matrix refresh are **not** complete for the merged candidate SHA; see
+  Exact-SHA artifact qualification, the rehearsal and SAST as a CI run are
+  **not** complete for the merged candidate SHA; the support-matrix refresh is
+  done (below); see
   [Baseline evidence and invalidation](#baseline-evidence-and-invalidation).
 
 This review replaces the beta.11 document as the current review input to the
@@ -168,8 +169,8 @@ written by the closeout).
   (#1031-#1035); `google-oauth-client-secret` (#1029) and
   `aws-secret-access-key` (#1028, context-constrained). Together they add 25
   finding types (the 22 counted by the new detectors plus the three Vercel
-  class types). None is a support-status claim; the support matrix does not yet
-  measure them.
+  class types). None is a support-status claim by itself; the refreshed support
+  matrix (below) measures them.
 - **More redaction.** Values in new forms: `.npmrc` credential keys (#1024),
   `"SecretAccessKey"` (#1026), Kubernetes `name:`/`value:` env pairs (#1016),
   keyed environment stores such as `os.environ["NAME"] = "..."` (#1038), the
@@ -248,13 +249,17 @@ Complete for this product source:
 - The performance evaluation of `bfc608cc` (run 36788351912) with the
   WebAssembly size record above.
 
+Support-matrix refresh (done): `benchmarks/support-matrix.json` is the
+candidate-mode matrix measured at product `bfc608cc` with trufflehog 3.97.4
+(`redact-secret-benchmarks` `bbcf4029`, `evidence/860/bfc608c/`): 173 families,
+144 stable, 7 provisional, 5 pending, 17 unsupported (candidate mode; the
+published `0.1.0-beta.11` package reads 111 stable on the same corpus). The
+drift gate against `v0.1.0-beta.11` reports 0 regressions, 18 improvements and
+21 new families.
+
 Not complete, and required before release approval under
 [releasing](../releasing.md#qualify-without-publication):
 
-- The support-matrix refresh. `benchmarks/support-matrix.json` still pins the
-  beta.11 candidate measurement (76 providers, 152 families) and does not
-  cover the 18 new detectors; the refresh from `redact-secret-benchmarks` and
-  the drift gate against `v0.1.0-beta.11` happen separately.
 - `Artifact qualification` and `Package Release Rehearsal` for the merged
   candidate SHA, including the artifact inventory that binds this document.
 - SAST as evidence for the frozen revision.
