@@ -33,6 +33,94 @@ pub(crate) fn is_invisible(ch: char) -> bool {
         .is_some_and(|&(_, last)| code_point <= last)
 }
 
+/// Bytes walked character by character between two looks for an ASCII
+/// stretch to skip.
+///
+/// The look is a single word load per window, so dense non-ASCII text pays
+/// about one such load per window on top of the plain per-character walk, and
+/// text with a long ASCII stretch skips it a word at a time (issue #1134).
+const WALK_WINDOW: usize = 4096;
+
+/// The offset of the first non-ASCII byte at or after `from` (or the length),
+/// when the eight bytes at `from` are all ASCII; `None` otherwise, including
+/// when fewer than eight bytes remain.
+///
+/// `from` is a character boundary, and so is the result: every byte before it
+/// is a whole ASCII character.
+#[inline(never)]
+fn ascii_stretch_end(bytes: &[u8], from: usize) -> Option<usize> {
+    const HIGH_BITS: u64 = 0x8080_8080_8080_8080;
+    let word = |position: usize| -> Option<u64> {
+        let chunk = bytes.get(position..position + 8)?;
+        Some(u64::from_le_bytes(<[u8; 8]>::try_from(chunk).ok()?))
+    };
+    if word(from)? & HIGH_BITS != 0 {
+        return None;
+    }
+    let mut position = from + 8;
+    // Four words per step while they are all ASCII, then one word at a time
+    // to find the exact byte.
+    while let (Some(a), Some(b), Some(c), Some(d)) = (
+        word(position),
+        word(position + 8),
+        word(position + 16),
+        word(position + 24),
+    ) {
+        if (a | b | c | d) & HIGH_BITS != 0 {
+            break;
+        }
+        position += 32;
+    }
+    while let Some(next) = word(position) {
+        let high = next & HIGH_BITS;
+        if high != 0 {
+            // Little-endian: the lowest set bit is the first non-ASCII byte.
+            return Some(position + usize::try_from(high.trailing_zeros() / 8).ok()?);
+        }
+        position += 8;
+    }
+    while bytes.get(position).is_some_and(u8::is_ascii) {
+        position += 1;
+    }
+    Some(position)
+}
+
+/// The end of the next walk window starting at the character boundary
+/// `position`: at least [`WALK_WINDOW`] bytes on, moved forward to a character
+/// boundary so no character is split.
+fn walk_window_end(input: &str, position: usize) -> usize {
+    let mut end = (position + WALK_WINDOW).min(input.len());
+    while !input.is_char_boundary(end) {
+        end += 1;
+    }
+    end
+}
+
+/// Offset of the first removed code point, if any.
+///
+/// The walk decodes characters exactly as a plain `char_indices` scan would.
+/// The only dispatch, at the start of each [`WALK_WINDOW`], is to jump over an
+/// ASCII stretch (which holds no removed code point).
+fn first_invisible(input: &str, skip_ascii: bool) -> Option<usize> {
+    let bytes = input.as_bytes();
+    let mut position = 0;
+    while position < input.len() {
+        if skip_ascii && let Some(after) = ascii_stretch_end(bytes, position) {
+            position = after;
+            continue;
+        }
+        let end = walk_window_end(input, position);
+        if let Some(offset) = input[position..end]
+            .char_indices()
+            .find_map(|(offset, ch)| is_invisible(ch).then_some(offset + position))
+        {
+            return Some(offset);
+        }
+        position = end;
+    }
+    None
+}
+
 /// One maximal run of removed code points.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Seam {
@@ -40,6 +128,59 @@ struct Seam {
     normalized: usize,
     /// Offset in the original input just after the run.
     original_after: usize,
+}
+
+/// The scan copy and seams of `input`, whose first removed code point is at
+/// `first_removed`.
+#[inline(never)]
+fn strip_removed(input: &str, first_removed: usize, skip_ascii: bool) -> (String, Vec<Seam>) {
+    let mut text = String::with_capacity(input.len());
+    text.push_str(&input[..first_removed]);
+    let mut seams = Vec::new();
+    let mut kept_from = first_removed;
+    let mut in_run = false;
+    let bytes = input.as_bytes();
+    let mut position = first_removed;
+    while position < input.len() {
+        // Outside a run an ASCII stretch changes neither `text` nor `seams`
+        // (no ASCII code point is removed, and `kept_from` stays put to copy
+        // it later). Inside a run the next character must be seen: the first
+        // kept one, ASCII or not, closes the run.
+        if skip_ascii
+            && !in_run
+            && let Some(after) = ascii_stretch_end(bytes, position)
+        {
+            position = after;
+            continue;
+        }
+        let end = walk_window_end(input, position);
+        for (relative, ch) in input[position..end].char_indices() {
+            let offset = relative + position;
+            if is_invisible(ch) {
+                if !in_run {
+                    text.push_str(&input[kept_from..offset]);
+                    in_run = true;
+                }
+            } else if in_run {
+                seams.push(Seam {
+                    normalized: text.len(),
+                    original_after: offset,
+                });
+                kept_from = offset;
+                in_run = false;
+            }
+        }
+        position = end;
+    }
+    if in_run {
+        seams.push(Seam {
+            normalized: text.len(),
+            original_after: input.len(),
+        });
+    } else {
+        text.push_str(&input[kept_from..]);
+    }
+    (text, seams)
 }
 
 /// The scan copy of one input and the seams that map it back.
@@ -58,6 +199,14 @@ pub(crate) struct NormalizedInput<'a> {
 impl<'a> NormalizedInput<'a> {
     /// Builds the scan copy of `input`.
     pub(crate) fn new(input: &'a str) -> Self {
+        Self::build(input, true)
+    }
+
+    /// [`new`](Self::new) with the ASCII-stretch dispatch selectable. The
+    /// dispatch decides only which bytes are *examined*, never which code
+    /// points are removed: with `skip_ascii` false every character goes
+    /// through the same per-character walk the dispatch falls back to.
+    fn build(input: &'a str, skip_ascii: bool) -> Self {
         let borrowed = Self {
             text: Cow::Borrowed(input),
             seams: Vec::new(),
@@ -67,45 +216,11 @@ impl<'a> NormalizedInput<'a> {
         if input.is_ascii() {
             return borrowed;
         }
-        let Some(first_removed) = input
-            .char_indices()
-            .find_map(|(offset, ch)| is_invisible(ch).then_some(offset))
-        else {
+        let Some(first_removed) = first_invisible(input, skip_ascii) else {
             return borrowed;
         };
 
-        let mut text = String::with_capacity(input.len());
-        text.push_str(&input[..first_removed]);
-        let mut seams = Vec::new();
-        let mut kept_from = first_removed;
-        let mut in_run = false;
-        for (offset, ch) in input[first_removed..]
-            .char_indices()
-            .map(|(offset, ch)| (offset + first_removed, ch))
-        {
-            if is_invisible(ch) {
-                if !in_run {
-                    text.push_str(&input[kept_from..offset]);
-                    in_run = true;
-                }
-            } else if in_run {
-                seams.push(Seam {
-                    normalized: text.len(),
-                    original_after: offset,
-                });
-                kept_from = offset;
-                in_run = false;
-            }
-        }
-        if in_run {
-            seams.push(Seam {
-                normalized: text.len(),
-                original_after: input.len(),
-            });
-        } else {
-            text.push_str(&input[kept_from..]);
-        }
-
+        let (text, seams) = strip_removed(input, first_removed, skip_ascii);
         Self {
             text: Cow::Owned(text),
             seams,
@@ -139,8 +254,21 @@ impl<'a> NormalizedInput<'a> {
     /// translated span, while a run merely adjacent to either boundary is
     /// not absorbed.
     pub(crate) fn to_original(&self, range: ByteRange) -> Option<ByteRange> {
+        self.translate(range).map(|(original, _)| original)
+    }
+
+    /// [`to_original`](Self::to_original) and
+    /// [`contains_removed_run`](Self::contains_removed_run) from one pair of
+    /// seam searches: the translated range, and whether a removed run lies
+    /// strictly inside `range`.
+    ///
+    /// Both questions partition the seams at the same two points (`<= start`
+    /// and `< end`), so the second is the difference of the two counts. This
+    /// is not [`touches_removed_run`](Self::touches_removed_run), which uses
+    /// different boundaries and stays separate (issue #1133).
+    pub(crate) fn translate(&self, range: ByteRange) -> Option<(ByteRange, bool)> {
         if self.seams.is_empty() {
-            return Some(range);
+            return Some((range, false));
         }
         // A run removed exactly at `start` precedes the first character, so
         // it counts; one removed exactly at `end` follows the last, so it
@@ -151,10 +279,11 @@ impl<'a> NormalizedInput<'a> {
         let before_end = self
             .seams
             .partition_point(|seam| seam.normalized < range.end());
-        ByteRange::new(
+        let original = ByteRange::new(
             range.start() + self.removed_before(through_start),
             range.end() + self.removed_before(before_end),
-        )
+        )?;
+        Some((original, before_end > through_start))
     }
 
     /// Translates `original`, an offset in the original input that is not
@@ -165,24 +294,6 @@ impl<'a> NormalizedInput<'a> {
             .seams
             .partition_point(|seam| seam.original_after <= original);
         original - self.removed_before(runs_before)
-    }
-
-    /// Whether a removed run lies strictly inside `range` (of
-    /// [`text`](Self::text)): the same "interior" definition
-    /// [`to_original`](Self::to_original) uses to fold a run into a
-    /// translated span. A run merely adjacent to either boundary does not
-    /// count.
-    pub(crate) fn contains_removed_run(&self, range: ByteRange) -> bool {
-        if self.seams.is_empty() {
-            return false;
-        }
-        let through_start = self
-            .seams
-            .partition_point(|seam| seam.normalized <= range.start());
-        let before_end = self
-            .seams
-            .partition_point(|seam| seam.normalized < range.end());
-        before_end > through_start
     }
 
     /// Whether a removed run lies inside `range` or immediately touches
@@ -220,6 +331,281 @@ mod tests {
         let original = view.to_original(normalized).unwrap();
         assert!(original.is_char_aligned_in(input));
         &input[original.start()..original.end()]
+    }
+
+    /// The pre-#1133 `to_original`: its own pair of seam searches. Kept as the
+    /// oracle for [`NormalizedInput::translate`].
+    fn oracle_to_original(view: &NormalizedInput<'_>, range: ByteRange) -> Option<ByteRange> {
+        if view.seams.is_empty() {
+            return Some(range);
+        }
+        let through_start = view
+            .seams
+            .partition_point(|seam| seam.normalized <= range.start());
+        let before_end = view
+            .seams
+            .partition_point(|seam| seam.normalized < range.end());
+        ByteRange::new(
+            range.start() + view.removed_before(through_start),
+            range.end() + view.removed_before(before_end),
+        )
+    }
+
+    /// The pre-#1133 `contains_removed_run`, likewise an independent oracle.
+    fn oracle_contains_removed_run(view: &NormalizedInput<'_>, range: ByteRange) -> bool {
+        if view.seams.is_empty() {
+            return false;
+        }
+        let through_start = view
+            .seams
+            .partition_point(|seam| seam.normalized <= range.start());
+        let before_end = view
+            .seams
+            .partition_point(|seam| seam.normalized < range.end());
+        before_end > through_start
+    }
+
+    fn contained(view: &NormalizedInput<'_>, range: ByteRange) -> bool {
+        view.translate(range).unwrap().1
+    }
+
+    #[test]
+    fn translate_equals_the_two_separate_searches_for_every_range() {
+        let inputs = [
+            String::new(),
+            "plain text".to_owned(),
+            format!("{ZWSP}"),
+            format!("{ZWSP}ab{ZWNJ}cd{ZWSP}"),
+            format!("x={ZWSP}abcd{ZWSP};"),
+            format!("a{ZWSP}{ZWNJ}{ZWSP}b{ZWSP}c{ZWNJ}"),
+            format!("é{ZWSP}한\u{E0067}😀{ZWNJ}\u{FE0F}z\u{00AD}"),
+            format!("{ZWSP}가🙂\u{2060}abc{ZWNJ}끝"),
+            "naïve café 한국어 😀".to_owned(),
+        ];
+        let mut checked = 0;
+        for input in &inputs {
+            let view = NormalizedInput::new(input);
+            let text = view.text().to_owned();
+            for start in 0..=text.len() {
+                for end in start..=text.len() {
+                    let Some(candidate) = ByteRange::new(start, end) else {
+                        continue;
+                    };
+                    let fused = view.translate(candidate);
+                    assert_eq!(
+                        fused.map(|pair| pair.0),
+                        oracle_to_original(&view, candidate),
+                        "{input:?} {start}..{end}"
+                    );
+                    assert_eq!(
+                        fused.map(|pair| pair.1),
+                        Some(oracle_contains_removed_run(&view, candidate)),
+                        "{input:?} {start}..{end}"
+                    );
+                    assert_eq!(view.to_original(candidate), fused.map(|pair| pair.0));
+                    checked += 1;
+                }
+            }
+        }
+        assert!(checked > 300);
+    }
+
+    #[test]
+    fn the_pipeline_boundary_rules_keep_their_distinct_search_points() {
+        // `touches_removed_run` (`< start`, `<= end`) is deliberately not
+        // part of the fused result: a run exactly at a boundary touches but
+        // is neither interior nor absorbed.
+        let input = format!("x={ZWSP}abcd{ZWSP};");
+        let view = NormalizedInput::new(&input);
+        let boundary = range(2, 6);
+        assert!(view.touches_removed_run(boundary));
+        assert_eq!(view.translate(boundary).map(|pair| pair.1), Some(false));
+    }
+
+    /// The pre-#1134 `NormalizedInput::new`, verbatim: one `char_indices`
+    /// walk with no ASCII-block dispatch. The oracle for
+    /// [`NormalizedInput::build`].
+    fn oracle_new(input: &str) -> (Cow<'_, str>, Vec<Seam>) {
+        oracle_new_copy::<0>(input)
+    }
+
+    /// The same body monomorphized once more, so the timing harness can show
+    /// how far two builds of identical code differ by layout alone.
+    fn oracle_new_copy<const COPY: u8>(input: &str) -> (Cow<'_, str>, Vec<Seam>) {
+        std::hint::black_box(COPY);
+        if input.is_ascii() {
+            return (Cow::Borrowed(input), Vec::new());
+        }
+        let Some(first_removed) = input
+            .char_indices()
+            .find_map(|(offset, ch)| is_invisible(ch).then_some(offset))
+        else {
+            return (Cow::Borrowed(input), Vec::new());
+        };
+        let mut text = String::with_capacity(input.len());
+        text.push_str(&input[..first_removed]);
+        let mut seams = Vec::new();
+        let mut kept_from = first_removed;
+        let mut in_run = false;
+        for (offset, ch) in input[first_removed..]
+            .char_indices()
+            .map(|(offset, ch)| (offset + first_removed, ch))
+        {
+            if is_invisible(ch) {
+                if !in_run {
+                    text.push_str(&input[kept_from..offset]);
+                    in_run = true;
+                }
+            } else if in_run {
+                seams.push(Seam {
+                    normalized: text.len(),
+                    original_after: offset,
+                });
+                kept_from = offset;
+                in_run = false;
+            }
+        }
+        if in_run {
+            seams.push(Seam {
+                normalized: text.len(),
+                original_after: input.len(),
+            });
+        } else {
+            text.push_str(&input[kept_from..]);
+        }
+        (Cow::Owned(text), seams)
+    }
+
+    fn assert_dispatch_matches_oracle(input: &str) {
+        let (oracle_text, oracle_seams) = oracle_new(input);
+        for skip_ascii in [true, false] {
+            let view = NormalizedInput::build(input, skip_ascii);
+            assert_eq!(view.text, oracle_text, "skip_ascii={skip_ascii} {input:?}");
+            assert_eq!(
+                view.seams, oracle_seams,
+                "skip_ascii={skip_ascii} {input:?}"
+            );
+            assert_eq!(
+                matches!(view.text, Cow::Borrowed(_)),
+                matches!(oracle_text, Cow::Borrowed(_)),
+                "skip_ascii={skip_ascii} {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn dispatch_equals_the_plain_walk_for_every_scalar_at_every_block_alignment() {
+        // Every governed boundary character plus a stride over the rest, each
+        // after ASCII prefixes that put it before, on and past the block
+        // edges, followed by ASCII (a removed run must close at the right
+        // offset) and by a second removed character.
+        let mut characters: Vec<char> = INVISIBLE_RANGES
+            .iter()
+            .flat_map(|&(first, last)| {
+                [
+                    first.checked_sub(1),
+                    Some(first),
+                    Some(last),
+                    Some(last + 1),
+                ]
+            })
+            .flatten()
+            .filter_map(char::from_u32)
+            .collect();
+        characters.extend((0..=0x10_FFFF).step_by(251).filter_map(char::from_u32));
+        for ch in characters {
+            for prefix in 0..=140 {
+                let ascii = "x".repeat(prefix);
+                assert_dispatch_matches_oracle(&format!("{ascii}{ch}tail-{ZWSP}"));
+                assert_dispatch_matches_oracle(&format!("{ascii}{ch}{ZWSP}"));
+            }
+        }
+    }
+
+    #[test]
+    fn dispatch_equals_the_plain_walk_on_generated_mixed_text() {
+        let mut state = 0x2545_F491_4F6C_DD1D_u64;
+        let mut next = move || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            usize::try_from(state >> 33).unwrap()
+        };
+        let pieces: [&str; 14] = [
+            "ordinary request\n",
+            "한글 문장",
+            "🙂",
+            "é",
+            "\u{200B}",
+            "\u{200C}\u{2060}",
+            "\u{E0041}",
+            "\u{00AD}",
+            "\u{FE0F}",
+            "\u{3000}",
+            "token_abcdefghijklmnopqrstuvwxyz0123456789",
+            " ",
+            "\r\n",
+            "\u{FFA0}",
+        ];
+        for _ in 0..4000 {
+            let mut input = String::new();
+            for _ in 0..(next() % 40) {
+                let piece = pieces[next() % pieces.len()];
+                for _ in 0..=(next() % 6) {
+                    input.push_str(piece);
+                }
+                if next() % 3 == 0 {
+                    input.push_str(&"a".repeat(next() % 200));
+                }
+                if next() % 25 == 0 {
+                    // Long enough to cross walk windows and four-word steps.
+                    input.push_str(&"b".repeat(next() % 9000));
+                }
+            }
+            assert_dispatch_matches_oracle(&input);
+        }
+    }
+
+    #[test]
+    fn dispatch_equals_the_plain_walk_around_walk_window_edges() {
+        let mixed_dense = "한글🙂é ".repeat(2000);
+        for prefix in
+            (WALK_WINDOW - 12..=WALK_WINDOW + 12).chain(2 * WALK_WINDOW - 12..=2 * WALK_WINDOW + 12)
+        {
+            let ascii = "x".repeat(prefix);
+            for edge in ["한", "🙂", "é", ZWSP.to_string().as_str(), "a"] {
+                assert_dispatch_matches_oracle(&format!("{ascii}{edge}{ZWSP}{ZWNJ}tail"));
+                assert_dispatch_matches_oracle(&format!("{ascii}{edge}tail{ZWSP}"));
+                assert_dispatch_matches_oracle(&format!("{ZWSP}{ascii}{edge}{ZWNJ}"));
+                assert_dispatch_matches_oracle(&format!("{mixed_dense}{ascii}{edge}{ZWSP}x"));
+            }
+        }
+        // A removed run in the middle of dense non-ASCII text, at every
+        // alignment of the window.
+        for skew in 0..8 {
+            let input = format!("{}{ZWSP}{mixed_dense}", "x".repeat(skew));
+            assert_dispatch_matches_oracle(&input);
+        }
+    }
+
+    #[test]
+    fn dispatch_handles_the_named_boundary_shapes() {
+        let long = "ordinary request processed successfully\n".repeat(40);
+        for input in [
+            format!("{long}한글"),
+            format!("{long}{ZWSP}"),
+            format!("{ZWSP}{long}"),
+            format!("{long}{ZWSP}{long}"),
+            format!("{ZWSP}{ZWNJ}{long}{ZWSP}"),
+            format!("한{ZWSP}{long}{ZWSP}한"),
+            format!("{long}한{ZWSP}{ZWSP}{long}한"),
+            format!("{}{ZWSP}x", "a".repeat(63)),
+            format!("{}{ZWSP}x", "a".repeat(64)),
+            format!("{}é{ZWSP}x", "a".repeat(63)),
+            format!("{}é{ZWSP}x", "a".repeat(62)),
+        ] {
+            assert_dispatch_matches_oracle(&input);
+        }
     }
 
     #[test]
@@ -354,20 +740,20 @@ mod tests {
     fn contains_removed_run_matches_the_interior_definition() {
         let input = format!("x=ab{ZWNJ}{ZWSP}cd;");
         let view = NormalizedInput::new(&input);
-        assert!(view.contains_removed_run(range(2, 6)));
-        assert!(!view.contains_removed_run(range(0, 2)));
+        assert!(contained(&view, range(2, 6)));
+        assert!(!contained(&view, range(0, 2)));
         // The run sits exactly at this range's start, so it is adjacent, not
         // interior.
-        assert!(!view.contains_removed_run(range(4, 6)));
+        assert!(!contained(&view, range(4, 6)));
 
         let input = format!("x={ZWSP}abcd{ZWSP};");
         let view = NormalizedInput::new(&input);
         // Both runs are adjacent to this range's boundaries, not interior.
-        assert!(!view.contains_removed_run(range(2, 6)));
-        assert!(view.contains_removed_run(range(0, 7)));
+        assert!(!contained(&view, range(2, 6)));
+        assert!(contained(&view, range(0, 7)));
 
         let view = NormalizedInput::new("plain");
-        assert!(!view.contains_removed_run(range(1, 4)));
+        assert!(!contained(&view, range(1, 4)));
     }
 
     #[test]
