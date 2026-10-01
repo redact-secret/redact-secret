@@ -1,0 +1,186 @@
+diff --git a/crates/secret-scan-core/src/normalize.rs b/crates/secret-scan-core/src/normalize.rs
+index 5f72ad86..a09acd58 100644
+--- a/crates/secret-scan-core/src/normalize.rs
++++ b/crates/secret-scan-core/src/normalize.rs
+@@ -422,83 +422,6 @@ mod tests {
+         assert_eq!(view.translate(boundary).map(|pair| pair.1), Some(false));
+     }
+ 
+-    /// Median nanoseconds per call of `f`, over `samples` batches of `reps`.
+-    #[allow(clippy::cast_precision_loss)]
+-    fn median_ns(samples: usize, reps: usize, mut f: impl FnMut() -> usize) -> f64 {
+-        use std::hint::black_box;
+-        use std::time::Instant;
+-        let mut times: Vec<f64> = (0..samples)
+-            .map(|_| {
+-                let started = Instant::now();
+-                for _ in 0..reps {
+-                    black_box(f());
+-                }
+-                started.elapsed().as_secs_f64() * 1e9 / reps as f64
+-            })
+-            .collect();
+-        times.sort_by(f64::total_cmp);
+-        times[times.len() / 2]
+-    }
+-
+-    /// Stage measurement for #1133 (maintainer-only):
+-    /// `cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_translate`.
+-    /// Translates 4,096 ranges per call with the old pair of searches and the
+-    /// fused one, alternating A/B.
+-    #[test]
+-    #[ignore = "timing harness, run with --release --nocapture"]
+-    #[allow(clippy::print_stderr)]
+-    fn measure_translate_1133() {
+-        use std::hint::black_box;
+-        for (name, text) in [
+-            ("no-seams", "a".repeat(32_768)),
+-            ("4096-seams", format!("ab{ZWSP}cdEFGH").repeat(4096)),
+-        ] {
+-            let view = NormalizedInput::new(&text);
+-            let ranges: Vec<ByteRange> = (0..4096)
+-                .map(|i| {
+-                    let start = i * 7 % (view.text().len() - 8);
+-                    range(start, start + 8)
+-                })
+-                .collect();
+-            let old = || {
+-                let mut sum = 0;
+-                for &r in black_box(&ranges) {
+-                    let original = black_box(oracle_to_original(&view, r).unwrap());
+-                    let interior = black_box(oracle_contains_removed_run(&view, r));
+-                    sum += original.start() + original.end() + usize::from(interior);
+-                }
+-                sum
+-            };
+-            let fused = || {
+-                let mut sum = 0;
+-                for &r in black_box(&ranges) {
+-                    let (original, interior) = black_box(view.translate(r).unwrap());
+-                    sum += original.start() + original.end() + usize::from(interior);
+-                }
+-                sum
+-            };
+-            assert_eq!(old(), fused());
+-            let (mut olds, mut news) = (Vec::new(), Vec::new());
+-            for round in 0..15 {
+-                if round % 2 == 0 {
+-                    olds.push(median_ns(1, 200, old));
+-                    news.push(median_ns(1, 200, fused));
+-                } else {
+-                    news.push(median_ns(1, 200, fused));
+-                    olds.push(median_ns(1, 200, old));
+-                }
+-            }
+-            olds.sort_by(f64::total_cmp);
+-            news.sort_by(f64::total_cmp);
+-            eprintln!(
+-                "{name}: {:.1} -> {:.1} us per 4096 ranges ({:+.1}%)",
+-                olds[7] / 1e3,
+-                news[7] / 1e3,
+-                (news[7] / olds[7] - 1.0) * 100.0
+-            );
+-        }
+-    }
+-
+     /// The pre-#1134 `NormalizedInput::new`, verbatim: one `char_indices`
+     /// walk with no ASCII-block dispatch. The oracle for
+     /// [`NormalizedInput::build`].
+@@ -685,97 +608,6 @@ mod tests {
+         }
+     }
+ 
+-    /// Stage measurement for #1134 (maintainer-only):
+-    /// `cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_normalize`.
+-    /// Old plain walk vs the dispatch, same binary, alternating A/B.
+-    #[test]
+-    #[ignore = "timing harness, run with --release --nocapture"]
+-    #[allow(clippy::print_stderr)]
+-    fn measure_normalize_1134() {
+-        use std::hint::black_box;
+-        let ordinary = "ordinary request processed successfully\n";
+-        let mut sparse = ordinary.repeat(1700);
+-        sparse.push_str("한글🙂");
+-        let workloads: Vec<(&str, String)> = vec![
+-            ("ascii", ordinary.repeat(1700)),
+-            ("sparse-unicode", sparse),
+-            ("dense-unicode", "한글 문장과🙂이모지 테스트\n".repeat(1700)),
+-            (
+-                "sparse-invisible",
+-                format!(
+-                    "{}{ZWSP}{}",
+-                    "ordinary request\n".repeat(2000),
+-                    "completed successfully\n".repeat(2000)
+-                ),
+-            ),
+-            ("dense-invisible", "a\u{200b}b\u{200c}가🙂\n".repeat(4000)),
+-            (
+-                "en-kr-mixed-prose",
+-                "user=minho 한글 문장 id=4711 status=ok ".repeat(1800),
+-            ),
+-            (
+-                "sparse-emoji-log",
+-                format!("{}🙂 ", ordinary.repeat(8)).repeat(200),
+-            ),
+-            (
+-                "emoji-every-line",
+-                "ordinary request processed 🙂\n".repeat(2000),
+-            ),
+-            (
+-                "kr-dense-prose",
+-                "이것은 한국어로 작성된 로그 메시지입니다 ".repeat(1500),
+-            ),
+-        ];
+-        for (name, text) in &workloads {
+-            let old = || {
+-                let (text, seams) = oracle_new(black_box(text));
+-                text.len() + seams.len()
+-            };
+-            let new = || {
+-                let view = NormalizedInput::build(black_box(text), true);
+-                view.text.len() + view.seams.len()
+-            };
+-            // A/A control: a second compiled copy of the same old walk, to show
+-            // how far identical code differs by layout alone.
+-            let structure = || {
+-                let (text, seams) = oracle_new_copy::<1>(black_box(text));
+-                text.len() + seams.len()
+-            };
+-            assert_eq!(old(), new());
+-            let (mut olds, mut news) = (Vec::new(), Vec::new());
+-            let mut structs = Vec::new();
+-            for round in 0..41 {
+-                if round % 2 == 0 {
+-                    olds.push(median_ns(1, 100, old));
+-                    news.push(median_ns(1, 100, new));
+-                    structs.push(median_ns(1, 100, structure));
+-                } else {
+-                    structs.push(median_ns(1, 100, structure));
+-                    news.push(median_ns(1, 100, new));
+-                    olds.push(median_ns(1, 100, old));
+-                }
+-            }
+-            olds.sort_by(f64::total_cmp);
+-            news.sort_by(f64::total_cmp);
+-            structs.sort_by(f64::total_cmp);
+-            eprintln!(
+-                "  A/A control (old vs old) min {:.3} us ({:+.1}%)",
+-                structs[0] / 1e3,
+-                (structs[0] / olds[0] - 1.0) * 100.0
+-            );
+-            eprintln!(
+-                "{name} ({} B): median {:.3} -> {:.3} us ({:+.1}%), min {:.3} -> {:.3} us ({:+.1}%)",
+-                text.len(),
+-                olds[20] / 1e3,
+-                news[20] / 1e3,
+-                (news[20] / olds[20] - 1.0) * 100.0,
+-                olds[0] / 1e3,
+-                news[0] / 1e3,
+-                (news[0] / olds[0] - 1.0) * 100.0
+-            );
+-        }
+-    }
+-
+     #[test]
+     fn the_table_is_pinned_to_the_decided_ucd_version() {
+         // Bumping the UCD is a decision change: this, the generator's pins,

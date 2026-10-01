@@ -557,27 +557,57 @@ fn azure_segment_bounds(input: &str, anchor: usize) -> Option<(usize, usize)> {
     Some((start, end))
 }
 
-struct AzureField<'a> {
-    key: &'a str,
-    value: &'a str,
-    value_start: usize,
+/// The four borrowed first-occurrence fields of a segment, each with the
+/// absolute byte offset of its value where needed. First duplicate wins.
+#[derive(Default)]
+struct AzureFields<'a> {
+    protocol: Option<&'a str>,
+    account_name: Option<&'a str>,
+    endpoint_suffix: Option<&'a str>,
+    account_key: Option<(&'a str, usize)>,
+}
+
+impl AzureFields<'_> {
+    fn is_complete(&self) -> bool {
+        self.protocol.is_some()
+            && self.account_name.is_some()
+            && self.endpoint_suffix.is_some()
+            && self.account_key.is_some()
+    }
 }
 
 /// Splits `segment` (starting at absolute offset `segment_start`) into
-/// `key=value` pairs on `;`, order-independent, recording each value's
-/// absolute byte offset. A pair without `=` is skipped rather than
-/// rejecting the whole segment, so unrelated trailing fields do not block
-/// recognition.
-fn parse_azure_fields(segment: &str, segment_start: usize) -> Vec<AzureField<'_>> {
-    let mut fields = Vec::new();
+/// `key=value` pairs on `;`, order-independent, keeping only the first
+/// occurrence of each of the four recognized keys. A pair without `=` is
+/// skipped rather than rejecting the whole segment, so unrelated trailing
+/// fields do not block recognition.
+fn parse_azure_fields(segment: &str, segment_start: usize) -> AzureFields<'_> {
+    let mut fields = AzureFields::default();
     let mut offset = 0usize;
     for pair in segment.split(';') {
         if let Some(equals) = pair.find('=') {
-            fields.push(AzureField {
-                key: &pair[..equals],
-                value: &pair[equals + 1..],
-                value_start: segment_start + offset + equals + 1,
-            });
+            let key = &pair[..equals];
+            let value = &pair[equals + 1..];
+            match key {
+                AZURE_PROTOCOL_KEY => {
+                    fields.protocol.get_or_insert(value);
+                }
+                AZURE_ACCOUNT_NAME_KEY => {
+                    fields.account_name.get_or_insert(value);
+                }
+                AZURE_ENDPOINT_SUFFIX_KEY => {
+                    fields.endpoint_suffix.get_or_insert(value);
+                }
+                AZURE_ACCOUNT_KEY_KEY => {
+                    fields
+                        .account_key
+                        .get_or_insert((value, segment_start + offset + equals + 1));
+                }
+                _ => {}
+            }
+            if fields.is_complete() {
+                break;
+            }
         }
         offset += pair.len() + 1;
     }
@@ -607,51 +637,90 @@ fn is_valid_azure_account_key(value: &str) -> bool {
     true
 }
 
+/// Validates a parsed segment and returns the account-key value range, or
+/// `None` when any structural rule fails.
+fn azure_account_key_range(fields: &AzureFields<'_>) -> Option<ByteRange> {
+    let protocol = fields.protocol?;
+    if !protocol.eq_ignore_ascii_case("https") && !protocol.eq_ignore_ascii_case("http") {
+        return None;
+    }
+    if fields.account_name?.is_empty() {
+        return None;
+    }
+    if !KNOWN_AZURE_ENDPOINT_SUFFIXES.contains(&fields.endpoint_suffix?) {
+        return None;
+    }
+    let (value, value_start) = fields.account_key?;
+    if !is_valid_azure_account_key(value) {
+        return None;
+    }
+    ByteRange::new(value_start, value_start + value.len())
+}
+
+/// Coordinates and outcome of the most recently parsed bounded segment of
+/// one `detect` call. Holds offsets only: no input text and no clone of a
+/// `Candidate`. `start`/`end` are the segment's true extent, which does not
+/// depend on the anchor; only the per-direction bound check does.
+#[derive(Clone, Copy)]
+struct AzureSegment {
+    start: usize,
+    end: usize,
+    key_range: Option<ByteRange>,
+}
+
 /// Recognizes an Azure Storage connection string anchored at `anchor`, the
 /// start of its `AccountKey=` field, and selects only the account key
-/// value.
-fn azure_storage_candidate(input: &str, anchor: usize) -> Option<Candidate> {
-    let (segment_start, segment_end) = azure_segment_bounds(input, anchor)?;
-    let fields = parse_azure_fields(&input[segment_start..segment_end], segment_start);
+/// value. A later anchor inside the cached segment reuses its parse once it
+/// satisfies the same per-direction bound as an uncached anchor.
+fn azure_storage_candidate(
+    input: &str,
+    anchor: usize,
+    cache: &mut Option<AzureSegment>,
+) -> Option<Candidate> {
+    let reusable = cache.filter(|segment| {
+        anchor >= segment.start
+            && anchor < segment.end
+            && anchor - segment.start <= MAX_AZURE_SEGMENT_LENGTH
+            && segment.end - anchor <= MAX_AZURE_SEGMENT_LENGTH
+    });
+    let segment = if let Some(segment) = reusable {
+        segment
+    } else {
+        let (start, end) = azure_segment_bounds(input, anchor)?;
+        let fields = parse_azure_fields(&input[start..end], start);
+        let segment = AzureSegment {
+            start,
+            end,
+            key_range: azure_account_key_range(&fields),
+        };
+        *cache = Some(segment);
+        segment
+    };
 
-    let protocol = fields
-        .iter()
-        .find(|field| field.key == AZURE_PROTOCOL_KEY)?;
-    if !protocol.value.eq_ignore_ascii_case("https") && !protocol.value.eq_ignore_ascii_case("http")
-    {
-        return None;
-    }
-
-    let account_name = fields
-        .iter()
-        .find(|field| field.key == AZURE_ACCOUNT_NAME_KEY)?;
-    if account_name.value.is_empty() {
-        return None;
-    }
-
-    let endpoint_suffix = fields
-        .iter()
-        .find(|field| field.key == AZURE_ENDPOINT_SUFFIX_KEY)?;
-    if !KNOWN_AZURE_ENDPOINT_SUFFIXES.contains(&endpoint_suffix.value) {
-        return None;
-    }
-
-    let account_key = fields
-        .iter()
-        .find(|field| field.key == AZURE_ACCOUNT_KEY_KEY)?;
-    if !is_valid_azure_account_key(account_key.value) {
-        return None;
-    }
-
-    let range = ByteRange::new(
-        account_key.value_start,
-        account_key.value_start + account_key.value.len(),
-    )?;
+    let range = segment.key_range?;
     Some(
         Candidate::built_in("connection_string_password", Confidence::High, range)
             .with_specificity(Specificity::Structural)
             .with_signals(vec!["azure-storage-account-key", "known-endpoint-suffix"]),
     )
+}
+
+/// Appends every Azure Storage account-key candidate in `input`, in anchor
+/// order, reusing the bounded parse of the current segment across anchors.
+fn azure_candidates(input: &str, candidates: &mut Vec<Candidate>) {
+    let mut position = 0;
+    let mut cache = None;
+    while let Some(anchor) = find_next_literal(input, AZURE_ACCOUNT_KEY_ANCHOR, position) {
+        position = anchor + 1;
+
+        if anchor > 0 && is_identifier_byte(input.as_bytes()[anchor - 1]) {
+            continue;
+        }
+
+        if let Some(candidate) = azure_storage_candidate(input, anchor, &mut cache) {
+            candidates.push(candidate);
+        }
+    }
 }
 
 /// Recognizes the password of a credential-bearing connection authority for
@@ -737,18 +806,7 @@ impl Detector for ConnectionStringDetector {
             }
         }
 
-        let mut position = 0;
-        while let Some(anchor) = find_next_literal(input, AZURE_ACCOUNT_KEY_ANCHOR, position) {
-            position = anchor + 1;
-
-            if anchor > 0 && is_identifier_byte(input.as_bytes()[anchor - 1]) {
-                continue;
-            }
-
-            if let Some(candidate) = azure_storage_candidate(input, anchor) {
-                candidates.push(candidate);
-            }
-        }
+        azure_candidates(input, &mut candidates);
 
         Ok(candidates)
     }
@@ -1487,6 +1545,190 @@ mod tests {
             );
             assert_eq!(detect(&input).len(), 1, "{suffix}");
         }
+    }
+
+    // --- #1131 differential oracle: the pre-cache implementation -----------
+
+    struct RefAzureField<'a> {
+        key: &'a str,
+        value: &'a str,
+        value_start: usize,
+    }
+
+    // Splits `segment` (starting at absolute offset `segment_start`) into
+    // `key=value` pairs on `;`, order-independent, recording each value's
+    // absolute byte offset. A pair without `=` is skipped rather than
+    // rejecting the whole segment, so unrelated trailing fields do not block
+    // recognition.
+    fn ref_parse_azure_fields(segment: &str, segment_start: usize) -> Vec<RefAzureField<'_>> {
+        let mut fields = Vec::new();
+        let mut offset = 0usize;
+        for pair in segment.split(';') {
+            if let Some(equals) = pair.find('=') {
+                fields.push(RefAzureField {
+                    key: &pair[..equals],
+                    value: &pair[equals + 1..],
+                    value_start: segment_start + offset + equals + 1,
+                });
+            }
+            offset += pair.len() + 1;
+        }
+        fields
+    }
+
+    // Recognizes an Azure Storage connection string anchored at `anchor`, the
+    // start of its `AccountKey=` field, and selects only the account key
+    // value.
+    fn ref_azure_storage_candidate(input: &str, anchor: usize) -> Option<Candidate> {
+        let (segment_start, segment_end) = azure_segment_bounds(input, anchor)?;
+        let fields = ref_parse_azure_fields(&input[segment_start..segment_end], segment_start);
+
+        let protocol = fields
+            .iter()
+            .find(|field| field.key == AZURE_PROTOCOL_KEY)?;
+        if !protocol.value.eq_ignore_ascii_case("https")
+            && !protocol.value.eq_ignore_ascii_case("http")
+        {
+            return None;
+        }
+
+        let account_name = fields
+            .iter()
+            .find(|field| field.key == AZURE_ACCOUNT_NAME_KEY)?;
+        if account_name.value.is_empty() {
+            return None;
+        }
+
+        let endpoint_suffix = fields
+            .iter()
+            .find(|field| field.key == AZURE_ENDPOINT_SUFFIX_KEY)?;
+        if !KNOWN_AZURE_ENDPOINT_SUFFIXES.contains(&endpoint_suffix.value) {
+            return None;
+        }
+
+        let account_key = fields
+            .iter()
+            .find(|field| field.key == AZURE_ACCOUNT_KEY_KEY)?;
+        if !is_valid_azure_account_key(account_key.value) {
+            return None;
+        }
+
+        let range = ByteRange::new(
+            account_key.value_start,
+            account_key.value_start + account_key.value.len(),
+        )?;
+        Some(
+            Candidate::built_in("connection_string_password", Confidence::High, range)
+                .with_specificity(Specificity::Structural)
+                .with_signals(vec!["azure-storage-account-key", "known-endpoint-suffix"]),
+        )
+    }
+
+    fn reference_azure_candidates(input: &str) -> Vec<Candidate> {
+        let mut out = Vec::new();
+        let mut position = 0;
+        while let Some(anchor) = find_next_literal(input, AZURE_ACCOUNT_KEY_ANCHOR, position) {
+            position = anchor + 1;
+            if anchor > 0 && is_identifier_byte(input.as_bytes()[anchor - 1]) {
+                continue;
+            }
+            if let Some(candidate) = ref_azure_storage_candidate(input, anchor) {
+                out.push(candidate);
+            }
+        }
+        out
+    }
+
+    fn azure_only(candidates: Vec<Candidate>) -> Vec<Candidate> {
+        candidates
+            .into_iter()
+            .filter(|c| c.signals().iter().any(|s| s == "azure-storage-account-key"))
+            .collect()
+    }
+
+    fn assert_azure_matches_reference(input: &str) {
+        assert_eq!(
+            format!("{:?}", azure_only(detect(input))),
+            format!("{:?}", reference_azure_candidates(input)),
+            "cached Azure detection diverged from the reference for a {}-byte input",
+            input.len()
+        );
+    }
+
+    #[test]
+    fn azure_segment_reuse_matches_the_reference_on_generated_inputs() {
+        let key = AZURE_ACCOUNT_KEY;
+        let atoms = [
+            "DefaultEndpointsProtocol=https".to_string(),
+            "DefaultEndpointsProtocol=ftp".to_string(),
+            "DefaultEndpointsProtocol=HTTP".to_string(),
+            "AccountName=synthetic".to_string(),
+            "AccountName=".to_string(),
+            "EndpointSuffix=core.windows.net".to_string(),
+            "EndpointSuffix=example.invalid".to_string(),
+            format!("AccountKey={key}"),
+            "AccountKey=short".to_string(),
+            "AccountKey=!!!!!!!!!!!!!!!!!!!!!!!!".to_string(),
+            "noequals".to_string(),
+            String::new(),
+            "\u{ac00}=\u{1f642}".to_string(),
+        ];
+        let separators = [";", ";", ";", " ", "\n", "\"", ";;"];
+        let mut seed = 0x1131_u64;
+        let mut next = move || {
+            seed = seed
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (seed >> 33) as usize
+        };
+        for _ in 0..4_000 {
+            let count = next() % 14;
+            let mut input = String::new();
+            for _ in 0..count {
+                input.push_str(&atoms[next() % atoms.len()]);
+                input.push_str(separators[next() % separators.len()]);
+            }
+            assert_azure_matches_reference(&input);
+        }
+    }
+
+    #[test]
+    fn azure_segment_reuse_matches_the_reference_at_the_segment_limit() {
+        let key = AZURE_ACCOUNT_KEY;
+        let base = format!(
+            "DefaultEndpointsProtocol=https;AccountName=synthetic;EndpointSuffix=core.windows.net;AccountKey={key}"
+        );
+        for width in [
+            8_000, 8_100, 8_191, 8_192, 8_193, 8_300, 16_383, 16_384, 16_385,
+        ] {
+            let filler = "x".repeat(width);
+            for input in [
+                format!("{base};{filler};AccountKey={key}"),
+                format!("AccountKey={key};{filler};{base}"),
+                format!("{filler};{base};AccountKey={key};{filler}"),
+                format!("{base};AccountKey={key};{filler};AccountKey={key}"),
+                format!(
+                    "AccountKey=short;{filler};AccountKey={key};DefaultEndpointsProtocol=https;AccountName=a;EndpointSuffix=core.windows.net"
+                ),
+            ] {
+                assert_azure_matches_reference(&input);
+            }
+        }
+        // Many repeated anchors in one segment and across independent lines,
+        // with an invalid first duplicate and a valid second one.
+        let invalid_first = format!(
+            "DefaultEndpointsProtocol=https;AccountName=synthetic;EndpointSuffix=core.windows.net;AccountKey=short;AccountKey={key}"
+        );
+        assert_azure_matches_reference(&invalid_first);
+        assert_azure_matches_reference(&format!("{base}\n").repeat(40));
+        assert_azure_matches_reference(&format!(
+            "{base}{}",
+            format!(";AccountKey={key}").repeat(99)
+        ));
+        assert_azure_matches_reference(&format!(
+            "{base}\n{}",
+            format!(";AccountKey={key}").repeat(5)
+        ));
     }
 
     #[test]
