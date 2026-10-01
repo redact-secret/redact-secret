@@ -167,6 +167,8 @@ REASON_GATE_GROUPS = {
     "mutation.unresolvedCritical": "review",
     "differential.unresolvedContractDisagreements": "peer-disagreements",
     "policy.protected-holdout": "holdout",
+    "policy.exact-span": "span-accuracy",
+    "policy.leaked-span": "span-accuracy",
 }
 
 # A `fixtureProfile <profile>: <actual> <cell> < <required> (<n> short)`
@@ -206,6 +208,7 @@ REASON_GROUP_COPY = (
     ("robustness", "detection that survives format-preserving changes to the surrounding text"),
     ("review", "its open fixture-versus-detector findings reviewed"),
     ("peer-disagreements", "its disagreements with other scanners about the format settled"),
+    ("span-accuracy", "exact match spans that leave no part of the value exposed"),
     ("holdout", "a passing protected holdout run on the frozen candidate"),
 )
 
