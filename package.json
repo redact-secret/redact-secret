@@ -111,6 +111,7 @@
     "@types/node": "^24.3.0",
     "@vitest/coverage-v8": "4.1.11",
     "esbuild": "^0.25.9",
+    "fast-check": "4.10.2",
     "playwright": "1.63.0",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11",
