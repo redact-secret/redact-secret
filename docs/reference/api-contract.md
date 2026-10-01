@@ -7,9 +7,14 @@
 | Detect and apply policy | `scan` | `scan` | Findings |
 | Replace supplied ranges | `redact` | `redact` | Text |
 | Both together | `scanAndRedact` | `scan_and_redact` | Text and findings |
+| Supported defaults, Rust only | none | `sanitize`, `sanitize_with_profile` | Text and findings, as `scan_and_redact` |
 
 Bindings adapt arguments and results; they do not copy detector logic. Rust
-additionally takes a registry, policy, and formatter. Python uses optional
+additionally takes a registry, policy, and formatter; `sanitize(input)` and
+`sanitize_with_profile(input, Profile)` are the one-call Rust path over the
+built-in registry, `DefaultPolicy`, the default placeholder formatter, and the
+default whole-input limits, with no custom detectors
+([Rust guide](../guides/rust.md)). Python uses optional
 `policy` and `formatter`; JavaScript uses an options object with `policy` and
 `placeholderFormatter`.
 
