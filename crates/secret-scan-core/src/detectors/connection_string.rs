@@ -370,8 +370,14 @@ fn is_valid_ipv4_octet(part: &str) -> bool {
 }
 
 fn is_valid_ipv4(value: &str) -> bool {
-    let parts: Vec<&str> = value.split('.').collect();
-    parts.len() == 4 && parts.iter().all(|part| is_valid_ipv4_octet(part))
+    let mut count = 0u8;
+    for part in value.split('.') {
+        count += 1;
+        if count > 4 || !is_valid_ipv4_octet(part) {
+            return false;
+        }
+    }
+    count == 4
 }
 
 fn is_hex_group(group: &str) -> bool {
@@ -387,24 +393,26 @@ fn is_valid_ipv6(value: &str) -> bool {
         return false;
     }
 
-    let sides: Vec<&str> = match compression {
-        None => vec![value],
-        Some(index) => vec![&value[..index], &value[index + 2..]],
+    // Two fixed sides (the second is empty without a compression marker), a
+    // non-empty side is walked group by group, and `peek` identifies the last
+    // group (the only position an IPv4 tail may occupy) without storage.
+    let (head, tail) = match compression {
+        None => (value, ""),
+        Some(index) => (&value[..index], &value[index + 2..]),
     };
-    let groups: Vec<&str> = sides
+    let mut groups = [head, tail]
         .into_iter()
         .filter(|side| !side.is_empty())
         .flat_map(|side| side.split(':'))
-        .collect();
-    if groups.iter().any(|group| group.is_empty()) {
-        return false;
-    }
+        .peekable();
 
-    let last = groups.len().saturating_sub(1);
     let mut units = 0u32;
-    for (index, group) in groups.iter().enumerate() {
+    while let Some(group) = groups.next() {
+        if group.is_empty() {
+            return false;
+        }
         if group.contains('.') {
-            if index != last || !is_valid_ipv4(group) {
+            if groups.peek().is_some() || !is_valid_ipv4(group) {
                 return false;
             }
             units += 2;
@@ -1438,6 +1446,243 @@ mod tests {
             detect("postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@[2001:db8::g]/db"),
             Vec::new()
         );
+    }
+
+    // Test-only oracles: the pre-#1160 validators that collected each split
+    // into a `Vec`. The shipped iterator forms must agree on every input.
+    fn oracle_is_valid_ipv4(value: &str) -> bool {
+        let parts: Vec<&str> = value.split('.').collect();
+        parts.len() == 4 && parts.iter().all(|part| is_valid_ipv4_octet(part))
+    }
+
+    fn oracle_is_valid_ipv6(value: &str) -> bool {
+        if !value.contains(':') {
+            return false;
+        }
+        let compression = value.find("::");
+        if compression != value.rfind("::") {
+            return false;
+        }
+        let sides: Vec<&str> = match compression {
+            None => vec![value],
+            Some(index) => vec![&value[..index], &value[index + 2..]],
+        };
+        let groups: Vec<&str> = sides
+            .into_iter()
+            .filter(|side| !side.is_empty())
+            .flat_map(|side| side.split(':'))
+            .collect();
+        if groups.iter().any(|group| group.is_empty()) {
+            return false;
+        }
+        let last = groups.len().saturating_sub(1);
+        let mut units = 0u32;
+        for (index, group) in groups.iter().enumerate() {
+            if group.contains('.') {
+                if index != last || !oracle_is_valid_ipv4(group) {
+                    return false;
+                }
+                units += 2;
+            } else {
+                if !is_hex_group(group) {
+                    return false;
+                }
+                units += 1;
+            }
+        }
+        if compression.is_none() {
+            units == 8
+        } else {
+            units < 8
+        }
+    }
+
+    fn assert_ip_matches_oracle(input: &str) {
+        assert_eq!(
+            is_valid_ipv4(input),
+            oracle_is_valid_ipv4(input),
+            "ipv4 {input:?}"
+        );
+        assert_eq!(
+            is_valid_ipv6(input),
+            oracle_is_valid_ipv6(input),
+            "ipv6 {input:?}"
+        );
+    }
+
+    fn assert_every_string_matches_oracle(alphabet: &[char], max_len: usize) {
+        let mut current: Vec<String> = vec![String::new()];
+        for _ in 0..=max_len {
+            let mut next = Vec::new();
+            for text in &current {
+                assert_ip_matches_oracle(text);
+                if text.chars().count() < max_len {
+                    for ch in alphabet {
+                        let mut grown = text.clone();
+                        grown.push(*ch);
+                        next.push(grown);
+                    }
+                }
+            }
+            if next.is_empty() {
+                break;
+            }
+            current = next;
+        }
+    }
+
+    #[test]
+    fn ip_validation_matches_the_collecting_oracle_on_named_shapes() {
+        let shapes = [
+            "",
+            ":",
+            "::",
+            ":::",
+            "::::",
+            "1::",
+            "::1",
+            "1::1",
+            "1::1::1",
+            "1:2:3:4:5:6:7:8",
+            "1:2:3:4:5:6:7",
+            "1:2:3:4:5:6:7:8:9",
+            "1:2:3:4:5:6:7::",
+            "::2:3:4:5:6:7:8",
+            "1:2:3:4:5:6::8",
+            "1::3:4:5:6:7:8",
+            "2001:db8::ff00:42:8329",
+            "2001:db8:0:0:0:0:0:1",
+            "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+            "2001:0db8:85a3:0000:0000:8a2e:0370:73345",
+            "2001:db8::g",
+            ":1:2:3:4:5:6:7",
+            "1:2:3:4:5:6:7:",
+            "1:2:3:4:5:6:1.2.3.4",
+            "1:2:3:4:5:6:7:1.2.3.4",
+            "::1.2.3.4",
+            "::ffff:192.0.2.128",
+            "::192.0.2.128:1",
+            "1.2.3.4::",
+            "1.2.3.4:1",
+            "::1.2.3",
+            "::1.2.3.4.5",
+            "::1.2.3.256",
+            "::1.2.3.04",
+            "::1.2.3.",
+            "::.1.2.3",
+            "1:2:3:4:5:6:7:8.9.10.11",
+            "1.2.3.4",
+            "0.0.0.0",
+            "255.255.255.255",
+            "256.1.1.1",
+            "01.1.1.1",
+            "1.1.1.1.",
+            ".1.1.1.1",
+            "1..1.1",
+            "1.1.1",
+            "1.1.1.1.1",
+            "1.1.1.1.1.1.1.1.1.1",
+            "999.1.1.1",
+            "1.1.1.0001",
+            "a.b.c.d",
+            "\u{0661}.1.1.1",
+            "\u{ff11}.1.1.1",
+            "::\u{ff11}",
+            "1:2:\u{e9}::",
+            "\u{1f512}::1",
+            "::1\u{0}",
+            " ::1",
+            "::1 ",
+        ];
+        for shape in shapes {
+            assert_ip_matches_oracle(shape);
+        }
+        // The named valid shapes stay valid, so the comparison is not vacuous.
+        assert!(is_valid_ipv4("192.0.2.128"));
+        assert!(is_valid_ipv6("2001:db8::ff00:42:8329"));
+        assert!(is_valid_ipv6("::ffff:192.0.2.128"));
+        assert!(is_valid_ipv6("1:2:3:4:5:6:1.2.3.4"));
+        assert!(!is_valid_ipv6("1:2:3:4:5:6:7:1.2.3.4"));
+        assert!(!is_valid_ipv6("::192.0.2.128:1"));
+    }
+
+    #[test]
+    fn ip_validation_matches_the_collecting_oracle_exhaustively_on_small_alphabets() {
+        assert_every_string_matches_oracle(&['0', '2', '5', ':', '.', 'f'], 7);
+        assert_every_string_matches_oracle(&[':', '.', '1', 'g'], 10);
+        assert_every_string_matches_oracle(&[':', '.', '1', '\u{e9}', '\u{ff11}'], 7);
+    }
+
+    #[test]
+    fn ip_validation_matches_the_collecting_oracle_on_generated_inputs() {
+        let atoms: [&str; 24] = [
+            "0",
+            "1",
+            "9",
+            "25",
+            "255",
+            "256",
+            "0f",
+            "ffff",
+            "fffff",
+            "g",
+            ":",
+            "::",
+            ".",
+            "..",
+            "1.2.3.4",
+            "01.2.3.4",
+            "192.0.2.1",
+            "::",
+            ":",
+            ":",
+            "\u{e9}",
+            "\u{ff11}",
+            "-",
+            "%",
+        ];
+        let mut state = 0x9e37_79b9_7f4a_7c15_u64;
+        for _ in 0..40_000 {
+            let mut input = String::new();
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let pieces = usize::try_from(state % 14).unwrap();
+            for _ in 0..pieces {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                input.push_str(atoms[usize::try_from(state % 24).unwrap()]);
+            }
+            assert_ip_matches_oracle(&input);
+        }
+    }
+
+    #[test]
+    fn ip_validation_matches_the_collecting_oracle_on_long_inputs() {
+        let eight = "1:2:3:4:5:6:7:8";
+        let mut inputs = vec![
+            "1:".repeat(5_000),
+            ":".repeat(10_000),
+            ".".repeat(10_000),
+            "1.".repeat(5_000),
+            format!("{}1", "1:".repeat(5_000)),
+            format!("::{}", "1:".repeat(5_000)),
+            format!("{}::", "1:".repeat(5_000)),
+            format!("{eight}{}", ":1".repeat(5_000)),
+            format!("{}::1.2.3.4", "1:".repeat(3)),
+            format!("{}.4", "1.2.3".repeat(3_000)),
+            format!("::{}", "1.".repeat(4_000)),
+        ];
+        for count in 0..=12 {
+            inputs.push(vec!["1"; count].join(":"));
+            inputs.push(format!("::{}", vec!["1"; count].join(":")));
+            inputs.push(format!("{}::", vec!["1"; count].join(":")));
+            inputs.push(vec!["1"; count].join("."));
+        }
+        for input in &inputs {
+            assert_ip_matches_oracle(input);
+        }
     }
 
     #[test]
