@@ -295,22 +295,30 @@ fn is_interpolation_or_env_reference(value: &str) -> bool {
 /// `TODO_SET_PASSWORD`).
 fn is_fill_in_password_prose(value: &str) -> bool {
     const PREFIXES: [&str; 3] = ["insert", "replace", "todo"];
-    let tokens: Vec<&str> = value
-        .split(['_', '-'])
-        .filter(|token| !token.is_empty())
-        .collect();
-    if tokens.len() < 2 {
+    // One pass over the non-empty tokens keeps only the first, the last, the
+    // count (two are enough) and whether any token is "password".
+    let mut first = "";
+    let mut last = "";
+    let mut count = 0u8;
+    let mut has_password = false;
+    for token in value.split(['_', '-']).filter(|token| !token.is_empty()) {
+        if count == 0 {
+            first = token;
+        }
+        last = token;
+        count = count.saturating_add(1);
+        has_password |= token.eq_ignore_ascii_case("password");
+    }
+    if count < 2 {
         return false;
     }
-    if tokens[tokens.len() - 1].eq_ignore_ascii_case("here") {
+    if last.eq_ignore_ascii_case("here") {
         return true;
     }
-    PREFIXES
-        .iter()
-        .any(|prefix| tokens[0].eq_ignore_ascii_case(prefix))
-        && tokens
+    has_password
+        && PREFIXES
             .iter()
-            .any(|token| token.eq_ignore_ascii_case("password"))
+            .any(|prefix| first.eq_ignore_ascii_case(prefix))
 }
 
 fn is_userinfo_char(byte: u8) -> bool {
@@ -1066,6 +1074,164 @@ mod tests {
                 Vec::new(),
                 "expected no findings for {input:?}"
             );
+        }
+    }
+
+    // Test-only oracle: the pre-#1161 classifier that collected the filtered
+    // tokens into a `Vec`. The shipped single pass must agree on every input.
+    fn oracle_is_fill_in_password_prose(value: &str) -> bool {
+        const PREFIXES: [&str; 3] = ["insert", "replace", "todo"];
+        let tokens: Vec<&str> = value
+            .split(['_', '-'])
+            .filter(|token| !token.is_empty())
+            .collect();
+        if tokens.len() < 2 {
+            return false;
+        }
+        if tokens[tokens.len() - 1].eq_ignore_ascii_case("here") {
+            return true;
+        }
+        PREFIXES
+            .iter()
+            .any(|prefix| tokens[0].eq_ignore_ascii_case(prefix))
+            && tokens
+                .iter()
+                .any(|token| token.eq_ignore_ascii_case("password"))
+    }
+
+    fn assert_prose_matches_oracle(input: &str) {
+        assert_eq!(
+            is_fill_in_password_prose(input),
+            oracle_is_fill_in_password_prose(input),
+            "{input:?}"
+        );
+    }
+
+    #[test]
+    fn fill_in_prose_matches_the_collecting_oracle_on_named_shapes() {
+        let shapes = [
+            "",
+            "_",
+            "-",
+            "__",
+            "_-_-",
+            "here",
+            "_here",
+            "here_",
+            "x_here",
+            "x-HERE",
+            "x_Here_",
+            "_x_here_",
+            "here_x",
+            "here_here",
+            "your_password_here",
+            "your_password_here_now",
+            "insert-password-here",
+            "REPLACE_ME_PASSWORD",
+            "TODO_SET_PASSWORD",
+            "todo_password",
+            "todo-PassWord-x",
+            "todo_passwords",
+            "todo_password_",
+            "_todo_password",
+            "x_todo_password",
+            "password_todo",
+            "insert",
+            "insert_",
+            "insert_x",
+            "insert__password",
+            "insert_xpassword",
+            "inserts_password",
+            "replace_me_password_here_not",
+            "replace_me_password_here",
+            "a_b",
+            "a-b",
+            "ab",
+            "pass_word",
+            "password",
+            "PASSWORD_HERE",
+            "Pass\u{ff3f}word_here",
+            "todo_pass\u{e9}word",
+            "\u{e9}_here",
+            "todo_\u{fb00}",
+            "todo\u{0}_password",
+            "todo password",
+            "x.here",
+            "x_here\u{0}",
+            "tod\u{0130}_password",
+        ];
+        for shape in shapes {
+            assert_prose_matches_oracle(shape);
+        }
+        // Non-vacuous: both sides of each rule are exercised.
+        assert!(is_fill_in_password_prose("your_password_here"));
+        assert!(is_fill_in_password_prose("TODO_SET_PASSWORD"));
+        assert!(!is_fill_in_password_prose("here"));
+        assert!(!is_fill_in_password_prose("todo_passwords"));
+        assert!(!is_fill_in_password_prose("password_todo"));
+    }
+
+    #[test]
+    fn fill_in_prose_matches_the_collecting_oracle_exhaustively_on_token_alphabets() {
+        // Every sequence of up to six pieces drawn from separators, empty-run
+        // markers and the lexical atoms the rules look at.
+        let atoms = [
+            "_", "-", "here", "HERE", "password", "PassWord", "todo", "insert", "replace", "x",
+        ];
+        let mut sequences: Vec<String> = vec![String::new()];
+        for _ in 0..6 {
+            let mut next = Vec::new();
+            for text in &sequences {
+                assert_prose_matches_oracle(text);
+                for atom in atoms {
+                    let mut grown = text.clone();
+                    grown.push_str(atom);
+                    next.push(grown);
+                }
+            }
+            sequences = next;
+        }
+        for text in &sequences {
+            assert_prose_matches_oracle(text);
+        }
+    }
+
+    #[test]
+    fn fill_in_prose_matches_the_collecting_oracle_on_generated_and_long_inputs() {
+        let atoms: [&str; 16] = [
+            "_", "-", "__", "here", "Here", "password", "PASSWORD", "todo", "TODO", "insert",
+            "replace", "x9", "\u{e9}", "\u{ff3f}", "\u{fb00}", "pass",
+        ];
+        let mut state = 0x2545_f491_4f6c_dd1d_u64;
+        for _ in 0..40_000 {
+            let mut input = String::new();
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let pieces = usize::try_from(state % 12).unwrap();
+            for _ in 0..pieces {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                input.push_str(atoms[usize::try_from(state % 16).unwrap()]);
+            }
+            assert_prose_matches_oracle(&input);
+        }
+        let long = [
+            "a_".repeat(50_000),
+            format!("{}here", "a_".repeat(50_000)),
+            format!("todo{}password", "_x".repeat(50_000)),
+            format!("todo{}", "_x".repeat(50_000)),
+            format!("{}password_x", "x_".repeat(50_000)),
+            "_".repeat(100_000),
+            "-_".repeat(60_000),
+            format!("{}a", "_".repeat(100_000)),
+            format!("a{}here", "-".repeat(100_000)),
+            format!("{}_here", "x".repeat(100_000)),
+            format!("todo_{}", "password".repeat(10_000)),
+        ];
+        for input in &long {
+            assert_prose_matches_oracle(input);
         }
     }
 
