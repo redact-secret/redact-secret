@@ -116,6 +116,7 @@ fn base64_url_sextet(byte: u8) -> Option<u8> {
 /// byte (never reached by a caller here, since every caller's `segment` was
 /// already validated against the base64url alphabet) or a one-sextet
 /// remainder, which unpadded base64 can never legitimately produce.
+#[cfg(test)]
 fn base64_url_decode(segment: &[u8]) -> Option<Vec<u8>> {
     let low_byte = |value: u32| u8::try_from(value & 0xFF).unwrap_or(0);
     let (chunks, remainder) = segment.as_chunks::<4>();
@@ -161,6 +162,120 @@ fn base64_url_decode(segment: &[u8]) -> Option<Vec<u8>> {
 /// structural match stands. This is a deliberately narrow, exact carve-out,
 /// not general JSON parsing — see the module docs.
 fn is_supabase_legacy_anon_claim(payload: &[u8]) -> bool {
+    let mut buf = [0u8; DECODE_BUFFER];
+    let mut len = 0usize;
+    let mut found = (false, false);
+    let (chunks, remainder) = payload.as_chunks::<4>();
+    for chunk in chunks {
+        let mut combined = 0u32;
+        let mut invalid = 0u8;
+        for &byte in chunk {
+            let sextet = SEXTET_TABLE[usize::from(byte)];
+            invalid |= sextet;
+            combined = (combined << 6) | u32::from(sextet & 0x3F);
+        }
+        if invalid & 0x80 != 0 {
+            return false;
+        }
+        let [_, b0, b1, b2] = combined.to_be_bytes();
+        if let Some(slot) = buf.get_mut(len..len + 3) {
+            slot.copy_from_slice(&[b0, b1, b2]);
+        }
+        len += 3;
+        if len > DECODE_BUFFER - 3 && !flush_decoded(&mut buf, &mut len, false, &mut found) {
+            return false;
+        }
+    }
+    if remainder.len() == 1 {
+        return false;
+    }
+    if !remainder.is_empty() {
+        let mut combined = 0u32;
+        for &byte in remainder {
+            let Some(sextet) = base64_url_sextet(byte) else {
+                return false;
+            };
+            combined = (combined << 6) | u32::from(sextet);
+        }
+        combined <<= 6 * (4 - remainder.len());
+        buf[len] = u8::try_from((combined >> 16) & 0xFF).unwrap_or(0);
+        len += 1;
+        if remainder.len() == 3 {
+            buf[len] = u8::try_from((combined >> 8) & 0xFF).unwrap_or(0);
+            len += 1;
+        }
+    }
+    flush_decoded(&mut buf, &mut len, true, &mut found) && found.0 && found.1
+}
+
+/// Sextet value per byte; `0x80` marks a byte outside the base64url alphabet.
+const SEXTET_TABLE: [u8; 256] = {
+    let mut table = [0x80u8; 256];
+    let mut byte = 0u8;
+    loop {
+        table[byte as usize] = match byte {
+            b'A'..=b'Z' => byte - b'A',
+            b'a'..=b'z' => byte - b'a' + 26,
+            b'0'..=b'9' => byte - b'0' + 52,
+            b'-' => 62,
+            b'_' => 63,
+            _ => 0x80,
+        };
+        if byte == u8::MAX {
+            break;
+        }
+        byte += 1;
+    }
+    table
+};
+
+const ISS_MARKER: &str = "\"iss\":\"supabase\"";
+const ROLE_MARKER: &str = "\"role\":\"anon\"";
+/// Decoded text kept between flushes: one less than the longest marker, so
+/// a marker split across two flushes is still found whole.
+const MARKER_CARRY: usize = if ISS_MARKER.len() > ROLE_MARKER.len() {
+    ISS_MARKER.len()
+} else {
+    ROLE_MARKER.len()
+} - 1;
+/// Bounded stack buffer for decoded payload bytes (no heap copy).
+const DECODE_BUFFER: usize = 2048;
+
+/// Validates the buffered decoded prefix as UTF-8 and records marker hits.
+/// With `last == false`, an incomplete trailing sequence is held back (it
+/// may complete in the next flush) and the buffer is trimmed to the marker
+/// carry plus that tail. Returns `false` on invalid UTF-8; validation never
+/// stops early on a marker hit, so later invalid UTF-8 still fails closed.
+fn flush_decoded(
+    buf: &mut [u8; DECODE_BUFFER],
+    len: &mut usize,
+    last: bool,
+    found: &mut (bool, bool),
+) -> bool {
+    let valid = match std::str::from_utf8(&buf[..*len]) {
+        Ok(text) => text.len(),
+        Err(error) if !last && error.error_len().is_none() => error.valid_up_to(),
+        Err(_) => return false,
+    };
+    let Ok(text) = std::str::from_utf8(&buf[..valid]) else {
+        return false;
+    };
+    found.0 |= text.contains(ISS_MARKER);
+    found.1 |= text.contains(ROLE_MARKER);
+    if !last {
+        let mut keep = valid.saturating_sub(MARKER_CARRY);
+        while keep < valid && !text.is_char_boundary(keep) {
+            keep += 1;
+        }
+        buf.copy_within(keep..*len, 0);
+        *len -= keep;
+    }
+    true
+}
+
+/// Test-only oracle: the original heap-decoding implementation.
+#[cfg(test)]
+fn oracle_is_supabase_legacy_anon_claim(payload: &[u8]) -> bool {
     let Some(decoded) = base64_url_decode(payload) else {
         return false;
     };
@@ -463,6 +578,150 @@ mod tests {
         ] {
             let encoded = base64_url_encode(bytes);
             assert_eq!(base64_url_decode(encoded.as_bytes()).unwrap(), bytes);
+        }
+    }
+
+    // -- Streaming exception check vs. the heap-decoding oracle (#1132) -----
+
+    fn assert_matches_oracle(payload: &[u8]) {
+        assert_eq!(
+            is_supabase_legacy_anon_claim(payload),
+            oracle_is_supabase_legacy_anon_claim(payload),
+            "payload of {} bytes",
+            payload.len()
+        );
+    }
+
+    fn assert_decoded_matches_oracle(decoded: &[u8]) {
+        let encoded = base64_url_encode(decoded);
+        assert_matches_oracle(encoded.as_bytes());
+    }
+
+    #[test]
+    fn streaming_check_matches_oracle_for_markers_at_every_offset() {
+        const ISS: &str = "\"iss\":\"supabase\"";
+        const ROLE: &str = "\"role\":\"anon\"";
+        // Fillers of 1-, 2-, 3- and 4-byte scalars so sequences straddle
+        // flushes at every alignment around the 2048-byte buffer.
+        for filler in ["a", "\u{e9}", "\u{20ac}", "\u{1f600}"] {
+            for lead in 0..40usize {
+                for gap in [
+                    0usize, 1, 2, 3, 7, 480, 511, 512, 513, 1500, 2030, 2040, 2044, 2045, 2046,
+                    2047, 2048, 2049, 2100,
+                ] {
+                    let mut text = String::new();
+                    for _ in 0..(lead * 13) {
+                        text.push_str(filler);
+                    }
+                    text.push_str(ISS);
+                    for _ in 0..gap {
+                        text.push_str(filler);
+                    }
+                    text.push_str(ROLE);
+                    assert_decoded_matches_oracle(text.as_bytes());
+                    let reversed = text.replace(ISS, "X").replace(ROLE, ISS) + ROLE;
+                    assert_decoded_matches_oracle(reversed.as_bytes());
+                    let only_iss = text.replace(ROLE, "");
+                    assert_decoded_matches_oracle(only_iss.as_bytes());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn streaming_check_matches_oracle_for_trailing_and_inner_invalid_utf8() {
+        const BOTH: &str = "{\"iss\":\"supabase\",\"role\":\"anon\"}";
+        for pad in [
+            0usize, 1, 100, 511, 512, 513, 2030, 2040, 2043, 2044, 2045, 2046, 2047, 2048, 2049,
+            4090, 4100,
+        ] {
+            for tail in [
+                &[0xFFu8][..],
+                &[0xC3],
+                &[0xE2, 0x82],
+                &[0xF0, 0x9F, 0x98],
+                &[0xC0, 0x80],
+                &[0xED, 0xA0, 0x80],
+                &[0x80],
+            ] {
+                let mut raw = vec![b' '; pad];
+                raw.extend_from_slice(BOTH.as_bytes());
+                raw.extend_from_slice(tail);
+                assert_decoded_matches_oracle(&raw);
+                let mut inner = vec![b' '; pad];
+                inner.extend_from_slice(tail);
+                inner.extend_from_slice(BOTH.as_bytes());
+                assert_decoded_matches_oracle(&inner);
+                let mut head = BOTH.as_bytes().to_vec();
+                head.extend(vec![b' '; pad]);
+                head.extend_from_slice(tail);
+                assert_decoded_matches_oracle(&head);
+            }
+        }
+    }
+
+    #[test]
+    fn streaming_check_matches_oracle_for_invalid_alphabet_and_remainders() {
+        let anon = base64_url_encode(b"{\"iss\":\"supabase\",\"role\":\"anon\"}");
+        for len in 0..=anon.len() {
+            assert_matches_oracle(&anon.as_bytes()[..len]);
+        }
+        let mut bytes = anon.into_bytes();
+        for index in 0..bytes.len() {
+            let saved = bytes[index];
+            for bad in [b'=', b'+', b'/', b'.', b' ', 0xFFu8] {
+                bytes[index] = bad;
+                assert_matches_oracle(&bytes);
+            }
+            bytes[index] = saved;
+        }
+        let mut long = base64_url_encode(
+            format!(
+                "{}{{\"iss\":\"supabase\",\"role\":\"anon\"}}",
+                " ".repeat(5000)
+            )
+            .as_bytes(),
+        )
+        .into_bytes();
+        assert_matches_oracle(&long);
+        let last = long.len() - 1;
+        long[last] = b'=';
+        assert_matches_oracle(&long);
+    }
+
+    #[test]
+    fn streaming_check_matches_oracle_for_pseudo_random_payloads() {
+        let mut state = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        let pieces: [&[u8]; 9] = [
+            b"\"iss\":\"supabase\"",
+            b"\"role\":\"anon\"",
+            b"\"role\":\"service_role\"",
+            "\u{20ac}".as_bytes(),
+            "\u{1f600}".as_bytes(),
+            b"\xFF",
+            b"\xE2\x82",
+            b"{\"a\":1,",
+            b"                ",
+        ];
+        for _ in 0..4000 {
+            let mut raw = Vec::new();
+            let count = usize::try_from(next() % 120).unwrap_or(0);
+            for _ in 0..count {
+                let pick = usize::try_from(next() % 12).unwrap_or(0);
+                match pieces.get(pick) {
+                    Some(piece) if (pick != 5 && pick != 6) || next() % 40 == 0 => {
+                        raw.extend_from_slice(piece);
+                    }
+                    _ => raw.push(b'a' + u8::try_from(next() % 26).unwrap_or(0)),
+                }
+            }
+            assert_decoded_matches_oracle(&raw);
         }
     }
 }
