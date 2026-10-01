@@ -153,9 +153,12 @@ workflow's own reports:
 - **npm:** all ten packages are at `0.1.0-beta.12`, each shasum equal to the
   `published` digest the Release run's own jobs recorded. The `beta` dist-tag is
   `0.1.0-beta.12`. The publish left `latest` at `0.1.0-beta.11`, as the
-  [dist-tag policy](../../releasing.md#npm-dist-tag-policy) requires. Moving
-  `latest` is a separate action that needs the maintainer's explicit approval;
-  it has not been given, and this record does not claim or change it.
+  [dist-tag policy](../../releasing.md#npm-dist-tag-policy) requires. The
+  maintainer separately approved moving `latest` on 2026-10-01 and moved all
+  ten packages by hand; afterwards every package was re-observed as
+  `{"latest":"0.1.0-beta.12","beta":"0.1.0-beta.12"}`, and a bare
+  `npm install @redact-secret/core` in a clean directory resolved
+  `0.1.0-beta.12`.
 - **crates.io:** both crate checksums equal the inventory's crate digests.
   Neither version is yanked.
 - **PyPI:** all nine file hashes equal the inventory's Python entries.
