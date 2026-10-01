@@ -72,10 +72,9 @@ struct ForbiddenMatchedText<'a> {
 }
 
 impl<'a> ForbiddenMatchedText<'a> {
-    fn build(input: &'a str, findings: &[&Finding]) -> Self {
+    fn build<'f>(input: &'a str, findings: impl Iterator<Item = &'f Finding>) -> Self {
         let mut values: Vec<&'a str> = findings
-            .iter()
-            .map(|finding| finding.range())
+            .map(Finding::range)
             .filter(|range| range.len() <= MAX_PLACEHOLDER_LENGTH)
             .map(|range| &input[range.start()..range.end()])
             .collect();
@@ -132,29 +131,66 @@ impl<'a> ForbiddenMatchedText<'a> {
     }
 }
 
-fn ordered_and_disjoint<'a>(
-    findings: &'a [Finding],
-    input: &str,
-) -> Result<Vec<&'a Finding>, SecretScanError> {
-    for finding in findings {
-        if !finding.range().is_char_aligned_in(input) {
-            return Err(SecretScanErrorCode::InvalidFindings.into());
+/// Findings proven character-aligned in the input, ordered by start and
+/// pairwise disjoint (issue #1124).
+///
+/// Redaction can only start from this type, so every caller gets the same
+/// proof. Findings that already arrive ordered and disjoint (every pipeline
+/// result) are borrowed in place; anything else is sorted into a reference
+/// vector first, which is the only case that allocates.
+enum OrderedFindings<'a> {
+    InPlace(&'a [Finding]),
+    Sorted(Vec<&'a Finding>),
+}
+
+impl<'a> OrderedFindings<'a> {
+    fn new(findings: &'a [Finding], input: &str) -> Result<Self, SecretScanError> {
+        let mut previous_end = 0;
+        let mut in_place = true;
+        for finding in findings {
+            let range: ByteRange = finding.range();
+            if !range.is_char_aligned_in(input) {
+                return Err(SecretScanErrorCode::InvalidFindings.into());
+            }
+            if range.start() < previous_end {
+                in_place = false;
+            }
+            previous_end = range.end();
+        }
+        if in_place {
+            return Ok(Self::InPlace(findings));
+        }
+
+        let mut ordered: Vec<&Finding> = findings.iter().collect();
+        ordered.sort_by_key(|finding| (finding.range().start(), finding.range().end()));
+        let mut previous_end = 0;
+        for finding in &ordered {
+            let range: ByteRange = finding.range();
+            if range.start() < previous_end {
+                return Err(SecretScanErrorCode::InvalidFindings.into());
+            }
+            previous_end = range.end();
+        }
+        Ok(Self::Sorted(ordered))
+    }
+
+    fn len(&self) -> usize {
+        match self {
+            Self::InPlace(findings) => findings.len(),
+            Self::Sorted(ordered) => ordered.len(),
         }
     }
 
-    let mut ordered: Vec<&Finding> = findings.iter().collect();
-    ordered.sort_by_key(|finding| (finding.range().start(), finding.range().end()));
-
-    let mut previous_end = 0;
-    for finding in &ordered {
-        let range: ByteRange = finding.range();
-        if range.start() < previous_end {
-            return Err(SecretScanErrorCode::InvalidFindings.into());
+    fn get(&self, index: usize) -> &'a Finding {
+        match self {
+            Self::InPlace(findings) => &findings[index],
+            Self::Sorted(ordered) => ordered[index],
         }
-        previous_end = range.end();
     }
 
-    Ok(ordered)
+    fn iter(&self) -> impl Iterator<Item = &'a Finding> + '_ {
+        (0..self.len()).map(|index| self.get(index))
+    }
 }
 
 /// Reconstructs `input` in one ordered pass: `warn` and `allow` findings
@@ -244,8 +280,8 @@ pub(crate) fn redact_into(
 ) -> Result<(), SecretScanError> {
     limits.check_input(input)?;
     limits.check_findings(findings.len())?;
-    let ordered = ordered_and_disjoint(findings, input)?;
-    let forbidden = ForbiddenMatchedText::build(input, &ordered);
+    let ordered = OrderedFindings::new(findings, input)?;
+    let forbidden = ForbiddenMatchedText::build(input, ordered.iter());
 
     // Phase 1: format and validate every replaced finding in order, so the
     // formatter call order and the first error are unchanged and no partial
@@ -275,7 +311,7 @@ pub(crate) fn redact_into(
     output.reserve_exact(output_len);
     let mut cursor = 0;
     let replaced = ordered
-        .into_iter()
+        .iter()
         .filter(|finding| finding.action().replaces_text());
     for (finding, placeholder) in replaced.zip(&placeholders) {
         let range = finding.range();
@@ -501,6 +537,30 @@ mod tests {
     use std::collections::{BTreeMap, BTreeSet};
     use std::fmt::Write as _;
 
+    /// The pre-#1124 validation, verbatim: always a reference vector, always
+    /// sorted.
+    fn ordered_and_disjoint<'a>(
+        findings: &'a [Finding],
+        input: &str,
+    ) -> Result<Vec<&'a Finding>, SecretScanError> {
+        for finding in findings {
+            if !finding.range().is_char_aligned_in(input) {
+                return Err(SecretScanErrorCode::InvalidFindings.into());
+            }
+        }
+        let mut ordered: Vec<&Finding> = findings.iter().collect();
+        ordered.sort_by_key(|finding| (finding.range().start(), finding.range().end()));
+        let mut previous_end = 0;
+        for finding in &ordered {
+            let range: ByteRange = finding.range();
+            if range.start() < previous_end {
+                return Err(SecretScanErrorCode::InvalidFindings.into());
+            }
+            previous_end = range.end();
+        }
+        Ok(ordered)
+    }
+
     struct OldForbidden {
         by_length: BTreeMap<usize, BTreeSet<String>>,
     }
@@ -671,6 +731,108 @@ mod tests {
         }
     }
 
+    /// Issue #1124: findings in any order, including reversed, shuffled, with
+    /// a forged overlap or a forged out-of-range or mid-character span, behave
+    /// exactly as the pre-#1124 sort-always validation did: same result, same
+    /// error, same formatter calls in the same order, and a prefilled output
+    /// untouched on every failure.
+    #[test]
+    fn arbitrary_finding_order_matches_the_always_sorting_oracle() {
+        let mut rng = Rng(0xA5A5_1124_0000_0001);
+        let mut ok = 0;
+        let mut invalid = 0;
+        for case in 0..6000 {
+            let input = random_text(&mut rng, 24);
+            let bounds = char_starts(&input);
+            let mut findings = Vec::new();
+            let mut at = 0;
+            while at + 1 < bounds.len() {
+                if rng.below(2) == 0 {
+                    let end = (at + 1 + rng.below(4)).min(bounds.len() - 1);
+                    let action =
+                        [Action::Redact, Action::Block, Action::Warn, Action::Allow][rng.below(4)];
+                    findings.push(finding("finding-1", bounds[at], bounds[end], action));
+                    at = end;
+                }
+                at += 1;
+            }
+            match rng.below(5) {
+                0 => findings.reverse(),
+                1 => {
+                    for i in (1..findings.len()).rev() {
+                        findings.swap(i, rng.below(i + 1));
+                    }
+                }
+                2 if input.len() >= 2 => {
+                    findings.push(finding("finding-9", 1, input.len(), Action::Redact));
+                }
+                3 => findings.push(finding("finding-9", 0, input.len() + 1, Action::Redact)),
+                _ => {}
+            }
+            let build = |log: std::rc::Rc<std::cell::RefCell<Vec<usize>>>| {
+                move |_: &Finding, context: &PlaceholderContext| {
+                    log.borrow_mut().push(context.placeholder_index());
+                    Ok(format!("<#{}>", context.placeholder_index()))
+                }
+            };
+            let old_log = std::rc::Rc::<std::cell::RefCell<Vec<usize>>>::default();
+            let new_log = std::rc::Rc::<std::cell::RefCell<Vec<usize>>>::default();
+            let old = oracle_redact(&input, &findings, &build(std::rc::Rc::clone(&old_log)));
+            let new = redact(&input, &findings, &build(std::rc::Rc::clone(&new_log)));
+            assert_eq!(old.as_ref().ok(), new.as_ref().ok(), "case {case}");
+            assert_eq!(
+                old.as_ref().map_err(|e| e.code()),
+                new.as_ref().map_err(|e| e.code()),
+                "case {case}"
+            );
+            // Validation precedes every formatter call, so a rejected set
+            // reaches the formatter zero times, in both implementations.
+            if new.is_err()
+                && new.as_ref().unwrap_err().code() == SecretScanErrorCode::InvalidFindings
+            {
+                assert!(new_log.borrow().is_empty(), "case {case}");
+                invalid += 1;
+            } else {
+                assert_eq!(*old_log.borrow(), *new_log.borrow(), "case {case}");
+                ok += 1;
+            }
+            let mut prefilled = String::from("prefix|");
+            let into = redact_into(
+                &input,
+                &findings,
+                &build(std::rc::Rc::default()),
+                &WholeInputLimits::default(),
+                &mut prefilled,
+            );
+            match into {
+                Ok(()) => assert_eq!(prefilled, format!("prefix|{}", new.unwrap()), "{case}"),
+                Err(_) => assert_eq!(prefilled, "prefix|", "{case}"),
+            }
+        }
+        assert!(
+            ok > 1000 && invalid > 500,
+            "generator must reach both outcomes"
+        );
+    }
+
+    #[test]
+    fn placeholder_length_boundary_is_exactly_the_maximum() {
+        let input = "SYNTHETIC_ONE|SYNTHETIC_TWO";
+        let findings = [
+            finding("finding-2", 14, input.len(), Action::Redact),
+            finding("finding-1", 0, 13, Action::Redact),
+        ];
+        let exact = |_: &Finding, _: &PlaceholderContext| Ok("x".repeat(MAX_PLACEHOLDER_LENGTH));
+        let output = redact(input, &findings, &exact).unwrap();
+        assert_eq!(output.len(), 2 * MAX_PLACEHOLDER_LENGTH + 1);
+        assert_eq!(output.capacity(), output.len());
+        let over = |_: &Finding, _: &PlaceholderContext| Ok("x".repeat(MAX_PLACEHOLDER_LENGTH + 1));
+        assert_eq!(
+            redact(input, &findings, &over).unwrap_err().code(),
+            SecretScanErrorCode::InvalidPlaceholder
+        );
+    }
+
     /// `redact_into` (issue #1087) appends exactly what the pre-#1087 path
     /// returned and then copied into the released text, and leaves the
     /// buffer untouched on an error.
@@ -740,7 +902,7 @@ mod tests {
             }
             let refs: Vec<&Finding> = findings.iter().collect();
             let old = OldForbidden::build(&input, &refs);
-            let new = ForbiddenMatchedText::build(&input, &refs);
+            let new = ForbiddenMatchedText::build(&input, refs.iter().copied());
             for _ in 0..20 {
                 let placeholder = random_text(&mut rng, 12);
                 let expected = old.contains(&placeholder);
@@ -754,12 +916,12 @@ mod tests {
     #[test]
     fn index_handles_empty_input_multibyte_and_boundary_edges() {
         let refs: Vec<&Finding> = Vec::new();
-        assert!(!ForbiddenMatchedText::build("", &refs).contains("anything"));
+        assert!(!ForbiddenMatchedText::build("", refs.iter().copied()).contains("anything"));
         // A value of continuation-looking bytes never matches mid-character.
         let input = "é";
         let findings = [finding("finding-1", 0, 2, Action::Redact)];
         let refs: Vec<&Finding> = findings.iter().collect();
-        let index = ForbiddenMatchedText::build(input, &refs);
+        let index = ForbiddenMatchedText::build(input, refs.iter().copied());
         assert!(index.contains("<é>"));
         assert!(!index.contains("<e\u{301}>"));
         assert!(!index.contains(""));
@@ -767,11 +929,13 @@ mod tests {
         let long = "a".repeat(MAX_PLACEHOLDER_LENGTH + 1);
         let findings = [finding("finding-1", 0, long.len(), Action::Redact)];
         let refs: Vec<&Finding> = findings.iter().collect();
-        assert!(!ForbiddenMatchedText::build(&long, &refs).contains(&"a".repeat(256)));
+        assert!(
+            !ForbiddenMatchedText::build(&long, refs.iter().copied()).contains(&"a".repeat(256))
+        );
         let max = "a".repeat(MAX_PLACEHOLDER_LENGTH);
         let findings = [finding("finding-1", 0, max.len(), Action::Redact)];
         let refs: Vec<&Finding> = findings.iter().collect();
-        assert!(ForbiddenMatchedText::build(&max, &refs).contains(&max));
+        assert!(ForbiddenMatchedText::build(&max, refs.iter().copied()).contains(&max));
     }
 
     #[test]

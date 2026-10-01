@@ -1,0 +1,103 @@
+//! Temporary allocation probe for #1124 (not committed).
+#![allow(unsafe_code, clippy::all, clippy::pedantic, unused_imports)]
+use std::alloc::{GlobalAlloc, Layout, System};
+use std::sync::atomic::{AtomicUsize, Ordering::Relaxed};
+
+use redact_secret::{
+    Action, ByteRange, Confidence, Finding, FormatterFailure, PlaceholderContext,
+    default_placeholder_formatter, redact,
+};
+
+struct Counting;
+static CALLS: AtomicUsize = AtomicUsize::new(0);
+static BYTES: AtomicUsize = AtomicUsize::new(0);
+static LIVE: AtomicUsize = AtomicUsize::new(0);
+static PEAK: AtomicUsize = AtomicUsize::new(0);
+
+fn grow(n: usize) {
+    let live = LIVE.fetch_add(n, Relaxed) + n;
+    PEAK.fetch_max(live, Relaxed);
+}
+unsafe impl GlobalAlloc for Counting {
+    unsafe fn alloc(&self, l: Layout) -> *mut u8 {
+        CALLS.fetch_add(1, Relaxed);
+        BYTES.fetch_add(l.size(), Relaxed);
+        grow(l.size());
+        unsafe { System.alloc(l) }
+    }
+    unsafe fn dealloc(&self, p: *mut u8, l: Layout) {
+        LIVE.fetch_sub(l.size(), Relaxed);
+        unsafe { System.dealloc(p, l) }
+    }
+    unsafe fn realloc(&self, p: *mut u8, l: Layout, new: usize) -> *mut u8 {
+        CALLS.fetch_add(1, Relaxed);
+        BYTES.fetch_add(new, Relaxed);
+        LIVE.fetch_sub(l.size(), Relaxed);
+        grow(new);
+        unsafe { System.realloc(p, l, new) }
+    }
+}
+#[global_allocator]
+static A: Counting = Counting;
+
+fn measure(
+    label: &str,
+    input: &str,
+    findings: &[Finding],
+    f: &dyn redact_secret::PlaceholderFormatter,
+) {
+    let base_live = LIVE.load(Relaxed);
+    CALLS.store(0, Relaxed);
+    BYTES.store(0, Relaxed);
+    PEAK.store(base_live, Relaxed);
+    let out = redact(input, findings, f).unwrap();
+    println!(
+        "{label}: alloc_calls {} requested_bytes {} peak_extra_live_bytes {} out_len {}",
+        CALLS.load(Relaxed),
+        BYTES.load(Relaxed),
+        PEAK.load(Relaxed) - base_live,
+        out.len()
+    );
+}
+
+fn main() {
+    let mut input = String::new();
+    let mut findings = Vec::new();
+    for i in 0..49_000usize {
+        let len = 3 + (i * 7) % 38;
+        input.push(' ');
+        let start = input.len();
+        for k in 0..len {
+            input.push(char::from(b'A' + u8::try_from((i + k) % 26).unwrap()));
+        }
+        findings.push(
+            Finding::new(
+                format!("finding-{}", i + 1),
+                "synthetic-credential",
+                "synthetic-detector",
+                Confidence::High,
+                Action::Redact,
+                ByteRange::new(start, input.len()).unwrap(),
+            )
+            .unwrap(),
+        );
+    }
+    let p42 = |_: &Finding, c: &PlaceholderContext| {
+        Ok(format!("[r{}-{}]", c.placeholder_index(), "x".repeat(30)))
+    };
+    measure(
+        "sorted default",
+        &input,
+        &findings,
+        &default_placeholder_formatter,
+    );
+    measure("sorted p42", &input, &findings, &p42);
+    let mut rev = findings.clone();
+    rev.reverse();
+    measure(
+        "reversed default",
+        &input,
+        &rev,
+        &default_placeholder_formatter,
+    );
+}
