@@ -138,7 +138,10 @@ impl Detector for FirebaseServerKeyDetector {
                 candidates.push(
                     Candidate::built_in("firebase_server_key", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(["firebase-documented-prefix", "two-segment-exact-length"]),
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "firebase-documented-prefix",
+                            "two-segment-exact-length"
+                        )),
                 );
             }
             start = end;

@@ -60,7 +60,10 @@ impl Detector for SendgridTokenDetector {
                 candidates.push(
                     Candidate::built_in("sendgrid_api_key", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(["sendgrid-documented-shape", "two-segment-exact-length"]),
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "sendgrid-documented-shape",
+                            "two-segment-exact-length"
+                        )),
                 );
             }
             start = end;

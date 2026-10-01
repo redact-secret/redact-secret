@@ -139,7 +139,9 @@ impl Detector for TelegramBotTokenDetector {
                 candidates.push(
                     Candidate::built_in("telegram_bot_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(["telegram-documented-id-colon-secret-shape"]),
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "telegram-documented-id-colon-secret-shape"
+                        )),
                 );
             }
             start = end.max(start + 1);

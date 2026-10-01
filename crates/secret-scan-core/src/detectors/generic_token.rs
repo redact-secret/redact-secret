@@ -3229,7 +3229,11 @@ fn call_argument_candidates(input: &str) -> Vec<Candidate> {
             candidates.push(
                 Candidate::built_in("contextual_secret", Confidence::High, range)
                     .with_specificity(Specificity::Contextual)
-                    .with_signals(["high-signal-name", "bounded-entropy", "sdk-call-argument"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "high-signal-name",
+                        "bounded-entropy",
+                        "sdk-call-argument"
+                    )),
             );
         }
     }
@@ -3483,7 +3487,7 @@ fn bare_vendor_prefix_candidates(input: &str) -> Vec<Candidate> {
             Some(
                 Candidate::built_in("vendor_prefixed_credential", Confidence::Medium, range)
                     .with_specificity(Specificity::Entropy)
-                    .with_signals(["vendor-prefix-policy"]),
+                    .with_signal_pack(crate::types::signal_pack!("vendor-prefix-policy")),
             )
         })
         .collect()
@@ -3600,7 +3604,10 @@ fn npmrc_credential_candidates(input: &str) -> Vec<Candidate> {
             candidates.push(
                 Candidate::built_in("contextual_secret", Confidence::High, range)
                     .with_specificity(Specificity::Contextual)
-                    .with_signals(["npmrc-credential-key", "credential-by-construction"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "npmrc-credential-key",
+                        "credential-by-construction"
+                    )),
             );
         }
     }

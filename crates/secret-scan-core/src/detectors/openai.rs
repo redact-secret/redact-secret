@@ -91,7 +91,7 @@ impl Detector for OpenAiTokenDetector {
             candidates.push(
                 Candidate::built_in(type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["openai-prefix", "openai-marker"]),
+                    .with_signal_pack(crate::types::signal_pack!("openai-prefix", "openai-marker")),
             );
         }
         Ok(candidates)

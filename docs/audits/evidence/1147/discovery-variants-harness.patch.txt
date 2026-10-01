@@ -1,0 +1,312 @@
+diff --git a/crates/secret-scan-core/src/pii/pii_email.rs b/crates/secret-scan-core/src/pii/pii_email.rs
+index 72e4c360..cc1a2d75 100644
+--- a/crates/secret-scan-core/src/pii/pii_email.rs
++++ b/crates/secret-scan-core/src/pii/pii_email.rs
+@@ -886,3 +886,307 @@ mod nfc_fast_path_tests {
+         assert!(with_findings >= 4);
+     }
+ }
++
++#[cfg(test)]
++mod timing_1147 {
++    use super::*;
++    use std::time::Instant;
++fn detect_match_indices(input: &str, is_nfc: impl Fn(&str) -> bool) -> Vec<Alternative> {
++    let mut output = Vec::new();
++    for (at, _) in input.match_indices('@') {
++        let Some(start) = scan_local_start(input, at) else {
++            continue;
++        };
++        let Some(end) = scan_domain_end(input, at + 1) else {
++            continue;
++        };
++        if start == at || end == at + 1 {
++            continue;
++        }
++        let candidate = &input[start..end];
++        if candidate.len() > MAX_CANDIDATE_BYTES
++            || !valid_boundary(input, start, end)
++            || unsupported_enclosing_syntax(input, start, at, end)
++            || is_uri_userinfo(input, start, at)
++        {
++            continue;
++        }
++        let local = &input[start..at];
++        let domain = &input[at + 1..end];
++        if !valid_local(local) || !valid_domain(domain) || !is_nfc(candidate) {
++            continue;
++        }
++        let start = match email_label_key_length(local) {
++            Some(label) if valid_local(&local[label..]) => start + label,
++            Some(_) => continue,
++            None => start,
++        };
++        let sensitivity = if reserved_documentation_domain(domain) {
++            SensitivityState::NonSensitive
++        } else {
++            SensitivityState::NotEstablished
++        };
++        let Some(range) = ByteRange::new(start, end) else {
++            continue;
++        };
++        output.push(Alternative {
++            family_id: FAMILY_ID,
++            domain: IdentityDomain::Email,
++            range,
++            identity: IdentityState::Established,
++            identity_confidence: Confidence::High,
++            identity_specificity: Specificity::Structural,
++            sensitivity,
++            sensitivity_confidence: Confidence::High,
++            sensitivity_specificity: Specificity::Contextual,
++            obfuscation: Obfuscation::None,
++            reject_invisible_normalization: true,
++        });
++    }
++    output
++}
++
++fn detect_bytes(input: &str, is_nfc: impl Fn(&str) -> bool) -> Vec<Alternative> {
++    let mut output = Vec::new();
++    for (at, _) in input.as_bytes().iter().enumerate().filter(|(_, b)| **b == b'@') {
++        let Some(start) = scan_local_start(input, at) else {
++            continue;
++        };
++        let Some(end) = scan_domain_end(input, at + 1) else {
++            continue;
++        };
++        if start == at || end == at + 1 {
++            continue;
++        }
++        let candidate = &input[start..end];
++        if candidate.len() > MAX_CANDIDATE_BYTES
++            || !valid_boundary(input, start, end)
++            || unsupported_enclosing_syntax(input, start, at, end)
++            || is_uri_userinfo(input, start, at)
++        {
++            continue;
++        }
++        let local = &input[start..at];
++        let domain = &input[at + 1..end];
++        if !valid_local(local) || !valid_domain(domain) || !is_nfc(candidate) {
++            continue;
++        }
++        let start = match email_label_key_length(local) {
++            Some(label) if valid_local(&local[label..]) => start + label,
++            Some(_) => continue,
++            None => start,
++        };
++        let sensitivity = if reserved_documentation_domain(domain) {
++            SensitivityState::NonSensitive
++        } else {
++            SensitivityState::NotEstablished
++        };
++        let Some(range) = ByteRange::new(start, end) else {
++            continue;
++        };
++        output.push(Alternative {
++            family_id: FAMILY_ID,
++            domain: IdentityDomain::Email,
++            range,
++            identity: IdentityState::Established,
++            identity_confidence: Confidence::High,
++            identity_specificity: Specificity::Structural,
++            sensitivity,
++            sensitivity_confidence: Confidence::High,
++            sensitivity_specificity: Specificity::Contextual,
++            obfuscation: Obfuscation::None,
++            reject_invisible_normalization: true,
++        });
++    }
++    output
++}
++
++fn detect_adaptive(input: &str, is_nfc: impl Fn(&str) -> bool) -> Vec<Alternative> {
++    let mut output = Vec::new();
++    for at in AtPositions::new(input) {
++        let Some(start) = scan_local_start(input, at) else {
++            continue;
++        };
++        let Some(end) = scan_domain_end(input, at + 1) else {
++            continue;
++        };
++        if start == at || end == at + 1 {
++            continue;
++        }
++        let candidate = &input[start..end];
++        if candidate.len() > MAX_CANDIDATE_BYTES
++            || !valid_boundary(input, start, end)
++            || unsupported_enclosing_syntax(input, start, at, end)
++            || is_uri_userinfo(input, start, at)
++        {
++            continue;
++        }
++        let local = &input[start..at];
++        let domain = &input[at + 1..end];
++        if !valid_local(local) || !valid_domain(domain) || !is_nfc(candidate) {
++            continue;
++        }
++        let start = match email_label_key_length(local) {
++            Some(label) if valid_local(&local[label..]) => start + label,
++            Some(_) => continue,
++            None => start,
++        };
++        let sensitivity = if reserved_documentation_domain(domain) {
++            SensitivityState::NonSensitive
++        } else {
++            SensitivityState::NotEstablished
++        };
++        let Some(range) = ByteRange::new(start, end) else {
++            continue;
++        };
++        output.push(Alternative {
++            family_id: FAMILY_ID,
++            domain: IdentityDomain::Email,
++            range,
++            identity: IdentityState::Established,
++            identity_confidence: Confidence::High,
++            identity_specificity: Specificity::Structural,
++            sensitivity,
++            sensitivity_confidence: Confidence::High,
++            sensitivity_specificity: Specificity::Contextual,
++            obfuscation: Obfuscation::None,
++            reject_invisible_normalization: true,
++        });
++    }
++    output
++}
++
++
++    /// Scalar probe of a short window, then a memchr-backed jump when the
++    /// window had no `@`; the probe resumes after every hit.
++    struct AtPositions<'a> {
++        input: &'a str,
++        pos: usize,
++    }
++    impl<'a> AtPositions<'a> {
++        fn new(input: &'a str) -> Self {
++            Self { input, pos: 0 }
++        }
++    }
++    impl Iterator for AtPositions<'_> {
++        type Item = usize;
++        fn next(&mut self) -> Option<usize> {
++            const PROBE: usize = 64;
++            let bytes = self.input.as_bytes();
++            while self.pos < bytes.len() {
++                let probe_end = (self.pos + PROBE).min(bytes.len());
++                if let Some(offset) = bytes[self.pos..probe_end].iter().position(|b| *b == b'@') {
++                    let at = self.pos + offset;
++                    self.pos = at + 1;
++                    return Some(at);
++                }
++                let mut jump = probe_end;
++                while !self.input.is_char_boundary(jump) {
++                    jump += 1;
++                }
++                match self.input[jump..].find('@') {
++                    Some(offset) => {
++                        let at = jump + offset;
++                        self.pos = at + 1;
++                        return Some(at);
++                    }
++                    None => {
++                        self.pos = bytes.len();
++                    }
++                }
++            }
++            None
++        }
++    }
++    fn workloads() -> Vec<(&'static str, String)> {
++        let filler = "The quick brown fox jumps over the lazy dog while the build runs. ";
++        let ufiller = "고객 이메일 안내문입니다 \u{1f600} 계속 읽어 주세요. ";
++        let sparse = |f: &str, n: usize| {
++            let mut s = f.repeat(n);
++            let mid = s.len() / 2;
++            let mid = (mid..).find(|i| s.is_char_boundary(*i)).unwrap();
++            s.insert_str(mid, " email: fixture876@q7m9z2x4.synthetic ");
++            s
++        };
++        let dense = |f: &str, n: usize| {
++            (0..n)
++                .map(|i| format!("{f}email: user{i}.tag@q7m9z2x4.synthetic "))
++                .collect::<String>()
++        };
++        vec![
++            ("sparse-ascii", sparse(filler, 1100)),
++            ("sparse-unicode", sparse(ufiller, 1500)),
++            ("dense-ascii", dense("x ", 1000)),
++            (
++                "dense-unicode",
++                (0..1000)
++                    .map(|i| format!("고객 e\u{301}{i}.tag@q7m9z2x4.synthetic \u{e9}{i}@a.test "))
++                    .collect::<String>(),
++            ),
++            (
++                "dense-unicode-local",
++                (0..1000)
++                    .map(|i| format!("email: 고객{i}.tag@q7m9z2x4.synthetic "))
++                    .collect::<String>(),
++            ),
++            ("at-noise", "@@ a@ @b @@@ x@ @ ".repeat(1400)),
++            ("at-noise-mixed", "a@@b @ c@d@ e@@ ".repeat(1600)),
++        ]
++    }
++    fn time(f: &dyn Fn() -> usize) -> f64 {
++        let mut reps = 1usize;
++        loop {
++            let t = Instant::now();
++            let mut sink = 0;
++            for _ in 0..reps {
++                sink += std::hint::black_box(f());
++            }
++            let e = t.elapsed();
++            std::hint::black_box(sink);
++            if e.as_millis() >= 20 || reps >= 1_000_000 {
++                return e.as_secs_f64() * 1e6 / reps as f64;
++            }
++            reps *= 2;
++        }
++    }
++    fn median(mut v: Vec<f64>) -> f64 {
++        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
++        v[v.len() / 2]
++    }
++    #[test]
++    #[ignore]
++    fn measure_1147() {
++        for (name, input) in workloads() {
++            let n = |i: &str| format!("{:?}", detect_email_candidates_with(i, is_nfc_normalizing));
++            assert_eq!(n(&input), format!("{:?}", detect_email_candidates_with(&input, is_nfc)));
++            assert_eq!(n(&input), format!("{:?}", detect_match_indices(&input, is_nfc)));
++            assert_eq!(n(&input), format!("{:?}", detect_bytes(&input, is_nfc)));
++            assert_eq!(n(&input), format!("{:?}", detect_adaptive(&input, is_nfc)));
++            let i = &input;
++            let variants: Vec<(&str, Box<dyn Fn() -> usize + '_>)> = vec![
++                ("A  old (char loop, always nfc)", Box::new(move || detect_email_candidates_with(i, is_nfc_normalizing).len())),
++                ("A2 old again (A/A control)", Box::new(move || detect_email_candidates_with(i, is_nfc_normalizing).len())),
++                ("B  ascii-nfc, char loop", Box::new(move || detect_email_candidates_with(i, is_nfc).len())),
++                ("C  ascii-nfc + match_indices", Box::new(move || detect_match_indices(i, is_nfc).len())),
++                ("D  ascii-nfc + byte scan", Box::new(move || detect_bytes(i, is_nfc).len())),
++                ("E  ascii-nfc + adaptive probe/jump", Box::new(move || detect_adaptive(i, is_nfc).len())),
++            ];
++            let mut samples: Vec<Vec<f64>> = vec![Vec::new(); variants.len()];
++            for round in 0..41 {
++                let order: Vec<usize> = if round % 2 == 0 {
++                    (0..variants.len()).collect()
++                } else {
++                    (0..variants.len()).rev().collect()
++                };
++                for k in order {
++                    samples[k].push(time(&variants[k].1));
++                }
++            }
++            let base = median(samples[0].clone());
++            for (k, (label, _)) in variants.iter().enumerate() {
++                let m = median(samples[k].clone());
++                println!("{name:22} {label:34} {m:10.2} us {:+6.1}%", (m / base - 1.0) * 100.0);
++            }
++        }
++    }
++}

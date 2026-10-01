@@ -6,6 +6,7 @@
 //! offsets into the scanned input ([`crate::RANGE_UNIT`]).
 
 use std::borrow::Cow;
+use std::sync::OnceLock;
 
 use crate::error::{
     DetectorFailure, FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode,
@@ -307,6 +308,42 @@ impl DetectorContext {
     }
 }
 
+/// A finite pack of compile-time diagnostic signal labels, materialized once
+/// as `String`s so [`Candidate::signals`] can keep returning `&[String]`.
+///
+/// A pack only ever holds the fixed literals written at its definition site:
+/// never source input, never a runtime-derived name, and there is no registry,
+/// so the retained memory is bounded by the number of definition sites.
+/// Define one through [`signal_pack!`].
+pub(crate) struct SignalPack {
+    names: &'static [&'static str],
+    strings: OnceLock<Box<[String]>>,
+}
+
+impl SignalPack {
+    pub(crate) const fn new(names: &'static [&'static str]) -> Self {
+        Self {
+            names,
+            strings: OnceLock::new(),
+        }
+    }
+
+    fn strings(&'static self) -> &'static [String] {
+        self.strings
+            .get_or_init(|| self.names.iter().map(|name| (*name).to_owned()).collect())
+    }
+}
+
+/// Expands to a `&'static SignalPack` for the given string literals, one
+/// `static` per expansion site.
+macro_rules! signal_pack {
+    ($($name:literal),+ $(,)?) => {{
+        static PACK: $crate::types::SignalPack = $crate::types::SignalPack::new(&[$($name),+]);
+        &PACK
+    }};
+}
+pub(crate) use signal_pack;
+
 /// A detector's private proposal: classification and range only.
 ///
 /// A candidate never carries the matched text. It is validated by the
@@ -317,7 +354,7 @@ pub struct Candidate {
     confidence: Confidence,
     specificity: Option<Specificity>,
     range: ByteRange,
-    signals: Vec<String>,
+    signals: Cow<'static, [String]>,
     obfuscation: Obfuscation,
     reject_invisible_normalization: bool,
 }
@@ -332,7 +369,7 @@ impl Candidate {
             confidence,
             specificity: None,
             range,
-            signals: Vec::new(),
+            signals: Cow::Borrowed(&[]),
             obfuscation: Obfuscation::None,
             reject_invisible_normalization: false,
         }
@@ -352,7 +389,7 @@ impl Candidate {
             confidence,
             specificity: None,
             range,
-            signals: Vec::new(),
+            signals: Cow::Borrowed(&[]),
             obfuscation: Obfuscation::None,
             reject_invisible_normalization: false,
         }
@@ -390,7 +427,18 @@ impl Candidate {
         I: IntoIterator<Item = S>,
         S: Into<String>,
     {
-        self.signals = signals.into_iter().map(Into::into).collect();
+        self.signals = Cow::Owned(signals.into_iter().map(Into::into).collect());
+        self
+    }
+
+    /// [`with_signals`](Self::with_signals) for a finite, compile-time set of
+    /// diagnostic labels: the candidate borrows the pack's one shared slice,
+    /// so constructing or cloning it allocates no signal strings. Built-in
+    /// detectors use this; the observable values and their order are exactly
+    /// those `with_signals` would produce from the same labels.
+    #[must_use]
+    pub(crate) fn with_signal_pack(mut self, pack: &'static SignalPack) -> Self {
+        self.signals = Cow::Borrowed(pack.strings());
         self
     }
 
@@ -1062,6 +1110,60 @@ mod tests {
         assert_eq!(candidate.type_name(), "token");
         assert_eq!(candidate.range(), range);
         assert_eq!(candidate.obfuscation(), Obfuscation::InvisibleCharacters);
+    }
+
+    fn signal_candidate() -> Candidate {
+        Candidate::new("token", Confidence::Low, ByteRange::new(0, 4).unwrap())
+    }
+
+    #[test]
+    fn a_signal_pack_equals_with_signals_for_the_same_labels() {
+        use std::hash::{BuildHasher, BuildHasherDefault, DefaultHasher};
+
+        let packed = signal_candidate().with_signal_pack(signal_pack!("alpha-label", "beta-label"));
+        let owned = signal_candidate().with_signals(["alpha-label", "beta-label"]);
+        assert_eq!(packed.signals(), ["alpha-label", "beta-label"]);
+        assert_eq!(packed.signals(), owned.signals());
+        assert_eq!(packed, owned);
+        let hasher = BuildHasherDefault::<DefaultHasher>::default();
+        assert_eq!(hasher.hash_one(&packed), hasher.hash_one(&owned));
+        assert_eq!(format!("{packed:?}"), format!("{owned:?}"));
+        // The public slice type is unchanged.
+        let _: &[String] = packed.signals();
+    }
+
+    #[test]
+    fn candidates_from_one_pack_share_a_single_slice_and_clone_keeps_it() {
+        fn built() -> Candidate {
+            signal_candidate().with_signal_pack(signal_pack!("shared-one", "shared-two"))
+        }
+        // Two separate constructions through the same expansion site return
+        // the very same static slice: no per-candidate signal strings.
+        let first = built();
+        let second = built();
+        assert!(std::ptr::eq(first.signals(), second.signals()));
+        assert!(std::ptr::eq(first.signals(), first.clone().signals()));
+        // A different pack is a different slice; custom signals stay owned.
+        let other = signal_candidate().with_signal_pack(signal_pack!("shared-one", "shared-two"));
+        assert!(!std::ptr::eq(first.signals(), other.signals()));
+        let owned = signal_candidate().with_signals(["shared-one", "shared-two"]);
+        assert!(!std::ptr::eq(first.signals(), owned.signals()));
+        assert!(!std::ptr::eq(owned.signals(), owned.clone().signals()));
+        assert_eq!(owned.clone().signals(), first.signals());
+    }
+
+    #[test]
+    fn with_signals_and_with_signal_pack_each_replace_the_previous_list() {
+        let packed_then_owned = signal_candidate()
+            .with_signal_pack(signal_pack!("first-pack"))
+            .with_signals(["custom"]);
+        assert_eq!(packed_then_owned.signals(), ["custom"]);
+        let owned_then_packed = signal_candidate()
+            .with_signals(["custom"])
+            .with_signal_pack(signal_pack!("second-pack"));
+        assert_eq!(owned_then_packed.signals(), ["second-pack"]);
+        let dynamic = signal_candidate().with_signals([format!("dyn-{}", 7)]);
+        assert_eq!(dynamic.signals(), ["dyn-7"]);
     }
 
     #[test]

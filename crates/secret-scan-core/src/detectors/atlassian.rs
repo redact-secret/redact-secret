@@ -142,7 +142,10 @@ impl Detector for AtlassianApiTokenDetector {
             candidates.push(
                 Candidate::built_in("atlassian_api_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["atlassian-documented-prefix", "minimum-length-opaque-body"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "atlassian-documented-prefix",
+                        "minimum-length-opaque-body"
+                    )),
             );
         }
         Ok(candidates)

@@ -44,7 +44,7 @@ impl Detector for AwsAccessKeyDetector {
             candidates.push(
                 Candidate::built_in("aws_access_key_id", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["aws-prefix", "fixed-length"]),
+                    .with_signal_pack(crate::types::signal_pack!("aws-prefix", "fixed-length")),
             );
         }
         Ok(candidates)
