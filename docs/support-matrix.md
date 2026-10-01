@@ -7,13 +7,13 @@ regenerate with:
 python3 -B scripts/generate-support-matrix-docs.py
 ```
 
-`npm run ci` fails if this file, or the README support-status section, is out of date with `benchmarks/support-matrix.json`. That file is itself a pinned copy of `redact-secret-benchmarks`'s generated evidence ([source revision](https://github.com/redact-secret/redact-secret-benchmarks/commit/f35037073a3cd9bc1269f62e4c51b7d9f457515e)); see the module docstring for how to refresh it.
+`npm run ci` fails if this file, or the README support-status section, is out of date with `benchmarks/support-matrix.json`. That file is itself a pinned copy of `redact-secret-benchmarks`'s generated evidence ([source revision](https://github.com/redact-secret/redact-secret-benchmarks/commit/e8f73bfd7241845ef9fb75574a72b135aa777ba6)); see the module docstring for how to refresh it.
 
 92 providers, 173 credential families.
 
 Support status, evidence provenance, and qualification are separate dimensions. In particular, a T2 family may be stable through the empirical profile without being described as provider-documented or rewritten as T1. User-facing labels combine the dimensions without conflating them: `Stable · Provider documented`, `Stable · Empirically qualified`, and `Provisional · Tool corroborated`.
 
-For the detailed measurement protocol behind these statuses -- evidence tiers, and the twin, benign, metamorphic, mutation, and differential criteria a family must clear -- see `redact-secret-benchmarks`'s [support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/f35037073a3cd9bc1269f62e4c51b7d9f457515e/docs/specs/support-status.md). You do not need to read it to use this table.
+For the detailed measurement protocol behind these statuses -- evidence tiers, and the twin, benign, metamorphic, mutation, and differential criteria a family must clear -- see `redact-secret-benchmarks`'s [support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/e8f73bfd7241845ef9fb75574a72b135aa777ba6/docs/specs/support-status.md). You do not need to read it to use this table.
 
 ## What each status means
 

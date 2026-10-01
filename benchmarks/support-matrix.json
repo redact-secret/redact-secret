@@ -3,9 +3,9 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-10-01T01:51:54.844Z",
-    "runId": "dbbeea5b-c769-43dc-853f-4c0f5484c7c0",
-    "revision": "f35037073a3cd9bc1269f62e4c51b7d9f457515e",
+    "generatedAt": "2026-10-01T10:49:11.866Z",
+    "runId": "07d1bfa0-b7e4-43e3-b0d8-f9de06494d73",
+    "revision": "e8f73bfd7241845ef9fb75574a72b135aa777ba6",
     "dirty": false,
     "criteriaSchemaVersion": 1,
     "fixtureIndex": {
@@ -16,29 +16,29 @@
     },
     "taxonomyDigest": "7a210894da37b6641543d6faf7acf75d670eec74618111bd3311621fbf3844fc",
     "product": {
-      "sourceCommit": "bfc608cce75f79f6a5cab037d7e558ba629777f6",
+      "sourceCommit": "4227160c4dac402d7add53d3f8fe990f693912c1",
       "packageName": "@redact-secret/core",
-      "declaredVersion": "0.1.0-beta.11",
+      "declaredVersion": "0.1.0-beta.12",
       "artifacts": [
         {
           "role": "package",
-          "sha256": "8bda9ce64f2bcc0b96b75edc1cfd8ce03534078ccd664c80ed3807ce55b6924a"
+          "sha256": "9011bbe659629c892ad1f1309a3ec1719621e5e782650543400871a120eebcbb"
         },
         {
           "role": "node",
-          "sha256": "45d29c3d8f4ef6f2ed58f7b7e7115710a666cabbedd5ecbecd196313aad686e1"
+          "sha256": "3b34840ba24c5e757c5c59c0cac3af47dbc5ca5492a3257598a6563216d75251"
         },
         {
           "role": "wasm",
-          "sha256": "9f23d389ac2585c569c3c4dacbc76531394f1599b65c0f75a9d426bd9e47c0f4"
+          "sha256": "efdc7d121b215dfc99dac1af4a67191ff9e3f4e586639ed59663262e150aab56"
         }
       ]
     },
     "scannerObservations": {
       "redact-secret": {
         "source": "fresh",
-        "observedAt": "2026-10-01T01:51:38.697Z",
-        "sourceRunId": "dbbeea5b-c769-43dc-853f-4c0f5484c7c0"
+        "observedAt": "2026-10-01T10:48:26.359Z",
+        "sourceRunId": "07d1bfa0-b7e4-43e3-b0d8-f9de06494d73"
       },
       "gitleaks": {
         "source": "snapshot",
