@@ -306,6 +306,28 @@ version, expected artifact identities, observed registry states, and (issue
 qualification` computed for this candidate. Its success does not establish
 tag or registry-install success: those jobs are separate.
 
+### Version tag signing
+
+Version tags (`v{version}`) are annotated and **unsigned**: the workflow
+creates them with the Actions token and does not sign them with GPG, SSH, or
+gitsign. A tag is not what binds a release to its source. These records do:
+
+- The release manifest records the source commit (`github.sha`), the version,
+  the artifact set, and the registry state for every run, including a failed
+  one. The tag is created at that same commit only after publication and
+  registry-install verification succeed.
+- npm packages are published with provenance (`NPM_CONFIG_PROVENANCE`), a
+  Sigstore attestation that binds each tarball to the workflow run and commit.
+  PyPI publication uses trusted publishing through the pinned
+  `pypa/gh-action-pypi-publish`; this workflow does not set its `attestations`
+  input, so attestations follow that action's default behavior.
+
+Signing tags, for example with gitsign (Sigstore keyless signing from the
+workflow's OIDC identity), is a possible future step. It would change the
+release workflow, so it needs maintainer approval of that change and a fresh
+rehearsal before it is adopted. Until then, treat the manifest and the
+registry attestations, not the tag signature, as the source-identity evidence.
+
 ### npm dist-tag policy
 
 The release workflow publishes every `0.1.0-beta.N` npm package with

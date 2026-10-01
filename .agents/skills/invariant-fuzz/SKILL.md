@@ -10,8 +10,10 @@ Break the core's security invariants with generated inputs. Report counterexampl
 ## Setup
 
 - Build first: `npm run js:build`. Test `packages/javascript`'s built output through the public API only (`scan`, `scanAndRedact`, `redact`, the incremental sanitizer, `initialize`) — never an internal module path.
-- Properties live in `packages/javascript/test/fuzz.mjs`. If it is missing, create it. Add `fast-check` as an exact-pinned devDependency and ask before committing either.
-- Run: `node packages/javascript/test/fuzz.mjs [numRuns] [seed]`. Default is 2000 runs. The argument sets the count.
+- Properties live in the committed `packages/javascript/test/fuzz.test.ts` (vitest; it runs inside `npm run js:test`). It is deterministic: fixed seed `1143`, 2000 runs per property (about 5 seconds). `fast-check` is an exact-pinned root devDependency.
+- It needs a real engine: the N-API addon or the WebAssembly artifact. A source checkout has neither, so the suite is skipped (visibly) there; set `REDACT_SECRET_FUZZ_REQUIRE_ARTIFACT=1` to make a missing artifact a failure. Build the addon locally with `cd bindings/node && npm ci --ignore-scripts && npx napi build --platform --release`, then link it as `packages/javascript/node_modules/@redact-secret/node-<platform>` (what `scripts/qualify-node-addon.mjs` does).
+- Run: `npm run js:build && npx vitest run --root packages/javascript test/fuzz.test.ts`. For a manual large run set `REDACT_SECRET_FUZZ_RUNS=20000` and/or `REDACT_SECRET_FUZZ_SEED=<int>` (the count applies per property; 20000 runs takes about 40 seconds).
+- A known violation is kept as an `it.fails` test, which passes while the violation exists and goes red once the core is fixed. Do not weaken the property.
 
 ## Invariants
 
