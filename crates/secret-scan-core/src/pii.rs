@@ -323,6 +323,18 @@ struct FamilyAlternative {
     reinforced_sensitivity_confidence: Option<Confidence>,
 }
 
+/// The sorted, distinct `(range, domain)` keys the context vocabulary is
+/// asked about: one `Vec` sorted and deduplicated in place, the same order and
+/// distinctness a `BTreeSet` collection gives, without its node allocations.
+fn context_candidate_keys(
+    keys: impl Iterator<Item = (ByteRange, IdentityDomain)>,
+) -> Vec<(ByteRange, IdentityDomain)> {
+    let mut keys: Vec<_> = keys.collect();
+    keys.sort_unstable();
+    keys.dedup();
+    keys
+}
+
 struct PiiDomain {
     _selection: PiiSelection,
     families: Vec<Box<dyn PiiFamily>>,
@@ -360,13 +372,12 @@ impl PiiDomain {
                 });
             }
         }
-        let context_candidates: Vec<_> = detected
-            .iter()
-            .filter(|item| item.alternative.identity == IdentityState::Established)
-            .map(|item| (item.alternative.range, item.alternative.domain))
-            .collect::<BTreeSet<_>>()
-            .into_iter()
-            .collect();
+        let context_candidates = context_candidate_keys(
+            detected
+                .iter()
+                .filter(|item| item.alternative.identity == IdentityState::Established)
+                .map(|item| (item.alternative.range, item.alternative.domain)),
+        );
         let contexts = if context_candidates.is_empty() {
             Vec::new()
         } else {
@@ -2764,5 +2775,56 @@ mod tests {
         ] {
             assert!(IdentityEvaluator::new(other).is_none(), "{other:?}");
         }
+    }
+
+    /// The collection the sorted `Vec` replaced (#1165), kept as the oracle.
+    fn oracle_context_candidate_keys(
+        keys: &[(ByteRange, IdentityDomain)],
+    ) -> Vec<(ByteRange, IdentityDomain)> {
+        keys.iter()
+            .copied()
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect()
+    }
+
+    #[test]
+    fn context_candidate_keys_match_the_btreeset_collection() {
+        assert!(context_candidate_keys(std::iter::empty()).is_empty());
+        let mut rng = crate::test_rng::XorShift32::new(0x1165);
+        for round in 0..400 {
+            let count = rng.below(if round % 50 == 0 { 3000 } else { 40 });
+            // Few distinct starts force duplicates and shared starts/ends
+            // across domains.
+            let keys: Vec<(ByteRange, IdentityDomain)> = (0..count)
+                .map(|_| {
+                    let start = rng.below(30) * 3;
+                    let end = start + 1 + rng.below(12);
+                    (
+                        ByteRange::new(start, end).unwrap(),
+                        IdentityDomain::ALL[rng.below(IdentityDomain::ALL.len())],
+                    )
+                })
+                .collect();
+            let expected = oracle_context_candidate_keys(&keys);
+            assert_eq!(context_candidate_keys(keys.iter().copied()), expected);
+            let mut reversed = keys.clone();
+            reversed.reverse();
+            assert_eq!(context_candidate_keys(reversed.into_iter()), expected);
+        }
+    }
+
+    #[test]
+    fn context_candidate_keys_dedup_across_every_domain() {
+        let range = ByteRange::new(2, 9).unwrap();
+        let keys: Vec<_> = IdentityDomain::ALL
+            .iter()
+            .rev()
+            .chain(IdentityDomain::ALL.iter())
+            .map(|domain| (range, *domain))
+            .collect();
+        let sorted = context_candidate_keys(keys.iter().copied());
+        assert_eq!(sorted.len(), IdentityDomain::ALL.len());
+        assert_eq!(sorted, oracle_context_candidate_keys(&keys));
     }
 }
