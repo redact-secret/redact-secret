@@ -669,7 +669,7 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(review["status"], "required-before-release-approval")
         self.assertEqual(
             review["currentPublicApiReview"]["path"],
-            "docs/audits/beta11-candidate-public-contract-review.md",
+            "docs/audits/beta12-candidate-public-contract-review.md",
         )
         self.assertRegex(
             review["currentPublicApiReview"]["sha256"], r"^[0-9a-f]{64}$"
