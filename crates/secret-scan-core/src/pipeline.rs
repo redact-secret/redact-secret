@@ -46,6 +46,7 @@ pub(crate) fn is_known_vendor_placeholder_literal(matched: &str) -> bool {
 }
 
 /// A validated candidate with the keys overlap resolution sorts on.
+#[cfg_attr(test, derive(Clone))]
 struct RankedCandidate<'a> {
     type_name: &'a Cow<'static, str>,
     detector: &'a Cow<'static, str>,
@@ -417,48 +418,115 @@ fn select_optimal_disjoint_set(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<Rank
     }
 
     let n = ranked.len();
-    let ends: Vec<usize> = ranked
-        .iter()
-        .map(|candidate| candidate.range.end())
-        .collect();
     // Strictly exceeds `n`, the number of candidates that could ever be
-    // summed at one dominance tier; see `EvidenceWeight`'s doc comment.
+    // summed at one dominance tier; see `EvidenceWeight`'s doc comment. It
+    // stays the *whole set's* count for every component below: a smaller base
+    // would change which tier dominates and so which subset wins.
     let base = n as u128 + 1;
 
-    let mut totals: Vec<EvidenceWeight> = Vec::with_capacity(n + 1);
-    totals.push(EvidenceWeight::default());
-    let mut include: Vec<bool> = Vec::with_capacity(n);
-
-    for (i, candidate) in ranked.iter().enumerate() {
-        let pred = ends[..i].partition_point(|&end| end <= candidate.range.start());
-        let with_candidate = EvidenceWeight::of(candidate, base).plus(totals[pred]);
-        let without_candidate = totals[i];
-        if with_candidate > without_candidate {
-            include.push(true);
-            totals.push(with_candidate);
-        } else {
-            include.push(false);
-            totals.push(without_candidate);
-        }
-    }
-
+    // Independent components (issue #1135). Sorted by end, a prefix `..=i` is
+    // closed when no later candidate starts before `ranked[i]` ends, because
+    // every earlier candidate ends no later than `ranked[i]` does. A component
+    // never conflicts with another, the total weight is the sum of the
+    // components' totals, and the recurrence's comparisons are unchanged by
+    // the constant the earlier components add to both sides, so solving each
+    // one alone yields the whole-set selection, ties included. A candidate
+    // alone in its component is always taken (its weight is positive and
+    // nothing conflicts with it), exactly as the disjoint fast path above.
+    //
+    // One backward pass fills `ends` (as the unsplit DP did) and finds the
+    // closing points from the running minimum start of the later candidates;
+    // each component is solved the moment it closes, in reverse order, which
+    // is immaterial because components do not interact. A set with no closing
+    // point is one component: the unsplit DP, with the same tables.
+    let mut ends = vec![0_usize; n];
     let mut selected_mask = vec![false; n];
-    let mut i = n;
-    while i > 0 {
-        if include[i - 1] {
-            selected_mask[i - 1] = true;
-            let start = ranked[i - 1].range.start();
-            i = ends[..i - 1].partition_point(|&end| end <= start);
-        } else {
-            i -= 1;
+    let mut workspace = DpWorkspace::default();
+    let mut component_end = n;
+    let mut min_later_start = usize::MAX;
+    for (i, candidate) in ranked.iter().enumerate().rev() {
+        // `ranked[i + 1..component_end]` is complete when this candidate ends
+        // before any later one starts.
+        if candidate.range.end() <= min_later_start && i + 1 < component_end {
+            workspace.solve(
+                &ranked[i + 1..component_end],
+                &ends[i + 1..component_end],
+                base,
+                &mut selected_mask[i + 1..component_end],
+            );
+            component_end = i + 1;
         }
+        ends[i] = candidate.range.end();
+        min_later_start = min_later_start.min(candidate.range.start());
     }
+    workspace.solve(
+        &ranked[..component_end],
+        &ends[..component_end],
+        base,
+        &mut selected_mask[..component_end],
+    );
 
     ranked
         .into_iter()
         .zip(selected_mask)
         .filter_map(|(candidate, selected)| selected.then_some(candidate))
         .collect()
+}
+
+/// Dynamic-program tables reused across the components of one call, so a set
+/// with many small overlapping clusters allocates them once, not per cluster.
+#[derive(Default)]
+struct DpWorkspace {
+    totals: Vec<EvidenceWeight>,
+    include: Vec<bool>,
+}
+
+impl DpWorkspace {
+    /// Marks in `mask` the candidates the weighted-interval recurrence selects
+    /// from `component`, which is sorted by end; `ends` and `mask` are parallel
+    /// to it. `base` is the whole set's, not the component's. A one-candidate
+    /// component is always selected without building any table.
+    fn solve(
+        &mut self,
+        component: &[RankedCandidate<'_>],
+        ends: &[usize],
+        base: u128,
+        mask: &mut [bool],
+    ) {
+        if component.len() <= 1 {
+            mask.fill(true);
+            return;
+        }
+        self.totals.clear();
+        self.totals.reserve(component.len() + 1);
+        self.totals.push(EvidenceWeight::default());
+        self.include.clear();
+        self.include.reserve(component.len());
+
+        for (i, candidate) in component.iter().enumerate() {
+            let pred = ends[..i].partition_point(|&end| end <= candidate.range.start());
+            let with_candidate = EvidenceWeight::of(candidate, base).plus(self.totals[pred]);
+            let without_candidate = self.totals[i];
+            if with_candidate > without_candidate {
+                self.include.push(true);
+                self.totals.push(with_candidate);
+            } else {
+                self.include.push(false);
+                self.totals.push(without_candidate);
+            }
+        }
+
+        let mut i = component.len();
+        while i > 0 {
+            if self.include[i - 1] {
+                mask[i - 1] = true;
+                let start = component[i - 1].range.start();
+                i = ends[..i - 1].partition_point(|&end| end <= start);
+            } else {
+                i -= 1;
+            }
+        }
+    }
 }
 
 /// Runs every registered detector over `input`, validates each candidate,
@@ -1065,6 +1133,334 @@ mod tests {
             );
         }
         assert!(fast > 500, "fast path exercised only {fast} times");
+    }
+
+    /// `(start, end, severity, specificity, confidence)` of one synthetic
+    /// candidate.
+    type Spec = (usize, usize, u8, usize, usize);
+
+    /// The resolver as shipped before component splitting (#1135): the
+    /// disjoint fast path, then the global DP over every candidate.
+    fn select_global_oracle(ranked: Vec<RankedCandidate<'_>>) -> Vec<RankedCandidate<'_>> {
+        let mut sorted = ranked;
+        sorted.sort_unstable_by(|a, b| {
+            a.range
+                .end()
+                .cmp(&b.range.end())
+                .then_with(|| a.priority(b))
+        });
+        if sorted
+            .windows(2)
+            .all(|pair| pair[1].range.start() >= pair[0].range.end())
+        {
+            return sorted;
+        }
+        select_dp_oracle(sorted)
+    }
+
+    fn candidates_from(specs: &[Spec]) -> Vec<RankedCandidate<'static>> {
+        let specificities = [
+            Specificity::Entropy,
+            Specificity::Contextual,
+            Specificity::Structural,
+            Specificity::Provider,
+            Specificity::PrivateKey,
+        ];
+        let confidences = [Confidence::Low, Confidence::Medium, Confidence::High];
+        specs
+            .iter()
+            .enumerate()
+            .map(|(i, &(start, end, severity, spec, conf))| {
+                synthetic(
+                    severity,
+                    specificities[spec % specificities.len()],
+                    confidences[conf % confidences.len()],
+                    start,
+                    end,
+                    i % 7,
+                    i / 7,
+                )
+            })
+            .collect()
+    }
+
+    fn assert_split_matches_global(specs: &[Spec], label: &str) {
+        let split = select_optimal_disjoint_set(candidates_from(specs));
+        let global = select_global_oracle(candidates_from(specs));
+        assert_eq!(key(&split), key(&global), "{label}");
+    }
+
+    /// Larger, structured sets than the tiny-space test above: clusters
+    /// separated by gaps and by exact adjacency, singletons between them,
+    /// containment, identical ranges, exact ties, sets of up to 600.
+    #[test]
+    fn component_split_matches_the_global_dp_on_structured_and_random_sets() {
+        use crate::test_rng::XorShift32;
+        let mut rng = XorShift32::new(0x1135_0001);
+        for case in 0..3000_usize {
+            let clusters = 1 + rng.below(12);
+            let mut specs = Vec::new();
+            let mut cursor = 0_usize;
+            for _ in 0..clusters {
+                // Gap of 0 makes the next cluster exactly adjacent.
+                cursor += rng.below(3);
+                let members = match rng.below(5) {
+                    0 => 1,
+                    1 => 2,
+                    2 => 1 + rng.below(6),
+                    3 => 1 + rng.below(40),
+                    _ => 1 + rng.below(8),
+                };
+                let width = 2 + rng.below(30);
+                for _ in 0..members {
+                    let start = cursor + rng.below(width);
+                    let end = start + 1 + rng.below(width);
+                    let severity = u8::try_from(rng.below(4)).unwrap_or(0);
+                    specs.push((start, end, severity, rng.below(5), rng.below(3)));
+                }
+                cursor += 2 * width;
+            }
+            assert_split_matches_global(&specs, &format!("structured case {case}"));
+        }
+        for case in 0..2000_usize {
+            let count = rng.below(600);
+            let span = 4 + rng.below(4000);
+            let specs: Vec<_> = (0..count)
+                .map(|_| {
+                    let start = rng.below(span);
+                    let width = 1 + rng.below(span / 8 + 1);
+                    let severity = u8::try_from(rng.below(4)).unwrap_or(0);
+                    (start, start + width, severity, rng.below(5), rng.below(3))
+                })
+                .collect();
+            assert_split_matches_global(&specs, &format!("random case {case}"));
+        }
+    }
+
+    #[test]
+    fn component_split_matches_the_global_dp_on_the_named_shapes() {
+        let same = |start, end| (start, end, 2, 2, 2);
+        // The weight base is the whole set's count, never a component's: a
+        // component of two with a higher-severity pair elsewhere keeps the
+        // global base, and an exact tie keeps the previously computed
+        // (excluding) state.
+        let cases: Vec<(&str, Vec<Spec>)> = vec![
+            ("single", vec![same(0, 5)]),
+            ("identical ranges", vec![same(3, 9), same(3, 9), same(3, 9)]),
+            (
+                "tie then singleton",
+                vec![same(0, 4), same(0, 4), same(10, 12)],
+            ),
+            (
+                "containment",
+                vec![same(0, 100), same(10, 20), same(30, 40), same(200, 210)],
+            ),
+            (
+                "adjacent clusters",
+                vec![same(0, 4), same(2, 6), same(6, 9), same(7, 12)],
+            ),
+            (
+                "pair beats single across clusters",
+                vec![
+                    (0, 100, 3, 3, 2),
+                    (0, 40, 2, 1, 0),
+                    (60, 100, 2, 1, 0),
+                    same(200, 201),
+                ],
+            ),
+            (
+                "two disjoint beat one overlapper",
+                vec![(0, 100, 2, 3, 2), (0, 40, 2, 2, 1), (60, 100, 2, 2, 1)],
+            ),
+            (
+                "long chain",
+                (0..200).map(|i| same(i * 3, i * 3 + 4)).collect(),
+            ),
+            (
+                "many pairs",
+                (0..400)
+                    .map(|i| same((i / 2) * 20, (i / 2) * 20 + 8))
+                    .collect(),
+            ),
+            (
+                "one dense cluster",
+                (0..300).map(|i| same(i, i + 1000)).collect(),
+            ),
+            (
+                "dense cluster among singletons",
+                (0..50)
+                    .map(|i| same(i * 20, i * 20 + 8))
+                    .chain((0..100).map(|i| same(2000 + i, 2000 + i + 500)))
+                    .chain((0..50).map(|i| same(5000 + i * 20, 5000 + i * 20 + 8)))
+                    .collect(),
+            ),
+        ];
+        for (label, specs) in cases {
+            assert_split_matches_global(&specs, label);
+        }
+        assert_split_matches_global(&[], "empty");
+    }
+
+    /// Stage measurement for #1135 (maintainer-only):
+    /// `cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_overlap`.
+    /// The shipped resolver (fast path, global DP) against component
+    /// splitting, same process, alternating A/B, minimum of 41 batches.
+    #[test]
+    #[ignore = "timing harness, run with --release --nocapture"]
+    #[allow(
+        clippy::print_stderr,
+        clippy::cast_precision_loss,
+        clippy::too_many_lines
+    )]
+    fn measure_overlap_1135() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn spec(start: usize, end: usize) -> Spec {
+            (start, end, 2, 2, 2)
+        }
+        fn ns(reps: usize, mut f: impl FnMut() -> usize) -> f64 {
+            let started = Instant::now();
+            for _ in 0..reps {
+                black_box(f());
+            }
+            started.elapsed().as_secs_f64() * 1e9 / reps as f64
+        }
+        let n = 5000;
+        let mut workloads: Vec<(String, Vec<Spec>)> = vec![
+            (
+                "disjoint-5000".into(),
+                (0..n).map(|i| spec(i * 20, i * 20 + 8)).collect(),
+            ),
+            (
+                "sparse-overlap-5000".into(),
+                (0..n)
+                    .map(|i| {
+                        if i == 2501 {
+                            spec(50_000, 50_009)
+                        } else {
+                            spec(i * 20, i * 20 + 8)
+                        }
+                    })
+                    .collect(),
+            ),
+            (
+                "pairs-5000".into(),
+                (0..n)
+                    .map(|i| spec((i / 2) * 20, (i / 2) * 20 + 8))
+                    .collect(),
+            ),
+            (
+                "dense-overlap-5000".into(),
+                (0..n).map(|i| spec(i, i + 10_000)).collect(),
+            ),
+            (
+                "clusters-of-50-5000".into(),
+                (0..n)
+                    .map(|i| spec((i / 50) * 1000 + i % 50, (i / 50) * 1000 + i % 50 + 600))
+                    .collect(),
+            ),
+            (
+                "one-dense-1000-among-4000-singletons".into(),
+                (0..n)
+                    .map(|i| {
+                        if i < 1000 {
+                            spec(20_000 + i, 20_000 + i + 5000)
+                        } else {
+                            spec(i * 20, i * 20 + 8)
+                        }
+                    })
+                    .collect(),
+            ),
+            (
+                "chain-5000 (one component, neighbours overlap)".into(),
+                (0..n).map(|i| spec(i * 3, i * 3 + 4)).collect(),
+            ),
+            (
+                "mixed-severity-dense-5000".into(),
+                (0..n)
+                    .map(|i| {
+                        let start = i % 4 * 7 + i / 4 % 50;
+                        (
+                            start,
+                            start + 300,
+                            u8::try_from(i % 4).unwrap_or(0),
+                            i % 5,
+                            i % 3,
+                        )
+                    })
+                    .collect(),
+            ),
+            ("single-1".into(), vec![spec(0, 8)]),
+            ("overlapping-pair-2".into(), vec![spec(0, 8), spec(4, 12)]),
+            (
+                "disjoint-3".into(),
+                vec![spec(0, 8), spec(20, 28), spec(40, 48)],
+            ),
+            (
+                "overlap-then-singleton-3".into(),
+                vec![spec(0, 8), spec(4, 12), spec(40, 48)],
+            ),
+            (
+                "pairs-16".into(),
+                (0..16)
+                    .map(|i| spec((i / 2) * 20, (i / 2) * 20 + 8))
+                    .collect(),
+            ),
+            (
+                "dense-overlap-16".into(),
+                (0..16).map(|i| spec(i, i + 100)).collect(),
+            ),
+            (
+                "sparse-overlap-64".into(),
+                (0..64)
+                    .map(|i| {
+                        if i == 31 {
+                            spec(400, 409)
+                        } else {
+                            spec(i * 20, i * 20 + 8)
+                        }
+                    })
+                    .collect(),
+            ),
+        ];
+        // Deterministic order of the tuples within a workload is irrelevant:
+        // both resolvers sort.
+        for (name, specs) in &mut workloads {
+            let base = candidates_from(specs);
+            let reps = (2_000_000 / specs.len().max(1)).clamp(20, 20_000);
+            let old = || select_global_oracle(black_box(base.clone())).len();
+            let new = || select_optimal_disjoint_set(black_box(base.clone())).len();
+            assert_eq!(
+                key(&select_global_oracle(base.clone())),
+                key(&select_optimal_disjoint_set(base.clone()))
+            );
+            // A/A control: the same shipped-before resolver again.
+            let control = || select_global_oracle(black_box(base.clone())).len();
+            let (mut olds, mut news, mut controls) = (Vec::new(), Vec::new(), Vec::new());
+            for round in 0..41 {
+                if round % 2 == 0 {
+                    olds.push(ns(reps, old));
+                    news.push(ns(reps, new));
+                } else {
+                    news.push(ns(reps, new));
+                    olds.push(ns(reps, old));
+                }
+                controls.push(ns(reps, control));
+            }
+            olds.sort_by(f64::total_cmp);
+            news.sort_by(f64::total_cmp);
+            controls.sort_by(f64::total_cmp);
+            eprintln!(
+                "{name}: min {:.2} -> {:.2} us ({:+.1}%), median {:.2} -> {:.2} us ({:+.1}%); A/A min {:+.1}%",
+                olds[0] / 1e3,
+                news[0] / 1e3,
+                (news[0] / olds[0] - 1.0) * 100.0,
+                olds[20] / 1e3,
+                news[20] / 1e3,
+                (news[20] / olds[20] - 1.0) * 100.0,
+                (controls[0] / olds[0] - 1.0) * 100.0
+            );
+        }
     }
 
     #[test]
