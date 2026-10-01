@@ -717,6 +717,18 @@ class UserFacingReasonTests(unittest.TestCase):
         )
         self.assert_plain(text)
 
+    def test_policy_span_gates_read_as_plain_language(self) -> None:
+        text = GEN.user_facing_reason(
+            "policy.exact-span: 1 (requires 0) | policy.leaked-span: 1 (requires 0) | "
+            "policy.protected-holdout: not-run (requires pass on frozen candidate)"
+        )
+        self.assertEqual(
+            text,
+            "Not yet stable: needs exact match spans that leave no part of the value exposed and a passing "
+            "protected holdout run on the frozen candidate.",
+        )
+        self.assert_plain(text)
+
     def test_project_policy_family_is_explained_without_tier_names(self) -> None:
         text = GEN.user_facing_reason(
             "qualificationProfile: tier T3 is not eligible for documented or empirical stable"

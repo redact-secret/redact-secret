@@ -73,6 +73,12 @@ way Python itself does.
 `limits=redact_secret.WholeInputLimits(max_input_bytes=..., max_findings=...)`
 to raise or lower them.
 
+`scan_and_redact` returns a `ScanResult` whose `text` is the same `str` on every
+read. Each read of `findings` returns a new `list` that holds the same `Finding`
+objects, so changing the list never changes the result. Detection releases the
+GIL, so threads can scan in parallel; policy and formatter callbacks still run
+on the calling thread.
+
 For input that arrives in pieces, `IncrementalSanitizer` sanitizes a bounded
 session chunk by chunk. Independently scanning chunks is unsafe, because a
 credential may cross any chunk boundary; a session carries the boundary state

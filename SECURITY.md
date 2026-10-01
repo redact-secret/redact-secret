@@ -63,10 +63,12 @@ call has no license to reveal regardless of which finding it belongs to.
 
 ## Authoritative server limits
 
-Whole-input scanning has no built-in request-size, candidate-count,
-finding-count, output-size, or concurrency limit. Before scanning, servers
-should enforce transport-byte and decoded-input length limits, the latter in
-each runtime's native range unit (UTF-8 bytes, UTF-16 code units, or Unicode
+Whole-input scanning applies only the default bound of 64 MiB of input and
+50,000 findings (`WholeInputLimits`), and fails closed when it is exceeded; it
+has no built-in transport, candidate-count, output-size, or concurrency limit.
+Before scanning,
+servers should enforce transport-byte and decoded-input length limits, the
+latter in each runtime's native range unit (UTF-8 bytes, UTF-16 code units, or Unicode
 code points). Custom detectors should reject rather than truncate above a
 declared per-request candidate limit; servers should additionally bound
 accepted findings, sanitized output, and concurrent synchronous scans
@@ -76,6 +78,10 @@ Incremental scanning requires explicit total-input, retained-plaintext, token,
 and multiline limits, but callers remain responsible for limiting accumulated
 safe output. Limit failures and extension failures are fail-closed and
 input-free. Reject oversized work without logging the raw body.
+
+How long input text stays in process memory, and what is and is not erased, is
+stated in [plaintext memory lifetime](docs/reference/plaintext-lifetime.md):
+the core minimizes owned copies and bounds retention, and it does not zeroize.
 
 ## CI supply-chain review
 

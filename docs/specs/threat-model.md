@@ -1,7 +1,7 @@
 # Threat model
 
 **Status:** current for `crates/secret-scan-core` and its bindings
-(`@redact-secret/core` `0.1.0-beta.11`, `bindings/node`, `bindings/wasm`,
+(`@redact-secret/core` `0.1.0-beta.12`, `bindings/node`, `bindings/wasm`,
 `bindings/python`, `crates/secret-scan-cli`) as described in
 [`ARCHITECTURE.md`](../../ARCHITECTURE.md#security-boundaries) and
 [`SECURITY.md`](../../SECURITY.md).
@@ -35,7 +35,7 @@ risk, or as explicitly out of scope, is not a finding for `owasp-review` or
 2. **Untrusted model or tool output consumed downstream of redaction.** Cannot alter what the core already redacted, but can hand a careless caller a payload shaped to look like a valid finding if that caller forwards model output straight into `redact` instead of `scan`'s own findings — the "findings supplied directly to `redact` are trusted caller assertions" boundary in `SECURITY.md`.
 3. **Malicious or careless custom detector, policy, or placeholder formatter.** In-process trusted code by design (`SECURITY.md` "Extension and caller trust"); can exfiltrate plaintext through its own return value, logs, or thrown errors if the caller loads an unreviewed extension.
 4. **A caller that skips or misconfigures the authoritative server-side scan.** Client-side scanning is preventive UX, not enforcement (`ARCHITECTURE.md`); a caller that treats client-side redaction as sufficient exposes the server path.
-5. **An unauthenticated or high-volume sender of scan requests at a server boundary.** Whole-input scanning has no built-in request-size, candidate-count, finding-count, output-size, or concurrency limit (`SECURITY.md` "Authoritative server limits"); the server, not the core, must enforce transport and decode limits.
+5. **An unauthenticated or high-volume sender of scan requests at a server boundary.** Whole-input scanning applies only the default bound of 64 MiB of input and 50,000 findings and has no built-in transport, candidate-count, output-size, or concurrency limit (`SECURITY.md` "Authoritative server limits"); the server, not the core, must enforce transport and decode limits.
 6. **A supply-chain attacker targeting CI or a dependency.** Constrained by pinned action SHAs, `npm ci --ignore-scripts`, and reviewed install-script declarations (`SECURITY.md` "CI supply-chain review").
 7. **Code already co-resident with the original input.** Out of scope for protection: anything that can read the caller's own process memory or variables before `scan` runs already holds the plaintext: the core cannot retroactively protect it.
 

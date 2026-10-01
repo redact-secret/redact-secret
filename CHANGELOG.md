@@ -33,6 +33,22 @@ evidence is linked from each published version.
   support no custom detectors. `scan_and_redact` and the registry API remain
   the advanced path.
 
+- `@redact-secret/wasm` (not intended for direct use) gains, additively, a
+  consuming `takeText()` and `takeFindings()` on its `ScanAndRedactResult` and
+  `IncrementalResult` (#1077, #1082) and numeric `start` and `end` on
+  `Finding` (#1077). Each `take` moves its value out once and leaves the result
+  empty; the existing `text`, `findings` and `range` getters are unchanged and
+  still clone. `@redact-secret/core` reads each result through them and frees
+  the handle, and pins `@redact-secret/wasm` exactly, so a direct importer sees
+  no change unless it calls the new methods.
+- Documentation: the [plaintext memory lifetime contract](docs/reference/plaintext-lifetime.md)
+  (#1079) states what the core promises about input text in memory (copy
+  minimization and bounded retention, never erasure) with a per-runtime
+  inventory; an opt-in zeroization mode was evaluated and is not implemented
+  (#1080); the `sanitize` golden path is in the Rust guide and API contract
+  (#1078); and the Beta.12 research records (#1012, #1013, #1014 ranking,
+  #1003 public US SSN investigation, #957 Clerk label ambiguity, #1097
+  compiled-sanitizer design) are under `docs/audits`. No behavior change.
 - New provider detectors from the #860 issuance-gated handoffs released by
   rulings R9 and R10, each always redacted at provider specificity so it wins
   overlap resolution over `contextual_secret`, `bearer_token` and
@@ -246,6 +262,29 @@ evidence is linked from each published version.
   instead of a binary search, and skips a lead group whose detectors have all
   been seen, so a lead-dense input repeats less work (#1093). The matched
   detector set is unchanged and is tested against a substring oracle.
+- Generic-token assignment discovery jumps to the next position where an
+  assignment prefix can start instead of testing every character (#1091), and
+  the ASCII entropy histogram no longer allocates. A differential test
+  checks that the jump never passes a position the per-character walk matched.
+  Nine bare-shape detectors keep the line index even when every line holds a
+  long run, because a density guard measured no saving (#1083, test only).
+  Findings, ranges, ids and order are unchanged.
+- Candidates and findings from built-in detectors borrow their static type
+  and detector names (`Cow<'static, str>`, with the public accessors still
+  returning `&str`) instead of allocating them, and overlap resolution skips
+  its dynamic program when the sorted candidates are already pairwise
+  disjoint (#1094). `redact` sorts its forbidden strings with the
+  allocation-free heap sort to keep the WebAssembly build small (#1084). A
+  random-set test checks the disjoint fast path against the full resolver.
+- Incremental sessions hand each unit's findings straight from the batch and
+  append global findings in place, so a unit no longer allocates a findings
+  vector and clones each finding (#1095); the formatter still sees each
+  finding's global id and range (tested).
+- The Node, WebAssembly and Python bindings keep their incremental UTF-16 or
+  code point offset index compact and bounded: runs of adjacent non-ASCII
+  characters are one record, entries below the retained window are pruned, and
+  capacity left by one large chunk is released (#1096). Offsets are unchanged
+  and tested against the previous per-unit index.
 
 - Scan cost is now linear on inputs that were quadratic or repeated work:
   generic-token `value` names and repeated `?a=`, `{a=x`, `(a=` prefixes on
@@ -259,8 +298,9 @@ evidence is linked from each published version.
 - The WebAssembly binding keeps the registry built from the last `ruleset`
   passed to `scan`/`scanAndRedact` and reuses it while the same ruleset bytes
   repeat, instead of parsing the ruleset and building a registry per call
-  (#1059). A different ruleset replaces the entry and a rejected one is never
-  kept. Findings and errors are unchanged. A short scan with a ruleset takes
+  (#1059). The Node addon does the same for the last (profile, PII
+  selection, ruleset bytes) it saw. A different ruleset replaces the entry and
+  a rejected one is never kept. Findings and errors are unchanged. A short scan with a ruleset takes
   about 3 us instead of 68 us (Node 22, release `full` artifact, single run).
 
 - Reduced WebAssembly initialization time and artifact size (#1043).
@@ -283,6 +323,16 @@ evidence is linked from each published version.
   samples a side, `scale-logs-small-whole` initialization is 0.881 [0.807,
   0.938] of `4fb78827` and 1.187 [1.108, 1.265] of beta.8; processing is
   unchanged.
+
+  These sizes were measured when #1043 merged, against the build before it;
+  they are not the Beta.12 candidate's. The candidate (`bfc608cc`, performance
+  evaluation run 36788351912 in `redact-secret-benchmarks`) measures `full` at
+  594,833 bytes raw / 205,068 gzip level 9 and `common` at 406,556 / 142,525,
+  against 542,445 / 187,230 and 356,480 / 127,667 for Beta.11. The `pii`
+  builds are 896,237 / 328,857 (`full`) and 708,032 / 265,924 (`common`),
+  against 833,757 / 310,058 and 647,891 / 248,491. The detectors and per-scan
+  work added since Beta.11 outweigh this reduction, so the shipped WebAssembly
+  artifacts are larger than Beta.11's, not smaller.
 
 - CLI streaming input (#1088): a chunk that completes no partial UTF-8
   sequence is now handed to the scanner without being copied, and only an
