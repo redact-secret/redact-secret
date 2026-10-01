@@ -323,7 +323,10 @@ impl Detector for JwtDetector {
                 candidates.push(
                     Candidate::built_in("jwt", Confidence::High, range)
                         .with_specificity(Specificity::Structural)
-                        .with_signals(["three-segments", "encoded-json-prefixes"]),
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "three-segments",
+                            "encoded-json-prefixes"
+                        )),
                 );
             }
 

@@ -79,7 +79,10 @@ impl Detector for AzureDevOpsPersonalAccessTokenDetector {
                     range,
                 )
                 .with_specificity(Specificity::Provider)
-                .with_signals(["azdo-fixed-signature", "azdo-84-byte-length"]),
+                .with_signal_pack(crate::types::signal_pack!(
+                    "azdo-fixed-signature",
+                    "azdo-84-byte-length"
+                )),
             );
         }
         Ok(candidates)

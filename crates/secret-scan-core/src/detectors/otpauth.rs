@@ -17,7 +17,10 @@
 
 use crate::detectors::prefilter::Literals;
 use crate::error::DetectorFailure;
-use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
+use crate::types::{
+    ByteRange, Candidate, Confidence, Detector, DetectorContext, SignalPack, Specificity,
+    signal_pack,
+};
 
 /// The two supported `otpauth://<type>/` prefixes, matched literally
 /// (lowercase, as every real-world generator emits them) together with the
@@ -37,6 +40,16 @@ const MAX_LABEL_LENGTH: usize = 2_048;
 
 /// Bounds the query-string scan for the same reason.
 const MAX_QUERY_LENGTH: usize = 8_192;
+
+/// The finite signal pack for a `PREFIXES` signal name: the labels are fixed
+/// literals, so every candidate of a form shares one slice.
+fn signal_pack_for(signal: &str) -> &'static SignalPack {
+    if signal == "totp" {
+        signal_pack!("otpauth-scheme", "totp")
+    } else {
+        signal_pack!("otpauth-scheme", "hotp")
+    }
+}
 
 fn is_boundary_identifier_char(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-')
@@ -192,7 +205,7 @@ impl Detector for OtpauthDetector {
             candidates.push(
                 Candidate::built_in("otpauth_secret", Confidence::High, range)
                     .with_specificity(Specificity::Structural)
-                    .with_signals(["otpauth-scheme", signal]),
+                    .with_signal_pack(signal_pack_for(signal)),
             );
         }
 
@@ -228,6 +241,18 @@ mod tests {
         assert_eq!(candidates[0].confidence(), Confidence::High);
         assert_eq!(candidates[0].specificity(), Some(Specificity::Structural));
         assert_eq!(candidates[0].type_name(), "otpauth_secret");
+    }
+
+    #[test]
+    fn otpauth_candidates_share_one_signal_slice_per_form() {
+        let totp = "otpauth://totp/A:a@example.com?secret=JBSWY3DPEHPK3PXP";
+        let hotp = "otpauth://hotp/A:a@example.com?secret=JBSWY3DPEHPK3PXP";
+        let (first, second) = (detect(totp), detect(totp));
+        assert_eq!(first[0].signals(), ["otpauth-scheme", "totp"]);
+        assert!(std::ptr::eq(first[0].signals(), second[0].signals()));
+        let other = detect(hotp);
+        assert_eq!(other[0].signals(), ["otpauth-scheme", "hotp"]);
+        assert!(!std::ptr::eq(first[0].signals(), other[0].signals()));
     }
 
     #[test]

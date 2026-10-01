@@ -421,7 +421,7 @@ fn secret_token_uri_candidates_from(
             candidates.push(
                 Candidate::built_in("bearer_token", Confidence::High, range)
                     .with_specificity(Specificity::Structural)
-                    .with_signals(["secret-token-uri"]),
+                    .with_signal_pack(crate::types::signal_pack!("secret-token-uri")),
             );
         }
         cursor = end.max(body_start);
@@ -540,7 +540,7 @@ fn bearer_scheme_candidates(
             candidates.push(
                 Candidate::built_in("bearer_token", Confidence::High, range)
                     .with_specificity(Specificity::Structural)
-                    .with_signals(["bearer-scheme"]),
+                    .with_signal_pack(crate::types::signal_pack!("bearer-scheme")),
             );
         }
 

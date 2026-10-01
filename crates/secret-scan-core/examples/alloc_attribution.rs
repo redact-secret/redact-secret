@@ -165,6 +165,8 @@ fn main() {
         ("ordinary", ordinary(n)),
         ("diverse", diverse(n)),
         ("references", references(n)),
+        ("otp-dense", otp_dense(n)),
+        ("otp-sparse", otp_sparse()),
     ] {
         let registry = DetectorRegistry::with_built_in([]).unwrap();
         let policy = DefaultPolicy;
@@ -220,4 +222,28 @@ fn main() {
             }
         }
     }
+}
+
+/// Synthetic `otpauth://` URIs, one per line (issues #1145 and #1146).
+fn otp_dense(n: usize) -> String {
+    let mut r = Lcg(13);
+    let mut s = String::new();
+    for i in 0..n {
+        let kind = if i % 2 == 0 { "totp" } else { "hotp" };
+        let secret = r.string(b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567", 24);
+        s.push_str(&format!(
+            "otpauth://{kind}/Example:user{i}@example.com?secret={secret}&issuer=Example\n"
+        ));
+    }
+    s
+}
+
+/// One synthetic `otpauth://` URI inside about 74 KB of ordinary log text.
+fn otp_sparse() -> String {
+    let mut s = String::new();
+    while s.len() < 74_000 {
+        s.push_str("The quick brown fox, request id 12345, status ok; path /var/log/app.log\n");
+    }
+    s.push_str("otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Example\n");
+    s
 }

@@ -75,7 +75,10 @@ impl Detector for AnthropicTokenDetector {
                     candidates.push(
                         Candidate::built_in(type_name, Confidence::High, range)
                             .with_specificity(Specificity::Provider)
-                            .with_signals(["anthropic-versioned-prefix", "opaque-suffix"]),
+                            .with_signal_pack(crate::types::signal_pack!(
+                                "anthropic-versioned-prefix",
+                                "opaque-suffix"
+                            )),
                     );
                     break;
                 }

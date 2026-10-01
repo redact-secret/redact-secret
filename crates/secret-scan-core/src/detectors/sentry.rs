@@ -128,7 +128,10 @@ impl Detector for SentryUserAuthTokenDetector {
             candidates.push(
                 Candidate::built_in("sentry_user_auth_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["sentry-documented-prefix", "exact-length-hex-secret"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "sentry-documented-prefix",
+                        "exact-length-hex-secret"
+                    )),
             );
         }
         Ok(candidates)
@@ -182,7 +185,10 @@ impl Detector for SentryOrgAuthTokenDetector {
                 candidates.push(
                     Candidate::built_in("sentry_org_auth_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(["sentry-documented-prefix", "json-payload-signature-shape"]),
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "sentry-documented-prefix",
+                            "json-payload-signature-shape"
+                        )),
                 );
             }
             start = end.max(start + 1);

@@ -111,7 +111,10 @@ impl Detector for TerraformCloudTokenDetector {
                 candidates.push(
                     Candidate::built_in("terraform_cloud_token", Confidence::High, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(["terraform-atlasv1-marker", "documented-exact-length"]),
+                        .with_signal_pack(crate::types::signal_pack!(
+                            "terraform-atlasv1-marker",
+                            "documented-exact-length"
+                        )),
                 );
                 cursor = range.end();
                 continue;

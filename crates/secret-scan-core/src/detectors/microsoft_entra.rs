@@ -70,7 +70,10 @@ impl Detector for MicrosoftEntraClientSecretDetector {
             candidates.push(
                 Candidate::built_in("microsoft_entra_client_secret", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["entra-digit-q-tilde-marker", "bounded-opaque-suffix"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "entra-digit-q-tilde-marker",
+                        "bounded-opaque-suffix"
+                    )),
             );
         }
         Ok(candidates)

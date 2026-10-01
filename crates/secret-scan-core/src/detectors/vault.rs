@@ -39,7 +39,10 @@ impl Detector for VaultTokenDetector {
             candidates.push(
                 Candidate::built_in("vault_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["vault-modern-prefix", "documented-minimum-length"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "vault-modern-prefix",
+                        "documented-minimum-length"
+                    )),
             );
         }
         Ok(candidates)

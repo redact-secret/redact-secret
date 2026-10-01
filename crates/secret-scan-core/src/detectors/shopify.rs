@@ -41,7 +41,10 @@ impl Detector for ShopifyTokenDetector {
             candidates.push(
                 Candidate::built_in("shopify_access_token", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["shopify-documented-prefix", "opaque-suffix"]),
+                    .with_signal_pack(crate::types::signal_pack!(
+                        "shopify-documented-prefix",
+                        "opaque-suffix"
+                    )),
             );
         }
         Ok(candidates)
