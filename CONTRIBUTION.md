@@ -98,8 +98,11 @@ items are enforced by CI on every pull request; the rest are checked in review.
   pull request, in the shared [conformance corpus](conformance/README.md) or
   the package's own test suite. A pull request that changes behavior without a
   test is not ready to merge. New functionality is accepted only with tests
-  that exercise it, and Rust line coverage must stay at or above 80% (the
-  `rust-coverage` CI job).
+  that exercise it. Statement coverage must stay at or above 80% for each
+  language layer: Rust lines (`rust-coverage`), `packages/javascript/src`
+  (`js-coverage`, `npm run js:coverage`), and the `redact_secret` Python
+  wrapper (`python-coverage`); see
+  [onboarding](docs/onboarding.md#measure-statement-coverage).
 - **Regression tests for bug fixes.** A bug fix includes a test that fails
   without the fix. A confirmed false positive or false negative becomes a
   permanent synthetic regression fixture
