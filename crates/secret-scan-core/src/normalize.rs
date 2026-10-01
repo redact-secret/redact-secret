@@ -33,6 +33,94 @@ pub(crate) fn is_invisible(ch: char) -> bool {
         .is_some_and(|&(_, last)| code_point <= last)
 }
 
+/// Bytes walked character by character between two looks for an ASCII
+/// stretch to skip.
+///
+/// The look is a single word load per window, so dense non-ASCII text pays
+/// about one such load per window on top of the plain per-character walk, and
+/// text with a long ASCII stretch skips it a word at a time (issue #1134).
+const WALK_WINDOW: usize = 4096;
+
+/// The offset of the first non-ASCII byte at or after `from` (or the length),
+/// when the eight bytes at `from` are all ASCII; `None` otherwise, including
+/// when fewer than eight bytes remain.
+///
+/// `from` is a character boundary, and so is the result: every byte before it
+/// is a whole ASCII character.
+#[inline(never)]
+fn ascii_stretch_end(bytes: &[u8], from: usize) -> Option<usize> {
+    const HIGH_BITS: u64 = 0x8080_8080_8080_8080;
+    let word = |position: usize| -> Option<u64> {
+        let chunk = bytes.get(position..position + 8)?;
+        Some(u64::from_le_bytes(<[u8; 8]>::try_from(chunk).ok()?))
+    };
+    if word(from)? & HIGH_BITS != 0 {
+        return None;
+    }
+    let mut position = from + 8;
+    // Four words per step while they are all ASCII, then one word at a time
+    // to find the exact byte.
+    while let (Some(a), Some(b), Some(c), Some(d)) = (
+        word(position),
+        word(position + 8),
+        word(position + 16),
+        word(position + 24),
+    ) {
+        if (a | b | c | d) & HIGH_BITS != 0 {
+            break;
+        }
+        position += 32;
+    }
+    while let Some(next) = word(position) {
+        let high = next & HIGH_BITS;
+        if high != 0 {
+            // Little-endian: the lowest set bit is the first non-ASCII byte.
+            return Some(position + usize::try_from(high.trailing_zeros() / 8).ok()?);
+        }
+        position += 8;
+    }
+    while bytes.get(position).is_some_and(u8::is_ascii) {
+        position += 1;
+    }
+    Some(position)
+}
+
+/// The end of the next walk window starting at the character boundary
+/// `position`: at least [`WALK_WINDOW`] bytes on, moved forward to a character
+/// boundary so no character is split.
+fn walk_window_end(input: &str, position: usize) -> usize {
+    let mut end = (position + WALK_WINDOW).min(input.len());
+    while !input.is_char_boundary(end) {
+        end += 1;
+    }
+    end
+}
+
+/// Offset of the first removed code point, if any.
+///
+/// The walk decodes characters exactly as a plain `char_indices` scan would.
+/// The only dispatch, at the start of each [`WALK_WINDOW`], is to jump over an
+/// ASCII stretch (which holds no removed code point).
+fn first_invisible(input: &str, skip_ascii: bool) -> Option<usize> {
+    let bytes = input.as_bytes();
+    let mut position = 0;
+    while position < input.len() {
+        if skip_ascii && let Some(after) = ascii_stretch_end(bytes, position) {
+            position = after;
+            continue;
+        }
+        let end = walk_window_end(input, position);
+        if let Some(offset) = input[position..end]
+            .char_indices()
+            .find_map(|(offset, ch)| is_invisible(ch).then_some(offset + position))
+        {
+            return Some(offset);
+        }
+        position = end;
+    }
+    None
+}
+
 /// One maximal run of removed code points.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Seam {
@@ -40,6 +128,59 @@ struct Seam {
     normalized: usize,
     /// Offset in the original input just after the run.
     original_after: usize,
+}
+
+/// The scan copy and seams of `input`, whose first removed code point is at
+/// `first_removed`.
+#[inline(never)]
+fn strip_removed(input: &str, first_removed: usize, skip_ascii: bool) -> (String, Vec<Seam>) {
+    let mut text = String::with_capacity(input.len());
+    text.push_str(&input[..first_removed]);
+    let mut seams = Vec::new();
+    let mut kept_from = first_removed;
+    let mut in_run = false;
+    let bytes = input.as_bytes();
+    let mut position = first_removed;
+    while position < input.len() {
+        // Outside a run an ASCII stretch changes neither `text` nor `seams`
+        // (no ASCII code point is removed, and `kept_from` stays put to copy
+        // it later). Inside a run the next character must be seen: the first
+        // kept one, ASCII or not, closes the run.
+        if skip_ascii
+            && !in_run
+            && let Some(after) = ascii_stretch_end(bytes, position)
+        {
+            position = after;
+            continue;
+        }
+        let end = walk_window_end(input, position);
+        for (relative, ch) in input[position..end].char_indices() {
+            let offset = relative + position;
+            if is_invisible(ch) {
+                if !in_run {
+                    text.push_str(&input[kept_from..offset]);
+                    in_run = true;
+                }
+            } else if in_run {
+                seams.push(Seam {
+                    normalized: text.len(),
+                    original_after: offset,
+                });
+                kept_from = offset;
+                in_run = false;
+            }
+        }
+        position = end;
+    }
+    if in_run {
+        seams.push(Seam {
+            normalized: text.len(),
+            original_after: input.len(),
+        });
+    } else {
+        text.push_str(&input[kept_from..]);
+    }
+    (text, seams)
 }
 
 /// The scan copy of one input and the seams that map it back.
@@ -58,6 +199,14 @@ pub(crate) struct NormalizedInput<'a> {
 impl<'a> NormalizedInput<'a> {
     /// Builds the scan copy of `input`.
     pub(crate) fn new(input: &'a str) -> Self {
+        Self::build(input, true)
+    }
+
+    /// [`new`](Self::new) with the ASCII-stretch dispatch selectable. The
+    /// dispatch decides only which bytes are *examined*, never which code
+    /// points are removed: with `skip_ascii` false every character goes
+    /// through the same per-character walk the dispatch falls back to.
+    fn build(input: &'a str, skip_ascii: bool) -> Self {
         let borrowed = Self {
             text: Cow::Borrowed(input),
             seams: Vec::new(),
@@ -67,45 +216,11 @@ impl<'a> NormalizedInput<'a> {
         if input.is_ascii() {
             return borrowed;
         }
-        let Some(first_removed) = input
-            .char_indices()
-            .find_map(|(offset, ch)| is_invisible(ch).then_some(offset))
-        else {
+        let Some(first_removed) = first_invisible(input, skip_ascii) else {
             return borrowed;
         };
 
-        let mut text = String::with_capacity(input.len());
-        text.push_str(&input[..first_removed]);
-        let mut seams = Vec::new();
-        let mut kept_from = first_removed;
-        let mut in_run = false;
-        for (offset, ch) in input[first_removed..]
-            .char_indices()
-            .map(|(offset, ch)| (offset + first_removed, ch))
-        {
-            if is_invisible(ch) {
-                if !in_run {
-                    text.push_str(&input[kept_from..offset]);
-                    in_run = true;
-                }
-            } else if in_run {
-                seams.push(Seam {
-                    normalized: text.len(),
-                    original_after: offset,
-                });
-                kept_from = offset;
-                in_run = false;
-            }
-        }
-        if in_run {
-            seams.push(Seam {
-                normalized: text.len(),
-                original_after: input.len(),
-            });
-        } else {
-            text.push_str(&input[kept_from..]);
-        }
-
+        let (text, seams) = strip_removed(input, first_removed, skip_ascii);
         Self {
             text: Cow::Owned(text),
             seams,
@@ -308,6 +423,7 @@ mod tests {
     }
 
     /// Median nanoseconds per call of `f`, over `samples` batches of `reps`.
+    #[allow(clippy::cast_precision_loss)]
     fn median_ns(samples: usize, reps: usize, mut f: impl FnMut() -> usize) -> f64 {
         use std::hint::black_box;
         use std::time::Instant;
@@ -330,6 +446,7 @@ mod tests {
     /// fused one, alternating A/B.
     #[test]
     #[ignore = "timing harness, run with --release --nocapture"]
+    #[allow(clippy::print_stderr)]
     fn measure_translate_1133() {
         use std::hint::black_box;
         for (name, text) in [
@@ -378,6 +495,283 @@ mod tests {
                 olds[7] / 1e3,
                 news[7] / 1e3,
                 (news[7] / olds[7] - 1.0) * 100.0
+            );
+        }
+    }
+
+    /// The pre-#1134 `NormalizedInput::new`, verbatim: one `char_indices`
+    /// walk with no ASCII-block dispatch. The oracle for
+    /// [`NormalizedInput::build`].
+    fn oracle_new(input: &str) -> (Cow<'_, str>, Vec<Seam>) {
+        oracle_new_copy::<0>(input)
+    }
+
+    /// The same body monomorphized once more, so the timing harness can show
+    /// how far two builds of identical code differ by layout alone.
+    fn oracle_new_copy<const COPY: u8>(input: &str) -> (Cow<'_, str>, Vec<Seam>) {
+        std::hint::black_box(COPY);
+        if input.is_ascii() {
+            return (Cow::Borrowed(input), Vec::new());
+        }
+        let Some(first_removed) = input
+            .char_indices()
+            .find_map(|(offset, ch)| is_invisible(ch).then_some(offset))
+        else {
+            return (Cow::Borrowed(input), Vec::new());
+        };
+        let mut text = String::with_capacity(input.len());
+        text.push_str(&input[..first_removed]);
+        let mut seams = Vec::new();
+        let mut kept_from = first_removed;
+        let mut in_run = false;
+        for (offset, ch) in input[first_removed..]
+            .char_indices()
+            .map(|(offset, ch)| (offset + first_removed, ch))
+        {
+            if is_invisible(ch) {
+                if !in_run {
+                    text.push_str(&input[kept_from..offset]);
+                    in_run = true;
+                }
+            } else if in_run {
+                seams.push(Seam {
+                    normalized: text.len(),
+                    original_after: offset,
+                });
+                kept_from = offset;
+                in_run = false;
+            }
+        }
+        if in_run {
+            seams.push(Seam {
+                normalized: text.len(),
+                original_after: input.len(),
+            });
+        } else {
+            text.push_str(&input[kept_from..]);
+        }
+        (Cow::Owned(text), seams)
+    }
+
+    fn assert_dispatch_matches_oracle(input: &str) {
+        let (oracle_text, oracle_seams) = oracle_new(input);
+        for skip_ascii in [true, false] {
+            let view = NormalizedInput::build(input, skip_ascii);
+            assert_eq!(view.text, oracle_text, "skip_ascii={skip_ascii} {input:?}");
+            assert_eq!(
+                view.seams, oracle_seams,
+                "skip_ascii={skip_ascii} {input:?}"
+            );
+            assert_eq!(
+                matches!(view.text, Cow::Borrowed(_)),
+                matches!(oracle_text, Cow::Borrowed(_)),
+                "skip_ascii={skip_ascii} {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn dispatch_equals_the_plain_walk_for_every_scalar_at_every_block_alignment() {
+        // Every governed boundary character plus a stride over the rest, each
+        // after ASCII prefixes that put it before, on and past the block
+        // edges, followed by ASCII (a removed run must close at the right
+        // offset) and by a second removed character.
+        let mut characters: Vec<char> = INVISIBLE_RANGES
+            .iter()
+            .flat_map(|&(first, last)| {
+                [
+                    first.checked_sub(1),
+                    Some(first),
+                    Some(last),
+                    Some(last + 1),
+                ]
+            })
+            .flatten()
+            .filter_map(char::from_u32)
+            .collect();
+        characters.extend((0..=0x10_FFFF).step_by(251).filter_map(char::from_u32));
+        for ch in characters {
+            for prefix in 0..=140 {
+                let ascii = "x".repeat(prefix);
+                assert_dispatch_matches_oracle(&format!("{ascii}{ch}tail-{ZWSP}"));
+                assert_dispatch_matches_oracle(&format!("{ascii}{ch}{ZWSP}"));
+            }
+        }
+    }
+
+    #[test]
+    fn dispatch_equals_the_plain_walk_on_generated_mixed_text() {
+        let mut state = 0x2545_F491_4F6C_DD1D_u64;
+        let mut next = move || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            usize::try_from(state >> 33).unwrap()
+        };
+        let pieces: [&str; 14] = [
+            "ordinary request\n",
+            "한글 문장",
+            "🙂",
+            "é",
+            "\u{200B}",
+            "\u{200C}\u{2060}",
+            "\u{E0041}",
+            "\u{00AD}",
+            "\u{FE0F}",
+            "\u{3000}",
+            "token_abcdefghijklmnopqrstuvwxyz0123456789",
+            " ",
+            "\r\n",
+            "\u{FFA0}",
+        ];
+        for _ in 0..4000 {
+            let mut input = String::new();
+            for _ in 0..(next() % 40) {
+                let piece = pieces[next() % pieces.len()];
+                for _ in 0..=(next() % 6) {
+                    input.push_str(piece);
+                }
+                if next() % 3 == 0 {
+                    input.push_str(&"a".repeat(next() % 200));
+                }
+                if next() % 25 == 0 {
+                    // Long enough to cross walk windows and four-word steps.
+                    input.push_str(&"b".repeat(next() % 9000));
+                }
+            }
+            assert_dispatch_matches_oracle(&input);
+        }
+    }
+
+    #[test]
+    fn dispatch_equals_the_plain_walk_around_walk_window_edges() {
+        let mixed_dense = "한글🙂é ".repeat(2000);
+        for prefix in
+            (WALK_WINDOW - 12..=WALK_WINDOW + 12).chain(2 * WALK_WINDOW - 12..=2 * WALK_WINDOW + 12)
+        {
+            let ascii = "x".repeat(prefix);
+            for edge in ["한", "🙂", "é", ZWSP.to_string().as_str(), "a"] {
+                assert_dispatch_matches_oracle(&format!("{ascii}{edge}{ZWSP}{ZWNJ}tail"));
+                assert_dispatch_matches_oracle(&format!("{ascii}{edge}tail{ZWSP}"));
+                assert_dispatch_matches_oracle(&format!("{ZWSP}{ascii}{edge}{ZWNJ}"));
+                assert_dispatch_matches_oracle(&format!("{mixed_dense}{ascii}{edge}{ZWSP}x"));
+            }
+        }
+        // A removed run in the middle of dense non-ASCII text, at every
+        // alignment of the window.
+        for skew in 0..8 {
+            let input = format!("{}{ZWSP}{mixed_dense}", "x".repeat(skew));
+            assert_dispatch_matches_oracle(&input);
+        }
+    }
+
+    #[test]
+    fn dispatch_handles_the_named_boundary_shapes() {
+        let long = "ordinary request processed successfully\n".repeat(40);
+        for input in [
+            format!("{long}한글"),
+            format!("{long}{ZWSP}"),
+            format!("{ZWSP}{long}"),
+            format!("{long}{ZWSP}{long}"),
+            format!("{ZWSP}{ZWNJ}{long}{ZWSP}"),
+            format!("한{ZWSP}{long}{ZWSP}한"),
+            format!("{long}한{ZWSP}{ZWSP}{long}한"),
+            format!("{}{ZWSP}x", "a".repeat(63)),
+            format!("{}{ZWSP}x", "a".repeat(64)),
+            format!("{}é{ZWSP}x", "a".repeat(63)),
+            format!("{}é{ZWSP}x", "a".repeat(62)),
+        ] {
+            assert_dispatch_matches_oracle(&input);
+        }
+    }
+
+    /// Stage measurement for #1134 (maintainer-only):
+    /// `cargo test --release -p redact-secret --lib -- --ignored --nocapture measure_normalize`.
+    /// Old plain walk vs the dispatch, same binary, alternating A/B.
+    #[test]
+    #[ignore = "timing harness, run with --release --nocapture"]
+    #[allow(clippy::print_stderr)]
+    fn measure_normalize_1134() {
+        use std::hint::black_box;
+        let ordinary = "ordinary request processed successfully\n";
+        let mut sparse = ordinary.repeat(1700);
+        sparse.push_str("한글🙂");
+        let workloads: Vec<(&str, String)> = vec![
+            ("ascii", ordinary.repeat(1700)),
+            ("sparse-unicode", sparse),
+            ("dense-unicode", "한글 문장과🙂이모지 테스트\n".repeat(1700)),
+            (
+                "sparse-invisible",
+                format!(
+                    "{}{ZWSP}{}",
+                    "ordinary request\n".repeat(2000),
+                    "completed successfully\n".repeat(2000)
+                ),
+            ),
+            ("dense-invisible", "a\u{200b}b\u{200c}가🙂\n".repeat(4000)),
+            (
+                "en-kr-mixed-prose",
+                "user=minho 한글 문장 id=4711 status=ok ".repeat(1800),
+            ),
+            (
+                "sparse-emoji-log",
+                format!("{}🙂 ", ordinary.repeat(8)).repeat(200),
+            ),
+            (
+                "emoji-every-line",
+                "ordinary request processed 🙂\n".repeat(2000),
+            ),
+            (
+                "kr-dense-prose",
+                "이것은 한국어로 작성된 로그 메시지입니다 ".repeat(1500),
+            ),
+        ];
+        for (name, text) in &workloads {
+            let old = || {
+                let (text, seams) = oracle_new(black_box(text));
+                text.len() + seams.len()
+            };
+            let new = || {
+                let view = NormalizedInput::build(black_box(text), true);
+                view.text.len() + view.seams.len()
+            };
+            // A/A control: a second compiled copy of the same old walk, to show
+            // how far identical code differs by layout alone.
+            let structure = || {
+                let (text, seams) = oracle_new_copy::<1>(black_box(text));
+                text.len() + seams.len()
+            };
+            assert_eq!(old(), new());
+            let (mut olds, mut news) = (Vec::new(), Vec::new());
+            let mut structs = Vec::new();
+            for round in 0..41 {
+                if round % 2 == 0 {
+                    olds.push(median_ns(1, 100, old));
+                    news.push(median_ns(1, 100, new));
+                    structs.push(median_ns(1, 100, structure));
+                } else {
+                    structs.push(median_ns(1, 100, structure));
+                    news.push(median_ns(1, 100, new));
+                    olds.push(median_ns(1, 100, old));
+                }
+            }
+            olds.sort_by(f64::total_cmp);
+            news.sort_by(f64::total_cmp);
+            structs.sort_by(f64::total_cmp);
+            eprintln!(
+                "  A/A control (old vs old) min {:.3} us ({:+.1}%)",
+                structs[0] / 1e3,
+                (structs[0] / olds[0] - 1.0) * 100.0
+            );
+            eprintln!(
+                "{name} ({} B): median {:.3} -> {:.3} us ({:+.1}%), min {:.3} -> {:.3} us ({:+.1}%)",
+                text.len(),
+                olds[20] / 1e3,
+                news[20] / 1e3,
+                (news[20] / olds[20] - 1.0) * 100.0,
+                olds[0] / 1e3,
+                news[0] / 1e3,
+                (news[0] / olds[0] - 1.0) * 100.0
             );
         }
     }
