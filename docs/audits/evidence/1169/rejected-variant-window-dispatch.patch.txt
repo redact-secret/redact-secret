@@ -1,0 +1,770 @@
+# Rejected last variant for #1169 (head-density dispatch + 32-byte windows). NOT applied; kept as the
+# exact design the final measurement rejected. Apply with `patch -p1` against the main commit named in README.md.
+--- a/crates/secret-scan-core/src/pii.rs
++++ b/crates/secret-scan-core/src/pii.rs
+@@ -44,6 +44,59 @@
+ mod pii_phone;
+ #[path = "pii/pii_us_ssn.rs"]
+ mod pii_us_ssn;
++
++/// Inputs shorter than this are never classified as sparse: the dispatch
++/// itself would cost more than a short scan (issue #1169).
++const DIGIT_SPARSE_MIN_BYTES: usize = 256;
++/// Leading bytes counted by [`sparse_digit_head`].
++const DIGIT_HEAD_BYTES: usize = 128;
++/// A head with fewer ASCII digits than this is sparse.
++const DIGIT_HEAD_SPARSE_BELOW: usize = 8;
++/// Bytes [`next_ascii_digit`] tests at once.
++const DIGIT_BLOCK_BYTES: usize = 16;
++/// Bytes the original loop walks after each jump in a sparse input.
++const DIGIT_WINDOW_BYTES: usize = 32;
++
++/// `true` when `bytes` is long enough and its first [`DIGIT_HEAD_BYTES`] hold
++/// fewer than [`DIGIT_HEAD_SPARSE_BELOW`] ASCII digits.
++///
++/// This is the adaptive part of issue #1169. The digit-family detectors scan
++/// a digit-dense or digit-noisy input with the original byte loop, which
++/// every skipping variant measured slower there; only an input whose head
++/// looks sparse jumps with [`next_ascii_digit`] and runs the same loop over a
++/// [`DIGIT_WINDOW_BYTES`] window after each jump. The skipped bytes are
++/// non-digits, which the loop steps over anyway, so the choice affects time
++/// only, never the findings.
++#[inline]
++fn sparse_digit_head(bytes: &[u8]) -> bool {
++    bytes.len() >= DIGIT_SPARSE_MIN_BYTES
++        && bytes[..DIGIT_HEAD_BYTES]
++            .iter()
++            .filter(|byte| byte.is_ascii_digit())
++            .count()
++            < DIGIT_HEAD_SPARSE_BELOW
++}
++
++/// The offset of the first ASCII digit at or after `from`, or `bytes.len()`
++/// when there is none. Whole blocks without a digit are skipped, then the
++/// block holding the first digit is walked byte by byte, so the result is
++/// always the exact first digit.
++fn next_ascii_digit(bytes: &[u8], from: usize) -> usize {
++    let mut at = from.min(bytes.len());
++    while let Some(block) = bytes.get(at..at + DIGIT_BLOCK_BYTES) {
++        if block
++            .iter()
++            .fold(false, |found, byte| found | byte.is_ascii_digit())
++        {
++            break;
++        }
++        at += DIGIT_BLOCK_BYTES;
++    }
++    while at < bytes.len() && !bytes[at].is_ascii_digit() {
++        at += 1;
++    }
++    at
++}
+ 
+ /// A canonical, closed PII selector set for the loaded artifact.
+ ///
+@@ -2763,6 +2816,187 @@
+             "pii:global:email ",
+         ] {
+             assert!(IdentityEvaluator::new(other).is_none(), "{other:?}");
++        }
++    }
++}
++
++/// Whole-scan and incremental-scan comparison of a digit-family detector
++/// against its one-byte-at-a-time oracle (issue #1169).
++#[cfg(test)]
++mod digit_discovery_tests {
++    use super::{PiiDomain, PiiFamily, PiiSelection, next_ascii_digit};
++    use crate::test_rng::XorShift32;
++
++    fn scalar_next_digit(bytes: &[u8], from: usize) -> usize {
++        let mut at = from.min(bytes.len());
++        while at < bytes.len() && !bytes[at].is_ascii_digit() {
++            at += 1;
++        }
++        at
++    }
++
++    #[test]
++    fn next_ascii_digit_equals_the_byte_walk_across_probe_and_block_edges() {
++        let mut rng = XorShift32::new(0x1169_0001);
++        let pieces = [
++            "a",
++            "-",
++            " ",
++            "\u{e9}",
++            "\u{1f600}",
++            "7",
++            "0",
++            "9",
++            "/",
++            ":",
++        ];
++        for round in 0..4_000 {
++            let mut text = String::new();
++            for _ in 0..rng.below(8) {
++                // Gaps around the probe (16) and block (16) sizes.
++                let gap = match round % 3 {
++                    0 => rng.below(4),
++                    1 => 12 + rng.below(10),
++                    _ => 28 + rng.below(12),
++                };
++                text.push_str(&"x".repeat(gap));
++                text.push_str(pieces[rng.below(pieces.len())]);
++            }
++            text.push_str(&"y".repeat(rng.below(40)));
++            let bytes = text.as_bytes();
++            for from in 0..=bytes.len() + 2 {
++                assert_eq!(
++                    next_ascii_digit(bytes, from),
++                    scalar_next_digit(bytes, from),
++                    "{text:?} {from}"
++                );
++            }
++        }
++        // A digit at every offset of a long non-digit run, and the ends.
++        for length in 0..70 {
++            for digit_at in 0..=length {
++                let mut bytes = vec![b'x'; length];
++                if digit_at < length {
++                    bytes[digit_at] = b'3';
++                }
++                for from in 0..=length + 1 {
++                    assert_eq!(
++                        next_ascii_digit(&bytes, from),
++                        scalar_next_digit(&bytes, from)
++                    );
++                }
++            }
+         }
+     }
++
++    type Summary = (String, Vec<String>);
++
++    fn registry(selector: &str, id: &str, family: Box<dyn PiiFamily>) -> crate::DetectorRegistry {
++        let ids = [id];
++        let selectors = [selector];
++        let selection = PiiSelection::parse_with_catalog(&selectors, &ids, &ids).unwrap();
++        crate::DetectorRegistry::with_internal_test_detector(Box::new(PiiDomain::new(
++            selection,
++            vec![family],
++        )))
++    }
++
++    fn summarize<'a>(findings: impl Iterator<Item = &'a crate::Finding>) -> Vec<String> {
++        findings
++            .map(|f| {
++                format!(
++                    "{:?}|{}|{}|{:?}|{:?}|{:?}",
++                    f.id(),
++                    f.type_name(),
++                    f.detector(),
++                    f.confidence(),
++                    f.action(),
++                    f.range()
++                )
++            })
++            .collect()
++    }
++
++    fn whole(registry: &crate::DetectorRegistry, input: &str) -> Summary {
++        let result = crate::scan_and_redact(
++            input,
++            registry,
++            &crate::DefaultPolicy,
++            &crate::default_placeholder_formatter,
++        )
++        .unwrap();
++        (
++            result.text().to_owned(),
++            summarize(result.findings().iter()),
++        )
++    }
++
++    fn incremental(registry: crate::DetectorRegistry, input: &str, splits: &[usize]) -> Summary {
++        let limits = crate::IncrementalLimits::new(4_096, 2_048, 512, 1_024).unwrap();
++        let policy: Box<dyn crate::IncrementalPolicy> = Box::new(crate::DefaultPolicy);
++        let formatter: Box<dyn crate::PlaceholderFormatter> =
++            Box::new(crate::default_placeholder_formatter);
++        let mut session =
++            crate::IncrementalSanitizer::from_registry(registry, limits, policy, formatter);
++        let mut text = String::new();
++        let mut findings = Vec::new();
++        let mut previous = 0;
++        for &split in splits.iter().chain(std::iter::once(&input.len())) {
++            let part = session.append(&input[previous..split]).unwrap();
++            text.push_str(part.text());
++            findings.extend(summarize(part.findings().iter()));
++            previous = split;
++        }
++        let last = session.finalize().unwrap();
++        text.push_str(last.text());
++        findings.extend(summarize(last.findings().iter()));
++        (text, findings)
++    }
++
++    /// Compares the production family against the oracle family over whole
++    /// scans, every single split and random three-way partitions of each
++    /// input. Returns how many inputs produced a finding.
++    pub(super) fn assert_family_equals_oracle(
++        selector: &str,
++        id: &str,
++        production: fn() -> Box<dyn PiiFamily>,
++        oracle: fn() -> Box<dyn PiiFamily>,
++        inputs: &[String],
++    ) -> usize {
++        let mut with_findings = 0;
++        for input in inputs {
++            let expected = whole(&registry(selector, id, oracle()), input);
++            assert_eq!(
++                whole(&registry(selector, id, production()), input),
++                expected,
++                "{input:?}"
++            );
++            with_findings += usize::from(!expected.1.is_empty());
++            let boundaries: Vec<usize> = input
++                .char_indices()
++                .map(|(index, _)| index)
++                .chain(std::iter::once(input.len()))
++                .collect();
++            for &split in &boundaries {
++                assert_eq!(
++                    incremental(registry(selector, id, production()), input, &[split]),
++                    incremental(registry(selector, id, oracle()), input, &[split]),
++                    "{input:?} split {split}"
++                );
++            }
++            let mut rng = XorShift32::new(0x1169_0002);
++            for _ in 0..30 {
++                let mut cuts: Vec<usize> = (0..3)
++                    .map(|_| boundaries[rng.below(boundaries.len())])
++                    .collect();
++                cuts.sort_unstable();
++                assert_eq!(
++                    incremental(registry(selector, id, production()), input, &cuts),
++                    incremental(registry(selector, id, oracle()), input, &cuts),
++                    "{input:?} cuts {cuts:?}"
++                );
++            }
++        }
++        with_findings
++    }
+ }
+--- a/crates/secret-scan-core/src/pii/pii_us_ssn.rs
++++ b/crates/secret-scan-core/src/pii/pii_us_ssn.rs
+@@ -50,10 +50,39 @@
+ }
+ 
+ fn detect_us_ssns(input: &str) -> Vec<Alternative> {
++    collect_us_ssns(input, super::sparse_digit_head(input.as_bytes()))
++}
++
++/// [`detect_us_ssns`] with the sparse-input jumps forced on or off, so the tests can
++/// run both loops over any input.
++fn collect_us_ssns(input: &str, skipping: bool) -> Vec<Alternative> {
+     let bytes = input.as_bytes();
+     let mut output = Vec::new();
+     let mut start = 0;
+     while start < bytes.len() {
++        let end = if skipping {
++            start = super::next_ascii_digit(bytes, start);
++            start.saturating_add(super::DIGIT_WINDOW_BYTES)
++        } else {
++            bytes.len()
++        };
++        start = scan_us_ssn_window(input, start, end, &mut output);
++    }
++    output
++}
++
++/// The original byte loop of [`detect_us_ssns`] over the positions `start..limit`: the
++/// scan behind it, which a sparse input runs once per jump (issue #1169).
++/// Returns where the loop stopped.
++fn scan_us_ssn_window(
++    input: &str,
++    mut start: usize,
++    limit: usize,
++    output: &mut Vec<Alternative>,
++) -> usize {
++    let bytes = input.as_bytes();
++    let limit = limit.min(bytes.len());
++    while start < limit {
+         if !bytes[start].is_ascii_digit() || !valid_left_boundary(input, start) {
+             start += 1;
+             continue;
+@@ -92,7 +121,7 @@
+         }
+         start = end;
+     }
+-    output
++    start
+ }
+ 
+ fn parse_candidate(input: &str, start: usize) -> Option<(usize, [u8; COMPACT_BYTES])> {
+@@ -262,5 +291,208 @@
+     fn scan_is_bounded_before_validation() {
+         let input = "9".repeat(1_000_000);
+         assert!(ranges(&input).is_empty());
++    }
++}
++
++#[cfg(test)]
++mod digit_discovery_tests {
++    use super::*;
++    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
++
++    /// `detect_us_ssns` before #1169: every byte is tested for being a digit.
++    fn oracle_detect_us_ssns(input: &str) -> Vec<Alternative> {
++        let bytes = input.as_bytes();
++        let mut output = Vec::new();
++        let mut start = 0;
++        while start < bytes.len() {
++            if !bytes[start].is_ascii_digit() || !valid_left_boundary(input, start) {
++                start += 1;
++                continue;
++            }
++
++            let Some((end, compact)) = parse_candidate(input, start) else {
++                start += 1;
++                continue;
++            };
++            if fully_delimited_reference(input, start, end) {
++                start = end;
++                continue;
++            }
++            let compact_value = core::str::from_utf8(&compact).ok();
++            let validated = compact_value.and_then(|candidate| {
++                StructuredValidatorRegistry::validate(VALIDATOR_ID, VALIDATOR_VERSION, candidate)
++                    .ok()
++            });
++            if validated.is_some_and(|evidence| {
++                evidence.provenance.identity == VALIDATOR_ID
++                    && evidence.provenance.version == VALIDATOR_VERSION
++            }) && let Some(range) = ByteRange::new(start, end)
++            {
++                output.push(Alternative {
++                    family_id: FAMILY_ID,
++                    domain: IdentityDomain::NationalId,
++                    range,
++                    identity: IdentityState::Established,
++                    identity_confidence: Confidence::High,
++                    identity_specificity: Specificity::Structural,
++                    sensitivity: SensitivityState::NotEstablished,
++                    sensitivity_confidence: Confidence::High,
++                    sensitivity_specificity: Specificity::Contextual,
++                    obfuscation: Obfuscation::None,
++                    reject_invisible_normalization: true,
++                });
++            }
++            start = end;
++        }
++        output
++    }
++
++    struct OracleFamily;
++
++    impl PiiFamily for OracleFamily {
++        fn id(&self) -> &'static str {
++            FAMILY_ID
++        }
++        fn context_requirement(&self) -> ContextRequirement {
++            UsSsnFamily.context_requirement()
++        }
++        fn occurrence_exclusions(&self) -> &'static [&'static str] {
++            OCCURRENCE_EXCLUSIONS
++        }
++        fn reject_invisible_normalization(&self) -> bool {
++            true
++        }
++        fn detect(&self, input: &str) -> Vec<Alternative> {
++            oracle_detect_us_ssns(input)
++        }
++    }
++
++    fn corpus() -> Vec<String> {
++        const PIECES: &[&str] = &[
++            "078-05-1120",
++            "078051120",
++            "123-45-6789",
++            "000-12-3456",
++            "666-12-3456",
++            "{{078051120}}",
++            "<078051120>",
++            "${078051120}",
++            "078-05-11200",
++            "1078-05-1120",
++            "078--05-1120",
++            "078\u{2010}05\u{2010}1120",
++            "x078051120",
++            "078051120x",
++            "9",
++            "12",
++            "-",
++            " ",
++            "\n",
++            "\u{e9}",
++            "\u{1f600}",
++            "\u{200b}",
++            "\u{301}",
++            "ssn: ",
++            "SSN=",
++            "\u{c0ac}\u{d68c}\u{bcf4}\u{c7a5}\u{bc88}\u{d638}: ",
++        ];
++        let mut rng = XorShift32::new(0x1169_0003);
++        let mut inputs = Vec::new();
++        for _ in 0..3_000 {
++            let mut text = String::new();
++            for _ in 0..rng.below(10) {
++                // Gaps straddle the 16-byte probe and block sizes.
++                text.push_str(&" ".repeat([0, 1, 7, 15, 16, 17, 31, 33][rng.below(8)]));
++                text.push_str(PIECES[rng.below(PIECES.len())]);
++            }
++            inputs.push(text);
++        }
++        for _ in 0..1_500 {
++            inputs.push(rng.text(BOUNDARY_PIECES, 24));
++        }
++        inputs.push("9".repeat(1_000));
++        // Long enough to be classified by head density: sparse head with a
++        // dense tail, dense head with a sparse tail, and a sparse head only.
++        inputs.push("filler text ".repeat(40) + &"078-05-1120 ".repeat(30));
++        inputs.push("078-05-1120 ".repeat(30) + &"filler text ".repeat(40));
++        inputs.push("filler text ".repeat(60) + "078-05-1120");
++        inputs.push("a".repeat(500) + "078-05-1120" + &"b".repeat(500));
++        inputs
+     }
++
++    #[test]
++    fn adaptive_discovery_equals_the_byte_walk() {
++        let mut found = 0;
++        for input in corpus() {
++            let old = oracle_detect_us_ssns(&input);
++            for new in [
++                detect_us_ssns(&input),
++                collect_us_ssns(&input, true),
++                collect_us_ssns(&input, false),
++            ] {
++                assert_eq!(format!("{new:?}"), format!("{old:?}"), "{input:?}");
++            }
++            found += old.len();
++        }
++        assert!(found > 500, "only {found} candidates");
++    }
++
++    #[test]
++    fn every_window_of_a_sparse_input_matches_the_byte_walk() {
++        let input = format!(
++            "{}078-05-1120{}\u{e9}123456789 {}",
++            "a".repeat(40),
++            "b".repeat(33),
++            "c".repeat(20)
++        );
++        for start in 0..=input.len() {
++            for end in start..=input.len() {
++                if input.is_char_boundary(start) && input.is_char_boundary(end) {
++                    let window = &input[start..end];
++                    let expected = format!("{:?}", oracle_detect_us_ssns(window));
++                    assert_eq!(
++                        format!("{:?}", detect_us_ssns(window)),
++                        expected,
++                        "{window:?}"
++                    );
++                    assert_eq!(
++                        format!("{:?}", collect_us_ssns(window, true)),
++                        expected,
++                        "{window:?}"
++                    );
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn whole_and_incremental_scans_equal_the_byte_walk() {
++        let inputs: Vec<String> = [
++            "ssn: 078-05-1120\nnote: 123456789 and 666-12-3456 and 000-12-3456",
++            "SSN=078051120; ssn: {{078051120}} ssn: <078051120> ssn: 078-05-11200",
++            "\u{c0ac}\u{d68c}\u{bcf4}\u{c7a5}\u{bc88}\u{d638}: 078-05-1120 \u{1f600} ssn: 0780511209",
++        ]
++        .iter()
++        .map(|text| (*text).to_owned())
++        .chain([
++            format!(
++                "{}ssn: 078-05-1120 {}",
++                "filler text ".repeat(40),
++                "9".repeat(40)
++            ),
++            "1 2 3 4 5 6 7 8 9 0 ".repeat(8),
++        ])
++        .collect();
++        let with_findings = super::super::digit_discovery_tests::assert_family_equals_oracle(
++            "pii:family:us:ssn",
++            FAMILY_ID,
++            || Box::new(UsSsnFamily),
++            || Box::new(OracleFamily),
++            &inputs,
++        );
++        assert!(
++            with_findings >= 3,
++            "only {with_findings} inputs had findings"
++        );
++    }
+ }
+--- a/crates/secret-scan-core/src/pii/pii_payment_card.rs
++++ b/crates/secret-scan-core/src/pii/pii_payment_card.rs
+@@ -59,10 +59,39 @@
+ }
+ 
+ fn detect_payment_cards(input: &str) -> Vec<Alternative> {
++    collect_payment_cards(input, super::sparse_digit_head(input.as_bytes()))
++}
++
++/// [`detect_payment_cards`] with the sparse-input jumps forced on or off, so the tests can
++/// run both loops over any input.
++fn collect_payment_cards(input: &str, skipping: bool) -> Vec<Alternative> {
+     let bytes = input.as_bytes();
+     let mut output = Vec::new();
+     let mut index = 0;
+     while index < bytes.len() {
++        let end = if skipping {
++            index = super::next_ascii_digit(bytes, index);
++            index.saturating_add(super::DIGIT_WINDOW_BYTES)
++        } else {
++            bytes.len()
++        };
++        index = scan_payment_card_window(input, index, end, &mut output);
++    }
++    output
++}
++
++/// The original byte loop of [`detect_payment_cards`] over the positions `index..limit`: the
++/// scan behind it, which a sparse input runs once per jump (issue #1169).
++/// Returns where the loop stopped.
++fn scan_payment_card_window(
++    input: &str,
++    mut index: usize,
++    limit: usize,
++    output: &mut Vec<Alternative>,
++) -> usize {
++    let bytes = input.as_bytes();
++    let limit = limit.min(bytes.len());
++    while index < limit {
+         if !bytes[index].is_ascii_digit() || !left_boundary(input, index) {
+             index += 1;
+             continue;
+@@ -102,7 +131,7 @@
+         }
+         index = run_end.max(index + 1);
+     }
+-    output
++    index
+ }
+ 
+ fn display_run_end(bytes: &[u8], start: usize) -> usize {
+@@ -541,5 +570,206 @@
+             hits += usize::from(old.is_some());
+         }
+         assert!(hits > 20, "the generator must reach the accepted cases");
++    }
++}
++
++#[cfg(test)]
++mod digit_discovery_tests {
++    use super::*;
++    use crate::test_rng::{BOUNDARY_PIECES, XorShift32};
++
++    /// `detect_payment_cards` before #1169: every byte is tested for being a digit.
++    fn oracle_detect_payment_cards(input: &str) -> Vec<Alternative> {
++        let bytes = input.as_bytes();
++        let mut output = Vec::new();
++        let mut index = 0;
++        while index < bytes.len() {
++            if !bytes[index].is_ascii_digit() || !left_boundary(input, index) {
++                index += 1;
++                continue;
++            }
++
++            let run_end = display_run_end(bytes, index);
++            let mut end = run_end;
++            while end > index && is_separator(bytes[end - 1]) {
++                end -= 1;
++            }
++            if end > index
++                && end - index <= MAX_DISPLAY_BYTES
++                && right_boundary(input, end)
++                && let Some(digits) = normalize_display(&input[index..end])
++                && supported_payment_range(digits.as_bytes())
++                && StructuredValidatorRegistry::validate("luhn", 1, digits.as_str()).is_ok()
++                && let Some(range) = ByteRange::new(index, end)
++            {
++                let sensitivity = if SUPPORTED_BRAND_TEST_PANS.contains(&digits.as_str()) {
++                    SensitivityState::NonSensitive
++                } else {
++                    SensitivityState::NotEstablished
++                };
++                output.push(Alternative {
++                    family_id: FAMILY_ID,
++                    domain: IdentityDomain::PaymentCard,
++                    range,
++                    identity: IdentityState::Established,
++                    identity_confidence: Confidence::High,
++                    identity_specificity: Specificity::Structural,
++                    sensitivity,
++                    sensitivity_confidence: Confidence::High,
++                    sensitivity_specificity: Specificity::Contextual,
++                    obfuscation: Obfuscation::None,
++                    reject_invisible_normalization: true,
++                });
++            }
++            index = run_end.max(index + 1);
++        }
++        output
++    }
++
++    struct OracleFamily;
++
++    impl PiiFamily for OracleFamily {
++        fn id(&self) -> &'static str {
++            FAMILY_ID
++        }
++        fn context_requirement(&self) -> ContextRequirement {
++            PaymentCardFamily.context_requirement()
++        }
++        fn occurrence_exclusions(&self) -> &'static [&'static str] {
++            OCCURRENCE_EXCLUSIONS
++        }
++        fn reject_invisible_normalization(&self) -> bool {
++            true
++        }
++        fn detect(&self, input: &str) -> Vec<Alternative> {
++            oracle_detect_payment_cards(input)
++        }
++    }
++
++    fn corpus() -> Vec<String> {
++        const PIECES: &[&str] = &[
++            "4000008770000003",
++            "4000 0087 7000 0003",
++            "4000-0087-7000-0003",
++            "4111111111111111",
++            "5555555555554444",
++            "340000877000009",
++            "3400 123456 12345",
++            "4000 0087 7000 0004",
++            "40000087700000031",
++            "x4000008770000003",
++            "4000008770000003x",
++            "4000--0087-7000-0003",
++            "0000000000",
++            "9",
++            "12",
++            "-",
++            " ",
++            "\n",
++            "\u{e9}",
++            "\u{1f600}",
++            "\u{200b}",
++            "\u{301}",
++            "card: ",
++            "\u{ce74}\u{b4dc}\u{bc88}\u{d638}: ",
++        ];
++        let mut rng = XorShift32::new(0x1169_0004);
++        let mut inputs = Vec::new();
++        for _ in 0..3_000 {
++            let mut text = String::new();
++            for _ in 0..rng.below(10) {
++                // Gaps straddle the 16-byte probe and block sizes.
++                text.push_str(&" ".repeat([0, 1, 7, 15, 16, 17, 31, 33][rng.below(8)]));
++                text.push_str(PIECES[rng.below(PIECES.len())]);
++            }
++            inputs.push(text);
++        }
++        for _ in 0..1_500 {
++            inputs.push(rng.text(BOUNDARY_PIECES, 24));
++        }
++        inputs.push("9".repeat(1_000));
++        // Long enough to be classified by head density: sparse head with a
++        // dense tail, dense head with a sparse tail, and a sparse head only.
++        inputs.push("filler text ".repeat(40) + &"4000 0087 7000 0003 ".repeat(30));
++        inputs.push("4000 0087 7000 0003 ".repeat(30) + &"filler text ".repeat(40));
++        inputs.push("filler text ".repeat(60) + "4000 0087 7000 0003");
++        inputs.push("a".repeat(500) + "4000008770000003" + &"b".repeat(500));
++        inputs
+     }
++
++    #[test]
++    fn adaptive_discovery_equals_the_byte_walk() {
++        let mut found = 0;
++        for input in corpus() {
++            let old = oracle_detect_payment_cards(&input);
++            for new in [
++                detect_payment_cards(&input),
++                collect_payment_cards(&input, true),
++                collect_payment_cards(&input, false),
++            ] {
++                assert_eq!(format!("{new:?}"), format!("{old:?}"), "{input:?}");
++            }
++            found += old.len();
++        }
++        assert!(found > 500, "only {found} candidates");
++    }
++
++    #[test]
++    fn every_window_of_a_sparse_input_matches_the_byte_walk() {
++        let input = format!(
++            "{}4000 0087 7000 0003{}\u{e9}4111111111111111 {}",
++            "a".repeat(40),
++            "b".repeat(33),
++            "c".repeat(20)
++        );
++        for start in 0..=input.len() {
++            for end in start..=input.len() {
++                if input.is_char_boundary(start) && input.is_char_boundary(end) {
++                    let window = &input[start..end];
++                    let expected = format!("{:?}", oracle_detect_payment_cards(window));
++                    assert_eq!(
++                        format!("{:?}", detect_payment_cards(window)),
++                        expected,
++                        "{window:?}"
++                    );
++                    assert_eq!(
++                        format!("{:?}", collect_payment_cards(window, true)),
++                        expected,
++                        "{window:?}"
++                    );
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn whole_and_incremental_scans_equal_the_byte_walk() {
++        let inputs: Vec<String> = [
++            "card: 4000 0087 7000 0003\nnote: 4111111111111111 and 5555555555554444",
++            "Card number=4000008770000003; card: 4000-0087-7000-0003 card: 40000087700000031",
++            "\u{ce74}\u{b4dc}\u{bc88}\u{d638}: 4000008770000003 \u{1f600} card: 3400 123456 12345",
++        ]
++        .iter()
++        .map(|text| (*text).to_owned())
++        .chain([
++            format!(
++                "{}card: 4000 0087 7000 0003 {}",
++                "filler text ".repeat(40),
++                "9".repeat(40)
++            ),
++            "1 2 3 4 5 6 7 8 9 0 ".repeat(8),
++        ])
++        .collect();
++        let with_findings = super::super::digit_discovery_tests::assert_family_equals_oracle(
++            "pii:family:global:payment-card",
++            FAMILY_ID,
++            || Box::new(PaymentCardFamily),
++            || Box::new(OracleFamily),
++            &inputs,
++        );
++        assert!(
++            with_findings >= 3,
++            "only {with_findings} inputs had findings"
++        );
++    }
+ }
