@@ -11,6 +11,7 @@
 import type {
   NativeBinding,
   NativeFinding,
+  NativeIncrementalLimits,
   NativeIncrementalSanitizer,
   NativeWholeInputLimits,
 } from "../src/native.js";
@@ -42,6 +43,8 @@ export interface FakeBinding extends NativeBinding {
    * first.
    */
   readonly lastLimits: NativeWholeInputLimits | undefined;
+  /** The limits the most recent `createIncrementalSanitizer` call received. */
+  readonly lastIncrementalLimits: NativeIncrementalLimits | undefined;
   /**
    * The `ruleset` argument the most recent `scan`/`scanAndRedact` call
    * received, with the same "check `calls` first" caveat as
@@ -55,6 +58,7 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
   let lastLimits: NativeWholeInputLimits | undefined;
+  let lastIncrementalLimits: NativeIncrementalLimits | undefined;
   let lastRuleset: Uint8Array | undefined;
   let activation = "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
 
@@ -153,8 +157,12 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
       return { text: redacted, findings };
     },
     createIncrementalSanitizer: (incrementalOptions) => {
+      lastIncrementalLimits = incrementalOptions.limits;
       calls.push(`createIncrementalSanitizer:${incrementalOptions.limits.maxInputCodeUnits}`);
       return session();
+    },
+    get lastIncrementalLimits() {
+      return lastIncrementalLimits;
     },
     get lastLimits() {
       return lastLimits;

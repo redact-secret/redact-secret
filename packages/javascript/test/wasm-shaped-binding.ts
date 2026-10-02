@@ -45,6 +45,8 @@ function invalidStateError(): Error {
 
 export interface WasmShapedBinding {
   readonly calls: string[];
+  /** The four positional limits the most recent `createIncrementalSanitizer` call received. */
+  readonly lastIncrementalLimits: readonly number[] | undefined;
   /** Mirrors `runtime/browser.ts`'s own `loadNativeBinding`, against this fake module instead of a real dynamic import. */
   readonly load: NativeBindingLoader;
 }
@@ -63,6 +65,7 @@ function toDetectedFindingMetadata(finding: WasmFinding): WasmDetectedFindingMet
 
 export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}): WasmShapedBinding {
   const calls: string[] = [];
+  let lastIncrementalLimits: readonly number[] | undefined;
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
   let activation = `credentials=${options.profile ?? "full"};selectors=off;families=;vocabulary=pii-context/v2`;
@@ -152,12 +155,13 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
     },
     createIncrementalSanitizer: (
       maxInputCodeUnits,
-      _maxBufferedCodeUnits,
-      _maxTokenCodeUnits,
-      _maxMultilineCodeUnits,
+      maxBufferedCodeUnits,
+      maxTokenCodeUnits,
+      maxMultilineCodeUnits,
       policy,
       formatter,
     ) => {
+      lastIncrementalLimits = [maxInputCodeUnits, maxBufferedCodeUnits, maxTokenCodeUnits, maxMultilineCodeUnits];
       calls.push(`createIncrementalSanitizer:${maxInputCodeUnits}`);
       const incrementalFindings = options.incrementalFindings ?? [];
       let state: WasmIncrementalSanitizer["state"] = "accepting";
@@ -206,6 +210,9 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
 
   return {
     calls,
+    get lastIncrementalLimits() {
+      return lastIncrementalLimits;
+    },
     load: async (): Promise<NativeBinding> => {
       await module.default();
       return createBindingFromWasmModule(module);

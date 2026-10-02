@@ -257,3 +257,12 @@ node scripts/qualify-cli-binary.mjs --binary .target/release/redact-secret
 node scripts/build-browser-artifact.mjs --out-dir wasm-full
 node scripts/qualify-node-wasm-fallback.mjs --wasm-dir wasm-full
 ```
+
+## Implementation
+
+Owner decisions D5 and D6 were implemented on `workbench/1184-1185-api-docs`.
+
+### #1184: LB1 and LB2
+
+- **LB1 (D5).** `SecretScanErrorCode` and `Profile` are `#[non_exhaustive]`. The only exhaustive `match` expressions outside the core crate were in `bindings/node/src/lib.rs` (five over `Profile`), `bindings/python/src/lib.rs` (`map_error_code`) and `crates/secret-scan-core/tests/sanitize_golden_path_1078.rs`; each gained a wildcard arm. The CLI, the WebAssembly binding, the examples and the other tests had none. `Action`, `Confidence`, `Specificity` and `SessionState` are unchanged.
+- **LB2 (D6).** `IncrementalLimits` accepts `maxInputBytes`, `maxBufferedBytes`, `maxTokenBytes` and `maxMultilineBytes` as aliases of the four `CodeUnits` names. The public wrapper (`packages/javascript/src/runtime.ts`) resolves them once, so the Node addon and the WebAssembly binding keep receiving the legacy shape and need no alias of their own. Precedence: one name per limit uses it; both names with equal values are accepted; both with different values, a missing limit, or an invalid value in either name throw `INVALID_LIMITS`; an explicitly `undefined` field counts as not given. `packages/javascript/test/incremental-limit-aliases.test.ts` covers both binding shapes and the unchanged old names. The contradicting "UTF-16 code-unit limits" comment is replaced.

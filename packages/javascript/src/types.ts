@@ -151,20 +151,95 @@ export interface IncrementalSecretPolicy {
   evaluate(finding: DetectedSecretFinding, context: IncrementalPolicyContext): SecretAction;
 }
 
-/**
- * Explicit, positive UTF-16 code-unit limits every incremental session
- * requires. There are no environment-derived or silent defaults.
- */
-export interface IncrementalLimits {
-  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
-  readonly maxInputCodeUnits: number;
-  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
-  readonly maxBufferedCodeUnits: number;
-  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
-  readonly maxTokenCodeUnits: number;
-  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
-  readonly maxMultilineCodeUnits: number;
+/** The input limit under its byte name; the deprecated alias is optional. */
+interface InputLimitInBytes {
+  /** UTF-8 byte ceiling. */
+  readonly maxInputBytes: number;
+  /** @deprecated Use `maxInputBytes`; same meaning (UTF-8 bytes). */
+  readonly maxInputCodeUnits?: number;
 }
+
+/** The input limit under its deprecated name; the byte name is optional. */
+interface InputLimitInCodeUnits {
+  /** @deprecated Use `maxInputBytes`; same meaning (UTF-8 bytes). */
+  readonly maxInputCodeUnits: number;
+  /** UTF-8 byte ceiling. */
+  readonly maxInputBytes?: number;
+}
+
+/** The buffered limit under its byte name; the deprecated alias is optional. */
+interface BufferedLimitInBytes {
+  /** UTF-8 byte ceiling. */
+  readonly maxBufferedBytes: number;
+  /** @deprecated Use `maxBufferedBytes`; same meaning (UTF-8 bytes). */
+  readonly maxBufferedCodeUnits?: number;
+}
+
+/** The buffered limit under its deprecated name; the byte name is optional. */
+interface BufferedLimitInCodeUnits {
+  /** @deprecated Use `maxBufferedBytes`; same meaning (UTF-8 bytes). */
+  readonly maxBufferedCodeUnits: number;
+  /** UTF-8 byte ceiling. */
+  readonly maxBufferedBytes?: number;
+}
+
+/** The token limit under its byte name; the deprecated alias is optional. */
+interface TokenLimitInBytes {
+  /** UTF-8 byte ceiling. */
+  readonly maxTokenBytes: number;
+  /** @deprecated Use `maxTokenBytes`; same meaning (UTF-8 bytes). */
+  readonly maxTokenCodeUnits?: number;
+}
+
+/** The token limit under its deprecated name; the byte name is optional. */
+interface TokenLimitInCodeUnits {
+  /** @deprecated Use `maxTokenBytes`; same meaning (UTF-8 bytes). */
+  readonly maxTokenCodeUnits: number;
+  /** UTF-8 byte ceiling. */
+  readonly maxTokenBytes?: number;
+}
+
+/** The multiline limit under its byte name; the deprecated alias is optional. */
+interface MultilineLimitInBytes {
+  /** UTF-8 byte ceiling. */
+  readonly maxMultilineBytes: number;
+  /** @deprecated Use `maxMultilineBytes`; same meaning (UTF-8 bytes). */
+  readonly maxMultilineCodeUnits?: number;
+}
+
+/** The multiline limit under its deprecated name; the byte name is optional. */
+interface MultilineLimitInCodeUnits {
+  /** @deprecated Use `maxMultilineBytes`; same meaning (UTF-8 bytes). */
+  readonly maxMultilineCodeUnits: number;
+  /** UTF-8 byte ceiling. */
+  readonly maxMultilineBytes?: number;
+}
+
+/**
+ * Explicit, positive limits every incremental session requires. There are no
+ * environment-derived or silent defaults.
+ *
+ * Every limit is a **UTF-8 byte** ceiling on every artifact, not a UTF-16
+ * code-unit count: size non-ASCII input with `TextEncoder` when choosing it.
+ * Each limit has two spellings, and each limit must be given under at least
+ * one of them (naming both is allowed only when they hold the same value):
+ *
+ * | Preferred | Deprecated alias |
+ * | --- | --- |
+ * | `maxInputBytes` | `maxInputCodeUnits` |
+ * | `maxBufferedBytes` | `maxBufferedCodeUnits` |
+ * | `maxTokenBytes` | `maxTokenCodeUnits` |
+ * | `maxMultilineBytes` | `maxMultilineCodeUnits` |
+ *
+ * The `CodeUnits` names are deprecated, not removed: they keep working with
+ * the same meaning. Giving both spellings of one limit with different values
+ * throws `INVALID_LIMITS`, as does giving neither. Findings' `start` and `end`
+ * ranges are still UTF-16 code units; only these four ceilings count bytes.
+ */
+export type IncrementalLimits = (InputLimitInBytes | InputLimitInCodeUnits) &
+  (BufferedLimitInBytes | BufferedLimitInCodeUnits) &
+  (TokenLimitInBytes | TokenLimitInCodeUnits) &
+  (MultilineLimitInBytes | MultilineLimitInCodeUnits);
 
 /**
  * Does not extend {@link RedactOptions}: that interface's `limits` is a

@@ -75,6 +75,12 @@ export interface NativeWholeInputLimits {
   readonly maxFindings: number;
 }
 
+/**
+ * What the bindings receive. The public wrapper resolves the `max*Bytes`
+ * aliases to these fields before the call, so a binding never sees (or needs
+ * to know) the alias spelling. All four are UTF-8 byte ceilings despite the
+ * legacy field names.
+ */
 export interface NativeIncrementalLimits {
   readonly maxInputCodeUnits: number;
   readonly maxBufferedCodeUnits: number;

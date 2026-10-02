@@ -155,9 +155,11 @@ five host codes (`NOT_INITIALIZED`, `INITIALIZATION_FAILED`, `INVALID_CHUNK`,
 `INVALID_UTF8`, `UNPAIRED_SURROGATE`). A lone surrogate cannot reach the core
 in either host: JavaScript rejects it with `UNPAIRED_SURROGATE`, Python with
 `InvalidInputError`. The set of codes grows over time; handle an unknown code
-as a failure. **Open:** whether Rust's `SecretScanErrorCode` and `Profile`
-become `#[non_exhaustive]` before the freeze (it is the only way to make "the
-set grows" non-breaking for an exhaustive `match`).
+as a failure. Rust's `SecretScanErrorCode` and `Profile` are
+`#[non_exhaustive]`, so a `match` over either needs a wildcard arm and a new
+variant is not a breaking change. `Action`, `Confidence` and `Specificity`
+stay exhaustive by design: they are closed sets, and a new variant changes
+pipeline semantics (a breaking change).
 
 **Policy and placeholder callbacks.** They receive safe metadata only (never
 the input or a matched value). A policy returns one of `redact`, `block`,
@@ -174,11 +176,14 @@ and for accepted input produces output and findings equal to one whole-input
 operation at every chunk partition. A failure leaves a sanitized, incomplete
 prefix and a terminal state; the states are `accepting`, `finalized`,
 `aborted` and `failed`.
-The four limits are UTF-8 byte ceilings on every surface. **Open:** the
-JavaScript field names `maxInputCodeUnits` and the three like it say code
-units but count bytes (see the audit); they are frozen as spelled unless the
-owner approves an additive correction before the freeze. Sessions accept no
-custom detector and no ruleset, on any surface.
+The four limits are UTF-8 byte ceilings on every surface. The JavaScript
+fields `maxInputCodeUnits`, `maxBufferedCodeUnits`, `maxTokenCodeUnits` and
+`maxMultilineCodeUnits` say code units but count bytes, so `maxInputBytes`,
+`maxBufferedBytes`, `maxTokenBytes` and `maxMultilineBytes` are accepted as
+additive aliases. The old names are deprecated, keep working and are not
+removed. Naming both spellings of one limit with different values is
+`INVALID_LIMITS`. Sessions accept no custom detector and no ruleset, on any
+surface.
 
 **Detector profiles and PII.** `full` is the default and the authoritative
 baseline; `common` is a smaller structural/contextual subset for preventive

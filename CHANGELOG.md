@@ -20,8 +20,23 @@ evidence is linked from each published version.
   ruleset detection is `warn` under the default policy (so `scanAndRedact` and
   `redact-secret --redact` leave its match unchanged); that behavior is
   unchanged and is now pinned by the reference fixture.
+- Rust: `SecretScanErrorCode` and `Profile` are now `#[non_exhaustive]`
+  (#1184), so adding a code or a profile later is no longer a breaking change.
+  A dependent crate that matches either enum exhaustively must add a wildcard
+  `_` arm; nothing else changes. `Action`, `Confidence` and `Specificity` stay
+  exhaustive by design, and `SessionState` is unchanged.
 
 ### Added
+
+- JavaScript: `IncrementalLimits` accepts `maxInputBytes`,
+  `maxBufferedBytes`, `maxTokenBytes` and `maxMultilineBytes` as additive
+  aliases of `maxInputCodeUnits`, `maxBufferedCodeUnits`, `maxTokenCodeUnits`
+  and `maxMultilineCodeUnits` (#1184). All eight are UTF-8 byte ceilings; the
+  old names are deprecated in the typings and docs, keep working with the same
+  meaning and are not removed. Naming both spellings of one limit is accepted
+  only when the values are equal; different values throw `INVALID_LIMITS`
+  rather than picking one. The `IncrementalLimits` doc comment that called the
+  limits UTF-16 code-unit limits is corrected.
 
 - Every `@redact-secret/*` npm package is now published with an npm
   provenance attestation signed through Sigstore, so `npm audit signatures`

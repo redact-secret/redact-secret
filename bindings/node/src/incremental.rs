@@ -15,14 +15,15 @@
 //! reports absolute UTF-8 byte offsets; [`Utf16Index`] converts them without
 //! retaining any of the input's characters.
 //!
-//! The four `limits` fields are documented in the public JavaScript API as
-//! UTF-16 code-unit bounds, but this binding passes them to the core
-//! unchanged as byte bounds, exactly like `bindings/python` passes its own
-//! code-point-labeled limits through as bytes: every credential format this
-//! project detects is ASCII, where a code unit and a byte coincide, and the
-//! canonical `conformance/fixtures/incremental-lifecycle-corpus.json`
-//! fixtures assert exact ASCII byte-for-code-unit boundaries with no
-//! conversion factor (`decision-govern-cross-language-conformance`).
+//! The four `limits` fields are UTF-8 **byte** ceilings, passed to the core
+//! unchanged. Their names say `CodeUnits` for compatibility; the public
+//! JavaScript wrapper also accepts `max*Bytes` aliases and resolves them to
+//! these four fields before this binding is called, so this binding sees only
+//! the legacy spelling. A code unit and a byte coincide for ASCII, which every
+//! credential format this project detects is, and the canonical
+//! `conformance/fixtures/incremental-lifecycle-corpus.json` fixtures assert
+//! exact ASCII boundaries with no conversion factor
+//! (`decision-govern-cross-language-conformance`).
 
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -474,9 +475,9 @@ impl PlaceholderFormatter for JsIncrementalFormatterAdapter {
 /// Explicit, positive limits every incremental session requires. There are
 /// no defaults: a session that does not declare its bounds is not created.
 ///
-/// The public JavaScript contract documents these as UTF-16 code-unit
-/// bounds; this binding passes them to the core unchanged as byte bounds
-/// (see the module documentation).
+/// All four are UTF-8 byte ceilings, passed to the core unchanged. The
+/// `CodeUnits` names are legacy spellings; the public wrapper resolves its
+/// `max*Bytes` aliases to these fields (see the module documentation).
 #[napi(object)]
 #[allow(clippy::struct_field_names)]
 pub struct JsIncrementalLimits {
