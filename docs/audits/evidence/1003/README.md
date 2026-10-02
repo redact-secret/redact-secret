@@ -43,6 +43,30 @@ No publicly reproducible product defect.
   us-ssn defect. Allowing particle adjacency would be a cross-family policy
   change that needs its own decision.
 
+## Committed probe and a contract-text gap
+
+[`probe.py`](probe.py) keeps a deterministic, stdlib-only subset of this
+matrix (318 probes) so the check can be repeated: build the example and run
+`python3 -B probe.py <binary> [--all]`. Its expectation encodes the adjacency
+set the code enforces, so it reports 0 identity disagreements; the mismatches
+above are the boundary shapes where an expectation taken from the contract
+text alone would differ.
+
+The contract's exclusion list names alphanumeric, underscore, percent, mark
+and invisible adjacency. `blocks_boundary` also blocks an adjacent ASCII
+hyphen, any non-ASCII whitespace and Unicode dashes. Unicode space and dash
+adjacency are pinned by public fixtures, but ASCII-hyphen adjacency
+(`ssn: 1-890-62-6879`, `890-62-6879-1`) has no dedicated fixture and is
+implied only by "partial prefixes or suffixes". Sensitivity probes with
+free-prose labels (`Social Security Number is`, `미국 사회보장번호는`) report
+`not-established`, which matches the contract's bounded field-label rule.
+
+Proposed narrow follow-up (docs and fixtures, no detector change): state the
+full adjacency set in `us-ssn-v1.md`, and add public conformance twins for
+ASCII-hyphen prefix and suffix and for NBSP and ideographic-space adjacency.
+This is a hypothesis about a class of disagreement, not evidence about the
+protected case.
+
 ## Reading for the next epoch
 
 The cause of the one protected disagreement is **not reproducible from public
