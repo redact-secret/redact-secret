@@ -525,6 +525,69 @@ fn is_placeholder_provider_word(word: &str) -> bool {
 /// applied behind a vendor prefix (`re_yourkey`), never to a bare value. A
 /// letter left over (`yourkeyq`) or any digit keeps the value detected.
 pub(super) fn is_glued_instructional_placeholder(value: &str) -> bool {
+    // Values past the stack bound take the original heap implementation, so
+    // no accepted length is truncated (#1162).
+    if value.len() > GLUED_PLACEHOLDER_STACK_BOUND {
+        return is_glued_instructional_placeholder_heap(value);
+    }
+    if value.is_empty() || !value.bytes().all(|byte| byte.is_ascii_alphabetic()) {
+        return false;
+    }
+    let bytes = value.as_bytes();
+    let Some(lead) = PLACEHOLDER_LEAD_WORDS
+        .iter()
+        .find(|lead| starts_with_ascii_ci(bytes, lead.as_bytes()))
+    else {
+        return false;
+    };
+    glued_placeholder_split(&bytes[lead.len()..])
+}
+
+/// The word-split DP over the text after the lead word, on two stack arrays.
+/// A separate function so the early rejections above never pay for its frame.
+fn glued_placeholder_split(rest: &[u8]) -> bool {
+    let len = rest.len();
+    debug_assert!(len <= GLUED_PLACEHOLDER_STACK_BOUND);
+    // reachable[i]: rest[..i] splits into listed words; with_noun[i]: one
+    // such split names a credential noun. Both live on the stack.
+    let mut reachable = [false; GLUED_PLACEHOLDER_STACK_BOUND + 1];
+    let mut with_noun = [false; GLUED_PLACEHOLDER_STACK_BOUND + 1];
+    reachable[0] = true;
+    for start in 0..len {
+        if !reachable[start] {
+            continue;
+        }
+        for word in glued_placeholder_words() {
+            if starts_with_ascii_ci(&rest[start..], word.as_bytes()) {
+                let end = start + word.len();
+                reachable[end] = true;
+                with_noun[end] |= with_noun[start] || PLACEHOLDER_CREDENTIAL_NOUNS.contains(word);
+            }
+        }
+    }
+    len > 0 && reachable[len] && with_noun[len]
+}
+
+/// Longest value the stack-bounded form of
+/// [`is_glued_instructional_placeholder`] handles; longer values fall back
+/// to the heap implementation.
+const GLUED_PLACEHOLDER_STACK_BOUND: usize = 256;
+
+fn starts_with_ascii_ci(haystack: &[u8], prefix: &[u8]) -> bool {
+    haystack.len() >= prefix.len() && haystack[..prefix.len()].eq_ignore_ascii_case(prefix)
+}
+
+fn glued_placeholder_words() -> impl Iterator<Item = &'static &'static str> {
+    PLACEHOLDER_CREDENTIAL_WORDS
+        .iter()
+        .chain(PLACEHOLDER_PROVIDER_WORDS)
+        .chain(super::generic_token::DEDICATED_PROVIDER_SEGMENTS)
+        .chain(PLACEHOLDER_LEAD_WORDS)
+}
+
+/// The original heap implementation: the fallback above the stack bound and
+/// the differential-test oracle for the bounded form.
+fn is_glued_instructional_placeholder_heap(value: &str) -> bool {
     if value.is_empty() || !value.bytes().all(|byte| byte.is_ascii_alphabetic()) {
         return false;
     }
@@ -1964,5 +2027,108 @@ mod residual_allocation_tests {
                 "{fixed:?}"
             );
         }
+    }
+}
+
+/// Differential tests for #1162: the stack-bounded glued-placeholder check
+/// must agree with the heap implementation it falls back to, including at
+/// and around the 256-byte bound.
+#[cfg(test)]
+mod glued_placeholder_stack_tests {
+    use super::*;
+    use crate::test_rng::XorShift32;
+
+    const PIECES: &[&str] = &[
+        "your", "YOUR", "Insert", "enter", "paste", "replace", "key", "secret", "TOKEN", "jwt",
+        "api", "access", "openai", "github", "stripe", "x", "zz", "_", "9", "\u{212a}", "\u{e9}",
+        "example", "my",
+    ];
+
+    fn assert_same(value: &str) {
+        assert_eq!(
+            is_glued_instructional_placeholder(value),
+            is_glued_instructional_placeholder_heap(value),
+            "{value:?}"
+        );
+    }
+
+    #[test]
+    fn word_lists_are_lowercase_ascii() {
+        // The borrowed case-insensitive compare equals the lowercased-copy
+        // compare only while every listed word is already lowercase ASCII.
+        for word in glued_placeholder_words() {
+            assert!(
+                word.is_ascii() && !word.bytes().any(|b| b.is_ascii_uppercase()),
+                "{word} must be ASCII without uppercase"
+            );
+        }
+    }
+
+    #[test]
+    fn seeded_values_match_heap_implementation() {
+        let mut rng = XorShift32::new(0x1162);
+        for _ in 0..20_000 {
+            assert_same(&rng.text(PIECES, 12));
+        }
+        let mut accepted = 0;
+        for _ in 0..20_000 {
+            let value = format!("your{}", rng.text(&PIECES[4..18], 10));
+            assert_same(&value);
+            accepted += usize::from(is_glued_instructional_placeholder(&value));
+        }
+        assert!(accepted > 100, "generator must reach accepted values");
+    }
+
+    #[test]
+    fn known_values_and_boundaries() {
+        for value in [
+            "",
+            "your",
+            "yourkey",
+            "YourSecretToken",
+            "yourapikey",
+            "yourkeyx",
+            "replaceopenaikey",
+            "your_key",
+            "yourK",
+            "pasteyourjwt",
+            "yourgithubtoken",
+            "yourdummy",
+        ] {
+            assert_same(value);
+        }
+        assert!(is_glued_instructional_placeholder("YourSecretToken"));
+        assert!(!is_glued_instructional_placeholder("your"));
+        assert!(!is_glued_instructional_placeholder("yourk\u{212a}ey"));
+    }
+
+    #[test]
+    fn lengths_around_the_stack_bound_match() {
+        for unit in ["key", "token", "jwtapi"] {
+            for target in 240..=300 {
+                let mut value = String::from("your");
+                while value.len() < target {
+                    value.push_str(unit);
+                }
+                for cut in [0, 1, 2] {
+                    let mut candidate = value.clone();
+                    candidate.truncate(candidate.len() - cut);
+                    assert_same(&candidate);
+                    // A non-word tail keeps the value just outside the grammar.
+                    candidate.push('q');
+                    assert_same(&candidate);
+                    candidate.make_ascii_uppercase();
+                    assert_same(&candidate);
+                }
+            }
+        }
+        let exact = format!("your{}", "key".repeat(84));
+        assert_eq!(exact.len(), 256);
+        assert!(is_glued_instructional_placeholder(&exact));
+        let over = format!("your{}", "key".repeat(85));
+        assert_eq!(over.len(), 259);
+        assert!(is_glued_instructional_placeholder(&over));
+        let long_non_ascii = format!("your{}\u{e9}", "key".repeat(100));
+        assert!(!is_glued_instructional_placeholder(&long_non_ascii));
     }
 }

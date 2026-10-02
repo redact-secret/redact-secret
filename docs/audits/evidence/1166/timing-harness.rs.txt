@@ -1,0 +1,72 @@
+// Temporary: included into pii.rs under #[cfg(test)] as
+//   mod zz_bench_file { use super::*; include!("../../../docs/audits/evidence/1166/timing-harness.rs.txt"); }
+// run with `cargo test --release -p redact-secret --lib zz_bench -- --ignored --nocapture`,
+// then removed. Never built by Cargo as kept here.
+mod zz_bench {
+    use super::*;
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    const IDS: [&str; 6] = [
+        "pii:global:email",
+        "pii:global:iban",
+        "pii:global:network-address",
+        "pii:global:payment-card",
+        "pii:global:phone",
+        "pii:us:ssn",
+    ];
+
+    // The pre-#1166 construction: owned String from `public_type`.
+    fn old(ids: &[&'static str], range: ByteRange) -> Vec<Candidate> {
+        ids.iter()
+            .map(|id| Candidate::new(public_type(id), Confidence::High, range))
+            .collect()
+    }
+    fn new(ids: &[&'static str], range: ByteRange) -> Vec<Candidate> {
+        ids.iter()
+            .map(|id| match public_type_name(id) {
+                Cow::Borrowed(name) => Candidate::built_in(name, Confidence::High, range),
+                Cow::Owned(name) => Candidate::new(name, Confidence::High, range),
+            })
+            .collect()
+    }
+    type F = fn(&[&'static str], ByteRange) -> Vec<Candidate>;
+    fn timeit(f: F, ids: &[&'static str], reps: u32) -> f64 {
+        let range = ByteRange::new(0, 4).unwrap();
+        let t = Instant::now();
+        for _ in 0..reps {
+            black_box(f(black_box(ids), range));
+        }
+        t.elapsed().as_nanos() as f64 / f64::from(reps)
+    }
+    fn med(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+    fn compare(name: &str, ids: &[&'static str], reps: u32) {
+        let fs: [F; 3] = [old, new, old];
+        let mut res: Vec<Vec<f64>> = vec![vec![]; 3];
+        for round in 0..41 {
+            for k in 0..3 {
+                let idx = if round % 2 == 0 { k } else { 2 - k };
+                res[idx].push(timeit(fs[idx], ids, reps));
+            }
+        }
+        let (b, n, aa) = (med(res[0].clone()), med(res[1].clone()), med(res[2].clone()));
+        eprintln!(
+            "{name:24} old {b:10.1}ns | new {n:10.1} ({:+.1}%) | A/A {aa:10.1} ({:+.1}%)",
+            (n / b - 1.0) * 100.0,
+            (aa / b - 1.0) * 100.0
+        );
+    }
+    #[test]
+    #[ignore]
+    fn bench_names() {
+        compare("single", &IDS[..1], 200_000);
+        compare("six", &IDS, 50_000);
+        let many: Vec<&'static str> = (0..1000).map(|i| IDS[(i * 37) % 6]).collect();
+        compare("1000-built-in", &many, 300);
+        let custom: Vec<&'static str> = (0..1000).map(|_| "pii:global:us-ssn").collect();
+        compare("1000-custom-owned", &custom, 300);
+    }
+}

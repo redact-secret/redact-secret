@@ -1,0 +1,195 @@
+// Temporary module appended to crates/secret-scan-core/src/pii/pii_iban.rs
+// while measuring, then removed. `detect_with` and `parse_candidate_with` are
+// copies of the shipped `detect_ibans`/`parse_candidate` that take the country
+// lookup as a parameter (the shipped grid lookup `country_length`, or the
+// pre-#1168 binary search `tests::country_length_oracle`, made pub(super) for
+// the run) and count findings instead of building them; everything else is
+// unchanged. Variants run alternated old/new/old (A/A control), 41 rounds.
+#[cfg(test)]
+mod zz_bench {
+    use super::*;
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    type Lookup = fn([u8; 2]) -> Option<usize>;
+
+    fn detect_with(input: &str, lookup: Lookup) -> usize {
+        let bytes = input.as_bytes();
+        let mut output = 0_usize;
+        let mut start = 0;
+        while start + 4 <= bytes.len() {
+            if bytes[start].is_ascii_uppercase()
+                && bytes[start + 1].is_ascii_uppercase()
+                && bytes[start + 2].is_ascii_digit()
+                && bytes[start + 3].is_ascii_digit()
+                && valid_left_boundary(input, start)
+                && let Some(end) = parse_candidate_with(input, start, lookup)
+            {
+                if !fully_delimited_reference(input, start, end) {
+                    output += 1;
+                }
+                start = end;
+                continue;
+            }
+            start += 1;
+        }
+        output
+    }
+
+    fn parse_candidate_with(input: &str, start: usize, lookup: Lookup) -> Option<usize> {
+        let bytes = input.as_bytes();
+        let expected_len = lookup([bytes[start], bytes[start + 1]])?;
+        let mut compact = [0_u8; MAX_COMPACT_BYTES];
+        compact[..4].copy_from_slice(&bytes[start..start + 4]);
+
+        let mut compact_len = 4;
+        let mut cursor = start + 4;
+        let print_form = bytes.get(cursor) == Some(&b' ');
+        if print_form {
+            cursor += 1;
+        }
+
+        while compact_len < expected_len {
+            let group_len = if print_form {
+                (expected_len - compact_len).min(4)
+            } else {
+                expected_len - compact_len
+            };
+            let group_end = cursor.checked_add(group_len)?;
+            let group = bytes.get(cursor..group_end)?;
+            if !group.iter().all(u8::is_ascii_alphanumeric) {
+                return None;
+            }
+            compact[compact_len..compact_len + group_len].copy_from_slice(group);
+            compact_len += group_len;
+            cursor = group_end;
+            if print_form && compact_len < expected_len {
+                if bytes.get(cursor) != Some(&b' ') || bytes.get(cursor + 1) == Some(&b' ') {
+                    return None;
+                }
+                cursor += 1;
+            }
+        }
+
+        if !valid_right_boundary(input, cursor) {
+            return None;
+        }
+        let compact_value = core::str::from_utf8(&compact[..expected_len]).ok()?;
+        let evidence =
+            StructuredValidatorRegistry::validate(VALIDATOR_ID, VALIDATOR_VERSION, compact_value)
+                .ok()?;
+        if evidence.provenance.identity != VALIDATOR_ID
+            || evidence.provenance.version != VALIDATOR_VERSION
+        {
+            return None;
+        }
+        Some(cursor)
+    }
+
+    fn new_lookup(c: [u8; 2]) -> Option<usize> {
+        country_length(c)
+    }
+    fn old_lookup(c: [u8; 2]) -> Option<usize> {
+        tests::country_length_oracle(c)
+    }
+
+    fn med(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+    fn time_scan(input: &str, f: Lookup, reps: u32) -> f64 {
+        let t = Instant::now();
+        for _ in 0..reps {
+            black_box(detect_with(black_box(input), f));
+        }
+        t.elapsed().as_nanos() as f64 / f64::from(reps)
+    }
+    fn time_lookup(pairs: &[[u8; 2]], f: Lookup, reps: u32) -> f64 {
+        let t = Instant::now();
+        for _ in 0..reps {
+            for p in pairs {
+                black_box(f(black_box(*p)));
+            }
+        }
+        t.elapsed().as_nanos() as f64 / (f64::from(reps) * pairs.len() as f64)
+    }
+    fn report(name: &str, r: &[Vec<f64>]) {
+        let base = med(r[0].clone());
+        let new = med(r[1].clone());
+        let aa = med(r[2].clone());
+        eprintln!(
+            "{name:22} old {base:10.2}ns | new {new:10.2} ({:+.1}%) | A/A {aa:10.2} ({:+.1}%)",
+            (new / base - 1.0) * 100.0,
+            (aa / base - 1.0) * 100.0
+        );
+    }
+    fn compare_scan(name: &str, input: &str) {
+        let fs: [Lookup; 3] = [old_lookup, new_lookup, old_lookup];
+        assert_eq!(detect_with(input, old_lookup), detect_with(input, new_lookup));
+        let reps = (20_000_000 / input.len().max(1)).clamp(10, 5000) as u32;
+        let mut r: Vec<Vec<f64>> = vec![vec![]; 3];
+        for round in 0..41 {
+            for k in 0..3 {
+                let i = if round % 2 == 0 { k } else { 2 - k };
+                r[i].push(time_scan(input, fs[i], reps));
+            }
+        }
+        report(name, &r);
+    }
+    fn compare_lookup(name: &str, pairs: &[[u8; 2]]) {
+        let fs: [Lookup; 3] = [old_lookup, new_lookup, old_lookup];
+        let mut r: Vec<Vec<f64>> = vec![vec![]; 3];
+        for round in 0..41 {
+            for k in 0..3 {
+                let i = if round % 2 == 0 { k } else { 2 - k };
+                r[i].push(time_lookup(pairs, fs[i], 20_000));
+            }
+        }
+        report(name, &r);
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_iban() {
+        let prose = "The quick brown fox, request id 12345, status ok; path /var/log/app.log\n";
+        let caps = "ERROR 4F2A OK DE12 AB34 CD56 X9 \n";
+        compare_lookup("lookup GB", &[*b"GB"; 64]);
+        compare_lookup("lookup AD (first)", &[*b"AD"; 64]);
+        compare_lookup("lookup YE (last)", &[*b"YE"; 64]);
+        compare_lookup("lookup ZZ (absent)", &[*b"ZZ"; 64]);
+        compare_lookup(
+            "lookup mixed 8",
+            &[*b"GB", *b"DE", *b"FR", *b"MT", *b"ZZ", *b"US", *b"NO", *b"RU"],
+        );
+        compare_scan("compact-dense", &"IBAN: GB82WEST12345698765432 ok\n".repeat(1000));
+        compare_scan(
+            "compact-mixed-dense",
+            &"IBAN: DE89370400440532013000 and FR1420041010050500013M02606 ok\n".repeat(500),
+        );
+        compare_scan("print-dense", &"IBAN: GB82 WEST 1234 5698 7654 32 ok\n".repeat(1000));
+        compare_scan(
+            "unknown-noise",
+            &"ref ZZ82WEST12345698765432 US12ABCD AA99 XY00 QQ11 ok\n".repeat(700),
+        );
+        compare_scan(
+            "bad-checksum",
+            &"IBAN: GB83WEST12345698765432 DE90370400440532013000 ok\n".repeat(700),
+        );
+        compare_scan(
+            "sparse",
+            &format!(
+                "{}IBAN: GB82WEST12345698765432 ok\n{}",
+                prose.repeat(400),
+                prose.repeat(400)
+            ),
+        );
+        compare_scan(
+            "caps-sparse",
+            &format!(
+                "{}IBAN: GB82WEST12345698765432 ok\n{}",
+                caps.repeat(700),
+                caps.repeat(700)
+            ),
+        );
+    }
+}

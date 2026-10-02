@@ -1,0 +1,277 @@
+== run 1 pii-prod-old2 load averages: 4.46 5.03 7.79
+ssn sparse ascii 74KB      production median     36.50 us   min     36.25 us
+ssn sparse unicode 78KB    production median     42.19 us   min     41.85 us
+ssn dense                  production median     14.34 us   min     14.22 us
+ssn digit noise 48KB       production median    108.90 us   min    103.85 us
+ssn isolated digit /17     production median     36.05 us   min     35.05 us
+ssn isolated digit /24     production median     35.53 us   min     33.61 us
+ssn isolated digit /40     production median     39.59 us   min     32.46 us
+ssn long digit run 60KB    production median    166.86 us   min    129.34 us
+ssn all non-digit 60KB     production median     57.54 us   min     51.06 us
+ssn sparse head, dense tail production median     40.62 us   min     36.09 us
+ssn dense head, sparse tail production median     43.10 us   min     34.09 us
+pan sparse ascii 74KB      production median     20.31 us   min     20.24 us
+pan sparse unicode 78KB    production median     32.74 us   min     23.71 us
+pan dense                  production median      9.39 us   min      8.78 us
+pan digit noise 48KB       production median     78.29 us   min     66.17 us
+pan isolated digit /17     production median     32.49 us   min     29.58 us
+pan isolated digit /24     production median     26.76 us   min     24.73 us
+pan isolated digit /40     production median     30.72 us   min     25.16 us
+pan long digit run 60KB    production median     35.36 us   min     29.16 us
+pan all non-digit 60KB     production median     21.01 us   min     19.43 us
+pan sparse head, dense tail production median     16.49 us   min     14.89 us
+pan dense head, sparse tail production median     24.31 us   min     23.53 us
+== run 1 pii-prod-oldp2 load averages: 4.06 4.81 7.53
+ssn sparse ascii 74KB      production median     47.15 us   min     42.01 us
+ssn sparse unicode 78KB    production median     48.17 us   min     46.52 us
+ssn dense                  production median     21.75 us   min     19.87 us
+ssn digit noise 48KB       production median    172.97 us   min    152.61 us
+ssn isolated digit /17     production median     54.11 us   min     48.42 us
+ssn isolated digit /24     production median     39.11 us   min     37.32 us
+ssn isolated digit /40     production median     37.27 us   min     35.63 us
+ssn long digit run 60KB    production median    104.90 us   min     97.22 us
+ssn all non-digit 60KB     production median     37.82 us   min     34.65 us
+ssn sparse head, dense tail production median     27.54 us   min     25.77 us
+ssn dense head, sparse tail production median     35.78 us   min     34.02 us
+pan sparse ascii 74KB      production median     22.31 us   min     22.19 us
+pan sparse unicode 78KB    production median     51.05 us   min     27.68 us
+pan dense                  production median     19.15 us   min     15.65 us
+pan digit noise 48KB       production median    114.18 us   min    113.69 us
+pan isolated digit /17     production median     47.16 us   min     27.39 us
+pan isolated digit /24     production median     24.33 us   min     22.13 us
+pan isolated digit /40     production median     22.29 us   min     20.79 us
+pan long digit run 60KB    production median     26.06 us   min     24.87 us
+pan all non-digit 60KB     production median     25.79 us   min     16.62 us
+pan sparse head, dense tail production median     24.75 us   min     21.94 us
+pan dense head, sparse tail production median     28.25 us   min     26.17 us
+== run 1 pii-prod-new5 load averages: 4.37 4.77 7.36
+ssn sparse ascii 74KB      production median      2.27 us   min      2.11 us
+ssn sparse unicode 78KB    production median      2.68 us   min      2.41 us
+ssn dense                  production median     27.58 us   min     21.35 us
+ssn digit noise 48KB       production median    109.99 us   min    101.24 us
+ssn isolated digit /17     production median      9.19 us   min      8.61 us
+ssn isolated digit /24     production median     12.16 us   min     11.56 us
+ssn isolated digit /40     production median      8.25 us   min      7.38 us
+ssn long digit run 60KB    production median     77.68 us   min     69.49 us
+ssn all non-digit 60KB     production median      1.26 us   min      1.26 us
+ssn sparse head, dense tail production median     42.17 us   min     31.15 us
+ssn dense head, sparse tail production median     32.49 us   min     28.80 us
+pan sparse ascii 74KB      production median      2.47 us   min      2.44 us
+pan sparse unicode 78KB    production median      2.60 us   min      2.47 us
+pan dense                  production median     11.90 us   min     11.08 us
+pan digit noise 48KB       production median     94.27 us   min     83.43 us
+pan isolated digit /17     production median     17.00 us   min     12.36 us
+pan isolated digit /24     production median     15.05 us   min     13.05 us
+pan isolated digit /40     production median     16.79 us   min      8.28 us
+pan long digit run 60KB    production median     55.47 us   min     49.65 us
+pan all non-digit 60KB     production median      2.40 us   min      2.16 us
+pan sparse head, dense tail production median     24.49 us   min     15.58 us
+pan dense head, sparse tail production median     18.78 us   min     16.99 us
+== run 1 pii-prod-new5 load averages: 4.21 4.62 7.15
+ssn sparse ascii 74KB      production median      2.30 us   min      1.60 us
+ssn sparse unicode 78KB    production median      2.57 us   min      2.40 us
+ssn dense                  production median     27.65 us   min     24.87 us
+ssn digit noise 48KB       production median    138.13 us   min    133.08 us
+ssn isolated digit /17     production median     11.47 us   min     10.86 us
+ssn isolated digit /24     production median     12.17 us   min     11.07 us
+ssn isolated digit /40     production median      7.47 us   min      7.07 us
+ssn long digit run 60KB    production median     94.02 us   min     85.26 us
+ssn all non-digit 60KB     production median      1.36 us   min      1.19 us
+ssn sparse head, dense tail production median     29.13 us   min     27.90 us
+ssn dense head, sparse tail production median     19.58 us   min     18.69 us
+pan sparse ascii 74KB      production median      1.95 us   min      1.40 us
+pan sparse unicode 78KB    production median      2.60 us   min      2.46 us
+pan dense                  production median     11.10 us   min     10.19 us
+pan digit noise 48KB       production median     89.73 us   min     75.97 us
+pan isolated digit /17     production median     16.26 us   min     15.07 us
+pan isolated digit /24     production median     17.64 us   min     16.34 us
+pan isolated digit /40     production median      9.10 us   min      7.89 us
+pan long digit run 60KB    production median     28.25 us   min     24.90 us
+pan all non-digit 60KB     production median      1.43 us   min      1.26 us
+pan sparse head, dense tail production median     12.92 us   min     12.72 us
+pan dense head, sparse tail production median     15.33 us   min     15.27 us
+== run 1 pii-prod-oldp2 load averages: 3.54 4.42 6.93
+ssn sparse ascii 74KB      production median     36.28 us   min     36.16 us
+ssn sparse unicode 78KB    production median     41.99 us   min     41.74 us
+ssn dense                  production median     14.49 us   min     14.22 us
+ssn digit noise 48KB       production median    107.00 us   min    105.68 us
+ssn isolated digit /17     production median     35.26 us   min     35.09 us
+ssn isolated digit /24     production median     34.23 us   min     33.52 us
+ssn isolated digit /40     production median     32.57 us   min     32.07 us
+ssn long digit run 60KB    production median     74.85 us   min     74.54 us
+ssn all non-digit 60KB     production median     29.90 us   min     29.83 us
+ssn sparse head, dense tail production median     21.63 us   min     21.16 us
+ssn dense head, sparse tail production median     30.72 us   min     30.60 us
+pan sparse ascii 74KB      production median     18.49 us   min     18.21 us
+pan sparse unicode 78KB    production median     21.34 us   min     21.11 us
+pan dense                  production median      7.21 us   min      7.18 us
+pan digit noise 48KB       production median     51.12 us   min     50.89 us
+pan isolated digit /17     production median     21.96 us   min     21.03 us
+pan isolated digit /24     production median     19.96 us   min     19.84 us
+pan isolated digit /40     production median     18.32 us   min     17.91 us
+pan long digit run 60KB    production median     22.64 us   min     22.40 us
+pan all non-digit 60KB     production median     14.99 us   min     14.95 us
+pan sparse head, dense tail production median     12.85 us   min     12.80 us
+pan dense head, sparse tail production median     15.33 us   min     15.25 us
+== run 1 pii-prod-old2 load averages: 3.25 4.18 6.69
+ssn sparse ascii 74KB      production median     36.33 us   min     36.11 us
+ssn sparse unicode 78KB    production median     42.28 us   min     41.88 us
+ssn dense                  production median     14.49 us   min     14.21 us
+ssn digit noise 48KB       production median    107.77 us   min    105.52 us
+ssn isolated digit /17     production median     35.96 us   min     35.14 us
+ssn isolated digit /24     production median     34.21 us   min     33.59 us
+ssn isolated digit /40     production median     32.46 us   min     32.09 us
+ssn long digit run 60KB    production median     74.81 us   min     74.59 us
+ssn all non-digit 60KB     production median     29.95 us   min     29.84 us
+ssn sparse head, dense tail production median     21.65 us   min     21.28 us
+ssn dense head, sparse tail production median     30.79 us   min     30.69 us
+pan sparse ascii 74KB      production median     18.32 us   min     18.19 us
+pan sparse unicode 78KB    production median     21.35 us   min     21.10 us
+pan dense                  production median      7.22 us   min      7.19 us
+pan digit noise 48KB       production median     51.25 us   min     50.81 us
+pan isolated digit /17     production median     22.03 us   min     21.12 us
+pan isolated digit /24     production median     21.39 us   min     20.34 us
+pan isolated digit /40     production median     19.96 us   min     18.97 us
+pan long digit run 60KB    production median     38.63 us   min     27.30 us
+pan all non-digit 60KB     production median     28.91 us   min     25.69 us
+pan sparse head, dense tail production median     25.10 us   min     23.22 us
+pan dense head, sparse tail production median     30.03 us   min     26.56 us
+== run 2 pii-prod-old2 load averages: 4.00 4.22 6.55
+ssn sparse ascii 74KB      production median     65.38 us   min     61.94 us
+ssn sparse unicode 78KB    production median     46.46 us   min     41.70 us
+ssn dense                  production median     14.74 us   min     14.18 us
+ssn digit noise 48KB       production median    107.40 us   min    104.19 us
+ssn isolated digit /17     production median     35.29 us   min     35.08 us
+ssn isolated digit /24     production median     33.98 us   min     33.57 us
+ssn isolated digit /40     production median     32.31 us   min     32.10 us
+ssn long digit run 60KB    production median     75.11 us   min     74.58 us
+ssn all non-digit 60KB     production median     30.01 us   min     29.81 us
+ssn sparse head, dense tail production median     40.74 us   min     29.71 us
+ssn dense head, sparse tail production median     59.11 us   min     54.77 us
+pan sparse ascii 74KB      production median     34.11 us   min     32.49 us
+pan sparse unicode 78KB    production median     23.53 us   min     21.21 us
+pan dense                  production median      7.22 us   min      7.18 us
+pan digit noise 48KB       production median     51.13 us   min     50.62 us
+pan isolated digit /17     production median     21.20 us   min     21.03 us
+pan isolated digit /24     production median     20.00 us   min     19.88 us
+pan isolated digit /40     production median     17.97 us   min     17.88 us
+pan long digit run 60KB    production median     22.48 us   min     22.39 us
+pan all non-digit 60KB     production median     14.98 us   min     14.93 us
+pan sparse head, dense tail production median     12.87 us   min     12.81 us
+pan dense head, sparse tail production median     15.35 us   min     15.29 us
+== run 2 pii-prod-oldp2 load averages: 4.60 4.33 6.45
+ssn sparse ascii 74KB      production median     36.29 us   min     36.14 us
+ssn sparse unicode 78KB    production median     42.27 us   min     41.83 us
+ssn dense                  production median     14.52 us   min     14.23 us
+ssn digit noise 48KB       production median    108.13 us   min    104.77 us
+ssn isolated digit /17     production median     47.44 us   min     36.22 us
+ssn isolated digit /24     production median     60.07 us   min     57.42 us
+ssn isolated digit /40     production median     56.92 us   min     54.87 us
+ssn long digit run 60KB    production median     97.08 us   min     76.42 us
+ssn all non-digit 60KB     production median     29.96 us   min     29.84 us
+ssn sparse head, dense tail production median     21.67 us   min     21.26 us
+ssn dense head, sparse tail production median     30.80 us   min     30.60 us
+pan sparse ascii 74KB      production median     18.27 us   min     18.17 us
+pan sparse unicode 78KB    production median     21.28 us   min     21.13 us
+pan dense                  production median      7.22 us   min      7.19 us
+pan digit noise 48KB       production median     78.42 us   min     52.16 us
+pan isolated digit /17     production median     40.61 us   min     36.76 us
+pan isolated digit /24     production median     36.64 us   min     34.04 us
+pan isolated digit /40     production median     32.71 us   min     30.64 us
+pan long digit run 60KB    production median     39.38 us   min     38.29 us
+pan all non-digit 60KB     production median     26.90 us   min     25.55 us
+pan sparse head, dense tail production median     21.95 us   min     15.34 us
+pan dense head, sparse tail production median     15.35 us   min     15.27 us
+== run 2 pii-prod-new5 load averages: 5.08 4.52 6.38
+ssn sparse ascii 74KB      production median      1.23 us   min      1.23 us
+ssn sparse unicode 78KB    production median      1.41 us   min      1.41 us
+ssn dense                  production median     17.42 us   min     16.48 us
+ssn digit noise 48KB       production median     92.42 us   min     89.24 us
+ssn isolated digit /17     production median      7.86 us   min      7.21 us
+ssn isolated digit /24     production median     11.61 us   min     11.06 us
+ssn isolated digit /40     production median      6.64 us   min      6.50 us
+ssn long digit run 60KB    production median     64.03 us   min     62.00 us
+ssn all non-digit 60KB     production median      1.08 us   min      1.04 us
+ssn sparse head, dense tail production median     26.18 us   min     25.72 us
+ssn dense head, sparse tail production median     16.92 us   min     16.85 us
+pan sparse ascii 74KB      production median      1.27 us   min      1.26 us
+pan sparse unicode 78KB    production median      1.55 us   min      1.47 us
+pan dense                  production median      7.39 us   min      7.20 us
+pan digit noise 48KB       production median     54.32 us   min     53.89 us
+pan isolated digit /17     production median      8.83 us   min      8.80 us
+pan isolated digit /24     production median     19.82 us   min     11.39 us
+pan isolated digit /40     production median      8.67 us   min      7.89 us
+pan long digit run 60KB    production median     42.91 us   min     25.99 us
+pan all non-digit 60KB     production median      1.88 us   min      1.67 us
+pan sparse head, dense tail production median     23.20 us   min     21.74 us
+pan dense head, sparse tail production median     21.54 us   min     19.91 us
+== run 2 pii-prod-new5 load averages: 4.41 4.42 6.24
+ssn sparse ascii 74KB      production median      1.73 us   min      1.60 us
+ssn sparse unicode 78KB    production median      2.04 us   min      1.97 us
+ssn dense                  production median     23.77 us   min     22.33 us
+ssn digit noise 48KB       production median    130.31 us   min    126.16 us
+ssn isolated digit /17     production median      9.92 us   min      9.80 us
+ssn isolated digit /24     production median     13.99 us   min     11.40 us
+ssn isolated digit /40     production median      6.50 us   min      6.34 us
+ssn long digit run 60KB    production median     59.92 us   min     59.67 us
+ssn all non-digit 60KB     production median      1.87 us   min      0.99 us
+ssn sparse head, dense tail production median     48.31 us   min     42.83 us
+ssn dense head, sparse tail production median     28.85 us   min     28.77 us
+pan sparse ascii 74KB      production median      2.18 us   min      1.47 us
+pan sparse unicode 78KB    production median      1.56 us   min      1.50 us
+pan dense                  production median      7.24 us   min      7.19 us
+pan digit noise 48KB       production median     54.26 us   min     53.89 us
+pan isolated digit /17     production median      8.83 us   min      8.79 us
+pan isolated digit /24     production median     11.24 us   min     11.19 us
+pan isolated digit /40     production median      7.59 us   min      7.09 us
+pan long digit run 60KB    production median     31.49 us   min     29.14 us
+pan all non-digit 60KB     production median      1.48 us   min      1.36 us
+pan sparse head, dense tail production median     17.94 us   min     17.83 us
+pan dense head, sparse tail production median     21.67 us   min     21.45 us
+== run 2 pii-prod-oldp2 load averages: 4.21 4.33 6.10
+ssn sparse ascii 74KB      production median     50.82 us   min     50.73 us
+ssn sparse unicode 78KB    production median     52.45 us   min     51.03 us
+ssn dense                  production median     20.17 us   min     18.39 us
+ssn digit noise 48KB       production median    149.64 us   min    137.61 us
+ssn isolated digit /17     production median     46.77 us   min     43.86 us
+ssn isolated digit /24     production median     44.38 us   min     41.19 us
+ssn isolated digit /40     production median     79.13 us   min     56.45 us
+ssn long digit run 60KB    production median    144.16 us   min    116.52 us
+ssn all non-digit 60KB     production median     45.67 us   min     41.88 us
+ssn sparse head, dense tail production median     36.80 us   min     32.46 us
+ssn dense head, sparse tail production median     47.25 us   min     43.04 us
+pan sparse ascii 74KB      production median     31.29 us   min     28.07 us
+pan sparse unicode 78KB    production median     32.71 us   min     29.67 us
+pan dense                  production median     10.11 us   min      9.36 us
+pan digit noise 48KB       production median     72.23 us   min     71.24 us
+pan isolated digit /17     production median     32.41 us   min     29.64 us
+pan isolated digit /24     production median     28.76 us   min     26.79 us
+pan isolated digit /40     production median     24.81 us   min     23.29 us
+pan long digit run 60KB    production median     29.34 us   min     29.11 us
+pan all non-digit 60KB     production median     21.01 us   min     19.47 us
+pan sparse head, dense tail production median     18.11 us   min     16.68 us
+pan dense head, sparse tail production median     39.63 us   min     26.16 us
+== run 2 pii-prod-old2 load averages: 5.19 4.55 6.07
+ssn sparse ascii 74KB      production median     69.68 us   min     55.64 us
+ssn sparse unicode 78KB    production median     59.21 us   min     51.81 us
+ssn dense                  production median     22.67 us   min     15.78 us
+ssn digit noise 48KB       production median    108.31 us   min    104.66 us
+ssn isolated digit /17     production median     37.21 us   min     35.10 us
+ssn isolated digit /24     production median     52.60 us   min     47.15 us
+ssn isolated digit /40     production median     49.52 us   min     45.02 us
+ssn long digit run 60KB    production median    108.82 us   min    104.66 us
+ssn all non-digit 60KB     production median     41.97 us   min     33.24 us
+ssn sparse head, dense tail production median     24.65 us   min     22.09 us
+ssn dense head, sparse tail production median     31.07 us   min     30.69 us
+pan sparse ascii 74KB      production median     22.33 us   min     20.20 us
+pan sparse unicode 78KB    production median     23.52 us   min     22.13 us
+pan dense                  production median      7.42 us   min      7.20 us
+pan digit noise 48KB       production median     51.20 us   min     50.88 us
+pan isolated digit /17     production median     29.63 us   min     21.36 us
+pan isolated digit /24     production median     37.35 us   min     34.05 us
+pan isolated digit /40     production median     27.80 us   min     25.12 us
+pan long digit run 60KB    production median     31.46 us   min     31.41 us
+pan all non-digit 60KB     production median     29.20 us   min     23.00 us
+pan sparse head, dense tail production median     13.77 us   min     12.83 us
+pan dense head, sparse tail production median     15.87 us   min     15.25 us
+finished

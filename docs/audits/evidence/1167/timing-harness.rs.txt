@@ -1,0 +1,112 @@
+// Temporary module appended to crates/secret-scan-core/src/pii/pii_phone.rs
+// while measuring, then removed. It re-declares the detection loop twice, once
+// calling the shipped `parse_main` and once calling the pre-#1167
+// `parse_main_oracle`, so both variants run in one binary, alternated, with an
+// A/A control (the old variant measured twice).
+#[cfg(test)]
+mod zz_bench {
+    use super::*;
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    type Main = fn(&str) -> Option<(usize, [u8; 10], usize, Form)>;
+
+    fn parse_candidate_with(input: &str, start: usize, main: Main) -> Option<usize> {
+        let remaining = input.get(start..)?;
+        let (main_len, _d, _c, form) = main(remaining)?;
+        if main_len > MAX_MAIN_BYTES {
+            return None;
+        }
+        let main_end = start.checked_add(main_len)?;
+        let end = parse_extension(input, main_end, form)?;
+        if end - start > MAX_CANDIDATE_BYTES || !right_boundary(input, end) {
+            return None;
+        }
+        Some(end)
+    }
+
+    fn detect_with(input: &str, main: Main) -> usize {
+        let bytes = input.as_bytes();
+        let mut found = 0;
+        let mut index = 0;
+        while index < bytes.len() {
+            if !matches!(bytes[index], b'+' | b'(' | b'0'..=b'9') || !left_boundary(input, index) {
+                index += 1;
+                continue;
+            }
+            if let Some(end) = parse_candidate_with(input, index, main) {
+                found += 1;
+                index = end;
+            } else {
+                index = malformed_display_end(bytes, index).max(index + 1);
+            }
+        }
+        found
+    }
+
+    fn new_main(s: &str) -> Option<(usize, [u8; 10], usize, Form)> {
+        parse_main(s)
+    }
+    fn old_main(s: &str) -> Option<(usize, [u8; 10], usize, Form)> {
+        parse_main_oracle(s)
+    }
+
+    fn med(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+    fn time(input: &str, main: Main, reps: u32) -> f64 {
+        let t = Instant::now();
+        for _ in 0..reps {
+            black_box(detect_with(black_box(input), main));
+        }
+        t.elapsed().as_nanos() as f64 / f64::from(reps)
+    }
+    fn compare(name: &str, input: &str) {
+        let fs: [Main; 3] = [old_main, new_main, old_main];
+        assert_eq!(detect_with(input, old_main), detect_with(input, new_main));
+        let reps = (20_000_000 / input.len().max(1)).clamp(10, 5000) as u32;
+        let mut res: Vec<Vec<f64>> = vec![vec![]; 3];
+        for round in 0..41 {
+            for k in 0..3 {
+                let idx = if round % 2 == 0 { k } else { 2 - k };
+                res[idx].push(time(input, fs[idx], reps));
+            }
+        }
+        let base = med(res[0].clone());
+        let new = med(res[1].clone());
+        let aa = med(res[2].clone());
+        eprintln!(
+            "{name:22} bytes {:7} old {:10.0}ns | new {:10.0} ({:+.1}%) | A/A {:10.0} ({:+.1}%)",
+            input.len(),
+            base,
+            new,
+            (new / base - 1.0) * 100.0,
+            aa,
+            (aa / base - 1.0) * 100.0
+        );
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_phone() {
+        let prose = "The quick brown fox, request id 12345, status ok; path /var/log/app.log\n";
+        let nums = "n 1234 5678 90 2024-01-02 10:11:12\n";
+        compare("compact-dense", &"call 2125552345 now\n".repeat(1500));
+        compare("parenthesized-dense", &"call (212) 555-2345 now\n".repeat(1500));
+        compare("hyphen-dense", &"call 212-555-2345 now\n".repeat(1500));
+        compare("plus-dense", &"call +12125552345 now\n".repeat(1500));
+        compare(
+            "malformed",
+            &"id 0125552345 and 1125552345 and 21255523 x\n".repeat(700),
+        );
+        compare(
+            "noise-numbers",
+            &"ts 1700000000123 build 20260930 v1.2.3 4096\n".repeat(700),
+        );
+        let sparse = format!("{}call 2125552345 now\n{}", prose.repeat(400), prose.repeat(400));
+        compare("sparse", &sparse);
+        let numeric_sparse = format!("{}call 2125552345 now\n{}", nums.repeat(700), nums.repeat(700));
+        compare("numeric-sparse", &numeric_sparse);
+    }
+}

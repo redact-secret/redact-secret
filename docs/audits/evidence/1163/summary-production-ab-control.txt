@@ -1,0 +1,10 @@
+sparse ascii 74KB          base med    18.31 p25    18.31 min    18.17 | prod-op2: med   +0.0% p25   +0.0% min   +0.1% | prod-n2: med  -64.6% p25  -64.6% min  -64.6%
+sparse unicode 78KB        base med    21.16 p25    21.15 min    20.91 | prod-op2: med   +0.0% p25   +0.0% min   +0.1% | prod-n2: med  -64.7% p25  -64.6% min  -64.5%
+dense short-body           base med    48.09 p25    47.89 min    46.23 | prod-op2: med   -0.5% p25   -0.3% min   +0.2% | prod-n2: med   -9.0% p25   -9.3% min   -9.4%
+dense 4-line               base med    41.17 p25    41.08 min    40.32 | prod-op2: med   -0.0% p25   +0.0% min   -0.5% | prod-n2: med  -35.7% p25  -35.7% min  -36.6%
+dense long-body            base med    24.94 p25    24.92 min    24.72 | prod-op2: med   +0.0% p25   -0.2% min   -0.5% | prod-n2: med  -54.0% p25  -54.1% min  -54.4%
+dense empty-body           base med    15.34 p25    15.02 min    14.23 | prod-op2: med   -0.2% p25   -0.9% min   +0.0% | prod-n2: med   +4.6% p25   +4.7% min   +6.5%
+dash noise (single)        base med    22.66 p25    22.66 min    22.56 | prod-op2: med   +0.2% p25   +0.2% min   +0.0% | prod-n2: med  -72.8% p25  -72.9% min  -72.9%
+dash noise (4-runs)        base med    35.96 p25    35.87 min    35.70 | prod-op2: med   -0.1% p25   -0.0% min   +0.0% | prod-n2: med  -56.1% p25  -56.1% min  -56.2%
+near-miss public           base med    27.12 p25    26.95 min    25.92 | prod-op2: med   -0.8% p25   -0.4% min   +0.2% | prod-n2: med  -13.0% p25  -13.9% min  -12.3%
+sparse + dash noise        base med    12.14 p25    12.14 min    12.10 | prod-op2: med   +0.0% p25   +0.1% min   -0.1% | prod-n2: med  -69.1% p25  -69.1% min  -69.2%

@@ -1,0 +1,35 @@
+RUN 1
+18:44  up 20 days,  1:43, 83 users, load averages: 71.53 57.51 41.75
+lookup GB              old       3.41ns | new       0.57 (-83.4%) | A/A       3.42 (+0.4%)
+lookup AD (first)      old       3.53ns | new       0.58 (-83.7%) | A/A       3.56 (+0.7%)
+lookup YE (last)       old       3.65ns | new       0.57 (-84.5%) | A/A       3.71 (+1.8%)
+lookup ZZ (absent)     old       2.98ns | new       0.56 (-81.3%) | A/A       3.00 (+0.4%)
+lookup mixed 8         old       5.82ns | new       0.69 (-88.1%) | A/A       5.84 (+0.3%)
+compact-dense          old  193740.93ns | new  193828.80 (+0.0%) | A/A  194065.33 (+0.2%)
+compact-mixed-dense    old  220313.40ns | new  217042.40 (-1.5%) | A/A  219606.07 (-0.3%)
+print-dense            old  271281.09ns | new  251725.85 (-7.2%) | A/A  265831.02 (-2.0%)
+unknown-noise          old   68289.70ns | new   55206.13 (-19.2%) | A/A   68719.20 (+0.6%)
+bad-checksum           old  494678.31ns | new  509892.74 (+3.1%) | A/A  615882.23 (+24.5%)
+sparse                 old   57893.13ns | new   57565.68 (-0.6%) | A/A   58361.31 (+0.8%)
+caps-sparse            old  209381.27ns | new  144373.26 (-31.0%) | A/A  229411.84 (+9.6%)
+RUN 2
+19:03  up 20 days,  2:01, 83 users, load averages: 27.34 24.00 33.09
+lookup GB              old      20.16ns | new       1.24 (-93.8%) | A/A      16.91 (-16.1%)
+lookup AD (first)      old      16.59ns | new       1.34 (-91.9%) | A/A      17.82 (+7.4%)
+lookup YE (last)       old      15.50ns | new       1.23 (-92.1%) | A/A      15.46 (-0.2%)
+lookup ZZ (absent)     old      17.79ns | new       2.51 (-85.9%) | A/A      17.72 (-0.4%)
+lookup mixed 8         old      20.89ns | new       1.56 (-92.5%) | A/A      14.86 (-28.9%)
+compact-dense          old  242098.07ns | new  224898.40 (-7.1%) | A/A  233622.67 (-3.5%)
+compact-mixed-dense    old  176142.93ns | new  176617.27 (+0.3%) | A/A  178794.33 (+1.5%)
+print-dense            old  137871.45ns | new  137875.39 (+0.0%) | A/A  139143.52 (+0.9%)
+unknown-noise          old   50315.93ns | new   41076.64 (-18.4%) | A/A   50132.40 (-0.4%)
+bad-checksum           old  234713.63ns | new  235445.65 (+0.3%) | A/A  235146.60 (+0.2%)
+sparse                 old   30335.01ns | new   29798.99 (-1.8%) | A/A   29845.34 (-1.6%)
+caps-sparse            old   68536.55ns | new   60023.82 (-12.4%) | A/A   70277.88 (+2.5%)
+
+NOTE: the host was shared and heavily loaded (load average 71 at the start of
+run 1, 27 at run 2). Absolute nanoseconds differ between runs for that reason;
+read only the old/new/A-A ratios inside one run. A/A swings of +24.5% (run 1
+bad-checksum) and -28.9% (run 2 lookup mixed 8) show where a row is noise.
+Apple M4 arm64, release (lto fat, codegen-units 1), 41 alternating rounds,
+median. Harness: timing-harness.rs.txt.

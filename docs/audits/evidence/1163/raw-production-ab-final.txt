@@ -1,0 +1,199 @@
+== run 1 prod-o2 load averages: 3.67 2.72 3.81
+sparse ascii 74KB      production median     18.36 us   min     18.26 us
+sparse unicode 78KB    production median     21.17 us   min     21.04 us
+dense short-body       production median     48.04 us   min     46.35 us
+dense 4-line           production median     41.66 us   min     40.67 us
+dense long-body        production median     24.94 us   min     24.60 us
+dense empty-body       production median     15.54 us   min     14.28 us
+dash noise (single)    production median     22.73 us   min     22.57 us
+dash noise (4-runs)    production median     40.65 us   min     35.75 us
+near-miss public       production median     27.08 us   min     25.96 us
+sparse + dash noise    production median     12.16 us   min     12.12 us
+== run 1 prod-n2 load averages: 3.08 2.66 3.75
+sparse ascii 74KB      production median      6.49 us   min      6.44 us
+sparse unicode 78KB    production median      7.66 us   min      7.47 us
+dense short-body       production median     46.25 us   min     42.12 us
+dense 4-line           production median     26.79 us   min     25.78 us
+dense long-body        production median     11.48 us   min     11.31 us
+dense empty-body       production median     16.19 us   min     15.20 us
+dash noise (single)    production median      6.15 us   min      6.10 us
+dash noise (4-runs)    production median     15.74 us   min     15.65 us
+near-miss public       production median     23.76 us   min     22.78 us
+sparse + dash noise    production median      3.76 us   min      3.74 us
+== run 1 prod-n3 load averages: 3.06 2.71 3.73
+sparse ascii 74KB      production median      6.49 us   min      6.47 us
+sparse unicode 78KB    production median      7.49 us   min      7.45 us
+dense short-body       production median     43.39 us   min     41.85 us
+dense 4-line           production median     26.43 us   min     26.09 us
+dense long-body        production median     11.39 us   min     11.21 us
+dense empty-body       production median     15.33 us   min     14.85 us
+dash noise (single)    production median      6.16 us   min      6.11 us
+dash noise (4-runs)    production median     15.72 us   min     15.63 us
+near-miss public       production median     21.95 us   min     21.55 us
+sparse + dash noise    production median      3.76 us   min      3.74 us
+== run 1 prod-n3 load averages: 2.49 2.61 3.65
+sparse ascii 74KB      production median      6.49 us   min      6.46 us
+sparse unicode 78KB    production median      7.47 us   min      7.44 us
+dense short-body       production median     43.51 us   min     42.50 us
+dense 4-line           production median     26.29 us   min     25.48 us
+dense long-body        production median     11.37 us   min     11.16 us
+dense empty-body       production median     15.40 us   min     14.99 us
+dash noise (single)    production median      6.15 us   min      6.13 us
+dash noise (4-runs)    production median     15.69 us   min     15.63 us
+near-miss public       production median     22.04 us   min     21.55 us
+sparse + dash noise    production median      3.76 us   min      3.75 us
+== run 1 prod-n2 load averages: 2.27 2.55 3.59
+sparse ascii 74KB      production median      6.49 us   min      6.47 us
+sparse unicode 78KB    production median      7.49 us   min      7.46 us
+dense short-body       production median     43.74 us   min     42.45 us
+dense 4-line           production median     26.62 us   min     26.01 us
+dense long-body        production median     11.57 us   min     11.35 us
+dense empty-body       production median     15.98 us   min     15.40 us
+dash noise (single)    production median      6.17 us   min      6.11 us
+dash noise (4-runs)    production median     16.04 us   min     15.86 us
+near-miss public       production median     23.60 us   min     23.10 us
+sparse + dash noise    production median      3.78 us   min      3.75 us
+== run 1 prod-o2 load averages: 2.90 2.65 3.58
+sparse ascii 74KB      production median     18.36 us   min     18.28 us
+sparse unicode 78KB    production median     21.18 us   min     21.09 us
+dense short-body       production median     47.90 us   min     46.92 us
+dense 4-line           production median     41.02 us   min     40.08 us
+dense long-body        production median     24.95 us   min     24.70 us
+dense empty-body       production median     15.61 us   min     14.27 us
+dash noise (single)    production median     22.89 us   min     22.57 us
+dash noise (4-runs)    production median     35.85 us   min     35.72 us
+near-miss public       production median     27.52 us   min     26.11 us
+sparse + dash noise    production median     12.16 us   min     12.11 us
+== run 2 prod-o2 load averages: 2.20 2.50 3.49
+sparse ascii 74KB      production median     18.32 us   min     18.25 us
+sparse unicode 78KB    production median     21.17 us   min     21.08 us
+dense short-body       production median     48.51 us   min     47.62 us
+dense 4-line           production median     41.18 us   min     40.62 us
+dense long-body        production median     24.89 us   min     24.67 us
+dense empty-body       production median     15.01 us   min     14.27 us
+dash noise (single)    production median     22.69 us   min     22.58 us
+dash noise (4-runs)    production median     36.98 us   min     35.76 us
+near-miss public       production median     46.69 us   min     27.53 us
+sparse + dash noise    production median     25.69 us   min     15.49 us
+== run 2 prod-n2 load averages: 4.68 3.00 3.63
+sparse ascii 74KB      production median     15.59 us   min      6.56 us
+sparse unicode 78KB    production median     15.57 us   min      9.26 us
+dense short-body       production median     55.01 us   min     45.17 us
+dense 4-line           production median     27.42 us   min     26.16 us
+dense long-body        production median     11.54 us   min     11.31 us
+dense empty-body       production median     16.22 us   min     15.18 us
+dash noise (single)    production median      6.16 us   min      6.11 us
+dash noise (4-runs)    production median     15.74 us   min     15.64 us
+near-miss public       production median     23.45 us   min     22.84 us
+sparse + dash noise    production median      3.76 us   min      3.75 us
+== run 2 prod-n3 load averages: 4.26 3.12 3.65
+sparse ascii 74KB      production median      6.49 us   min      6.46 us
+sparse unicode 78KB    production median      7.48 us   min      7.43 us
+dense short-body       production median     43.68 us   min     42.20 us
+dense 4-line           production median     26.17 us   min     25.38 us
+dense long-body        production median     11.36 us   min     11.16 us
+dense empty-body       production median     15.37 us   min     15.00 us
+dash noise (single)    production median      6.15 us   min      6.12 us
+dash noise (4-runs)    production median     15.71 us   min     15.64 us
+near-miss public       production median     22.56 us   min     21.55 us
+sparse + dash noise    production median      3.75 us   min      3.73 us
+== run 2 prod-n3 load averages: 3.16 2.96 3.57
+sparse ascii 74KB      production median      6.48 us   min      6.46 us
+sparse unicode 78KB    production median      7.48 us   min      7.45 us
+dense short-body       production median     43.72 us   min     42.54 us
+dense 4-line           production median     26.36 us   min     25.56 us
+dense long-body        production median     11.39 us   min     11.21 us
+dense empty-body       production median     15.02 us   min     14.63 us
+dash noise (single)    production median      6.15 us   min      6.12 us
+dash noise (4-runs)    production median     15.72 us   min     15.65 us
+near-miss public       production median     22.63 us   min     21.58 us
+sparse + dash noise    production median      3.76 us   min      3.73 us
+== run 2 prod-n2 load averages: 2.72 2.87 3.51
+sparse ascii 74KB      production median      6.49 us   min      6.45 us
+sparse unicode 78KB    production median      7.48 us   min      7.42 us
+dense short-body       production median     46.61 us   min     44.14 us
+dense 4-line           production median     30.10 us   min     27.41 us
+dense long-body        production median     12.97 us   min     11.74 us
+dense empty-body       production median     19.07 us   min     17.20 us
+dash noise (single)    production median      7.07 us   min      6.48 us
+dash noise (4-runs)    production median     18.19 us   min     16.68 us
+near-miss public       production median     26.57 us   min     22.80 us
+sparse + dash noise    production median      3.76 us   min      3.74 us
+== run 2 prod-o2 load averages: 3.48 3.03 3.54
+sparse ascii 74KB      production median     18.33 us   min     18.29 us
+sparse unicode 78KB    production median     21.20 us   min     21.09 us
+dense short-body       production median     53.49 us   min     47.12 us
+dense 4-line           production median     45.76 us   min     43.28 us
+dense long-body        production median     27.12 us   min     24.85 us
+dense empty-body       production median     15.08 us   min     14.29 us
+dash noise (single)    production median     23.24 us   min     22.57 us
+dash noise (4-runs)    production median     35.91 us   min     35.75 us
+near-miss public       production median     26.91 us   min     26.20 us
+sparse + dash noise    production median     12.18 us   min     12.13 us
+== run 3 prod-o2 load averages: 3.53 3.10 3.54
+sparse ascii 74KB      production median     18.36 us   min     18.27 us
+sparse unicode 78KB    production median     21.21 us   min     21.11 us
+dense short-body       production median     53.51 us   min     50.24 us
+dense 4-line           production median     46.00 us   min     43.61 us
+dense long-body        production median     25.40 us   min     24.70 us
+dense empty-body       production median     16.97 us   min     14.52 us
+dash noise (single)    production median     23.17 us   min     22.87 us
+dash noise (4-runs)    production median     39.35 us   min     35.95 us
+near-miss public       production median     26.91 us   min     25.99 us
+sparse + dash noise    production median     12.17 us   min     12.11 us
+== run 3 prod-n2 load averages: 3.46 3.13 3.54
+sparse ascii 74KB      production median      6.49 us   min      6.45 us
+sparse unicode 78KB    production median      7.49 us   min      7.44 us
+dense short-body       production median     44.03 us   min     42.63 us
+dense 4-line           production median     26.60 us   min     25.65 us
+dense long-body        production median     11.51 us   min     11.27 us
+dense empty-body       production median     16.36 us   min     15.25 us
+dash noise (single)    production median      6.81 us   min      6.14 us
+dash noise (4-runs)    production median     17.84 us   min     16.41 us
+near-miss public       production median     23.62 us   min     22.74 us
+sparse + dash noise    production median      4.04 us   min      3.75 us
+== run 3 prod-n3 load averages: 3.12 3.07 3.50
+sparse ascii 74KB      production median      7.49 us   min      7.05 us
+sparse unicode 78KB    production median      7.62 us   min      7.44 us
+dense short-body       production median     46.93 us   min     43.34 us
+dense 4-line           production median     28.18 us   min     26.15 us
+dense long-body        production median     12.25 us   min     11.31 us
+dense empty-body       production median     15.23 us   min     14.77 us
+dash noise (single)    production median      6.15 us   min      6.13 us
+dash noise (4-runs)    production median     15.71 us   min     15.66 us
+near-miss public       production median     22.29 us   min     21.61 us
+sparse + dash noise    production median      3.76 us   min      3.74 us
+== run 3 prod-n3 load averages: 2.99 3.06 3.48
+sparse ascii 74KB      production median      6.48 us   min      6.45 us
+sparse unicode 78KB    production median      7.46 us   min      7.43 us
+dense short-body       production median     43.33 us   min     42.45 us
+dense 4-line           production median     26.45 us   min     26.03 us
+dense long-body        production median     11.37 us   min     11.22 us
+dense empty-body       production median     15.28 us   min     14.99 us
+dash noise (single)    production median      6.16 us   min      6.13 us
+dash noise (4-runs)    production median     15.70 us   min     15.65 us
+near-miss public       production median     21.79 us   min     21.54 us
+sparse + dash noise    production median      3.76 us   min      3.74 us
+== run 3 prod-n2 load averages: 2.81 3.01 3.44
+sparse ascii 74KB      production median      6.49 us   min      6.44 us
+sparse unicode 78KB    production median      7.47 us   min      7.43 us
+dense short-body       production median     43.47 us   min     42.50 us
+dense 4-line           production median     26.63 us   min     25.90 us
+dense long-body        production median     11.49 us   min     11.32 us
+dense empty-body       production median     16.51 us   min     15.14 us
+dash noise (single)    production median      6.16 us   min      6.10 us
+dash noise (4-runs)    production median     15.77 us   min     15.69 us
+near-miss public       production median     23.25 us   min     22.80 us
+sparse + dash noise    production median      3.77 us   min      3.74 us
+== run 3 prod-o2 load averages: 2.49 2.90 3.38
+sparse ascii 74KB      production median     18.36 us   min     18.28 us
+sparse unicode 78KB    production median     21.21 us   min     21.09 us
+dense short-body       production median     48.11 us   min     47.29 us
+dense 4-line           production median     41.08 us   min     40.37 us
+dense long-body        production median     25.30 us   min     24.78 us
+dense empty-body       production median     17.95 us   min     15.04 us
+dash noise (single)    production median     24.63 us   min     22.62 us
+dash noise (4-runs)    production median     35.91 us   min     35.75 us
+near-miss public       production median     26.62 us   min     25.91 us
+sparse + dash noise    production median     12.14 us   min     12.11 us
+finished

@@ -228,11 +228,30 @@ fn parse_candidate(input: &str, start: usize) -> Option<usize> {
     Some(cursor)
 }
 
+/// Direct 26 x 26 form of [`COUNTRY_LENGTHS`], built at compile time from the
+/// sorted source table, which stays the single definition (#1168). A zero byte
+/// is an unregistered prefix; every registered length is 15..=34.
+const COUNTRY_LENGTH_GRID: [[u8; 26]; 26] = {
+    let mut grid = [[0_u8; 26]; 26];
+    let mut index = 0;
+    while index < COUNTRY_LENGTHS.len() {
+        let (code, length) = COUNTRY_LENGTHS[index];
+        grid[(code[0] - b'A') as usize][(code[1] - b'A') as usize] = length;
+        index += 1;
+    }
+    grid
+};
+
 fn country_length(country: [u8; 2]) -> Option<usize> {
-    COUNTRY_LENGTHS
-        .binary_search_by_key(&country, |(code, _)| *code)
-        .ok()
-        .map(|index| usize::from(COUNTRY_LENGTHS[index].1))
+    let first = country[0].wrapping_sub(b'A');
+    let second = country[1].wrapping_sub(b'A');
+    if first >= 26 || second >= 26 {
+        return None;
+    }
+    match COUNTRY_LENGTH_GRID[usize::from(first)][usize::from(second)] {
+        0 => None,
+        length => Some(usize::from(length)),
+    }
 }
 
 fn valid_left_boundary(input: &str, start: usize) -> bool {
@@ -264,7 +283,54 @@ fn fully_delimited_reference(input: &str, start: usize, end: usize) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{COUNTRY_LENGTHS, MAX_COMPACT_BYTES, country_length, detect_ibans};
+    use super::{
+        COUNTRY_LENGTH_GRID, COUNTRY_LENGTHS, MAX_COMPACT_BYTES, country_length, detect_ibans,
+    };
+
+    /// The pre-#1168 lookup, kept verbatim as the differential oracle.
+    fn country_length_oracle(country: [u8; 2]) -> Option<usize> {
+        COUNTRY_LENGTHS
+            .binary_search_by_key(&country, |(code, _)| *code)
+            .ok()
+            .map(|index| usize::from(COUNTRY_LENGTHS[index].1))
+    }
+
+    #[test]
+    fn grid_lookup_matches_the_binary_search_for_all_65536_byte_pairs() {
+        let mut found = 0;
+        for first in 0..=u8::MAX {
+            for second in 0..=u8::MAX {
+                let pair = [first, second];
+                assert_eq!(
+                    country_length(pair),
+                    country_length_oracle(pair),
+                    "{pair:?}"
+                );
+                found += usize::from(country_length(pair).is_some());
+            }
+        }
+        // Exactly the 89 registered prefixes, none of them lowercase.
+        assert_eq!(found, COUNTRY_LENGTHS.len());
+        for lower in [*b"gb", *b"Gb", *b"gB", *b"de", *b"zz"] {
+            assert_eq!(country_length(lower), None);
+        }
+    }
+
+    #[test]
+    fn grid_holds_every_source_row_and_nothing_else() {
+        let nonzero = COUNTRY_LENGTH_GRID
+            .iter()
+            .flatten()
+            .filter(|length| **length != 0)
+            .count();
+        assert_eq!(nonzero, COUNTRY_LENGTHS.len());
+        assert_eq!(core::mem::size_of_val(&COUNTRY_LENGTH_GRID), 676);
+        for (code, length) in COUNTRY_LENGTHS {
+            let cell =
+                COUNTRY_LENGTH_GRID[usize::from(code[0] - b'A')][usize::from(code[1] - b'A')];
+            assert_eq!(cell, *length);
+        }
+    }
 
     fn compact_values(input: &str) -> Vec<(usize, usize)> {
         detect_ibans(input)

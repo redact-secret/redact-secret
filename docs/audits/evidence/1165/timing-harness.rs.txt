@@ -1,0 +1,58 @@
+// Temporary: appended to the `tests` module of crates/secret-scan-core/src/pii.rs
+// in a working copy, run with `cargo test --release -p redact-secret --lib
+// zz_bench -- --ignored --nocapture`, then removed. Never built by Cargo as kept here.
+mod zz_bench {
+    use super::*;
+    use std::hint::black_box;
+    use std::time::Instant;
+    type K = (ByteRange, IdentityDomain);
+
+    fn old(keys: &[K]) -> Vec<K> {
+        keys.iter().copied().collect::<BTreeSet<_>>().into_iter().collect()
+    }
+    fn new(keys: &[K]) -> Vec<K> {
+        context_candidate_keys(keys.iter().copied())
+    }
+    fn timeit(f: fn(&[K]) -> Vec<K>, keys: &[K], reps: u32) -> f64 {
+        let t = Instant::now();
+        for _ in 0..reps {
+            black_box(f(black_box(keys)));
+        }
+        t.elapsed().as_nanos() as f64 / f64::from(reps)
+    }
+    fn med(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+    fn compare(name: &str, keys: &[K], reps: u32) {
+        let fs: [fn(&[K]) -> Vec<K>; 3] = [old, new, old];
+        let mut res: Vec<Vec<f64>> = vec![vec![]; 3];
+        for round in 0..41 {
+            for k in 0..3 {
+                let idx = if round % 2 == 0 { k } else { 2 - k };
+                res[idx].push(timeit(fs[idx], keys, reps));
+            }
+        }
+        let (b, n, aa) = (med(res[0].clone()), med(res[1].clone()), med(res[2].clone()));
+        eprintln!(
+            "{name:24} old {b:10.1}ns | new {n:10.1} ({:+.1}%) | A/A {aa:10.1} ({:+.1}%)",
+            (n / b - 1.0) * 100.0,
+            (aa / b - 1.0) * 100.0
+        );
+    }
+    fn key(i: usize) -> K {
+        let start = ((i * 37) % 1000) * 4;
+        (
+            ByteRange::new(start, start + 1 + i % 5).unwrap(),
+            IdentityDomain::ALL[(i * 37) % 6],
+        )
+    }
+    #[test]
+    #[ignore]
+    fn bench_keys() {
+        compare("single", &[key(0)], 200_000);
+        compare("sparse-3", &(0..3).map(key).collect::<Vec<_>>(), 100_000);
+        compare("shuffled-1000", &(0..1000).map(key).collect::<Vec<_>>(), 500);
+        compare("duplicates-3000", &(0..3000).map(|i| key(i % 40)).collect::<Vec<_>>(), 300);
+    }
+}

@@ -40,39 +40,84 @@ const DELIMITER_BEGIN: &str = "-----BEGIN ";
 /// The start of every `END` delimiter [`find_next_delimiter`] accepts.
 const DELIMITER_END: &str = "-----END ";
 
+/// Bytes the dash-jumping probe examines before discovery switches to the
+/// strided exact search (issue #1163).
+const DELIMITER_PROBE_BYTES: usize = 8;
+/// The run of dashes every delimiter starts with.
+const DASH_RUN: &[u8] = b"-----";
+
+/// The first offset at or after `from` where a run of five dashes starts.
+///
+/// Adaptive (issue #1163): the first [`DELIMITER_PROBE_BYTES`] bytes are
+/// walked one at a time, which has no setup cost and so keeps
+/// delimiter-dense input fast (an exact substring search is slower when the
+/// next delimiter is a few bytes away); a probe that finds no run in that
+/// window signals a sparse stretch, and the remainder is searched by
+/// [`next_dash_run_strided`]. Both return the first run the earlier
+/// dash-by-dash walk returned.
+fn next_dash_run(bytes: &[u8], from: usize) -> Option<usize> {
+    let rest = bytes.get(from..)?;
+    let probe = &rest[..rest.len().min(DELIMITER_PROBE_BYTES)];
+    for (offset, &byte) in probe.iter().enumerate() {
+        if byte == b'-' && rest[offset..].starts_with(DASH_RUN) {
+            return Some(from + offset);
+        }
+    }
+    next_dash_run_strided(bytes, from + probe.len())
+}
+
+/// Exact search for the first run of five dashes at or after `from`, reading
+/// every fifth byte. Any five consecutive bytes contain exactly one sampled
+/// offset, so a run of five dashes contains a sampled dash; the run is then
+/// extended left (never before `from`) and right to its full length.
+fn next_dash_run_strided(bytes: &[u8], from: usize) -> Option<usize> {
+    let mut sample = from.checked_add(DASH_RUN.len() - 1)?;
+    while sample < bytes.len() {
+        if bytes[sample] == b'-' {
+            let mut start = sample;
+            while start > from && bytes[start - 1] == b'-' {
+                start -= 1;
+            }
+            let mut end = sample + 1;
+            while end < bytes.len() && bytes[end] == b'-' {
+                end += 1;
+            }
+            if end - start >= DASH_RUN.len() {
+                return Some(start);
+            }
+        }
+        sample += DASH_RUN.len();
+    }
+    None
+}
+
 /// Finds the next `-----BEGIN <label>-----` / `-----END <label>-----`
-/// delimiter at or after `from`, scanning one byte at a time. `label` is an
-/// index into [`LABELS`].
+/// delimiter at or after `from`. `label` is an index into [`LABELS`].
 fn find_next_delimiter(input: &str, from: usize) -> Option<Delimiter> {
     let bytes = input.as_bytes();
     let mut position = from;
-    // Every delimiter starts with `-`: jump between dashes (issue #1074).
-    while let Some(offset) = bytes.get(position..)?.iter().position(|&byte| byte == b'-') {
-        position += offset;
-        if position + 5 > bytes.len() {
-            return None;
-        }
-        if &bytes[position..position + 5] == b"-----" {
-            for (kind, lead) in [
-                (DelimiterKind::Begin, DELIMITER_BEGIN),
-                (DelimiterKind::End, DELIMITER_END),
-            ] {
-                if bytes[position..].starts_with(lead.as_bytes()) {
-                    let label_start = position + lead.len();
-                    for (label, name) in LABELS.iter().enumerate() {
-                        let label_end = label_start + name.len();
-                        let suffix_end = label_end + 5;
-                        if suffix_end <= bytes.len()
-                            && bytes[label_start..label_end] == *name.as_bytes()
-                            && bytes[label_end..suffix_end] == *b"-----"
-                        {
-                            return Some(Delimiter {
-                                start: position,
-                                end: suffix_end,
-                                kind,
-                                label,
-                            });
-                        }
+    // Every delimiter starts with `-----`: jump between those runs.
+    while let Some(start) = next_dash_run(bytes, position) {
+        position = start;
+        for (kind, lead) in [
+            (DelimiterKind::Begin, DELIMITER_BEGIN),
+            (DelimiterKind::End, DELIMITER_END),
+        ] {
+            if bytes[position..].starts_with(lead.as_bytes()) {
+                let label_start = position + lead.len();
+                for (label, name) in LABELS.iter().enumerate() {
+                    let label_end = label_start + name.len();
+                    let suffix_end = label_end + 5;
+                    if suffix_end <= bytes.len()
+                        && bytes[label_start..label_end] == *name.as_bytes()
+                        && bytes[label_end..suffix_end] == *b"-----"
+                    {
+                        return Some(Delimiter {
+                            start: position,
+                            end: suffix_end,
+                            kind,
+                            label,
+                        });
                     }
                 }
             }
@@ -668,6 +713,141 @@ mod tests {
             position += 1;
         }
         None
+    }
+
+    /// The dash-jumping five-dash discovery before #1163.
+    fn oracle_dash_jump_run(bytes: &[u8], from: usize) -> Option<usize> {
+        let mut position = from;
+        while let Some(offset) = bytes.get(position..)?.iter().position(|&byte| byte == b'-') {
+            position += offset;
+            if position + 5 > bytes.len() {
+                return None;
+            }
+            if &bytes[position..position + 5] == b"-----" {
+                return Some(position);
+            }
+            position += 1;
+        }
+        None
+    }
+
+    fn key_tuple(delimiter: Option<Delimiter>) -> Option<(usize, usize, usize, bool)> {
+        delimiter.map(|d| (d.start, d.end, d.label, d.kind == DelimiterKind::Begin))
+    }
+
+    #[test]
+    fn adaptive_discovery_matches_the_earlier_walks_across_the_probe_window() {
+        const PIECES: &[&str] = &[
+            "-----BEGIN PRIVATE KEY-----",
+            "-----END RSA PRIVATE KEY-----",
+            "-----BEGIN PUBLIC KEY-----",
+            "------BEGIN PRIVATE KEY------",
+            "-----",
+            "----",
+            "-",
+            "--",
+            "-a-b-",
+            "\n",
+            "\u{e9}",
+            "\u{1f511}",
+            "\u{ac00}-\u{ac01}",
+        ];
+        let mut state = 0xD1B5_4A32_D192_ED03u64;
+        let mut next = move |bound: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            usize::try_from(state % u64::try_from(bound).unwrap()).unwrap()
+        };
+        let mut found = 0;
+        for round in 0..3_000 {
+            let mut text = String::new();
+            for _ in 0..next(10) {
+                // Gaps straddle the probe window in both directions.
+                text.push_str(&"x".repeat(match round % 4 {
+                    0 => next(3),
+                    1 => DELIMITER_PROBE_BYTES - 3 + next(7),
+                    2 => next(300),
+                    _ => 2 * DELIMITER_PROBE_BYTES + next(5),
+                }));
+                text.push_str(PIECES[next(PIECES.len())]);
+            }
+            text.push_str(&"y".repeat(next(100)));
+            let stride = 1 + text.len() / 60;
+            for from in (0..=text.len() + 2).step_by(stride) {
+                // `from` need not be a character boundary: discovery is on bytes.
+                let new = find_next_delimiter(&text, from);
+                let old = oracle_find_next_delimiter(&text, from);
+                found += usize::from(new.is_some());
+                assert_eq!(key_tuple(new), key_tuple(old), "{text:?} {from}");
+                assert_eq!(
+                    next_dash_run(text.as_bytes(), from),
+                    oracle_dash_jump_run(text.as_bytes(), from),
+                    "{text:?} {from}"
+                );
+            }
+        }
+        assert!(found > 2_000);
+    }
+
+    #[test]
+    fn strided_search_matches_the_dash_jump_walk_for_every_run_length_offset_and_start() {
+        // Runs of 1..=12 dashes at every offset of a short text, searched from
+        // every start, so each phase of the every-fifth-byte sampling and
+        // each way a run can straddle a sample is covered.
+        for run in 1..=12 {
+            for at in 0..=30 {
+                let mut bytes = vec![b'x'; 40];
+                for byte in bytes.iter_mut().skip(at).take(run) {
+                    *byte = b'-';
+                }
+                // A second, shorter run to find after the first.
+                bytes[36] = b'-';
+                for from in 0..=bytes.len() + 1 {
+                    let expected = oracle_dash_jump_run(&bytes, from);
+                    assert_eq!(
+                        next_dash_run_strided(&bytes, from),
+                        expected,
+                        "run {run} at {at} from {from}"
+                    );
+                    assert_eq!(
+                        next_dash_run(&bytes, from),
+                        expected,
+                        "run {run} at {at} from {from}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn adaptive_discovery_lists_the_same_delimiters_on_sparse_dense_and_noisy_inputs() {
+        let sparse = format!(
+            "{}-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRUQ=\n-----END PRIVATE KEY-----\n{}",
+            "lorem ipsum ".repeat(900),
+            "dolor \u{ac00} sit ".repeat(500)
+        );
+        let dense =
+            "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRUQ=\n-----END PRIVATE KEY-----\n"
+                .repeat(300);
+        let noise = "a-b -- --- ---- c".repeat(2_000);
+        let near = "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n".repeat(200);
+        let nested = format!("{dense}-----BEGIN RSA PRIVATE KEY-----\n{sparse}");
+        let unterminated = format!("{sparse}-----BEGIN PRIVATE KEY-----\n{}", "A".repeat(500));
+        for text in [sparse, dense, noise, near, nested, unterminated] {
+            let (mut new, mut old) = (Vec::new(), Vec::new());
+            let mut position = 0;
+            while let Some(d) = find_next_delimiter(&text, position) {
+                position = d.end;
+                new.push(key_tuple(Some(d)));
+            }
+            position = 0;
+            while let Some(d) = oracle_find_next_delimiter(&text, position) {
+                position = d.end;
+                old.push(key_tuple(Some(d)));
+            }
+            assert_eq!(new, old);
+        }
     }
 
     /// The tracker before #1074: lookbehind is the untrimmed byte suffix.

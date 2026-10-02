@@ -1,0 +1,50 @@
+// Temporary whole-scan harness (#1160, reused by #1161). Copied to
+// crates/secret-scan-core/tests/zz_whole.rs in a working copy, built twice
+// (baseline source and candidate source) with `cargo test --release --no-run`,
+// the two test executables are copied aside and run alternately
+// (`zz_whole --ignored --nocapture`), then the file is removed. Never committed.
+use redact_secret::{DefaultPolicy, DetectorRegistry, scan};
+use std::time::Instant;
+
+fn lines(urls: &[&str], n: usize, noise: &str) -> String {
+    let mut out = String::new();
+    for i in 0..n {
+        out.push_str(noise);
+        out.push_str(urls[i % urls.len()]);
+        out.push_str(" and ordinary prose follows here.\n");
+    }
+    out
+}
+
+#[test]
+#[ignore]
+fn whole_scan() {
+    let registry = DetectorRegistry::with_built_in(Vec::new()).unwrap();
+    let prose = "The service reads its settings from a file and logs every request. ".repeat(60);
+    let sparse_url = "postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@[2001:db8::1]:5432/db";
+    let mut sparse = String::new();
+    for _ in 0..8 {
+        sparse.push_str(&prose);
+        sparse.push_str(sparse_url);
+        sparse.push('\n');
+    }
+    let cases = vec![
+        ("sparse-ipv6", sparse),
+        ("dense-ipv6", lines(&["postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@[2001:db8::1]:5432/db", "mongodb://fixture:SYNTHETIC_REVOKED_DB_VALUE@[::ffff:192.0.2.128]/db", "redis://fixture:SYNTHETIC_REVOKED_DB_VALUE@[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:6379"], 2000, "dsn ")),
+        ("dense-regname-hosts", lines(&["postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@192.0.2.10:5432/db", "mysql://fixture:SYNTHETIC_REVOKED_DB_VALUE@db.example.test/db"], 2000, "dsn ")),
+        ("dense-placeholder", lines(&["postgres://fixture:your_password_here@db.example.test/db", "postgres://fixture:REPLACE_ME_PASSWORD@db.example.test/db", "postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@db.example.test/db"], 2000, "dsn ")),
+        ("dense-malformed-ipv6", lines(&["postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@[2001:db8::g]/db", "postgres://fixture:SYNTHETIC_REVOKED_DB_VALUE@[1::2::3]/db"], 2000, "dsn ")),
+        ("prose-noise", "the url scheme postgres is documented elsewhere\n".repeat(3000)),
+    ];
+    for (name, input) in &cases {
+        let mut v = Vec::new();
+        let mut found = 0;
+        for _ in 0..41 {
+            let t = Instant::now();
+            found = scan(input, &registry, &DefaultPolicy).unwrap().len();
+            v.push(t.elapsed().as_micros() as f64);
+        }
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        eprintln!("WHOLE {name:22} bytes {:7} findings {found:5} median {:9.1}us min {:9.1}us", input.len(), v[20], v[0]);
+    }
+}

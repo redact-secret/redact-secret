@@ -1,0 +1,93 @@
+// Temporary stage harness (#1160). Appended to
+// crates/secret-scan-core/src/detectors/connection_string.rs in a working copy,
+// run with `cargo test --release -p redact-secret --lib bench_ip -- --ignored --nocapture`,
+// then removed. Never committed under src/ (rust:check forbids std::time there).
+#[cfg(test)]
+mod zz_bench {
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    fn old_v4(value: &str) -> bool {
+        let parts: Vec<&str> = value.split('.').collect();
+        parts.len() == 4 && parts.iter().all(|part| super::is_valid_ipv4_octet(part))
+    }
+    fn old_v6(value: &str) -> bool {
+        if !value.contains(':') {
+            return false;
+        }
+        let compression = value.find("::");
+        if compression != value.rfind("::") {
+            return false;
+        }
+        let sides: Vec<&str> = match compression {
+            None => vec![value],
+            Some(index) => vec![&value[..index], &value[index + 2..]],
+        };
+        let groups: Vec<&str> = sides
+            .into_iter()
+            .filter(|side| !side.is_empty())
+            .flat_map(|side| side.split(':'))
+            .collect();
+        if groups.iter().any(|group| group.is_empty()) {
+            return false;
+        }
+        let last = groups.len().saturating_sub(1);
+        let mut units = 0u32;
+        for (index, group) in groups.iter().enumerate() {
+            if group.contains('.') {
+                if index != last || !old_v4(group) {
+                    return false;
+                }
+                units += 2;
+            } else {
+                if !super::is_hex_group(group) {
+                    return false;
+                }
+                units += 1;
+            }
+        }
+        if compression.is_none() { units == 8 } else { units < 8 }
+    }
+
+    fn timeit(f: fn(&str) -> bool, inputs: &[&str], reps: u32) -> f64 {
+        let t = Instant::now();
+        for _ in 0..reps {
+            for s in inputs {
+                black_box(f(black_box(s)));
+            }
+        }
+        t.elapsed().as_nanos() as f64 / (f64::from(reps) * inputs.len() as f64)
+    }
+    fn med(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+    fn compare(name: &str, old: fn(&str) -> bool, new: fn(&str) -> bool, inputs: &[&str]) {
+        let fs: [fn(&str) -> bool; 3] = [old, new, old];
+        let mut res: Vec<Vec<f64>> = vec![vec![]; 3];
+        for round in 0..41 {
+            for k in 0..3 {
+                let idx = if round % 2 == 0 { k } else { 2 - k };
+                res[idx].push(timeit(fs[idx], inputs, 20_000));
+            }
+        }
+        let (b, n, a) = (med(res[0].clone()), med(res[1].clone()), med(res[2].clone()));
+        eprintln!(
+            "{name:24} old {b:8.2}ns | new {n:8.2} ({:+.1}%) | A/A {a:8.2} ({:+.1}%)",
+            (n / b - 1.0) * 100.0,
+            (a / b - 1.0) * 100.0
+        );
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_ip() {
+        compare("ipv4-valid", old_v4, super::is_valid_ipv4, &["192.0.2.128", "10.20.30.40"]);
+        compare("ipv4-invalid", old_v4, super::is_valid_ipv4, &["192.0.2.256", "1.2.3.4.5"]);
+        compare("ipv6-full", old_v6, super::is_valid_ipv6, &["2001:0db8:85a3:0000:0000:8a2e:0370:7334"]);
+        compare("ipv6-compressed", old_v6, super::is_valid_ipv6, &["2001:db8::1", "::1"]);
+        compare("ipv6-ipv4tail", old_v6, super::is_valid_ipv6, &["::ffff:192.0.2.128"]);
+        compare("ipv6-malformed", old_v6, super::is_valid_ipv6, &["2001:db8::g", "1::2::3"]);
+        compare("ipv6-not-ip", old_v6, super::is_valid_ipv6, &["db.example.test"]);
+    }
+}

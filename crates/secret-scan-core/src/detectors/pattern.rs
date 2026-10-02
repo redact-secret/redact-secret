@@ -421,9 +421,21 @@ pub(super) mod probe {
 /// loop with this search leaves the scan's result unchanged; it only skips
 /// the offsets whose first byte already rules them out (issue #950).
 pub(super) fn find_literal(bytes: &[u8], needle: &[u8], from: usize) -> Option<usize> {
+    find_literal_with(&LeadBytes::of(std::iter::once(needle)), bytes, needle, from)
+}
+
+/// [`find_literal`] with the lead-byte set for `needle` built by the caller,
+/// so a detector that searches the same literal repeatedly while it walks one
+/// input builds the 256-entry table once instead of once per search (#1164).
+/// `lead` must be `LeadBytes::of(std::iter::once(needle))`.
+pub(super) fn find_literal_with(
+    lead: &LeadBytes,
+    bytes: &[u8],
+    needle: &[u8],
+    from: usize,
+) -> Option<usize> {
     let (&first, rest) = needle.split_first()?;
     let last_start = bytes.len().checked_sub(needle.len())?;
-    let lead = LeadBytes::of(std::iter::once(needle));
     let candidates = &bytes[..=last_start];
     let mut at = from;
     while at <= last_start {

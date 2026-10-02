@@ -1,0 +1,14 @@
+import re, sys, statistics as st
+d = {}
+for line in open(sys.argv[1]):
+    m = re.match(r"r(\d+) (\w+) WHOLE (\S+)\s+bytes\s+(\d+) findings\s+(\d+) median\s+([\d.]+)us min\s+([\d.]+)us", line)
+    if not m: continue
+    r, v, case, nb, f, med, mn = m.groups()
+    d.setdefault(case, {}).setdefault(v, []).append((float(med), float(mn), int(f)))
+for case, vs in d.items():
+    base = [x[0] for x in vs["base"]]
+    cand = [x[0] for x in vs["cand"]]
+    b2 = [x[0] for x in vs["base2"]]
+    ratios = [c / b - 1 for c, b in zip(cand, base)]
+    aa = [c / b - 1 for c, b in zip(b2, base)]
+    print(f"{case:22} base {st.median(base):9.1f}us cand {st.median(cand):9.1f}us ({st.median(ratios)*100:+.1f}%, rounds {min(ratios)*100:+.1f}..{max(ratios)*100:+.1f}) A/A {st.median(aa)*100:+.1f}% (rounds {min(aa)*100:+.1f}..{max(aa)*100:+.1f}) findings {vs['base'][0][2]}/{vs['cand'][0][2]}")

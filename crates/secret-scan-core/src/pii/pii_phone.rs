@@ -128,6 +128,24 @@ fn parse_candidate(input: &str, start: usize) -> Option<ParsedCandidate> {
 
 fn parse_main(value: &str) -> Option<(usize, [u8; 10], usize, Form)> {
     let bytes = value.as_bytes();
+    // Exact shape guard (#1167): a digit at byte 0 and a digit at byte 3 can
+    // only be the compact ten-digit display. Every other non-`+1` pattern
+    // puts `' '` or `'-'` at byte 3, except `(###) ###-####`, whose byte 3 is
+    // a digit but whose byte 0 is `(`; the first-byte guard keeps that form
+    // on the general path. `+1` forms start with `+`, so they never match.
+    if bytes.len() >= 4 && bytes[0].is_ascii_digit() && bytes[3].is_ascii_digit() {
+        return parse_compact_ten(bytes);
+    }
+    parse_main_general(bytes)
+}
+
+fn parse_compact_ten(bytes: &[u8]) -> Option<(usize, [u8; 10], usize, Form)> {
+    let mut digits = [0_u8; 10];
+    match_pattern(bytes, b"##########", &mut digits)?;
+    valid_full_digits(&digits).then_some((10, digits, 10, Form::Full))
+}
+
+fn parse_main_general(bytes: &[u8]) -> Option<(usize, [u8; 10], usize, Form)> {
     let mut digits = [0_u8; 10];
 
     if bytes.starts_with(b"+1") {
@@ -321,6 +339,167 @@ fn right_boundary(input: &str, end: usize) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The pre-#1167 `parse_main`, kept verbatim as the differential oracle.
+    fn parse_main_oracle(value: &str) -> Option<(usize, [u8; 10], usize, Form)> {
+        let bytes = value.as_bytes();
+        let mut digits = [0_u8; 10];
+
+        if bytes.starts_with(b"+1") {
+            for (pattern, compact) in [
+                ("+1##########", true),
+                ("+1 ### ### ####", false),
+                ("+1-###-###-####", false),
+            ] {
+                if let Some(length) = match_pattern(bytes, pattern.as_bytes(), &mut digits)
+                    && valid_full_digits(&digits)
+                {
+                    return Some((length, digits, 10, Form::Full));
+                }
+                if compact {
+                    digits.fill(0);
+                }
+            }
+            return None;
+        }
+
+        for pattern in [
+            "##########",
+            "### ### ####",
+            "###-###-####",
+            "(###) ###-####",
+        ] {
+            if let Some(length) = match_pattern(bytes, pattern.as_bytes(), &mut digits)
+                && valid_full_digits(&digits)
+            {
+                return Some((length, digits, 10, Form::Full));
+            }
+            digits.fill(0);
+        }
+
+        if let Some(length) = match_pattern(bytes, b"###-####", &mut digits)
+            && valid_exchange(&digits[..3])
+        {
+            return Some((length, digits, 7, Form::Local));
+        }
+        None
+    }
+
+    fn assert_same(value: &str) {
+        assert_eq!(parse_main(value), parse_main_oracle(value), "{value:?}");
+    }
+
+    #[test]
+    fn compact_guard_matches_the_oracle_on_named_shapes() {
+        for input in [
+            "",
+            "2",
+            "21",
+            "212",
+            "2125",
+            "212555234",
+            "2125552345",
+            "21255523456",
+            "2125552345x",
+            "1125552345",
+            "2115552345",
+            "2121552345",
+            "2125512345",
+            "2125552345 ext 1",
+            "212 555 2345",
+            "212-555-2345",
+            "(212) 555-2345",
+            "(212)555-2345",
+            "(2125552345",
+            "(212",
+            "(2125",
+            "555-2345",
+            "555-23456",
+            "+12125552345",
+            "+1 212 555 2345",
+            "+1-212-555-2345",
+            "+1212555234",
+            "+2125552345",
+            "212555-2345",
+            "2125-552345",
+            "212 5552345",
+            "212)555-2345",
+            "2a25552345",
+            "212a552345",
+            "2125552a45",
+            "212555234\u{e9}",
+            "212\u{ff15}552345",
+            "\u{ff12}125552345",
+            "212.555.2345",
+            " 2125552345",
+            "9889882345",
+            "0125552345",
+            "1125552345",
+            "9999999999",
+            "2002002000",
+        ] {
+            assert_same(input);
+        }
+    }
+
+    #[test]
+    fn compact_guard_matches_the_oracle_for_every_first_four_byte_class() {
+        // Representative byte per class at each of the first four positions
+        // and a following digit run, so every guard outcome is covered.
+        let alphabet: &[u8] = b"0123456789+()- .a\xc3";
+        let tails = [
+            "",
+            "5552345",
+            "555-2345",
+            ") 555-2345",
+            " 555 2345",
+            "-555-2345",
+        ];
+        let mut buffer = [0_u8; 4];
+        let total = alphabet.len().pow(4);
+        for n in 0..total {
+            let mut m = n;
+            for slot in &mut buffer {
+                *slot = alphabet[m % alphabet.len()];
+                m /= alphabet.len();
+            }
+            for tail in tails {
+                let mut bytes = buffer.to_vec();
+                bytes.extend_from_slice(tail.as_bytes());
+                if let Ok(text) = core::str::from_utf8(&bytes) {
+                    assert_same(text);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn compact_guard_matches_the_oracle_for_every_digit_boundary() {
+        // Every exchange-code leading digit and the N11 rule, both exchanges,
+        // in all four displays, plus truncation at every length.
+        for first in b'0'..=b'9' {
+            for second in b'0'..=b'9' {
+                for third in b'0'..=b'9' {
+                    let area = [first, second, third];
+                    let area = core::str::from_utf8(&area).unwrap();
+                    for display in [
+                        format!("{area}5552345"),
+                        format!("{area} 555 2345"),
+                        format!("{area}-555-2345"),
+                        format!("({area}) 555-2345"),
+                        format!("{area}-2345"),
+                        format!("+1{area}5552345"),
+                        format!("5552345{area}"),
+                        format!("555{area}2345"),
+                    ] {
+                        for cut in 0..=display.len() {
+                            assert_same(&display[..cut]);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn accepts_only_frozen_full_and_local_displays() {
