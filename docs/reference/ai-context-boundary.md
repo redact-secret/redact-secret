@@ -264,8 +264,34 @@ where a secret sat and how long it was, never what it was.
 Telemetry is one optional callback, `onFinding(finding, { boundary })`,
 called once per finding in scan order. It is observational. An exception
 it throws is swallowed and never read, and it never changes an outcome.
-Nothing else is emitted: no input, no value, no error, and no per-chunk
-event.
+Nothing else is emitted by the contract: no input, no value, no error, and
+no per-chunk event.
+
+The `context` argument is exactly `{ boundary }`, and the outcome JSON is
+unchanged. An adapter may pass an optional third argument carrying
+non-sensitive occurrence metadata (for example a part index, a leaf or key
+ordinal, and the range scope below). That argument is an adapter-side
+extension and is not part of this contract: a host must not rely on its
+presence or shape, and the conformance runners neither supply nor check it.
+It never holds an input, a raw key, a field path, a value, or an identifier
+derived from a secret.
+
+### Range and id scope
+
+A finding's `start` and `end` index the unit that was scanned, not the
+operation's input as a whole:
+
+| Scanned unit | `start` / `end` index |
+| --- | --- |
+| `sanitizeText`, or one `buildContext` text part | the whole text |
+| One string leaf (or object key) of `sanitizeValue` | that leaf or key alone, with [leaf offsets](#key-aware-sanitizevalue) for the key-context view |
+| `openStream` | the stream's logical text, as absolute offsets across chunks |
+
+`finding.id` is unique within one scan only. A list that flattens the
+findings of several scans (the leaves of a value, the parts of a context)
+can repeat an id, so a host must not use `id` alone as a key across scans.
+The only cross-scan equality the contract states is the stream rule in
+[Whole-input and incremental equivalence](#whole-input-and-incremental-equivalence).
 
 ## Lifecycle rules
 
@@ -394,6 +420,11 @@ Checked for every conformance case, on every runtime lane:
   that non-contract fields are stripped, that an error message never
   crosses the boundary, and that a pass-through core is rejected without
   its secret being printed.
+
+Conformance replays `ok.findings` only. It does not check the optional
+`onFinding` third argument or any adapter occurrence provenance; the
+adapters repository tests those itself
+(`packages/adapter-ai-context/test/occurrence*.test.ts`).
 
 An adapter qualifies by replaying the fixture at a pinned commit of this
 repository through its own public API and reaching the same outcomes. Any
