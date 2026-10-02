@@ -545,41 +545,6 @@
       "path": "crates/secret-scan-core/benches/scan_cost.rs",
       "rationale": "The maintainer-local scan_cost bench parses its own flags (--runs, --filter, --json, --no-detectors, --top, --list) from its arguments to choose which synthetic workloads to time and how to print them. They are never interpreted as a command, passed to a shell, or used to launch another process, and the bench is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
-    },
-    "7c43c2c2df9e761b": {
-      "classification": "false_positive",
-      "line": 64,
-      "path": "crates/secret-scan-core/examples/alloc_attribution.rs",
-      "rationale": "Maintainer-only measurement example (#1121), never built into a published artifact. The `unsafe` is the `GlobalAlloc` implementation of a counting allocator: each method records the requested size and delegates the same layout and pointer unchanged to `std::alloc::System`, so it upholds the trait contract by construction. Counting allocation requests needs a global allocator, so there is no safe alternative; the example handles only synthetic generated input.",
-      "rule_id": "sast.rules.rust.lang.security.unsafe-usage"
-    },
-    "e7fd43aea41a1c6a": {
-      "classification": "false_positive",
-      "line": 67,
-      "path": "crates/secret-scan-core/examples/alloc_attribution.rs",
-      "rationale": "Maintainer-only measurement example (#1121), never built into a published artifact. The `unsafe` is the `GlobalAlloc` implementation of a counting allocator: each method records the requested size and delegates the same layout and pointer unchanged to `std::alloc::System`, so it upholds the trait contract by construction. Counting allocation requests needs a global allocator, so there is no safe alternative; the example handles only synthetic generated input.",
-      "rule_id": "sast.rules.rust.lang.security.unsafe-usage"
-    },
-    "8b680f0b9c3e096d": {
-      "classification": "false_positive",
-      "line": 71,
-      "path": "crates/secret-scan-core/examples/alloc_attribution.rs",
-      "rationale": "Maintainer-only measurement example (#1121), never built into a published artifact. The `unsafe` is the `GlobalAlloc` implementation of a counting allocator: each method records the requested size and delegates the same layout and pointer unchanged to `std::alloc::System`, so it upholds the trait contract by construction. Counting allocation requests needs a global allocator, so there is no safe alternative; the example handles only synthetic generated input.",
-      "rule_id": "sast.rules.rust.lang.security.unsafe-usage"
-    },
-    "808f2967a2836257": {
-      "classification": "false_positive",
-      "line": 161,
-      "path": "crates/secret-scan-core/examples/alloc_attribution.rs",
-      "rationale": "Maintainer-only measurement example (#1121), never built into a published artifact. The process arguments are only compared against the literal flags `--attribute` and `--time` to select a reporting mode. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
-      "rule_id": "sast.rules.rust.lang.security.args"
-    },
-    "dae7668416b650ca": {
-      "classification": "false_positive",
-      "line": 162,
-      "path": "crates/secret-scan-core/examples/alloc_attribution.rs",
-      "rationale": "Maintainer-only measurement example (#1121), never built into a published artifact. The process arguments are only compared against the literal flags `--attribute` and `--time` to select a reporting mode. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
-      "rule_id": "sast.rules.rust.lang.security.args"
     }
   },
   "known_errors": {
