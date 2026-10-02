@@ -386,3 +386,27 @@ class already existed and fixtures pin it.
 
 Deviation from the audit's draft: none beyond that sentence. D2, D3 and D4 are
 documentation only.
+
+### #1183: R6
+
+The reference fixture now runs in CI on the Node addon
+(`scripts/qualify-node-addon.mjs`, both profiles), the WebAssembly artifact
+through its generated glue in the Node fallback job
+(`scripts/qualify-node-wasm-fallback.mjs`, both profiles) and the release CLI
+(`scripts/qualify-cli-binary.mjs`), through one shared checker,
+`scripts/lib/ruleset-reference.mjs`. They are existing steps of the
+artifact-qualification workflow, which `release.yml` also calls, so no job or
+matrix leg was added; the only workflow change is that a change to the shared
+checker triggers the pull-request run. Each run checks 40 cases: 9 accepted
+(with the `warn` action), 3 names, 1 ordering, the 18 class rejections and the
+9 `tightenedRejections`. Offsets are compared in UTF-8 bytes for the CLI and
+UTF-16 for the JavaScript surfaces, converted by an independent function. The
+class is read from the raw addon and glue error message and from the CLI's
+fixed per-class sentence; the public JavaScript package hides it by design
+(D4), so it is not run through this checker. Rust and Python keep their own
+consumers.
+
+The browser pages are not extended. They run the same glue and `.wasm` bytes,
+but their harness runs in a page with a hand-built fixture payload and no
+shared module with this checker, so adding the fixture there needs a
+browser-safe copy of the checker. The fixture description says so.

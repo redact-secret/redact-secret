@@ -15,6 +15,11 @@
  *    (`decision-govern-cross-language-conformance`) through the addon's
  *    `scan`, with each expectation's UTF-8 byte offsets converted to UTF-16
  *    code units by an independent reference conversion.
+ *    The reference declarative ruleset fixture
+ *    (`conformance/fixtures/ruleset-reference.json`, #1183) runs in the same
+ *    pass through the addon's `ruleset` argument: accepted cases and their
+ *    default action, and every rejection as `INVALID_RULESET` with the fixed
+ *    class the raw addon appends to its message.
  * 4. **Integrate** — the published JavaScript package's public API driven
  *    against the same addon, resolved the way an installed consumer resolves
  *    it, so the package's own binding glue is covered end to end.
@@ -57,6 +62,7 @@ import { Readable, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
+import { loadRulesetReference, runRulesetReference } from "./lib/ruleset-reference.mjs";
 import {
   assertMatchesFixture,
   CANONICAL_FIXTURE_ID,
@@ -377,6 +383,37 @@ function conformAddon(fixtures, detectorProfile, commonExpectations) {
   assert(
     foreign.size === 0,
     `finding(s) from detector(s) outside the ${detectorProfile} profile: ${[...foreign].join(", ")}`,
+  );
+}
+
+/**
+ * Runs the reference ruleset fixture through the addon's raw `scan` or
+ * `scanCommon` (#1183). The addon reports UTF-16 offsets and appends the fixed
+ * rejection class to the `INVALID_RULESET` message, which the public
+ * JavaScript package deliberately hides, so this is the one JavaScript-side
+ * place the class is compared.
+ */
+function conformAddonRuleset(detectorProfile) {
+  const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
+  const scan = detectorProfile === "common" ? addon.scanCommon : addon.scan;
+  const { checks, failures: mismatched } = runRulesetReference(loadRulesetReference(), {
+    offsetUnit: "utf16",
+    scan: (ruleset, input) => scan(input, undefined, undefined, ruleset),
+    reject: (ruleset) => {
+      try {
+        scan("irrelevant", undefined, undefined, ruleset);
+      } catch (error) {
+        assertEqual(error.code, "INVALID_RULESET", "rejected ruleset error code");
+        const match = /\(([A-Z_]+)\)$/.exec(String(error.message));
+        return match === null ? "(no class)" : match[1];
+      }
+      return undefined;
+    },
+  });
+  assert(checks >= 40, `only ${checks} ruleset reference checks ran`);
+  assert(
+    mismatched.length === 0,
+    `${mismatched.length} ruleset case(s) disagreed: ${mismatched.slice(0, 5).join("; ")}`,
   );
 }
 
@@ -752,6 +789,9 @@ async function main() {
   report("the addon passes its own consumer smoke test", runSmokeTest);
   report(`the addon matches the canonical synchronous corpus (${detectorProfile})`, () =>
     conformAddon(fixtures, detectorProfile, commonExpectations),
+  );
+  report(`the addon matches the reference ruleset fixture (${detectorProfile})`, () =>
+    conformAddonRuleset(detectorProfile),
   );
   report(`profile()/profileCommon() report the ${detectorProfile} contract`, () => {
     const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");

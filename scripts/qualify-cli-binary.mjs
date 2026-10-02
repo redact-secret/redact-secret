@@ -22,6 +22,14 @@
  *    documented default placeholder imply, and checked for any surviving
  *    match.
  *
+ * 6. **Ruleset** - the reference declarative ruleset fixture
+ *    (`conformance/fixtures/ruleset-reference.json`, #1183) through
+ *    `--json --ruleset`: the accepted cases with their default action (UTF-8
+ *    byte ranges, compared directly) and every rejection as exit `2` with
+ *    `INVALID_RULESET` and the fixed sentence of the fixture's class. The CLI
+ *    names a class by sentence, not by class name, so the table below mirrors
+ *    `crates/secret-scan-cli/src/failure.rs`.
+ *
  * Every fixture input is synthetic or explicitly revoked, and nothing this
  * script prints carries an input, a matched value, or a placeholder body.
  * Node rather than Python because this has to run on every runner in the
@@ -39,6 +47,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { batchArguments } from "./lib/cli-qualification-batches.mjs";
+import { loadRulesetReference, runRulesetReference } from "./lib/ruleset-reference.mjs";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FIXTURES_DIR = join(REPO_ROOT, "conformance", "fixtures");
@@ -63,6 +72,31 @@ const BINARY_NAME = "redact-secret";
 const USAGE_PREFIX = "usage: redact-secret";
 /** Actions the default policy resolves to a placeholder in the output. */
 const REDACTED_ACTIONS = new Set(["redact", "block"]);
+
+/**
+ * The fixed sentence the CLI prints for each ruleset rejection class
+ * (`crates/secret-scan-cli/src/failure.rs`, `ruleset_class_message`).
+ */
+const RULESET_CLASS_SENTENCES = {
+  RULESET_TOO_LARGE: "the ruleset file exceeds the maximum size.",
+  UNKNOWN_REVISION: "the ruleset-revision value is not supported.",
+  UNKNOWN_FIELD: "a detector block declares an unknown field.",
+  UNSUPPORTED_CONSTRUCT: "a line, block header, repeated field, or value has an unsupported shape.",
+  UNKNOWN_ALPHABET: "a detector block declares an unknown alphabet.",
+  UNKNOWN_VALIDATOR: "a detector block declares an unknown validator.",
+  SPECIFICITY_NOT_CLAIMABLE: "a detector block declares a specificity a ruleset cannot claim.",
+  MISSING_FIELD: "a detector block is missing a required field.",
+  PREFIX_TOO_SHORT: "a detector block's prefix is too short.",
+  PREFIX_TOO_LONG: "a detector block's prefix is too long.",
+  RUN_LENGTH_OUT_OF_BOUNDS: "a detector block's run length is out of bounds.",
+  TOO_MANY_DETECTORS: "the ruleset declares too many detectors.",
+  DUPLICATE_DETECTOR_ID: "two detector blocks declare the same id.",
+  RESERVED_DETECTOR_ID: "a detector block's id collides with a built-in detector.",
+  EMPTY_RULESET: "the ruleset declares no detectors.",
+  NAME_BUCKET_NOT_CLAIMABLE: "a names block declares a bucket other than ambiguous.",
+  NAME_TOO_LONG: "a names block's name is too long.",
+  TOO_MANY_NAMES: "the ruleset declares too many names.",
+};
 
 const failures = [];
 
@@ -277,6 +311,39 @@ function redact(binary, fixtures, paths, reported) {
   assert(checked >= 50, `only ${checked} fixture(s) exercised redaction`);
 }
 
+/** The reference ruleset fixture through `--json --ruleset` (#1183). */
+function conformRuleset(binary, directory) {
+  const rulesetPath = join(directory, "reference.ruleset");
+  const inputPath = join(directory, "reference.input");
+  const { checks, failures: mismatched } = runRulesetReference(loadRulesetReference(), {
+    offsetUnit: "utf8-byte",
+    scan: (ruleset, input) => {
+      writeFileSync(rulesetPath, ruleset);
+      writeFileSync(inputPath, Buffer.from(input, "utf8"));
+      const result = runCli(binary, ["--json", "--ruleset", rulesetPath, "--", inputPath]);
+      assert([0, 1].includes(result.status), `ruleset scan exited ${result.status}`);
+      const report = JSON.parse(result.stdout);
+      assertEqual(report.failures, [], "the ruleset run reported source failures");
+      return report.sources[0].findings;
+    },
+    reject: (ruleset) => {
+      writeFileSync(rulesetPath, ruleset);
+      writeFileSync(inputPath, "irrelevant\n");
+      const result = runCli(binary, ["--ruleset", rulesetPath, "--", inputPath]);
+      if (result.status !== 2) return undefined;
+      const stderr = result.stderr.toString();
+      assert(stderr.includes("INVALID_RULESET"), "a rejected ruleset did not report INVALID_RULESET");
+      const matching = Object.entries(RULESET_CLASS_SENTENCES).filter(([, sentence]) => stderr.includes(sentence));
+      return matching.length === 1 ? matching[0][0] : "(no unique class sentence)";
+    },
+  });
+  assert(checks >= 40, `only ${checks} ruleset reference checks ran`);
+  assert(
+    mismatched.length === 0,
+    `${mismatched.length} ruleset case(s) disagreed: ${mismatched.slice(0, 5).join("; ")}`,
+  );
+}
+
 function main() {
   const options = parseArguments(process.argv.slice(2));
   const fixtures = loadFixtures();
@@ -306,6 +373,7 @@ function main() {
         redact(options.binary, fixtures, paths, reported),
       );
     }
+    report("the CLI matches the reference ruleset fixture", () => conformRuleset(options.binary, directory));
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
