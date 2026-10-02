@@ -45,6 +45,8 @@ Current rules: `docs/specs/engine.md`.
 - [Define the bounded built-in structured-validator registry](2026-09-26-define-the-bounded-built-in-structured-validator-registry.md)
 - [Define the PII domain, scope, arbitration, and activation contract](2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
 - [Define the plaintext memory-lifetime contract as copy minimization and bounded retention, with no erasure claim](2026-09-30-define-the-plaintext-memory-lifetime-contract.md)
+- [Define declarative ruleset revisioning and the revision 1 freeze](2026-10-02-define-declarative-ruleset-revisioning.md)
+- [Define the 0.1.x stable public contract and its compatibility classes](2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md)
 
 ## Distribution
 
