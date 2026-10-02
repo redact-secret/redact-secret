@@ -8,6 +8,17 @@ Repository Markdown remains the source during beta. A separate web-app
 repository versus GitHub Wiki is **undecided**. This page records preparation;
 it does not claim that public delivery or stable-release qualification is done.
 
+## Status for the stable release
+
+[#1070](https://github.com/redact-secret/redact-secret/issues/1070) reviewed
+every row below against the current contracts, ran the documented commands and
+code blocks against artifacts built from the repository, and recorded what ran,
+what did not, and what other repositories still need to change in
+[the evidence record](audits/evidence/1070/README.md). It is the recorded
+review and the executable-example evidence that C1 to C3 below ask for, for the
+revision it names. D1 to D3 stay pending until a delivery platform is chosen, and a published
+`0.1.0` needs the install commands re-run against the registries.
+
 ## Required content before stable release
 
 Every required topic has a repository entry point today. Presence is not final
