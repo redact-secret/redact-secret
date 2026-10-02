@@ -1,0 +1,95 @@
+// Temporary production-only harness for #1163 (NOT compiled). It times only
+// `PrivateKeyDetector::detect`, so the same text can be appended to the
+// pre-change and the post-change `private_key.rs` and the two release test
+// binaries compared process against process (alternating runs).
+
+#[cfg(test)]
+mod timing_1163_production {
+    use super::*;
+    use std::time::Instant;
+
+    fn production(input: &str) -> usize {
+        PrivateKeyDetector
+            .detect(input, &DetectorContext::new(input.len()))
+            .unwrap()
+            .len()
+    }
+
+    const BODY: &str = "U1lOVEhFVElDX1JFVk9LRUQ9U1lOVEhFVElDX1JFVk9LRUQ9U1lOVEhFVElDX1JFVk9LRUQ9\n";
+    fn block(lines: usize) -> String {
+        format!(
+            "-----BEGIN PRIVATE KEY-----\n{}-----END PRIVATE KEY-----\n",
+            BODY.repeat(lines)
+        )
+    }
+    fn workloads() -> Vec<(&'static str, String)> {
+        let filler = "The quick brown fox jumps over the lazy dog while the build runs. ";
+        let ufiller = "고객 안내문입니다 \u{1f600} 계속 읽어 주세요. ";
+        let sparse = |f: &str, n: usize| {
+            let mut s = f.repeat(n);
+            let mid = s.len() / 2;
+            let mid = (mid..).find(|i| s.is_char_boundary(*i)).unwrap();
+            s.insert_str(mid, &block(3));
+            s
+        };
+        vec![
+            ("sparse ascii 74KB", sparse(filler, 1100)),
+            ("sparse unicode 78KB", sparse(ufiller, 1500)),
+            ("dense short-body", block(1).repeat(500)),
+            ("dense 4-line", block(4).repeat(250)),
+            ("dense long-body", block(22).repeat(50)),
+            ("dense empty-body", block(0).repeat(1500)),
+            ("dash noise (single)", "a-b c-d e - f-g ".repeat(3500)),
+            ("dash noise (4-runs)", "x---- y---- z---- ".repeat(3000)),
+            (
+                "near-miss public",
+                "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n".repeat(800),
+            ),
+            (
+                "sparse + dash noise",
+                format!("{}{}", "a-b c-d ".repeat(4000), block(3)),
+            ),
+        ]
+    }
+
+    fn time(f: &dyn Fn() -> usize) -> f64 {
+        let mut reps = 1u32;
+        loop {
+            let t = Instant::now();
+            let mut sink = 0;
+            for _ in 0..reps {
+                sink += std::hint::black_box(f());
+            }
+            let e = t.elapsed();
+            std::hint::black_box(sink);
+            if e.as_millis() >= 20 || reps >= 1_000_000 {
+                return e.as_secs_f64() * 1e6 / f64::from(reps);
+            }
+            reps *= 2;
+        }
+    }
+    fn minimum(v: &[f64]) -> f64 {
+        v.iter().copied().fold(f64::INFINITY, f64::min)
+    }
+    fn median(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+
+    #[test]
+    #[ignore]
+    fn measure_1163_production() {
+        for (name, input) in workloads() {
+            let i = input.as_str();
+            let mut samples = Vec::new();
+            for _ in 0..61 {
+                samples.push(time(&move || production(i)));
+            }
+            println!(
+                "{name:22} production median {:9.2} us   min {:9.2} us",
+                median(samples.clone()),
+                minimum(&samples)
+            );
+        }
+    }
+}

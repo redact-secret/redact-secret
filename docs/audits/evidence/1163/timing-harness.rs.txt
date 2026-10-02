@@ -1,0 +1,319 @@
+// Temporary measurement harness for #1163 (NOT compiled, never under src in a
+// commit). Append to crates/secret-scan-core/src/detectors/private_key.rs,
+// run `cargo test -p redact-secret --release --lib measure_1163 -- --ignored
+// --nocapture`, then remove it again. It uses clock names, which
+// scripts/check-rust-workspace.py forbids under src.
+
+#[cfg(test)]
+mod timing_1163 {
+    use super::*;
+    use std::time::Instant;
+
+    fn dash_jump(bytes: &[u8], from: usize) -> Option<usize> {
+        let mut position = from;
+        while let Some(offset) = bytes.get(position..)?.iter().position(|&b| b == b'-') {
+            position += offset;
+            if position + 5 > bytes.len() {
+                return None;
+            }
+            if &bytes[position..position + 5] == b"-----" {
+                return Some(position);
+            }
+            position += 1;
+        }
+        None
+    }
+    /// Exact search that reads every fifth byte: any run of five dashes
+    /// contains one sampled offset, from which the run is extended both ways.
+    fn stride5(bytes: &[u8], from: usize) -> Option<usize> {
+        let mut at = from.checked_add(4)?;
+        while at < bytes.len() {
+            if bytes[at] == b'-' {
+                let mut left = at;
+                while left > from && bytes[left - 1] == b'-' {
+                    left -= 1;
+                }
+                let mut right = at + 1;
+                while right < bytes.len() && bytes[right] == b'-' {
+                    right += 1;
+                }
+                if right - left >= 5 {
+                    return Some(left);
+                }
+            }
+            at += 5;
+        }
+        None
+    }
+    fn probe_stride5<const W: usize>(bytes: &[u8], from: usize) -> Option<usize> {
+        let rest = bytes.get(from..)?;
+        let window_end = from + rest.len().min(W);
+        let mut position = from;
+        while let Some(offset) = bytes[position..window_end].iter().position(|&b| b == b'-') {
+            position += offset;
+            if bytes[position..].starts_with(b"-----") {
+                return Some(position);
+            }
+            position += 1;
+        }
+        stride5(bytes, window_end)
+    }
+
+    fn plain_probe<const W: usize>(bytes: &[u8], from: usize) -> Option<usize> {
+        if from > bytes.len() {
+            return None;
+        }
+        let window_end = bytes.len().min(from + W);
+        let mut position = from;
+        while position < window_end {
+            if bytes[position] == b'-' && bytes[position..].starts_with(b"-----") {
+                return Some(position);
+            }
+            position += 1;
+        }
+        stride5(bytes, window_end)
+    }
+
+    /// `find_next_delimiter` with the five-dash discovery supplied (the shipped
+    /// function is not generic).
+    fn find_next_delimiter_with(
+        input: &str,
+        from: usize,
+        next_run: impl Fn(&[u8], usize) -> Option<usize>,
+    ) -> Option<Delimiter> {
+        let bytes = input.as_bytes();
+        let mut position = from;
+        while let Some(start) = next_run(bytes, position) {
+            position = start;
+            for (kind, lead) in [
+                (DelimiterKind::Begin, DELIMITER_BEGIN),
+                (DelimiterKind::End, DELIMITER_END),
+            ] {
+                if bytes[position..].starts_with(lead.as_bytes()) {
+                    let label_start = position + lead.len();
+                    for (label, name) in LABELS.iter().enumerate() {
+                        let label_end = label_start + name.len();
+                        let suffix_end = label_end + 5;
+                        if suffix_end <= bytes.len()
+                            && bytes[label_start..label_end] == *name.as_bytes()
+                            && bytes[label_end..suffix_end] == *b"-----"
+                        {
+                            return Some(Delimiter {
+                                start: position,
+                                end: suffix_end,
+                                kind,
+                                label,
+                            });
+                        }
+                    }
+                }
+            }
+            position += 1;
+        }
+        None
+    }
+
+    fn detect_with(input: &str, run: impl Fn(&[u8], usize) -> Option<usize>) -> usize {
+        let mut candidates = Vec::new();
+        let mut state = ParserState::new();
+        let mut position = 0;
+        while let Some(delimiter) = find_next_delimiter_with(input, position, &run) {
+            position = delimiter.end;
+            if let Some(span) = process_delimiter(&mut state, &delimiter)
+                && (span.malformed || has_encoded_body(input, span.body_start, span.footer_start))
+                && let Some(found) = candidate(span.start, span.end, span.malformed)
+            {
+                candidates.push(found);
+            }
+        }
+        // The same trailing unresolved-stack handling as `detect`.
+        if !state.stack.is_empty()
+            && state.malformed
+            && let Some(start) = state.outer_start
+            && start < input.len()
+            && let Some(found) = candidate(start, input.len(), true)
+        {
+            candidates.push(found);
+        }
+        candidates.len()
+    }
+
+    /// Verbatim copy of `find_next_delimiter` before #1163.
+    fn old_find_next_delimiter(input: &str, from: usize) -> Option<Delimiter> {
+        let bytes = input.as_bytes();
+        let mut position = from;
+        while let Some(offset) = bytes.get(position..)?.iter().position(|&byte| byte == b'-') {
+            position += offset;
+            if position + 5 > bytes.len() {
+                return None;
+            }
+            if &bytes[position..position + 5] == b"-----" {
+                for (kind, lead) in [
+                    (DelimiterKind::Begin, DELIMITER_BEGIN),
+                    (DelimiterKind::End, DELIMITER_END),
+                ] {
+                    if bytes[position..].starts_with(lead.as_bytes()) {
+                        let label_start = position + lead.len();
+                        for (label, name) in LABELS.iter().enumerate() {
+                            let label_end = label_start + name.len();
+                            let suffix_end = label_end + 5;
+                            if suffix_end <= bytes.len()
+                                && bytes[label_start..label_end] == *name.as_bytes()
+                                && bytes[label_end..suffix_end] == *b"-----"
+                            {
+                                return Some(Delimiter {
+                                    start: position,
+                                    end: suffix_end,
+                                    kind,
+                                    label,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            position += 1;
+        }
+        None
+    }
+
+    /// `PrivateKeyDetector::detect` before #1163 (the old discovery).
+    fn old_detect(input: &str) -> usize {
+        let mut candidates = Vec::new();
+        let mut state = ParserState::new();
+        let mut position = 0;
+        while let Some(delimiter) = old_find_next_delimiter(input, position) {
+            position = delimiter.end;
+            if let Some(span) = process_delimiter(&mut state, &delimiter)
+                && (span.malformed || has_encoded_body(input, span.body_start, span.footer_start))
+                && let Some(found) = candidate(span.start, span.end, span.malformed)
+            {
+                candidates.push(found);
+            }
+        }
+        if !state.stack.is_empty()
+            && state.malformed
+            && let Some(start) = state.outer_start
+            && start < input.len()
+            && let Some(found) = candidate(start, input.len(), true)
+        {
+            candidates.push(found);
+        }
+        candidates.len()
+    }
+
+    fn production(input: &str) -> usize {
+        PrivateKeyDetector
+            .detect(input, &DetectorContext::new(input.len()))
+            .unwrap()
+            .len()
+    }
+
+    const BODY: &str = "U1lOVEhFVElDX1JFVk9LRUQ9U1lOVEhFVElDX1JFVk9LRUQ9U1lOVEhFVElDX1JFVk9LRUQ9\n";
+    fn block(lines: usize) -> String {
+        format!(
+            "-----BEGIN PRIVATE KEY-----\n{}-----END PRIVATE KEY-----\n",
+            BODY.repeat(lines)
+        )
+    }
+    fn workloads() -> Vec<(&'static str, String)> {
+        let filler = "The quick brown fox jumps over the lazy dog while the build runs. ";
+        let ufiller = "고객 안내문입니다 \u{1f600} 계속 읽어 주세요. ";
+        let sparse = |f: &str, n: usize| {
+            let mut s = f.repeat(n);
+            let mid = s.len() / 2;
+            let mid = (mid..).find(|i| s.is_char_boundary(*i)).unwrap();
+            s.insert_str(mid, &block(3));
+            s
+        };
+        vec![
+            ("sparse ascii 74KB", sparse(filler, 1100)),
+            ("sparse unicode 78KB", sparse(ufiller, 1500)),
+            ("dense short-body", block(1).repeat(500)),
+            ("dense 4-line", block(4).repeat(250)),
+            ("dense long-body", block(22).repeat(50)),
+            ("dense empty-body", block(0).repeat(1500)),
+            ("dash noise (single)", "a-b c-d e - f-g ".repeat(3500)),
+            ("dash noise (4-runs)", "x---- y---- z---- ".repeat(3000)),
+            (
+                "near-miss public",
+                "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n".repeat(800),
+            ),
+            (
+                "sparse + dash noise",
+                format!("{}{}", "a-b c-d ".repeat(4000), block(3)),
+            ),
+        ]
+    }
+
+    fn time(f: &dyn Fn() -> usize) -> f64 {
+        let mut reps = 1u32;
+        loop {
+            let t = Instant::now();
+            let mut sink = 0;
+            for _ in 0..reps {
+                sink += std::hint::black_box(f());
+            }
+            let e = t.elapsed();
+            std::hint::black_box(sink);
+            if e.as_millis() >= 20 || reps >= 1_000_000 {
+                return e.as_secs_f64() * 1e6 / f64::from(reps);
+            }
+            reps *= 2;
+        }
+    }
+    fn minimum(v: &[f64]) -> f64 {
+        v.iter().copied().fold(f64::INFINITY, f64::min)
+    }
+    fn median(mut v: Vec<f64>) -> f64 {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    }
+
+    #[test]
+    #[ignore]
+    fn measure_1163() {
+        for (name, input) in workloads() {
+            let expect = old_detect(&input);
+            assert_eq!(expect, detect_with(&input, stride5));
+            assert_eq!(expect, detect_with(&input, plain_probe::<16>));
+            assert_eq!(expect, production(&input));
+            let i = &input;
+            let variants: Vec<(&str, Box<dyn Fn() -> usize + '_>)> = vec![
+                ("A  old detect (pre-change)", Box::new(move || old_detect(i))),
+                ("A2 old detect (A/A control)", Box::new(move || old_detect(i))),
+                ("A3 old detect (second control)", Box::new(move || old_detect(i))),
+                ("D  dash-jump via detect_with", Box::new(move || detect_with(i, dash_jump))),
+                ("Q  next_dash_run via detect_with", Box::new(move || detect_with(i, next_dash_run))),
+                ("S5 stride-5 exact", Box::new(move || detect_with(i, stride5))),
+                ("PS16 iter-probe16+stride5", Box::new(move || detect_with(i, probe_stride5::<16>))),
+                ("PL16 loop-probe16+stride5", Box::new(move || detect_with(i, plain_probe::<16>))),
+                ("PL8 loop-probe8+stride5", Box::new(move || detect_with(i, plain_probe::<8>))),
+                ("PL32 loop-probe32+stride5", Box::new(move || detect_with(i, plain_probe::<32>))),
+                ("P  production", Box::new(move || production(i))),
+            ];
+            let mut samples: Vec<Vec<f64>> = vec![Vec::new(); variants.len()];
+            for round in 0..61 {
+                let order: Vec<usize> = if round % 2 == 0 {
+                    (0..variants.len()).collect()
+                } else {
+                    (0..variants.len()).rev().collect()
+                };
+                for k in order {
+                    samples[k].push(time(&variants[k].1));
+                }
+            }
+            let base = median(samples[0].clone());
+            let base_min = minimum(&samples[0]);
+            for (k, (label, _)) in variants.iter().enumerate() {
+                let m = median(samples[k].clone());
+                let lo = minimum(&samples[k]);
+                println!(
+                    "{name:22} {label:30} median {m:9.2} us {:+7.1}%   min {lo:9.2} us {:+7.1}%",
+                    (m / base - 1.0) * 100.0,
+                    (lo / base_min - 1.0) * 100.0
+                );
+            }
+        }
+    }
+}
