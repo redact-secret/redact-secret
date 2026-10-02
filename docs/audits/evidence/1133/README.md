@@ -84,3 +84,5 @@ cargo bench -p redact-secret --bench scan_cost -- --no-detectors --runs 41 unico
 ## Reproducing the timing
 
 The ignored timing test(s) named above were removed before merge: `npm run rust:check` forbids clock and stdout names (`std::time`, `println!`) anywhere in `secret-scan-core/src`, test modules included. The removed code is kept verbatim as `removed-timing-harness.patch.txt` (a reverse patch: apply it to a checkout of the merged commit with `git apply -R` to restore the harness locally, then run the `cargo test --release ... --ignored --nocapture` command quoted above). Do not commit it back into `src/`.
+
+**Update (#1152):** `removed-timing-harness.patch.txt` is kept as inert history, not built or scanned; it holds the only record of the private-helper timing harness. The separate measurement engine measures the public API only and established no timing direction for this card on a hosted 2-vCPU runner, so this patch is the sole way to re-run the private-helper timing. See [`../1152/README.md`](../1152/README.md).

@@ -74,11 +74,24 @@ resolved on this loaded host; the benign path performs no additional operation.
 
 ## Allocation
 
-Not re-measured here (the allocation meter needs an `unsafe` global allocator,
-which core and harness code must not add). The research comment's meter counts
-for the prototype (duplicate x100: 946 to 382 allocation calls, 977,508 to
-29,988 requested bytes; single: 6 to 5) apply by construction: this change
-removes the per-anchor `Vec<AzureField>` and repeated parse the same way.
+Not re-measured in this card: the allocation meter needs an `unsafe` global
+allocator, which core and harness code must not add. The research comment's
+meter counts for the prototype (duplicate x100: 946 to 382 allocation calls,
+977,508 to 29,988 requested bytes; single: 6 to 5) were taken in the research
+harness.
+
+Measured later (#1152), end to end through the public API, by the separate
+measurement engine (it counts allocation requests with the third-party
+`stats_alloc` crate, so no `unsafe` enters this repository). Requests per
+scan, before -> after: azure single 17 -> 16, repeated-records(100)
+636 -> 536, duplicate-keys(100) 966 -> 402, benign 3 -> 3. These are
+whole-scan counts of the public `scan`, a proxy for the crate-private
+`azure-probe` helper path, which the engine cannot reach without widening the
+core's public API and which is therefore recorded as lost (see
+[`../1152/README.md`](../1152/README.md)); they are not the research meter's
+helper-level counts and are not directly comparable to them. They support the
+direction (fewer requests on repeated fields, none added on the benign path),
+not a latency claim: the engine established no timing direction for this card.
 
 ## Verdict
 
@@ -89,3 +102,5 @@ speedup is claimed. Observable behavior is unchanged, so no changelog entry.
 ## Reproducing the timing
 
 The ignored timing test(s) named above were removed before merge: `npm run rust:check` forbids clock and stdout names (`std::time`, `println!`) anywhere in `secret-scan-core/src`, test modules included. The removed code is kept verbatim as `removed-timing-harness.patch.txt` (a reverse patch: apply it to a checkout of the merged commit with `git apply -R` to restore the harness locally, then run the `cargo test --release ... --ignored --nocapture` command quoted above). Do not commit it back into `src/`.
+
+**Update (#1152):** `removed-timing-harness.patch.txt` is kept as inert history, not built or scanned; it holds the only record of the private-helper timing harness. The separate measurement engine measures the public API only and established no timing direction for this card on a hosted 2-vCPU runner, so this patch is the sole way to re-run the private-helper timing. See [`../1152/README.md`](../1152/README.md).

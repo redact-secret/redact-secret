@@ -108,8 +108,8 @@ expected or visible. This is a stage result, not a release speedup.
 
 ## Allocation and live memory
 
-Not instrumented here: the counting allocator in the maintainer examples
-needs `unsafe`, which new harness code may not contain. By construction the
+Not instrumented in this card: the counting allocator in the maintainer example
+needed `unsafe`, which new harness code may not contain. By construction the
 allocation count is unchanged: `ends`, mask, one `totals`, one `include`, the
 output vector (five calls) for every set, because a component's tables are
 reserved from the workspace and reused, never rebuilt (the prototype's 15,003
@@ -118,6 +118,18 @@ table memory falls from `96 * (n + 1)` bytes of `EvidenceWeight` (480 KB at
 5,000) to `96 * (largest component + 1)`; for sparse overlap, pairs and
 clusters that is a few hundred bytes to a few KB. For one dense component it is
 unchanged.
+
+Measured later (#1152), end to end through the public API, by the separate
+measurement engine (third-party `stats_alloc` crate; no `unsafe` in this
+repository). Allocation requests per scan on the overlap workloads disjoint /
+sparse / pairs / dense: 5,081 / 5,090 / 20,106 / 30,107, **unchanged before and
+after** the shipped change, which agrees with the by-construction claim above.
+The rejected prototype went from 5 to 15,003 requests on pairs in the same
+measurement. These are whole-scan counts and include the rest of the pipeline,
+so their absolute values are not the five helper-level calls quoted above; the
+crate-private `overlap-probe` path is recorded as lost and measured only by
+this proxy (see [`../1152/README.md`](../1152/README.md)). The engine
+established no timing direction for this card.
 
 ## Reproduce
 
@@ -129,3 +141,5 @@ cargo bench -p redact-secret --bench scan_cost -- --no-detectors --runs 21 scale
 ## Reproducing the timing
 
 The ignored timing test(s) named above were removed before merge: `npm run rust:check` forbids clock and stdout names (`std::time`, `println!`) anywhere in `secret-scan-core/src`, test modules included. The removed code is kept verbatim as `removed-timing-harness.patch.txt` (a reverse patch: apply it to a checkout of the merged commit with `git apply -R` to restore the harness locally, then run the `cargo test --release ... --ignored --nocapture` command quoted above). Do not commit it back into `src/`.
+
+**Update (#1152):** `removed-timing-harness.patch.txt` is kept as inert history, not built or scanned; it holds the only record of the private-helper timing harness. The separate measurement engine measures the public API only and established no timing direction for this card on a hosted 2-vCPU runner, so this patch is the sole way to re-run the private-helper timing. See [`../1152/README.md`](../1152/README.md).

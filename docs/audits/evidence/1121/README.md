@@ -1,13 +1,20 @@
 # #1121 - residual temporary allocations in generic assignment classification
 
 Verdict: **adopted** (behavior-preserving). Parent: #1068. Baseline: `44382b3f`.
-All fixtures are synthetic and generated in
+All fixtures are synthetic and were generated in
 `crates/secret-scan-core/examples/alloc_attribution.rs`; no value is printed.
+**That example was removed under #1152.** The same three fixtures and the
+counts below are reproduced exactly, and gated by a release test, in the separate measurement engine
+(allocation counting with the third-party `stats_alloc` crate, public API only,
+pinned core commits `44382b3f` -> `be5fee95` -> `ad877c03`, findings
+identical); see [`../1152/README.md`](../1152/README.md). The original harness
+is recoverable with
+`git show ab6f6eaeb511429c626e0ba29d97f3f8dbb62bda:crates/secret-scan-core/examples/alloc_attribution.rs`.
 
 ## Method
 
-1. Maintainer-only harness (`examples/alloc_attribution.rs`, not published; the
-   package `include` list excludes examples): a counting `System` allocator
+1. Maintainer-only harness (the former `examples/alloc_attribution.rs`, never
+   published; the package `include` list excludes examples): a counting `System` allocator
    over one whole-input `scan` with the default registry and policy, after one
    warm-up. It counts alloc/realloc **requests** (not peak/live memory). With
    `--attribute` it attributes each request to the innermost two crate frames

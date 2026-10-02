@@ -103,3 +103,5 @@ directory, never built by Cargo and never under `src/`:
 `crates/secret-scan-core/tests/zz_whole.rs`, removed before commit),
 `aggregate.py.txt` and `raw-whole-scan.txt` (summary script and raw output).
 `examples/alloc_attribution.rs` was not used.
+
+**Update (#1152):** the allocation-counting harness `crates/secret-scan-core/examples/alloc_attribution.rs` was removed from this repository, and the allocation counts moved to the separate measurement engine, a package that counts allocations with the third-party `stats_alloc` crate and has no `unsafe` in this repository's crates; it reproduces the #1121 baseline exactly. The inert `*.txt` harness files in this directory stay as history: they are not built or scanned, and they hold the only record of the private-helper timing harnesses. See [`../1152/README.md`](../1152/README.md) for what moved, what was reproduced and what was lost. The original example is recoverable with `git show ab6f6eaeb511429c626e0ba29d97f3f8dbb62bda:crates/secret-scan-core/examples/alloc_attribution.rs`.
