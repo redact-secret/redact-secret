@@ -58,6 +58,8 @@ SCHEMA_PATH = ROOT / "benchmarks" / "support-matrix-schema.json"
 DOC_PATH = ROOT / "docs" / "support-matrix.md"
 README_PATH = ROOT / "README.md"
 DETECTORS_PATH = ROOT / "crates" / "secret-scan-core" / "src" / "detectors" / "mod.rs"
+PIN_SOURCE_PATH = ROOT / "benchmarks" / "pin-source.json"
+PIN_MANIFEST_PATH = ROOT / "benchmarks" / "pin-manifest.json"
 CHANGELOG_PATH = ROOT / "CHANGELOG.md"
 RELEASES_DIR = ROOT / "docs" / "releases"
 FRAGMENT_NAME = "support-status.md"
@@ -443,7 +445,12 @@ def _support_label(family: dict) -> str:
     return status.capitalize()
 
 
-def render_matrix_markdown(matrix: dict, unmeasured: list[str] | tuple[str, ...] = ()) -> str:
+def render_matrix_markdown(
+    matrix: dict,
+    unmeasured: list[str] | tuple[str, ...] = (),
+    detector_count: int | None = None,
+    pins: dict | None = None,
+) -> str:
     families = matrix["families"]
     revision = matrix["sourceReport"]["revision"]
     lines = [
@@ -465,6 +472,11 @@ def render_matrix_markdown(matrix: dict, unmeasured: list[str] | tuple[str, ...]
         "",
         f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families.",
         "",
+        identity_sentence(matrix, detector_count, len(unmeasured)).replace(
+            "(docs/reference/detection.md", "(reference/detection.md"
+        ),
+        "",
+        *_identity_lines(matrix, pins),
         "Support status, evidence provenance, and qualification are separate dimensions. "
         "In particular, a T2 family may be stable through the empirical profile without "
         "being described as provider-documented or rewritten as T1. User-facing labels combine "
@@ -600,7 +612,81 @@ def _last_column(family: dict, status: str) -> str:
     return "not recorded in the pinned evidence"
 
 
-def render_readme_fragment(matrix: dict, unmeasured: list[str] | tuple[str, ...] = ()) -> str:
+def _identity_lines(matrix: dict, pins: dict | None) -> list[str]:
+    """Full identities behind the identity sentence, and the other benchmarks
+    revisions vendored in this repository, stated separately because only the
+    first produced the statuses."""
+    report = matrix["sourceReport"]
+    lines = [
+        "Identity of the counts above:",
+        "",
+        f"- Benchmarks revision that generated this matrix: `{report['revision']}`.",
+    ]
+    product = report.get("product", {})
+    if product.get("sourceCommit"):
+        lines.append(f"- Product commit it measured: `{product['sourceCommit']}`.")
+    index = report.get("fixtureIndex", {})
+    if index.get("digest"):
+        lines.append(f"- Corpus: {index.get('fixtureCount')} fixtures, fixture-index digest `{index['digest']}`.")
+    if pins:
+        lines.append(
+            "- Other vendored benchmarks revisions, which did not produce these statuses: "
+            f"`benchmarks/pin-source.json` benchmarkCommit `{pins['source']}`; "
+            f"`benchmarks/pin-manifest.json` revision `{pins['manifest']}`."
+        )
+    return [*lines, ""]
+
+
+def identity_sentence(matrix: dict, detector_count: int | None = None, unmeasured_count: int = 0) -> str:
+    """The denominator and identity of every count in the generated text
+    (issue #1067): the counts are families and statuses, not detectors; which
+    product commit, benchmarks revision and corpus produced them; how many
+    credential detectors this source ships; and that opt-in PII is outside the
+    count. Values come from the matrix's `sourceReport`, never typed here, and a
+    part the matrix does not record is omitted rather than invented."""
+    report = matrix["sourceReport"]
+    parts = [
+        "Counts are families and statuses, not detectors: a family is one provider x credential-family "
+        "entry, one detector can back several families, and some families have no shipped detector."
+    ]
+    measured = []
+    product = report.get("product", {})
+    if product.get("sourceCommit"):
+        version = f" (`{product['declaredVersion']}`)" if product.get("declaredVersion") else ""
+        measured.append(f"product commit `{product['sourceCommit'][:12]}`{version}")
+    measured.append(f"benchmarks revision `{report['revision'][:12]}`")
+    sentence = "Measured on " + " with ".join(measured)
+    fixture_count = report.get("fixtureIndex", {}).get("fixtureCount")
+    if fixture_count is not None:
+        sentence += f" over {fixture_count} fixtures"
+    parts.append(sentence + "; code shipped after the measured build is not covered by these statuses.")
+    if detector_count is not None:
+        mapped = detector_count - unmeasured_count
+        which = "all" if mapped == detector_count else str(mapped)
+        parts.append(
+            f"This source ships {detector_count} credential detectors, {which} of them mapped to at least one family."
+        )
+    parts.append(
+        "The opt-in PII families are outside this count and outside the matrix; their statuses are in "
+        "[the detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support)."
+    )
+    return " ".join(parts)
+
+
+def vendored_pins() -> dict | None:
+    """The other benchmarks revisions vendored beside the matrix, or None when
+    either file is absent (a partial checkout)."""
+    if not (PIN_SOURCE_PATH.exists() and PIN_MANIFEST_PATH.exists()):
+        return None
+    return {
+        "source": load_json(PIN_SOURCE_PATH)["benchmarkCommit"],
+        "manifest": load_json(PIN_MANIFEST_PATH)["revision"],
+    }
+
+
+def render_readme_fragment(
+    matrix: dict, unmeasured: list[str] | tuple[str, ...] = (), detector_count: int | None = None
+) -> str:
     distribution = matrix["distribution"]
     stable_counts = stable_distribution(matrix)
     tier_counts = _tier_counts(matrix)
@@ -622,7 +708,9 @@ def render_readme_fragment(matrix: dict, unmeasured: list[str] | tuple[str, ...]
         "`Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. "
         '`provisional` means useful but evidence-incomplete, not "almost stable"; unsupported '
         "families are listed with their reason. See the full "
-        "[support matrix](docs/support-matrix.md)." + not_measured,
+        "[support matrix](docs/support-matrix.md). "
+        + identity_sentence(matrix, detector_count, len(unmeasured))
+        + not_measured,
         README_END,
     ]
     return "\n".join(lines)
@@ -814,9 +902,9 @@ def main(argv: list[str] | None = None) -> int:
 
     detector_ids = built_in_detector_ids(args.detectors_source.read_text(encoding="utf-8"))
     unmeasured = unmeasured_detectors(matrix, detector_ids)
-    doc_text = render_matrix_markdown(matrix, unmeasured)
+    doc_text = render_matrix_markdown(matrix, unmeasured, len(detector_ids), vendored_pins())
     readme_text = args.readme.read_text(encoding="utf-8")
-    fragment = render_readme_fragment(matrix, unmeasured)
+    fragment = render_readme_fragment(matrix, unmeasured, len(detector_ids))
     new_readme_text = inject_readme_fragment(readme_text, fragment)
 
     if args.check:

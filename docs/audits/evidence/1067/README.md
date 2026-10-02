@@ -292,6 +292,37 @@ The contract page says this. Settling it needs the benchmarks policy run on the
 freeze candidate to name the case; that is
 `redact-secret/redact-secret-benchmarks` work.
 
+### Owner decisions applied
+
+1. Public counts quote the benchmarks revision that generated the matrix
+   (`e8f73bfd7241845ef9fb75574a72b135aa777ba6`); the two other vendored
+   revisions (`pin-source.json`, `pin-manifest.json`) are stated separately and
+   labeled as not having produced the statuses.
+2. PII statuses stay hand-written and gated until
+   [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+   lands (see above).
+3. `scripts/generate-support-matrix-docs.py` now emits, in the README
+   support-status block and `docs/support-matrix.md`, an identity sentence and
+   denominator read from the matrix's `sourceReport` and the detector registry:
+   "Counts are families and statuses, not detectors ... Measured on product
+   commit `4227160c4dac` (`0.1.0-beta.12`) with benchmarks revision
+   `e8f73bfd7241` over 5950 fixtures; code shipped after the measured build is
+   not covered by these statuses. This source ships 110 credential detectors,
+   all of them mapped to at least one family. The opt-in PII families are
+   outside this count and outside the matrix". The matrix page also gets an
+   "Identity of the counts above" list with the full revisions, the corpus
+   digest and the other vendored revisions. Tests:
+   `IdentitySentenceTests` and the real-repo reconciliation tests in
+   `scripts/tests/test_generate_support_matrix_docs.py`; `npm run support-matrix:check` is
+   green. The frozen `docs/releases/0.1.0-beta.12/support-status.md` is a
+   release record and was not changed.
+4. The four `generic:*` families are carried into the reliability contract as
+   provisional, with the reason, on `docs/reference/detection-reliability.md`
+   (DRAFT marker kept).
+5. The "Independent tool/community corroboration" label rename is
+   `redact-secret/redact-secret-benchmarks#648`; nothing here edits that label,
+   and the core wording above does not rely on it.
+
 ## Regenerate
 
 ```sh
