@@ -31,6 +31,6 @@
     "smoke": "node smoke-test.mjs"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^3.9.0"
+    "@napi-rs/cli": "^3.10.5"
   }
 }
