@@ -882,11 +882,14 @@ mod tests {
             state ^= state << 17;
             state
         };
+        // Reduce in u64 before narrowing: on wasm32 `usize` is 32 bits and a
+        // direct `usize::try_from(next())` would fall back to piece 0.
+        let piece_count = u64::try_from(pieces.len()).unwrap_or(1);
         let mut found = 0usize;
         for _ in 0..4000 {
             let count = usize::try_from(next() % 24).unwrap_or(0);
             let input: String = (0..count)
-                .map(|_| pieces[usize::try_from(next()).unwrap_or(0) % pieces.len()])
+                .map(|_| pieces[usize::try_from(next() % piece_count).unwrap_or(0)])
                 .collect();
             assert_matches_per_byte(&input);
             found += detect(&input).len();
