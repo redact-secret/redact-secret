@@ -228,6 +228,33 @@ class RustWorkspaceCheckTests(unittest.TestCase):
         errors = self.run_check(configure)
         self.assertTrue(any("must contain #![forbid(unsafe_code)]" in error for error in errors), errors)
 
+    def test_unsafe_keyword_in_core_example_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                "crates/secret-scan-core/examples/counting.rs",
+                "// unsafe in a comment is prose\n/* so is unsafe\nhere */\nunsafe impl Foo for Bar {}\n",
+            )
+
+        errors = self.run_check(configure)
+        self.assertEqual(len([e for e in errors if "names `unsafe`" in e]), 1, errors)
+        self.assertTrue(any("examples/counting.rs:4:" in error for error in errors), errors)
+
+    def test_unsafe_keyword_in_cli_tests_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write("crates/secret-scan-cli/tests/t.rs", "fn f() { unsafe { g() } }\n")
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("secret-scan-cli/tests/t.rs:1:" in error for error in errors), errors)
+
+    def test_unsafe_in_comments_and_forbid_attribute_is_accepted(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                "crates/secret-scan-core/examples/ok.rs",
+                "#![forbid(unsafe_code)]\n/// no unsafe code here\nfn main() {}\n",
+            )
+
+        self.assertEqual(self.run_check(configure), [])
+
     def test_member_without_workspace_lints_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
             workspace.add_member("redact-secret-wasm", "bindings/wasm", "src/lib.rs", "", lints="")

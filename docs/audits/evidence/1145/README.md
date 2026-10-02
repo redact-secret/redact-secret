@@ -59,7 +59,9 @@ every built-in detector passes the same fixed diagnostic constants.
 
 ## Measurement
 
-Whole `scan` allocation requests, existing `alloc_attribution` example
+Whole `scan` allocation requests, taken with the then-existing `alloc_attribution` example
+(since moved to the separate measurement engine, which carries `otp-dense`,
+`otp-sparse` and these fixtures; see `../1152/README.md`)
 (counts `alloc`/`realloc` requests and cumulative requested bytes; synthetic
 `otpauth://` lines; the digest of the full finding list is identical on both
 builds). Release build:
@@ -110,8 +112,6 @@ detector.
 
 ## Temporary in-repo measurement
 
-Per #1152 these move to the measurement engine before the beta.13 release.
-
 - `crates/secret-scan-core/examples/alloc_attribution.rs` (the only file that
   may hold `unsafe`): two added workloads, `otp-dense` and `otp-sparse`
   (functions `otp_dense`, `otp_sparse` and two entries in `main`'s workload
@@ -121,3 +121,5 @@ Per #1152 these move to the measurement engine before the beta.13 release.
 - `docs/audits/evidence/1145/otp-detect-timing-harness.rs.txt` is the
   uncompiled detector timing harness (it uses clock names, so it cannot live
   under `src`); `ab-raw.txt` is its raw output.
+
+**Update (#1152):** the allocation-counting harness `crates/secret-scan-core/examples/alloc_attribution.rs` was removed from this repository, and the allocation counts moved to the separate measurement engine, a package that counts allocations with the third-party `stats_alloc` crate and has no `unsafe` in this repository's crates; it reproduces the #1121 baseline exactly. The inert `*.txt` harness files in this directory stay as history: they are not built or scanned, and they hold the only record of the private-helper timing harnesses. See [`../1152/README.md`](../1152/README.md) for what moved, what was reproduced and what was lost. The original example is recoverable with `git show ab6f6eaeb511429c626e0ba29d97f3f8dbb62bda:crates/secret-scan-core/examples/alloc_attribution.rs`.

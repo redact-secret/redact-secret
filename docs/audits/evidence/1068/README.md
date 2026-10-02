@@ -30,7 +30,7 @@ are not stable blockers.
 |---|---|---|
 | Frozen workloads and thresholds for Rust core, Node addon, WASM full/common (PII and non-PII), Python, CLI, whole-input and incremental paths | `redact-secret-benchmarks` | not yet committed; must precede candidate judgement |
 | Verdict or reviewed tradeoff per breach on the exact Beta.13 stable candidate | `redact-secret-benchmarks` | needs the frozen candidate commit |
-| Move in-repo measurement code and `unsafe` allocator out of `crates/` | #1152 | open; blocked by benchmarks#608 |
+| Move in-repo measurement code and `unsafe` allocator out of `crates/` | #1152 | done in this repository: the example and its five SAST entries are removed, and `check-rust-workspace.py` enforces no `unsafe` in core and CLI ([`../1152/README.md`](../1152/README.md)) |
 | Audit that no quadratic or unbounded hot path remains on the supported default path | this repository | not performed here; see below |
 
 ## Not claimed

@@ -143,3 +143,5 @@ cargo bench -p redact-secret --bench scan_cost -- --no-detectors --runs 21 unico
 ## Reproducing the timing
 
 The `measure_normalize_1134` harness shares `normalize.rs` with #1133 and was removed with it; see `../1133/removed-timing-harness.patch.txt` (restore with `git apply -R`, local only).
+
+**Update (#1152):** `removed-timing-harness.patch.txt` is kept as inert history, not built or scanned; it holds the only record of the private-helper timing harness. The separate measurement engine measures the public API only and established no timing direction for this card on a hosted 2-vCPU runner, so this patch is the sole way to re-run the private-helper timing. See [`../1152/README.md`](../1152/README.md).

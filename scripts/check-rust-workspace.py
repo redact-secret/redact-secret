@@ -8,7 +8,9 @@ Checks, in order:
    ``[workspace.metadata.redact-secret] allowed-dependencies`` and never a
    package listed in ``forbidden-dependencies``.
 2. Unsafe-code policy: every member inherits workspace lints, the workspace
-   denies ``unsafe_code``, and the core and CLI crate roots forbid it.
+   denies ``unsafe_code``, the core and CLI crate roots forbid it, and no
+   ``.rs`` file under either crate (examples, tests and benches included)
+   names the ``unsafe`` keyword outside a comment (#1151).
 3. Version lockstep: the workspace version, every member, every manifest
    named in ``LOCKSTEP_MANIFESTS`` (``package.json``, ``bindings/node/package.json``,
    ``packages/javascript/package.json``), the WebAssembly package manifest
@@ -140,6 +142,9 @@ PUBLIC_SCORE_WORD = re.compile(r"score|probabilit|calibrat", re.I)
 # version string.
 FLOAT_USE = re.compile(r"\bf(?:32|64)\b|(?<![\w.])\d[\d_]*\.\d[\d_]*(?:[eE][+-]?\d+)?(?![\w.])")
 LINE_COMMENT = re.compile(r"//.*$", re.M)
+BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.S)
+# The `unsafe` keyword as a whole word; `unsafe_code` in `forbid(unsafe_code)` is not a match.
+UNSAFE_KEYWORD = re.compile(r"\bunsafe\b")
 # `#[cfg(test)] mod name;` (a test-only module file) and `#[cfg(test)] mod
 # name {` (an inline test module).
 TEST_MODULE_FILE = re.compile(r"#\[cfg\(test\)\]\s+mod\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*;")
@@ -227,6 +232,19 @@ def check_unsafe_policy(root: Path, metadata: dict, root_manifest: dict) -> list
         source_path = manifest_path.parent / source
         if not source_path.is_file() or not FORBID_UNSAFE.search(source_path.read_text(encoding="utf-8")):
             errors.append(f"{source_path.relative_to(root)}: must contain #![forbid(unsafe_code)]")
+        # The standing rule (#1151): no `unsafe` token anywhere in the core or CLI crate, examples,
+        # tests, benches and build scripts included. Comments and docs may still say the word.
+        for path in sorted(manifest_path.parent.rglob("*.rs")):
+            code = LINE_COMMENT.sub(
+                "", BLOCK_COMMENT.sub(lambda m: "\n" * m.group(0).count("\n"), path.read_text(encoding="utf-8"))
+            )
+            for match in UNSAFE_KEYWORD.finditer(code):
+                line = code.count("\n", 0, match.start()) + 1
+                errors.append(
+                    f"{path.relative_to(root)}:{line}: names `unsafe`; {package['name']} contains no unsafe "
+                    "code in any form, tooling included (counting allocators live in the separate "
+                    "measurement engine, #1151)"
+                )
     return errors
 
 

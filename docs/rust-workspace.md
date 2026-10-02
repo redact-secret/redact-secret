@@ -259,6 +259,16 @@ real FFI boundary, with a `// SAFETY:` comment that
 `clippy::undocumented_unsafe_blocks` requires, and the review must record why
 the binding macros were insufficient.
 
+`crates/secret-scan-core` and `crates/secret-scan-cli` contain no `unsafe` in
+any form: not in `src/`, and not in examples, tests, benches or build scripts
+either (#1151). `npm run rust:check` fails if any `.rs` file under either crate
+names the `unsafe` keyword outside a comment, so `grep -rn unsafe crates/` finds
+only the `forbid(unsafe_code)` declarations and prose. A counting allocator
+needs `unsafe impl GlobalAlloc`, so allocation measurement lives outside this
+repository, in the separate measurement engine, which uses a third-party
+counting allocator ([`docs/audits/evidence/1151`](audits/evidence/1151/README.md),
+[`docs/audits/evidence/1152`](audits/evidence/1152/README.md)).
+
 ### Generated invisible-code-point table
 
 `crates/secret-scan-core/src/invisible_table.rs` is generated data, not a
