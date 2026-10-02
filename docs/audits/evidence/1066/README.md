@@ -4,13 +4,16 @@ Product judgement. Final record for
 [#1066](https://github.com/redact-secret/redact-secret/issues/1066) (parent
 [#1065](https://github.com/redact-secret/redact-secret/issues/1065); it
 reconciles [#199](https://github.com/redact-secret/redact-secret/issues/199)).
-It is an audit, an evidence record and a **draft** contract. It does not change
-public behavior, any `core-public-api` entry, any binding source file, or
-version, tag and release state, and the owner has accepted nothing in it yet.
+It is an audit, an evidence record and the contract it proposed. As written, the
+audit changed no public behavior, `core-public-api` entry, binding source file,
+or version, tag and release state. The owner accepted its recommendations on
+2026-10-02; [Owner decisions](#owner-decisions) and [Outcome](#outcome) record
+that and what landed. The text between here and "Decisions needed from the
+owner" is the audit as it was written.
 
 What this branch adds:
 
-- **The draft contract**, as a new section "Stable contract 1 (DRAFT)" in
+- **The draft contract** (now accepted as "Stable contract 1"), as a new section in
   [`docs/reference/api-contract.md`](../../../reference/api-contract.md), the
   file the repository already uses for API concepts. It is not a parallel
   document.
@@ -28,7 +31,7 @@ What this branch adds:
 | Is the surface coherent enough to freeze? | Yes, after the bounded changes listed under [Surfaces likely to break](#surfaces-likely-to-break). The Rust, JavaScript, Python and CLI names, behaviors and error codes match their documentation, declarations and the shared fixtures; 54 Rust root names, 44 Python names, 13 JavaScript values and 25 JavaScript types were reconciled one by one. |
 | What is likely to need a breaking change after stable? | Nine surfaces ([list](#surfaces-likely-to-break)). Three should be fixed in Beta.13: Rust enums that grow without `#[non_exhaustive]`, JavaScript incremental limit names that say code units but count bytes, and three ruleset leniencies ([#1072](../1072/README.md)). The rest are documentation or are excluded from the contract. |
 | Do all runtimes pass conformance on one commit? | Rust, Python (9,084 tests), the Node addon (`full` and `common`), the CLI, WebAssembly in Chromium, Firefox and WebKit and through the Node fallback, and the 65 examples all pass on one commit. Not run: published artifacts, other operating systems and architectures, other Node and Python versions. [Details](#verification). |
-| Does it need an ADR? | Yes, one: the compatibility classes and what "stable" promises are new policy, not an application of an existing decision. Proposed title: *Define the 0.1.x stable public contract and its compatibility classes*, `scope: workspace`, spec `engine`, status `proposed`. A second, for rulesets, is proposed in [#1072](../1072/README.md) (R7). Neither is written here. |
+| Does it need an ADR? | Yes, one: the compatibility classes and what "stable" promises are new policy, not an application of an existing decision. Title: *Define the 0.1.x stable public contract and its compatibility classes*, `scope: workspace`, spec `engine`. A second, for rulesets, comes from [#1072](../1072/README.md) (R7). Both were written and accepted on 2026-10-02 ([Outcome](#outcome)). |
 | CLI panic status | Documented as outside the contract: any status other than `0`, `1`, `2` is an internal failure to treat as a failure. Catching panics to exit `2` is not recommended ([below](#cli-panic-exit-status)). |
 | `docs/guides/javascript.md` size link | Repointed; the section it linked never held sizes ([below](#documentation-corrections-made)). |
 
@@ -273,3 +276,51 @@ Owner decisions D5 and D6 were implemented on `workbench/1184-1185-api-docs`.
 - `sanitize_with_profile`'s rustdoc carries the run-time-profile link note and points to `with_common_built_in`.
 - The ruleset ADR (`decision-define-declarative-detector-ruleset-contract`) is amended in place, as the profile/pack ADR already is: the core depends on `unicode-normalization` (and its `tinyvec`), and the catalog is 18 rejection classes; the decision itself is unchanged. The ADR text listed 13 classes, not 12; the five added at implementation (`RulesetTooLarge`, `PrefixTooLong`, `NameBucketNotClaimable`, `NameTooLong`, `TooManyNames`) are now listed.
 - `docs/guides/python.md` gained an exception table (all 23 exception names, with `code` and when raised, and the "set grows" wording) and a table of the callback context types and default policies.
+
+## Owner decisions
+
+All accepted by the owner on 2026-10-02, **as recommended** in this audit and in
+[#1072](../1072/README.md).
+
+| # | Decision | Accepted |
+| --- | --- | --- |
+| D1 | Ruleset revision 1 is revised before stable (R1 to R3), then frozen | 2026-10-02, as recommended |
+| D2 | A ruleset detection stays `warn` under the default policy; documented as the 0.1.x contract | 2026-10-02, as recommended |
+| D3 | `--redact --ruleset` keeps running, documented | 2026-10-02, as recommended |
+| D4 | JavaScript errors stay one fixed message per code; no rejection-class field in 0.1.x (an additive optional field may follow) | 2026-10-02, as recommended |
+| D5 | `#[non_exhaustive]` on `SecretScanErrorCode` and `Profile` (LB1); `Action`, `Confidence` and `Specificity` stay exhaustive by design | 2026-10-02, as recommended |
+| D6 | `max*Bytes` additive aliases for the JavaScript incremental limits (LB2) | 2026-10-02, as recommended |
+| D7 | The draft contract is accepted, with a version rule for breaking changes: while the major version is 0, a breaking change to a stable surface bumps the minor version (0.2.0); additive and behavioral changes ship in patch releases | 2026-10-02. The draft left the number open; the rule is the one written in the ADR, not a quotation of the draft |
+
+## Outcome
+
+| Item | Landed in |
+| --- | --- |
+| LB1, LB2 (D5, D6) | [#1184](https://github.com/redact-secret/redact-secret/issues/1184), see Implementation below |
+| Ruleset R1 to R5 (D1 to D3) | [#1182](https://github.com/redact-secret/redact-secret/issues/1182) |
+| Ruleset R6, reference fixture on every surface | [#1183](https://github.com/redact-secret/redact-secret/issues/1183) |
+| Documentation gaps, Python exception table, ruleset ADR facts | [#1185](https://github.com/redact-secret/redact-secret/issues/1185) |
+| The accepted contract text | [`api-contract.md`](../../../reference/api-contract.md#stable-contract-1) |
+| Decision records (R7 and the compatibility classes) | [`decision-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes`](../../../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md), [`decision-define-declarative-ruleset-revisioning`](../../../decisions/2026-10-02-define-declarative-ruleset-revisioning.md) |
+
+Remaining, outside this record:
+
+- Conformance against the exact candidate artifacts, which closes
+  [#199](https://github.com/redact-secret/redact-secret/issues/199).
+- Benchmarks follow-ups
+  [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+  and
+  [`redact-secret/redact-secret-benchmarks#648`](https://github.com/redact-secret/redact-secret-benchmarks/issues/648).
+- Binding the reliability contract to the candidate SHA
+  ([`detection-reliability.md`](../../../reference/detection-reliability.md#binding-at-freeze)),
+  which keeps its DRAFT marker until then.
+
+### What this audit could not verify
+
+The verification above is one source-checkout run on one host (macOS arm64,
+Node.js 22.16.0, Python 3.14.7). It did **not** check published or candidate
+artifacts and their clean-install paths, other operating systems and
+architectures (Linux, Windows, x86-64, musl), Node.js 20 and 24, or Python 3.10
+to 3.13. "Stable" therefore means the audited source surface is coherent and
+documented, not that every shipped artifact on every platform has been shown to
+match it. That claim waits for the #199 run against the candidate artifacts.

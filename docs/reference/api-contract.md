@@ -99,18 +99,19 @@ Failures use fixed codes and input-free messages. JavaScript exposes
 common causes. Policy and formatter callbacks are supported across languages;
 custom detector callbacks are a direct Rust surface only.
 
-## Stable contract 1 (DRAFT)
+## Stable contract 1
 
-> **Draft, pending owner approval.** This section is the proposed 0.1.x
-> stable contract from [#1066](https://github.com/redact-secret/redact-secret/issues/1066).
-> It is not in force until the owner accepts it and records the policy it
-> relies on as a decision (proposed title: *Define the 0.1.x stable public
-> contract and its compatibility classes*). Items marked **open** wait on an
-> owner decision listed in the
-> [audit record](../audits/evidence/1066/README.md), which also holds the
-> name-by-name audit, the surfaces likely to break, and the verification this
-> draft rests on. The declarative ruleset part follows the recommendation in
-> the [ruleset audit](../audits/evidence/1072/README.md), also pending.
+> **Accepted by the owner on 2026-10-02 for the 0.1.x series.** The policy
+> behind this section is decided by
+> [`decision-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes`](../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md)
+> and, for declarative rulesets,
+> [`decision-define-declarative-ruleset-revisioning`](../decisions/2026-10-02-define-declarative-ruleset-revisioning.md).
+> The name-by-name audit, the surfaces that were likely to break, the owner
+> decisions and the verification this rests on are in the
+> [contract audit](../audits/evidence/1066/README.md) and the
+> [ruleset audit](../audits/evidence/1072/README.md). Conformance against the
+> exact candidate artifacts is a separate, later step
+> ([#199](https://github.com/redact-secret/redact-secret/issues/199)).
 
 ### What the contract covers
 
@@ -130,9 +131,9 @@ reference; the contract says how findings are reported, not which exist.
 
 | Class | Meaning | Examples | Rule |
 | --- | --- | --- | --- |
-| Breaking | A correct call stops compiling, stops working, or changes what a documented value means | Removing or renaming an export; changing a signature, a range unit, an action's meaning, an error code's meaning or a ruleset field; adding a variant to a Rust enum that is not `#[non_exhaustive]`; changing a published finding `type` or `detector` string (rename, split, remove) | Needs a contract review and a `Changed` entry; never in a patch release. **Open:** which version number a breaking change costs. |
-| Additive | A new name, option, accepted input, error code or `type`/`detector` value that existing correct code can ignore | A new export; a new optional argument; a new finding type; a new error code (consumers must treat error codes as an open set) | Needs a changelog entry and a manifest review where the Rust root changes. |
-| Behavioral | The same call returns different findings, spans or timing | A new detector, a tuned span, fewer or more redactions, the default policy's always-redact set growing | Changelog entry; covered by the evidence and support matrix, not frozen. |
+| Breaking | A correct call stops compiling, stops working, or changes what a documented value means | Removing or renaming an export; changing a signature, a range unit, an action's meaning, an error code's meaning or a ruleset field; adding a variant to a Rust enum that is not `#[non_exhaustive]`; changing a published finding `type` or `detector` string (rename, split, remove) | Needs a contract review and a `Changed` entry; never in a patch release. While the major version is 0, a breaking change to a stable surface bumps the minor version (0.2.0). |
+| Additive | A new name, option, accepted input, error code or `type`/`detector` value that existing correct code can ignore | A new export; a new optional argument; a new finding type; a new error code (consumers must treat error codes as an open set) | Needs a changelog entry and a manifest review where the Rust root changes. Ships in a patch release (0.1.x). |
+| Behavioral | The same call returns different findings, spans or timing | A new detector, a tuned span, fewer or more redactions, the default policy's always-redact set growing | Changelog entry; covered by the evidence and support matrix, not frozen. Ships in a patch release (0.1.x). |
 | Internal | Everything outside the "Covered" column | Private modules, `_native`, wasm glue | No promise. |
 
 ### Frozen behavior
@@ -195,16 +196,19 @@ off unless selected, with the selector grammar and activation identity of the
 PII contract; a selected family's support level is the support matrix's, not
 this contract's.
 
-**Declarative rulesets (pending the ruleset audit).** `ruleset-revision: 1` is
-the grammar in the [rulesets guide](../guides/rulesets.md), with the changes
-the audit recommends (reject repeated fields, invisible-character prefixes and
-non-canonical counts). A ruleset can add detections and can never outrank a
+**Declarative rulesets.** `ruleset-revision: 1` is the grammar in the
+[rulesets guide](../guides/rulesets.md); it rejects repeated fields,
+invisible-character prefixes and non-canonical counts. A ruleset can add detections and can never outrank a
 built-in; every ruleset detection is medium confidence, so under the default
 policy it is `warn` and `redact` leaves its text unchanged unless the caller's
 policy says otherwise (the CLI has no policy hook, so `--redact` never changes
 text for a ruleset match). Revision 1 is frozen byte for byte; any new
-alphabet, validator, field or bound is revision 2. Unknown revisions, fields
-and vocabulary are rejected, never skipped. A ruleset is one per call, applies
+alphabet, validator, field or bound is revision 2, and revision 1 stays
+supported through the major series in which revision 2 ships and the next
+one. Unknown revisions, fields and vocabulary are rejected, never skipped.
+JavaScript ruleset errors keep one fixed message per code, with no
+rejection-class field in 0.1.x (an additive optional field may follow); Rust,
+Python and the CLI report the class. A ruleset is one per call, applies
 to whole-input calls only, and is available on Rust, JavaScript (Node and
 WebAssembly), Python and the CLI with an explicit file source.
 

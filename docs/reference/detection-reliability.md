@@ -122,15 +122,28 @@ commit permalink, and this section's counts are replaced by its totals.
 
 ### Binding at freeze
 
-1. Re-pin `benchmarks/support-matrix.json` (and its pin files) from
-   `redact-secret/redact-secret-benchmarks` for the frozen candidate; the
-   matrix's `sourceReport.product.sourceCommit` must equal the candidate SHA.
-2. Run `python3 -B scripts/check-detector-family-coverage.py --strict` and the
+The code and the ruleset contract are frozen for 0.1.x (see
+[Stable contract 1](api-contract.md#stable-contract-1)); only the identity
+below is left. The remaining steps, in order:
+
+1. Choose the candidate source revision (the merged `main` commit that the
+   release is qualified from) and write its full SHA into the identity table.
+2. Re-pin `benchmarks/support-matrix.json` (and its pin files) from
+   `redact-secret/redact-secret-benchmarks` for that candidate, after the
+   benchmarks follow-ups
+   [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+   and
+   [`redact-secret/redact-secret-benchmarks#648`](https://github.com/redact-secret/redact-secret-benchmarks/issues/648)
+   have landed. The matrix's `sourceReport.product.sourceCommit` must equal the
+   candidate SHA, and its `sourceReport.revision` goes in the second row.
+3. Run `python3 -B scripts/check-detector-family-coverage.py --strict` and the
    report script; both must show 0 shipped-but-unmeasured credential detectors.
-3. Replace the working values above with the frozen identities, link the
-   regenerated join by permalink, and record PII statuses measured on the
-   candidate.
-4. Remove the DRAFT banner in a reviewed pull request. A release still needs
+4. Replace every working value above with the frozen identity (candidate SHA,
+   benchmarks revision, measured product commit, corpus count and digest),
+   link the regenerated join by permalink, and record the PII statuses measured
+   on the candidate in `pii-family-status.json` (`npm run pii-family-status:check`
+   binds them).
+5. Remove the DRAFT banner in a reviewed pull request. A release still needs
    explicit approval under the
    [release authority](../../AGENTS.md#release-authority).
 

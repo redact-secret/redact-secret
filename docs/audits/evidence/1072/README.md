@@ -5,8 +5,8 @@ Product judgement. Final record for
 [#1065](https://github.com/redact-secret/redact-secret/issues/1065), consumed
 by [#1066](https://github.com/redact-secret/redact-secret/issues/1066)). It audits `ruleset-revision: 1` and records a
 recommended disposition. **It changes no ruleset code, grammar, fixture or
-shipped behavior**, and the disposition below is a recommendation for the
-owner, not a decision. The contract itself is
+shipped behavior**, and the disposition below was a recommendation for the
+owner; the owner accepted it on 2026-10-02 (see [Owner decisions](#owner-decisions)). The contract itself is
 [`decision-define-declarative-detector-ruleset-contract`](../../../decisions/2026-09-19-define-declarative-detector-ruleset-contract.md)
 (accepted 2026-09-19, [#441](https://github.com/redact-secret/redact-secret/issues/441));
 the implementation is [#483](https://github.com/redact-secret/redact-secret/issues/483),
@@ -39,7 +39,7 @@ they say, and a revision-1 file that depends on any of them would pin a defect.
 | R4 | Publish the normative text grammar (the [Grammar](#normative-grammar-for-revision-1) section below, moved into `docs/guides/rulesets.md`), including what is rejected on purpose: byte order mark, comments, tabs, repeated blocks of `ruleset-revision`, detector ids outside `is_identifier`. | Docs | [Normative grammar](#normative-grammar-for-revision-1) |
 | R5 | State in the guide, README and CLI help that **a ruleset detection is `confidence: medium` and therefore `warn` under the default policy**: `scanAndRedact` and `redact-secret --redact` leave the matched text unchanged, and only a caller policy (Rust, JavaScript, Python) can redact it. Add the action to the reference fixture so the behavior is pinned across surfaces. | Docs + fixture | [Default action](#default-action-of-a-ruleset-detection) |
 | R6 | Run `conformance/fixtures/ruleset-reference.json` on the Node addon, the WebAssembly artifact and the CLI in CI, or correct the fixture description, which claims every surface does. Rust and Python run it today; the Node addon and WebAssembly artifact do not (they passed a one-off run for this record, see [Cross-runtime conformance](#cross-runtime-conformance)). | Tests / qualification scripts | [Cross-runtime conformance](#cross-runtime-conformance) |
-| R7 | Write the revisioning policy ([below](#2-revisioning-and-forward-compatibility)) as a decision. It is new policy, not an application of an existing one. Proposed title: *Define the declarative ruleset revisioning and v1 freeze policy*, status `proposed` until the owner accepts it. | ADR | [Revisioning](#2-revisioning-and-forward-compatibility) |
+| R7 | Write the revisioning policy ([below](#2-revisioning-and-forward-compatibility)) as a decision. It is new policy, not an application of an existing one. Written as *Define declarative ruleset revisioning and the revision 1 freeze*, accepted 2026-10-02. | ADR | [Revisioning](#2-revisioning-and-forward-compatibility) |
 
 R1 to R3 change what revision 1 accepts, so they must land before the stable
 candidate freezes. Together they reject only input that was already
@@ -410,3 +410,33 @@ The browser pages are not extended. They run the same glue and `.wasm` bytes,
 but their harness runs in a page with a hand-built fixture payload and no
 shared module with this checker, so adding the fixture there needs a
 browser-safe copy of the checker. The fixture description says so.
+
+## Owner decisions
+
+Accepted by the owner on 2026-10-02, **as recommended**.
+
+| # | Decision | Accepted |
+| --- | --- | --- |
+| D1 | Revise before stable (R1 to R3), then freeze revision 1 | 2026-10-02, option (a) as recommended |
+| D2 | A ruleset detection stays `warn` under the default policy; documented as the 0.1.x contract | 2026-10-02, option (a) as recommended |
+| D3 | `--redact --ruleset` keeps running; documented | 2026-10-02, option (a) as recommended |
+| D4 | JavaScript errors stay one fixed message per code; an additive optional field may follow later | 2026-10-02, option (a) as recommended |
+
+## Outcome
+
+- R1 to R5 landed in [#1182](https://github.com/redact-secret/redact-secret/issues/1182)
+  and R6 in [#1183](https://github.com/redact-secret/redact-secret/issues/1183)
+  (see Implementation above).
+- R7 is written and accepted:
+  [`decision-define-declarative-ruleset-revisioning`](../../../decisions/2026-10-02-define-declarative-ruleset-revisioning.md),
+  linked from `docs/specs/engine.md`. The ADR amendment for the stale
+  dependency and class facts landed in
+  [#1185](https://github.com/redact-secret/redact-secret/issues/1185).
+- The accepted contract text is in
+  [`api-contract.md`](../../../reference/api-contract.md#stable-contract-1).
+- Remaining: conformance of the ruleset on the candidate artifacts
+  ([#199](https://github.com/redact-secret/redact-secret/issues/199)) and the
+  benchmarks follow-ups
+  [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+  and
+  [`redact-secret/redact-secret-benchmarks#648`](https://github.com/redact-secret/redact-secret-benchmarks/issues/648).
