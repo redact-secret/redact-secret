@@ -504,10 +504,10 @@
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
-    "ddfe387dd9e6db6a": {
+    "fdf3fdaea249e3e5": {
       "classification": "false_positive",
       "path": "scripts/clean-install-doc.mjs",
-      "line": 56,
+      "line": 69,
       "rule_id": "sast.rules.javascript.lang.security.audit.prototype-pollution.prototype-pollution-assignment",
       "rationale": "`scenario[role] = ...` writes to a scenario object this file creates itself, and `role` is checked against the literal allowlist `setup`/`run`/`serve`/`expect` a few lines above, so the key can never be `__proto__`, `constructor`, or `prototype`. The input is this repository's own `docs/quickstart.md`, read by a local qualification script. It is not a network-facing service."
     },

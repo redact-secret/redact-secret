@@ -245,7 +245,7 @@ browser.js` through the package's own `imports` map, and the artifact
 specifier aliased to the glue being served — and drives the published
 `@redact-secret/core` public API on top of the same artifact: the
 `NOT_INITIALIZED` gate, `await initialize()`, `RANGE_UNIT` and `VERSION`, the
-whole canonical corpus, frozen findings with exactly the seven documented
+whole canonical corpus, frozen findings with exactly the eight documented
 keys, `scanAndRedact` against `scan` then `redact`, a policy callback
 receiving a frozen finding with numeric offsets, and a real
 `createIncrementalSanitizer` session — a synthetic value split across
@@ -515,6 +515,17 @@ Without `--candidate-dir`, the driver installs the published packages from
 the public registries. That is the post-publication check of the same page.
 Only versions whose failure messages meet the actionable requirement (from
 0.1.0-beta.7) pass it.
+
+The quickstart also declares a Rust lane and a command-line lane. Those two
+install from crates.io, and no candidate registry serves crates, so the driver
+does not run them and no `clean-install` job exists for them.
+`scripts/tests/clean-install-doc.test.mjs` parses both with the same reader,
+requires their version pins and expected-output headers to equal the product
+version, and requires the synthetic input, so a release bump that skips them
+fails `npm run ci`. Their commands were executed from the page against the
+published crates as the evidence for the page's last revision
+([#1070](audits/evidence/1070/README.md)); after each publication, run them
+again from the page's text.
 
 ## Golden-path qualification
 
