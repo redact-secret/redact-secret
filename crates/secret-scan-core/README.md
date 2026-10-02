@@ -27,6 +27,16 @@ Path: `crates/secret-scan-core`. Registry name: `redact-secret` (library
 `redact_secret`); see
 [workspace documentation](https://github.com/redact-secret/redact-secret/blob/main/docs/rust-workspace.md#registry-names).
 
+## Install
+
+```bash
+cargo add redact-secret
+```
+
+While every release is a beta this selects the newest beta. The
+[quickstart](https://github.com/redact-secret/redact-secret/blob/main/docs/quickstart.md#rust)
+pins an exact version and shows a complete program using `sanitize`.
+
 ## Boundary
 
 - `std` is allowed. Runtime network, filesystem, environment, process,

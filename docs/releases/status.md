@@ -105,16 +105,26 @@ new binary attachments. Security fixes target the latest beta under
 The adapters are released from
 [`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
 on their own versions, not in lockstep with the core. Observed on the
-registries on 2026-09-28 (`npm view` for npm, the PyPI JSON API for PyPI):
+registries on 2026-10-02 (`npm view` and the registry JSON for npm, the PyPI
+JSON API for PyPI). The adapters have published several times a week (release trains from
+2026-09-22 to 2026-10-02), so treat every version here as a snapshot and check the live value before you quote one:
 
-| Package | Registry | Published version | Published | Requires core |
+| Package | Registry | Latest version | Published | Requires core |
 | --- | --- | --- | --- | --- |
-| `@redact-secret/adapter` | npm | `0.1.2` (`latest`) | 2026-09-26 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
-| `@redact-secret/adapter-pino` | npm | `0.1.1` (`latest`) | 2026-09-25 | `@redact-secret/core ^0.1.0-beta.6`; peer `pino ^10.0.0` |
-| `@redact-secret/adapter-otel` | npm | `0.1.1` (`latest`) | 2026-09-25 | `@redact-secret/core ^0.1.0-beta.6`; peer `@opentelemetry/sdk-trace-base ^2.0.0` |
-| `@redact-secret/adapter-ai-context` | npm | `0.1.0-alpha.1` (`alpha`, also `latest`) | 2026-09-26 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
-| `@redact-secret/adapter-mcp` | npm | `0.1.0-alpha.1` (`alpha`, also `latest`) | 2026-09-26 | `@redact-secret/core ^0.1.0-beta.6` (peer); MCP SDK peers |
-| `redact-secret-adapters` | PyPI | `0.1.0` | 2026-09-22 | `redact-secret>=0.1.0b6,<0.2`; `[otel]` extra `opentelemetry-sdk>=1.16.0,<2` |
+| `@redact-secret/adapter` | npm | `0.1.7` (`latest`) | 2026-10-02 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
+| `@redact-secret/adapter-pino` | npm | `0.1.4` (`latest`) | 2026-10-02 | `@redact-secret/core ^0.1.0-beta.6`; peer `pino ^10.0.0` |
+| `@redact-secret/adapter-otel-trace` | npm | `0.1.2` (`latest`) | 2026-10-02 | `@redact-secret/core ^0.1.0-beta.6`; peer `@opentelemetry/sdk-trace-base ^2.0.0` |
+| `@redact-secret/adapter-otel` (earlier name of `adapter-otel-trace`) | npm | `0.1.5` (`latest`) | 2026-10-02 | same ranges as `adapter-otel-trace` |
+| `@redact-secret/adapter-ai-context` | npm | `0.1.3` (`latest`; `alpha` is `0.1.0`) | 2026-10-02 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
+| `@redact-secret/adapter-mcp` | npm | `0.1.4` (`latest`; `alpha` is `0.1.0`) | 2026-10-02 | `@redact-secret/core ^0.1.0-beta.6` (peer); MCP SDK peers |
+| `redact-secret-adapters` | PyPI | `0.1.4` | 2026-10-02 | `redact-secret>=0.1.0b6,<0.2`; `[otel]` extra `opentelemetry-sdk>=1.16.0,<2` |
+
+The sections below this table were written when the adapters were at their
+earlier `0.1.0` to `0.1.2` versions; the train tags and the install-command
+verification they describe are historical and were not re-run for the versions
+above. Whether a given adapter is ready for your use is the adapters
+repository's statement, not this repository's: Stable contract 1 does not
+cover them ([integrations](../integrations.md)).
 
 Source tags `adapter@0.1.0`, `adapter-pino@0.1.0`, `adapter-otel@0.1.0` and
 `redact-secret-adapters@0.1.0` came with the
@@ -147,14 +157,19 @@ ships the `createRedactingStreamWrite` hook.
 
 The opt-in, in-memory vault is released from
 [`redact-secret-vault`](https://github.com/redact-secret/redact-secret-vault),
-on its own alpha versions, not in lockstep with the core. Observed on the
-registries on 2026-09-28:
+on its own versions, not in lockstep with the core. Observed on the
+registries on 2026-10-02:
 
-| Package | Registry | Published version | Published | Requires core |
+| Package | Registry | Latest version | Published | Requires core |
 | --- | --- | --- | --- | --- |
-| `@redact-secret/vault` | npm | `0.1.0-alpha.3` (`alpha`, also `latest`) | 2026-09-28 | peer `@redact-secret/core` exactly `0.1.0-beta.10` |
-| `@redact-secret/vault-server` | npm | `0.1.0-alpha.3` (`alpha`, also `latest`) | 2026-09-28 | peer `@redact-secret/core` exactly `0.1.0-beta.10`; depends on `@redact-secret/vault` exactly `0.1.0-alpha.3` |
-| `redact-secret-vault` | PyPI | `0.1.0a3` | 2026-09-28 | no `redact-secret` dependency: it declares only the `test` and `lint` extras |
+| `@redact-secret/vault` | npm | `0.1.0-beta.4` (`latest` and `beta`; `alpha` is `0.1.0-alpha.3`) | 2026-10-02 | peer `@redact-secret/core` exactly `0.1.0-beta.12` |
+| `@redact-secret/vault-server` | npm | `0.1.0-beta.4` (`latest` and `beta`; `alpha` is `0.1.0-alpha.3`) | 2026-10-02 | peer `@redact-secret/core` exactly `0.1.0-beta.12` |
+| `redact-secret-vault` | PyPI | `0.1.0b3` | 2026-10-01 | no `redact-secret` dependency: it declares only the `test` and `lint` extras |
+
+The vault repository calls its in-memory packages beta and its persistent
+server profile alpha; its [release status](https://github.com/redact-secret/redact-secret-vault/blob/main/docs/status.md)
+is the source for that and for the packages beyond these three. The rest of
+this section was written at `0.1.0-alpha.3` and is historical.
 
 Source tag `v0.1.0-alpha.3` (`bd01c061`) is on the vault repository. The npm
 pin is exact, not a range, so each core release needs a matching vault release

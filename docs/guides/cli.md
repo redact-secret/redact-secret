@@ -5,6 +5,11 @@
 The `redact-secret` binary is a host adapter over the same core, for CI,
 pre-commit hooks, and safe redaction pipelines.
 
+Install it with `cargo install redact-secret-cli --locked --version <version>`.
+While every release is a beta, `--version` is required, and no prebuilt binary
+is published. The [quickstart](../quickstart.md#command-line) gives the exact
+command and the expected output.
+
 ```bash
 redact-secret config.txt              # check a file
 git diff --cached | redact-secret     # check a staged diff

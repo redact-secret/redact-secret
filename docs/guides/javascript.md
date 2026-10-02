@@ -2,8 +2,10 @@
 
 [Documentation home](../README.md) · [Installation](../getting-started.md)
 
-The package is ESM and exposes one typed whole-input API on Node and modern
-browsers. Initialize once before synchronous operations: the explicit
+Install with `npm install @redact-secret/core@beta` (the newest beta while no
+stable release exists); the [quickstart](../quickstart.md) pins an exact version
+for Node.js and for a browser bundler. The package is ESM and exposes one typed
+whole-input API on Node and modern browsers. Initialize once before synchronous operations: the explicit
 initialization contract makes native or WebAssembly loading failures
 observable without making every scan asynchronous. Initialization is
 idempotent; a failed attempt may be retried. It also checks that the binding
@@ -67,6 +69,7 @@ result.findings[0];
 //   detector: "generic-token",
 //   confidence: "high",
 //   action: "redact",
+//   obfuscation: "none",
 //   start: 8,
 //   end: 39
 // }
@@ -176,7 +179,11 @@ The package's conditions select the browser loader and its `@redact-secret/wasm`
 dependency. Use a bundler that honors browser conditions and preserves the
 WebAssembly asset referenced by the generated glue. Serve that asset over HTTP
 with the correct URL and `application/wasm` content type. Check asset requests
-if `initialize()` fails. There is no public custom-Wasm-URL initialization option.
+if `initialize()` fails. There is no public custom-Wasm-URL initialization option. The
+[quickstart](../quickstart.md#browser-with-a-bundler) walks through a complete
+[Vite](https://vite.dev) project, which is the bundler the documented path and
+CI exercise; another bundler needs the same two things, the `browser`
+condition and the emitted `.wasm` asset.
 
 The package ships two `.wasm` assets per profile. The default one
 (`redact_secret_wasm_bg.wasm`, or `redact_secret_wasm_common_bg.wasm` for

@@ -3,7 +3,10 @@
 [Documentation home](../README.md) · [Installation](../getting-started.md)
 
 The `redact-secret` crate is imported as `redact_secret`. It has no normal
-runtime dependencies and performs no network or filesystem access.
+runtime dependencies and performs no network or filesystem access. Add it with
+`cargo add redact-secret`, which selects the newest beta while no stable
+release exists; the [quickstart](../quickstart.md#rust) pins an exact version
+and shows a complete program.
 
 For the supported defaults, one call is enough. `sanitize` uses the `full`
 profile, `DefaultPolicy`, the default placeholder formatter, and the default
@@ -106,12 +109,14 @@ which returns `Some(Profile::Full)`, `Some(Profile::Common)`, or `None` for a
 registry assembled through `DetectorRegistry::new()`.
 
 ```rust
-use redact_secret::DetectorRegistry;
+use redact_secret::{DetectorRegistry, SecretScanError};
 
-let registry = DetectorRegistry::with_common_built_in(std::iter::empty())?;
-assert!(registry.contains("private-key"));
-assert!(!registry.contains("github-token"));
-# Ok::<(), redact_secret::SecretScanError>(())
+fn main() -> Result<(), SecretScanError> {
+    let registry = DetectorRegistry::with_common_built_in(std::iter::empty())?;
+    assert!(registry.contains("private-key"));
+    assert!(!registry.contains("github-token"));
+    Ok(())
+}
 ```
 
 A profile constructor's `custom` detectors reject any id already reserved by

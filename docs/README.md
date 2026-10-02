@@ -14,13 +14,18 @@ the generated [support matrix](support-matrix.md).
 
 ## Get started
 
-1. [Five-minute quickstart](quickstart.md): install the published package in an
-   empty project and redact one value with Node.js, Python, or a browser bundler.
-   [Installation and source setup](getting-started.md) covers every runtime.
+1. [Five-minute quickstart](quickstart.md): install a published package in an
+   empty project and redact one value with Node.js, Python, a browser bundler,
+   Rust, or the command line. It says which version each command installs
+   today. [Installation and supported runtimes](getting-started.md) covers the
+   rest.
 2. Follow a guide: [JavaScript](guides/javascript.md), [Python](guides/python.md),
    [Rust](guides/rust.md), or [CLI](guides/cli.md).
 3. Read [policy and safe integration](guides/safe-integration.md) before sending
    output downstream.
+4. Find the package for your logger, tracer, MCP server, or model client in
+   [integrations](integrations.md), which also says what the core promises and
+   which packages release on their own.
 
 | Question | Read |
 | --- | --- |
@@ -32,7 +37,10 @@ the generated [support matrix](support-matrix.md).
 | What must an AI-context integration guarantee? | [AI-context boundary contract](reference/ai-context-boundary.md) |
 | What may an MCP integration claim, and which tool-call points must it protect? | [MCP redaction boundary contract](reference/mcp-boundary.md) |
 | What may an MCP integration claim for resource contents it reads (`resources/read`)? | [MCP `resources/read` boundary contract](reference/mcp-resources-read.md) |
+| Which package protects my logs, traces, MCP server, or model context? What is stable and what is not? | [Integrations and release lifecycle](integrations.md) |
 | Where does redaction belong in logging, tracing, or AI context? | [Reference architectures](guides/reference-architectures.md) |
+| Which runtimes are supported, and which are not? | [Supported runtimes](getting-started.md#supported-runtimes) |
+| How do I turn on PII detection, and what does "available" mean? | [Opt-in PII availability is not support](reference/detection.md#opt-in-pii-availability-is-not-support) |
 | How do I detect an in-house credential format? | [Declarative rulesets](guides/rulesets.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I report a false positive or missed detection safely? | [Reporting guide](guides/reporting-detection-issues.md) |

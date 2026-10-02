@@ -2,7 +2,10 @@
 
 [Documentation home](../README.md) · [Installation](../getting-started.md)
 
-Import `redact_secret`; no explicit initialization call is required.
+Install with `pip install --only-binary=:all: redact-secret` (the newest beta
+while no stable release exists); the [quickstart](../quickstart.md#python) pins
+an exact version. Import `redact_secret`; no explicit initialization call is
+required.
 
 ```python
 import redact_secret

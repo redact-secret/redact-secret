@@ -186,6 +186,50 @@ whole incoming chunk before pruning. The index can keep its peak allocated
 capacity until session cleanup. Bound incoming chunk sizes; `max_buffered_bytes`
 alone does not cap all binding memory.
 
+## Rust example
+
+```rust
+use redact_secret::{IncrementalLimits, IncrementalSanitizer, SecretScanError};
+
+fn main() -> Result<(), SecretScanError> {
+    let max_token = 8_192;
+    let max_multiline = 32_768;
+    let limits = IncrementalLimits::new(
+        1_000_000,
+        IncrementalLimits::minimum_buffered_bytes(max_token, max_multiline),
+        max_token,
+        max_multiline,
+    )?;
+    let mut session = IncrementalSanitizer::new(limits)?;
+
+    let mut safe_text = String::new();
+    safe_text.push_str(session.append("api_key=SYNTHETIC_REVOKED_")?.text());
+    safe_text.push_str(session.append("INCREMENTAL_VALUE\nordinary text")?.text());
+    safe_text.push_str(session.finalize()?.text());
+
+    assert_eq!(safe_text, "api_key=<SECRET_1>\nordinary text");
+    Ok(())
+}
+```
+
+`IncrementalLimits::new` takes the four limits in the order total input,
+retained input, token, and multiline, all in UTF-8 bytes.
+
+## Command line example
+
+CLI standard input is streamed through the same incremental core, with limits
+the CLI chooses (see `redact-secret --help`). A credential split across two
+writes is still found:
+
+```bash
+{ printf 'api_key=SYNTHETIC_REVOKED_'; printf 'INCREMENTAL_VALUE\nordinary text\n'; } | redact-secret --redact
+# api_key=<SECRET_1>
+# ordinary text
+```
+
+Accept the output only after exit status `0`; a failure can leave a sanitized
+but incomplete prefix on standard output ([CLI guide](cli.md)).
+
 ## Lifecycle and failure
 
 A session starts `accepting` and becomes terminally `finalized`, `aborted`, or
