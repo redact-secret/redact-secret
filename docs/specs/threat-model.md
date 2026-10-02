@@ -1,7 +1,7 @@
 # Threat model
 
 **Status:** current for `crates/secret-scan-core` and its bindings
-(`@redact-secret/core` `0.1.0-beta.12`, `bindings/node`, `bindings/wasm`,
+(`@redact-secret/core` `0.1.0-beta.13`, `bindings/node`, `bindings/wasm`,
 `bindings/python`, `crates/secret-scan-cli`) as described in
 [`ARCHITECTURE.md`](../../ARCHITECTURE.md#security-boundaries) and
 [`SECURITY.md`](../../SECURITY.md).
