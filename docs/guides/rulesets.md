@@ -65,6 +65,18 @@ ruleset still sees `Full`/`Common` from `DetectorRegistry::profile()`;
 ruleset presence is a separate fact the caller already has from the number
 of detectors `load_ruleset` returned.
 
+## Default action
+
+Because every ruleset candidate is medium confidence and its `type` is the
+detector id (not a known credential type), the default policy returns `warn`
+for it: the finding is reported, and `scanAndRedact`, `scan_and_redact` and
+`redact-secret --redact` leave the matched text in place. To redact a ruleset
+detection, supply a policy that returns `redact` for its detector id (Rust,
+JavaScript, Python). The CLI has no policy hook, so it can report a ruleset
+detection in check mode but not remove it in redact mode. Check mode flags it
+either way. The reference fixture does not yet pin this action; the audit
+([#1072](../audits/evidence/1072/README.md)) proposes that it should.
+
 ## Names section
 
 A ruleset can also add to `generic-token`'s contextual-assignment name
