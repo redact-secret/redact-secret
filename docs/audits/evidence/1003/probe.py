@@ -5,7 +5,10 @@ Feeds synthetic inputs through the product identity seam
 (`pii_identity_evaluation` example, `--family pii:us:ssn`) and compares each
 line with an expectation derived ONLY from docs/contracts/pii/us-ssn-v1.md.
 
-Usage: probe.py <path-to-example-binary> [--all]
+Usage (two steps, no subprocess: the example reads JSON lines on stdin):
+
+    probe.py emit | <path-to-example-binary> --family pii:us:ssn > out.jsonl
+    probe.py check out.jsonl [--all]
 
 Prints one JSON line per disagreement (every row with --all). No real SSN is
 used: every value is a synthetic fixture value, an SSA invalid-by-design
@@ -15,7 +18,6 @@ text fixes only the identity outcome for that shape.
 """
 import json
 import re
-import subprocess
 import sys
 
 VALID = "890626879"  # synthetic public fixture value
@@ -52,10 +54,12 @@ VALUES = {
     "area-899-edge": "899999999",
 }
 S, N, X = "sensitive", "not-established", "non-sensitive"
+# "Social Security Number is " and "미국 사회보장번호는 " are N, not S: the contract
+# counts only a bounded field label (a trailing "is" / particle is not one).
 CONTEXTS = [
     ("", N), ("ssn=", S), ("SSN: ", S), ("Ssn ", S), ("social security number: ", S),
-    ("Social Security Number is ", S), ("social_security_number=", S),
-    ("사회보장번호: ", S), ("사회 보장 번호 = ", S), ("미국 사회보장번호는 ", S),
+    ("Social Security Number is ", N), ("social_security_number=", S),
+    ("사회보장번호: ", S), ("사회 보장 번호 = ", S), ("미국 사회보장번호는 ", N),
     ("사회보장번호=", S), ("미국 사회보장번호: ", S),
     ("주민등록번호: ", N), ("tax id: ", N), ("national id: ", N), ("order_reference=", N),
     ("invoice number ", N), ("number: ", N), ("id=", N), ("test ssn is ", None),
@@ -153,15 +157,18 @@ def expected(text, cand):
     return contract_identity(pre + mid + post, len(pre), len(pre) + len(mid))
 
 
-def main():
-    binary = sys.argv[1]
-    show_all = "--all" in sys.argv
-    cases = build()
-    lines = [json.dumps({"id": c[0], "family": "pii:us:ssn", "text": c[1],
-                         "candidate": None if c[2] is None else {"start": c[2][0], "end": c[2][1]}},
-                        ensure_ascii=False) for c in cases]
-    out = subprocess.run([binary, "--family", "pii:us:ssn"], input="\n".join(lines) + "\n",
-                         capture_output=True, text=True, check=True).stdout.splitlines()[1:]
+def emit(cases):
+    for c in cases:
+        print(json.dumps({"id": c[0], "family": "pii:us:ssn", "text": c[1],
+                          "candidate": None if c[2] is None else {"start": c[2][0], "end": c[2][1]}},
+                         ensure_ascii=False))
+
+
+def check(cases, path, show_all):
+    with open(path, encoding="utf-8") as handle:
+        out = handle.read().splitlines()[1:]  # the first line is the example's header
+    if len(out) != len(cases):
+        sys.exit(f"expected {len(cases)} result lines, got {len(out)}")
     bad_count = 0
     for (cid, text, cand, ctx, group), line in zip(cases, out):
         r = json.loads(line)
@@ -174,6 +181,18 @@ def main():
                               "expectedIdentity": exp_id, "sensitivity": r["sensitivity"],
                               "expectedSensitivity": exp_sens, "disagree": bad}, ensure_ascii=False))
     print(f"# cases={len(cases)} disagreements={bad_count}", file=sys.stderr)
+
+
+def main():
+    if len(sys.argv) < 2 or sys.argv[1] not in ("emit", "check"):
+        sys.exit("usage: probe.py emit | probe.py check <results.jsonl> [--all]")
+    cases = build()
+    if sys.argv[1] == "emit":
+        emit(cases)
+    else:
+        if len(sys.argv) < 3:
+            sys.exit("usage: probe.py check <results.jsonl> [--all]")
+        check(cases, sys.argv[2], "--all" in sys.argv)
 
 
 main()

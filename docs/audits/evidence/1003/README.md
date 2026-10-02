@@ -47,7 +47,7 @@ No publicly reproducible product defect.
 
 [`probe.py`](probe.py) keeps a deterministic, stdlib-only subset of this
 matrix (318 probes) so the check can be repeated: build the example and run
-`python3 -B probe.py <binary> [--all]`. Its expectation encodes the adjacency
+`python3 -B probe.py emit | <example-binary> --family pii:us:ssn > out.jsonl` and then `python3 -B probe.py check out.jsonl [--all]`. Its expectation encodes the adjacency
 set the code enforces, so it reports 0 identity disagreements; the mismatches
 above are the boundary shapes where an expectation taken from the contract
 text alone would differ.
