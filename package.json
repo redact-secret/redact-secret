@@ -111,14 +111,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.19.0",
     "@vitest/coverage-v8": "4.1.11",
-    "esbuild": "^0.25.9",
+    "esbuild": "^0.28.2",
     "fast-check": "4.10.2",
     "playwright": "1.63.0",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11",
-    "wrangler": "^4.135.0"
+    "wrangler": "^4.143.0"
   },
   "engines": {
     "node": "20.x || 22.x || 24.x"
