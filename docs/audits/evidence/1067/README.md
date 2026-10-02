@@ -227,6 +227,71 @@ are consistent with the matrix and the inventory (the strict check passes).
 5. Approve renaming "Independent tool/community corroboration" in
    `redact-secret/redact-secret-benchmarks`.
 
+## Implementation
+
+Core-side work for [#1186](https://github.com/redact-secret/redact-secret/issues/1186)
+and [#1187](https://github.com/redact-secret/redact-secret/issues/1187), after
+the owner accepted the recommendations in "Decisions needed" above.
+
+### PII statuses gated and bound (#1186)
+
+- `scripts/check-pii-family-status.py` (tests:
+  `scripts/tests/test_check_pii_family_status.py`, run by
+  `npm run pii-family-status:check`, wired into `check:docs` and `ci`). It
+  fails when a shipped PII family (`const FAMILY_ID` under
+  `crates/secret-scan-core/src`) has no row in
+  `docs/coverage/pii-family-status.json` or in the Opt-in PII table of
+  `docs/reference/detection.md`; when either names a family that does not ship;
+  when the documented status differs from the binding or is not
+  `pending`/`provisional`/`stable`; when the pinned matrix already carries a
+  `pii:` family with a different status; when a recorded revision is not a full
+  40-hex id or is absent from the page; and when a PII source file changed
+  since the qualification is missing or not named on the page.
+- `docs/coverage/pii-family-status.json` binds the six statuses to core
+  `8b6a5fde52ecb4dfce13f09c7a947062d21483c7` (`0.1.0-beta.11`) and benchmarks
+  revision `be0fb9f35045bf05e5b999a2c0ed368541f9e963`, and lists the PII files
+  that changed after that core revision: `pii.rs`, `pii_email.rs`,
+  `pii_iban.rs`, `pii_payment_card.rs`, `pii_phone.rs`, `pii_us_ssn.rs`
+  (6 production files plus a new test file, +1693/-91 lines in all). The issue
+  named email, IBAN and phone; payment-card, SSN and the shared adapter changed
+  too, and the page now says so.
+- `docs/reference/detection.md` states the two revisions and that the statuses
+  were measured on earlier code and not re-measured. The report script prints
+  the same binding. When
+  [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+  puts the families in the pinned matrix, the gate already requires the matrix
+  and the binding to agree; retire the table and binding then (not done here,
+  there is nothing to read yet).
+
+### Generic family recheck on current main (#1187)
+
+Scope: the four provisional `generic:*` families. Method: the public
+conformance corpus `conformance/fixtures/synchronous-corpus.json` (synthetic,
+exact start/end offsets, detector and finding type per fixture), asserted
+byte-exact against the current registry by `canonical_corpus`,
+`common_profile_corpus` and `detectors_conformance` (all pass on this branch;
+`cargo test -p redact-secret --lib` 1838 passed). No protected material was
+read, and the matrix does not name the case behind its recorded miss
+(`policyQualification` carries counts only), so that case cannot be rebuilt
+from public data.
+
+| Family (detector) | Matrix, Beta.12 | Public fixtures on current main | Reproduced? |
+| --- | --- | --- | --- |
+| `generic:unclassified-assignment-literal` (`generic-token`) | exact-span miss 1, leaked span 1 of 76 positives; holdout not run | 288 fixtures (120 positive, 151 negative, 8 boundary, 5 overlap, 4 adversarial), all exact; 5 are declared `intentionally-unsupported` non-detections | **No** from public fixtures; the recorded case is unidentifiable, so its absence is not shown |
+| `generic:bearer-token` (`bearer-token`) | 0 misses of 16; holdout not run | 58 fixtures, all exact | No |
+| `generic:connection-string-password` (`connection-string`) | 0 misses of 32; holdout not run | 108 fixtures, all exact | No |
+| `generic:otp-seed` (`otpauth-uri`) | 0 misses of 9; holdout not run | 31 fixtures, all exact | No |
+
+Result: no family reproduces a miss from public fixtures, so no detector change
+was made and no regression case was added. The one recorded miss
+(`generic-token`) is neither reproduced nor shown absent, so all four families
+stay `provisional` with the matrix's reason (protected holdout not run on a
+frozen candidate; the measured build predates later changes to
+`generic_token.rs`, `connection_string.rs`, `otpauth.rs`, `bearer_token.rs`).
+The contract page says this. Settling it needs the benchmarks policy run on the
+freeze candidate to name the case; that is
+`redact-secret/redact-secret-benchmarks` work.
+
 ## Regenerate
 
 ```sh

@@ -25,7 +25,7 @@ precision, recall, or detector-count claim.
 | Benchmarks revision that produced the matrix | `<sourceReport.revision of the matrix re-pinned for the candidate>` | `e8f73bfd7241845ef9fb75574a72b135aa777ba6` |
 | Product commit that matrix measured | must equal the candidate source revision | `4227160c4dac402d7add53d3f8fe990f693912c1` (Beta.12): **not** the audited source |
 | Corpus identity | fixture count and fixture-index digest from the matrix | 5950 fixtures, digest `58f09c3544bf7238dcd076a7c1379681a302adef9ba66ee14dc801f95cfdbbdd` |
-| PII qualification candidate | the frozen candidate | Beta.11 core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7` |
+| PII qualification candidate | the frozen candidate | Beta.11 core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7`, benchmarks revision `be0fb9f35045bf05e5b999a2c0ed368541f9e963` (bound in [`pii-family-status.json`](../coverage/pii-family-status.json) and gated by `npm run pii-family-status:check`); email, IBAN, phone, payment-card, SSN and the shared PII code changed after it |
 
 A count in this contract is valid only if the matrix's measured product commit
 equals the candidate source revision. If it does not, the page must say which
@@ -46,12 +46,32 @@ Working counts at the audited source (regenerate with
 - Counted by weakest listed family, the 110 detectors are 102 stable, 7
   provisional, 1 pending, 0 unsupported, and **0 shipped without a matrix
   family**.
-- The 6 PII families are **not in the matrix**. Their statuses (five
-  `provisional`, US SSN `pending`) are stated by hand above and were measured
-  on the Beta.11 candidate, not on the audited source.
+- The 6 PII families are **not in the matrix**
+  ([`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+  tracks moving them in). Their statuses (five `provisional`, US SSN
+  `pending`) are stated in the [Opt-in PII table](detection.md#opt-in-pii-availability-is-not-support),
+  checked by a gate that fails when a shipped PII family has no status row, and
+  were measured on the Beta.11 candidate, not on the audited source.
 
 "144 stable" counts matrix families, not detectors, and no stable family means
 a detector finds every credential its provider issues.
+
+### Provisional families carried into the contract
+
+Four `generic:*` families are `provisional` in the pinned matrix and are
+carried into the v0.1.0 contract as **provisional**, not stable:
+`generic:bearer-token`, `generic:connection-string-password`,
+`generic:otp-seed` and `generic:unclassified-assignment-literal`. The reason is
+the matrix's own: their protected holdout is `not-run` and needs a pass on a
+frozen candidate; the matrix measured Beta.12 and the code behind all four has
+changed since. `generic:unclassified-assignment-literal` (detector
+`generic-token`) additionally records one exact-span miss and one leaked span
+among 76 positive cases. A recheck on current main from public fixtures
+reproduces none of the four (every public conformance fixture for the four
+detectors matches its declared span exactly), but the recorded case is not
+named in the pinned matrix, so its absence is not shown and the family stays
+provisional. Per-family result and method:
+[#1187 recheck](../audits/evidence/1067/README.md#generic-family-recheck-on-current-main-1187).
 
 ### Known false-positive classes
 
