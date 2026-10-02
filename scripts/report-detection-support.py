@@ -142,11 +142,15 @@ def build(source_revision: str) -> dict:
 
     pii_ids = shipped_pii_families()
     pii_docs = documented_pii_status()
-    pii_matrix = sorted(f["family"] for f in matrix["families"] if f["family"].startswith("pii:"))
+    # The PII families are top-level `piiFamilies` of the pinned matrix (benchmarks 573e128),
+    # never rows of `families`; a matrix that predates the key has none.
+    pii_matrix_status = {row["family"]: row["status"] for row in matrix.get("piiFamilies", [])}
+    pii_matrix = sorted(pii_matrix_status)
     pii_rows = [
         {
             "family": family,
             "inPinnedMatrix": family in pii_matrix,
+            "pinnedMatrixStatus": pii_matrix_status.get(family),
             "documentedStatus": pii_docs.get(family),
         }
         for family in pii_ids

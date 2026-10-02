@@ -24,7 +24,7 @@ SCHEMA = {
                     "evidenceBasis": {
                         "enum": [
                             "provider-documented",
-                            "independently-corroborated",
+                            "corroborated",
                             "empirically-observed",
                             "project-policy",
                             "none",
@@ -59,7 +59,7 @@ def family(
     elif status == "unsupported":
         basis = "none"
     else:
-        basis = basis or "independently-corroborated"
+        basis = basis or "corroborated"
     return {
         "provider": provider,
         "family": family_id,
@@ -208,7 +208,7 @@ class ValidateMatrixTests(unittest.TestCase):
                     "Widget token",
                     "stable",
                     tier="T2",
-                    basis="independently-corroborated",
+                    basis="corroborated",
                     profile="empirical",
                 )
             ]
@@ -398,7 +398,15 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         )
         text = GEN.render_matrix_markdown(m)
         self.assertIn("Stable · Provider documented", text)
-        self.assertIn("Provisional · Tool corroborated", text)
+        self.assertIn("Provisional · Corroborated", text)
+        self.assertIn(GEN.CORROBORATED_LEGEND, text)
+        self.assertNotIn("Independent", text)
+
+    def test_old_independently_corroborated_basis_is_rejected(self) -> None:
+        m = matrix([family("gadget", "gadget:token", "Gadget token", "provisional", reason="x", tier="T2")])
+        m["families"][0]["evidenceBasis"] = "independently-corroborated"
+        errors = GEN.validate_matrix(m, SCHEMA)
+        self.assertTrue(any("evidence basis 'independently-corroborated'" in error for error in errors), errors)
 
     def test_counts_are_split_by_qualification_profile_and_evidence_tier(self) -> None:
         m = matrix(
@@ -728,7 +736,7 @@ DOCUMENTED_REASON = (
     "documented.minimumControlAxes: 3 < 4 — Benign coverage must span four axes."
 )
 EMPIRICAL_REASON = (
-    "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance. | "
+    "empirical.evidenceBasis: corroborated — T2 remains empirical provenance. | "
     "empirical.minimumObservations: 0 < 5 — Five observations are the minimum. | "
     "empirical.minimumSubjects: 0 < 2 — Two subjects. | "
     "empirical.minimumIssuanceDates: 0 < 2 — Two dates. | "

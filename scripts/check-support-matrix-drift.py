@@ -72,8 +72,21 @@ ACKNOWLEDGEMENTS_PATH = ROOT / "benchmarks" / "support-matrix-drift-acknowledgem
 # profile. redact-secret-benchmarks' decision
 # `decision-qualify-empirical-stable-by-corroboration` (benchmarks e1ecb29)
 # added the corroborated route beside the provider-issued observation route;
-# the tier stays T2 either way.
-EMPIRICAL_EVIDENCE_BASES = ("independently-corroborated", "empirically-observed")
+# the tier stays T2 either way. redact-secret-benchmarks'
+# `decision-rename-the-corroborated-evidence-basis` (benchmarks 573e128,
+# redact-secret-benchmarks#670) renamed `independently-corroborated` to
+# `corroborated`.
+EMPIRICAL_EVIDENCE_BASES = ("corroborated", "empirically-observed")
+
+# Baseline side only. The baseline is the previous release's matrix, which was
+# generated before the rename and so carries the old value; it fails the pinned
+# (current) schema although it was valid when it was published. The candidate
+# is never mapped: a candidate that still carries the old value fails closed,
+# as the pinned schema intends. The mapping is a pure rename (the benchmarks
+# decision states that no status, tier, profile or count changed), so it cannot
+# hide or invent a status change; `evidenceBasis` is the only field it touches.
+# Delete this once the previous tag's matrix already carries the new value.
+LEGACY_BASELINE_EVIDENCE_BASES = {"independently-corroborated": "corroborated"}
 
 # The stable qualification profiles. redact-secret-benchmarks'
 # `decision-qualify-bounded-t3-credential-policy` (benchmarks a66dbef) added
@@ -145,8 +158,7 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
                 errors.append(f"{label}: {name}: documented qualification is not T1 provider-documented")
             if profile == "empirical" and (tier != "T2" or basis not in EMPIRICAL_EVIDENCE_BASES):
                 errors.append(
-                    f"{label}: {name}: empirical qualification is not T2 "
-                    "independently-corroborated or empirically-observed"
+                    f"{label}: {name}: empirical qualification is not T2 corroborated or empirically-observed"
                 )
             if profile == "policy-qualified" and (tier != "T3" or basis != "project-policy"):
                 errors.append(f"{label}: {name}: policy-qualified qualification is not T3 project-policy")
@@ -164,6 +176,22 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
         if recorded != actual:
             errors.append(f"{label}: stableDistribution {matrix.get('stableDistribution')} does not match {actual}")
     return errors
+
+
+def normalize_baseline_evidence_basis(baseline: dict) -> dict:
+    """A copy of the baseline whose pre-rename `evidenceBasis` values are
+    spelled as the pinned schema spells them. Baseline only; see
+    LEGACY_BASELINE_EVIDENCE_BASES."""
+    families = baseline.get("families")
+    if not isinstance(families, list):
+        return baseline
+    normalized = []
+    for entry in families:
+        basis = entry.get("evidenceBasis") if isinstance(entry, dict) else None
+        if basis in LEGACY_BASELINE_EVIDENCE_BASES:
+            entry = {**entry, "evidenceBasis": LEGACY_BASELINE_EVIDENCE_BASES[basis]}
+        normalized.append(entry)
+    return {**baseline, "families": normalized}
 
 
 def family_index(matrix: dict) -> dict[str, dict]:
@@ -315,6 +343,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR could not read --candidate {args.candidate}: {error}", file=sys.stderr)
         return 1
 
+    baseline = normalize_baseline_evidence_basis(baseline)
     errors = validate_matrix("baseline", baseline, schema) + validate_matrix("candidate", candidate, schema)
     if errors:
         for error in errors:

@@ -24,7 +24,7 @@ SCHEMA = {
                     "evidenceBasis": {
                         "enum": [
                             "provider-documented",
-                            "independently-corroborated",
+                            "corroborated",
                             "empirically-observed",
                             "project-policy",
                             "none",
@@ -56,7 +56,7 @@ def family(
     elif status == "unsupported":
         basis = "none"
     else:
-        basis = basis or "independently-corroborated"
+        basis = basis or "corroborated"
     return {
         "provider": provider,
         "family": family_id,
@@ -152,14 +152,14 @@ class ValidateMatrixTests(unittest.TestCase):
 
     def test_accepts_a_t2_corroborated_empirical_stable_family(self) -> None:
         # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration:
-        # the corroborated route carries evidenceBasis independently-corroborated.
+        # the corroborated route carries evidenceBasis corroborated.
         candidate = matrix(
             [
                 family(
                     "widget:token",
                     "stable",
                     tier="T2",
-                    basis="independently-corroborated",
+                    basis="corroborated",
                     profile="empirical",
                 )
             ]
@@ -438,6 +438,36 @@ class MainTests(unittest.TestCase):
                 ]
             )
             self.assertEqual(status, 0)
+
+    def test_baseline_with_the_pre_rename_basis_is_accepted_and_not_a_change(self) -> None:
+        # The previous tag's matrix predates the `corroborated` rename. Mapping
+        # it on the baseline side must neither fail validation nor read the
+        # pure rename as an evidence change.
+        old_family = family("widget:token", "provisional", reason="needs evidence", tier="T2")
+        old_family["evidenceBasis"] = "independently-corroborated"
+        new_family = family("widget:token", "provisional", reason="needs evidence", tier="T2")
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            baseline = self.write(tmp, "baseline.json", matrix([old_family]))
+            candidate = self.write(tmp, "candidate.json", matrix([new_family]))
+            schema = self.write(tmp, "schema.json", DRIFT.load_json(DRIFT.SCHEMA_PATH))
+            out = tmp / "drift.json"
+            status = DRIFT.main(
+                ["--baseline", str(baseline), "--candidate", str(candidate), "--schema", str(schema), "--out", str(out)]
+            )
+            self.assertEqual(status, 0)
+            self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["summary"]["staleProviderProvenance"], 0)
+
+    def test_candidate_with_the_pre_rename_basis_still_fails(self) -> None:
+        old_family = family("widget:token", "provisional", reason="needs evidence", tier="T2")
+        old_family["evidenceBasis"] = "independently-corroborated"
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            baseline = self.write(tmp, "baseline.json", matrix([family("widget:token", "stable")]))
+            candidate = self.write(tmp, "candidate.json", matrix([old_family]))
+            schema = self.write(tmp, "schema.json", DRIFT.load_json(DRIFT.SCHEMA_PATH))
+            status = DRIFT.main(["--baseline", str(baseline), "--candidate", str(candidate), "--schema", str(schema)])
+            self.assertEqual(status, 1)
 
     def test_invalid_candidate_json_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
