@@ -27,6 +27,12 @@ The **Status as of beta.5** column is evidence, current as of this writing
 (2026-09-21); it is not a release decision, and a later run must be checked
 again in its own right rather than assumed to still match.
 
+The status column below has **not** been re-evaluated since beta.5. Later
+releases (see [release status](status.md)) exercised the same workflow, but this
+table does not record that, and a row must be re-checked against the candidate
+run before it counts for `0.1.0`. The `0.1.0-beta.13` preparation changes none
+of these rows.
+
 | # | Criterion | How to evaluate it against a run | Status as of beta.5 |
 | --- | --- | --- | --- |
 | 1 | Build-once / qualify-exact / publish-exact holds for every artifact class. | For every entry in the release manifest's `artifact_digests` with `comparable: true`, the `built`, `qualified`, and `published` digests are identical. `scripts/release-manifest.py` already fails the run loudly, naming the artifact, file, and both digests, if any comparable entry disagrees — so "met" means `record-manifest` exits `0` with no digest-mismatch error. Entries the ecosystem re-packs before upload (`npm publish`'s tarball) must instead carry `comparable: false` with a non-empty `note`, not a silently skipped field. | **Met**, by construction, since [#527](https://github.com/redact-secret/redact-secret/issues/527)/[#528](https://github.com/redact-secret/redact-secret/issues/528): `release.yml` now consumes `artifact-qualification.yml`'s single Python build instead of invoking `python-wheels.yml` a second time, and every artifact family (npm, WASM, crate, Python) records the three-stage digest. Not yet observed on a real `release.yml` run since the fix landed — beta.5 predates it. |
