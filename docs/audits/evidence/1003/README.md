@@ -76,3 +76,33 @@ like the ones above, where the authored label says `valid` and the seam reports
 unopened. When authoring the new-seed corpus, keep the characters around each
 authored candidate to ASCII whitespace, punctuation or a string edge, and check
 the case against the public oracle before sealing.
+
+## Implementation (#1188)
+
+Docs and fixtures only; no detector change. Before writing the text, each
+claimed blocking class was confirmed against `blocks_boundary` in
+`crates/secret-scan-core/src/pii/pii_us_ssn.rs` and with the identity seam: the
+committed `probe.py` matrix still reports `cases=318 disagreements=0`, and a
+12-shape control run (`ssn=<X>890-62-6879<X>`) gave `unmatched` for NBSP,
+U+3000, ASCII hyphen, U+3030, U+FF0D and a Korean particle, and `established`
+for ASCII space, tab, line feed, `:`/`,` and `.`. No claimed class differed
+from the code, so the stop condition did not trigger.
+
+- `docs/contracts/pii/us-ssn-v1.md` now has an "Adjacency set" subsection that
+  lists every blocking class (alphanumeric, `_`, `%`, ASCII hyphen, combining
+  mark, non-ASCII whitespace, listed Unicode dashes, governed invisibles) and
+  the non-blocking ones (ASCII whitespace, other ASCII punctuation, string
+  edge).
+- Eight new twins in `conformance/fixtures/pii-us-ssn-v1.json`, all
+  `expected: []`: `us-ssn-adjacent-ascii-hyphen-{prefix,suffix}`
+  (`ssn: 1-890-62-6879`, `ssn: 890-62-6879-1`),
+  `us-ssn-adjacent-ascii-hyphen-compact-{prefix,suffix}`,
+  `us-ssn-adjacent-nbsp-compact-{prefix,suffix}` and
+  `us-ssn-adjacent-ideographic-space-{prefix,suffix}`. Display-form NBSP
+  adjacency was already pinned by `us-ssn-adjacent-unicode-space-*`, so the NBSP
+  twins use the compact form.
+- Observation, not pinned or claimed: U+2212 MINUS SIGN is not in the code's
+  dash list and does not block adjacency.
+- Cross-repo follow-up: the changed fixture file's SHA-256 is part of the
+  conformance corpus identity that releases record. See the pull request for
+  any pin follow-up in `redact-secret-benchmarks`.
