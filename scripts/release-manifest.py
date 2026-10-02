@@ -253,9 +253,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest["artifact_digests"] = artifact_digests
 
     try:
-        raw_drift = json.loads(
-            _option_text(args.support_matrix_drift, args.support_matrix_drift_file)
-        )
+        raw_drift = json.loads(_option_text(args.support_matrix_drift, args.support_matrix_drift_file))
     except (OSError, json.JSONDecodeError) as error:
         print(f"ERROR --support-matrix-drift is not valid JSON: {error}", file=sys.stderr)
         return 1

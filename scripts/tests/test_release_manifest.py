@@ -361,15 +361,25 @@ class CliTests(unittest.TestCase):
             # "Argument list too long" before the script even started.
             subprocess.run(
                 [
-                    sys.executable, "-B", str(SCRIPT),
-                    "--source-revision", VALID_FIELDS["source_revision"],
-                    "--conformance-identity", VALID_FIELDS["conformance_identity"],
-                    "--version", VALID_FIELDS["version"],
-                    "--artifact", "npm:@redact-secret/core",
-                    "--registry-state", "npm=published",
-                    "--artifact-digests-file", str(digests),
-                    "--support-matrix-drift-file", str(drift),
-                    "--out", str(out),
+                    sys.executable,
+                    "-B",
+                    str(SCRIPT),
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--artifact-digests-file",
+                    str(digests),
+                    "--support-matrix-drift-file",
+                    str(drift),
+                    "--out",
+                    str(out),
                 ],
                 check=True,
                 capture_output=True,
@@ -382,13 +392,20 @@ class CliTests(unittest.TestCase):
             out = Path(tmp) / "manifest.json"
             status = RELEASE_MANIFEST.main(
                 [
-                    "--source-revision", VALID_FIELDS["source_revision"],
-                    "--conformance-identity", VALID_FIELDS["conformance_identity"],
-                    "--version", VALID_FIELDS["version"],
-                    "--artifact", "npm:@redact-secret/core",
-                    "--registry-state", "npm=published",
-                    "--artifact-digests-file", str(Path(tmp) / "absent.json"),
-                    "--out", str(out),
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--artifact-digests-file",
+                    str(Path(tmp) / "absent.json"),
+                    "--out",
+                    str(out),
                 ]
             )
             self.assertEqual(status, 1)
@@ -718,23 +735,31 @@ class WorkflowOutputTests(unittest.TestCase):
                 native = directory / "dependency-artifact-digests" / f"native-{index}"
                 native.mkdir(parents=True)
                 records = {
-                    f"npm:@redact-secret/synthetic-{index}-{n}": [{
-                        "file": "synthetic.node", "built": "a" * 64, "qualified": "a" * 64,
-                        "published": "a" * 64, "comparable": True, "note": "x" * 15000,
-                    }]
+                    f"npm:@redact-secret/synthetic-{index}-{n}": [
+                        {
+                            "file": "synthetic.node",
+                            "built": "a" * 64,
+                            "qualified": "a" * 64,
+                            "published": "a" * 64,
+                            "comparable": True,
+                            "note": "x" * 15000,
+                        }
+                    ]
                     for n in range(40)
                 }
                 (native / "artifact-digest.json").write_text(json.dumps(records))
             merged = sum(
-                f.stat().st_size
-                for f in (directory / "dependency-artifact-digests").glob("*/artifact-digest.json")
+                f.stat().st_size for f in (directory / "dependency-artifact-digests").glob("*/artifact-digest.json")
             )
             # Past Linux's 128 KiB per-argument limit and macOS's 1 MiB total.
             self.assertGreater(merged, 2 * 1024 * 1024)
-            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", shell], cwd=directory,
-                           env={**os.environ, "GITHUB_SHA": "a" * 40,
-                                "GITHUB_OUTPUT": str(directory / "output")},
-                           check=True, capture_output=True)
+            subprocess.run(
+                ["bash", "-e", "-o", "pipefail", "-c", shell],
+                cwd=directory,
+                env={**os.environ, "GITHUB_SHA": "a" * 40, "GITHUB_OUTPUT": str(directory / "output")},
+                check=True,
+                capture_output=True,
+            )
             manifest = json.loads((directory / "manifest.json").read_text())
             self.assertEqual(len(manifest["artifact_digests"]), 160)
 

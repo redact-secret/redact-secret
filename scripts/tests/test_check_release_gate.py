@@ -725,7 +725,7 @@ class ReleaseGateTests(unittest.TestCase):
         broken = RELEASE_YML.replace(
             "      - name: Publish to PyPI\n        run: echo noop\n",
             "      - name: Publish to PyPI\n"
-            "        run: python3 -B scripts/release-manifest.py --artifact-digests \"$d\" --out m.json\n",
+            '        run: python3 -B scripts/release-manifest.py --artifact-digests "$d" --out m.json\n',
         )
         self.assertNotEqual(broken, RELEASE_YML)
         self._write("release.yml", broken)

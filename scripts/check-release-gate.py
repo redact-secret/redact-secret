@@ -167,9 +167,7 @@ RUN_BLOCK_HEADER = re.compile(r"^(?P<indent>\s*)(?:- )?run:\s*(?P<rest>.*)$")
 # Issues #799 and #1115: the merged artifact digests exceed Linux's 128 KiB
 # per-argument limit, so `release.yml` must hand them to `release-manifest.py`
 # through the `-file` options, never as an inline argument.
-INLINE_MANIFEST_ARGUMENT = re.compile(
-    r"(?<![-\w])--(?:artifact-digests|support-matrix-drift)(?![-\w])[ \t]+\S"
-)
+INLINE_MANIFEST_ARGUMENT = re.compile(r"(?<![-\w])--(?:artifact-digests|support-matrix-drift)(?![-\w])[ \t]+\S")
 
 JOB_HEADER_PREFIX = "  "
 ATTRIBUTE_PREFIX = "    "
@@ -262,10 +260,7 @@ def extract_step_blocks(job_body: str) -> list[tuple[int, str, str]]:
 
 def inline_manifest_arguments(text: str) -> list[int]:
     """1-based line numbers passing a manifest JSON value as an argument, not a file."""
-    return [
-        text.count("\n", 0, match.start()) + 1
-        for match in INLINE_MANIFEST_ARGUMENT.finditer(text)
-    ]
+    return [text.count("\n", 0, match.start()) + 1 for match in INLINE_MANIFEST_ARGUMENT.finditer(text)]
 
 
 def inline_needs_in_run(text: str) -> list[int]:
