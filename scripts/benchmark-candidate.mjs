@@ -41,7 +41,11 @@ export function parseArguments(argv) {
 }
 
 function git(args, cwd = repositoryRoot) {
-  return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+  return execFileSync("git", args, {
+    cwd,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
 }
 
 export function inspectCleanRevision(root) {
@@ -62,7 +66,10 @@ export function resolveExactCommit(root, requested) {
   try {
     resolved = git(["rev-parse", `${requested}^{commit}`], root);
   } catch {
-    execFileSync("git", ["fetch", "--no-tags", "origin", requested], { cwd: root, stdio: "inherit" });
+    execFileSync("git", ["fetch", "--no-tags", "origin", requested], {
+      cwd: root,
+      stdio: "inherit",
+    });
     resolved = git(["rev-parse", `${requested}^{commit}`], root);
   }
   if (resolved !== requested) throw new Error("benchmark-head-mismatch");
@@ -88,27 +95,52 @@ export async function withTemporaryDirectory(prefix, action) {
   }
 }
 
+const FLAGGED_OUTCOME = /^(?:flagged|observed):[1-9][0-9]*$/;
+const isMiss = (outcome) => String(outcome).includes("MISS");
+
+// Issue #1114: every before/after pair is one measure (the scored outcome) over
+// one population (the fixtures that have a saved baseline row), so a corpus
+// that grows cannot read as a regression. Fixtures without a baseline row and
+// the raw finding count (co-detections the scorer marks `clean` included) are
+// reported separately, each against its own denominator.
 export function summarizeSection(report, section) {
   const rows = report.results.filter((row) => row.corpusSection === section);
   const negatives = rows.filter((row) => row.kind === "must-not-flag");
   const positives = rows.filter((row) => row.kind === "must-redact" && row.expectedSpans > 0);
   const policy = rows.filter((row) => row.kind === "policy" && row.expectedSpans > 0);
   const baselineNegatives = negatives.filter((row) => row.baseline.outcome !== null);
+  const unbaselinedNegatives = negatives.filter((row) => row.baseline.outcome === null);
   const baselinePositives = positives.filter((row) => row.baseline.outcome !== null);
+  const unbaselinedPositives = positives.filter((row) => row.baseline.outcome === null);
   return {
     rows: rows.length,
-    negativeBefore: baselineNegatives.filter((row) => /^(?:flagged|observed):[1-9][0-9]*$/.test(row.baseline.outcome))
-      .length,
+    negativeBefore: baselineNegatives.filter((row) => FLAGGED_OUTCOME.test(row.baseline.outcome)).length,
+    negativeAfter: baselineNegatives.filter((row) => FLAGGED_OUTCOME.test(row.outcome)).length,
     negativeBaselined: baselineNegatives.length,
-    negativeAfter: negatives.filter((row) => row.actualFindings > 0).length,
+    negativeUnbaselinedFlagged: unbaselinedNegatives.filter((row) => FLAGGED_OUTCOME.test(row.outcome)).length,
+    negativeUnbaselined: unbaselinedNegatives.length,
+    negativeRawFindings: negatives.filter((row) => row.actualFindings > 0).length,
     negativeTotal: negatives.length,
-    missesBefore: baselinePositives.filter((row) => String(row.baseline.outcome).includes("MISS")).length,
+    missesBefore: baselinePositives.filter((row) => isMiss(row.baseline.outcome)).length,
+    missesAfter: baselinePositives.filter((row) => isMiss(row.outcome)).length,
     positiveBaselined: baselinePositives.length,
-    missesAfter: positives.filter((row) => String(row.outcome).includes("MISS")).length,
+    missesUnbaselined: unbaselinedPositives.filter((row) => isMiss(row.outcome)).length,
+    positiveUnbaselined: unbaselinedPositives.length,
     positiveTotal: positives.length,
-    policyMisses: policy.filter((row) => String(row.outcome).includes("MISS")).length,
+    policyMisses: policy.filter((row) => isMiss(row.outcome)).length,
     policyTotal: policy.length,
   };
+}
+
+export function formatSection(label, summary) {
+  return (
+    `${label} (${summary.rows} fixtures): negative flags ${summary.negativeBefore} before / ${summary.negativeAfter} after, ` +
+    `over the same ${summary.negativeBaselined} baselined fixtures (outcome-scored); ` +
+    `${summary.negativeUnbaselinedFlagged}/${summary.negativeUnbaselined} unbaselined flagged (outcome-scored); ` +
+    `${summary.negativeRawFindings}/${summary.negativeTotal} raw fixtures with a finding (raw finding count, co-detections included). ` +
+    `Required-positive misses ${summary.missesBefore} before / ${summary.missesAfter} after, over the same ${summary.positiveBaselined} baselined fixtures; ` +
+    `${summary.missesUnbaselined}/${summary.positiveUnbaselined} unbaselined missed; policy misses ${summary.policyMisses}/${summary.policyTotal}.`
+  );
 }
 
 async function run(command, args, cwd, failureCode = "command-failed") {
@@ -168,7 +200,9 @@ async function buildCandidate(productCheckout, artifactDirectory, scratch) {
   await cp(path.join(productCheckout, "bindings/node", nodeManifest.main), path.join(nodeStage, nodeManifest.main));
   const node = await pack(nodeStage, artifactDirectory);
   const wasmStage = path.join(scratch, "wasm-package");
-  await cp(path.join(productCheckout, "bindings/wasm/npm"), wasmStage, { recursive: true });
+  await cp(path.join(productCheckout, "bindings/wasm/npm"), wasmStage, {
+    recursive: true,
+  });
   await cp(wasmOutput, wasmStage, { recursive: true });
   await cp(wasmCommonOutput, wasmStage, { recursive: true });
   const wasm = await pack(wasmStage, artifactDirectory);
@@ -176,7 +210,10 @@ async function buildCandidate(productCheckout, artifactDirectory, scratch) {
 }
 
 async function addWorktree(source, target, commit) {
-  execFileSync("git", ["worktree", "add", "--detach", target, commit], { cwd: source, stdio: "inherit" });
+  execFileSync("git", ["worktree", "add", "--detach", target, commit], {
+    cwd: source,
+    stdio: "inherit",
+  });
   verifyCheckoutHead(target, commit);
 }
 
@@ -266,12 +303,8 @@ export async function main(argv = process.argv.slice(2)) {
         expanded = summarizeSection(report, "expanded-corpus");
       console.log(`Candidate ${productCommit} against benchmark ${benchmarkCommit}`);
       console.log(`Artifact SHA-256: ${artifacts.coreSha256}`);
-      console.log(
-        `Fixed corpus (${fixed.rows} fixtures): negative flags ${fixed.negativeBefore} before (${fixed.negativeBaselined}/${fixed.negativeTotal} baselined) / ${fixed.negativeAfter} after; required-positive misses ${fixed.missesBefore} before (${fixed.positiveBaselined}/${fixed.positiveTotal} baselined) / ${fixed.missesAfter} after; policy misses ${fixed.policyMisses}/${fixed.policyTotal}.`,
-      );
-      console.log(
-        `Expanded corpus (${expanded.rows} fixtures): negative flags ${expanded.negativeBefore} before (${expanded.negativeBaselined}/${expanded.negativeTotal} baselined) / ${expanded.negativeAfter} after; required-positive misses ${expanded.missesBefore} before (${expanded.positiveBaselined}/${expanded.positiveTotal} baselined) / ${expanded.missesAfter} after; policy misses ${expanded.policyMisses}/${expanded.policyTotal}.`,
-      );
+      console.log(formatSection("Fixed corpus", fixed));
+      console.log(formatSection("Expanded corpus", expanded));
       console.log(`Evidence: ${evidence}`);
       return { evidence, report };
     } finally {
