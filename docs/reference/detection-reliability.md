@@ -8,6 +8,115 @@ not prove that input is secret-free. `supported` in that report means a
 finding-type inventory row has positive conformance evidence; it is not a
 precision, recall, or detector-count claim.
 
+## DRAFT: v0.1.0 reliability contract
+
+> **DRAFT.** The v0.1.0 candidate source revision is not frozen, so nothing in
+> this section is a release claim. It becomes one only when the identity table
+> below is filled from the frozen candidate and a reviewed pull request removes
+> this banner. Tracking: [#1067](https://github.com/redact-secret/redact-secret/issues/1067),
+> epic [#1065](https://github.com/redact-secret/redact-secret/issues/1065),
+> reconciling [#200](https://github.com/redact-secret/redact-secret/issues/200).
+
+### Identity this contract will bind
+
+| Item | At freeze | Working value (development, not a claim) |
+| --- | --- | --- |
+| Candidate source revision | `<frozen candidate SHA>` | audited `57a0dca9478c83e2c59caf9f9d7b467273d7e615` |
+| Benchmarks revision that produced the matrix | `<sourceReport.revision of the matrix re-pinned for the candidate>` | `e8f73bfd7241845ef9fb75574a72b135aa777ba6` |
+| Product commit that matrix measured | must equal the candidate source revision | `4227160c4dac402d7add53d3f8fe990f693912c1` (Beta.12): **not** the audited source |
+| Corpus identity | fixture count and fixture-index digest from the matrix | 5950 fixtures, digest `58f09c3544bf7238dcd076a7c1379681a302adef9ba66ee14dc801f95cfdbbdd` |
+| PII qualification candidate | the frozen candidate | Beta.11 core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7` |
+
+A count in this contract is valid only if the matrix's measured product commit
+equals the candidate source revision. If it does not, the page must say which
+families were measured on an earlier build instead of presenting the count as
+current.
+
+### Denominators
+
+Working counts at the audited source (regenerate with
+`python3 -B scripts/report-detection-support.py`; method and full tables in the
+[#1067 evidence record](../audits/evidence/1067/README.md)):
+
+- 110 shipped credential detectors emit 141 finding types; 6 opt-in PII
+  families also ship. These are the denominators.
+- The pinned matrix has 173 credential families: 144 stable, 7 provisional,
+  5 pending, 17 unsupported. Twenty-one of those families (17 unsupported, 4
+  pending) have no shipped detector.
+- Counted by weakest listed family, the 110 detectors are 102 stable, 7
+  provisional, 1 pending, 0 unsupported, and **0 shipped without a matrix
+  family**.
+- The 6 PII families are **not in the matrix**. Their statuses (five
+  `provisional`, US SSN `pending`) are stated by hand above and were measured
+  on the Beta.11 candidate, not on the audited source.
+
+"144 stable" counts matrix families, not detectors, and no stable family means
+a detector finds every credential its provider issues.
+
+### Known false-positive classes
+
+- Synthetic or documentation text that has the shape of a supported
+  credential. Detection cannot establish that a value is real.
+- A harmless assignment to a credential-like name, classified from context.
+- Keyword-gated provider keys without their own marker, which are claimed only
+  beside a provider name, host or SDK call, and can fire on that context alone
+  for a look-alike value.
+- PII: a well-formed identifier under a reviewed field label that is not
+  personal (each family's contract lists its named non-sensitive classes).
+
+### Known false-negative classes
+
+- Truncated, unusually short, new, or differently formatted credentials.
+- Credentials not in the support matrix, including the 17 `unsupported`
+  families listed there with reasons.
+- Encoded, wrapped, or split values; input is not generally decoded.
+- Contextual assignments whose value is not on the same line as the name, apart
+  from the documented multi-line layouts.
+- A bare base32 OTP seed, Azure Storage `AccountKey`, and query or property
+  passwords in connection strings.
+- The generic name `token` alone, which is deliberately ignored.
+- Anything not covered by one of the six PII contracts: names, postal
+  addresses, dates of birth, free-text personal data, phone numbers outside
+  `+1` / NANP, and every national identifier other than a US SSN.
+
+An empty finding list does not show that text is secret-free.
+
+### Per-family status
+
+The per-family status table is the generated
+[support matrix](../support-matrix.md) for credential families and the
+[Opt-in PII table](detection.md#opt-in-pii-availability-is-not-support) for
+PII. The per-detector join of both against the shipped code is
+[`detector-support-join.md`](../audits/evidence/1067/detector-support-join.md).
+At freeze, that file is regenerated for the candidate and linked from here by
+commit permalink, and this section's counts are replaced by its totals.
+
+### What this contract does not claim
+
+- No precision, recall, or accuracy percentage for production traffic.
+- No independent validation. Corroboration columns and any scanner comparison
+  are project-collected evidence, recorded so a reader can check it, and the
+  peer rules they cite often copy one another.
+- No support for a PII family merely because it can be activated; activation is
+  availability, and only the `pii-v1` status is support.
+
+### Binding at freeze
+
+1. Re-pin `benchmarks/support-matrix.json` (and its pin files) from
+   `redact-secret/redact-secret-benchmarks` for the frozen candidate; the
+   matrix's `sourceReport.product.sourceCommit` must equal the candidate SHA.
+2. Run `python3 -B scripts/check-detector-family-coverage.py --strict` and the
+   report script; both must show 0 shipped-but-unmeasured credential detectors.
+3. Replace the working values above with the frozen identities, link the
+   regenerated join by permalink, and record PII statuses measured on the
+   candidate.
+4. Remove the DRAFT banner in a reviewed pull request. A release still needs
+   explicit approval under the
+   [release authority](../../AGENTS.md#release-authority).
+
+The sections below are the earlier bounded assessment and are not the
+v0.1.0 contract.
+
 ## Measured corpus and artifact identity
 
 The [v4 assessment](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-v4/summary.json)
