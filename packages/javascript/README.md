@@ -12,12 +12,16 @@ the server must scan again as the authoritative enforcement boundary (see
 
 Redact Secret is not a DLP platform and does not detect every secret: it
 finds supported credential formats and, only when you opt in, six bounded
-structured PII families (five `provisional`, US SSN `pending`, none `stable`),
+structured PII families (at the Beta.11 qualification: five `provisional`, US SSN
+`pending`, none `stable`),
 and an empty finding list does not
 prove text is secret-free. It complements repository and history scanners
-rather than replacing them. Per-family support is published in the generated
+rather than replacing them. Credential-family support is published in the
+generated
 [support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
-not stated by hand here.
+not stated by hand here; that matrix does not carry the PII families, whose statuses
+are in the
+[detection reference](https://github.com/redact-secret/redact-secret/blob/main/docs/reference/detection.md#opt-in-pii-availability-is-not-support).
 
 One typed API, two artifacts: the package's `imports` map selects the Node
 N-API addon on Node.js and the browser WebAssembly build everywhere else
@@ -287,9 +291,9 @@ Types: `InitializeOptions`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFind
 PII activation is opt-in and off by default. Pass `pii` selectors to
 `initialize`, for example `await initialize({ pii: ["pii"] })`, then read the
 canonical identity with `piiActivation()`. It covers six bounded structured
-families (email, IBAN, network address, payment card, phone, US SSN); under
-`pii-v1` the first five are `provisional` and US SSN is `pending`, none
-`stable`. Availability is not a support claim. The `pii`
+families (email, IBAN, network address, payment card, phone, US SSN); at the
+Beta.11 `pii-v1` qualification the first five are `provisional` and US SSN is
+`pending`, none `stable`. Availability is not a support claim. The `pii`
 selection is an `initialize` option, not a separate subpath import. A browser
 or Worker fetches the PII WebAssembly build only when the first `initialize`
 call selects PII. See the

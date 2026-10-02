@@ -17,8 +17,10 @@ Built-in Rust detection covers these kinds of structure:
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
 | Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, payment-card, phone, and US SSN identities. Global families use `pii:global:*`; SSN uses `pii:us:ssn`. PII defaults off and all families share one `pii-domain` slot |
 
-Per-family support status is stated only in the generated
-[support matrix](../support-matrix.md). Each provider family's exact frozen
+Credential-family support status is stated only in the generated
+[support matrix](../support-matrix.md); that matrix does not carry the opt-in
+PII families, whose status is the table under
+[Opt-in PII](#opt-in-pii-availability-is-not-support). Each provider family's exact frozen
 grammar and the decision behind it are in the
 [detector-families spec](../specs/detector-families.md); for example,
 DigitalOcean tokens are `dop_v1_`/`doo_v1_`/`dor_v1_` plus exactly 64

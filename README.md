@@ -15,7 +15,8 @@ Your application handles text it does not fully control: user input, pasted
 configuration, error messages, HTTP bodies, and tool results. Before that text
 leaves the request and lands somewhere that keeps or repeats it, pass it
 through Redact Secret. It finds supported credential formats (plus opt-in
-structured PII: five families `provisional`, US SSN `pending`, none `stable`)
+structured PII, whose `pii-v1` statuses at the Beta.11 qualification were five families
+`provisional`, US SSN `pending`, none `stable`)
 and returns the text with those matches replaced, plus findings that describe what was
 found and where without ever including the secret itself. It runs in your
 process. It makes no network calls and sends no telemetry, and the same input
@@ -64,7 +65,7 @@ See [browser and server boundaries](#browser-and-server-boundaries) and
 ## What it does not replace
 
 - **It is not a DLP platform.** It finds credentials, plus opt-in structured PII (six bounded
-  families: five `provisional`, US SSN `pending`), not general personal data, and
+  families: at the Beta.11 qualification, five `provisional`, US SSN `pending`), not general personal data, and
   it has no policy console, quarantine, or hosted service.
 - **It does not detect every secret.** Detection is limited to supported
   formats and deliberately favors precision. Truncated, new, or unsupported

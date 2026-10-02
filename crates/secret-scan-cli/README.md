@@ -13,9 +13,11 @@ input produces the same findings here, in the library, and in every binding.
 
 It checks the files and streams it is given; it does not walk Git history, so
 it complements repository and history scanners rather than replacing them. It
-is not a DLP platform and does not detect every secret: per-family support is
+is not a DLP platform and does not detect every secret: credential-family support is
 published in the generated
-[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md).
+[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
+which does not carry the opt-in PII families (see the
+[detection reference](https://github.com/redact-secret/redact-secret/blob/main/docs/reference/detection.md#opt-in-pii-availability-is-not-support)).
 
 ```text
 usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
