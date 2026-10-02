@@ -14,6 +14,7 @@ use std::fmt;
 /// ([`message`](Self::message)) are part of the cross-language contract and
 /// must not change without a corpus review.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum SecretScanErrorCode {
     /// The host passed something other than a text input. The core itself
     /// only accepts `&str`, so this code is produced by bindings.

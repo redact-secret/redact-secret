@@ -15,7 +15,8 @@ Your application handles text it does not fully control: user input, pasted
 configuration, error messages, HTTP bodies, and tool results. Before that text
 leaves the request and lands somewhere that keeps or repeats it, pass it
 through Redact Secret. It finds supported credential formats (plus opt-in
-structured PII: five families `provisional`, US SSN `pending`, none `stable`)
+structured PII, whose `pii-v1` statuses at the Beta.11 qualification were five families
+`provisional`, US SSN `pending`, none `stable`)
 and returns the text with those matches replaced, plus findings that describe what was
 found and where without ever including the secret itself. It runs in your
 process. It makes no network calls and sends no telemetry, and the same input
@@ -64,7 +65,7 @@ See [browser and server boundaries](#browser-and-server-boundaries) and
 ## What it does not replace
 
 - **It is not a DLP platform.** It finds credentials, plus opt-in structured PII (six bounded
-  families: five `provisional`, US SSN `pending`), not general personal data, and
+  families: at the Beta.11 qualification, five `provisional`, US SSN `pending`), not general personal data, and
   it has no policy console, quarantine, or hosted service.
 - **It does not detect every secret.** Detection is limited to supported
   formats and deliberately favors precision. Truncated, new, or unsupported
@@ -263,8 +264,10 @@ implementation. A caller with an internal credential format uses a
 An organization with an internal credential format can declare it as a
 **declarative ruleset**: UTF-8 data (at most 64 KiB) the core parses and
 matches itself with the same linear-time engine as every built-in detector,
-never a callback. Ruleset detections always carry medium confidence and can
-never outrank a built-in finding. Rust, JavaScript, Python, and the CLI
+never a callback. Ruleset detections always carry medium confidence, so the
+default policy only warns about them (`scanAndRedact` and `redact-secret
+--redact` leave the matched text unchanged; only a caller policy redacts it),
+and they can never outrank a built-in finding. Rust, JavaScript, Python, and the CLI
 (`--ruleset <path>`) all accept one. See the
 [rulesets guide](docs/guides/rulesets.md) for the format, matching semantics,
 and rejection classes.
@@ -280,7 +283,7 @@ one whole-input operation, under explicit limits that fail closed. See
 ## Detection coverage
 
 <!-- support-matrix:start -->
-**Support status** (92 providers, 173 credential families; stable: 144, provisional: 7, pending: 5, unsupported: 17; stable qualification: documented: 106, empirical: 38, policy-qualified: 0; evidence tiers: T1: 106, T2: 41, T3: 4, T0: 1) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
+**Support status** (92 providers, 173 credential families; stable: 144, provisional: 7, pending: 5, unsupported: 17; stable qualification: documented: 106, empirical: 38, policy-qualified: 0; evidence tiers: T1: 106, T2: 41, T3: 4, T0: 1) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md). Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `4227160c4dac` (`0.1.0-beta.12`) with benchmarks revision `e8f73bfd7241` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 110 credential detectors, all of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support).
 <!-- support-matrix:end -->
 
 Built-in detection covers private keys, provider-issued tokens, JWT and

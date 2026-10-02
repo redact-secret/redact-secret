@@ -54,6 +54,13 @@ Check exit codes are the enforcement contract. A failure outranks a finding,
 and input that is not valid UTF-8 fails closed. Redaction reports `0` or `2`
 only: finding something is what it is for, not a failure.
 
+These three are the only statuses the CLI chooses. A status of any other value
+(for example `101` after an internal panic, or death by a signal) is an
+internal failure outside the contract: treat it like `2`, and discard any
+output. Standard output may then hold a sanitized but incomplete prefix; the
+CLI never writes an unsanitized byte
+([measured](../audits/evidence/1130/README.md)).
+
 Check mode flags **any** finding, including `warn` and `allow`. Redact mode
 replaces only `redact` and `block` spans under the default policy, so successful
 redaction does not guarantee that every detected range was removed.

@@ -13,9 +13,11 @@ input produces the same findings here, in the library, and in every binding.
 
 It checks the files and streams it is given; it does not walk Git history, so
 it complements repository and history scanners rather than replacing them. It
-is not a DLP platform and does not detect every secret: per-family support is
+is not a DLP platform and does not detect every secret: credential-family support is
 published in the generated
-[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md).
+[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
+which does not carry the opt-in PII families (see the
+[detection reference](https://github.com/redact-secret/redact-secret/blob/main/docs/reference/detection.md#opt-in-pii-availability-is-not-support)).
 
 ```text
 usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
@@ -27,6 +29,10 @@ usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<pa
 
 `--ruleset <path>` loads a declarative ruleset in either mode and needs an
 explicit path source; standard input accepts none.
+A ruleset detection has medium confidence, so the default policy only warns
+about it: check mode reports it, and `--redact --ruleset` runs but leaves
+ruleset matches in the output unchanged. The CLI has no policy hook to change
+that; see the [rulesets guide](../../docs/guides/rulesets.md#default-action).
 
 PII selectors are opt-in and repeatable. The activation-print form exits
 without opening input. `pii` closes over the context-required
@@ -98,6 +104,10 @@ would trade that for unbounded memory, which is what streaming exists to avoid.
 Redaction does not report a finding through its exit code: finding something is
 what redaction is for, not a failure. Run check mode when a finding should fail
 a hook or a job.
+
+Any other status (for example `101` after an internal panic, or death by a
+signal) is an internal failure outside this table: treat it like `2` and
+discard the output, which may hold a sanitized but incomplete prefix.
 
 In check mode a failure outranks a finding: a run that could not read or decode
 part of its input has not proved that part clean, so it exits `2` even when

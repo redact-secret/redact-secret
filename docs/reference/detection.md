@@ -17,8 +17,10 @@ Built-in Rust detection covers these kinds of structure:
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
 | Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, payment-card, phone, and US SSN identities. Global families use `pii:global:*`; SSN uses `pii:us:ssn`. PII defaults off and all families share one `pii-domain` slot |
 
-Per-family support status is stated only in the generated
-[support matrix](../support-matrix.md). Each provider family's exact frozen
+Credential-family support status is stated only in the generated
+[support matrix](../support-matrix.md); that matrix does not carry the opt-in
+PII families, whose status is the table under
+[Opt-in PII](#opt-in-pii-availability-is-not-support). Each provider family's exact frozen
 grammar and the decision behind it are in the
 [detector-families spec](../specs/detector-families.md); for example,
 DigitalOcean tokens are `dop_v1_`/`doo_v1_`/`dor_v1_` plus exactly 64
@@ -56,6 +58,22 @@ The Beta.11 qualification measured candidate core
 | `pii:global:iban` | `pii`, `pii:global`, `pii:us`, `pii:family:global:iban` | global | `provisional` |
 | `pii:global:phone` | `pii`, `pii:global`, `pii:us`, `pii:family:global:phone` | global selector, `+1` / NANP numbers only | `provisional` |
 | `pii:us:ssn` | `pii:us`, `pii:family:us:ssn` | United States only | `pending` |
+
+These statuses are bound to two exact revisions: core
+`8b6a5fde52ecb4dfce13f09c7a947062d21483c7` (`0.1.0-beta.11`) and
+`redact-secret/redact-secret-benchmarks` revision
+`be0fb9f35045bf05e5b999a2c0ed368541f9e963`, which holds the qualification
+record. The PII code has changed since that core revision: `pii_email.rs`,
+`pii_iban.rs` and `pii_phone.rs` (the email, IBAN and phone families) and also
+`pii_payment_card.rs`, `pii_us_ssn.rs` and the shared `pii.rs`. The statuses
+below were measured on the earlier code and have not been re-measured on the
+current source; re-qualification is benchmarks work. The pinned support matrix
+does not carry PII statuses yet
+([`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647));
+until it does, the gate `npm run pii-family-status:check` fails when a shipped
+PII family has no row here or in
+[`docs/coverage/pii-family-status.json`](../coverage/pii-family-status.json),
+when the two disagree, or when a recorded revision is missing.
 
 `provisional` is not `stable`, and no family is `stable`. The five
 `provisional` families met every public gate and their one sealed

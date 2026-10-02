@@ -171,6 +171,12 @@ depend on `src/`.
   shape), so it is not registered with `schema.ts`/`schema.json`. The Rust
   consumer is `crates/secret-scan-core/tests/ruleset_conformance.rs`; the
   Python consumer is `bindings/python/tests/test_ruleset_conformance.py`. The
+  Node addon, the WebAssembly artifact (through its Node glue) and the release
+  CLI run it in the artifact-qualification workflow through
+  `scripts/lib/ruleset-reference.mjs` (issue #1183), which also pins the
+  default action (`warn`) of every ruleset detection and checks the
+  `tightenedRejections` inputs (issue #1182). The browser pages do not run it.
+  The
   `RULESET_TOO_LARGE`, `TOO_MANY_DETECTORS`, and `TOO_MANY_NAMES` cases are
   generator-described (`oversizedBytes`/`detectorCount`/`nameCount`) rather
   than literal text, the same provenance idea

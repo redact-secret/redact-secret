@@ -25,6 +25,7 @@ use crate::types::{Detector, is_identifier};
 /// consumers. A registry built through [`DetectorRegistry::new`] plus
 /// [`DetectorRegistry::register`] carries no profile identity.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Profile {
     /// Every officially supported built-in detector. The default and
     /// compatibility baseline on every surface.

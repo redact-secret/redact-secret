@@ -42,6 +42,60 @@ Catch `redact_secret.SecretScanError` for library failures and stop downstream
 processing. Do not fall back to the raw input. The binding maps callback
 failures to fixed exceptions instead of forwarding the callback's message.
 
+## Exceptions
+
+Every library failure is a `redact_secret.SecretScanError` or one of its
+subclasses, with a fixed, input-free message and a `code` class attribute that
+equals the core's wire code. There is one subclass per core code, so
+`except redact_secret.SecretScanError` catches all of them and a subclass
+narrows a handler. The set of codes grows over time: treat any exception you do
+not name as a failure, and never fall back to the raw input.
+
+| Exception | `code` | Raised when |
+| --- | --- | --- |
+| `SecretScanError` | none | Base class of every error below; catch it for any library failure. |
+| `InvalidInputError` | `INVALID_INPUT` | The text is not a `str`, or contains an unpaired surrogate. |
+| `InvalidOptionsError` | `INVALID_OPTIONS` | An option has the wrong type, such as a `ruleset` that is not `bytes`, `bytearray` or `str`. |
+| `InvalidDetectorError` | `INVALID_DETECTOR` | The detector registry is malformed. Not reachable with the detectors this package ships. |
+| `DetectorFailureError` | `DETECTOR_FAILURE` | A detector failed while scanning. |
+| `InvalidCandidateError` | `INVALID_CANDIDATE` | A detector returned a candidate the core rejects. Not expected with the detectors this package ships. |
+| `PolicyFailureError` | `POLICY_FAILURE` | Your policy callback raised. The callback's message is not forwarded. |
+| `InvalidPolicyActionError` | `INVALID_POLICY_ACTION` | Your policy returned something other than `redact`, `block`, `warn` or `allow`. |
+| `InvalidFindingsError` | `INVALID_FINDINGS` | `redact` was given a finding whose range falls outside the text, is misaligned, or overlaps another finding. |
+| `PlaceholderFailureError` | `PLACEHOLDER_FAILURE` | Your formatter callback raised. The callback's message is not forwarded. |
+| `InvalidPlaceholderError` | `INVALID_PLACEHOLDER` | Your formatter returned an empty, over-long (more than 256 bytes) or value-reproducing placeholder. |
+| `InvalidLimitsError` | `INVALID_LIMITS` | A limit is zero, or `max_buffered_bytes` is below `IncrementalLimits.minimum_buffered_bytes` for the construct limits. |
+| `InputLimitExceededError` | `INPUT_LIMIT_EXCEEDED` | The whole-input bound, or an incremental session's `max_input_bytes`, was reached. |
+| `FindingLimitExceededError` | `FINDING_LIMIT_EXCEEDED` | A whole-input call found more than `max_findings` findings. |
+| `BufferLimitExceededError` | `BUFFER_LIMIT_EXCEEDED` | An incremental session would retain more than `max_buffered_bytes`. |
+| `TokenLimitExceededError` | `TOKEN_LIMIT_EXCEEDED` | An open single-line construct exceeded `max_token_bytes`. |
+| `MultilineLimitExceededError` | `MULTILINE_LIMIT_EXCEEDED` | An open multiline construct exceeded `max_multiline_bytes`. |
+| `InvalidStateError` | `INVALID_STATE` | An incremental session received an operation after it left the `accepting` state. |
+| `InvalidRulesetError` | `INVALID_RULESET` | A `ruleset` was rejected while loading; the message ends with the fixed rejection class in parentheses. See [rulesets](rulesets.md). |
+| `PiiSelectorInvalidError` | `PII_SELECTOR_INVALID` | A PII selector given to `initialize` is not valid. |
+| `PiiSelectorUnsupportedError` | `PII_SELECTOR_UNSUPPORTED` | A PII jurisdiction or family is unsupported. |
+| `PiiSelectorUnavailableError` | `PII_SELECTOR_UNAVAILABLE` | The selection is unavailable in this artifact. |
+| `PiiActivationConflictError` | `PII_ACTIVATION_CONFLICT` | A different PII selection was requested after one was activated. |
+
+## Callback context types and default callbacks
+
+A policy or formatter callback receives instances of these classes. They cannot
+be constructed from Python, are immutable, and carry positions only: never the
+input or a matched value. `redact_secret.__all__` exports them for type
+annotations.
+
+| Name | Where it appears | Fields |
+| --- | --- | --- |
+| `PolicyContext` | Second argument of a `scan`/`scan_and_redact` policy | `finding_index`, `finding_count` |
+| `PlaceholderContext` | Second argument of a formatter | `placeholder_index` (one-based among findings actually replaced) |
+| `IncrementalPolicyContext` | Second argument of an `IncrementalSanitizer` policy | `finding_index` only: a session cannot know a total count |
+| `IncrementalResult` | Return value of `IncrementalSanitizer.append()` and `finalize()` | `text`, `findings` |
+
+`default_policy(finding, context)` and `default_incremental_policy(finding,
+context)` are the built-in policies in the callback shapes above. They return
+the same action for the same finding, so a custom policy can call one to fall
+back to the default for findings it does not want to override.
+
 ## Whole-input limits
 
 `scan`, `redact`, and `scan_and_redact` default to a 64 MiB input bound and a

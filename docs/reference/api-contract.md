@@ -98,3 +98,138 @@ Failures use fixed codes and input-free messages. JavaScript exposes
 `SecretScanError` in `Result`. [Troubleshooting](../troubleshooting.md) covers
 common causes. Policy and formatter callbacks are supported across languages;
 custom detector callbacks are a direct Rust surface only.
+
+## Stable contract 1
+
+> **Accepted by the owner on 2026-10-02 for the 0.1.x series.** The policy
+> behind this section is decided by
+> [`decision-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes`](../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md)
+> and, for declarative rulesets,
+> [`decision-define-declarative-ruleset-revisioning`](../decisions/2026-10-02-define-declarative-ruleset-revisioning.md).
+> The name-by-name audit, the surfaces that were likely to break, the owner
+> decisions and the verification this rests on are in the
+> [contract audit](../audits/evidence/1066/README.md) and the
+> [ruleset audit](../audits/evidence/1072/README.md). Conformance against the
+> exact candidate artifacts is a separate, later step
+> ([#199](https://github.com/redact-secret/redact-secret/issues/199)).
+
+### What the contract covers
+
+| Surface | Covered | Not covered |
+| --- | --- | --- |
+| Rust | The 54 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
+| JavaScript | `@redact-secret/core` and its subpaths `./common`, `./node-stream`, `./web-stream`, `./common/node-stream`, `./common/web-stream`: exported functions, constants, classes and types | `@redact-secret/wasm`, `@redact-secret/node` and the platform packages: installed as dependencies, not for direct use, versioned only in lockstep |
+| Python | Names in `redact_secret.__all__` and the shipped `.pyi` stubs | `redact_secret._native` and anything not re-exported |
+| CLI | Arguments, exit codes `0`/`1`/`2`, the `--json` report fields, standard-stream behavior | The line-per-finding text format (it is for people; parse `--json`), and diagnostic wording beyond the fixed code |
+| Conformance | The fixtures under `conformance/fixtures/` define behavior for every surface above | Fixture file layout and the runners |
+
+Detection coverage is not part of this contract. Which credentials are found
+is governed by the [support matrix](../support-matrix.md) and the detection
+reference; the contract says how findings are reported, not which exist.
+
+### Compatibility classes
+
+| Class | Meaning | Examples | Rule |
+| --- | --- | --- | --- |
+| Breaking | A correct call stops compiling, stops working, or changes what a documented value means | Removing or renaming an export; changing a signature, a range unit, an action's meaning, an error code's meaning or a ruleset field; adding a variant to a Rust enum that is not `#[non_exhaustive]`; changing a published finding `type` or `detector` string (rename, split, remove) | Needs a contract review and a `Changed` entry; never in a patch release. While the major version is 0, a breaking change to a stable surface bumps the minor version (0.2.0). |
+| Additive | A new name, option, accepted input, error code or `type`/`detector` value that existing correct code can ignore | A new export; a new optional argument; a new finding type; a new error code (consumers must treat error codes as an open set) | Needs a changelog entry and a manifest review where the Rust root changes. Ships in a patch release (0.1.x). |
+| Behavioral | The same call returns different findings, spans or timing | A new detector, a tuned span, fewer or more redactions, the default policy's always-redact set growing | Changelog entry; covered by the evidence and support matrix, not frozen. Ships in a patch release (0.1.x). |
+| Internal | Everything outside the "Covered" column | Private modules, `_native`, wasm glue | No promise. |
+
+### Frozen behavior
+
+**Operations.** `scan`, `redact` and `scanAndRedact` (`scan_and_redact`) keep
+the semantics in this document: findings are sorted by position, numbered
+`finding-1`..., half-open, and index the original input; overlap precedence is
+the documented order; `redact` validates caller findings and replaces only
+`redact`/`block` ranges; identical input and configuration give identical
+output. Whole-input calls are bounded by default (64 MiB, 50,000 findings) and
+fail rather than truncate.
+
+**Range units.** UTF-16 code units (JavaScript), Unicode code points
+(Python), UTF-8 bytes (Rust and CLI). Frozen per surface; the exported
+`RANGE_UNIT` names it.
+
+**Errors.** Every failure carries a fixed code and an input-free message. The
+22 core codes are identical in Rust, JavaScript and Python; JavaScript adds
+five host codes (`NOT_INITIALIZED`, `INITIALIZATION_FAILED`, `INVALID_CHUNK`,
+`INVALID_UTF8`, `UNPAIRED_SURROGATE`). A lone surrogate cannot reach the core
+in either host: JavaScript rejects it with `UNPAIRED_SURROGATE`, Python with
+`InvalidInputError`. The set of codes grows over time; handle an unknown code
+as a failure. Rust's `SecretScanErrorCode` and `Profile` are
+`#[non_exhaustive]`, so a `match` over either needs a wildcard arm and a new
+variant is not a breaking change. `Action`, `Confidence` and `Specificity`
+stay exhaustive by design: they are closed sets, and a new variant changes
+pipeline semantics (a breaking change).
+
+**Policy and placeholder callbacks.** They receive safe metadata only (never
+the input or a matched value). A policy returns one of `redact`, `block`,
+`warn`, `allow`, exactly once per selected finding in order; anything else is
+`INVALID_POLICY_ACTION`, a throw is `POLICY_FAILURE`. A formatter returns a
+non-empty placeholder of at most 256 bytes that reproduces no finding's
+matched value; otherwise `INVALID_PLACEHOLDER` (a throw is
+`PLACEHOLDER_FAILURE`). JavaScript policies are objects with `evaluate`,
+Python and Rust policies are callables; the behavior is the same.
+
+**Incremental and streaming.** A session requires explicit limits (no
+defaults), keeps findings absolute, evaluates policy once per final finding,
+and for accepted input produces output and findings equal to one whole-input
+operation at every chunk partition. A failure leaves a sanitized, incomplete
+prefix and a terminal state; the states are `accepting`, `finalized`,
+`aborted` and `failed`.
+The four limits are UTF-8 byte ceilings on every surface. The JavaScript
+fields `maxInputCodeUnits`, `maxBufferedCodeUnits`, `maxTokenCodeUnits` and
+`maxMultilineCodeUnits` say code units but count bytes, so `maxInputBytes`,
+`maxBufferedBytes`, `maxTokenBytes` and `maxMultilineBytes` are accepted as
+additive aliases. The old names are deprecated, keep working and are not
+removed. Naming both spellings of one limit with different values is
+`INVALID_LIMITS`. Sessions accept no custom detector and no ruleset, on any
+surface.
+
+**Detector profiles and PII.** `full` is the default and the authoritative
+baseline; `common` is a smaller structural/contextual subset for preventive
+use and by design reports fewer findings. Python and the CLI expose `full`
+only. In Rust, call `DetectorRegistry::with_common_built_in` (or
+`IncrementalSanitizer::with_common_built_in`) for `common`: a run-time
+`Profile` value passed to `sanitize_with_profile` links both profiles. PII is
+off unless selected, with the selector grammar and activation identity of the
+PII contract; a selected family's support level is the support matrix's, not
+this contract's.
+
+**Declarative rulesets.** `ruleset-revision: 1` is the grammar in the
+[rulesets guide](../guides/rulesets.md); it rejects repeated fields,
+invisible-character prefixes and non-canonical counts. A ruleset can add detections and can never outrank a
+built-in; every ruleset detection is medium confidence, so under the default
+policy it is `warn` and `redact` leaves its text unchanged unless the caller's
+policy says otherwise (the CLI has no policy hook, so `--redact` never changes
+text for a ruleset match). Revision 1 is frozen byte for byte; any new
+alphabet, validator, field or bound is revision 2, and revision 1 stays
+supported through the major series in which revision 2 ships and the next
+one. Unknown revisions, fields and vocabulary are rejected, never skipped.
+JavaScript ruleset errors keep one fixed message per code, with no
+rejection-class field in 0.1.x (an additive optional field may follow); Rust,
+Python and the CLI report the class. A ruleset is one per call, applies
+to whole-input calls only, and is available on Rust, JavaScript (Node and
+WebAssembly), Python and the CLI with an explicit file source.
+
+**Custom extension boundary.** Rust consumers may implement `Detector` and
+register it: trusted in-process code, not a sandbox. JavaScript and Python
+have no custom detector callback and will not get one; their extension is the
+ruleset. No surface performs network access, and a detector, policy or
+formatter never receives more than its documented inputs.
+
+**CLI.** Exit `0` (clean), `1` (check mode found something), `2` (usage,
+decoding, limit, read or write failure). Any other status (for example `101`
+from a panic, or death by signal) is an internal failure outside the contract:
+treat it as a failure and discard the output. Standard output may then hold a
+sanitized, incomplete prefix; the CLI never writes an unsanitized byte. The
+`--json` report keeps its field set (`version`, `rangeUnit`, `findingCount`,
+`sources`, `failures`) and may only add fields.
+
+### Unsupported and experimental
+
+Not part of contract 1: custom detector callbacks in JavaScript or Python;
+rulesets in incremental sessions, stream adapters or CLI standard input; more
+than one ruleset per call; decoding encoded input; a third detector profile;
+the `@redact-secret/wasm` package used directly; detector coverage claims
+beyond the support matrix.

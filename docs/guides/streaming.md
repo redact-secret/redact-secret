@@ -29,10 +29,15 @@ subpaths — see
 ## JavaScript incremental example
 
 Both installed JavaScript artifacts expose the same root API. Findings count
-UTF-16 code units on Node.js and in browsers. The four limit properties retain
-their existing `CodeUnits` names for compatibility, but their numeric ceilings
-are enforced by the Rust core as UTF-8 byte limits on both artifacts. Size
-non-ASCII input with `TextEncoder` when choosing those bounds.
+UTF-16 code units on Node.js and in browsers. The four limits are UTF-8 byte
+ceilings, enforced by the Rust core on both artifacts, so they are named
+`maxInputBytes`, `maxBufferedBytes`, `maxTokenBytes` and `maxMultilineBytes`.
+The older names `maxInputCodeUnits`, `maxBufferedCodeUnits`,
+`maxTokenCodeUnits` and `maxMultilineCodeUnits` are deprecated aliases with the
+same meaning; they keep working. Give each limit under one name. Naming both
+spellings of one limit is accepted only when the values are equal; different
+values throw `INVALID_LIMITS`, as does leaving a limit out. Size non-ASCII input
+with `TextEncoder` when choosing those bounds.
 
 ```ts
 import { createIncrementalSanitizer, initialize } from "@redact-secret/core";
@@ -41,10 +46,10 @@ await initialize();
 
 const session = createIncrementalSanitizer({
   limits: {
-    maxInputCodeUnits: 32_768,
-    maxBufferedCodeUnits: 16_512,
-    maxTokenCodeUnits: 8_192,
-    maxMultilineCodeUnits: 16_384,
+    maxInputBytes: 32_768,
+    maxBufferedBytes: 16_512,
+    maxTokenBytes: 8_192,
+    maxMultilineBytes: 16_384,
   },
 });
 const first = session.append("api_key=SYNTHETIC_REVOKED_");
@@ -67,10 +72,10 @@ await pipeline(
   process.stdin,
   createNodeStreamSanitizer({
     limits: {
-      maxInputCodeUnits: 32_768,
-      maxBufferedCodeUnits: 16_512,
-      maxTokenCodeUnits: 8_192,
-      maxMultilineCodeUnits: 16_384,
+      maxInputBytes: 32_768,
+      maxBufferedBytes: 16_512,
+      maxTokenBytes: 8_192,
+      maxMultilineBytes: 16_384,
     },
   }),
   process.stdout,
@@ -105,10 +110,10 @@ await pipeline(
   process.stdin,
   createNodeStreamSanitizer({
     limits: {
-      maxInputCodeUnits: 32_768,
-      maxBufferedCodeUnits: 16_512,
-      maxTokenCodeUnits: 8_192,
-      maxMultilineCodeUnits: 16_384,
+      maxInputBytes: 32_768,
+      maxBufferedBytes: 16_512,
+      maxTokenBytes: 8_192,
+      maxMultilineBytes: 16_384,
     },
   }),
   process.stdout,
@@ -136,10 +141,10 @@ import { NodeStreamSanitizer } from "@redact-secret/core/common/node-stream";
 await initialize();
 const session = createIncrementalSanitizer({
   limits: {
-    maxInputCodeUnits: 32_768,
-    maxBufferedCodeUnits: 16_512,
-    maxTokenCodeUnits: 8_192,
-    maxMultilineCodeUnits: 16_384,
+    maxInputBytes: 32_768,
+    maxBufferedBytes: 16_512,
+    maxTokenBytes: 8_192,
+    maxMultilineBytes: 16_384,
   },
 });
 await pipeline(process.stdin, new NodeStreamSanitizer(session), process.stdout);

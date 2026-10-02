@@ -11,6 +11,15 @@ python3 -B scripts/generate-support-matrix-docs.py
 
 92 providers, 173 credential families.
 
+Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `4227160c4dac` (`0.1.0-beta.12`) with benchmarks revision `e8f73bfd7241` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 110 credential detectors, all of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](reference/detection.md#opt-in-pii-availability-is-not-support).
+
+Identity of the counts above:
+
+- Benchmarks revision that generated this matrix: `e8f73bfd7241845ef9fb75574a72b135aa777ba6`.
+- Product commit it measured: `4227160c4dac402d7add53d3f8fe990f693912c1`.
+- Corpus: 5950 fixtures, fixture-index digest `58f09c3544bf7238dcd076a7c1379681a302adef9ba66ee14dc801f95cfdbbdd`.
+- Other vendored benchmarks revisions, which did not produce these statuses: `benchmarks/pin-source.json` benchmarkCommit `1485f73e9eb23179fdfeab6aa6170745e989453d`; `benchmarks/pin-manifest.json` revision `68dacc4c3ac0ebc929e2f72ab5adeb55c0272a32`.
+
 Support status, evidence provenance, and qualification are separate dimensions. In particular, a T2 family may be stable through the empirical profile without being described as provider-documented or rewritten as T1. User-facing labels combine the dimensions without conflating them: `Stable · Provider documented`, `Stable · Empirically qualified`, and `Provisional · Tool corroborated`.
 
 For the detailed measurement protocol behind these statuses -- evidence tiers, and the twin, benign, metamorphic, mutation, and differential criteria a family must clear -- see `redact-secret-benchmarks`'s [support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/e8f73bfd7241845ef9fb75574a72b135aa777ba6/docs/specs/support-status.md). You do not need to read it to use this table.

@@ -191,6 +191,26 @@ function toNativeRuleset(ruleset: ScanOptions["ruleset"]): Uint8Array | undefine
   throw new SecretScanError("INVALID_OPTIONS");
 }
 
+/**
+ * Resolves one incremental limit given under its byte name, its deprecated
+ * `CodeUnits` name, or both. Both are validated like any limit
+ * ({@link toNativeLimit}); a name that is absent or `undefined` is not
+ * given. Both given with different values is ambiguous and throws
+ * `INVALID_LIMITS` rather than guessing which one the caller meant; neither
+ * given throws the same code, as an omitted limit always did.
+ */
+function resolveIncrementalLimit(limits: object, bytesName: string, legacyName: string): number {
+  const record = limits as Readonly<Record<string, unknown>>;
+  const bytes = record[bytesName];
+  const legacy = record[legacyName];
+  if (bytes === undefined) return toNativeLimit(legacy);
+  const resolved = toNativeLimit(bytes);
+  if (legacy !== undefined && toNativeLimit(legacy) !== resolved) {
+    throw new SecretScanError("INVALID_LIMITS");
+  }
+  return resolved;
+}
+
 function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): NativeIncrementalOptions {
   if (typeof options !== "object" || options === null) {
     throw new SecretScanError("INVALID_OPTIONS");
@@ -207,10 +227,10 @@ function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): Nativ
     policy === undefined ? undefined : (finding, context) => policy.evaluate(toDetectedSecretFinding(finding), context);
   return {
     limits: {
-      maxInputCodeUnits: toNativeLimit(limits.maxInputCodeUnits),
-      maxBufferedCodeUnits: toNativeLimit(limits.maxBufferedCodeUnits),
-      maxTokenCodeUnits: toNativeLimit(limits.maxTokenCodeUnits),
-      maxMultilineCodeUnits: toNativeLimit(limits.maxMultilineCodeUnits),
+      maxInputCodeUnits: resolveIncrementalLimit(limits, "maxInputBytes", "maxInputCodeUnits"),
+      maxBufferedCodeUnits: resolveIncrementalLimit(limits, "maxBufferedBytes", "maxBufferedCodeUnits"),
+      maxTokenCodeUnits: resolveIncrementalLimit(limits, "maxTokenBytes", "maxTokenCodeUnits"),
+      maxMultilineCodeUnits: resolveIncrementalLimit(limits, "maxMultilineBytes", "maxMultilineCodeUnits"),
     },
     ...(policyCallback === undefined ? {} : { policy: policyCallback }),
     ...(formatter === undefined ? {} : { formatter }),

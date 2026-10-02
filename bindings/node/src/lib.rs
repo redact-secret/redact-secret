@@ -168,8 +168,10 @@ thread_local! {
 
 fn selection_cell<T>(profile: Profile, f: impl FnOnce(&OnceCell<PiiSelection>) -> T) -> T {
     match profile {
-        Profile::Full => PII_SELECTION.with(f),
         Profile::Common => PII_SELECTION_COMMON.with(f),
+        // `Profile` is `#[non_exhaustive]`: a profile this addon does not
+        // link yet falls back to the full set, the superset.
+        _ => PII_SELECTION.with(f),
     }
 }
 
@@ -187,14 +189,14 @@ fn with_profile_registry<T>(
     f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
 ) -> Result<T, SecretScanError> {
     match profile {
-        Profile::Full => REGISTRY.with(|cell| {
-            match cell.get_or_init(|| DetectorRegistry::with_built_in(std::iter::empty())) {
+        Profile::Common => REGISTRY_COMMON.with(|cell| {
+            match cell.get_or_init(|| DetectorRegistry::with_common_built_in(std::iter::empty())) {
                 Ok(registry) => f(registry),
                 Err(error) => Err(*error),
             }
         }),
-        Profile::Common => REGISTRY_COMMON.with(|cell| {
-            match cell.get_or_init(|| DetectorRegistry::with_common_built_in(std::iter::empty())) {
+        _ => REGISTRY.with(|cell| {
+            match cell.get_or_init(|| DetectorRegistry::with_built_in(std::iter::empty())) {
                 Ok(registry) => f(registry),
                 Err(error) => Err(*error),
             }
@@ -308,11 +310,9 @@ fn initialize_profile_with_selection(profile: Profile, pii: &[String]) -> napi::
     let selection = PiiSelection::parse(&borrowed).map_err(to_js_error)?;
     let identity = selection.activation_identity(profile);
     let result = match profile {
-        Profile::Full => {
-            REGISTRY.with(|cell| initialize_registry_cell(cell, profile, &selection, &identity))
-        }
         Profile::Common => REGISTRY_COMMON
             .with(|cell| initialize_registry_cell(cell, profile, &selection, &identity)),
+        _ => REGISTRY.with(|cell| initialize_registry_cell(cell, profile, &selection, &identity)),
     };
     result.map_err(to_js_error)?;
     selection_cell(profile, |cell| {
@@ -343,8 +343,8 @@ fn initialize_registry_cell(
         };
     }
     let registry = match profile {
-        Profile::Full => DetectorRegistry::with_built_in_and_pii(selection),
         Profile::Common => DetectorRegistry::with_common_built_in_and_pii(selection),
+        _ => DetectorRegistry::with_built_in_and_pii(selection),
     };
     let outcome = registry.as_ref().map(|_| ()).map_err(|error| *error);
     let _ = cell.set(registry);
@@ -603,10 +603,10 @@ fn with_ruleset_registry<T>(
         }
         let detectors = load_ruleset(ruleset).map_err(to_js_ruleset_error)?;
         let registry = match profile {
-            Profile::Full => DetectorRegistry::with_built_in_and_pii_custom(&selection, detectors),
             Profile::Common => {
                 DetectorRegistry::with_common_built_in_and_pii_custom(&selection, detectors)
             }
+            _ => DetectorRegistry::with_built_in_and_pii_custom(&selection, detectors),
         }
         .map_err(to_js_error)?;
         #[cfg(test)]

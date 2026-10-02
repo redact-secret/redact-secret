@@ -49,8 +49,10 @@ is already a restricted, linear-time matching vocabulary of exactly the
 needed shape — a fixed set of byte-class alphabets, `RunLength::{Exact,
 AtLeast}` quantifiers mirroring `{n}`/`{n,}`, a literal prefix, and a
 byte-adjacent boundary check — written specifically because the core may
-depend on nothing (`[workspace.metadata.redact-secret] allowed-dependencies
-= []`) and so cannot use a regex crate. Its own module comment records that
+depend only on an audited allowlist (`[workspace.metadata.redact-secret]
+allowed-dependencies`, which was empty when this was decided and now holds
+`unicode-normalization` and its `tinyvec` dependency; amended for #1185) and
+so cannot use a regex crate. Its own module comment records that
 every provider detector's grammar reduced to this shape except OpenAI's,
 which composes the same primitives directly. There is no backtracking, so
 the ReDoS surface is zero today by construction, not by review; a ruleset
@@ -197,10 +199,14 @@ Two constraints, both hard, decide this (option A, over the rejected
 alternative of a typed builder each binding fills from its own native
 objects — option B):
 
-- **No dependencies.** `crates/secret-scan-core/Cargo.toml`'s
-  `[dependencies]` is empty and `allowed-dependencies = []` in the root
-  manifest (`docs/rust-workspace.md`). There is no serde and no JSON parser
-  in the core. A text format needs a hand-written minimal parser, the same
+- **No parser or matching dependency.** When this was decided,
+  `crates/secret-scan-core/Cargo.toml`'s `[dependencies]` was empty and
+  `allowed-dependencies = []` in the root manifest. The core has since gained
+  one pure, table-driven dependency, `unicode-normalization` (with its
+  `tinyvec` dependency), for context normalization, and the root manifest
+  allows exactly those two (`docs/rust-workspace.md`; amended for #1185, the
+  decision itself is unchanged). There is no serde and no JSON parser in the
+  core. A text format needs a hand-written minimal parser, the same
   kind `pattern.rs`'s module comment already justifies for the same reason.
 - **No filesystem access.** `docs/rust-workspace.md`'s "No runtime I/O"
   source-boundary check forbids `std::fs`/`std::net`/`std::env` etc. under
@@ -262,7 +268,12 @@ contributes, not a new one.
 Loading a ruleset either returns every validated detector or rejects the
 whole ruleset with one fixed, input-free error — **never a partial load**.
 The canonical rejection classes, each a fixed enum variant carrying no byte
-derived from the rejected content:
+derived from the rejected content. The list below is the catalog as decided;
+the shipped `RulesetErrorClass` has 18 classes, the five that this list
+predates being `RulesetTooLarge`, `PrefixTooLong`, `NameBucketNotClaimable`,
+`NameTooLong` and `TooManyNames` (listed last below; amended
+for #1185, each is the same fixed, content-free kind of variant and the rule
+is unchanged):
 
 - `UnknownRevision` — the `ruleset-revision` value is not the one supported
   revision.
@@ -282,12 +293,20 @@ derived from the rejected content:
   ruleset `github-token` cannot emit findings under a built-in id with
   different behavior.
 - `EmptyRuleset` — no detector blocks at all.
+- `RulesetTooLarge` — the whole document exceeds its byte cap, checked before
+  anything is parsed (added at implementation).
+- `PrefixTooLong` — the counterpart of `PrefixTooShort` for the upper
+  [cost bound](#cost-bounds) (added at implementation).
+- `NameBucketNotClaimable` / `NameTooLong` / `TooManyNames` — the three
+  violations the names section can commit: a bucket other than `ambiguous`, a
+  name over its byte cap, and more names than the cap after de-duplication
+  (added at implementation).
 
 The implementation issue adds one test per class to the conformance corpus
 (see [Conformance](#conformance)); [`docs/audits/evidence/441/README.md`](../audits/evidence/441/README.md)'s
 prototype already demonstrates 7 of these classes end to end as real,
 passing unit tests, so the catalog above is proven parseable and rejectable
-in the actual constrained environment (no dependencies, no `unsafe`,
+in the actual constrained environment (no parser or matching dependency, no `unsafe`,
 `#![deny(missing_docs)]`), not merely specified.
 
 ### Ordering and the specificity cap
@@ -481,7 +500,7 @@ tracked implementation issue, not a claim that the loader ships today.
   wasm, and PyO3 diverge on which rulesets load at all — the
   divergent-implementation failure re-entering through the loader.
 - **A new regex-like matching engine or an embedded regex crate.** Rejected:
-  breaks `allowed-dependencies = []` for a crate, or reimplements a
+  adds a matching crate to `allowed-dependencies`, or reimplements a
   backtracking engine that reopens the ReDoS surface `pattern.rs` was
   written specifically to avoid. The existing vocabulary already covers
   every provider grammar but one, which composes it directly.

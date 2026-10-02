@@ -60,11 +60,16 @@
 //! [`RulesetLoadError::UnknownField`], and one omitted is
 //! [`RulesetLoadError::MissingField`].
 //!
+//! A repeated field is [`RulesetLoadError::UnsupportedConstruct`] (#1182).
+//!
 //! `prefix` is a double-quoted literal with no escape sequences recognized
-//! inside the quotes. `alphabet` and `validator` are each one name from a
+//! inside the quotes, and may not contain an invisible or format code point
+//! (the normalizer would remove it from the scan copy, so it could never
+//! match: [`RulesetLoadError::UnsupportedConstruct`]). `alphabet` and `validator` are each one name from a
 //! closed, seven- and two-member vocabulary
 //! ([`AlphabetName`], [`ValidatorName`]). `run` is `exact <n>` or `at-least
-//! <n>`. `specificity` is `entropy` or `contextual`; every other name —
+//! <n>`, with `<n>` in canonical decimal (`[1-9][0-9]*`; `+20` and `020` are
+//! [`RulesetLoadError::UnsupportedConstruct`]). `specificity` is `entropy` or `contextual`; every other name —
 //! including the three reserved to built-ins and any name the pipeline's
 //! specificity enum does not define at all — is the single fixed
 //! [`RulesetLoadError::SpecificityNotClaimable`].
@@ -114,6 +119,7 @@ use crate::detectors::{
     is_reserved_name, normalize_name,
 };
 use crate::error::SecretScanErrorCode;
+use crate::normalize::is_invisible;
 use crate::pii::is_reserved_detector_id;
 use crate::types::{Detector, Specificity, is_identifier};
 
@@ -630,6 +636,12 @@ fn parse_prefix(value: &str) -> Result<String, RulesetLoadError> {
         .strip_prefix('"')
         .and_then(|rest| rest.strip_suffix('"'))
         .ok_or(RulesetLoadError::UnsupportedConstruct)?;
+    // Detection runs on the copy with invisible and format code points
+    // removed, so a prefix containing one could never occur in it: reject it
+    // instead of loading a detector that cannot match (#1182, R2).
+    if inner.chars().any(is_invisible) {
+        return Err(RulesetLoadError::UnsupportedConstruct);
+    }
     if inner.len() < MIN_RULESET_PREFIX_BYTES {
         return Err(RulesetLoadError::PrefixTooShort);
     }
@@ -645,8 +657,18 @@ fn parse_run(value: &str) -> Result<RunSpec, RulesetLoadError> {
     let (kind, count) = value
         .split_once(' ')
         .ok_or(RulesetLoadError::UnsupportedConstruct)?;
+    let count = count.trim();
+    // Canonical decimal only: ASCII digits, no sign, no leading zero (a lone
+    // `0` stays a bounds error). Rust's integer parser also accepts `+20`
+    // and `020`, which a second implementation would not replicate (#1182,
+    // R3).
+    let canonical = !count.is_empty()
+        && count.bytes().all(|byte| byte.is_ascii_digit())
+        && (count == "0" || !count.starts_with('0'));
+    if !canonical {
+        return Err(RulesetLoadError::UnsupportedConstruct);
+    }
     let count: usize = count
-        .trim()
         .parse()
         .map_err(|_| RulesetLoadError::UnsupportedConstruct)?;
     if count == 0 || count > MAX_RULESET_RUN_LENGTH {
@@ -688,7 +710,20 @@ fn flush_block(
     let mut run = None;
     let mut validator = None;
 
+    // Each field is accepted exactly once: a repeat is rejected rather than
+    // letting the last occurrence silently win (#1182, R1).
     for &(key, value) in fields {
+        let repeated = match key {
+            "specificity" => specificity.is_some(),
+            "prefix" => prefix.is_some(),
+            "alphabet" => alphabet.is_some(),
+            "run" => run.is_some(),
+            "validator" => validator.is_some(),
+            _ => return Err(RulesetLoadError::UnknownField),
+        };
+        if repeated {
+            return Err(RulesetLoadError::UnsupportedConstruct);
+        }
         match key {
             "specificity" => specificity = Some(parse_specificity(value)?),
             "prefix" => prefix = Some(parse_prefix(value)?),
@@ -697,12 +732,11 @@ fn flush_block(
                     Some(AlphabetName::from_wire(value).ok_or(RulesetLoadError::UnknownAlphabet)?);
             }
             "run" => run = Some(parse_run(value)?),
-            "validator" => {
+            _ => {
                 validator = Some(
                     ValidatorName::from_wire(value).ok_or(RulesetLoadError::UnknownValidator)?,
                 );
             }
-            _ => return Err(RulesetLoadError::UnknownField),
         }
     }
 
@@ -1151,6 +1185,72 @@ validator: none\n";
             parse_ruleset(text.as_bytes()),
             Err(RulesetLoadError::UnsupportedConstruct)
         );
+    }
+
+    #[test]
+    fn rejects_every_non_canonical_run_count() {
+        for count in ["+20", "020", "00", "-1", "2_0", "٢٠", "1e1", "0x14"] {
+            let text = replace_once(VALID, "run: at-least 20", &format!("run: at-least {count}"));
+            assert_eq!(
+                parse_ruleset(text.as_bytes()),
+                Err(RulesetLoadError::UnsupportedConstruct),
+                "{count:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn accepts_canonical_run_counts_at_both_bounds() {
+        for count in ["1", "20", "4096"] {
+            let text = replace_once(VALID, "run: at-least 20", &format!("run: exact {count}"));
+            assert!(parse_ruleset(text.as_bytes()).is_ok(), "{count}");
+        }
+    }
+
+    #[test]
+    fn rejects_a_repeated_field_in_one_detector_block() {
+        for (field, repeat) in [
+            ("specificity: contextual", "specificity: entropy"),
+            ("prefix: \"ACME_\"", "prefix: \"OTHER_\""),
+            ("alphabet: alnum-dash", "alphabet: alnum"),
+            ("run: at-least 20", "run: exact 20"),
+            ("validator: none", "validator: none"),
+        ] {
+            let text = replace_once(VALID, field, &format!("{field}\n{repeat}"));
+            assert_eq!(
+                parse_ruleset(text.as_bytes()),
+                Err(RulesetLoadError::UnsupportedConstruct),
+                "{field}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_repeated_field_in_another_block_is_not_a_repeat() {
+        let text = format!("{VALID}{}", detector_block("acme-second-token"));
+        assert!(parse_ruleset(text.as_bytes()).is_ok());
+    }
+
+    #[test]
+    fn rejects_a_prefix_containing_an_invisible_or_format_character() {
+        for invisible in ["\u{200B}", "\u{200D}", "\u{FEFF}", "\u{00AD}", "\u{202E}"] {
+            let text = replace_once(
+                VALID,
+                "prefix: \"ACME_\"",
+                &format!("prefix: \"AC{invisible}ME_\""),
+            );
+            assert_eq!(
+                parse_ruleset(text.as_bytes()),
+                Err(RulesetLoadError::UnsupportedConstruct),
+                "{invisible:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn accepts_a_visible_non_ascii_prefix() {
+        let text = replace_once(VALID, "prefix: \"ACME_\"", "prefix: \"ÄCME_\"");
+        assert!(parse_ruleset(text.as_bytes()).is_ok());
     }
 
     fn detector_block(id: &str) -> String {

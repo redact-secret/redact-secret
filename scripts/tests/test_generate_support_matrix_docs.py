@@ -455,6 +455,41 @@ class ReadmeFragmentTests(unittest.TestCase):
         self.assertIn("evidence tiers: T1: 1, T2: 0, T3: 0, T0: 0", fragment)
 
 
+class IdentitySentenceTests(unittest.TestCase):
+    """Issue #1067: every count carries its denominator and identity."""
+
+    def full_matrix(self) -> dict:
+        m = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        m["sourceReport"]["product"] = {"sourceCommit": "a" * 40, "declaredVersion": "0.1.0-beta.99"}
+        m["sourceReport"]["fixtureIndex"] = {"digest": "d" * 64, "fixtureCount": 77}
+        return m
+
+    def test_readme_and_doc_carry_denominator_identity_and_pii_scope(self) -> None:
+        m = self.full_matrix()
+        pins = {"source": "1" * 40, "manifest": "2" * 40}
+        fragment = GEN.render_readme_fragment(m, (), 110)
+        doc = GEN.render_matrix_markdown(m, (), 110, pins)
+        for text in (fragment, doc):
+            self.assertIn("families and statuses, not detectors", text)
+            self.assertIn("110 credential detectors, all of them mapped", text)
+            self.assertIn("`aaaaaaaaaaaa` (`0.1.0-beta.99`)", text)
+            self.assertIn("benchmarks revision `000000000000`", text)
+            self.assertIn("77 fixtures", text)
+            self.assertIn("PII families are outside this count", text)
+        self.assertIn("`" + "1" * 40 + "`", doc)
+        self.assertIn("did not produce these statuses", doc)
+
+    def test_unmeasured_detectors_reduce_the_mapped_count(self) -> None:
+        text = GEN.identity_sentence(self.full_matrix(), 110, 2)
+        self.assertIn("108 of them mapped", text)
+
+    def test_unrecorded_parts_are_omitted_not_invented(self) -> None:
+        text = GEN.identity_sentence(matrix([family("widget", "widget:token", "Widget token", "stable")]))
+        self.assertNotIn("fixtures", text)
+        self.assertNotIn("product commit", text)
+        self.assertNotIn("credential detectors", text)
+
+
 class ReleaseNoteTests(unittest.TestCase):
     def test_no_previous_matrix_states_so(self) -> None:
         m = matrix([family("widget", "widget:token", "Widget token", "stable")])
@@ -638,7 +673,10 @@ class RealRepoReconciliationTests(unittest.TestCase):
 
     def test_committed_support_matrix_doc_is_up_to_date(self) -> None:
         pinned_matrix = GEN.load_json(GEN.MATRIX_PATH)
-        fresh = GEN.render_matrix_markdown(pinned_matrix, GEN.repo_unmeasured(pinned_matrix))
+        ids = GEN.built_in_detector_ids(GEN.DETECTORS_PATH.read_text(encoding="utf-8"))
+        fresh = GEN.render_matrix_markdown(
+            pinned_matrix, GEN.unmeasured_detectors(pinned_matrix, ids), len(ids), GEN.vendored_pins()
+        )
         committed = GEN.DOC_PATH.read_text(encoding="utf-8")
         self.assertEqual(
             fresh,
@@ -649,7 +687,8 @@ class RealRepoReconciliationTests(unittest.TestCase):
 
     def test_committed_readme_support_section_is_up_to_date(self) -> None:
         pinned_matrix = GEN.load_json(GEN.MATRIX_PATH)
-        fragment = GEN.render_readme_fragment(pinned_matrix, GEN.repo_unmeasured(pinned_matrix))
+        ids = GEN.built_in_detector_ids(GEN.DETECTORS_PATH.read_text(encoding="utf-8"))
+        fragment = GEN.render_readme_fragment(pinned_matrix, GEN.unmeasured_detectors(pinned_matrix, ids), len(ids))
         readme = GEN.README_PATH.read_text(encoding="utf-8")
         start = readme.find(GEN.README_START)
         end = readme.find(GEN.README_END) + len(GEN.README_END)

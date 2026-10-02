@@ -30,14 +30,15 @@ validator: none
 ```
 
 The first line is always `ruleset-revision: 1`. Every following `detector:
-<id>` line starts a block of exactly five fields:
+<id>` line starts a block of exactly five fields, each given exactly once (a
+repeated field is rejected; the last one does not win):
 
 | Field | Values |
 | --- | --- |
 | `specificity` | `entropy` or `contextual` only — `structural`, `provider`, and `private-key` are reserved to built-in detectors and rejected |
-| `prefix` | a double-quoted literal, 3–64 bytes, matched byte-exact and case-sensitive (no escape sequences) |
+| `prefix` | a double-quoted literal, 3–64 bytes, matched byte-exact and case-sensitive (no escape sequences); it may not contain an invisible or format code point, because detection runs on a copy with those removed and such a prefix could never match |
 | `alphabet` | one of `alnum`, `alnum-dash`, `alnum-dash-dot`, `upper-alnum`, `digit`, `lower-hex`, `base64-body` |
-| `run` | `exact <n>` or `at-least <n>`, `1 ≤ n ≤ 4096` |
+| `run` | `exact <n>` or `at-least <n>`, `1 ≤ n ≤ 4096`, `<n>` in canonical decimal (`+20` and `020` are rejected) |
 | `validator` | `none`, or `trailing-lower-hex` (the matched run's final `n` alphabet bytes — `n` from the block's own `run` count — must be lowercase hex) |
 
 ## Matching semantics
@@ -64,6 +65,70 @@ never silently outrank a built-in's resolved finding. A caller with a loaded
 ruleset still sees `Full`/`Common` from `DetectorRegistry::profile()`;
 ruleset presence is a separate fact the caller already has from the number
 of detectors `load_ruleset` returned.
+
+## Default action
+
+Because every ruleset candidate is medium confidence and its `type` is the
+detector id (not a known credential type), the default policy returns `warn`
+for it: the finding is reported, and `scanAndRedact`, `scan_and_redact` and
+`redact-secret --redact` leave the matched text in place. This is the
+contract, not a gap: the fixed medium confidence is what keeps a ruleset from
+outranking a built-in, and the reference fixture pins `action: warn` for every
+ruleset detection on every surface. To redact a ruleset detection, supply a
+policy that returns `redact` for its detector id (Rust, JavaScript, Python).
+The CLI has no policy hook, so it can report a ruleset detection in check mode
+but not remove it in redact mode: `--redact --ruleset` still runs, and
+changes nothing for ruleset matches. Check mode flags it either way. A
+caller-set action is out of scope for revision 1.
+
+## Grammar
+
+This is the normative text grammar of `ruleset-revision: 1`, in the ABNF style
+of RFC 5234. The Rust parser implements it for every surface, and the
+conformance fixture (`conformance/fixtures/ruleset-reference.json`) pins it.
+
+```text
+ruleset      = *blank revision *( blank / block )
+revision     = "ruleset-revision:" SP "1" EOL            ; first non-blank line
+block        = detector-block / names-block
+detector-block = "detector:" SP id EOL 5( field )        ; each field exactly once, any order
+field        = specificity / prefix / alphabet / run / validator
+specificity  = "specificity:" SP ( "entropy" / "contextual" ) EOL
+prefix       = "prefix:" SP DQUOTE 3*64 OCTET DQUOTE EOL ; no escapes, no invisible code points
+alphabet     = "alphabet:" SP ( "alnum" / "alnum-dash" / "alnum-dash-dot" / "upper-alnum"
+                              / "digit" / "lower-hex" / "base64-body" ) EOL
+run          = "run:" SP ( "exact" / "at-least" ) 1*SP count EOL
+count        = nonzero-digit *DIGIT                      ; 1..4096, canonical decimal
+validator    = "validator:" SP ( "none" / "trailing-lower-hex" ) EOL
+names-block  = "names:" SP "ambiguous" EOL *( "name:" SP name EOL )
+name         = ALPHA *( ALPHA / DIGIT / "_" / "." / "-" ) ; at most 64 bytes
+id           = lower *( lower / DIGIT ) *( ( "." / "_" / "-" ) 1*( lower / DIGIT ) )
+                                                         ; at most 64 bytes
+blank        = *WSP EOL
+```
+
+Whole-document rules:
+
+- UTF-8, no byte order mark (a leading one is `UNSUPPORTED_CONSTRUCT`), at
+  most 65,536 bytes, at most 64 `detector:` blocks, and at least one
+  `detector:` block or one `name:` line.
+- Keys are case-sensitive. Whitespace at the start and end of a line and
+  around the first `:` is ignored. Separate the words of a `run` value with
+  spaces, not tabs.
+- No comments (a `#` line is `UNSUPPORTED_CONSTRUCT`), no escapes, no include,
+  and no concatenation: a second `ruleset-revision` line is read as an unknown
+  field of the open block.
+- `detector:` and `names:` blocks may interleave and repeat. A field repeated
+  inside one `detector:` block is `UNSUPPORTED_CONSTRUCT`.
+- A detector id must be a lowercase identifier (`is_identifier`) that is not a
+  built-in or reserved id, and unique in the ruleset. Its `Finding.type` is the
+  id itself, hyphens included (`acme-internal-token`), unlike the snake_case
+  types of built-in detectors.
+- `specificity` is only a tie-break rank; nothing is entropy-checked.
+- A `count` of `0` is `RUN_LENGTH_OUT_OF_BOUNDS`; any other non-canonical form
+  (a sign, a leading zero, a non-digit) is `UNSUPPORTED_CONSTRUCT`.
+- Anything else the grammar does not accept is one of the 18 classes below, and
+  the whole document is rejected.
 
 ## Names section
 
@@ -101,7 +166,12 @@ classes (`RulesetErrorClass`: `RULESET_TOO_LARGE`, `UNKNOWN_REVISION`,
 `TOO_MANY_DETECTORS`, `DUPLICATE_DETECTOR_ID`, `RESERVED_DETECTOR_ID`,
 `EMPTY_RULESET`, `NAME_BUCKET_NOT_CLAIMABLE`, `NAME_TOO_LONG`,
 `TOO_MANY_NAMES`) — never a byte from the rejected ruleset. Python raises it
-as `InvalidRulesetError`.
+as `InvalidRulesetError`. A repeated field, an invisible or format character
+in a `prefix`, and a non-canonical `run` count are all
+`UNSUPPORTED_CONSTRUCT`. The class is available in Rust, Python, the CLI
+(as a fixed sentence per class), and the raw Node addon and WebAssembly errors;
+the public JavaScript `SecretScanError` carries only the `INVALID_RULESET` code
+and one fixed message.
 
 ## Load a ruleset on each surface
 

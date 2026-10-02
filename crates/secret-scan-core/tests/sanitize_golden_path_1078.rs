@@ -19,6 +19,8 @@ fn registry(profile: Profile) -> DetectorRegistry {
     match profile {
         Profile::Full => DetectorRegistry::with_built_in([]).unwrap(),
         Profile::Common => DetectorRegistry::with_common_built_in([]).unwrap(),
+        // `Profile` is `#[non_exhaustive]`: a new profile must add its own arm here.
+        _ => panic!("profile without a reference registry"),
     }
 }
 

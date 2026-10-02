@@ -119,6 +119,16 @@ const incrementalOptions: IncrementalSanitizerOptions = {
   placeholderFormatter: typedPlaceholderFormatter,
 };
 
+// The byte-named aliases (#1184) and a per-limit mix type-check as well.
+const incrementalBytesOptions: IncrementalSanitizerOptions = {
+  limits: {
+    maxInputBytes: 4_096,
+    maxBufferedBytes: 2_176,
+    maxTokenCodeUnits: 1_024,
+    maxMultilineBytes: 2_048,
+  },
+};
+
 async function documentedUsage(input: string): Promise<void> {
   await initialize();
 
@@ -130,6 +140,7 @@ async function documentedUsage(input: string): Promise<void> {
   const result: ScanResult = scanAndRedact(input, scanAndRedactOptions);
 
   const session: IncrementalSanitizer = createIncrementalSanitizer(incrementalOptions);
+  createIncrementalSanitizer(incrementalBytesOptions);
   const appended: IncrementalSanitizerResult = session.append(input);
   const finalized: IncrementalSanitizerResult = session.finalize();
 

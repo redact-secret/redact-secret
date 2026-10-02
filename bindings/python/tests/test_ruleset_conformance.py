@@ -64,6 +64,7 @@ def test_the_accepted_ruleset_matches_every_declared_case() -> None:
         assert finding.detector == case["detector"], case["id"]
         assert finding.type == case["type"], case["id"]
         assert finding.confidence == case["confidence"], case["id"]
+        assert finding.action == case["action"], case["id"]
         start = byte_offset_to_char_offset_reference(case["input"], case["start"])
         end = byte_offset_to_char_offset_reference(case["input"], case["end"])
         assert (finding.start, finding.end) == (start, end), case["id"]
@@ -84,6 +85,7 @@ def test_the_names_section_ruleset_matches_every_declared_case() -> None:
         assert finding.detector == case["detector"], case["id"]
         assert finding.type == case["type"], case["id"]
         assert finding.confidence == case["confidence"], case["id"]
+        assert finding.action == case["action"], case["id"]
         start = byte_offset_to_char_offset_reference(case["input"], case["start"])
         end = byte_offset_to_char_offset_reference(case["input"], case["end"])
         assert (finding.start, finding.end) == (start, end), case["id"]
@@ -101,6 +103,7 @@ def test_the_ordering_fixture_shows_the_built_in_winning_the_tie() -> None:
     assert finding.detector == expected["detector"]
     assert finding.type == expected["type"]
     assert finding.confidence == expected["confidence"]
+    assert finding.action == expected["action"]
     start = byte_offset_to_char_offset_reference(text, expected["start"])
     end = byte_offset_to_char_offset_reference(text, expected["end"])
     assert (finding.start, finding.end) == (start, end)
@@ -123,6 +126,18 @@ def test_every_declared_rejection_class_is_reproduced(rejection: dict) -> None:
 
     with pytest.raises(redact_secret.InvalidRulesetError) as excinfo:
         redact_secret.scan("irrelevant", ruleset=ruleset)
+    assert excinfo.value.code == "INVALID_RULESET"
+    assert rejection["class"] in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    "rejection",
+    _fixture()["tightenedRejections"],
+    ids=lambda rejection: rejection["id"],
+)
+def test_every_tightened_rejection_is_reproduced(rejection: dict) -> None:
+    with pytest.raises(redact_secret.InvalidRulesetError) as excinfo:
+        redact_secret.scan("irrelevant", ruleset=rejection["ruleset"].encode("utf-8"))
     assert excinfo.value.code == "INVALID_RULESET"
     assert rejection["class"] in str(excinfo.value)
 

@@ -19,13 +19,12 @@
 //! implements, duplicated here rather than shared because a
 //! `wasm32-unknown-unknown` build cannot depend on the N-API crate.
 //!
-//! The four limits fields are documented in the public JavaScript API as
-//! UTF-16 code-unit bounds, but this binding passes them to the core
-//! unchanged as byte bounds, exactly like `bindings/node` and
-//! `bindings/python` pass their own code-unit/code-point-labeled limits
-//! through as bytes: every credential format this project detects is ASCII,
-//! where a code unit and a byte coincide
-//! (`decision-govern-cross-language-conformance`).
+//! The four limits are UTF-8 **byte** ceilings, passed to the core unchanged.
+//! Their parameter names say `CodeUnits` for compatibility; the public
+//! JavaScript wrapper also accepts `max*Bytes` aliases and resolves them to
+//! these four positional values before this binding is called. A code unit
+//! and a byte coincide for ASCII, which every credential format this project
+//! detects is (`decision-govern-cross-language-conformance`).
 
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;

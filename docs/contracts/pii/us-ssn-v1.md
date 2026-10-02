@@ -71,11 +71,38 @@ digits and rejects area `000`, `666`, or `900`–`999`, group `00`, and serial
 `0000`. Those failures establish no identity. There is no checksum.
 
 Spaces, Unicode digits, Unicode dash characters, other punctuation, missing or
-repeated hyphens, partial prefixes or suffixes, alphanumeric/underscore/percent
-adjacency, Unicode-mark adjacency, governed invisibles, and whole `{{...}}`,
-`${...}`, or `<...>` references are excluded. Scanning and validation are
-constant-bounded per candidate and perform no I/O or candidate-proportional
-allocation.
+repeated hyphens, partial prefixes or suffixes, adjacency (below), and whole
+`{{...}}`, `${...}`, or `<...>` references are excluded. Scanning and
+validation are constant-bounded per candidate and perform no I/O or
+candidate-proportional allocation.
+
+### Adjacency set
+
+A candidate is rejected when the single character immediately before or after
+it (before the first digit, after the last digit) is any of:
+
+- an alphanumeric character in any script (Unicode alphabetic or numeric, as
+  Rust `char::is_alphanumeric`), which includes a Korean particle glued to the
+  number;
+- an underscore `_` or a percent sign `%`;
+- an ASCII hyphen `-`, so `1-890-62-6879` and `890-62-6879-1` do not match
+  inside a longer hyphenated run;
+- a Unicode combining mark;
+- any non-ASCII whitespace, including no-break space U+00A0 and ideographic
+  space U+3000;
+- a Unicode dash from the code's fixed list (for example U+2010 through
+  U+2015, U+3030, and U+FF0D); and
+- a governed invisible character (the same set the normalizer treats as
+  invisible, for example U+200D).
+
+ASCII whitespace (space, tab, line feed, carriage return), other ASCII
+punctuation such as `=`, `:`, `,`, `.`, and the string edge do not block. Only
+the immediately adjacent character is examined, so a candidate separated from
+other digits by ASCII whitespace is still a candidate. The rule is identical
+before and after the candidate and for the compact and display forms. The
+public fixtures `us-ssn-adjacent-*` pin each class. The phone, payment-card, and
+email families also reject a Korean particle glued to a candidate; this
+contract states only the US SSN rule.
 
 ## Sensitivity and negative evidence
 

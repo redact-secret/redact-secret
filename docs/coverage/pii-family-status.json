@@ -1,0 +1,26 @@
+{
+  "$comment": "Machine-readable binding for the hand-written PII status table in docs/reference/detection.md (issue #1186). Checked by scripts/check-pii-family-status.py. Retire this file when the pinned support matrix carries the pii: families (redact-secret/redact-secret-benchmarks#647).",
+  "profile": "pii-v1",
+  "qualification": {
+    "coreRevision": "8b6a5fde52ecb4dfce13f09c7a947062d21483c7",
+    "benchmarksRevision": "be0fb9f35045bf05e5b999a2c0ed368541f9e963",
+    "release": "0.1.0-beta.11",
+    "record": "https://github.com/redact-secret/redact-secret-benchmarks/blob/be0fb9f35045bf05e5b999a2c0ed368541f9e963/evidence/901/428/final-core-8b6a5fde.md"
+  },
+  "codeChangedSinceQualification": [
+    "crates/secret-scan-core/src/pii.rs",
+    "crates/secret-scan-core/src/pii/pii_email.rs",
+    "crates/secret-scan-core/src/pii/pii_iban.rs",
+    "crates/secret-scan-core/src/pii/pii_payment_card.rs",
+    "crates/secret-scan-core/src/pii/pii_phone.rs",
+    "crates/secret-scan-core/src/pii/pii_us_ssn.rs"
+  ],
+  "families": {
+    "pii:global:email": "provisional",
+    "pii:global:iban": "provisional",
+    "pii:global:network-address": "provisional",
+    "pii:global:payment-card": "provisional",
+    "pii:global:phone": "provisional",
+    "pii:us:ssn": "pending"
+  }
+}

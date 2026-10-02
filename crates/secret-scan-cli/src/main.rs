@@ -222,6 +222,10 @@ action=<action> id=<finding>
                   detector, ruleset or otherwise. A malformed ruleset fails
                   the whole run with INVALID_RULESET before any source is
                   scanned.
+                  A ruleset detection has medium confidence, so the default
+                  policy only warns about it: check mode reports it, but
+                  --redact --ruleset runs and leaves ruleset matches in the
+                  output unchanged.
 
 redact mode
   Reads standard input, or exactly one path, and writes the sanitized text to

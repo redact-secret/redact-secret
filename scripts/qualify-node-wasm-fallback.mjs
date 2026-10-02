@@ -19,6 +19,13 @@
  * asserts `artifact()` reports `"wasm"` so a false pass (the addon loading
  * anyway) cannot go unnoticed.
  *
+ * It also runs the reference declarative ruleset fixture
+ * (`conformance/fixtures/ruleset-reference.json`, #1183) through the artifact's
+ * own generated glue, loaded the way the fallback loads it: the accepted cases
+ * with their default action, and every rejection as `INVALID_RULESET` with the
+ * fixed class the glue appends to its error message. The public package hides
+ * the class by design, so the class comparison needs the glue itself.
+ *
  * This does not exhaustively fuzz every byte boundary the way
  * `qualify-node-addon.mjs`'s own stream pass does: the stream adapter and
  * incremental session are unmodified, already-qualified code shared with the
@@ -40,12 +47,13 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { existsSync, rmSync, symlinkSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import { cp, mkdir, readFile, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { pathToFileURL } from "node:url";
 
+import { loadRulesetReference, runRulesetReference } from "./lib/ruleset-reference.mjs";
 import {
   assertMatchesFixture,
   CANONICAL_FIXTURE_ID,
@@ -207,6 +215,38 @@ async function linkWasmFallback(wasmDir) {
   return link;
 }
 
+/**
+ * The reference ruleset fixture through the WebAssembly artifact's generated
+ * glue (#1183). The glue reports UTF-16 offsets, like every JavaScript surface.
+ */
+async function conformRuleset(detectorProfile) {
+  const name = detectorProfile === "common" ? "redact_secret_wasm_common" : "redact_secret_wasm";
+  // A query string makes this a module instance of its own, so initializing
+  // it cannot disturb the one the package's fallback loader imports.
+  const glue = await import(`${pathToFileURL(join(WASM_PACKAGE_ROOT, `${name}.js`)).href}?ruleset-reference`);
+  await glue.default({ module_or_path: readFileSync(join(WASM_PACKAGE_ROOT, `${name}_bg.wasm`)) });
+  assertEqual(glue.profile(), detectorProfile, "the glue's reported profile");
+  glue.initialize([]);
+
+  const { checks, failures } = runRulesetReference(loadRulesetReference(), {
+    offsetUnit: "utf16",
+    scan: (ruleset, input) => glue.scan(input, undefined, undefined, undefined, ruleset),
+    reject: (ruleset) => {
+      try {
+        glue.scan("irrelevant", undefined, undefined, undefined, ruleset);
+      } catch (error) {
+        assertEqual(error.code, "INVALID_RULESET", "rejected ruleset error code");
+        const match = /\(([A-Z_]+)\)$/.exec(String(error.message));
+        return match === null ? "(no class)" : match[1];
+      }
+      return undefined;
+    },
+  });
+  assert(checks >= 40, `only ${checks} ruleset reference checks ran`);
+  assert(failures.length === 0, `${failures.length} ruleset case(s) disagreed: ${failures.slice(0, 5).join("; ")}`);
+  return checks;
+}
+
 async function main() {
   const { wasmDir, detectorProfile, phoneSelector } = parseArguments(process.argv.slice(2));
   const packageEntry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
@@ -234,6 +274,9 @@ async function main() {
       console.log(`qualified Node WebAssembly fallback phone matrix: ${phoneSelector}`);
       return;
     }
+
+    const rulesetChecks = await conformRuleset(detectorProfile);
+    console.log(`the WebAssembly artifact matches the reference ruleset fixture (${rulesetChecks} checks)`);
 
     await api.initialize();
     assertEqual(api.artifact(), "wasm", "the fallback's reported artifact");

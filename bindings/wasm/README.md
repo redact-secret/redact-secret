@@ -19,7 +19,8 @@
   chunk by chunk without ever holding the whole input as one string.
   The four legacy `CodeUnits` limit parameter names are retained for API
   compatibility, while their values are enforced as UTF-8 byte ceilings by
-  the Rust core.
+  the Rust core. `@redact-secret/core` also accepts `max*Bytes` aliases and
+  resolves them to these four positional values before calling this binding.
 - One Cargo feature, default-on `full`, picks the compiled detector profile
   (`decision-define-detector-profile-and-pack-contract`). The default build
   (`npm run wasm:build`, `pkg/redact_secret_wasm*`) is the `full` artifact.

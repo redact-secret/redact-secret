@@ -265,6 +265,10 @@ pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
         SecretScanErrorCode::PiiActivationConflict => {
             PyErr::new::<PiiActivationConflictError, _>(message)
         }
+        // `SecretScanErrorCode` is `#[non_exhaustive]`: a code added to the
+        // core before this binding gains a subclass for it surfaces as the
+        // base exception with the core's fixed message.
+        _ => PyErr::new::<SecretScanError, _>(message),
     }
 }
 

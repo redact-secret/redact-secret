@@ -20,8 +20,9 @@
 //!
 //! [`run_detector_pipeline`] runs every detector in a [`DetectorRegistry`]
 //! in registration order, validates each [`Candidate`], resolves overlapping
-//! candidates with the documented precedence (specificity, confidence,
-//! narrower span, registration order, emission order), and numbers the
+//! candidates with the documented precedence (resolved-action severity,
+//! specificity, confidence, narrower span, registration order, emission
+//! order), and numbers the
 //! disjoint survivors by input offset. [`scan`] then evaluates a [`Policy`]
 //! once per finding. Identical input and configuration always produce
 //! identical findings and ids.
