@@ -2,6 +2,22 @@
 
 [Documentation home](README.md)
 
+## Install and setup
+
+Check [supported runtimes](getting-started.md#supported-runtimes) first: an
+unsupported runtime explains most setup failures.
+
+| Symptom | What to check |
+| --- | --- |
+| `cargo install redact-secret-cli` fails with ``could not find `redact-secret-cli` in registry `crates-io` with version `*` `` | Every release is a beta, and Cargo does not pick a prerelease unless you name it: add `--version <version>`, as in the [quickstart](quickstart.md#command-line) |
+| `redact-secret: command not found` after `cargo install` | Cargo installs into `~/.cargo/bin` (or `$CARGO_HOME/bin`); put it on `PATH` |
+| `npm install @redact-secret/core` gives an older beta than the newest | A bare install resolves the `latest` tag, which a maintainer moves by hand after publishing. Use `@redact-secret/core@beta` or an exact version |
+| pip reports no matching distribution with `--only-binary=:all:` | No wheel exists for this platform or Python version; see the [wheel matrix](python-packaging.md). Without that flag pip would start a source build, which needs a Rust toolchain |
+| `cargo install` or `cargo build` fails to compile | The workspace needs Rust 1.88 or newer (`rustc --version`) |
+| Which version am I running? | JavaScript: `VERSION` exported by `@redact-secret/core`. Python: `redact_secret.VERSION`. Rust: `redact_secret::VERSION`. CLI: `redact-secret --version`. Quote it when you [report a problem](guides/reporting-detection-issues.md) |
+
+## Errors
+
 | Symptom / code | What to check |
 | --- | --- |
 | `NOT_INITIALIZED` in JavaScript | Await `initialize()` before synchronous work |

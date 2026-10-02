@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
 import {
+  DOC_LANES,
+  EXTRA_LANES,
   LANES,
   parseQuickstart,
   requirePinnedVersion,
@@ -25,13 +27,26 @@ const lane = (name, { serve = name === "browser", input = SYNTHETIC_INPUT } = {}
     serve ? fence(`sh qualify=${name}:serve`, "npx vite preview --port 4173") : "",
     fence(`text qualify=${name}:expect`, "redact-secret 0.1.0-beta.1 loaded addon"),
   ].join("\n");
-const minimal = (overrides = {}) => LANES.map((name) => overrides[name] ?? lane(name)).join("\n");
+const extraLane = (name) =>
+  [
+    fence(
+      `sh qualify=${name}:setup`,
+      name === "rust"
+        ? "cargo add redact-secret@0.1.0-beta.1"
+        : "cargo install redact-secret-cli --version 0.1.0-beta.1 --locked",
+    ),
+    fence(`rust qualify=${name}:file:${name === "rust" ? "src/main.rs" : "input.txt"}`, SYNTHETIC_INPUT),
+    fence(`sh qualify=${name}:run`, "cargo run --quiet"),
+    fence(`text qualify=${name}:expect`, "redact-secret 0.1.0-beta.1\nAPI_KEY=<SECRET_1>"),
+  ].join("\n");
+const minimal = (overrides = {}) =>
+  DOC_LANES.map((name) => overrides[name] ?? (EXTRA_LANES.includes(name) ? extraLane(name) : lane(name))).join("\n");
 
 test("the published quickstart declares every lane and pins the product version", () => {
   const scenarios = parseQuickstart(quickstart);
-  assert.deepEqual(Object.keys(scenarios), LANES);
+  assert.deepEqual(Object.keys(scenarios), DOC_LANES);
   assert.deepEqual(requirePinnedVersion(scenarios, version), []);
-  for (const name of LANES) {
+  for (const name of DOC_LANES) {
     assert.ok(scenarioCommands(scenarios[name]).length >= 2, name);
     assert.match(scenarios[name].expect, /^API_KEY=<SECRET_1>$/m, name);
   }
@@ -41,9 +56,18 @@ test("the published quickstart declares every lane and pins the product version"
 
 test("the quickstart uses only the synthetic input and never installs from a path", () => {
   const scenarios = parseQuickstart(quickstart);
-  for (const name of LANES) {
+  for (const name of DOC_LANES) {
     for (const command of scenarioCommands(scenarios[name])) {
       assert.doesNotMatch(command, /file:|link:|\.\.\/|\/packages\/|\/bindings\//, command);
+    }
+    if (EXTRA_LANES.includes(name)) {
+      // The Rust and CLI lanes hold the value as a string literal or a file line.
+      const contents = scenarios[name].files.map((file) => file.content.trim());
+      assert.ok(
+        contents.some((content) => content.includes(SYNTHETIC_INPUT)),
+        name,
+      );
+      continue;
     }
     const literals = scenarios[name].files.flatMap((file) => file.content.match(/"API_KEY=[^"]*"/g) ?? []);
     assert.deepEqual([...new Set(literals)], [JSON.stringify(SYNTHETIC_INPUT)], name);
@@ -68,9 +92,13 @@ test("CI runs the quickstart driver for every lane and the qualification guide n
   assert.match(guide, /node scripts\/qualify-clean-install\.mjs --lane <node\|python\|browser> --candidate-dir <dir>/);
 });
 
-test("a minimal three-lane page parses", () => {
+test("a minimal five-lane page parses", () => {
   const scenarios = parseQuickstart(minimal());
   assert.deepEqual(scenarios.node.files, [{ name: "main.js", content: `scan(${JSON.stringify(SYNTHETIC_INPUT)});\n` }]);
+  assert.deepEqual(
+    scenarios.rust.files.map((file) => file.name),
+    ["src/main.rs"],
+  );
   assert.deepEqual(scenarioCommands(scenarios.browser), [
     "npm install @redact-secret/core@0.1.0-beta.1",
     "node main.js",
@@ -94,6 +122,8 @@ test("a page a reader could not follow literally is rejected", () => {
   );
   assert.throws(() => parseQuickstart(minimal() + fence("sh qualify=ruby:run", "ruby x.rb")), /unknown lane ruby/);
   assert.throws(() => parseQuickstart(minimal() + fence("js qualify=node:file:../escape.js", "x")), /plain file name/);
+  assert.throws(() => parseQuickstart(minimal() + fence("js qualify=node:file:a/../b.js", "x")), /plain file name/);
+  assert.throws(() => parseQuickstart(minimal() + fence("js qualify=node:file:/abs.js", "x")), /plain file name/);
 });
 
 test("a stale version pin or expected version is reported per lane", () => {
@@ -107,6 +137,11 @@ test("a stale version pin or expected version is reported per lane", () => {
     errors.some((error) => error.startsWith("node: setup must install exactly @redact-secret/core@0.1.0-beta.2")),
   );
   assert.ok(errors.some((error) => error.startsWith("python: setup must install exactly redact-secret==0.1.0b2")));
+  assert.ok(errors.some((error) => error.startsWith("rust: setup must install exactly redact-secret@0.1.0-beta.2")));
+  assert.ok(errors.some((error) => error.startsWith("cli: setup must install exactly --version 0.1.0-beta.2")));
+  assert.ok(
+    errors.some((error) => error.startsWith('cli: expected output must start with "redact-secret 0.1.0-beta.2"')),
+  );
   assert.ok(
     errors.some((error) => error.startsWith('browser: expected output must start with "redact-secret 0.1.0-beta.2"')),
   );

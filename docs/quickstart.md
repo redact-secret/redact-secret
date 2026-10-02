@@ -5,11 +5,47 @@
 Each path below starts in an empty directory, installs only the published
 package, and redacts one synthetic value. Pick the runtime you use; each one
 takes about five minutes on a supported development machine, most of it
-spent downloading packages.
+spent downloading packages or compiling.
 
-CI runs these exact commands and files against every release candidate (see
+| I use | Section | Installs |
+| --- | --- | --- |
+| Node.js 20, 22, or 24 | [Node.js](#nodejs) | `@redact-secret/core` from npm |
+| Python 3.10 or newer | [Python](#python) | `redact-secret` from PyPI |
+| A browser app with a bundler | [Browser with a bundler](#browser-with-a-bundler) | `@redact-secret/core` from npm |
+| Rust | [Rust](#rust) | the `redact-secret` crate |
+| CI, hooks, or shell pipelines | [Command line](#command-line) | the `redact-secret` binary, built from the `redact-secret-cli` crate |
+
+## Which version you get
+
+Every release so far is a beta; the stable `0.1.0` is not published yet. The
+commands below pin the newest published beta, `0.1.0-beta.12` (PyPI spells it
+`0.1.0b12`), so they give the same result tomorrow as today. Pin the version in
+your own lockfile too.
+
+- A bare `npm install @redact-secret/core` resolves the `latest` tag, which a
+  maintainer moves by hand after each beta publish and which can lag the
+  `beta` tag. `@beta` always selects the newest beta.
+- A bare `pip install redact-secret` and `cargo add redact-secret` resolve the
+  newest beta, because no stable release exists to prefer.
+- `cargo install redact-secret-cli` without `--version` fails today
+  (`could not find redact-secret-cli ... with version *`): Cargo does not
+  choose a prerelease for an install unless you name it.
+- When `0.1.0` is published, these pins change to `0.1.0` and the unpinned
+  forms resolve it. The steps do not otherwise change. [Release
+  status](releases/status.md) lists what each registry carries now.
+
+Logging, tracing, MCP, and model-context packages ([integrations](integrations.md))
+and the opt-in vault are separate packages on their own versions. They are not
+part of these steps.
+
+CI runs the Node.js, Python, and browser commands and files below against every
+release candidate (see
 [clean-install qualification](qualification.md#clean-install-qualification)).
 It reads them from this page, so a change here changes the qualification too.
+For the Rust and command-line sections CI checks the version pin and the page's
+shape but does not execute them, because no candidate registry serves crates.
+They were executed from this page's text against the published crates when
+the page was last revised ([evidence](audits/evidence/1070/README.md)).
 Commands are POSIX shell. On Windows, run them from Git Bash or WSL, or use
 `.venv\Scripts\python` in place of `.venv/bin/python`.
 
@@ -155,10 +191,93 @@ If the page shows `INITIALIZATION_FAILED`, check that the server returned the
 `.wasm` asset with the `application/wasm` content type; see
 [browser loading](guides/javascript.md#browser-loading).
 
+## Rust
+
+Requires Rust 1.88 or newer. In an empty directory:
+
+```sh qualify=rust:setup
+cargo new redact-quickstart
+cd redact-quickstart
+cargo add redact-secret@0.1.0-beta.12
+```
+
+Replace `src/main.rs` with:
+
+```rust qualify=rust:file:src/main.rs
+use redact_secret::{SecretScanError, VERSION, sanitize};
+
+fn main() -> Result<(), SecretScanError> {
+    let result = sanitize("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE")?;
+    println!("redact-secret {VERSION}");
+    println!("{}", result.text());
+    println!("findings: {}", result.findings().len());
+    Ok(())
+}
+```
+
+Run it:
+
+```sh qualify=rust:run
+cargo run --quiet
+```
+
+Expected output:
+
+```text qualify=rust:expect
+redact-secret 0.1.0-beta.12
+API_KEY=<SECRET_1>
+findings: 1
+```
+
+`sanitize` uses the `full` profile, the default policy, and the default
+limits. Custom policies, explicit limits, PII, and a registry reused across
+scans use the [advanced API](guides/rust.md).
+
+## Command line
+
+Building the binary needs Rust 1.88 or newer. No prebuilt binary is published,
+and `--version` is required while every release is a beta. In an empty
+directory:
+
+```sh qualify=cli:setup
+cargo install redact-secret-cli --version 0.1.0-beta.12 --locked
+```
+
+Save this as `input.txt`:
+
+```text qualify=cli:file:input.txt
+API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE
+```
+
+Print the version, sanitize the file, then check it:
+
+```sh qualify=cli:run
+redact-secret --version
+redact-secret --redact input.txt
+redact-secret input.txt || echo "exit $?"
+```
+
+Expected output:
+
+```text qualify=cli:expect
+redact-secret 0.1.0-beta.12
+API_KEY=<SECRET_1>
+input.txt:8-39 contextual_secret detector=generic-token confidence=high action=redact obfuscation=none id=finding-1
+exit 1
+```
+
+Check mode exits `1` when it finds anything, which is what makes it usable in
+CI, and prints a one-line summary on standard error. `--redact` writes the
+sanitized text to standard output, exits `0`, and never edits the input file.
+Exit codes, reports, and limits are in the [CLI guide](guides/cli.md).
+
 ## Next steps
 
-Read [policy and safe integration](guides/safe-integration.md) before sending
-sanitized output downstream, then continue with the
-[JavaScript](guides/javascript.md) or [Python](guides/python.md) guide.
-Scanning in a browser is preventive; scan again at the server, which is the
-authoritative enforcement boundary.
+- [Policy and safe integration](guides/safe-integration.md): read this before
+  sending sanitized output downstream. Scanning in a browser is preventive;
+  scan again at the server, which is the authoritative enforcement boundary.
+- The [JavaScript](guides/javascript.md), [Python](guides/python.md),
+  [Rust](guides/rust.md), or [CLI](guides/cli.md) guide.
+- [Streaming](guides/streaming.md), when the text arrives in chunks.
+- [Integrations](integrations.md), for logs, traces, MCP, and model context.
+- [Troubleshooting](troubleshooting.md), when something does not load or build.

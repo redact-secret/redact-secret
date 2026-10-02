@@ -144,7 +144,14 @@ and must use the qualified binaries and recorded digests.
    Preserve historical release records and examples intentionally pinned to them.
    Update the version pins and expected output in
    [`docs/quickstart.md`](quickstart.md) too; the `clean-install` job fails on
-   a page that does not pin the candidate version.
+   a page that does not pin the candidate version, and the page's Rust and
+   command-line sections are checked for the same pin by
+   `scripts/tests/clean-install-doc.test.mjs`. Two places carry the version
+   in prose and no check reads them: the Quick start in the root
+   [`README.md`](../README.md) and the install commands in
+   [`docs/getting-started.md`](getting-started.md#install-a-published-release).
+   Change them in the same commit, and at `0.1.0` drop the `@beta` and
+   `--version` qualifiers the quickstart explains.
 4. Run the local checks below before merging. After merge, record the exact
    `main` commit to qualify. Selecting any later source commit requires fresh
    qualification.

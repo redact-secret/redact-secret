@@ -4,6 +4,11 @@
  * construction, the commands and files `scripts/qualify-clean-install.mjs`
  * runs in CI -- there is no second copy to drift.
  *
+ * Five scenarios are declared: `node`, `python` and `browser` (the lanes the
+ * driver runs against a release candidate) and `cli` and `rust` (the crates.io
+ * paths, pinned and shape-checked here, executed by hand and after
+ * publication, because no candidate registry serves crates).
+ *
  * A scenario block is an ordinary fenced code block whose info string carries
  * one `qualify=<lane>:<role>` attribute after the language, which Markdown
  * renderers ignore:
@@ -17,12 +22,17 @@
 
 export const LANES = Object.freeze(["node", "python", "browser"]);
 
+/** Declared on the page and checked here, but not run by the candidate driver. */
+export const EXTRA_LANES = Object.freeze(["cli", "rust"]);
+
+export const DOC_LANES = Object.freeze([...LANES, ...EXTRA_LANES]);
+
 /** The one synthetic, revoked-shaped value every scenario redacts. */
 export const SYNTHETIC_INPUT = "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE";
 
 const FENCE = /^```([^\n`]*)\n([\s\S]*?)^```[ \t]*$/gm;
 const ATTRIBUTE = /(?:^|\s)qualify=([a-z]+):([a-z]+)(?::(\S+))?(?:\s|$)/;
-const FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+const FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
 
 /**
  * Every `qualify=` block in `markdown`, grouped by lane, validated for shape.
@@ -30,7 +40,10 @@ const FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
  */
 export function parseQuickstart(markdown) {
   const scenarios = Object.fromEntries(
-    LANES.map((lane) => [lane, { setup: undefined, files: [], run: undefined, serve: undefined, expect: undefined }]),
+    DOC_LANES.map((lane) => [
+      lane,
+      { setup: undefined, files: [], run: undefined, serve: undefined, expect: undefined },
+    ]),
   );
   for (const match of markdown.matchAll(FENCE)) {
     const attribute = ATTRIBUTE.exec(match[1]);
@@ -56,7 +69,7 @@ export function parseQuickstart(markdown) {
     scenario[role] = role === "expect" ? body.replace(/\n$/, "") : body;
   }
 
-  for (const lane of LANES) {
+  for (const lane of DOC_LANES) {
     const scenario = scenarios[lane];
     for (const role of ["setup", "run", "expect"]) {
       if (scenario[role] === undefined) throw new Error(`quickstart: ${lane} has no ${role} block`);
@@ -65,7 +78,7 @@ export function parseQuickstart(markdown) {
     if ((lane === "browser") !== (scenario.serve !== undefined)) {
       throw new Error(`quickstart: only the browser lane has a serve block (${lane})`);
     }
-    if (!scenario.files.some((file) => file.content.includes(JSON.stringify(SYNTHETIC_INPUT)))) {
+    if (!scenario.files.some((file) => file.content.includes(SYNTHETIC_INPUT))) {
       throw new Error(`quickstart: ${lane} does not redact the synthetic input`);
     }
   }
@@ -100,14 +113,16 @@ export function requirePinnedVersion(scenarios, version) {
     ["node", scenarios.node.setup, `@redact-secret/core@${npm}`],
     ["browser", scenarios.browser.setup, `@redact-secret/core@${npm}`],
     ["python", scenarios.python.setup, `redact-secret==${python}`],
+    ["rust", scenarios.rust.setup, `redact-secret@${npm}`],
+    ["cli", scenarios.cli.setup, `--version ${npm}`],
   ];
   for (const [lane, setup, pin] of pins) {
-    const specs = setup.match(/@redact-secret\/core@\S+|redact-secret==\S+/g) ?? [];
+    const specs = setup.match(/@redact-secret\/core@\S+|redact-secret==\S+|redact-secret@\S+|--version \S+/g) ?? [];
     if (specs.length !== 1 || specs[0] !== pin) {
       errors.push(`${lane}: setup must install exactly ${pin}, found ${specs.join(", ") || "nothing"}`);
     }
   }
-  for (const lane of LANES) {
+  for (const lane of DOC_LANES) {
     const first = scenarios[lane].expect.split("\n")[0];
     if (!first.startsWith(`redact-secret ${npm}`)) {
       errors.push(`${lane}: expected output must start with "redact-secret ${npm}"`);

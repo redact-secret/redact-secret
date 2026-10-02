@@ -6,6 +6,18 @@ Scan untrusted text before logging, persistence, indexing, request forwarding,
 or model/tool context construction. Browser scanning improves preventive UX;
 the server must scan independently even when the client already did.
 
+## Where the authoritative scan belongs
+
+A client can be modified, skipped, or replaced, so a scan that runs on the
+user's device is preventive UX: it keeps a pasted credential from leaving the
+device in the ordinary case. The server scans again, independently, before
+logging, storage, context construction, and model or tool invocation, and that
+scan is the one your security decisions rely on. Use the default `full`
+detector profile for it. The smaller opt-in `common` profile is for preventive
+consumers such as a browser or a small agent process; it drops provider-specific
+detectors by design, so it is never the authoritative boundary
+([detector profiles](../reference/detection.md#detector-profiles)).
+
 ## Actions are decisions your host consumes
 
 | Action | Library output | Host responsibility |
@@ -47,11 +59,16 @@ browser WebAssembly candidates.
 
 ## Bound resources before scanning
 
-Whole-input APIs do not impose automatic input-size or finding-count limits.
-Bound transport bytes before decoding, decoded input before scanning, and output,
-concurrency, and memory before downstream use. A finding-count check performed
-after scanning cannot prevent the allocation that already happened. Choose
-limits appropriate to your application and test them with small synthetic inputs.
+Whole-input `scan`, `redact`, and `scanAndRedact` are bounded by default: 64 MiB
+of input and 50,000 findings, failing closed with `INPUT_LIMIT_EXCEEDED` or
+`FINDING_LIMIT_EXCEEDED` rather than returning a truncated result
+(`decision-bound-whole-input-operations-by-default`; pass `limits` to raise or
+lower them). Those defaults are a ceiling, not a request budget. By the time
+the check runs, your process already holds the decoded string, so bound
+transport bytes before decoding, decoded input before scanning, and output,
+concurrency, and memory before downstream use. Choose limits appropriate to
+your application and test them with small synthetic inputs. A failed scan must
+stop the operation: never fall back to the raw input.
 
 Incremental APIs require explicit limits but may emit a prefix before a later
 failure. Stage output until successful finalization when a downstream operation

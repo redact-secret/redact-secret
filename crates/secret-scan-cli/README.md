@@ -43,6 +43,17 @@ selected exactly. Under `pii-v1` those five are `provisional`, not `stable`.
 `pii:family:us:ssn` selects only the SSN family, which stays `pending`.
 Selecting a family makes it available; it does not make it qualified.
 
+## Install
+
+```bash
+cargo install redact-secret-cli --locked --version <version>
+```
+
+While every release is a beta, `--version` is required, and no prebuilt binary
+is published. The
+[quickstart](https://github.com/redact-secret/redact-secret/blob/main/docs/quickstart.md#command-line)
+gives the exact command and the expected output.
+
 ## Check mode
 
 The default. Reads standard input when no path is given, and otherwise reads

@@ -13,7 +13,7 @@ Deterministic secret detection and redaction for runtime data and AI context.
 
 Your application handles text it does not fully control: user input, pasted
 configuration, error messages, HTTP bodies, and tool results. Before that text
-leaves the request and lands somewhere that keeps or repeats it, pass it
+reaches logs, persistence, telemetry, tool output, or model context, pass it
 through Redact Secret. It finds supported credential formats (plus opt-in
 structured PII, whose `pii-v1` statuses at the Beta.11 qualification were five families
 `provisional`, US SSN `pending`, none `stable`)
@@ -21,6 +21,61 @@ and returns the text with those matches replaced, plus findings that describe wh
 found and where without ever including the secret itself. It runs in your
 process. It makes no network calls and sends no telemetry, and the same input
 always gives the same result.
+
+## Quick start
+
+Every release so far is a beta. The newest published version is `0.1.0-beta.12`;
+the stable `0.1.0` is not published yet. Pick your runtime, install, and redact
+one synthetic value in about five minutes:
+
+| Runtime | Install | Steps |
+| --- | --- | --- |
+| JavaScript: Node.js 20, 22, 24, and browsers | `npm install @redact-secret/core@beta` | [Node.js](docs/quickstart.md#nodejs), [browser](docs/quickstart.md#browser-with-a-bundler) |
+| Python 3.10 or newer | `pip install --only-binary=:all: redact-secret` | [Python](docs/quickstart.md#python) |
+| Rust 1.88 or newer | `cargo add redact-secret` | [Rust](docs/quickstart.md#rust) |
+| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.12` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
+
+These install the newest beta. The [quickstart](docs/quickstart.md#which-version-you-get)
+pins an exact version, says what a bare install resolves today, and says what
+changes when `0.1.0` is published. No prebuilt CLI binary is published.
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+
+const result = scanAndRedact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+console.log(result.text);
+// API_KEY=<SECRET_1>
+```
+
+```python
+import redact_secret
+
+result = redact_secret.scan_and_redact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE")
+print(result.text)
+# API_KEY=<SECRET_1>
+```
+
+```bash
+printf '%s\n' 'API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE' | redact-secret --redact
+# API_KEY=<SECRET_1>
+```
+
+Two things to know before you rely on it. Scanning in a browser is preventive;
+the server must scan again, and that scan is the authoritative boundary
+([where scanning belongs](#where-scanning-belongs)). And an empty finding list
+does not prove text is secret-free ([what it does not replace](#what-it-does-not-replace)).
+
+| I want to | Read |
+| --- | --- |
+| Use it from [JavaScript](docs/guides/javascript.md), [Python](docs/guides/python.md), [Rust](docs/guides/rust.md), or the [CLI](docs/guides/cli.md) | the guide for my language |
+| Decide what gets redacted, blocked, or only reported | [policy and safe integration](docs/guides/safe-integration.md) |
+| Process a stream or large input in chunks | [streaming](docs/guides/streaming.md) |
+| Detect an in-house credential format | [declarative rulesets](docs/guides/rulesets.md) |
+| Protect logs, traces, MCP, or model context | [integrations](docs/integrations.md) |
+| Fix an error or check a runtime is supported | [troubleshooting](docs/troubleshooting.md) |
+| See every document | [documentation home](docs/README.md) |
 
 ## What it is for
 
@@ -89,70 +144,36 @@ That matrix is built from evaluation evidence, not written by hand. The
 can be missed and why. Published versions and their artifacts are listed in
 [release status](docs/releases/status.md).
 
-## Install and first example
+## Integrations and release status
 
-Public beta packages exist for npm, PyPI, crates.io, and the CLI. The exact
-install command for the current published version of each is in
-[getting started](docs/getting-started.md#install-a-published-release).
-Select a version explicitly rather than relying on an unqualified install.
+This repository ships the core: the Rust crates, the JavaScript and Python
+packages, and the CLI. They are beta today and move together on one version.
+Stable contract 1 ([API concepts](docs/reference/api-contract.md#stable-contract-1))
+applies to them from `0.1.0`; the promise is deterministic, evidence-qualified
+runtime detection and redaction across the supported core runtimes, with
+documented limits and cross-runtime conformance.
 
-```ts
-import { initialize, scanAndRedact } from "@redact-secret/core";
+Integrations are separate packages in separate repositories, on their own
+versions, and Stable contract 1 does not cover them:
 
-await initialize();
+- **Logging, tracing, MCP, and model context**: Pino, Python `logging`,
+  OpenTelemetry spans, a `mask` callback, AI-context, and MCP packages, from
+  [`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters).
+  Each requires core `0.1.0-beta.6` or later.
+- **Vault** (opt-in; hides secrets from a model and restores them only where
+  you allow): [`redact-secret-vault`](https://github.com/redact-secret/redact-secret-vault).
+  Its in-memory packages are beta and its persistent server profile is alpha;
+  it pins the core version exactly.
 
-const result = scanAndRedact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE");
-console.log(result.text);
-// API_KEY=<SECRET_1>
-```
-
-```python
-import redact_secret
-
-result = redact_secret.scan_and_redact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE")
-print(result.text)
-# API_KEY=<SECRET_1>
-```
-
-```bash
-printf '%s\n' 'API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE' | redact-secret --redact
-# API_KEY=<SECRET_1>
-```
-
-Then continue with the [JavaScript](docs/guides/javascript.md),
-[Python](docs/guides/python.md), [Rust](docs/guides/rust.md), or
-[CLI](docs/guides/cli.md) guide, or the [documentation home](docs/README.md).
-To build this checkout instead, see the
-[source setup](docs/getting-started.md#build-this-checkout). The executable
-behavior contract that every surface passes lives in
-[conformance](conformance/README.md).
-
-## Integrations
-
-Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations ship
-from a separate repository,
-[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
-as `@redact-secret/adapter` (0.1.2), `@redact-secret/adapter-pino` (0.1.1),
-`@redact-secret/adapter-otel` (0.1.1) (npm) and `redact-secret-adapters`
-(PyPI, 0.1.0), each requiring core 0.1.0-beta.6 or later. Versions as
-observed on the registries on 2026-09-28; the adapters ship on their own
-release trains ([`train/2026.09.22`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.22),
-[`2026.09.25`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.25),
-[`2026.09.26`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.26)).
-The opt-in [`@redact-secret/vault`](docs/releases/status.md#vault)
-(`0.1.0-alpha.3`) pins core exactly at `0.1.0-beta.10`. The published
-versions, their core ranges, and the install commands are in
-[release status](docs/releases/status.md#host-integration-adapters). See
-[`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
-for why they live apart, including why this repository's own release matrix
-is unaffected.
-Model context (MCP) is covered by the published
-`@redact-secret/adapter-mcp@0.1.0-alpha.1` in the adapters repository
-(npm dist-tag `alpha`, observed 2026-09-28), which implements the
-[MCP boundary contract](docs/reference/mcp-boundary.md);
-[`examples/mcp-redact/`](examples/mcp-redact/) composes it into a tested
-agent turn — see its README for its stated support level. LangChain remains
-an application use case with no integration in this repository at all.
+[Integrations](docs/integrations.md) says which package fits which job and what
+each lifecycle means. [Release status](docs/releases/status.md) lists the
+versions each registry carried when last observed. Model context (MCP) is
+specified by the [MCP boundary contract](docs/reference/mcp-boundary.md);
+[`examples/mcp-redact/`](examples/mcp-redact/) composes the adapter into a
+tested agent turn. LangChain remains an application use case with no
+integration in this repository. The adapters live apart for the reasons in
+[`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md),
+including why this repository's own release matrix is unaffected.
 
 ## Architecture at a glance
 
@@ -194,7 +215,7 @@ policies, and [docs/python-packaging.md](./docs/python-packaging.md) for the
 CPython distribution, its abi3 wheel matrix, and how each artifact is
 qualified.
 
-## JavaScript quick start
+## JavaScript runtimes and PII
 
 `@redact-secret/core` presents one typed API across Node.js and modern
 browsers. On Node.js it loads a prebuilt N-API addon and falls back to the
@@ -297,7 +318,9 @@ false-negative tradeoffs, and the limits.
 ## Browser and server boundaries
 
 Scan in the browser before constructing a request body so preventive UX can
-keep a high-confidence credential on the device:
+keep a high-confidence credential on the device. These two snippets are
+illustrative: `showSecretWarning`, `serverPolicy`, `conversationStore`, and
+`modelGateway` stand for your own code.
 
 ```ts
 const result = scanAndRedact(userInput);
@@ -339,7 +362,8 @@ for its false-negative tradeoff and measured savings.
 Wire the same detection into LLM tracing SDKs so prompts, tool calls, and
 spans never carry a secret into observability storage, with the released
 [`@redact-secret/adapter-otel`](https://www.npmjs.com/package/@redact-secret/adapter-otel)
-`SpanProcessor` or the masking callback in
+`SpanProcessor` (the adapters repository now documents it as
+`@redact-secret/adapter-otel-trace`) or the masking callback in
 [`@redact-secret/adapter`](https://www.npmjs.com/package/@redact-secret/adapter).
 See the [tracing reference](examples/tracing-masking/) for the trust zone,
 the failure behavior, and what it does not cover.
@@ -394,10 +418,11 @@ from redact_secret_adapters.logging_filter import RedactSecretFilter
 handler.addFilter(RedactSecretFilter())
 ```
 
-## CLI quick start
+## CLI
 
 The `redact-secret` binary is a host adapter over the same core, for CI,
-pre-commit hooks, and safe redaction pipelines.
+pre-commit hooks, and safe redaction pipelines. Install it with the command in
+the [quick start](#quick-start).
 
 ```bash
 redact-secret src/config.ts src/client.ts   # check files; exit 1 on a finding
