@@ -241,6 +241,84 @@ test("binary payloads block by default and pass unscanned, in place, only on opt
   assert.throws(() => createMcpBoundary(createAiContextBoundary(fakeApi(), LIMITS), { binaryContent: "scan" }), TypeError);
 });
 
+/**
+ * An accessor-backed binary field (#1099). `mode` decides what each read
+ * returns; `reads.count` proves how many times the field was read.
+ *   "retype"        string on the first read, a non-string object on the later ones
+ *   "throw-second"  string on the first read, throws on the later ones
+ *   "throw-first"   throws on every read
+ */
+function accessorBinary(target, key, mode) {
+  const reads = { count: 0 };
+  Object.defineProperty(target, key, {
+    enumerable: true,
+    configurable: true,
+    get() {
+      reads.count += 1;
+      if (mode === "throw-first") throw new Error("synthetic first-read failure");
+      if (reads.count === 1) return "U1lOVEhFVElD";
+      if (mode === "retype") return { text: SYNTHETIC };
+      throw new Error("synthetic second-read failure");
+    },
+  });
+  return reads;
+}
+
+const BINARY_SHAPES = {
+  "tool-result image block": (mode) => {
+    const block = { type: "image", mimeType: "image/png" };
+    const reads = accessorBinary(block, "data", mode);
+    return { reads, run: (mcp) => mcp.sanitizeToolResult({ content: [block] }) };
+  },
+  "tool-result audio block": (mode) => {
+    const block = { type: "audio", mimeType: "audio/wav" };
+    const reads = accessorBinary(block, "data", mode);
+    return { reads, run: (mcp) => mcp.sanitizeToolResult({ content: [block] }) };
+  },
+  "tool-result embedded resource blob": (mode) => {
+    const resource = { uri: "file:///x.bin", mimeType: "application/octet-stream" };
+    const reads = accessorBinary(resource, "blob", mode);
+    return { reads, run: (mcp) => mcp.sanitizeToolResult({ content: [{ type: "resource", resource }] }) };
+  },
+  "resources/read blob entry": (mode) => {
+    const entry = { uri: "file:///x.bin", mimeType: "application/octet-stream" };
+    const reads = accessorBinary(entry, "blob", mode);
+    return { reads, run: (mcp) => mcp.sanitizeResourceResult({ contents: [entry] }) };
+  },
+};
+
+const UNSUPPORTED_OUTCOME = { outcome: "blocked", reason: "unsupported_value" };
+
+test("a passed-through binary field is read once: a getter that changes type or throws on a later read cannot escape (#1099)", () => {
+  for (const [shape, build] of Object.entries(BINARY_SHAPES)) {
+    for (const mode of ["retype", "throw-second"]) {
+      const { reads, run } = build(mode);
+      const outcome = run(setup({ binaryContent: "pass" }).mcp);
+      assert.equal(reads.count, 1, `${shape} ${mode}: read exactly once`);
+      assert.equal(outcome.outcome, "ok", `${shape} ${mode}: the value that was checked is passed`);
+      assert.equal(JSON.stringify(outcome.value).includes(SYNTHETIC), false, `${shape} ${mode}: nothing unscanned leaks`);
+      assert.ok(JSON.stringify(outcome.value).includes("U1lOVEhFVElD"), `${shape} ${mode}: the checked string is delivered`);
+    }
+  }
+});
+
+test("a binary getter that throws on the first read blocks as unsupported_value instead of throwing (#1099)", () => {
+  for (const [shape, build] of Object.entries(BINARY_SHAPES)) {
+    const { run } = build("throw-first");
+    assert.deepEqual(run(setup({ binaryContent: "pass" }).mcp), UNSUPPORTED_OUTCOME, shape);
+  }
+});
+
+test("under binaryContent block the binary field is refused without its value being read (#1099)", () => {
+  for (const [shape, build] of Object.entries(BINARY_SHAPES)) {
+    for (const mode of ["retype", "throw-second", "throw-first"]) {
+      const { reads, run } = build(mode);
+      assert.deepEqual(run(setup().mcp), UNSUPPORTED_OUTCOME, `${shape} ${mode}`);
+      assert.equal(reads.count, 0, `${shape} ${mode}: the value was never read`);
+    }
+  }
+});
+
 test("a block type outside the protocol revisions blocks the whole result", () => {
   const { mcp } = setup();
   assert.deepEqual(mcp.sanitizeToolResult({ content: [{ type: "text", text: "ok" }, { type: "video", uri: "x" }] }), {
