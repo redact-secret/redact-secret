@@ -3,7 +3,7 @@
   "$id": "urn:redact-secret-benchmarks:support-matrix:1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "taxonomySchemaVersion", "sourceReport", "providerCount", "familyCount", "distribution", "stableDistribution", "families"],
+  "required": ["schemaVersion", "taxonomySchemaVersion", "sourceReport", "providerCount", "familyCount", "distribution", "stableDistribution", "families", "findingTypeSource", "piiQualification", "piiDistribution", "piiFamilies"],
   "properties": {
     "schemaVersion": { "const": 1 },
     "taxonomySchemaVersion": { "const": 1 },
@@ -102,14 +102,14 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["provider", "family", "familyName", "status", "evidenceTier", "evidenceBasis", "qualificationProfile", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "empiricalEvidence", "fixtureProfile", "detectors", "reason", "profileCoverage"],
+        "required": ["provider", "family", "familyName", "status", "evidenceTier", "evidenceBasis", "qualificationProfile", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "empiricalEvidence", "fixtureProfile", "detectors", "findingTypes", "reason", "profileCoverage"],
         "properties": {
           "provider": { "type": ["string", "null"] },
           "family": { "type": "string" },
           "familyName": { "type": "string" },
           "status": { "enum": ["stable", "provisional", "pending", "unsupported"] },
           "evidenceTier": { "enum": ["T0", "T1", "T2", "T3", null] },
-          "evidenceBasis": { "enum": ["provider-documented", "independently-corroborated", "empirically-observed", "project-policy", "none"] },
+          "evidenceBasis": { "enum": ["provider-documented", "corroborated", "empirically-observed", "project-policy", "none"] },
           "qualificationProfile": { "enum": ["documented", "empirical", "policy-qualified", null] },
           "providerSource": {
             "type": ["object", "null"],
@@ -175,13 +175,136 @@
             }
           },
           "detectors": { "type": "array", "items": { "type": "string" } },
+          "findingTypes": {
+            "description": "The (detector, finding type) pairs this row's evidence covers, so a shared detector joins to its rows per finding type. [] when the row has no detector; null (unset) when no recorded source grounds a key. Rule: docs/specs/support-matrix.md.",
+            "type": ["array", "null"],
+            "items": {
+              "type": "object", "additionalProperties": false, "required": ["detector", "type", "basis"],
+              "properties": {
+                "detector": { "type": "string", "minLength": 1 },
+                "type": { "type": "string", "minLength": 1 },
+                "basis": { "enum": ["sole-type-of-detector", "arrival-finding-type-table", "remaining-types-of-detector"] }
+              }
+            }
+          },
           "reason": { "type": ["string", "null"] },
           "profileCoverage": { "oneOf": [{ "$ref": "#/definitions/fixtureProfile" }, { "type": "null" }] }
+        }
+      }
+    },
+    "findingTypeSource": {
+      "description": "The product revision whose detector inventory the finding-type keys were read from.",
+      "type": "object", "additionalProperties": false, "required": ["repository", "revision", "path", "sha256"],
+      "properties": {
+        "repository": { "const": "redact-secret/redact-secret" },
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "piiQualification": {
+      "description": "Identity of the single qualification the piiFamilies statuses come from. The PII statuses are at that core commit and are not re-qualified on any later one.",
+      "type": "object", "additionalProperties": false,
+      "required": ["profile", "route", "binding", "maximumStatus", "qualifiedAt", "benchmarks", "record", "disposition", "commitments", "costAcceptance", "requalification"],
+      "properties": {
+        "profile": { "const": "pii-v1" },
+        "route": { "type": "string", "minLength": 1 },
+        "binding": { "type": "string", "minLength": 1 },
+        "maximumStatus": { "const": "provisional" },
+        "qualifiedAt": {
+          "type": "object", "additionalProperties": false, "required": ["coreCommit", "epoch", "populationPlanSet"],
+          "properties": {
+            "coreCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "epoch": { "type": "string", "pattern": "^[0-9a-f]{12}$" },
+            "populationPlanSet": { "type": "string", "minLength": 1 }
+          }
+        },
+        "benchmarks": {
+          "type": "object", "additionalProperties": false, "required": ["recordRevision", "freezeBaseRevision"],
+          "properties": {
+            "recordRevision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "freezeBaseRevision": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          }
+        },
+        "record": { "type": "string", "minLength": 1 },
+        "disposition": { "type": "string", "minLength": 1 },
+        "commitments": {
+          "type": "object", "additionalProperties": false, "required": ["freeze", "report", "disposition", "seal", "protectedDisposition"],
+          "properties": {
+            "freeze": { "$ref": "#/definitions/digest" }, "report": { "$ref": "#/definitions/digest" }, "disposition": { "$ref": "#/definitions/digest" },
+            "seal": { "$ref": "#/definitions/digest" }, "protectedDisposition": { "$ref": "#/definitions/digest" }
+          }
+        },
+        "costAcceptance": {
+          "type": "object", "additionalProperties": false, "required": ["id", "entryCommitment", "status", "cells", "sizeRows"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 }, "entryCommitment": { "$ref": "#/definitions/digest" }, "status": { "const": "accepted" },
+            "cells": { "type": "integer", "minimum": 0 }, "sizeRows": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "requalification": {
+          "type": "object", "additionalProperties": false, "required": ["state", "requalifiedOnCoreCommit", "statement"],
+          "properties": {
+            "state": { "const": "not-requalified" },
+            "requalifiedOnCoreCommit": { "type": "null" },
+            "statement": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "piiDistribution": {
+      "type": "object", "additionalProperties": false, "required": ["stable", "provisional", "pending", "unsupported"],
+      "properties": {
+        "stable": { "const": 0 }, "provisional": { "type": "integer", "minimum": 0 }, "pending": { "type": "integer", "minimum": 0 }, "unsupported": { "const": 0 }
+      }
+    },
+    "piiFamilies": {
+      "description": "The opt-in PII families, apart from the credential families: never counted in providerCount, familyCount, distribution or stableDistribution.",
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["family", "familyName", "status", "reason", "coverage", "findingTypes", "gates", "failedGates"],
+        "properties": {
+          "family": { "type": "string", "pattern": "^pii:[a-z0-9-]+:[a-z0-9-]+$" },
+          "familyName": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["pending", "provisional"] },
+          "reason": { "type": "string", "minLength": 1 },
+          "coverage": {
+            "type": "object", "additionalProperties": false, "required": ["scope", "jurisdiction", "restriction", "note"],
+            "properties": {
+              "scope": { "type": "string", "minLength": 1 }, "jurisdiction": { "type": ["string", "null"] },
+              "restriction": { "type": ["string", "null"] }, "note": { "type": "string", "minLength": 1 }
+            }
+          },
+          "findingTypes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^pii_[a-z0-9_]+$" } },
+          "gates": {
+            "type": "object", "additionalProperties": false, "required": ["public", "protected"],
+            "properties": {
+              "public": {
+                "type": "object", "additionalProperties": false, "required": ["met", "notMet", "unresolved", "acceptedTradeoffs"],
+                "properties": {
+                  "met": { "type": "integer", "minimum": 0 },
+                  "notMet": { "type": "array", "items": { "type": "string" } },
+                  "unresolved": { "type": "array", "items": { "type": "string" } },
+                  "acceptedTradeoffs": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "protected": {
+                "type": "object", "additionalProperties": false, "required": ["state", "reason", "runs", "epochCommitment", "aggregateCommitment", "trustCommitment"],
+                "properties": {
+                  "state": { "enum": ["met", "not-met"] }, "reason": { "type": "string", "minLength": 1 }, "runs": { "type": "string", "pattern": "^[0-9]+/[0-9]+$" },
+                  "epochCommitment": { "$ref": "#/definitions/digest" }, "aggregateCommitment": { "$ref": "#/definitions/digest" }, "trustCommitment": { "$ref": "#/definitions/digest" }
+                }
+              }
+            }
+          },
+          "failedGates": { "type": "array", "items": { "type": "string" } }
         }
       }
     }
   },
   "definitions": {
+    "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "fixtureProfile": {
       "type": "object",
       "additionalProperties": false,

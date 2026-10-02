@@ -30,9 +30,9 @@ body:
     attributes:
       label: Package and exact version
       description: >-
-        e.g. `@redact-secret/core@0.1.0-beta.12`, `redact-secret==0.1.0b12`,
-        `redact-secret-cli 0.1.0-beta.12`, or a commit SHA.
-      placeholder: "@redact-secret/core@0.1.0-beta.12"
+        e.g. `@redact-secret/core@0.1.0-beta.13`, `redact-secret==0.1.0b13`,
+        `redact-secret-cli 0.1.0-beta.13`, or a commit SHA.
+      placeholder: "@redact-secret/core@0.1.0-beta.13"
     validations:
       required: true
 

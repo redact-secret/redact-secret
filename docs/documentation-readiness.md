@@ -19,6 +19,12 @@ review and the executable-example evidence that C1 to C3 below ask for, for the
 revision it names. D1 to D3 stay pending until a delivery platform is chosen, and a published
 `0.1.0` needs the install commands re-run against the registries.
 
+The install commands in the README, `getting-started.md` and `quickstart.md`
+pin `0.1.0-beta.13` in the Beta.13 preparation. The #1070 record ran them
+against `0.1.0-beta.12`; they have not been run against registry packages of
+`0.1.0-beta.13`, which does not exist until the owner publishes it, so that
+re-run is pending too.
+
 ## Required content before stable release
 
 Every required topic has a repository entry point today. Presence is not final

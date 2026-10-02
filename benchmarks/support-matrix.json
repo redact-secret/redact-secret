@@ -3,9 +3,9 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-10-01T10:49:11.866Z",
-    "runId": "07d1bfa0-b7e4-43e3-b0d8-f9de06494d73",
-    "revision": "e8f73bfd7241845ef9fb75574a72b135aa777ba6",
+    "generatedAt": "2026-10-02T19:28:20.296Z",
+    "runId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05",
+    "revision": "573e128863e0543133e5ccbd513216d19513b7da",
     "dirty": false,
     "criteriaSchemaVersion": 1,
     "fixtureIndex": {
@@ -16,29 +16,29 @@
     },
     "taxonomyDigest": "7a210894da37b6641543d6faf7acf75d670eec74618111bd3311621fbf3844fc",
     "product": {
-      "sourceCommit": "4227160c4dac402d7add53d3f8fe990f693912c1",
+      "sourceCommit": "fe6e9234d40e7d5964de27d00d33544f9c621dbf",
       "packageName": "@redact-secret/core",
-      "declaredVersion": "0.1.0-beta.12",
+      "declaredVersion": "0.1.0-beta.13",
       "artifacts": [
         {
           "role": "package",
-          "sha256": "9011bbe659629c892ad1f1309a3ec1719621e5e782650543400871a120eebcbb"
+          "sha256": "8e281e2932b245c8d238f52076c08e6c00859edafdb3e1e202500bc176a73cec"
         },
         {
           "role": "node",
-          "sha256": "3b34840ba24c5e757c5c59c0cac3af47dbc5ca5492a3257598a6563216d75251"
+          "sha256": "d84e31859c72fd046810bb3370df0e61376f5266969ec86b4bd9837437409083"
         },
         {
           "role": "wasm",
-          "sha256": "efdc7d121b215dfc99dac1af4a67191ff9e3f4e586639ed59663262e150aab56"
+          "sha256": "f19919458494de3c7210edae7099a47f380191debc956618a37963fc9ef5e1fb"
         }
       ]
     },
     "scannerObservations": {
       "redact-secret": {
         "source": "fresh",
-        "observedAt": "2026-10-01T10:48:26.359Z",
-        "sourceRunId": "07d1bfa0-b7e4-43e3-b0d8-f9de06494d73"
+        "observedAt": "2026-10-02T19:28:01.450Z",
+        "sourceRunId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05"
       },
       "gitleaks": {
         "source": "snapshot",
@@ -76,7 +76,7 @@
       "familyName": "API key (unprefixed)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -189,7 +189,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "ai21-api-key",
+          "type": "ai21_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "anthropic",
@@ -312,7 +319,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_admin_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "anthropic",
@@ -431,7 +445,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_enterprise_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "anthropic",
@@ -543,7 +564,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "apify",
@@ -659,7 +687,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "apify-api-token",
+          "type": "apify_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "atlassian",
@@ -678,7 +713,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "atlassian-api-token's contract review states the pinned TruffleHog detector targets the distinct ATCT access-token family, not the ATAT-prefixed API-token shape."
+      "reason": "atlassian-api-token's contract review states the pinned TruffleHog detector targets the distinct ATCT access-token family, not the ATAT-prefixed API-token shape.",
+      "findingTypes": []
     },
     {
       "provider": "atlassian",
@@ -686,7 +722,7 @@
       "familyName": "API token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -807,7 +843,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "aws-bedrock",
@@ -932,7 +975,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "aws-bedrock",
@@ -1052,7 +1102,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "aws",
@@ -1071,7 +1128,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
+      "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes.",
+      "findingTypes": []
     },
     {
       "provider": "aws",
@@ -1180,7 +1238,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "aws",
@@ -1188,7 +1253,7 @@
       "familyName": "IAM user secret access key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -1304,7 +1369,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "aws-secret-access-key",
+          "type": "aws_secret_access_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "aws",
@@ -1323,7 +1395,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
+      "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes.",
+      "findingTypes": []
     },
     {
       "provider": "aws",
@@ -1342,7 +1415,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Measured as the Beta.12 unscored arrival family aws-sts-temporary-access-key (benchmarks/lib/beta8/1012d.ts; #1012 research, T2: ASIA + exactly 16 [A-Z0-9]). The product claims ASIA inside aws-access-key under the shared aws_access_key_id finding type (redact-secret#1027), so its findings carry no family evidence of their own and no detector is mapped here; the registry aws-access-key contract stays AKIA-only. A bare ASIA id is an identifier and scores as project policy. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes, https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1012/aws-sts-temporary-access-key.md."
+      "reason": "Measured as the Beta.12 unscored arrival family aws-sts-temporary-access-key (benchmarks/lib/beta8/1012d.ts; #1012 research, T2: ASIA + exactly 16 [A-Z0-9]). The product claims ASIA inside aws-access-key under the shared aws_access_key_id finding type (redact-secret#1027), so its findings carry no family evidence of their own and no detector is mapped here; the registry aws-access-key contract stays AKIA-only. A bare ASIA id is an identifier and scores as project policy. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes, https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1012/aws-sts-temporary-access-key.md.",
+      "findingTypes": []
     },
     {
       "provider": "axiom",
@@ -1454,7 +1528,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_api_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "axiom",
@@ -1568,7 +1649,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "axiom-token",
+          "type": "axiom_personal_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "azure-devops",
@@ -1680,7 +1768,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "azure-devops-personal-access-token",
+          "type": "azure_devops_personal_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "bitwarden",
@@ -1801,7 +1896,14 @@
             "shortfall": 3
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "bitwarden-secrets-manager-access-token",
+          "type": "bitwarden_secrets_manager_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "browserbase",
@@ -1913,7 +2015,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "browserbase-api-key",
+          "type": "browserbase_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "cerebras",
@@ -2026,7 +2135,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "cerebras-api-key",
+          "type": "cerebras_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "clickhouse-cloud",
@@ -2145,7 +2261,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "clickhouse-cloud-api-secret",
+          "type": "clickhouse_cloud_api_secret",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "clojars",
@@ -2261,7 +2384,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "clojars-deploy-token",
+          "type": "clojars_deploy_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "cloudflare",
@@ -2370,7 +2500,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "cohere",
@@ -2378,7 +2515,7 @@
       "familyName": "API key (unprefixed)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -2496,7 +2633,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "cohere-api-key",
+          "type": "cohere_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "composio",
@@ -2611,7 +2755,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_org_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "composio",
@@ -2728,7 +2879,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_project_api_key",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "composio",
@@ -2843,7 +3001,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "composio-api-key",
+          "type": "composio_user_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "confluent",
@@ -2961,7 +3126,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "confluent",
@@ -2969,7 +3141,7 @@
       "familyName": "Cloud API secret (unprefixed, pre-2025-07-30)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -3092,7 +3264,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "convex",
@@ -3209,7 +3388,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "convex-deployment-key",
+          "type": "convex_deployment_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "crates-io",
@@ -3324,7 +3510,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_api_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "crates-io",
@@ -3436,7 +3629,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "crates-io-token",
+          "type": "crates_io_trusted_publishing_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "databricks",
@@ -3444,7 +3644,7 @@
       "familyName": "Personal access token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -3563,7 +3763,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "datadog",
@@ -3681,7 +3888,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "datadog-api-key",
+          "type": "datadog_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "datadog",
@@ -3803,7 +4017,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "datadog",
@@ -3811,7 +4032,7 @@
       "familyName": "Application key (legacy 40-hex)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -3934,7 +4155,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "daytona",
@@ -4050,7 +4278,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "daytona-api-key",
+          "type": "daytona_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "deepgram",
@@ -4058,7 +4293,7 @@
       "familyName": "API key (unprefixed)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -4178,7 +4413,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "deepgram-api-key",
+          "type": "deepgram_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "digitalocean",
@@ -4285,7 +4527,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "digitalocean",
@@ -4392,7 +4641,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "digitalocean",
@@ -4499,7 +4755,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "discord",
@@ -4507,7 +4770,7 @@
       "familyName": "Bot token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -4626,7 +4889,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "docker",
@@ -4732,7 +5002,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "docker",
@@ -4838,7 +5115,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -4960,7 +5244,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_audit_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -5082,7 +5373,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_cli_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -5204,7 +5502,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_personal_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -5326,7 +5631,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_scim_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -5448,7 +5760,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_identity_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -5570,7 +5889,14 @@
             "shortfall": 5
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_account_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "doppler",
@@ -5690,7 +6016,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "doppler-token",
+          "type": "doppler_service_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "dynatrace",
@@ -5810,7 +6143,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "dynatrace-token",
+          "type": "dynatrace_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "e2b",
@@ -5926,7 +6266,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "e2b-api-key",
+          "type": "e2b_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "elevenlabs",
@@ -6042,7 +6389,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "elevenlabs-api-key",
+          "type": "elevenlabs_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "exa",
@@ -6061,7 +6415,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Beta.10 context-gated arrival family exa-api-key (#384, research redact-secret#787, product #868). T0: measures the keyword gate and the SDK-call-argument forms only; no value grammar is claimed and none is fabricated. Provider source: https://exa.ai/docs/reference/team-management/update-api-key, https://github.com/exa-labs/exa-py."
+      "reason": "Beta.10 context-gated arrival family exa-api-key (#384, research redact-secret#787, product #868). T0: measures the keyword gate and the SDK-call-argument forms only; no value grammar is claimed and none is fabricated. Provider source: https://exa.ai/docs/reference/team-management/update-api-key, https://github.com/exa-labs/exa-py.",
+      "findingTypes": []
     },
     {
       "provider": "firebase",
@@ -6069,7 +6424,7 @@
       "familyName": "Legacy FCM server key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -6190,7 +6545,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "firebase-server-key",
+          "type": "firebase_server_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "firecrawl",
@@ -6308,7 +6670,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "firecrawl-api-key",
+          "type": "firecrawl_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "fireworks-ai",
@@ -6420,7 +6789,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": null,
@@ -6585,7 +6961,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": null,
@@ -6741,7 +7124,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": null,
@@ -6854,7 +7244,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": null,
@@ -7010,7 +7407,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "otpauth-uri",
+          "type": "otpauth_secret",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": null,
@@ -7120,7 +7524,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": null,
@@ -7306,7 +7717,24 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "github",
@@ -7440,7 +7868,34 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "github",
@@ -7574,7 +8029,34 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "github",
@@ -7708,7 +8190,34 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "github",
@@ -7716,7 +8225,7 @@
       "familyName": "Fine-grained personal access token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -7841,7 +8350,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "github-token",
+          "type": "github_fine_grained_personal_access_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "github",
@@ -7975,7 +8491,34 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "github",
@@ -8109,7 +8652,34 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "basis": "remaining-types-of-detector"
+        },
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "gitlab",
@@ -8219,7 +8789,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "gitlab",
@@ -8238,7 +8815,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Measured as the Beta.12 unscored arrival family gitlab-routable-personal-access-token (benchmarks/lib/beta8/1012c.ts; #1012 research, T1 provider code; the length holder and CRC are enforced as provider offline checks). The product reports it whole inside gitlab-token under the shared gitlab_token finding type (redact-secret#1022), so its findings carry no family evidence of their own and no detector is mapped here; the registry gitlab-token contract stays the legacy 20-byte body. Provider source: https://gitlab.com/gitlab-org/gitlab/-/blob/fa2faf332129a1fd9130b052f42b85f0fa346b65/lib/authn/token_field/generator/routable_token.rb#L7-L86, https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1012/gitlab-routable-personal-access-token.md."
+      "reason": "Measured as the Beta.12 unscored arrival family gitlab-routable-personal-access-token (benchmarks/lib/beta8/1012c.ts; #1012 research, T1 provider code; the length holder and CRC are enforced as provider offline checks). The product reports it whole inside gitlab-token under the shared gitlab_token finding type (redact-secret#1022), so its findings carry no family evidence of their own and no detector is mapped here; the registry gitlab-token contract stays the legacy 20-byte body. Provider source: https://gitlab.com/gitlab-org/gitlab/-/blob/fa2faf332129a1fd9130b052f42b85f0fa346b65/lib/authn/token_field/generator/routable_token.rb#L7-L86, https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1012/gitlab-routable-personal-access-token.md.",
+      "findingTypes": []
     },
     {
       "provider": "gitlab",
@@ -8246,7 +8824,7 @@
       "familyName": "Runner authentication token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -8365,7 +8943,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "google",
@@ -8479,7 +9064,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "google",
@@ -8487,7 +9079,7 @@
       "familyName": "OAuth client secret",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -8600,7 +9192,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "google-oauth-client-secret",
+          "type": "google_oauth_client_secret",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "google",
@@ -8619,7 +9218,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "BLOCKED in the #1012 research record: the ya29. alphabet and floor and the 1// lead byte and length are unsettled, so no contract is authored. The GOCSPX- client secret is split out as google:oauth-client-secret. Provider source: https://developers.google.com/identity/protocols/oauth2, https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1012/google-oauth2-credential.md."
+      "reason": "BLOCKED in the #1012 research record: the ya29. alphabet and floor and the 1// lead byte and length are unsettled, so no contract is authored. The GOCSPX- client secret is split out as google:oauth-client-secret. Provider source: https://developers.google.com/identity/protocols/oauth2, https://github.com/redact-secret/redact-secret/blob/4fb78827f1ddf5b3106f25130ca510a836ada186/docs/audits/evidence/1012/google-oauth2-credential.md.",
+      "findingTypes": []
     },
     {
       "provider": "grafana",
@@ -8737,7 +9337,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "grafana-cloud-access-policy-token",
+          "type": "grafana_cloud_access_policy_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "grafana",
@@ -8856,7 +9463,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "grafana-service-account-token",
+          "type": "grafana_service_account_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "groq",
@@ -8864,7 +9478,7 @@
       "familyName": "API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -8984,7 +9598,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "hashicorp-terraform",
@@ -9093,7 +9714,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "terraform-cloud-token",
+          "type": "terraform_cloud_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "hashicorp-terraform",
@@ -9202,7 +9830,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "terraform-cloud-token",
+          "type": "terraform_cloud_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "hashicorp-terraform",
@@ -9311,7 +9946,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "terraform-cloud-token",
+          "type": "terraform_cloud_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "hashicorp-vault",
@@ -9423,7 +10065,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "hashicorp-vault",
@@ -9535,7 +10184,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "hashicorp-vault",
@@ -9647,7 +10303,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "helicone",
@@ -9762,7 +10425,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_api_key",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "helicone",
@@ -9879,7 +10549,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "helicone-api-key",
+          "type": "helicone_write_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "heroku",
@@ -9887,7 +10564,7 @@
       "familyName": "Legacy API key (bare UUID)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -10008,7 +10685,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "heroku",
@@ -10124,7 +10808,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "honeycomb",
@@ -10236,7 +10927,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "honeycomb-api-key",
+          "type": "honeycomb_ingest_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "huggingface",
@@ -10346,7 +11044,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "inngest",
@@ -10462,7 +11167,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "inngest-signing-key",
+          "type": "inngest_signing_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "langfuse",
@@ -10470,7 +11182,7 @@
       "familyName": "Secret API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -10592,7 +11304,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "langsmith",
@@ -10600,7 +11319,7 @@
       "familyName": "API key (personal access token or service key)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -10722,7 +11441,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "linear",
@@ -10741,7 +11467,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "classifyFixture explicitly routes lin_oauth_ values to the \"needs a separate format contract; related detector support is not evidence of parity\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+      "reason": "classifyFixture explicitly routes lin_oauth_ values to the \"needs a separate format contract; related detector support is not evidence of parity\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\").",
+      "findingTypes": []
     },
     {
       "provider": "linear",
@@ -10847,7 +11574,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "mailchimp",
@@ -10855,7 +11589,7 @@
       "familyName": "Marketing API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -10978,7 +11712,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "mailgun",
@@ -10997,7 +11738,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Beta.8 context-gated arrival family mailgun-api-key-triplet (#259). Since redact-secret#701 (#773, registry pinned at 3144bb3) the product mailgun-api-key detector also reports this shape under mailgun_api_key, inside the shared detector. It is no longer treated as a superseded legacy signing key: no issued key has been observed and the role is recorded uncertainty. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml, https://github.com/trufflesecurity/trufflehog/issues/3870."
+      "reason": "Beta.8 context-gated arrival family mailgun-api-key-triplet (#259). Since redact-secret#701 (#773, registry pinned at 3144bb3) the product mailgun-api-key detector also reports this shape under mailgun_api_key, inside the shared detector. It is no longer treated as a superseded legacy signing key: no issued key has been observed and the role is recorded uncertainty. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml, https://github.com/trufflesecurity/trufflehog/issues/3870.",
+      "findingTypes": []
     },
     {
       "provider": "mailgun",
@@ -11005,7 +11747,7 @@
       "familyName": "Private API key and HTTP webhook signing key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -11120,7 +11862,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "mailgun",
@@ -11139,7 +11888,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Documented public per redact-secret#314's scope; gitleaks 8.30.1's mailgun-pub-key rule still flags it, which the mailgun-api-key public-id control records. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml."
+      "reason": "Documented public per redact-secret#314's scope; gitleaks 8.30.1's mailgun-pub-key rule still flags it, which the mailgun-api-key public-id control records. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml.",
+      "findingTypes": []
     },
     {
       "provider": "microsoft-entra",
@@ -11255,7 +12005,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "mistral",
@@ -11263,7 +12020,7 @@
       "familyName": "Studio API key (unprefixed)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -11379,7 +12136,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "mistral-api-key",
+          "type": "mistral_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "mistral",
@@ -11398,7 +12162,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Beta.10 research disposition (redact-secret#780, benchmarks #384): pending, no corpus. No source states a body length, alphabet or checksum, so only a carrier-gated shape could be justified and it needs hands-on issuance first; keyed env and Bearer contexts are already redacted by generic paths, and the documented client_secret.value and WebSocket subprotocol carriers are a generic-carrier question, not a Mistral family. Not the Mistral Studio key (mistral:api-key). Provider source: https://docs.mistral.ai/studio-api/audio/speech_to_text/realtime_transcription/client_auth, https://github.com/redact-secret/redact-secret/issues/780."
+      "reason": "Beta.10 research disposition (redact-secret#780, benchmarks #384): pending, no corpus. No source states a body length, alphabet or checksum, so only a carrier-gated shape could be justified and it needs hands-on issuance first; keyed env and Bearer contexts are already redacted by generic paths, and the documented client_secret.value and WebSocket subprotocol carriers are a generic-carrier question, not a Mistral family. Not the Mistral Studio key (mistral:api-key). Provider source: https://docs.mistral.ai/studio-api/audio/speech_to_text/realtime_transcription/client_auth, https://github.com/redact-secret/redact-secret/issues/780.",
+      "findingTypes": []
     },
     {
       "provider": "neon",
@@ -11406,7 +12171,7 @@
       "familyName": "API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -11528,7 +12293,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "netlify",
@@ -11547,7 +12319,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Out of redact-secret#311's explicit scope; each is a distinct credential, so none is a control or positive for netlify:personal-access-token. Provider source: https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146."
+      "reason": "Out of redact-secret#311's explicit scope; each is a distinct credential, so none is a control or positive for netlify:personal-access-token. Provider source: https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146.",
+      "findingTypes": []
     },
     {
       "provider": "netlify",
@@ -11659,7 +12432,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "new-relic",
@@ -11779,7 +12559,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "new-relic",
@@ -11898,7 +12685,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "new-relic-user-api-key",
+          "type": "new_relic_user_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "notion",
@@ -11917,7 +12711,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "notion-token's contract review states this current ntn_-prefixed format has no contract here; the pinned gitleaks rule targets it instead of the legacy secret_ shape. Measured as the Beta.8 arrival family notion-integration-token (#211, research #225), separate from notion:legacy-integration-token: the ntn_ prefix is provider-documented, the 11-digit + 35-character body is tool-only and provisional, and PAT/OAuth/org-bot roles that may share the prefix are not merged into it. Provider source: https://developers.notion.com/page/changelog."
+      "reason": "notion-token's contract review states this current ntn_-prefixed format has no contract here; the pinned gitleaks rule targets it instead of the legacy secret_ shape. Measured as the Beta.8 arrival family notion-integration-token (#211, research #225), separate from notion:legacy-integration-token: the ntn_ prefix is provider-documented, the 11-digit + 35-character body is tool-only and provisional, and PAT/OAuth/org-bot roles that may share the prefix are not merged into it. Provider source: https://developers.notion.com/page/changelog.",
+      "findingTypes": []
     },
     {
       "provider": "notion",
@@ -12032,7 +12827,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "npm",
@@ -12142,7 +12944,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "npm",
@@ -12161,7 +12970,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "npm-token's own provider source is the changelog announcing the npm_ prefix scheme as a replacement, implying the prior UUID-format token predates it; that legacy shape is not matched by the npm_-prefixed pattern. Provider source: https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/."
+      "reason": "npm-token's own provider source is the changelog announcing the npm_ prefix scheme as a replacement, implying the prior UUID-format token predates it; that legacy shape is not matched by the npm_-prefixed pattern. Provider source: https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/.",
+      "findingTypes": []
     },
     {
       "provider": "nvidia",
@@ -12276,7 +13086,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "nvidia-api-key",
+          "type": "nvidia_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "okta",
@@ -12284,7 +13101,7 @@
       "familyName": "Management API token (SSWS)",
       "status": "provisional",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
@@ -12400,7 +13217,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "onepassword",
@@ -12519,7 +13343,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "onepassword-service-account-token",
+          "type": "onepassword_service_account_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "openai",
@@ -12527,7 +13358,7 @@
       "familyName": "Admin API key (sk-admin-)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -12655,7 +13486,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "openai-token",
+          "type": "openai_admin_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "openai",
@@ -12663,7 +13501,7 @@
       "familyName": "Secret API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -12777,7 +13615,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "openrouter",
@@ -12894,7 +13739,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "openrouter",
@@ -12913,7 +13765,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Unsupported and unclaimed (#208, research #220): a real secret, but no body grammar is published and no product detector, contract or fixture targets it. It is never used as a benign control of openrouter:api-key. Provider source: https://openrouter.ai/docs/guides/overview/auth/management-api-keys, https://github.com/OpenRouterTeam/terraform-provider-openrouter."
+      "reason": "Unsupported and unclaimed (#208, research #220): a real secret, but no body grammar is published and no product detector, contract or fixture targets it. It is never used as a benign control of openrouter:api-key. Provider source: https://openrouter.ai/docs/guides/overview/auth/management-api-keys, https://github.com/OpenRouterTeam/terraform-provider-openrouter.",
+      "findingTypes": []
     },
     {
       "provider": "paddle",
@@ -13031,7 +13884,14 @@
             "shortfall": 3
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "paddle-api-key",
+          "type": "paddle_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "perplexity",
@@ -13039,7 +13899,7 @@
       "familyName": "API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -13158,7 +14018,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "pinecone",
@@ -13166,7 +14033,7 @@
       "familyName": "API key (pcsk_)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -13287,7 +14154,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "pinecone",
@@ -13306,7 +14180,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Beta.8 context-gated arrival family pinecone-api-key-legacy (#212, research #228); the UUID shape is corroborated by unpinned tools only. Owned by the product pinecone-api-key detector since product main 2420e80 (redact-secret#766 and its ADR 2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name): the UUID is redacted at high confidence under a Pinecone API-key name (PINECONE_API_KEY, pinecone_api_key, PINECONE_KEY, or api_key/apiKey/Api-Key on a line naming pinecone), and a bare UUID stays unclaimed. The detector reports it with the same pinecone_api_key finding type as pcsk_, so detectors stays empty: mapping the family to pinecone-api-key would merge it into that contract (#253). Provider source: https://docs.pinecone.io/reference/api/authentication."
+      "reason": "Beta.8 context-gated arrival family pinecone-api-key-legacy (#212, research #228); the UUID shape is corroborated by unpinned tools only. Owned by the product pinecone-api-key detector since product main 2420e80 (redact-secret#766 and its ADR 2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name): the UUID is redacted at high confidence under a Pinecone API-key name (PINECONE_API_KEY, pinecone_api_key, PINECONE_KEY, or api_key/apiKey/Api-Key on a line naming pinecone), and a bare UUID stays unclaimed. The detector reports it with the same pinecone_api_key finding type as pcsk_, so detectors stays empty: mapping the family to pinecone-api-key would merge it into that contract (#253). Provider source: https://docs.pinecone.io/reference/api/authentication.",
+      "findingTypes": []
     },
     {
       "provider": "polar",
@@ -13421,7 +14296,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "polar-token",
+          "type": "polar_api_credential",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "polar",
@@ -13535,7 +14417,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "polar-token",
+          "type": "polar_organization_access_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "posthog",
@@ -13653,7 +14542,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_personal_api_key",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "posthog",
@@ -13772,7 +14668,14 @@
             "shortfall": 3
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "posthog-token",
+          "type": "posthog_project_secret_api_key",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "postman",
@@ -13780,7 +14683,7 @@
       "familyName": "API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -13897,7 +14800,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "postman",
@@ -13905,7 +14815,7 @@
       "familyName": "Collection access key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -14024,7 +14934,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "pulumi",
@@ -14133,7 +15050,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "pulumi",
@@ -14242,7 +15166,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "pulumi",
@@ -14351,7 +15282,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "pypi",
@@ -14466,7 +15404,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "replicate",
@@ -14582,7 +15527,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "resend",
@@ -14697,7 +15649,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "resend-api-key",
+          "type": "resend_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "rubygems",
@@ -14815,7 +15774,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "rubygems-api-key",
+          "type": "rubygems_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "runpod",
@@ -14928,7 +15894,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "runpod-api-key",
+          "type": "runpod_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "sendgrid",
@@ -15040,7 +16013,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "sentry",
@@ -15048,7 +16028,7 @@
       "familyName": "Organization auth token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -15167,7 +16147,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "sentry-org-auth-token",
+          "type": "sentry_org_auth_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "sentry",
@@ -15175,7 +16162,7 @@
       "familyName": "User auth token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -15293,7 +16280,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "sentry-user-auth-token",
+          "type": "sentry_user_auth_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "shopify",
@@ -15404,7 +16398,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "shopify",
@@ -15515,7 +16516,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "slack",
@@ -15523,7 +16531,7 @@
       "familyName": "App-level token",
       "status": "provisional",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
@@ -15631,7 +16639,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "slack",
@@ -15738,7 +16753,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "slack",
@@ -15855,7 +16877,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "slack",
@@ -15874,7 +16903,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "classifyFixture explicitly routes xwfp- values to the \"needs a separate format contract\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+      "reason": "classifyFixture explicitly routes xwfp- values to the \"needs a separate format contract\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\").",
+      "findingTypes": []
     },
     {
       "provider": "sonarqube",
@@ -15994,7 +17024,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "sonarqube-token",
+          "type": "sonarqube_analysis_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "sonarqube",
@@ -16111,7 +17148,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "sonarqube-token",
+          "type": "sonarqube_user_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "stripe",
@@ -16130,7 +17174,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "stripe-token's live/test secret-key pattern does not claim sk_org_ values. Since redact-secret#1030 (product #1101) classifyFixture resolves sk_org_, sk_org_live_ and sk_org_test_ followed by at least 20 [A-Za-z0-9] to this one family as policy/T3 rows at core's support-policy floor (not a provider grammar; no organization key issued or observed); other sk_org_ values and whsec_ stay pending. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+      "reason": "stripe-token's live/test secret-key pattern does not claim sk_org_ values. Since redact-secret#1030 (product #1101) classifyFixture resolves sk_org_, sk_org_live_ and sk_org_test_ followed by at least 20 [A-Za-z0-9] to this one family as policy/T3 rows at core's support-policy floor (not a provider grammar; no organization key issued or observed); other sk_org_ values and whsec_ stay pending. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\").",
+      "findingTypes": []
     },
     {
       "provider": "stripe",
@@ -16249,7 +17294,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "stripe",
@@ -16368,7 +17420,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "stripe",
@@ -16487,7 +17546,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "stripe",
@@ -16606,7 +17672,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "stripe",
@@ -16721,7 +17794,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "supabase",
@@ -16834,7 +17914,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "supabase-management-token",
+          "type": "supabase_personal_access_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "supabase",
@@ -16948,7 +18035,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "tavily",
@@ -16956,7 +18050,7 @@
       "familyName": "API key (tvly-)",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -17074,7 +18168,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "telegram",
@@ -17082,7 +18183,7 @@
       "familyName": "Bot token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -17199,7 +18300,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "telegram-bot-token",
+          "type": "telegram_bot_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "together",
@@ -17207,7 +18315,7 @@
       "familyName": "Project API key (tgp_v1_)",
       "status": "provisional",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
@@ -17328,7 +18436,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "travis-ci",
@@ -17336,7 +18451,7 @@
       "familyName": "API token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -17457,7 +18572,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "trigger-dev",
@@ -17574,7 +18696,14 @@
             "shortfall": 4
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_personal_access_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "trigger-dev",
@@ -17692,7 +18821,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "trigger-dev-token",
+          "type": "trigger_dev_secret_api_key",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "twilio",
@@ -17700,7 +18836,7 @@
       "familyName": "API key secret",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -17819,7 +18955,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "twilio",
@@ -17827,7 +18970,7 @@
       "familyName": "Account auth token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -17952,7 +19095,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "vercel",
@@ -18077,7 +19227,14 @@
             "shortfall": 1
           }
         ]
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "basis": "remaining-types-of-detector"
+        }
+      ]
     },
     {
       "provider": "vercel",
@@ -18096,7 +19253,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Product #858 records this semantic contract as pending/T0. The class and vck_ marker are provider-backed, but no reviewed source establishes a complete body grammar or boundary. No scored fixture/profile cells exist, and the aggregate vercel-token detector is not attributed to this family. Provider source: https://vercel.com/changelog/new-token-formats-and-secret-scanning, https://vercel.com/docs/ai-gateway/authentication-and-byok/api-keys, https://github.com/vercel/vercel/blob/c628be7835e03a965b93e9cf9e2bd5ac2acbf5eb/packages/cli/test/unit/commands/ai-gateway/coding-agents-setup.test.ts."
+      "reason": "Product #858 records this semantic contract as pending/T0. The class and vck_ marker are provider-backed, but no reviewed source establishes a complete body grammar or boundary. No scored fixture/profile cells exist, and the aggregate vercel-token detector is not attributed to this family. Provider source: https://vercel.com/changelog/new-token-formats-and-secret-scanning, https://vercel.com/docs/ai-gateway/authentication-and-byok/api-keys, https://github.com/vercel/vercel/blob/c628be7835e03a965b93e9cf9e2bd5ac2acbf5eb/packages/cli/test/unit/commands/ai-gateway/coding-agents-setup.test.ts.",
+      "findingTypes": []
     },
     {
       "provider": "vercel",
@@ -18104,7 +19262,7 @@
       "familyName": "App access token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -18218,7 +19376,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_access_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "vercel",
@@ -18226,7 +19391,7 @@
       "familyName": "App refresh token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -18338,7 +19503,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_app_refresh_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "vercel",
@@ -18357,7 +19529,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Product #858 records this semantic contract as pending/T0. Provider evidence establishes the vci stem but not the underscore, body grammar, or boundary; the current detector's vci_ branch is an implementation hypothesis. No scored fixture/profile cells exist, and the aggregate vercel-token detector is not attributed to this family. Provider source: https://vercel.com/changelog/new-token-formats-and-secret-scanning, https://vercel.com/docs/integrations/create-integration/vercel-api-integrations."
+      "reason": "Product #858 records this semantic contract as pending/T0. Provider evidence establishes the vci stem but not the underscore, body grammar, or boundary; the current detector's vci_ branch is an implementation hypothesis. No scored fixture/profile cells exist, and the aggregate vercel-token detector is not attributed to this family. Provider source: https://vercel.com/changelog/new-token-formats-and-secret-scanning, https://vercel.com/docs/integrations/create-integration/vercel-api-integrations.",
+      "findingTypes": []
     },
     {
       "provider": "vercel",
@@ -18365,7 +19538,7 @@
       "familyName": "Personal access token",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -18477,7 +19650,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_personal_access_token",
+          "basis": "arrival-finding-type-table"
+        }
+      ]
     },
     {
       "provider": "voyage-ai",
@@ -18496,7 +19676,8 @@
       "fixtureProfile": null,
       "profileCoverage": null,
       "detectors": [],
-      "reason": "Beta.10 research disposition (redact-secret#785, benchmarks #384): pending, no corpus. The only body evidence is one betterleaks rule and community pages, no issued key confirms it, and pa- and al- are common two-letter prefixes, so a bare rule has low precision. Named-assignment, Bearer, JSON, YAML and tool-call forms are already redacted by the generic paths; revisit after the hands-on issuance the research comment lists. Provider source: https://www.mongodb.com/docs/voyageai/management/api-keys/, https://github.com/voyage-ai/voyageai-python/blob/cf6b295b691f4923946cd13fd8c2efdd9344d74a/voyageai/util.py, https://github.com/redact-secret/redact-secret/issues/785."
+      "reason": "Beta.10 research disposition (redact-secret#785, benchmarks #384): pending, no corpus. The only body evidence is one betterleaks rule and community pages, no issued key confirms it, and pa- and al- are common two-letter prefixes, so a bare rule has low precision. Named-assignment, Bearer, JSON, YAML and tool-call forms are already redacted by the generic paths; revisit after the hands-on issuance the research comment lists. Provider source: https://www.mongodb.com/docs/voyageai/management/api-keys/, https://github.com/voyage-ai/voyageai-python/blob/cf6b295b691f4923946cd13fd8c2efdd9344d74a/voyageai/util.py, https://github.com/redact-secret/redact-secret/issues/785.",
+      "findingTypes": []
     },
     {
       "provider": "wandb",
@@ -18612,7 +19793,14 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "wandb-api-key",
+          "type": "wandb_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
     },
     {
       "provider": "xai",
@@ -18620,7 +19808,7 @@
       "familyName": "API key",
       "status": "stable",
       "evidenceTier": "T2",
-      "evidenceBasis": "independently-corroborated",
+      "evidenceBasis": "corroborated",
       "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
@@ -18740,7 +19928,270 @@
         },
         "requiredButEmptyAxisIds": [],
         "debt": []
-      }
+      },
+      "findingTypes": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "basis": "sole-type-of-detector"
+        }
+      ]
+    }
+  ],
+  "findingTypeSource": {
+    "repository": "redact-secret/redact-secret",
+    "revision": "4227160c4dac402d7add53d3f8fe990f693912c1",
+    "path": "docs/coverage/detector-inventory.json",
+    "sha256": "c12822510bfd456ac409c999cc1a13363a47cef0847347f66de448c2e9555c62"
+  },
+  "piiQualification": {
+    "profile": "pii-v1",
+    "route": "pii-b11-protected-v1",
+    "binding": "beta11-8b6a5fd-pii-protected",
+    "maximumStatus": "provisional",
+    "qualifiedAt": {
+      "coreCommit": "8b6a5fde52ecb4dfce13f09c7a947062d21483c7",
+      "epoch": "17dae942ee4b",
+      "populationPlanSet": "b11-population-v2"
+    },
+    "benchmarks": {
+      "recordRevision": "be0fb9f35045bf05e5b999a2c0ed368541f9e963",
+      "freezeBaseRevision": "85b6a5cfd427bb828c70f2bad253662ccded7573"
+    },
+    "record": "evidence/901/428/final-core-8b6a5fde.md",
+    "disposition": "evidence/901/428/core-8b6a5fde52ec/pii-beta11-protected-disposition-v2.json",
+    "commitments": {
+      "freeze": "f79278aeb40c06cacaab5c91bd63aedddaadf1b8d3d68761c9a2dc5f78dce412",
+      "report": "530879bc6db9f3bc497164c936f56718262d94953cf068021255f730c09088bd",
+      "disposition": "50c2268060b48d852ff8510c61a713ef13e4dd537cf17d55ee71146c3dd4b518",
+      "seal": "63e62fa409f55f14a4d342485a9d18259953f2370f0efb3f9c5687a75edaa334",
+      "protectedDisposition": "e3ea85dde722310766e95ea2c1bfa5750d99a251aff3a23bbe318c9b2b5b3401"
+    },
+    "costAcceptance": {
+      "id": "beta11-8b6a5fd-pii-profile-cost",
+      "entryCommitment": "086647b4fbb0154e8ed8c3b8076123ebdd3eb174c8a8ceb259bda98a581bce82",
+      "status": "accepted",
+      "cells": 175,
+      "sizeRows": 38
+    },
+    "requalification": {
+      "state": "not-requalified",
+      "requalifiedOnCoreCommit": null,
+      "statement": "These statuses were qualified at the Beta.11 core commit above and have not been re-qualified on any later core commit, including the Beta.13 candidate. The core email, IBAN, phone, payment-card and us-ssn code changed after that commit, so the statuses describe the Beta.11 code, not later code."
+    }
+  },
+  "piiDistribution": {
+    "stable": 0,
+    "provisional": 5,
+    "pending": 1,
+    "unsupported": 0
+  },
+  "piiFamilies": [
+    {
+      "family": "pii:global:email",
+      "familyName": "Email address",
+      "status": "provisional",
+      "reason": "protected-gates-met",
+      "coverage": {
+        "scope": "global",
+        "jurisdiction": null,
+        "restriction": null,
+        "note": "Global"
+      },
+      "findingTypes": [
+        "pii_global_email"
+      ],
+      "gates": {
+        "public": {
+          "met": 20,
+          "notMet": [],
+          "unresolved": [],
+          "acceptedTradeoffs": [
+            "profile-cost:beta11-8b6a5fd-pii-profile-cost"
+          ]
+        },
+        "protected": {
+          "state": "met",
+          "reason": "protected-gates-met",
+          "runs": "1/1",
+          "epochCommitment": "04d02d9f6b1aa593aff609045cf1479ddea5d042e71cb7e00af480c724d7c515",
+          "aggregateCommitment": "479ad8c2f731f6f9dbf03803769b0f54c05e503c0da2ef3cb155aca103b6f0d4",
+          "trustCommitment": "d44e7880479b72435734e547c64c9deea97c0dc0d9aa88904a03980962b52e5e"
+        }
+      },
+      "failedGates": []
+    },
+    {
+      "family": "pii:global:iban",
+      "familyName": "International Bank Account Number",
+      "status": "provisional",
+      "reason": "protected-gates-met",
+      "coverage": {
+        "scope": "global",
+        "jurisdiction": null,
+        "restriction": null,
+        "note": "Global"
+      },
+      "findingTypes": [
+        "pii_global_iban"
+      ],
+      "gates": {
+        "public": {
+          "met": 20,
+          "notMet": [],
+          "unresolved": [],
+          "acceptedTradeoffs": [
+            "profile-cost:beta11-8b6a5fd-pii-profile-cost"
+          ]
+        },
+        "protected": {
+          "state": "met",
+          "reason": "protected-gates-met",
+          "runs": "1/1",
+          "epochCommitment": "ab045b20028f1e3952ee4a730e5015b94df444f915c96b410348dd7014bcc4fc",
+          "aggregateCommitment": "f98051176b84d3e5c8ef676fd0be50f19605c78176cc7d80a5ddb2b82f4fc5b3",
+          "trustCommitment": "4ac0480be2f8fa6f8e23a7527a89d0894994dadfb1acf4eb3b9d7d7e4b2bfbae"
+        }
+      },
+      "failedGates": []
+    },
+    {
+      "family": "pii:global:network-address",
+      "familyName": "IPv4 and IPv6 network address",
+      "status": "provisional",
+      "reason": "protected-gates-met",
+      "coverage": {
+        "scope": "global",
+        "jurisdiction": null,
+        "restriction": null,
+        "note": "Global"
+      },
+      "findingTypes": [
+        "pii_global_network_address"
+      ],
+      "gates": {
+        "public": {
+          "met": 20,
+          "notMet": [],
+          "unresolved": [],
+          "acceptedTradeoffs": [
+            "profile-cost:beta11-8b6a5fd-pii-profile-cost"
+          ]
+        },
+        "protected": {
+          "state": "met",
+          "reason": "protected-gates-met",
+          "runs": "1/1",
+          "epochCommitment": "f3acc8eb4a33377c8d3ed5d2b4d913e5bbdfd01dc6cd0c5c427ee90f5a3ffc47",
+          "aggregateCommitment": "6ab7c6086dc7933e1b55741514305099426a0bdd6e19feea6219f2c2b159b952",
+          "trustCommitment": "3d9d4951b6669cddb5b3c529f6c2e51b4ecfa4e4b8c843b60425b4538b273993"
+        }
+      },
+      "failedGates": []
+    },
+    {
+      "family": "pii:global:payment-card",
+      "familyName": "Payment card number",
+      "status": "provisional",
+      "reason": "protected-gates-met",
+      "coverage": {
+        "scope": "global",
+        "jurisdiction": null,
+        "restriction": null,
+        "note": "Global"
+      },
+      "findingTypes": [
+        "pii_global_payment_card"
+      ],
+      "gates": {
+        "public": {
+          "met": 20,
+          "notMet": [],
+          "unresolved": [],
+          "acceptedTradeoffs": [
+            "profile-cost:beta11-8b6a5fd-pii-profile-cost"
+          ]
+        },
+        "protected": {
+          "state": "met",
+          "reason": "protected-gates-met",
+          "runs": "1/1",
+          "epochCommitment": "77ec7334e5883cae9b0427b5009a252abbb47f48e8a7836956c95fff511d3dc9",
+          "aggregateCommitment": "c9bc82c16c00ac52288164659af7fd1200af98bc8362c2e81a65902e5c3e6681",
+          "trustCommitment": "c6d2954aec12c8d9f869918b5814e2aca7b576ff2fa2a51c2f2d81ee7b4500cc"
+        }
+      },
+      "failedGates": []
+    },
+    {
+      "family": "pii:global:phone",
+      "familyName": "Phone number",
+      "status": "provisional",
+      "reason": "protected-gates-met",
+      "coverage": {
+        "scope": "global",
+        "jurisdiction": null,
+        "restriction": "nanp-country-code-1",
+        "note": "Country code +1 (NANP) only"
+      },
+      "findingTypes": [
+        "pii_global_phone"
+      ],
+      "gates": {
+        "public": {
+          "met": 20,
+          "notMet": [],
+          "unresolved": [],
+          "acceptedTradeoffs": [
+            "profile-cost:beta11-8b6a5fd-pii-profile-cost"
+          ]
+        },
+        "protected": {
+          "state": "met",
+          "reason": "protected-gates-met",
+          "runs": "1/1",
+          "epochCommitment": "63de326f17eeda45ed214ba86fe4110d95521f51900825a503bcea8234ae7fbb",
+          "aggregateCommitment": "bfd4b25a710d3995bb0650c7b92fd6579e78c1f3228b0679ef53434cdff68a28",
+          "trustCommitment": "fac300037f5af2d28076aa67bc217bea87fd32e370b9aff7381bec39b48320cd"
+        }
+      },
+      "failedGates": []
+    },
+    {
+      "family": "pii:us:ssn",
+      "familyName": "US Social Security Number",
+      "status": "pending",
+      "reason": "protected-gates-not-met:identity-only-classification",
+      "coverage": {
+        "scope": "jurisdiction:US",
+        "jurisdiction": "US",
+        "restriction": null,
+        "note": "United States only"
+      },
+      "findingTypes": [
+        "pii_jurisdiction_us_ssn"
+      ],
+      "gates": {
+        "public": {
+          "met": 20,
+          "notMet": [],
+          "unresolved": [],
+          "acceptedTradeoffs": [
+            "profile-cost:beta11-8b6a5fd-pii-profile-cost"
+          ]
+        },
+        "protected": {
+          "state": "not-met",
+          "reason": "protected-gates-not-met:identity-only-classification",
+          "runs": "1/1",
+          "epochCommitment": "0269a49341fcb8071014785769e28759766fe2f98512e14e7d078cada3d17452",
+          "aggregateCommitment": "049813e10c47f5a0638c5b379cb62cfeedd7e0b29589eb5fac9f1b0a0a3e971e",
+          "trustCommitment": "e60074f1617b8c72e6e36ac36c8cabd1198d7acda51df6e52b2fd30ec95b3de8"
+        }
+      },
+      "failedGates": [
+        "protected-partition"
+      ]
     }
   ]
 }

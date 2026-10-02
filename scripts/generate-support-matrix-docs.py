@@ -75,8 +75,19 @@ QUALIFICATION_PROFILE_ORDER = ("documented", "empirical", "policy-qualified")
 # profile. redact-secret-benchmarks' decision
 # `decision-qualify-empirical-stable-by-corroboration` (benchmarks e1ecb29)
 # added the corroborated route beside the provider-issued observation route;
-# the tier stays T2 either way.
-EMPIRICAL_EVIDENCE_BASES = ("independently-corroborated", "empirically-observed")
+# the tier stays T2 either way. redact-secret-benchmarks' decision
+# `decision-rename-the-corroborated-evidence-basis` (benchmarks 573e128,
+# redact-secret-benchmarks#670) renamed the value from `independently-corroborated`
+# to `corroborated`: the comparison is run by this project, so "independently"
+# claimed third-party validation the evidence is not. No status, tier or count
+# changed. A matrix carrying the old value fails the pinned schema on purpose.
+EMPIRICAL_EVIDENCE_BASES = ("corroborated", "empirically-observed")
+
+# The legend for the label, as the benchmarks decision words it. It appears
+# wherever this document explains the label.
+CORROBORATED_LEGEND = (
+    "Corroborated: checked against other tools and community sources; the comparison is run by this project."
+)
 
 # redact-secret-benchmarks' `decision-qualify-bounded-t3-credential-policy`
 # (benchmarks a66dbef) added a third stable profile, `policy-qualified`,
@@ -88,7 +99,7 @@ POLICY_QUALIFIED_BASIS = "project-policy"
 
 EVIDENCE_BASIS_COPY = {
     "provider-documented": "Provider documentation",
-    "independently-corroborated": "Independent tool/community corroboration",
+    "corroborated": "Corroborated",
     "empirically-observed": "Provider-issued observation",
     "project-policy": "Project policy",
     "none": "None",
@@ -371,8 +382,7 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
             errors.append(f"{name}: documented qualification must remain T1 provider-documented evidence")
         if profile == "empirical" and (tier != "T2" or basis not in EMPIRICAL_EVIDENCE_BASES):
             errors.append(
-                f"{name}: empirical qualification must remain T2 independently-corroborated "
-                "or empirically-observed evidence"
+                f"{name}: empirical qualification must remain T2 corroborated or empirically-observed evidence"
             )
         if profile == "policy-qualified" and (tier != POLICY_QUALIFIED_TIER or basis != POLICY_QUALIFIED_BASIS):
             errors.append(f"{name}: policy-qualified qualification must remain T3 project-policy evidence")
@@ -438,8 +448,8 @@ def _support_label(family: dict) -> str:
         return "Stable · Provider documented"
     if status == "stable" and profile == "empirical":
         return "Stable · Empirically qualified"
-    if status == "provisional" and basis == "independently-corroborated":
-        return "Provisional · Tool corroborated"
+    if status == "provisional" and basis == "corroborated":
+        return "Provisional · Corroborated"
     if status == "provisional":
         return f"Provisional · {EVIDENCE_BASIS_COPY[basis]}"
     return status.capitalize()
@@ -481,7 +491,9 @@ def render_matrix_markdown(
         "In particular, a T2 family may be stable through the empirical profile without "
         "being described as provider-documented or rewritten as T1. User-facing labels combine "
         "the dimensions without conflating them: `Stable · Provider documented`, "
-        "`Stable · Empirically qualified`, and `Provisional · Tool corroborated`.",
+        "`Stable · Empirically qualified`, and `Provisional · Corroborated`.",
+        "",
+        CORROBORATED_LEGEND,
         "",
         "For the detailed measurement protocol behind these statuses -- evidence tiers, and "
         "the twin, benign, metamorphic, mutation, and differential criteria a family must clear "

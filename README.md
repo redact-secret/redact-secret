@@ -24,7 +24,7 @@ always gives the same result.
 
 ## Quick start
 
-Every release so far is a beta. The newest published version is `0.1.0-beta.12`;
+Every release so far is a beta. The newest published version is `0.1.0-beta.13`;
 the stable `0.1.0` is not published yet. Pick your runtime, install, and redact
 one synthetic value in about five minutes:
 
@@ -33,7 +33,7 @@ one synthetic value in about five minutes:
 | JavaScript: Node.js 20, 22, 24, and browsers | `npm install @redact-secret/core@beta` | [Node.js](docs/quickstart.md#nodejs), [browser](docs/quickstart.md#browser-with-a-bundler) |
 | Python 3.10 or newer | `pip install --only-binary=:all: redact-secret` | [Python](docs/quickstart.md#python) |
 | Rust 1.88 or newer | `cargo add redact-secret` | [Rust](docs/quickstart.md#rust) |
-| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.12` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
+| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.13` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
 
 These install the newest beta. The [quickstart](docs/quickstart.md#which-version-you-get)
 pins an exact version, says what a bare install resolves today, and says what
@@ -304,7 +304,7 @@ one whole-input operation, under explicit limits that fail closed. See
 ## Detection coverage
 
 <!-- support-matrix:start -->
-**Support status** (92 providers, 173 credential families; stable: 144, provisional: 7, pending: 5, unsupported: 17; stable qualification: documented: 106, empirical: 38, policy-qualified: 0; evidence tiers: T1: 106, T2: 41, T3: 4, T0: 1) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md). Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `4227160c4dac` (`0.1.0-beta.12`) with benchmarks revision `e8f73bfd7241` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 110 credential detectors, all of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support).
+**Support status** (92 providers, 173 credential families; stable: 144, provisional: 7, pending: 5, unsupported: 17; stable qualification: documented: 106, empirical: 38, policy-qualified: 0; evidence tiers: T1: 106, T2: 41, T3: 4, T0: 1) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md). Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `fe6e9234d40e` (`0.1.0-beta.13`) with benchmarks revision `573e128863e0` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 110 credential detectors, all of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support).
 <!-- support-matrix:end -->
 
 Built-in detection covers private keys, provider-issued tokens, JWT and

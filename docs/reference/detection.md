@@ -67,13 +67,18 @@ record. The PII code has changed since that core revision: `pii_email.rs`,
 `pii_iban.rs` and `pii_phone.rs` (the email, IBAN and phone families) and also
 `pii_payment_card.rs`, `pii_us_ssn.rs` and the shared `pii.rs`. The statuses
 below were measured on the earlier code and have not been re-measured on the
-current source; re-qualification is benchmarks work. The pinned support matrix
-does not carry PII statuses yet
-([`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647));
-until it does, the gate `npm run pii-family-status:check` fails when a shipped
-PII family has no row here or in
+current source; they are not re-qualified on any later core commit, and
+re-qualification is benchmarks work. The pinned support matrix now carries
+these six families as `piiFamilies`, with the qualification identity as
+`piiQualification` (state `not-requalified`) and `piiDistribution`
+([`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)),
+apart from the credential families and never counted in their totals. The
+matrix is the status source; the table above must agree with it. The gate
+`npm run pii-family-status:check` fails when a shipped PII family has no row in
+the matrix or here, when the two disagree, when the matrix names a different
+qualification than
 [`docs/coverage/pii-family-status.json`](../coverage/pii-family-status.json),
-when the two disagree, or when a recorded revision is missing.
+or when a recorded revision is missing.
 
 `provisional` is not `stable`, and no family is `stable`. The five
 `provisional` families met every public gate and their one sealed
