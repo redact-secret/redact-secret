@@ -185,8 +185,10 @@ has no `pii` option. A second, lazily loaded asset (`redact_secret_wasm_pii_bg.w
 or `redact_secret_wasm_common_pii_bg.wasm`) is fetched only when the first
 `initialize()` call passes a non-empty `pii` selection. Make sure your bundler
 emits both and that your server serves both with `application/wasm`; a page
-that never enables PII never requests the PII asset. Raw release sizes and the
-rest of the split are in [detector profiles](../reference/api-contract.md#detector-profiles).
+that never enables PII never requests the PII asset. Transfer sizes of the
+default builds are in [detector profiles](../reference/detection.md#detector-profiles);
+raw, gzip and brotli sizes of all four assets, including the PII split, are in
+the [#1127 measurement](../audits/evidence/1127/README.md).
 
 A PII selection fails with one of three fixed, input-free errors:
 

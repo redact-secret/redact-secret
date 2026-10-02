@@ -99,6 +99,10 @@ Redaction does not report a finding through its exit code: finding something is
 what redaction is for, not a failure. Run check mode when a finding should fail
 a hook or a job.
 
+Any other status (for example `101` after an internal panic, or death by a
+signal) is an internal failure outside this table: treat it like `2` and
+discard the output, which may hold a sanitized but incomplete prefix.
+
 In check mode a failure outranks a finding: a run that could not read or decode
 part of its input has not proved that part clean, so it exits `2` even when
 another source produced findings. Input that is not valid UTF-8 fails closed
