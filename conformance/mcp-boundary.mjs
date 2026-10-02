@@ -109,10 +109,15 @@ function without(object, omit) {
   return copy;
 }
 
-/** `sanitized` with `key` put back at its original position in `original`. */
-function restore(original, sanitized, key) {
+/**
+ * `sanitized` with `key` put back at its original position in `original`.
+ * `value` is the payload `detachBinary` already read and checked: `original`
+ * is never read at `key` again, so an accessor cannot hand back a different,
+ * unscanned value (#1099).
+ */
+function restore(original, sanitized, key, value) {
   const out = {};
-  for (const name of Object.keys(original)) define(out, name, name === key ? original[key] : sanitized[name]);
+  for (const name of Object.keys(original)) define(out, name, name === key ? value : sanitized[name]);
   return out;
 }
 
@@ -197,12 +202,23 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
    * A base64 payload (`image.data`, `audio.data`, `resource.blob`) cannot be
    * scanned. By default it blocks the result; on opt-in it is removed from
    * the scan view and restored unscanned afterwards.
-   * Returns `{ failure }` or `{ view, binary }`.
+   * The field is read exactly once, and only under `pass`: the value checked
+   * is the value returned, so a caller restores that value and never reads the
+   * field again (#1099). Under `block` the field is refused without being
+   * read. A read that throws fails closed.
+   * Returns `{ failure }` or `{ view, binary, value }`.
    */
   function detachBinary(object, key) {
     if (!(key in object)) return { view: object, binary: false };
-    if (binaryContent === "block" || typeof object[key] !== "string") return { failure: UNSUPPORTED };
-    return { view: without(object, key), binary: true };
+    if (binaryContent === "block") return { failure: UNSUPPORTED };
+    let value;
+    try {
+      value = object[key];
+    } catch {
+      return { failure: UNSUPPORTED };
+    }
+    if (typeof value !== "string") return { failure: UNSUPPORTED };
+    return { view: without(object, key), binary: true, value };
   }
 
   function prepareBlock(block) {
@@ -210,11 +226,12 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
     if (block.type === "image" || block.type === "audio") {
       const detached = detachBinary(block, "data");
       if (detached.failure) return detached;
-      return { view: detached.view, reassemble: detached.binary ? (clean) => restore(block, clean, "data") : null };
+      return { view: detached.view, reassemble: detached.binary ? (clean) => restore(block, clean, "data", detached.value) : null };
     }
     if (block.type === "resource") {
-      if (!isPlainObject(block.resource)) return { failure: UNSUPPORTED };
-      const detached = detachBinary(block.resource, "blob");
+      const resource = block.resource;
+      if (!isPlainObject(resource)) return { failure: UNSUPPORTED };
+      const detached = detachBinary(resource, "blob");
       if (detached.failure) return detached;
       if (!detached.binary) return { view: block, reassemble: null };
       const view = {};
@@ -224,7 +241,7 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
         reassemble: (clean) => {
           const out = {};
           for (const key of Object.keys(block)) {
-            define(out, key, key === "resource" ? restore(block.resource, clean.resource, "blob") : clean[key]);
+            define(out, key, key === "resource" ? restore(resource, clean.resource, "blob", detached.value) : clean[key]);
           }
           return out;
         },
@@ -285,6 +302,16 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
    */
   function sanitizeToolResult(result, { signal } = {}) {
     if (isAborted(signal)) return ABORTED;
+    // A read of the host's value that throws (an accessor, a proxy) fails
+    // closed instead of escaping the boundary (#1099).
+    try {
+      return sanitizeToolResultValue(result, signal);
+    } catch {
+      return UNSUPPORTED;
+    }
+  }
+
+  function sanitizeToolResultValue(result, signal) {
     if (!isPlainObject(result)) return UNSUPPORTED;
     if (result.content !== undefined && !Array.isArray(result.content)) return UNSUPPORTED;
 
@@ -403,7 +430,7 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
     if (hasText) return typeof entry.text === "string" ? { view: entry, reassemble: null } : { failure: UNSUPPORTED };
     const detached = detachBinary(entry, "blob");
     if (detached.failure) return detached;
-    return { view: detached.view, reassemble: (clean) => restore(entry, clean, "blob") };
+    return { view: detached.view, reassemble: (clean) => restore(entry, clean, "blob", detached.value) };
   }
 
   /**
@@ -419,6 +446,15 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
    */
   function sanitizeResourceResult(result, { signal } = {}) {
     if (isAborted(signal)) return ABORTED;
+    // Same fail-closed rule as sanitizeToolResult (#1099).
+    try {
+      return sanitizeResourceResultValue(result, signal);
+    } catch {
+      return UNSUPPORTED;
+    }
+  }
+
+  function sanitizeResourceResultValue(result, signal) {
     if (!isPlainObject(result) || !Array.isArray(result.contents)) return UNSUPPORTED;
 
     const contents = [];
