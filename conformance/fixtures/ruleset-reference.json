@@ -1,6 +1,6 @@
 {
   "$schema": "ruleset-reference-v1",
-  "description": "The reference declarative ruleset fixture (issue #495, decision-define-declarative-detector-ruleset-contract). Every binding surface that accepts a ruleset in its first shipping slice (the Rust core, the CLI, and the JavaScript and Python bindings) runs this fixture as part of the shared behavioral contract, not a per-binding smoke test. Every ruleset text and scanned input here is synthetic; nothing reproduces a real credential.",
+  "description": "The reference declarative ruleset fixture (issue #495, decision-define-declarative-detector-ruleset-contract; revision 1 tightened by issue #1182). Every binding surface that accepts a ruleset runs this fixture as part of the shared behavioral contract, not a per-binding smoke test: the Rust core, the CLI, the Node addon, the WebAssembly artifact (Node fallback path) and the Python binding (issue #1183). Offsets are UTF-8 byte offsets; a UTF-16 surface converts them. The default action of every ruleset detection is pinned as `warn`. `rejections` lists each of the 18 rejection classes exactly once; `tightenedRejections` lists the further inputs revision 1 rejects with an existing class. Every ruleset text and scanned input here is synthetic; nothing reproduces a real credential.",
   "accepted": {
     "id": "ruleset-value-grammar",
     "description": "One detector per named alphabet, plus the trailing-lower-hex validator and both specificity values a ruleset may claim. Exercises the whole value grammar in one committed ruleset.",
@@ -14,7 +14,8 @@
         "confidence": "medium",
         "specificity": "contextual",
         "start": 0,
-        "end": 28
+        "end": 28,
+        "action": "warn"
       },
       {
         "id": "alnum-dash",
@@ -24,7 +25,8 @@
         "confidence": "medium",
         "specificity": "contextual",
         "start": 0,
-        "end": 28
+        "end": 28,
+        "action": "warn"
       },
       {
         "id": "alnum-dash-dot",
@@ -34,7 +36,8 @@
         "confidence": "medium",
         "specificity": "entropy",
         "start": 0,
-        "end": 29
+        "end": 29,
+        "action": "warn"
       },
       {
         "id": "upper-alnum",
@@ -44,7 +47,8 @@
         "confidence": "medium",
         "specificity": "contextual",
         "start": 0,
-        "end": 28
+        "end": 28,
+        "action": "warn"
       },
       {
         "id": "digit",
@@ -54,7 +58,8 @@
         "confidence": "medium",
         "specificity": "entropy",
         "start": 0,
-        "end": 24
+        "end": 24,
+        "action": "warn"
       },
       {
         "id": "lower-hex",
@@ -64,7 +69,8 @@
         "confidence": "medium",
         "specificity": "contextual",
         "start": 0,
-        "end": 40
+        "end": 40,
+        "action": "warn"
       },
       {
         "id": "base64-body",
@@ -74,7 +80,8 @@
         "confidence": "medium",
         "specificity": "entropy",
         "start": 0,
-        "end": 31
+        "end": 31,
+        "action": "warn"
       },
       {
         "id": "trailing-lower-hex-pass",
@@ -84,14 +91,16 @@
         "confidence": "medium",
         "specificity": "contextual",
         "start": 0,
-        "end": 25
+        "end": 25,
+        "action": "warn"
       },
       {
         "id": "trailing-lower-hex-fail",
         "detector": "acme-checksum-token",
         "input": "ACME_CK_SYNTHETICnothexZZ",
         "findingCount": 0,
-        "note": "the final 8 bytes are not all lowercase hex, so the whole candidate is rejected"
+        "note": "the final 8 bytes are not all lowercase hex, so the whole candidate is rejected",
+        "action": "warn"
       }
     ]
   },
@@ -108,7 +117,8 @@
         "confidence": "medium",
         "specificity": "contextual",
         "start": 16,
-        "end": 56
+        "end": 56,
+        "action": "warn"
       },
       {
         "id": "unlisted-name-produces-no-finding",
@@ -124,7 +134,8 @@
         "specificity": "contextual",
         "start": 8,
         "end": 39,
-        "note": "declaring the already-built-in api_key/auth names is a no-op; the built-in generic-token detector (not the names-only ruleset extension) still resolves them exactly as it does with no ruleset loaded"
+        "note": "declaring the already-built-in api_key/auth names is a no-op; the built-in generic-token detector (not the names-only ruleset extension) still resolves them exactly as it does with no ruleset loaded",
+        "action": "redact"
       }
     ]
   },
@@ -138,7 +149,8 @@
       "type": "contextual_secret",
       "confidence": "medium",
       "start": 12,
-      "end": 34
+      "end": 34,
+      "action": "warn"
     }
   },
   "rejections": [
@@ -223,6 +235,62 @@
       "class": "TOO_MANY_NAMES",
       "nameCount": 33,
       "note": "33 unique ambiguous-bucket names, one over the 32-name maximum"
+    }
+  ],
+  "tightenedRejections": [
+    {
+      "id": "repeated-specificity",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\nspecificity: entropy\n",
+      "note": "R1 (#1182): a repeated field is rejected; the last occurrence no longer wins"
+    },
+    {
+      "id": "repeated-prefix",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\nprefix: \"OTHER_\"\n",
+      "note": "R1 (#1182): a repeated prefix"
+    },
+    {
+      "id": "repeated-alphabet",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\nalphabet: alnum\n",
+      "note": "R1 (#1182): a repeated alphabet"
+    },
+    {
+      "id": "repeated-run",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\nrun: exact 20\n",
+      "note": "R1 (#1182): a repeated run"
+    },
+    {
+      "id": "repeated-validator",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\nvalidator: none\n",
+      "note": "R1 (#1182): a repeated validator"
+    },
+    {
+      "id": "prefix-zero-width-space",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"AC\u200bME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "R2 (#1182): a prefix containing U+200B can never match the normalized scan copy"
+    },
+    {
+      "id": "prefix-byte-order-mark",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\ufeff\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "R2 (#1182): a prefix containing U+FEFF"
+    },
+    {
+      "id": "run-leading-plus",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least +20\nvalidator: none\n",
+      "note": "R3 (#1182): only canonical decimal counts load; +20 is rejected"
+    },
+    {
+      "id": "run-leading-zero",
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 020\nvalidator: none\n",
+      "note": "R3 (#1182): 020 is rejected"
     }
   ]
 }

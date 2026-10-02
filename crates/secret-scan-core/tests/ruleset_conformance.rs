@@ -56,6 +56,11 @@ fn the_accepted_ruleset_parses_and_every_case_matches_as_declared() {
         assert_eq!(finding.detector(), str_field(case, "detector"), "case {id}");
         assert_eq!(finding.type_name(), str_field(case, "type"), "case {id}");
         assert_eq!(
+            finding.action().as_str(),
+            str_field(case, "action"),
+            "case {id}"
+        );
+        assert_eq!(
             finding.confidence(),
             Confidence::from_name(str_field(case, "confidence")).unwrap(),
             "case {id}"
@@ -96,6 +101,11 @@ fn the_names_section_ruleset_parses_and_every_case_matches_as_declared() {
         assert_eq!(finding.detector(), str_field(case, "detector"), "case {id}");
         assert_eq!(finding.type_name(), str_field(case, "type"), "case {id}");
         assert_eq!(
+            finding.action().as_str(),
+            str_field(case, "action"),
+            "case {id}"
+        );
+        assert_eq!(
             finding.confidence(),
             Confidence::from_name(str_field(case, "confidence")).unwrap(),
             "case {id}"
@@ -127,6 +137,7 @@ fn the_ordering_fixture_shows_the_built_in_winning_the_tie() {
     let finding = &findings[0];
     assert_eq!(finding.detector(), str_field(expected, "detector"));
     assert_eq!(finding.type_name(), str_field(expected, "type"));
+    assert_eq!(finding.action().as_str(), str_field(expected, "action"));
     assert_eq!(
         finding.confidence(),
         Confidence::from_name(str_field(expected, "confidence")).unwrap()
@@ -230,6 +241,31 @@ fn every_declared_rejection_class_is_reproduced() {
             error.code(),
             redact_secret::SecretScanErrorCode::InvalidRuleset,
             "{class_name}"
+        );
+    }
+}
+
+/// Inputs revision 1 rejects with an existing class (issue #1182, R1 to R3).
+#[test]
+fn every_tightened_rejection_is_reproduced() {
+    let document = document();
+    let rejections = document["tightenedRejections"].as_array().unwrap();
+    assert!(!rejections.is_empty());
+
+    for rejection in rejections {
+        let id = str_field(rejection, "id");
+        let error = load_ruleset(str_field(rejection, "ruleset").as_bytes())
+            .err()
+            .unwrap_or_else(|| panic!("{id}: expected rejection"));
+        assert_eq!(
+            error.class(),
+            class_from_wire(str_field(rejection, "class")),
+            "{id}"
+        );
+        assert_eq!(
+            error.code(),
+            redact_secret::SecretScanErrorCode::InvalidRuleset,
+            "{id}"
         );
     }
 }

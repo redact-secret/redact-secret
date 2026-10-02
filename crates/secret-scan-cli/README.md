@@ -29,6 +29,10 @@ usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<pa
 
 `--ruleset <path>` loads a declarative ruleset in either mode and needs an
 explicit path source; standard input accepts none.
+A ruleset detection has medium confidence, so the default policy only warns
+about it: check mode reports it, and `--redact --ruleset` runs but leaves
+ruleset matches in the output unchanged. The CLI has no policy hook to change
+that; see the [rulesets guide](../../docs/guides/rulesets.md#default-action).
 
 PII selectors are opt-in and repeatable. The activation-print form exits
 without opening input. `pii` closes over the context-required

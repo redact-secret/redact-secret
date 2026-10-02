@@ -92,7 +92,7 @@ const fn ruleset_class_message(class: RulesetErrorClass) -> &'static str {
         RulesetErrorClass::UnknownRevision => "the ruleset-revision value is not supported.",
         RulesetErrorClass::UnknownField => "a detector block declares an unknown field.",
         RulesetErrorClass::UnsupportedConstruct => {
-            "a line, block header, or value has an unsupported shape."
+            "a line, block header, repeated field, or value has an unsupported shape."
         }
         RulesetErrorClass::UnknownAlphabet => "a detector block declares an unknown alphabet.",
         RulesetErrorClass::UnknownValidator => "a detector block declares an unknown validator.",

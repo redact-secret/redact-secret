@@ -5,6 +5,22 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Breaking and compatibility changes
+
+- Declarative `ruleset-revision: 1` loading is tightened before the stable
+  contract freezes it (#1182, audit #1072). A ruleset that loaded before is now
+  rejected as `INVALID_RULESET` with class `UNSUPPORTED_CONSTRUCT`, on every
+  surface (Rust, Node, WebAssembly, Python, CLI), in three cases: a field
+  repeated inside one `detector:` block (the last one used to win silently), a
+  `prefix` containing an invisible or format character (it could never match),
+  and a `run` count that is not canonical decimal (`+20` and `020` used to
+  load). A ruleset that uses none of these behaves exactly as before. The
+  normative grammar is now published in the
+  [rulesets guide](docs/guides/rulesets.md#grammar), which also states that a
+  ruleset detection is `warn` under the default policy (so `scanAndRedact` and
+  `redact-secret --redact` leave its match unchanged); that behavior is
+  unchanged and is now pinned by the reference fixture.
+
 ### Added
 
 - Every `@redact-secret/*` npm package is now published with an npm

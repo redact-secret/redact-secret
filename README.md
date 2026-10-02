@@ -264,8 +264,10 @@ implementation. A caller with an internal credential format uses a
 An organization with an internal credential format can declare it as a
 **declarative ruleset**: UTF-8 data (at most 64 KiB) the core parses and
 matches itself with the same linear-time engine as every built-in detector,
-never a callback. Ruleset detections always carry medium confidence and can
-never outrank a built-in finding. Rust, JavaScript, Python, and the CLI
+never a callback. Ruleset detections always carry medium confidence, so the
+default policy only warns about them (`scanAndRedact` and `redact-secret
+--redact` leave the matched text unchanged; only a caller policy redacts it),
+and they can never outrank a built-in finding. Rust, JavaScript, Python, and the CLI
 (`--ruleset <path>`) all accept one. See the
 [rulesets guide](docs/guides/rulesets.md) for the format, matching semantics,
 and rejection classes.

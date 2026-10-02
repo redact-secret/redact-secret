@@ -358,3 +358,31 @@ cargo test -p redact-secret --test ruleset_conformance --locked
 python -m pytest bindings/python/tests/test_ruleset.py bindings/python/tests/test_ruleset_conformance.py
 cargo test -p redact-secret-cli --test cli --locked ruleset
 ```
+
+## Implementation
+
+Added after the owner accepted D1(a), D2(a), D3(a) and D4(a). Everything above
+this heading is the audit as it was written; this section records what landed.
+
+### #1182: R1 to R5
+
+| Row | What changed | Class | Where |
+| --- | --- | --- | --- |
+| R1 | A field repeated inside one `detector:` block is rejected | `UNSUPPORTED_CONSTRUCT` | `ruleset.rs` `flush_block` |
+| R2 | A `prefix` containing a code point `normalize::is_invisible` removes is rejected | `UNSUPPORTED_CONSTRUCT` | `ruleset.rs` `parse_prefix` |
+| R3 | A `run` count must be ASCII digits without a leading zero (`+20`, `020`, `00` rejected); a lone `0` stays `RUN_LENGTH_OUT_OF_BOUNDS` | `UNSUPPORTED_CONSTRUCT` | `ruleset.rs` `parse_run` |
+| R4 | The normative grammar is published in `docs/guides/rulesets.md#grammar` | n/a | guide |
+| R5 | The default action `warn` is stated in the guide, the README and the CLI `--help` and README text for `--ruleset`; the reference fixture pins `action` for every ruleset detection | n/a | guide, README, CLI, fixture |
+
+No new rejection class was needed: all three tightenings use the existing
+`UNSUPPORTED_CONSTRUCT`, so the 18 classes and the `#[non_exhaustive]` enum are
+unchanged. The CLI sentence for that class now also says "repeated field". The
+fixture keeps `rejections` as one entry per class (18) and adds
+`tightenedRejections` (9 inputs: five repeated fields, two invisible prefix
+characters, `+20` and `020`) so the "each class exactly once" check still
+holds. The grammar rule for a count of `0` differs slightly from the draft's
+`nonzero-digit *DIGIT`: `0` is a bounds error, not a shape error, because that
+class already existed and fixtures pin it.
+
+Deviation from the audit's draft: none beyond that sentence. D2, D3 and D4 are
+documentation only.

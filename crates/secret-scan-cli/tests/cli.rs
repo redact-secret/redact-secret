@@ -487,6 +487,36 @@ fn a_malformed_ruleset_fails_the_whole_run_before_any_source_is_scanned() {
 }
 
 #[test]
+fn a_tightened_ruleset_is_rejected_as_an_unsupported_construct() {
+    // #1182 R1 to R3: a repeated field, an invisible prefix character and a
+    // non-canonical run count each fail the whole run with the fixed
+    // unsupported-shape sentence.
+    let scratch = Scratch::new();
+    let source = scratch.write("secret.env", "clean\n");
+    for (name, ruleset) in [
+        ("repeat", format!("{RULESET_FIXTURE}validator: none\n")),
+        (
+            "invisible",
+            RULESET_FIXTURE.replace("\"ACME_\"", "\"AC\u{200B}ME_\""),
+        ),
+        (
+            "plus",
+            RULESET_FIXTURE.replace("at-least 20", "at-least +20"),
+        ),
+        (
+            "zero",
+            RULESET_FIXTURE.replace("at-least 20", "at-least 020"),
+        ),
+    ] {
+        let path = scratch.write(&format!("{name}.txt"), &ruleset);
+        let run = run(&[Path::new("--ruleset"), &path, &source], b"");
+        assert_eq!(run.code, 2, "{name}");
+        assert!(run.stderr.contains("INVALID_RULESET"), "{name}");
+        assert!(run.stderr.contains("unsupported shape"), "{name}");
+    }
+}
+
+#[test]
 fn ruleset_without_an_explicit_path_source_is_a_usage_failure() {
     let scratch = Scratch::new();
     let ruleset = scratch.write("rules.txt", RULESET_FIXTURE);
