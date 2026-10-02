@@ -8,24 +8,50 @@ not prove that input is secret-free. `supported` in that report means a
 finding-type inventory row has positive conformance evidence; it is not a
 precision, recall, or detector-count claim.
 
-## DRAFT: v0.1.0 reliability contract
+## v0.1.0 reliability contract
 
-> **DRAFT.** The v0.1.0 candidate source revision is not frozen, so nothing in
-> this section is a release claim. It becomes one only when the identity table
-> below is filled from the frozen candidate and a reviewed pull request removes
-> this banner. Tracking: [#1067](https://github.com/redact-secret/redact-secret/issues/1067),
+> **Bound to the Beta.13 candidate; not yet a release claim.** The identity,
+> denominators and per-family counts below are bound to the exact candidate and
+> benchmarks revision in the identity table. Nothing here approves a release;
+> the [release authority](../../AGENTS.md#release-authority) still applies.
+> Tracking: [#1067](https://github.com/redact-secret/redact-secret/issues/1067),
 > epic [#1065](https://github.com/redact-secret/redact-secret/issues/1065),
 > reconciling [#200](https://github.com/redact-secret/redact-secret/issues/200).
+>
+> **Still pending, and not claimed:**
+>
+> - The US SSN custodian run
+>   [`redact-secret/redact-secret-benchmarks#667`](https://github.com/redact-secret/redact-secret-benchmarks/issues/667):
+>   a new corpus and one protected run on the Beta.13 candidate. Until it is
+>   recorded, `pii:us:ssn` stays `pending`.
+> - The protected holdout of the four `generic:*` families below, which the
+>   matrix records as `not-run (requires pass on frozen candidate)`. They stay
+>   `provisional`.
+> - The performance evaluation against the final release source commit, which
+>   the owner dispatches. No performance, memory or size claim is made here.
+> - PII re-qualification. The PII statuses are the Beta.11 qualification, not
+>   re-qualified on this candidate.
+> - Owner approval of the release.
 
-### Identity this contract will bind
+### Identity this contract binds
 
-| Item | At freeze | Working value (development, not a claim) |
-| --- | --- | --- |
-| Candidate source revision | `<frozen candidate SHA>` | audited `57a0dca9478c83e2c59caf9f9d7b467273d7e615` |
-| Benchmarks revision that produced the matrix | `<sourceReport.revision of the matrix re-pinned for the candidate>` | `e8f73bfd7241845ef9fb75574a72b135aa777ba6` |
-| Product commit that matrix measured | must equal the candidate source revision | `4227160c4dac402d7add53d3f8fe990f693912c1` (Beta.12): **not** the audited source |
-| Corpus identity | fixture count and fixture-index digest from the matrix | 5950 fixtures, digest `58f09c3544bf7238dcd076a7c1379681a302adef9ba66ee14dc801f95cfdbbdd` |
-| PII qualification candidate | the frozen candidate | Beta.11 core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7`, benchmarks revision `be0fb9f35045bf05e5b999a2c0ed368541f9e963` (bound in [`pii-family-status.json`](../coverage/pii-family-status.json) and gated by `npm run pii-family-status:check`); email, IBAN, phone, payment-card, SSN and the shared PII code changed after it |
+| Item | Value |
+| --- | --- |
+| Candidate source revision (the commit the matrix measured) | `fe6e9234d40e7d5964de27d00d33544f9c621dbf` (`0.1.0-beta.13`) |
+| Benchmarks revision that produced the matrix | `573e128863e0543133e5ccbd513216d19513b7da` (`sourceReport.revision`; also `benchmarks/pin-source.json`) |
+| Product commit that matrix measured | `fe6e9234d40e7d5964de27d00d33544f9c621dbf`: equals the candidate source revision |
+| Candidate artifacts | `@redact-secret/core` tarball SHA-256 `8e281e2932b245c8d238f52076c08e6c00859edafdb3e1e202500bc176a73cec`; Node addon (`darwin-arm64`) `d84e31859c72fd046810bb3370df0e61376f5266969ec86b4bd9837437409083`; WebAssembly `f19919458494de3c7210edae7099a47f380191debc956618a37963fc9ef5e1fb` |
+| Measurement | formal candidate run, full suite (5950 of 5950 fixtures), clean source, no failures; scanner `trufflehog` 3.97.4 |
+| Corpus identity | 5950 fixtures, digest `58f09c3544bf7238dcd076a7c1379681a302adef9ba66ee14dc801f95cfdbbdd` |
+| PII qualification | Beta.11 core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7`, benchmarks revision `be0fb9f35045bf05e5b999a2c0ed368541f9e963`, state `not-requalified` (read from the matrix `piiQualification`, bound in [`pii-family-status.json`](../coverage/pii-family-status.json), gated by `npm run pii-family-status:check`); email, IBAN, phone, payment-card, SSN and the shared PII code changed after it |
+
+The candidate commit is the commit the matrix measured. The release is
+published from a later commit on `main`: the commits after the candidate change
+only documentation, the vendored benchmark evidence and the text generated from
+it, and leave `crates/`, `packages/`, `bindings/` and
+`conformance/` unchanged, which `git diff fe6e9234d40e7d5964de27d00d33544f9c621dbf
+HEAD -- crates packages bindings conformance` shows to be empty. The release
+manifest records the source commit actually published.
 
 A count in this contract is valid only if the matrix's measured product commit
 equals the candidate source revision. If it does not, the page must say which
@@ -34,9 +60,11 @@ current.
 
 ### Denominators
 
-Working counts at the audited source (regenerate with
-`python3 -B scripts/report-detection-support.py`; method and full tables in the
-[#1067 evidence record](../audits/evidence/1067/README.md)):
+Counts at the candidate (regenerate with
+`python3 -B scripts/report-detection-support.py --source-revision fe6e9234d40e7d5964de27d00d33544f9c621dbf`;
+method in the [#1067 evidence record](../audits/evidence/1067/README.md), the
+per-detector join in
+[`detector-support-join.md`](../audits/evidence/1067/detector-support-join.md)):
 
 - 110 shipped credential detectors emit 141 finding types; 6 opt-in PII
   families also ship. These are the denominators.
@@ -46,12 +74,14 @@ Working counts at the audited source (regenerate with
 - Counted by weakest listed family, the 110 detectors are 102 stable, 7
   provisional, 1 pending, 0 unsupported, and **0 shipped without a matrix
   family**.
-- The 6 PII families are **not in the matrix**
-  ([`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
-  tracks moving them in). Their statuses (five `provisional`, US SSN
-  `pending`) are stated in the [Opt-in PII table](detection.md#opt-in-pii-availability-is-not-support),
-  checked by a gate that fails when a shipped PII family has no status row, and
-  were measured on the Beta.11 candidate, not on the audited source.
+- The 6 PII families are carried in the matrix apart from the credential
+  families, as `piiFamilies` with their own `piiDistribution` (five
+  `provisional`, one `pending`, none `stable`); they are not part of the 173
+  credential families or of the 144 stable. Their statuses are stated in the
+  [Opt-in PII table](detection.md#opt-in-pii-availability-is-not-support),
+  which a gate checks against the matrix, and they are the **Beta.11
+  qualification, not re-qualified** on this candidate (core `8b6a5fde`,
+  benchmarks `be0fb9f3`).
 
 "144 stable" counts matrix families, not detectors, and no stable family means
 a detector finds every credential its provider issues.
@@ -63,11 +93,10 @@ carried into the v0.1.0 contract as **provisional**, not stable:
 `generic:bearer-token`, `generic:connection-string-password`,
 `generic:otp-seed` and `generic:unclassified-assignment-literal`. The reason is
 the matrix's own: their protected holdout is `not-run` and needs a pass on a
-frozen candidate; the matrix measured Beta.12 and the code behind all four has
-changed since. `generic:unclassified-assignment-literal` (detector
+frozen candidate, and the formal run on the candidate did not include it. `generic:unclassified-assignment-literal` (detector
 `generic-token`) additionally records one exact-span miss and one leaked span
-among 76 positive cases. A recheck on current main from public fixtures
-reproduces none of the four (every public conformance fixture for the four
+among 76 positive cases. The candidate run still records that miss and that leaked span. A recheck on
+current main from public fixtures reproduces none of the four (every public conformance fixture for the four
 detectors matches its declared span exactly), but the recorded case is not
 named in the pinned matrix, so its absence is not shown and the family stays
 provisional. Per-family result and method:
@@ -108,8 +137,7 @@ The per-family status table is the generated
 [Opt-in PII table](detection.md#opt-in-pii-availability-is-not-support) for
 PII. The per-detector join of both against the shipped code is
 [`detector-support-join.md`](../audits/evidence/1067/detector-support-join.md).
-At freeze, that file is regenerated for the candidate and linked from here by
-commit permalink, and this section's counts are replaced by its totals.
+That file is regenerated for the candidate named in the identity table.
 
 ### What this contract does not claim
 
@@ -123,28 +151,27 @@ commit permalink, and this section's counts are replaced by its totals.
 ### Binding at freeze
 
 The code and the ruleset contract are frozen for 0.1.x (see
-[Stable contract 1](api-contract.md#stable-contract-1)); only the identity
-below is left. The remaining steps, in order:
+[Stable contract 1](api-contract.md#stable-contract-1)). State of the steps
+that bind this page to a candidate:
 
-1. Choose the candidate source revision (the merged `main` commit that the
-   release is qualified from) and write its full SHA into the identity table.
-2. Re-pin `benchmarks/support-matrix.json` (and its pin files) from
-   `redact-secret/redact-secret-benchmarks` for that candidate, after the
-   benchmarks follow-ups
+1. Candidate source revision chosen and written into the identity table: done
+   (`fe6e9234d40e7d5964de27d00d33544f9c621dbf`).
+2. `benchmarks/support-matrix.json` and its pin files re-pinned from
+   `redact-secret/redact-secret-benchmarks` revision `573e1288`, after
    [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
    and
    [`redact-secret/redact-secret-benchmarks#648`](https://github.com/redact-secret/redact-secret-benchmarks/issues/648)
-   have landed. The matrix's `sourceReport.product.sourceCommit` must equal the
-   candidate SHA, and its `sourceReport.revision` goes in the second row.
-3. Run `python3 -B scripts/check-detector-family-coverage.py --strict` and the
-   report script; both must show 0 shipped-but-unmeasured credential detectors.
-4. Replace every working value above with the frozen identity (candidate SHA,
-   benchmarks revision, measured product commit, corpus count and digest),
-   link the regenerated join by permalink, and record the PII statuses measured
-   on the candidate in `pii-family-status.json` (`npm run pii-family-status:check`
-   binds them).
-5. Remove the DRAFT banner in a reviewed pull request. A release still needs
-   explicit approval under the
+   landed: done. The matrix's `sourceReport.product.sourceCommit` equals the
+   candidate SHA.
+3. `python3 -B scripts/check-detector-family-coverage.py --strict` and the
+   report script show 0 shipped-but-unmeasured credential detectors: done.
+4. Identity values, the regenerated join and the PII statuses recorded and
+   gated (`npm run pii-family-status:check`): done, with the PII statuses
+   explicitly not re-qualified.
+5. Open, and not part of this page: the US SSN custodian run
+   ([`redact-secret/redact-secret-benchmarks#667`](https://github.com/redact-secret/redact-secret-benchmarks/issues/667)),
+   the performance evaluation against the final release source commit, and
+   explicit owner approval under the
    [release authority](../../AGENTS.md#release-authority).
 
 The sections below are the earlier bounded assessment and are not the

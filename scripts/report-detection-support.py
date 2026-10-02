@@ -16,8 +16,10 @@ Shipped set (read from the code-derived artifacts, never typed in):
   (`pii-domain`) and is deliberately not in the detector inventory.
 
 Measured set: `benchmarks/support-matrix.json`, keyed family -> detector ids.
-The matrix has no PII families, so PII status is read from the hand-written
-table in `docs/reference/detection.md` and reported as "outside the matrix".
+The matrix carries the PII families apart from the credential families, as
+`piiFamilies`; the report shows each family's pinned-matrix status beside the
+status documented in `docs/reference/detection.md`. A matrix that predates
+those keys reports them as absent from the matrix.
 
 Both revisions are printed: this repository's `git rev-parse HEAD` (or
 `--source-revision`) and the pinned benchmarks revision, together with the
