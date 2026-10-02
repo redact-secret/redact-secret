@@ -926,6 +926,11 @@ pub fn sanitize(input: &str) -> Result<ScanResult, SecretScanError> {
 /// [`DetectorRegistry::with_built_in`] or
 /// [`DetectorRegistry::with_common_built_in`] with no custom detectors.
 ///
+/// A run-time `Profile` value references both registry constructors, so the
+/// linker keeps the detectors of both profiles. For the smaller binary the
+/// `common` profile exists for, call [`DetectorRegistry::with_common_built_in`]
+/// directly (the Rust guide, `docs/guides/rust.md`, "Detector profiles").
+///
 /// ```
 /// use redact_secret::Profile;
 ///
