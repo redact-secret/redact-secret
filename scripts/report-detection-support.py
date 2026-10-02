@@ -30,7 +30,8 @@ says so rather than hiding it.
 
 Offline and deterministic: no network, no timestamps, sorted output. It writes
 nothing; redirect the output where it is needed. It is a report, not a gate:
-the gate is `scripts/check-detector-family-coverage.py --strict`.
+the gates are `scripts/check-detector-family-coverage.py --strict` and
+`scripts/check-pii-family-status.py` (PII statuses).
 """
 
 from __future__ import annotations
@@ -49,6 +50,7 @@ PIN_SOURCE_PATH = ROOT / "benchmarks" / "pin-source.json"
 PIN_MANIFEST_PATH = ROOT / "benchmarks" / "pin-manifest.json"
 ALLOWLIST_PATH = ROOT / "docs" / "coverage" / "detector-family-coverage-allowlist.json"
 DETECTION_DOC = ROOT / "docs" / "reference" / "detection.md"
+PII_BINDING_PATH = ROOT / "docs" / "coverage" / "pii-family-status.json"
 PII_SOURCES = (ROOT / "crates" / "secret-scan-core" / "src" / "pii", ROOT / "crates" / "secret-scan-core" / "src")
 
 STATUSES = ("stable", "provisional", "pending", "unsupported")
@@ -185,6 +187,10 @@ def build(source_revision: str) -> dict:
             r["detector"] for r in rows if r["weakestStatus"] == "shipped-but-unmeasured"
         ],
         "piiFamilies": pii_rows,
+        "piiQualification": {
+            **load(PII_BINDING_PATH)["qualification"],
+            "codeChangedSinceQualification": load(PII_BINDING_PATH)["codeChangedSinceQualification"],
+        },
         "detectors": rows,
     }
 
@@ -235,6 +241,14 @@ def markdown(report: dict) -> str:
         out.append(
             f"| `{row['family']}` | {'yes' if row['inPinnedMatrix'] else 'no'} | {row['documentedStatus'] or 'none'} |"
         )
+    q = report["piiQualification"]
+    out += [
+        "",
+        f"PII statuses were qualified at core `{q['coreRevision']}` ({q['release']}) with benchmarks revision "
+        f"`{q['benchmarksRevision']}`. PII source files changed since: "
+        + ", ".join(f"`{p}`" for p in q["codeChangedSinceQualification"])
+        + ". Gate: `scripts/check-pii-family-status.py`.",
+    ]
     out += ["", "## Matrix families with no shipped detector", "", "| Family | Status |", "| --- | --- |"]
     for row in report["matrix"]["familiesWithoutShippedDetector"]:
         out.append(f"| `{row['family']}` | {row['status']} |")

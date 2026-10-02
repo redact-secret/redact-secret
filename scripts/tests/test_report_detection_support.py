@@ -44,6 +44,12 @@ class ReportInvariantTests(unittest.TestCase):
             self.assertTrue(row["family"].startswith("pii:"))
             self.assertIsNotNone(row["documentedStatus"], row["family"])
 
+    def test_pii_statuses_are_bound_to_full_revisions(self) -> None:
+        q = self.report["piiQualification"]
+        self.assertEqual(len(q["coreRevision"]), 40)
+        self.assertEqual(len(q["benchmarksRevision"]), 40)
+        self.assertIn(q["coreRevision"], REPORT.markdown(self.report))
+
     def test_every_folded_matrix_id_is_owned_by_a_shipped_detector(self) -> None:
         shipped = {row["detector"] for row in self.report["detectors"]}
         self.assertEqual(self.report["matrix"]["detectorIdsNotInInventory"], [])

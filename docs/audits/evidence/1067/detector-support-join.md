@@ -33,6 +33,8 @@ Credential detectors with no matrix family: none.
 | `pii:global:phone` | no | provisional |
 | `pii:us:ssn` | no | pending |
 
+PII statuses were qualified at core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7` (0.1.0-beta.11) with benchmarks revision `be0fb9f35045bf05e5b999a2c0ed368541f9e963`. PII source files changed since: `crates/secret-scan-core/src/pii.rs`, `crates/secret-scan-core/src/pii/pii_email.rs`, `crates/secret-scan-core/src/pii/pii_iban.rs`, `crates/secret-scan-core/src/pii/pii_payment_card.rs`, `crates/secret-scan-core/src/pii/pii_phone.rs`, `crates/secret-scan-core/src/pii/pii_us_ssn.rs`. Gate: `scripts/check-pii-family-status.py`.
+
 ## Matrix families with no shipped detector
 
 | Family | Status |
