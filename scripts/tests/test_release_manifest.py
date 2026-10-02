@@ -331,6 +331,86 @@ class CliTests(unittest.TestCase):
             self.assertEqual(status, 1)
             self.assertFalse(out.exists())
 
+    def test_reads_artifact_digests_and_drift_from_files(self) -> None:
+        # Issues #799 and #1115: the merged digests exceed the 128 KiB
+        # per-argument limit, so the workflow hands them over by file.
+        records = {
+            f"npm:@redact-secret/synthetic-{index}": [
+                {
+                    "file": f"file-{index}-{n}.node",
+                    "built": "a" * 64,
+                    "qualified": "a" * 64,
+                    "published": "a" * 64,
+                    "comparable": True,
+                    "note": "x" * 400,
+                }
+                for n in range(8)
+            ]
+            for index in range(60)
+        }
+        payload = json.dumps(records)
+        self.assertGreater(len(payload), 128 * 1024)
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            digests = directory / "artifact-digests.json"
+            digests.write_text(payload, encoding="utf-8")
+            drift = directory / "drift.json"
+            drift.write_text("{}", encoding="utf-8")
+            out = directory / "manifest.json"
+            # Through a real process: an argv entry this large would raise
+            # "Argument list too long" before the script even started.
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    str(SCRIPT),
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--artifact-digests-file",
+                    str(digests),
+                    "--support-matrix-drift-file",
+                    str(drift),
+                    "--out",
+                    str(out),
+                ],
+                check=True,
+                capture_output=True,
+            )
+            recorded = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(len(recorded["artifact_digests"]), 60)
+
+    def test_missing_artifact_digests_file_fails_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--artifact-digests-file",
+                    str(Path(tmp) / "absent.json"),
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 1)
+            self.assertFalse(out.exists())
+
     def test_defaults_support_matrix_drift_to_empty_object(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "manifest.json"
@@ -638,6 +718,50 @@ class WorkflowOutputTests(unittest.TestCase):
             manifest = json.loads((directory / "manifest.json").read_text())
             self.assertEqual(manifest["registry_state"]["npm:@redact-secret/wasm"], "published")
             self.assertEqual(manifest["artifact_digests"]["npm:@redact-secret/wasm"][0]["note"], note)
+
+    def test_manifest_step_survives_digests_over_the_argument_limit(self) -> None:
+        # Issues #799 and #1115: merged digests past 128 KiB made the manifest
+        # step fail with "python3: Argument list too long".
+        root = SCRIPT.parents[1]
+        workflow = (root / ".github/workflows/release.yml").read_text()
+        step = workflow.split("      - name: Build and record the manifest\n", 1)[1]
+        shell = step.split("        run: |\n", 1)[1].split("      - name:", 1)[0]
+        shell = textwrap.dedent(shell)
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "packages").symlink_to(root / "packages", target_is_directory=True)
+            (directory / "scripts").symlink_to(root / "scripts", target_is_directory=True)
+            for index in range(4):
+                native = directory / "dependency-artifact-digests" / f"native-{index}"
+                native.mkdir(parents=True)
+                records = {
+                    f"npm:@redact-secret/synthetic-{index}-{n}": [
+                        {
+                            "file": "synthetic.node",
+                            "built": "a" * 64,
+                            "qualified": "a" * 64,
+                            "published": "a" * 64,
+                            "comparable": True,
+                            "note": "x" * 15000,
+                        }
+                    ]
+                    for n in range(40)
+                }
+                (native / "artifact-digest.json").write_text(json.dumps(records))
+            merged = sum(
+                f.stat().st_size for f in (directory / "dependency-artifact-digests").glob("*/artifact-digest.json")
+            )
+            # Past Linux's 128 KiB per-argument limit and macOS's 1 MiB total.
+            self.assertGreater(merged, 2 * 1024 * 1024)
+            subprocess.run(
+                ["bash", "-e", "-o", "pipefail", "-c", shell],
+                cwd=directory,
+                env={**os.environ, "GITHUB_SHA": "a" * 40, "GITHUB_OUTPUT": str(directory / "output")},
+                check=True,
+                capture_output=True,
+            )
+            manifest = json.loads((directory / "manifest.json").read_text())
+            self.assertEqual(len(manifest["artifact_digests"]), 160)
 
 
 if __name__ == "__main__":

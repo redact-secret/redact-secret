@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import {
+  formatSection,
   inspectCleanRevision,
   parseArguments,
   resolveExactCommit,
@@ -84,54 +85,74 @@ test("benchmark installation runs lifecycle scripts needed to materialize genera
   assert.doesNotMatch(source, /\[["']ci["'], ["']--ignore-scripts["'][^\n]+benchmarkCheckout/);
 });
 
-test("section summaries distinguish unknown baselines from findings", () => {
+test("section summaries compare one measure over one population", () => {
+  const row = (kind, outcome, baselineOutcome, actualFindings = 0, expectedSpans = 0) => ({
+    corpusSection: "expanded-corpus",
+    kind,
+    expectedSpans,
+    actualFindings,
+    outcome,
+    baseline: { outcome: baselineOutcome },
+  });
   const report = {
     results: [
-      {
-        corpusSection: "expanded-corpus",
-        kind: "must-not-flag",
-        expectedSpans: 0,
-        actualFindings: 0,
-        outcome: "observed:0",
-        baseline: { outcome: null },
-      },
-      {
-        corpusSection: "expanded-corpus",
-        kind: "must-not-flag",
-        expectedSpans: 0,
-        actualFindings: 0,
-        outcome: "clean",
-        baseline: { outcome: "flagged:1" },
-      },
-      {
-        corpusSection: "expanded-corpus",
-        kind: "must-redact",
-        expectedSpans: 1,
-        actualFindings: 1,
-        outcome: "EXACT",
-        baseline: { outcome: null },
-      },
-      {
-        corpusSection: "expanded-corpus",
-        kind: "policy",
-        expectedSpans: 1,
-        actualFindings: 0,
-        outcome: "MISS",
-        baseline: { outcome: "EXACT" },
-      },
+      row("must-not-flag", "observed:0", null),
+      // baselined, flagged before, clean now
+      row("must-not-flag", "clean", "flagged:1"),
+      // baselined, still flagged
+      row("must-not-flag", "flagged:2", "observed:1", 2),
+      // unbaselined and newly flagged
+      row("must-not-flag", "flagged:1", null, 1),
+      // a co-detection the scorer marks clean: a raw finding, not an outcome flag
+      row("must-not-flag", "clean", "clean", 3),
+      row("must-redact", "EXACT", null, 1, 1),
+      row("must-redact", "MISS", null, 0, 1),
+      row("must-redact", "MISS", "EXACT", 0, 1),
+      row("policy", "MISS", "EXACT", 0, 1),
     ],
   };
-  assert.deepEqual(summarizeSection(report, "expanded-corpus"), {
-    rows: 4,
-    negativeBefore: 1,
-    negativeBaselined: 1,
-    negativeAfter: 0,
-    negativeTotal: 2,
+  const summary = summarizeSection(report, "expanded-corpus");
+  assert.deepEqual(summary, {
+    rows: 9,
+    negativeBefore: 2,
+    negativeAfter: 1,
+    negativeBaselined: 3,
+    negativeUnbaselinedFlagged: 1,
+    negativeUnbaselined: 2,
+    negativeRawFindings: 3,
+    negativeTotal: 5,
     missesBefore: 0,
-    positiveBaselined: 0,
-    missesAfter: 0,
-    positiveTotal: 1,
+    missesAfter: 1,
+    positiveBaselined: 1,
+    missesUnbaselined: 1,
+    positiveUnbaselined: 2,
+    positiveTotal: 3,
     policyMisses: 1,
     policyTotal: 1,
   });
+  // Before and after share one denominator; the raw count is labelled raw and never sits beside a scored one.
+  const text = formatSection("Expanded corpus", summary);
+  assert.match(text, /negative flags 2 before \/ 1 after, over the same 3 baselined fixtures \(outcome-scored\)/);
+  assert.match(text, /1\/2 unbaselined flagged \(outcome-scored\)/);
+  assert.match(text, /3\/5 raw fixtures with a finding \(raw finding count/);
+});
+
+test("a corpus that grows with raw co-detections does not read as a regression", () => {
+  const row = (outcome, baselineOutcome, actualFindings) => ({
+    corpusSection: "expanded-corpus",
+    kind: "must-not-flag",
+    expectedSpans: 0,
+    actualFindings,
+    outcome,
+    baseline: { outcome: baselineOutcome },
+  });
+  const results = [
+    ...Array.from({ length: 5 }, () => row("flagged:1", "flagged:1", 1)),
+    ...Array.from({ length: 50 }, () => row("clean", "clean", 2)),
+    ...Array.from({ length: 20 }, () => row("clean", null, 1)),
+  ];
+  const summary = summarizeSection({ results }, "expanded-corpus");
+  assert.equal(summary.negativeBefore, summary.negativeAfter);
+  assert.equal(summary.negativeRawFindings, 75);
+  assert.equal(summary.negativeBaselined, 55);
 });
