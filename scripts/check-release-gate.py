@@ -164,6 +164,13 @@ INLINE_NEEDS_WORKFLOWS = (
 INLINE_NEEDS_PATTERN = re.compile(r"\$\{\{\s*needs\.")
 RUN_BLOCK_HEADER = re.compile(r"^(?P<indent>\s*)(?:- )?run:\s*(?P<rest>.*)$")
 
+# Issues #799 and #1115: the merged artifact digests exceed Linux's 128 KiB
+# per-argument limit, so `release.yml` must hand them to `release-manifest.py`
+# through the `-file` options, never as an inline argument.
+INLINE_MANIFEST_ARGUMENT = re.compile(
+    r"(?<![-\w])--(?:artifact-digests|support-matrix-drift)(?![-\w])[ \t]+\S"
+)
+
 JOB_HEADER_PREFIX = "  "
 ATTRIBUTE_PREFIX = "    "
 LIST_ITEM_PREFIX = "      - "
@@ -251,6 +258,14 @@ def extract_step_blocks(job_body: str) -> list[tuple[int, str, str]]:
         end = headers[index + 1][0] if index + 1 < len(headers) else len(job_body)
         blocks.append((offset, name, job_body[offset:end]))
     return blocks
+
+
+def inline_manifest_arguments(text: str) -> list[int]:
+    """1-based line numbers passing a manifest JSON value as an argument, not a file."""
+    return [
+        text.count("\n", 0, match.start()) + 1
+        for match in INLINE_MANIFEST_ARGUMENT.finditer(text)
+    ]
 
 
 def inline_needs_in_run(text: str) -> list[int]:
@@ -483,6 +498,16 @@ def validate(root: Path) -> list[str]:
             errors.append(
                 f"{workflow.as_posix()}:{number}: a `run:` script substitutes a "
                 '`${{ needs.* }}` job output inline -- pass it through `env:` and read it as "$VAR"'
+            )
+
+    release_path = root / RELEASE_WORKFLOW
+    if release_path.is_file():
+        for number in inline_manifest_arguments(release_path.read_text(encoding="utf-8")):
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}:{number}: `release-manifest.py` receives a "
+                "JSON value as an argument -- pass it with `--artifact-digests-file` / "
+                "`--support-matrix-drift-file` (a merged value can exceed the 128 KiB "
+                "per-argument limit, issues #799 and #1115)"
             )
 
     reconcile_path = root / ".github/workflows/reconcile-release.yml"

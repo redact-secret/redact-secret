@@ -173,6 +173,11 @@ def _parse_registry_state(pairs: list[str]) -> dict[str, str]:
     return state
 
 
+def _option_text(inline: str, file: Path | None) -> str:
+    """The option's JSON text: the file's content when one is given, else the inline value."""
+    return file.read_text(encoding="utf-8") if file is not None else inline
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--source-revision", required=True)
@@ -201,12 +206,25 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     parser.add_argument(
+        "--artifact-digests-file",
+        type=Path,
+        help=(
+            "read the --artifact-digests JSON object from this file instead of an argument "
+            "(issues #799, #1115: the merged digests exceed Linux's 128 KiB per-argument limit)"
+        ),
+    )
+    parser.add_argument(
         "--support-matrix-drift",
         default="{}",
         help=(
             "JSON object: the drift record `check-support-matrix-drift.py` wrote for this "
             "candidate, or {} when the job did not run (issue #511)"
         ),
+    )
+    parser.add_argument(
+        "--support-matrix-drift-file",
+        type=Path,
+        help="read the --support-matrix-drift JSON object from this file instead of an argument",
     )
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args(argv)
@@ -224,8 +242,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        raw_digests = json.loads(args.artifact_digests)
-    except json.JSONDecodeError as error:
+        raw_digests = json.loads(_option_text(args.artifact_digests, args.artifact_digests_file))
+    except (OSError, json.JSONDecodeError) as error:
         print(f"ERROR --artifact-digests is not valid JSON: {error}", file=sys.stderr)
         return 1
     if not isinstance(raw_digests, dict):
@@ -235,8 +253,10 @@ def main(argv: list[str] | None = None) -> int:
     manifest["artifact_digests"] = artifact_digests
 
     try:
-        raw_drift = json.loads(args.support_matrix_drift)
-    except json.JSONDecodeError as error:
+        raw_drift = json.loads(
+            _option_text(args.support_matrix_drift, args.support_matrix_drift_file)
+        )
+    except (OSError, json.JSONDecodeError) as error:
         print(f"ERROR --support-matrix-drift is not valid JSON: {error}", file=sys.stderr)
         return 1
     if not isinstance(raw_drift, dict):

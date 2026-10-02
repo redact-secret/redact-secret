@@ -703,6 +703,48 @@ class ReleaseGateTests(unittest.TestCase):
         self._write("release.yml", passing)
         self.assertEqual(CHECK.validate(self.root), [])
 
+    def test_inline_manifest_argument_is_an_error(self) -> None:
+        # Issues #799 and #1115: a merged digests value passed as one argument
+        # exceeds the 128 KiB per-argument limit and fails the manifest step.
+        broken = RELEASE_YML.replace(
+            "      - name: Publish to PyPI\n        run: echo noop\n",
+            "      - name: Publish to PyPI\n"
+            "        run: |\n"
+            "          python3 -B scripts/release-manifest.py \\\n"
+            '            --artifact-digests "$artifact_digests" \\\n'
+            '            --support-matrix-drift "$drift" \\\n'
+            "            --out manifest.json\n",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertEqual(len(errors), 2, errors)
+        self.assertIn("--artifact-digests-file", errors[0])
+
+    def test_inline_manifest_argument_on_one_line_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Publish to PyPI\n        run: echo noop\n",
+            "      - name: Publish to PyPI\n"
+            "        run: python3 -B scripts/release-manifest.py --artifact-digests \"$d\" --out m.json\n",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        self.assertEqual(len(CHECK.validate(self.root)), 1)
+
+    def test_manifest_file_arguments_are_accepted(self) -> None:
+        passing = RELEASE_YML.replace(
+            "      - name: Publish to PyPI\n        run: echo noop\n",
+            "      - name: Publish to PyPI\n"
+            "        run: |\n"
+            "          python3 -B scripts/release-manifest.py \\\n"
+            '            --artifact-digests-file "$dir/a.json" \\\n'
+            '            --support-matrix-drift-file "$dir/d.json" \\\n'
+            "            --out manifest.json\n",
+        )
+        self.assertNotEqual(passing, RELEASE_YML)
+        self._write("release.yml", passing)
+        self.assertEqual(CHECK.validate(self.root), [])
+
     def test_repository_release_workflows_have_no_inline_needs_outputs(self) -> None:
         repo = Path(__file__).resolve().parents[2]
         for workflow in CHECK.INLINE_NEEDS_WORKFLOWS:
