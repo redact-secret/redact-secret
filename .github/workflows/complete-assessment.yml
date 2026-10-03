@@ -62,7 +62,8 @@ jobs:
           cargo install wasm-bindgen-cli --version "$WASM_BINDGEN_VERSION" --locked
           npm run wasm:build
           cargo build --release --locked -p redact-secret-cli
-          python -m pip install 'maturin>=1.10,<2'
+          python -m pip install --require-hashes --only-binary :all: \
+            -r .github/requirements/maturin.txt
           maturin build --release --locked -m bindings/python/Cargo.toml -o dist
 
       - name: Install the candidate Python wheel without an index or source fallback
