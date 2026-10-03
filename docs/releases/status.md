@@ -5,13 +5,13 @@ Every published version has one durable record under `docs/releases/<version>/`:
 [beta.3](0.1.0-beta.3/README.md), [beta.4](0.1.0-beta.4/README.md),
 [beta.5](0.1.0-beta.5/README.md), [beta.6](0.1.0-beta.6/README.md), [beta.7](0.1.0-beta.7/README.md),
 [beta.8](0.1.0-beta.8/README.md), [beta.9](0.1.0-beta.9/README.md),
-[beta.10](0.1.0-beta.10/README.md), [beta.11](0.1.0-beta.11/README.md), and
-[beta.12](0.1.0-beta.12/README.md).
+[beta.10](0.1.0-beta.10/README.md), [beta.11](0.1.0-beta.11/README.md),
+[beta.12](0.1.0-beta.12/README.md), and [beta.13](0.1.0-beta.13/README.md).
 Beta.1 through beta.3 were also observed together on 2026-09-16: the
 [registry observation](registry-observation.json) records their version
 availability, npm integrity values, crate and Python checksums, npm dist-tags,
 and annotated tag targets. The npm dist-tags below were last observed on
-2026-10-01. Registry publication, workflow completion,
+2026-10-03. Registry publication, workflow completion,
 and a GitHub Release page are separate facts.
 
 | Version | Registry artifacts | Annotated source tag | GitHub Release |
@@ -28,10 +28,11 @@ and a GitHub Release page are separate facts.
 | 0.1.0-beta.10 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `af7f863f29f9fe482dd233c8b7bc5b77dc427314` | Not created |
 | 0.1.0-beta.11 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `94fc18a974f659ea882c89120dbf1adb3acf2f28` | Not created |
 | 0.1.0-beta.12 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `4227160c4dac402d7add53d3f8fe990f693912c1` | Not created |
+| 0.1.0-beta.13 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `66b492bdff5e6751fc6b5409266916346ed7c723` | Not created |
 
-Observed on 2026-10-01 (the npm registry's `dist-tags` for each package), all
+Observed on 2026-10-03 (the npm registry's `dist-tags` for each package), all
 ten npm packages (`@redact-secret/core`, `@redact-secret/wasm` and the eight
-native addons) have `beta` and `latest` at `0.1.0-beta.12`. The release workflow
+native addons) have `beta` at `0.1.0-beta.13` and `latest` at `0.1.0-beta.12`. The release workflow
 publishes prereleases with `--tag beta` only, so it never sets `latest`; every
 `latest` value in this file was set by hand, outside the release workflows.
 The history of that hand-moved tag, as observed: beta.1 (beta.5 for the musl
@@ -42,9 +43,9 @@ before 2026-09-28 (an earlier revision of this page recorded beta.8 as the
 beta.11 on 2026-09-29 at 18:47Z, and beta.12 on 2026-10-01 (moved by the
 maintainer by hand after the publish; the exact time was not recorded, and it
 was first observed complete on all ten packages on 2026-10-01). Use
-`@redact-secret/core@0.1.0-beta.12` or `@redact-secret/core@beta` to select the
-current beta, and a bare `@redact-secret/core` resolves beta.12 as well. Python spells beta.7 as `0.1.0b7`, beta.9 as `0.1.0b9`, beta.10
-as `0.1.0b10`, beta.11 as `0.1.0b11` and beta.12 as `0.1.0b12`; PyPI has no dist-tag equivalent, so `pip install redact-secret`
+`@redact-secret/core@0.1.0-beta.13` or `@redact-secret/core@beta` to select the
+current beta; a bare `@redact-secret/core` still resolves beta.12, because beta.13 has not been moved to `latest`. Python spells beta.7 as `0.1.0b7`, beta.9 as `0.1.0b9`, beta.10
+as `0.1.0b10`, beta.11 as `0.1.0b11`, beta.12 as `0.1.0b12` and beta.13 as `0.1.0b13`; PyPI has no dist-tag equivalent, so `pip install redact-secret`
 resolves the newest version, and `--pre` is needed only because every release is
 a prerelease.
 
@@ -64,7 +65,12 @@ orchestrator then re-observed every package as
 directory that a bare `npm install @redact-secret/core` resolves
 `0.1.0-beta.12` together with its `wasm` and native packages.
 
-Beta.8's manifest is reconstructed, because its run's manifest job failed ([#799](https://github.com/redact-secret/redact-secret/issues/799)); no publication was partial. Beta.9's release run failed only at its `npm:@redact-secret/core` publish job's pre-publish `release:check` gate, on an unrelated `examples/mcp-redact` dependency, not the actual `npm publish` step or a redact-secret artifact defect; Reconcile Release repaired it. Both beta.9's and beta.10's manifests are reconstructed, because this repository's manifest job has never itself populated the tag/registry/verification evidence a durable record requires (see each [record](0.1.0-beta.9/README.md) for what each reconstruction corrects). Beta.11's release run succeeded end to end; its manifest is reconstructed for the same missing evidence and because one musl addon's registry-state snapshot was an npm propagation-lag false negative, which a Reconcile Release dry run confirmed as already published ([record](0.1.0-beta.11/README.md)). Beta.12's release run published and verified every artifact and created the tag, but its `Record release manifest` job failed (`python3: Argument list too long`, the beta.8 defect again, [#1115](https://github.com/redact-secret/redact-secret/issues/1115)), so no manifest artifact exists; its manifest is rebuilt from the run's preserved inputs and labelled `reconstructed` ([record](0.1.0-beta.12/README.md)). No beta.8, beta.9, beta.10, beta.11 or beta.12 publication was partial by the time of publication.
+The Beta.13 publish did not move `latest` either, as the same policy requires.
+Moving it is a separate action that needs the maintainer's explicit approval,
+which has not been given; observed on 2026-10-03, every package reads
+`beta` `0.1.0-beta.13` and `latest` `0.1.0-beta.12`.
+
+Beta.8's manifest is reconstructed, because its run's manifest job failed ([#799](https://github.com/redact-secret/redact-secret/issues/799)); no publication was partial. Beta.9's release run failed only at its `npm:@redact-secret/core` publish job's pre-publish `release:check` gate, on an unrelated `examples/mcp-redact` dependency, not the actual `npm publish` step or a redact-secret artifact defect; Reconcile Release repaired it. Both beta.9's and beta.10's manifests are reconstructed, because this repository's manifest job has never itself populated the tag/registry/verification evidence a durable record requires (see each [record](0.1.0-beta.9/README.md) for what each reconstruction corrects). Beta.11's release run succeeded end to end; its manifest is reconstructed for the same missing evidence and because one musl addon's registry-state snapshot was an npm propagation-lag false negative, which a Reconcile Release dry run confirmed as already published ([record](0.1.0-beta.11/README.md)). Beta.12's release run published and verified every artifact and created the tag, but its `Record release manifest` job failed (`python3: Argument list too long`, the beta.8 defect again, [#1115](https://github.com/redact-secret/redact-secret/issues/1115)), so no manifest artifact exists; its manifest is rebuilt from the run's preserved inputs and labelled `reconstructed` ([record](0.1.0-beta.12/README.md)). Beta.13's release run succeeded end to end with no reconcile dispatch and uploaded its own manifest; the manifest is reconstructed only to correct two npm packages (`node-darwin-x64`, `node-win32-x64-msvc`) whose registry-state snapshot read `unpublished` inside npm propagation lag, and the empty published digests of those two packages and three PyPI files, all verified against the live registries (the original manifest is preserved verbatim in the record, [record](0.1.0-beta.13/README.md)). No beta.8, beta.9, beta.10, beta.11, beta.12 or beta.13 publication was partial by the time of publication.
 
 Beta.2's [durable release record](0.1.0-beta.2/README.md) preserves its initial
 partial failure and subsequent authorized repair. Beta.3 also had a failed
