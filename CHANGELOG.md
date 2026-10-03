@@ -44,6 +44,12 @@ evidence is linked from each published version.
   published by `Reconcile Release`. See
   [Verifying releases](SECURITY.md#verifying-releases).
 
+- Documentation only, no behavior change (#1066): the stable contract states
+  that Python `ScanResult.findings` stays a `list` in 0.1.x (a new list per
+  read over cached `Finding` objects; a `tuple` would be a breaking change),
+  and records the decision in the compatibility ADR. See
+  [Frozen behavior](docs/reference/api-contract.md#frozen-behavior).
+
 - Documentation only, no behavior change (#1179, #1177): the stable contract
   now states two facts a consumer can rely on. A whole-input call that returns
   a value (Rust `scan`, `redact`, `scan_and_redact` and `sanitize*`;

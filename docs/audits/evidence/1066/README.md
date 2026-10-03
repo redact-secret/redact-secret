@@ -291,6 +291,7 @@ All accepted by the owner on 2026-10-02, **as recommended** in this audit and in
 | D5 | `#[non_exhaustive]` on `SecretScanErrorCode` and `Profile` (LB1); `Action`, `Confidence` and `Specificity` stay exhaustive by design | 2026-10-02, as recommended |
 | D6 | `max*Bytes` additive aliases for the JavaScript incremental limits (LB2) | 2026-10-02, as recommended |
 | D7 | The draft contract is accepted, with a version rule for breaking changes: while the major version is 0, a breaking change to a stable surface bumps the minor version (0.2.0); additive and behavioral changes ship in patch releases | 2026-10-02. The draft left the number open; the rule is the one written in the ADR, not a quotation of the draft |
+| D8 | Python `ScanResult.findings` stays a `list` for 0.1.x (a new shallow list per read over cached `Finding` objects, from [#1077](https://github.com/redact-secret/redact-secret/issues/1077)); a `tuple` is a deliberate breaking change for a later minor version | Not part of the 2026-10-02 D1 to D7 acceptance. Recorded as the recommendation in the #1066 comment on #1077 (keep the list for 0.1.x), applied as the default; the owner can still choose the tuple before 0.1.0 as a deliberate pre-1.0 break |
 
 ## Outcome
 
@@ -300,6 +301,7 @@ All accepted by the owner on 2026-10-02, **as recommended** in this audit and in
 | Ruleset R1 to R5 (D1 to D3) | [#1182](https://github.com/redact-secret/redact-secret/issues/1182) |
 | Ruleset R6, reference fixture on every surface | [#1183](https://github.com/redact-secret/redact-secret/issues/1183) |
 | Documentation gaps, Python exception table, ruleset ADR facts | [#1185](https://github.com/redact-secret/redact-secret/issues/1185) |
+| Python `findings` decision (D8) | [`api-contract.md`](../../../reference/api-contract.md#frozen-behavior), item 9 of the compatibility ADR; implementation [#1077](https://github.com/redact-secret/redact-secret/issues/1077) |
 | The accepted contract text | [`api-contract.md`](../../../reference/api-contract.md#stable-contract-1) |
 | Decision records (R7 and the compatibility classes) | [`decision-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes`](../../../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md), [`decision-define-declarative-ruleset-revisioning`](../../../decisions/2026-10-02-define-declarative-ruleset-revisioning.md) |
 
@@ -311,6 +313,12 @@ Remaining, outside this record:
   [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
   and
   [`redact-secret/redact-secret-benchmarks#648`](https://github.com/redact-secret/redact-secret-benchmarks/issues/648).
+- `conformance/README.md` says a debug build of the adversarial runtime caps
+  gets 8 times the declared cap; `adversarial_bounds.rs` uses 32
+  (`DEBUG_RUNTIME_ALLOWANCE`). The contract cites the code. Editing the README
+  changes the conformance tree identity that benchmark and qualification
+  evidence is bound to, so it is left for a change that re-binds that
+  evidence. It is not part of the stable contract.
 - Binding the reliability contract to the candidate SHA
   ([`detection-reliability.md`](../../../reference/detection-reliability.md#binding-at-freeze)),
   which keeps its DRAFT marker until then.

@@ -146,6 +146,18 @@ the documented order; `redact` validates caller findings and replaces only
 output. Whole-input calls are bounded by default (64 MiB, 50,000 findings) and
 fail rather than truncate.
 
+**Python result objects.** `ScanResult` and `IncrementalResult` are immutable:
+they have no setters. `.text` is a `str`, and `.findings` is a `list` of
+`Finding` objects in input order. In 0.1.x each read of `ScanResult.findings`
+returns a new list that holds the same cached `Finding` objects, so reading it
+is cheap, mutating the list you got never affects the result or another read,
+and `Finding` cannot be mutated. Do not depend on whether two reads, or the
+elements of two reads, are the same object. The `list` type is part of the
+contract: changing `.findings` to a `tuple` (immutable, O(1) per read) would
+break callers that append, sort, test `isinstance(x, list)` or compare with a
+list, so it is a breaking change that needs a minor version bump. Callers in a
+hot loop read `.findings` once into a local variable.
+
 **Range units.** UTF-16 code units (JavaScript), Unicode code points
 (Python), UTF-8 bytes (Rust and CLI). Frozen per surface; the exported
 `RANGE_UNIT` names it.
