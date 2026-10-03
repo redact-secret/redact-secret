@@ -282,7 +282,8 @@ jobs:
           for version in "${{ matrix.python-floor }}" "${{ matrix.python-latest }}"; do
             docker run --rm -v "$PWD:/io" -w /io "python:${version}-alpine" sh -c '
               python3 -c "import tomllib" 2>/dev/null ||
-                pip install --quiet --disable-pip-version-check tomli
+                pip install --quiet --disable-pip-version-check \
+                  --require-hashes -r .github/requirements/tomli.txt
               python3 -B scripts/qualify-python-wheel.py --conformance dist/*.whl
             '
           done
