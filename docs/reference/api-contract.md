@@ -226,6 +226,74 @@ sanitized, incomplete prefix; the CLI never writes an unsanitized byte. The
 `--json` report keeps its field set (`version`, `rangeUnit`, `findingCount`,
 `sources`, `failures`) and may only add fields.
 
+### Completeness of `Ok`
+
+A *whole-input call* is one call that receives the entire input and returns
+once: Rust `scan`, `redact`, `scan_and_redact`, their `_with_limits` siblings
+and `sanitize`/`sanitize_with_profile`; JavaScript `scan`, `redact` and
+`scanAndRedact`; Python `scan`, `redact` and `scan_and_redact`; and a file path
+given to the CLI. This holds with or without a profile, a PII selection or a
+ruleset. The incremental API, the JavaScript stream adapters and CLI standard
+input are not whole-input calls; their own rule is the last row of the table.
+
+**`Ok` means complete inspection.** When a whole-input call returns a value
+(`Ok` in Rust, a returned value in JavaScript and Python, exit status `0` or
+`1` for a CLI check source, `0` for a CLI redaction), every detector of the
+registry the call selected has examined the whole normalized input, the policy
+ran on every selected finding, and every replacement was formatted and
+validated. Every other outcome is an error: `Err`, a thrown `SecretScanError`,
+a raised `SecretScanError` subclass, or CLI exit status `2`. There is no
+partial success, no "truncated" flag and no per-detector status in a result,
+and no error carries findings or redacted text beside it.
+
+This is part of the stable contract. Under the
+[compatibility ADR](../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md),
+changing what a documented value means is a breaking change, which bumps the
+minor version while the major version is 0. A future time budget, deadline or
+best-effort mode therefore has to be opt-in and additive, and it must not make
+a partial result look like `Ok`: it needs its own option and its own error
+code or result type. Consumers that treat `Ok` as the only completeness signal
+stay correct across 0.1.x.
+
+| Fact | Evidence |
+| --- | --- |
+| A limit breach fails the whole call and nothing is truncated. `max_input_bytes` is checked before any detection work; `max_findings` is checked after detection and before the policy runs, so a finding-limit breach also discards the redacted text rather than returning the first findings. | `WholeInputLimits::check_input` and `check_findings` (`crates/secret-scan-core/src/limits.rs`), `scan_with_limits` and `scan_and_redact_with_limits` (`src/pipeline.rs`). Tests: `an_input_one_byte_over_the_byte_bound_is_rejected_with_input_limit_exceeded`, `a_finding_count_one_over_the_bound_is_rejected_with_finding_limit_exceeded` (`tests/whole_input_limits.rs`); `input_limit_error_is_identical_and_not_truncated`, `finding_limit_error_is_identical` (`tests/sanitize_golden_path_1078.rs`); the Node, WebAssembly and Python bindings repeat the limit cases (`bindings/node/src/lib.rs`, `bindings/wasm/src/lib.rs`, `bindings/python/tests/test_whole_input_limits.py`). |
+| A detector failure, an invalid candidate, a policy failure, a placeholder failure and an invalid placeholder each fail the whole call with their own fixed code. A callback that throws or raises never yields `Ok`. | `collect_candidates`, `validate_candidate` (`src/pipeline.rs`); `redact_shifted_into` (`src/redact.rs`). Tests: `detector_failure_is_reported_with_a_fixed_code_and_no_payload`, `policy_failure_is_reported_with_a_fixed_code_and_no_payload`, `first_invalid_candidate_fails_the_whole_scan` (`tests/pipeline.rs`); `scan_and_redact_reports_the_error_of_whichever_stage_fails` (`tests/public_api.rs`); `bindings/python/tests/test_callback_failure.py`. |
+| An invalid ruleset, an invalid or unavailable PII selection, invalid limits and invalid input (such as a lone surrogate) are errors raised before any scan result exists. | `load_ruleset` (`src/ruleset.rs`), `PiiSelection::parse` (`src/pii.rs`), `WholeInputLimits::new` (`src/limits.rs`). Tests: `every_declared_rejection_class_is_reproduced` (`tests/ruleset_conformance.rs`); the `PiiSelectorUnsupported` and `PiiSelectorUnavailable` cases in `src/pii.rs`; `new_rejects_a_zero_max_input_bytes` (`tests/whole_input_limits.rs`); `a_malformed_ruleset_fails_the_whole_run_before_any_source_is_scanned` (`crates/secret-scan-cli/tests/cli.rs`). |
+| A detector is skipped only when the shared literal prefilter shows that none of the detector's declared required literals occurs in the input. Such a skip cannot change the result, so it does not weaken the statement above. | `collect_candidates` (`src/pipeline.rs`). Test: `tests/prefilter_soundness.rs` (debug builds only: every skipped detector is run and must propose nothing). |
+| No partial text is returned beside an error. The Rust return types carry a value or an error, never both. `redact` formats and validates every placeholder before it writes a byte, so a failing formatter leaves no partial output. The crate-internal `redact_into` leaves a caller-supplied buffer untouched on error; no public function takes an output buffer in 0.1.x. | `redact_shifted_into` (`src/redact.rs`, "Phase 1" and "Phase 2"). Test: `redact_into_appends_what_redact_returns_and_is_untouched_on_error` (`src/redact.rs`). |
+| `Ok` describes inspection, not the policy outcome. Under the default policy a `warn` or `allow` finding stays in the returned text, and a credential format no detector covers is not found. Check the actions of the findings to see what was replaced. | [Policy and safe integration](../guides/safe-integration.md#actions-are-decisions-your-host-consumes); [detection coverage](detection.md). |
+| CLI file sources follow the whole-input rule: a source that cannot be read, decoded or scanned contributes a failure and no findings, and a `--redact` run over a file writes nothing before the call returns `Ok`. In a multi-file check, sources that were scanned are still reported in full, and exit status `2` outranks `1`. A write failure during `--redact` (for example a closed pipe) can still leave a sanitized prefix on standard output. | `check_file`, `redact` (`crates/secret-scan-cli/src/modes.rs`). Tests: `a_malformed_file_fails_closed_and_is_not_scanned_in_part`, `a_failure_outranks_a_finding`, `a_closed_downstream_pipe_fails_the_run_instead_of_hanging` (`crates/secret-scan-cli/tests/cli.rs`). |
+| **Incremental sessions, stream adapters and CLI standard input are not whole-input calls.** A successful `append` returns the text and findings whose detection window has closed. They are sanitized and final, but the call says nothing about the rest of the input, and text held back is not yet released. Only a successful `finalize` means the session accepted the whole input; then the concatenated output and findings equal the whole-input result at every chunk partition. A later error leaves the earlier results released: that output is a sanitized, incomplete prefix, the session is `failed`, it discards retained plaintext and it rejects every further call. `abort`, and cancelling or aborting a stream adapter, discard retained text without finalizing and are never complete. A host that needs atomic output stages it until `finalize` succeeds. CLI standard input follows this rule, so a `--redact` failure on standard input can leave a sanitized prefix on standard output together with exit status `2`. | `IncrementalSanitizer::append`, `finalize`, `abort` (`src/incremental.rs`); `stream` (`crates/secret-scan-cli/src/modes.rs`). Tests: `ordinary_closed_lines_emit_immediately_without_finalize`, `a_failure_discards_retained_text_and_rejects_every_later_call`, `a_callback_that_fails_at_finalize_never_releases_the_retained_unit` (`tests/incremental.rs`); `tests/incremental_partitions.rs` for partition invariance. No test asserts the content of standard output after a failed `--redact` run on standard input. |
+
+### Cancellation and time bounds
+
+There is no cancellation, no deadline and no work budget in 0.1.x. This is the
+current contract, stated here so that no consumer has to infer it.
+
+| Fact | Evidence |
+| --- | --- |
+| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 54 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
+| Policy and formatter callbacks cannot act as a deadline. The policy runs only after detection has finished and the formatter only after the policy, so neither can cut detection short. A Rust custom `Detector` may return `DetectorFailure`, but that is the detector's own choice; the core never preempts it. | `scan_with_limits`, `scan_and_redact_with_limits` (`src/pipeline.rs`). |
+| `abort()` on an incremental session, and `cancel()` or `abort()` on a stream adapter, discard retained plaintext between calls. They cannot interrupt an `append` or `finalize` that is already running. | `IncrementalSanitizer::abort` (`src/incremental.rs`); `WebStreamSanitizer` (`packages/javascript/src/adapters/web-stream-core.ts`). Tests: `abort_rejects_every_later_call` (`tests/incremental.rs`), `packages/javascript/test/adapters/`. |
+| The only bounds are `max_input_bytes`, 64 MiB (67,108,864 bytes), and `max_findings`, 50,000. Both fail closed, as described in the previous section. They bound input size and finding count, not running time: the time a call takes depends on the host, the build, the profile, the PII selection, the ruleset and the content of the input. A CLI file source uses the same 64 MiB bound, and CLI standard input runs under the explicit incremental limits that `--help` lists. | `DEFAULT_MAX_INPUT_BYTES`, `DEFAULT_MAX_FINDINGS` (`src/limits.rs`); `crates/secret-scan-cli/src/limits.rs`. Tests: `default_matches_declared_constants` (`src/limits.rs`), the 50,001-finding and 64 MiB + 1 cases in `tests/sanitize_golden_path_1078.rs`. No test asserts the literal values 67,108,864 and 50,000. |
+| The repository does not publish a worst-case cost bound. The adversarial tier of the synchronous corpus declares, per fixture, `maxInputBytes`, `maxFindings` and `maxRuntimeMs`, and `tests/adversarial_bounds.rs` asserts them on the whole-input and the incremental path (an optimized build against the declared value, a debug build against 32 times it). At 0.1.0-beta.13 the declared runtime caps are 250 to 300 ms and the largest adversarial input is 337,521 bytes. These are test-only caps meant to catch superlinear blowup. They name no reference hardware, they can fail when the host is heavily loaded, and they say nothing about inputs near the 64 MiB ceiling. Do not read them as a per-byte or per-call guarantee. | `conformance/fixtures/synchronous-corpus.json`; `crates/secret-scan-core/tests/adversarial_bounds.rs`. |
+
+A host must therefore size `max_input_bytes` to the CPU time and memory it is
+willing to hold until a call really returns, and measure on its own hardware
+with its own profile and rulesets. A host that needs a hard deadline runs the
+scan where it can terminate the worker (a thread, a child process or a
+JavaScript worker), discards everything that worker produced and treats the
+request as failed. Dropping a promise, abandoning a future or timing out an
+await does not stop the scan or release what it holds. See
+[Policy and safe integration](../guides/safe-integration.md#completeness-limits-and-deadlines).
+
+Adding an opt-in cooperative cancel or deadline check is an additive change:
+it does not alter what `Ok` means, because a stopped call returns an error.
+Applying a default deadline or work budget to the existing calls is not
+additive, since correct calls would start to fail, and is a breaking change
+under the same ADR.
+
 ### Unsupported and experimental
 
 Not part of contract 1: custom detector callbacks in JavaScript or Python;

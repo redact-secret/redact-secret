@@ -91,6 +91,12 @@ fn main() -> Result<(), SecretScanError> {
 }
 ```
 
+An `Ok` from these calls means every detector of the registry inspected the
+whole input, and every error comes with no partial result. The calls cannot be
+cancelled and have no deadline; the limits above are the only bounds. See
+[Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
+[Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
+
 ## Detector profiles
 
 `DetectorRegistry::with_built_in` builds `full`: every built-in detector, and

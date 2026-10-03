@@ -144,6 +144,13 @@ const result = scanAndRedact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE", {
 console.log(result.text); // API_KEY=<SECRET_1>
 ```
 
+A returned value means every detector inspected the whole input; a thrown
+`SecretScanError` comes with no partial result. These calls are synchronous,
+cannot be cancelled and have no deadline, so a large input blocks the calling
+thread until it finishes. See
+[Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
+[Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
+
 ## Detector profiles
 
 `@redact-secret/core` is `full`: every built-in detector, and the default and
