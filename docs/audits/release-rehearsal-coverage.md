@@ -197,66 +197,67 @@ live dispatch:
   `test_source_commit_input_is_still_verified_as_an_ancestor`
 
 What unit tests cannot substitute for is a **live, deliberate** dispatch of
-`.github/workflows/reconcile-release.yml` against a real published version —
-this issue's second and third acceptance criteria explicitly ask for the
-workflow to have been run, not only its guard module. That has not been done
-as part of this branch: dispatching a GitHub Actions workflow against
-production release infrastructure is outside what this issue's implementation
-work does on its own judgment, and `Reconcile Release` specifically requires
-explicit authorization per `AGENTS.md` before every dispatch, repair or
-refusal alike.
+`.github/workflows/reconcile-release.yml` against a real published version.
+Those dispatches were authorized and run on 2026-10-03 against the Beta.13
+candidate (`401158d`); `Reconcile Release` still requires explicit
+authorization per `AGENTS.md` before every dispatch, repair or refusal alike.
 
-### Commands for the pending live exercise
+### Commands for the live exercise, as run
 
-Both use `rc/0.1.0-beta.5`, which is retained on the remote
-(`refs/heads/rc/0.1.0-beta.5`) and matches the beta.5 release that needed the
-recovery run. `gh run list --workflow=release.yml --branch rc/0.1.0-beta.5`
-finds the original Release run if `source_run` is needed (only when that
-run's manifest upload itself failed).
+Both dispatch from `main`, not an `rc/*` branch: the release ref guard
+(`scripts/check-release-refs.py`) rejects any ref other than `refs/heads/main`.
+Both target the published `0.1.0-beta.12`, whose
+Release run is [36844232498](https://github.com/redact-secret/redact-secret/actions/runs/36844232498)
+at source `4227160c4dac402d7add53d3f8fe990f693912c1`. That run's manifest
+upload failed, so the dry run needs `source_run` as well as `source_commit`.
 
 **1. Repair-without-republish, against a known-good published version.**
-`dry_run: true` computes and prints every artifact's reconciliation plan
-(skip, publish, or block) without publishing or tagging anything:
+`dry_run: true` computes every artifact's reconciliation plan without
+publishing or tagging anything:
 
 ```
 gh workflow run reconcile-release.yml \
-  --ref rc/0.1.0-beta.5 \
-  -f version=0.1.0-beta.5 \
+  --ref main \
+  -f version=0.1.0-beta.12 \
+  -f source_commit=4227160c4dac402d7add53d3f8fe990f693912c1 \
+  -f source_run=36844232498 \
   -f dry_run=true
 ```
 
-Expect every artifact to plan `skip` (already published at this version,
-matching the manifest) — a `publish` entry here would mean beta.5 has a gap
-this issue did not anticipate, and is itself a finding worth recording.
+Expected, and observed in [run 37093975420](https://github.com/redact-secret/redact-secret/actions/runs/37093975420):
+every artifact is already published and matches the revision's content
+("nothing to publish"), the tag and registry-install steps are skipped, and the
+run succeeds. A `publish` entry would be a finding worth recording.
 
-**2. The refusal case — a commit outside the RC branch's history.** Pick any
-commit that is not an ancestor of `rc/0.1.0-beta.5` (for example, a commit
-that exists only on this issue's own branch) and pass it as an explicit
-override:
+**2. The refusal case: a commit outside `main`'s history.** Pass any commit
+that is not an ancestor of the `main` tip (for example, a commit that exists
+only on a side branch) as the override:
 
 ```
 gh workflow run reconcile-release.yml \
-  --ref rc/0.1.0-beta.5 \
-  -f version=0.1.0-beta.5 \
-  -f source_commit=<a commit not reachable from rc/0.1.0-beta.5> \
+  --ref main \
+  -f version=0.1.0-beta.12 \
+  -f source_commit=<a commit not reachable from main> \
   -f dry_run=true
 ```
 
-Expect the `reconcile-guard.py` step to fail the run with `<source_commit> is
-not an ancestor of rc/0.1.0-beta.5` and no reconciliation plan to be computed
-— proving the guard fails closed live, not only under `unittest`.
+Expected, and observed in [run 37095965449](https://github.com/redact-secret/redact-secret/actions/runs/37095965449)
+with `6777f580dfed8e4a6895ccf6ce1538d731331fad`: `reconcile-guard.py` fails
+the run with `<sha> is not an ancestor of <main tip sha>` (there, `6777f580...
+is not an ancestor of 401158d09a677b110fa60209256ba184b1f08f8f`), no plan is
+computed, and the later steps are skipped, proving the guard fails closed live
+and not only under `unittest`.
 
-Both commands require whoever runs them to be authorized for the `release`
-GitHub Environment this workflow deploys against, and both should be recorded
-(run URL, inputs, and outcome) once run, per this issue's second acceptance
-criterion.
+Both commands need whoever runs them to be authorized for the `release` GitHub
+Environment this workflow deploys against, and both are recorded (run URL,
+inputs, outcome) in the [readiness checklist](../releases/release-readiness-v0.1.0.md).
 
 ## Mapping to #530's acceptance criteria
 
 | Criterion | Status |
 | --- | --- |
 | The rehearsal covers the three beta.5 failure modes, and #527/#528/#529's fixes are validated on it | Partially closed by this change: the #527/#528 digest-check property is now rehearsed for every artifact class where that is possible without a real publish (node-addon, browser/browser-common, python-wheel/python-sdist). The crate digest check and the propagation-delay behavior remain provably out of the no-publication rehearsal's reach for the reasons stated above; #529's propagation fix is covered instead at the unit-test level. |
-| `Reconcile Release` run at least once deliberately, with authorization, recorded | Not done on this branch — pending explicit authorization; commands above. |
-| Reconcile's refusal behavior verified live (not just unit-tested) | Not done on this branch — pending explicit authorization; commands above. Deterministic coverage of the same logic already exists (`test_non_ancestor_commit_is_rejected`). |
+| `Reconcile Release` run at least once deliberately, with authorization, recorded | Done on 2026-10-03: [run 37093975420](https://github.com/redact-secret/redact-secret/actions/runs/37093975420), authorized, recorded above. |
+| Reconcile's refusal behavior verified live (not just unit-tested) | Done on 2026-10-03: [run 37095965449](https://github.com/redact-secret/redact-secret/actions/runs/37095965449) failed closed with the ancestor message. Deterministic coverage of the same logic already exists (`test_non_ancestor_commit_is_rejected`). |
 | Gaps the rehearsal cannot cover are written down | Done — this document, "What the rehearsal cannot cover, and why". |
 | Nothing in this work selects a version, tags, publishes, or deploys; any reconcile run requires explicit authorization | Satisfied — this branch adds only local, no-registry checks to a workflow that was already publish-free, and performs no live dispatch of any kind. |
