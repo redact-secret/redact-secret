@@ -121,6 +121,13 @@ result = redact_secret.scan_and_redact(
 assert result.text == "API_KEY=<SECRET_1>"
 ```
 
+A returned value means every detector inspected the whole input; a raised
+`SecretScanError` comes with no partial result. These calls cannot be
+cancelled and have no deadline. They release the GIL while they scan but do not
+check for signals, so use a child process if you need to stop one. See
+[Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
+[Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
+
 ## Incremental input and packaging
 
 Python provides working bounded incremental sessions. See the complete

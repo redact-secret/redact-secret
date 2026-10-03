@@ -74,7 +74,49 @@ Incremental APIs require explicit limits but may emit a prefix before a later
 failure. Stage output until successful finalization when a downstream operation
 must be atomic. Do not independently scan chunks.
 
-## Extension trust
+## Completeness, limits and deadlines
+
+The contract behind this section is in
+[Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
+[Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
+
+- **Fail closed on any error.** A whole-input call that returns a value has
+  inspected the whole input with every detector of the registry you selected.
+  Any error, whatever its code, means no result exists: no findings and no
+  redacted text come with it. Reject, drop or quarantine the input. Treat an
+  unknown error code as a failure too, because the set of codes grows.
+- **Treat only a returned value as completeness.** Do not infer it from an
+  empty findings list, from a timeout, from a log line, or from a client that
+  says it already scanned. A value is complete inspection, not proof that
+  nothing sensitive remains: `warn` and `allow` findings stay in the text, and
+  a format no detector covers is not found.
+- **Do not retry with partial output.** Never fall back to the raw input, to a
+  truncated input, to a `common` profile run after a `full` run failed, or to
+  findings gathered before the failure. A retry that you accept must run the
+  same scan over the same whole input and be judged by the same rule.
+- **Do not reuse an incremental prefix as a result.** An incremental session, a
+  stream adapter and the CLI on standard input can release sanitized text
+  before a later failure. Stage that output and publish it only after
+  `finalize` succeeds (or the CLI exits `0`).
+- **Size limits to the capacity you will hold.** Version 0.1.x has no
+  cancellation, deadline or work budget, so a started scan holds its CPU and
+  memory (the input, a normalized copy, the candidates and the output) until
+  it really returns. The 64 MiB and 50,000-finding defaults are a ceiling, not
+  a plan. Set `max_input_bytes` and `max_findings` from the CPU time and
+  memory you are willing to spend per request, and measure that on your own
+  hardware with your own profile, PII selection and rulesets. The repository
+  publishes no per-byte cost bound; its adversarial runtime caps are
+  test-only.
+- **Run where you can terminate the worker if you need a hard deadline.** Put
+  the scan on a thread, child process or JavaScript worker that you can
+  terminate, bound the number of scans in flight, and discard everything the
+  worker produced when you terminate it. Timing out an `await`, dropping a
+  future or abandoning a promise leaves the scan running and holding its
+  resources. In Python a thread cannot be killed; use a child process for a
+  hard deadline.
+- **Do not scan on a latency-critical thread.** A call blocks its caller for
+  as long as it runs, including a JavaScript event loop or an async reactor.
+  Move large inputs to a separate worker.
 
 Policy and formatter callbacks receive safe metadata, not plaintext. They are
 trusted application code, not a sandbox: a closure can still capture raw input.

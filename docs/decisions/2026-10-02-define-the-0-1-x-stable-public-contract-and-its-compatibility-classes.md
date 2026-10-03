@@ -80,6 +80,13 @@ this record decides the policy that section relies on.
    field is not part of 0.1.x; an additive optional field may follow later.
 8. **Coverage is outside the contract.** Which credentials are found is the
    support matrix's, not this contract's.
+9. **Python `findings` is a `list`.** `ScanResult.findings` stays a `list` for
+   0.1.x. Since #1077 each read returns a shallow copy of one cached list, so
+   it costs microseconds instead of cloning every finding, and no caller code
+   changes. Identity of the list or of its elements across reads is not
+   promised. Moving to an immutable `tuple` is a deliberate breaking change,
+   to be made only with a minor version bump if `ScanResult` is later judged
+   to need strict immutability.
 
 ## Trade-offs
 
@@ -98,6 +105,11 @@ Rejected alternatives:
   promise a status the CLI cannot always deliver
   ([#1130](../audits/evidence/1130/README.md)).
 - Freeze the finding `type` set. Detector coverage grows.
+- Change Python `ScanResult.findings` to a `tuple` now. It would give O(1)
+  reads and enforced immutability, but it breaks `append`, `sort`,
+  `isinstance(x, list)` and `== [...]`, and the shallow-copy list already
+  removed the cost that motivated it (49,000 findings: about 0.2 to 0.7 ms per
+  read, down from 15 to 19 ms).
 
 ## Consequences
 

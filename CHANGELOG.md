@@ -44,6 +44,30 @@ evidence is linked from each published version.
   published by `Reconcile Release`. See
   [Verifying releases](SECURITY.md#verifying-releases).
 
+- Documentation only, no behavior change (#1066): the stable contract states
+  that Python `ScanResult.findings` stays a `list` in 0.1.x (a new list per
+  read over cached `Finding` objects; a `tuple` would be a breaking change),
+  and records the decision in the compatibility ADR. See
+  [Frozen behavior](docs/reference/api-contract.md#frozen-behavior).
+
+- Documentation only, no behavior change (#1179, #1177): the stable contract
+  now states two facts a consumer can rely on. A whole-input call that returns
+  a value (Rust `scan`, `redact`, `scan_and_redact` and `sanitize*`;
+  JavaScript, Python and the CLI file path) has run every detector of the
+  selected registry over the whole input, and every limit, detector, policy,
+  placeholder, ruleset, PII-selection or input failure is an error with no
+  partial findings or text returned beside it. The incremental API, stream
+  adapters and CLI standard input have their own stated rule: only a
+  successful `finalize` is complete, and an earlier `append` result may be a
+  released prefix. Whole-input calls cannot be cancelled and have no deadline
+  or work budget in 0.1.x; `max_input_bytes` (64 MiB) and `max_findings`
+  (50,000) are the only bounds, and no worst-case running time is published.
+  A future time budget, deadline or best-effort mode must be opt-in and must
+  not make a partial result look like a returned value. See
+  [Completeness of `Ok`](docs/reference/api-contract.md#completeness-of-ok),
+  [Cancellation and time bounds](docs/reference/api-contract.md#cancellation-and-time-bounds)
+  and [Policy and safe integration](docs/guides/safe-integration.md#completeness-limits-and-deadlines).
+
 ## 0.1.0-beta.12 — 2026-10-01
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.12/README.md).

@@ -66,6 +66,13 @@ output. Standard output may then hold a sanitized but incomplete prefix; the
 CLI never writes an unsanitized byte
 ([measured](../audits/evidence/1130/README.md)).
 
+A path is a whole-input call, so exit `0` or `1` for it means every detector
+inspected the whole file; standard input is incremental, so a failed
+`--redact` run can leave a sanitized prefix. The CLI has no timeout or
+cancellation option. See
+[Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
+[Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
+
 Check mode flags **any** finding, including `warn` and `allow`. Redact mode
 replaces only `redact` and `block` spans under the default policy, so successful
 redaction does not guarantee that every detected range was removed.

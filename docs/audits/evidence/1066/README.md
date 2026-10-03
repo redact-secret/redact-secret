@@ -291,6 +291,7 @@ All accepted by the owner on 2026-10-02, **as recommended** in this audit and in
 | D5 | `#[non_exhaustive]` on `SecretScanErrorCode` and `Profile` (LB1); `Action`, `Confidence` and `Specificity` stay exhaustive by design | 2026-10-02, as recommended |
 | D6 | `max*Bytes` additive aliases for the JavaScript incremental limits (LB2) | 2026-10-02, as recommended |
 | D7 | The draft contract is accepted, with a version rule for breaking changes: while the major version is 0, a breaking change to a stable surface bumps the minor version (0.2.0); additive and behavioral changes ship in patch releases | 2026-10-02. The draft left the number open; the rule is the one written in the ADR, not a quotation of the draft |
+| D8 | Python `ScanResult.findings` stays a `list` for 0.1.x (a new shallow list per read over cached `Finding` objects, from [#1077](https://github.com/redact-secret/redact-secret/issues/1077)); a `tuple` is a deliberate breaking change for a later minor version | Not part of the 2026-10-02 D1 to D7 acceptance. Recorded as the recommendation in the #1066 comment on #1077 (keep the list for 0.1.x), applied as the default; the owner can still choose the tuple before 0.1.0 as a deliberate pre-1.0 break |
 
 ## Outcome
 
@@ -300,6 +301,7 @@ All accepted by the owner on 2026-10-02, **as recommended** in this audit and in
 | Ruleset R1 to R5 (D1 to D3) | [#1182](https://github.com/redact-secret/redact-secret/issues/1182) |
 | Ruleset R6, reference fixture on every surface | [#1183](https://github.com/redact-secret/redact-secret/issues/1183) |
 | Documentation gaps, Python exception table, ruleset ADR facts | [#1185](https://github.com/redact-secret/redact-secret/issues/1185) |
+| Python `findings` decision (D8) | [`api-contract.md`](../../../reference/api-contract.md#frozen-behavior), item 9 of the compatibility ADR; implementation [#1077](https://github.com/redact-secret/redact-secret/issues/1077) |
 | The accepted contract text | [`api-contract.md`](../../../reference/api-contract.md#stable-contract-1) |
 | Decision records (R7 and the compatibility classes) | [`decision-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes`](../../../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md), [`decision-define-declarative-ruleset-revisioning`](../../../decisions/2026-10-02-define-declarative-ruleset-revisioning.md) |
 
@@ -311,6 +313,12 @@ Remaining, outside this record:
   [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
   and
   [`redact-secret/redact-secret-benchmarks#648`](https://github.com/redact-secret/redact-secret-benchmarks/issues/648).
+- `conformance/README.md` says a debug build of the adversarial runtime caps
+  gets 8 times the declared cap; `adversarial_bounds.rs` uses 32
+  (`DEBUG_RUNTIME_ALLOWANCE`). The contract cites the code. Editing the README
+  changes the conformance tree identity that benchmark and qualification
+  evidence is bound to, so it is left for a change that re-binds that
+  evidence. It is not part of the stable contract.
 - Binding the reliability contract to the candidate SHA
   ([`detection-reliability.md`](../../../reference/detection-reliability.md#binding-at-freeze)),
   which keeps its DRAFT marker until then.
@@ -324,3 +332,86 @@ architectures (Linux, Windows, x86-64, musl), Node.js 20 and 24, or Python 3.10
 to 3.13. "Stable" therefore means the audited source surface is coherent and
 documented, not that every shipped artifact on every platform has been shown to
 match it. That claim waits for the #199 run against the candidate artifacts.
+
+## Addendum (#1179, #1177)
+
+Documentation only. Two consumer requests from
+[`redact-secret/gateway#5`](https://github.com/redact-secret/gateway/issues/5)
+(issues [#1179](https://github.com/redact-secret/redact-secret/issues/1179)
+and [#1177](https://github.com/redact-secret/redact-secret/issues/1177)) were
+added to the accepted contract on 2026-10-02 for Beta.13:
+[Completeness of `Ok`](../../../reference/api-contract.md#completeness-of-ok) and
+[Cancellation and time bounds](../../../reference/api-contract.md#cancellation-and-time-bounds).
+No Rust, TypeScript, Python, workflow, fixture or test file changed, so the
+released source and its benchmark and qualification evidence still describe the
+same code. Each fact below was read in the source at the commit this addendum
+was written against (`origin/main` `0027da0b`), not copied from the issues.
+
+### What was verified, and the test that pins it
+
+| Fact | Pinned by |
+| --- | --- |
+| Whole-input `Ok` runs every selected detector over the whole normalized input; a detector failure fails the call | `detector_failure_is_reported_with_a_fixed_code_and_no_payload`, `first_invalid_candidate_fails_the_whole_scan` (`crates/secret-scan-core/tests/pipeline.rs`) |
+| A literal-prefilter skip is exact, so "every detector ran" holds in effect | `crates/secret-scan-core/tests/prefilter_soundness.rs`, debug builds only |
+| `max_input_bytes` and `max_findings` breaches are errors for `scan`, `redact`, `scan_and_redact` and `sanitize*`, with nothing truncated | `tests/whole_input_limits.rs`, `tests/sanitize_golden_path_1078.rs`; Node, WebAssembly and Python limit tests in `bindings/node/src/lib.rs`, `bindings/wasm/src/lib.rs`, `bindings/python/tests/test_whole_input_limits.py` |
+| Policy failure and placeholder failure fail `scan_and_redact` | `scan_and_redact_reports_the_error_of_whichever_stage_fails` (`tests/public_api.rs`); `bindings/python/tests/test_callback_failure.py` |
+| Placeholders are formatted and validated before any output byte is written; the internal output buffer is untouched on error | `redact_into_appends_what_redact_returns_and_is_untouched_on_error`, `arbitrary_finding_order_matches_the_always_sorting_oracle` (`src/redact.rs`) |
+| An incremental failure enters `failed`, discards retained text and rejects every later call; closed lines are released before `finalize` | `a_failure_discards_retained_text_and_rejects_every_later_call`, `ordinary_closed_lines_emit_immediately_without_finalize`, `a_callback_that_fails_at_finalize_never_releases_the_retained_unit` (`tests/incremental.rs`) |
+| Finalized incremental output equals the whole-input result at every partition | `tests/incremental_partitions.rs` |
+| CLI file sources report nothing for a source that fails; the exit status is `2` and outranks `1`; a closed pipe fails the run | `a_malformed_file_fails_closed_and_is_not_scanned_in_part`, `a_failure_outranks_a_finding`, `a_closed_downstream_pipe_fails_the_run_instead_of_hanging` (`crates/secret-scan-cli/tests/cli.rs`) |
+| The adversarial runtime caps exist and are asserted in tests only | `crates/secret-scan-core/tests/adversarial_bounds.rs` over the adversarial tier of `conformance/fixtures/synchronous-corpus.json` |
+
+Read from source, not from an issue: no public function takes a cancellation
+token, deadline or budget on any surface; JavaScript `scan`, `redact` and
+`scanAndRedact` are synchronous; the stream adapters' `cancel()` and `abort()`
+only discard retained text between chunks; Python's `scan` releases the GIL
+and never polls for signals.
+
+### Guarantees with no pinning test
+
+These statements are true in the code today, but no test would fail if they
+changed. They are now stated in the contract; adding a test for each is a
+separate decision.
+
+- The literal defaults, 64 MiB (67,108,864 bytes) and 50,000 findings. Tests tie
+  `WholeInputLimits::default()` to the constants and fail at 50,001 findings
+  and at `DEFAULT_MAX_INPUT_BYTES + 1`, but none asserts the numbers.
+- The absence of a cancellation, deadline or budget parameter. The public
+  names and signatures are pinned (`tests/public_api.rs`,
+  `packages/javascript/test/exact-exports.test.ts`, `type-contracts.ts`,
+  Python `__all__`), so adding a parameter would show up as an API change, but
+  no test asserts the absence by name.
+- Content of standard output after a failed `--redact` run on standard input.
+  `malformed_input_fails_closed_in_redact_mode_too` asserts the exit status
+  and the diagnostic only. The "sanitized prefix, never an unsanitized byte"
+  statement rests on `modes.rs` and the `1130` measurement.
+- Empty standard output after a failed `--redact` run on a file. The code
+  writes only after `scan_and_redact` returns `Ok`; no CLI test covers a
+  `--redact` failure of a file.
+- The prefilter's exactness in release builds. The assertion compiles out
+  there.
+- The JavaScript and WebAssembly "a thrown error carries no result" behavior.
+  The Rust binding tests assert the error status of a failing call; this
+  audit found no end-to-end JavaScript test that inspects what a failing call
+  returned.
+
+### Differences from the issue text
+
+- `scan_and_redact_into` does not exist, and `redact_into` is `pub(crate)`.
+  The "buffer is untouched on error" property holds for the internal function
+  only; no public function takes an output buffer in 0.1.x.
+- JavaScript has no `sanitize` function; `sanitize` and `sanitize_with_profile`
+  are Rust only.
+- The `sanitize*` functions take a profile but no PII selection or ruleset;
+  those need a registry and `scan_and_redact`.
+- "Every detector ran" is exact only through the literal prefilter, which skips
+  a detector whose declared required literals are absent.
+- The CLI is not wholly whole-input: a file path is, standard input is an
+  incremental session, so a failed redaction of standard input can leave a
+  sanitized prefix on standard output.
+- The adversarial runtime caps name no reference hardware (the issue says
+  "stated hardware"). `conformance/README.md` says a debug build is held to 8
+  times the declared cap; `adversarial_bounds.rs` uses 32
+  (`DEBUG_RUNTIME_ALLOWANCE`). The contract cites the code. The README line
+  was not edited here because `conformance/` is outside this documentation-only
+  change.
