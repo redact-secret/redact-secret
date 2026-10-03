@@ -299,11 +299,29 @@ freeze candidate to name the case; that is
 
 ### Owner decisions applied
 
+> **Pin correction (2026-10-02).** The revisions quoted in items 1 and 3 below
+> are historical: `e8f73bfd7241845ef9fb75574a72b135aa777ba6` (benchmarks) and
+> `4227160c4dac` (product, `0.1.0-beta.12`) were the pins when this audit was
+> written (source `57a0dca9`, Beta.12 cycle) and are superseded. The current
+> public counts are generated from benchmarks revision
+> `573e128863e0543133e5ccbd513216d19513b7da`, measuring product commit
+> `fe6e9234d40e7d5964de27d00d33544f9c621dbf` (`0.1.0-beta.13`); read the live
+> values in [`docs/support-matrix.md`](../../../support-matrix.md) ("Identity of
+> the counts above"), not from this record. The PII family statuses are **not**
+> re-qualified on the Beta.13 candidate: they stay bound to the Beta.11
+> qualification (core `8b6a5fde52ecb4dfce13f09c7a947062d21483c7`, epoch
+> `17dae942ee4b`; `piiQualification` state `not-requalified`) until
+> [`redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
+> and
+> [`redact-secret-benchmarks#667`](https://github.com/redact-secret/redact-secret-benchmarks/issues/667)
+> run on the candidate. This record is otherwise frozen as written.
+
 1. Public counts quote the benchmarks revision that generated the matrix
-   (`e8f73bfd7241845ef9fb75574a72b135aa777ba6`); the two other vendored
+   (then `e8f73bfd7241845ef9fb75574a72b135aa777ba6`, historical as of
+   Beta.12); the two other vendored
    revisions (`pin-source.json`, `pin-manifest.json`) are stated separately and
    labeled as not having produced the statuses.
-2. PII statuses stay hand-written and gated until
+2. PII statuses stay gated (not re-qualified on Beta.13, see the correction above) until
    [`redact-secret/redact-secret-benchmarks#647`](https://github.com/redact-secret/redact-secret-benchmarks/issues/647)
    lands (see above).
 3. `scripts/generate-support-matrix-docs.py` now emits, in the README
@@ -314,7 +332,8 @@ freeze candidate to name the case; that is
    `e8f73bfd7241` over 5950 fixtures; code shipped after the measured build is
    not covered by these statuses. This source ships 110 credential detectors,
    all of them mapped to at least one family. The opt-in PII families are
-   outside this count and outside the matrix". The matrix page also gets an
+   outside this count and outside the matrix" (the Beta.12 wording; Beta.13 now reads
+   `fe6e9234d40e` / `573e128863e0` over the same 5950 fixtures). The matrix page also gets an
    "Identity of the counts above" list with the full revisions, the corpus
    digest and the other vendored revisions. Tests:
    `IdentitySentenceTests` and the real-repo reconciliation tests in
