@@ -1256,8 +1256,8 @@
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "4912746791c7a2f8": {
-      "line": 338,
+    "b379308c79fac501": {
+      "line": 339,
       "path": ".github/workflows/python-wheels.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
