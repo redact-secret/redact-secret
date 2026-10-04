@@ -1576,6 +1576,62 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || (form == ValueForm::Unquoted && is_credential_variable_name_value(value))
         || is_reverse_dns_identifier(value)
         || is_composite_with_placeholder_secret_part(value)
+        || is_terraform_sensitive_marker(value)
+        || is_pem_framed_placeholder(value)
+}
+
+/// The value Terraform prints in a plan or apply for an attribute it
+/// withholds (`password = (sensitive value)`): a marker, not a credential
+/// (issue #1203). Matched exactly, so `(sensitive value) x` and a real value
+/// glued to it stay as before. FN cost: none, no issued secret is this text.
+const TERRAFORM_SENSITIVE_MARKER: &str = "(sensitive value)";
+
+fn is_terraform_sensitive_marker(value: &str) -> bool {
+    value == TERRAFORM_SENSITIVE_MARKER
+}
+
+/// `true` for a PEM frame whose body is a placeholder rather than key
+/// material: the lines between `-----BEGIN <label>-----` and
+/// `-----END <label>-----` (real or `\n`-escaped line breaks removed) are
+/// one `UPPER_SNAKE` credential variable name (`PRIVATE_KEY`) or an
+/// instructional placeholder (`YOUR_API_KEY`). This is the documented
+/// service-account key file template (`"private_key": "-----BEGIN PRIVATE
+/// KEY-----\nPRIVATE_KEY\n-----END PRIVATE KEY-----\n"`, issue #1203). A
+/// real body is base64 and is never a credential variable name, and a body
+/// with one word off the lists stays reported. FN cost: a real private key
+/// whose entire base64 body spells such a name, which the encoding never
+/// produces.
+fn is_pem_framed_placeholder(value: &str) -> bool {
+    let Some(rest) = value.strip_prefix("-----BEGIN ") else {
+        return false;
+    };
+    let Some(header_end) = rest.find("-----") else {
+        return false;
+    };
+    let after_header = &rest[header_end + 5..];
+    let Some(footer_start) = after_header.rfind("-----END ") else {
+        return false;
+    };
+    let footer = &after_header[footer_start + 9..];
+    let Some(footer_end) = footer.find("-----") else {
+        return false;
+    };
+    let separators_only = |text: &str| {
+        text.replace("\\r", "")
+            .replace("\\n", "")
+            .chars()
+            .all(char::is_whitespace)
+    };
+    if !separators_only(&footer[footer_end + 5..]) {
+        return false;
+    }
+    let body = after_header[..footer_start]
+        .replace("\\r", "")
+        .replace("\\n", "");
+    let body = body.trim();
+    !body.is_empty()
+        && !body.contains(char::is_whitespace)
+        && (is_credential_variable_name_value(body) || is_instructional_token_placeholder(body))
 }
 
 /// Final segments that make an `UPPER_SNAKE` identifier the *name* of a
@@ -2296,6 +2352,12 @@ fn scan_backtick_delimiter(input: &str, start: usize) -> Option<usize> {
 /// embedded in a larger value) is rejected here and falls through to the
 /// generic scan below, which captures it whole and leaves it detected.
 fn delimited_reference_value(input: &str, start: usize) -> Option<(usize, usize)> {
+    if input[start..].starts_with(TERRAFORM_SENSITIVE_MARKER) {
+        let end = start + TERRAFORM_SENSITIVE_MARKER.len();
+        if is_unquoted_value_boundary(char_at(input, end)) {
+            return Some((start, end));
+        }
+    }
     for opener in DELIMITED_REFERENCE_OPENERS {
         if input[start..].starts_with(opener.open) {
             let end = scan_nested_delimiter(

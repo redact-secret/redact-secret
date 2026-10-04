@@ -464,7 +464,8 @@ const PLACEHOLDER_CREDENTIAL_WORDS: &[&str] = &[
 /// `replace-with-your-mistral-key`). A closed list of the AI-inference and
 /// developer-credential providers the built-in detectors name, not a
 /// vocabulary. Issue #774; `convex` and `fal` were added with their exact
-/// credential names in issue #919 (`FAL_KEY=your_fal_key`). Since issue
+/// credential names in issue #919 (`FAL_KEY=your_fal_key`); `exa` was added
+/// in issue #1203 (`EXA_API_KEY=your_exa_api_key_here`). Since issue
 /// #993 every provider segment of `generic-token`'s rule-2 list
 /// ([`is_placeholder_provider_word`]) also counts (`YOUR_MAILGUN_API_KEY`,
 /// `your-travis-api-token`); a provider outside both lists
@@ -478,6 +479,7 @@ const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
     "deepgram",
     "deepseek",
     "elevenlabs",
+    "exa",
     "fal",
     "fireworks",
     "gemini",
