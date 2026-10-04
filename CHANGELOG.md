@@ -15,6 +15,12 @@ evidence is linked from each published version.
   first quote, and the host never contains one. The trade-off is a
   false-positive risk for an unquoted URL followed directly by `'` and an
   unrelated `x@y` with no whitespace between them.
+- `generic-token` no longer reports Terraform's `(sensitive value)` marker (for
+  example `password = (sensitive value)` in a plan or apply), a PEM frame whose
+  whole body is a placeholder name such as the documented service-account
+  template's `PRIVATE_KEY`, or `EXA_API_KEY=your_exa_api_key_here` (#1203). Each
+  exclusion is exact; a real value next to the marker, a base64 PEM body, and a
+  placeholder glued to random material are still reported.
 
 ### Documented scope
 
@@ -24,6 +30,13 @@ evidence is linked from each published version.
   `decision-define-fragmented-credentials-as-outside-the-raw-input-contract`).
   The 16 SendGrid fragment and 49 encoded-carrier evidence failures from
   `snapshot-2026.10.04.3` are this scope, not a beta.13 regression.
+- The core declares no `netrc`, kubeconfig, session-cookie, Azure SAS, S3-presigned
+  or GCS-signed-URL family; `Authorization: Basic` is claimed without decoding;
+  a private key block ends at its footer; an AWS access key id is redacted; and
+  a literal under a credential name that is not random is `warn`. These are the
+  24 base cases behind the 82 open root causes of #1203
+  (`decision-settle-the-open-structured-file-url-carrier-and-control-roots-of-1203`),
+  not a beta.13 regression.
 
 ## 0.1.0-beta.13 — 2026-10-03
 
