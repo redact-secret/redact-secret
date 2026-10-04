@@ -190,10 +190,29 @@ fn is_authority_terminator(byte: u8) -> bool {
 /// Scans forward from `start` for the end of the authority, bounded by
 /// [`MAX_AUTHORITY_LENGTH`]. Returns `None` when the bound is exceeded before
 /// a terminator or the end of input is reached.
-fn authority_end(input: &str, start: usize) -> Option<usize> {
+///
+/// A single quote is one of [`is_authority_terminator`]'s bytes because it
+/// usually closes a quoted URL. RFC 3986 also allows `'` as an unencoded
+/// userinfo sub-delimiter ([`is_userinfo_char`]), so it is a literal password
+/// byte, not a terminator, only when both hold: the scheme was not opened by
+/// a quote immediately before it (`opened_by_single_quote`), and no `@` has
+/// ended the userinfo yet (the host never contains `'`). A URL that a `'`
+/// opened keeps closing at the first `'`, so a quoted URL list such as
+/// `['mysql://u:p','a@b.example']` does not read as one authority (issue
+/// #1201).
+fn authority_end(input: &str, start: usize, opened_by_single_quote: bool) -> Option<usize> {
     let bytes = input.as_bytes();
     let mut end = start;
-    while end < bytes.len() && !is_authority_terminator(bytes[end]) {
+    let mut in_userinfo = true;
+    while end < bytes.len() {
+        let byte = bytes[end];
+        let literal_quote = byte == b'\'' && in_userinfo && !opened_by_single_quote;
+        if is_authority_terminator(byte) && !literal_quote {
+            break;
+        }
+        if byte == b'@' {
+            in_userinfo = false;
+        }
         if end - start >= MAX_AUTHORITY_LENGTH {
             return None;
         }
@@ -764,7 +783,11 @@ impl Detector for ConnectionStringDetector {
             }
 
             let user_info_start = scheme_match.end;
-            let Some(authority_stop) = authority_end(input, user_info_start) else {
+            let opened_by_single_quote =
+                scheme_match.start > 0 && input.as_bytes()[scheme_match.start - 1] == b'\'';
+            let Some(authority_stop) =
+                authority_end(input, user_info_start, opened_by_single_quote)
+            else {
                 continue;
             };
             let authority = &input[user_info_start..authority_stop];

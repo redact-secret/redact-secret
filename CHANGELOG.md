@@ -5,6 +5,26 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Fixed
+
+- `connection-string` reports the whole password of a URI whose userinfo
+  password contains an unencoded single quote (#1201). RFC 3986 allows `'`
+  there and the grammar already accepted it, but the authority scan ended at
+  every `'`, so `amqp://worker:Qv4!$&'()*+,;=Nz7@host` produced no finding. A
+  URL opened by a quote immediately before its scheme still closes at the
+  first quote, and the host never contains one. The trade-off is a
+  false-positive risk for an unquoted URL followed directly by `'` and an
+  unrelated `x@y` with no whitespace between them.
+
+### Documented scope
+
+- A credential cut by a line break, string-literal operator, line continuation
+  or escaped newline is outside the raw-input contract, as base64 and hex
+  carriers already are (#1199, #1200;
+  `decision-define-fragmented-credentials-as-outside-the-raw-input-contract`).
+  The 16 SendGrid fragment and 49 encoded-carrier evidence failures from
+  `snapshot-2026.10.04.3` are this scope, not a beta.13 regression.
+
 ## 0.1.0-beta.13 — 2026-10-03
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.13/README.md).

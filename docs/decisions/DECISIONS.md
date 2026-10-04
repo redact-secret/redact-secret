@@ -47,6 +47,7 @@ Current rules: `docs/specs/engine.md`.
 - [Define the plaintext memory-lifetime contract as copy minimization and bounded retention, with no erasure claim](2026-09-30-define-the-plaintext-memory-lifetime-contract.md)
 - [Define declarative ruleset revisioning and the revision 1 freeze](2026-10-02-define-declarative-ruleset-revisioning.md)
 - [Define the 0.1.x stable public contract and its compatibility classes](2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md)
+- [Define a credential fragmented across lines, literals or continuations as outside the raw-input contract](2026-10-04-define-fragmented-credentials-as-outside-the-raw-input-contract.md)
 
 ## Distribution
 
