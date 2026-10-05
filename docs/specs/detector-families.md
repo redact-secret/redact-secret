@@ -1372,6 +1372,27 @@ body is 24 or more bytes of the body alphabet, for example a snake_case
 variable name; no real-world collision is known. Cost: 15 prefixes on the
 shared known-format scan.
 
+## Batch 1 credential slots (#1209 to #1213)
+
+Five bounded credential carriers from the credential-evidence adoption
+inventory ([#232](https://github.com/redact-secret/credential-evidence/issues/232)),
+measured against the independent
+[benchmarks#717 corpus](https://github.com/redact-secret/redact-secret-benchmarks/blob/14271c7e85ad9300e100c6a4b5e33105e7429166/evidence/717/report.md).
+Each row applies the existing contextual and authorization policy to one
+documented slot. None adds a provider detector, a registry entry, a bare-prefix
+grammar, decoding, a width or alphabet claim, or a provider subtype from a
+shared carrier; the finding is the generic `contextual_secret` or
+`authorization_credential`, redacted by default. Provider documentation
+establishes the slot and role, never a universal byte shape. The accepted
+false-positive tradeoff is the contextual-policy one: a non-secret literal put
+into the exact credential slot is redacted by default; unsupported layouts,
+excluded values and values under the 8-byte contextual floor are documented
+false negatives.
+
+| Family | Applied rule | Evidence |
+| --- | --- | --- |
+| `figma:personal-access-token` | The explicit `X-Figma-Token` header value (raw HTTP, quoted curl `-H`, JSON header map) is `contextual_secret`, redacted, spanning the value only, with no PAT subtype, no `figd_`/`figp_` grammar and no width claim; it was already covered through the prefixed `_token` name rule. Since #1209 `figma` is a placeholder provider word, so `YOUR_FIGMA_TOKEN` is silent. `X-Figma-Token-Id`, suffixed names, references, masks, public ids and a newline-separated value stay silent. | [#1209](../audits/evidence/1209/README.md) |
+
 ## Rules
 
 | Rule | Governing ADR |

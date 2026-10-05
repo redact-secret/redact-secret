@@ -86,6 +86,13 @@ evidence is linked from each published version.
   value that is the assigned name itself (`aws_secret_access_key =
   aws_secret_access_key`) (#1205). The `${NAME:-default}` form and any other
   identifier under the name are still reported.
+- `generic-token` no longer reports the instructional placeholder
+  `YOUR_FIGMA_TOKEN` (and `your-figma-token`, `replace-with-your-figma-token`)
+  in an `X-Figma-Token` header or any other contextual slot (#1209). The
+  explicit `X-Figma-Token` header value was already redacted in raw HTTP,
+  quoted curl `-H` and JSON header maps as a generic `contextual_secret`, and
+  still is, with no personal-access-token subtype and no `figd_` grammar. A
+  placeholder glued to random material and a random value are still reported.
 
 ### Documented scope
 
