@@ -170,3 +170,87 @@ fn the_figma_placeholder_exclusion_keeps_a_real_value_and_a_glued_placeholder() 
         );
     }
 }
+
+// ------------------------------------------------- #1210 Asana X-Hook-Secret
+
+const HOOK_RAW: &str = "7f3a9c1e0b8d4a6fh2jkm5np0q1r3s9t";
+const HOOK_RESP: &str = "c4e8a2b6d0f1k3m5n7p9a1c3e5g7i9k2m4o6q8s0";
+const HOOK_UNI: &str = "9b1d3f5h7j9l1n3p5a7c9e1g3i5k7m9o0p2q";
+const HOOK_C1: &str = "a1c3e5g7i9k1m3o5p7b9d1f3h5j7";
+const HOOK_C2: &str = "e2g4i6k8m0o2q4b6d8f0h2j4l6n8p0a2c4e6g8i0k2m4";
+const HOOK_MAP: &str = "d3f5h7j9l1n3p5b7d9f1h3j5l7n9p1a3";
+
+#[test]
+fn asana_hook_secret_header_value_is_redacted_in_every_supported_layout() {
+    for (input, value) in [
+        (
+            format!(
+                "POST /receive-webhook HTTP/1.1\r\nHost: hooks.example.test\r\nX-Hook-Secret: {HOOK_RAW}\r\nContent-Length: 0\r\n\r\n"
+            ),
+            HOOK_RAW,
+        ),
+        (
+            format!("HTTP/1.1 200 OK\r\nX-Hook-Secret: {HOOK_RESP}\r\nContent-Length: 0\r\n\r\n"),
+            HOOK_RESP,
+        ),
+        (
+            format!(
+                "# r\u{fc}ckruf \u{1F512}\nPOST /h HTTP/1.1\r\nX-Hook-Secret: {HOOK_UNI}\r\n\r\n"
+            ),
+            HOOK_UNI,
+        ),
+        (
+            format!(
+                "curl -X POST -H 'X-Hook-Secret: {HOOK_C1}' https://hooks.example.test/receive\n"
+            ),
+            HOOK_C1,
+        ),
+        (
+            format!(
+                "curl -X POST -H \"X-Hook-Secret: {HOOK_C2}\" https://hooks.example.test/receive\n"
+            ),
+            HOOK_C2,
+        ),
+        (
+            format!(
+                "{{\"headers\":{{\"Content-Type\":\"application/json\",\"X-Hook-Secret\":\"{HOOK_MAP}\"}},\"body\":{{}}}}\n"
+            ),
+            HOOK_MAP,
+        ),
+    ] {
+        // No provider attribution is justified by the shared header carrier.
+        assert_value(&input, value, "contextual_secret");
+    }
+}
+
+#[test]
+fn asana_hook_secret_value_offset_is_in_utf8_bytes() {
+    let input =
+        format!("# r\u{fc}ckruf \u{1F512}\nPOST /h HTTP/1.1\r\nX-Hook-Secret: {HOOK_UNI}\r\n\r\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    let prefix = "# r\u{fc}ckruf \u{1F512}\nPOST /h HTTP/1.1\r\nX-Hook-Secret: ";
+    assert_ne!(prefix.len(), prefix.chars().count());
+    assert_eq!(findings[0].range().start(), prefix.len());
+    assert_eq!(findings[0].range().end(), prefix.len() + HOOK_UNI.len());
+}
+
+#[test]
+fn asana_signature_ids_lookalikes_placeholders_and_bare_strings_stay_clean() {
+    let hmac = "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0";
+    for input in [
+        // An HMAC output is not the shared secret.
+        format!("X-Hook-Signature: {hmac}\r\n"),
+        format!("curl -H 'X-Hook-Signature: {hmac}' https://hooks.example.test/receive\n"),
+        // Longer header names are different headers.
+        "X-Hook-Secret-Id: 0f1e2d3c4b5a6978\r\n".to_owned(),
+        format!("X-Hook-Secrets: {HOOK_RAW}\r\n"),
+        "X-Hook-Secret: <hook-secret>\r\n".to_owned(),
+        "curl -H \"X-Hook-Secret: ${HOOK_SECRET}\" https://hooks.example.test/receive\n".to_owned(),
+        "X-Hook-Secret: ********\r\n".to_owned(),
+        // A bare arbitrary string with no header around it.
+        format!("The handshake finished with {HOOK_RAW} in the log.\n"),
+    ] {
+        assert_clean(&input);
+    }
+}

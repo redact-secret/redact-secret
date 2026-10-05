@@ -1392,6 +1392,7 @@ false negatives.
 | Family | Applied rule | Evidence |
 | --- | --- | --- |
 | `figma:personal-access-token` | The explicit `X-Figma-Token` header value (raw HTTP, quoted curl `-H`, JSON header map) is `contextual_secret`, redacted, spanning the value only, with no PAT subtype, no `figd_`/`figp_` grammar and no width claim; it was already covered through the prefixed `_token` name rule. Since #1209 `figma` is a placeholder provider word, so `YOUR_FIGMA_TOKEN` is silent. `X-Figma-Token-Id`, suffixed names, references, masks, public ids and a newline-separated value stay silent. | [#1209](../audits/evidence/1209/README.md) |
+| `asana:webhook-secret` | The exact `X-Hook-Secret` header value (raw request or response header, quoted curl `-H`, JSON header map) is `contextual_secret`, redacted, spanning the value only, with no Asana attribution and no alphabet or width claim; no-code, covered through the prefixed `secret` name rule. `X-Hook-Signature` (an HMAC), `X-Hook-Secret-Id`, `X-Hook-Secrets`, placeholders, references, masks and bare strings stay silent. | [#1210](../audits/evidence/1210/README.md) |
 
 ## Rules
 

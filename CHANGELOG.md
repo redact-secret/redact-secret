@@ -93,6 +93,11 @@ evidence is linked from each published version.
   quoted curl `-H` and JSON header maps as a generic `contextual_secret`, and
   still is, with no personal-access-token subtype and no `figd_` grammar. A
   placeholder glued to random material and a random value are still reported.
+- An Asana `X-Hook-Secret` header value (raw HTTP, quoted curl `-H`, JSON header
+  map) is redacted as a generic `contextual_secret` spanning only the value; the
+  HMAC `X-Hook-Signature`, `X-Hook-Secret-Id` and longer names are not (#1210).
+  This was validated against an independent corpus and needed no code change;
+  a regression test now pins it.
 
 ### Documented scope
 
