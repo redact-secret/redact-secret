@@ -6961,12 +6961,69 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "buildkite_portal_token"
+    },
+    {
+      "detector": "pydantic-logfire-token",
+      "evidence": {
+        "fixtureCount": 51,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "pydantic-logfire-token-positive-ai-gateway-key",
+        "pydantic-logfire-token-positive-api-key-v2-org-id",
+        "pydantic-logfire-token-positive-api-key-v2-org-id-uppercase",
+        "pydantic-logfire-token-positive-bare",
+        "pydantic-logfire-token-positive-body-20",
+        "pydantic-logfire-token-positive-body-80",
+        "pydantic-logfire-token-positive-chat-sentence",
+        "pydantic-logfire-token-positive-crlf-unicode-prefix",
+        "pydantic-logfire-token-positive-curl-bearer",
+        "pydantic-logfire-token-positive-dotenv",
+        "pydantic-logfire-token-positive-json-config",
+        "pydantic-logfire-token-positive-json-token-key",
+        "pydantic-logfire-token-positive-log",
+        "pydantic-logfire-token-positive-mcp-server-config",
+        "pydantic-logfire-token-positive-punctuation-adjacent",
+        "pydantic-logfire-token-positive-read-token",
+        "pydantic-logfire-token-positive-region-16-letters",
+        "pydantic-logfire-token-positive-region-ap",
+        "pydantic-logfire-token-positive-region-staging",
+        "pydantic-logfire-token-positive-repeated-value",
+        "pydantic-logfire-token-positive-sdk-call",
+        "pydantic-logfire-token-positive-shell-export",
+        "pydantic-logfire-token-positive-tool-call-arguments",
+        "pydantic-logfire-token-positive-x-api-key-header",
+        "pydantic-logfire-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "pydantic_logfire_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 152,
+    "supported": 153,
     "unresolved": 0
   }
 }

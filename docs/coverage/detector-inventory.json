@@ -1093,6 +1093,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0062kpat_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
       "schemes": null
+    },
+    {
+      "type": "pydantic_logfire_token",
+      "detector": "pydantic-logfire-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070ylf_v1_us_SyntheticRevokedLogfireToken0000",
+      "schemes": null
     }
   ],
   "consumers": [

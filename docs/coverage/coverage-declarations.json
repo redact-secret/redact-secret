@@ -16824,6 +16824,144 @@
       "type": "buildkite_portal_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "pydantic-logfire-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "pydantic-logfire-token-positive-ai-gateway-key",
+            "pydantic-logfire-token-positive-api-key-v2-org-id",
+            "pydantic-logfire-token-positive-api-key-v2-org-id-uppercase",
+            "pydantic-logfire-token-positive-bare",
+            "pydantic-logfire-token-positive-body-20",
+            "pydantic-logfire-token-positive-body-80",
+            "pydantic-logfire-token-positive-chat-sentence",
+            "pydantic-logfire-token-positive-crlf-unicode-prefix",
+            "pydantic-logfire-token-positive-curl-bearer",
+            "pydantic-logfire-token-positive-dotenv",
+            "pydantic-logfire-token-positive-json-config",
+            "pydantic-logfire-token-positive-json-token-key",
+            "pydantic-logfire-token-positive-log",
+            "pydantic-logfire-token-positive-mcp-server-config",
+            "pydantic-logfire-token-positive-punctuation-adjacent",
+            "pydantic-logfire-token-positive-read-token",
+            "pydantic-logfire-token-positive-region-16-letters",
+            "pydantic-logfire-token-positive-region-ap",
+            "pydantic-logfire-token-positive-region-staging",
+            "pydantic-logfire-token-positive-repeated-value",
+            "pydantic-logfire-token-positive-sdk-call",
+            "pydantic-logfire-token-positive-shell-export",
+            "pydantic-logfire-token-positive-tool-call-arguments",
+            "pydantic-logfire-token-positive-x-api-key-header",
+            "pydantic-logfire-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "pydantic-logfire-token-overlap-bearer-header",
+            "pydantic-logfire-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "pydantic-logfire-token-adversarial-glued-tokens",
+            "pydantic-logfire-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "pydantic-logfire-token-boundary-body-19",
+            "pydantic-logfire-token-boundary-dash-in-body",
+            "pydantic-logfire-token-boundary-glued-prefix",
+            "pydantic-logfire-token-boundary-glued-trailing-dash",
+            "pydantic-logfire-token-boundary-glued-trailing-underscore",
+            "pydantic-logfire-token-boundary-glued-underscore-prefix",
+            "pydantic-logfire-token-boundary-hyphen-separator",
+            "pydantic-logfire-token-boundary-no-region",
+            "pydantic-logfire-token-boundary-no-version-digits",
+            "pydantic-logfire-token-boundary-org-id-wrong-group-width",
+            "pydantic-logfire-token-boundary-region-1-letter",
+            "pydantic-logfire-token-boundary-region-17-letters",
+            "pydantic-logfire-token-boundary-underscore-in-body",
+            "pydantic-logfire-token-boundary-uppercase-prefix",
+            "pydantic-logfire-token-boundary-uppercase-region",
+            "pydantic-logfire-token-boundary-v2-body-19",
+            "pydantic-logfire-token-boundary-version-4-digits"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "pydantic-logfire-token-negative-bare-44-alphanumerics",
+            "pydantic-logfire-token-negative-env-reference",
+            "pydantic-logfire-token-negative-masked-cli-form",
+            "pydantic-logfire-token-negative-placeholders",
+            "pydantic-logfire-token-negative-scrubber-pattern"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "pydantic-logfire-token-boundary-body-19",
+            "pydantic-logfire-token-boundary-dash-in-body",
+            "pydantic-logfire-token-boundary-glued-prefix",
+            "pydantic-logfire-token-boundary-glued-trailing-dash",
+            "pydantic-logfire-token-boundary-glued-trailing-underscore",
+            "pydantic-logfire-token-boundary-glued-underscore-prefix",
+            "pydantic-logfire-token-boundary-hyphen-separator",
+            "pydantic-logfire-token-boundary-no-region",
+            "pydantic-logfire-token-boundary-no-version-digits",
+            "pydantic-logfire-token-boundary-org-id-wrong-group-width",
+            "pydantic-logfire-token-boundary-region-1-letter",
+            "pydantic-logfire-token-boundary-region-17-letters",
+            "pydantic-logfire-token-boundary-underscore-in-body",
+            "pydantic-logfire-token-boundary-uppercase-prefix",
+            "pydantic-logfire-token-boundary-uppercase-region",
+            "pydantic-logfire-token-boundary-v2-body-19",
+            "pydantic-logfire-token-boundary-version-4-digits"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for pydantic_logfire_token (pydantic-logfire-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "pydantic_logfire_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -17075,6 +17213,8 @@
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
             "pulumi-access-token-adversarial-long-suffix",
+            "pydantic-logfire-token-adversarial-glued-tokens",
+            "pydantic-logfire-token-adversarial-prefix-run",
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
             "resend-api-key-adversarial-long-run",
@@ -17568,6 +17708,8 @@
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
             "pulumi-access-token-adversarial-long-suffix",
+            "pydantic-logfire-token-adversarial-glued-tokens",
+            "pydantic-logfire-token-adversarial-prefix-run",
             "pypi-adversarial-long-suffix",
             "replicate-api-token-adversarial-long-suffix",
             "resend-api-key-adversarial-long-run",

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3999,
+  "fixtureCount": 4050,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -91488,6 +91488,930 @@
       "input": "\u0062kct_cluster_name_for_builds\n",
       "expected": [],
       "note": "A snake_case identifier whose body is under the floor is not a token."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-bare",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 55
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-dotenv",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LOGFIRE_TOKEN=\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 69
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-shell-export",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export LOGFIRE_TOKEN=\"\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\"\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 77
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-yaml",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  LOGFIRE_TOKEN: \u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 77
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-json-config",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"env\": {\"LOGFIRE_TOKEN\": \"\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\"}}",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 82
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-json-token-key",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\"}",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 66
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-sdk-call",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "logfire.configure(token=\"\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\")\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 80
+        }
+      ],
+      "note": "An SDK or tool configuration is reported at exactly the key."
+    },
+    {
+      "id": "pydantic-logfire-token-overlap-bearer-header",
+      "detector": "pydantic-logfire-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 77
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-x-api-key-header",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 66
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-curl-bearer",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Bearer \u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM' https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 86
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-tool-call-arguments",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\": \"call_api\", \"arguments\": {\"api_key\": \"\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\", \"limit\": 10}}",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 47,
+          "end": 102
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-chat-sentence",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 70
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the key."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-log",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-10-05T12:00:00Z INFO client init token=\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM region=us\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 99
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-punctuation-adjacent",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM.\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 66
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-crlf-unicode-prefix",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 \ud0a4 reviewed format\r\n\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\n\r\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 83
+        }
+      ],
+      "note": "CRLF, Hangul and astral characters before the value keep the UTF-8 byte range exact."
+    },
+    {
+      "id": "pydantic-logfire-token-overlap-context",
+      "detector": "pydantic-logfire-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 66
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-repeated-value",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "first=\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM second=\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FQ\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6,
+          "end": 61
+        },
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 69,
+          "end": 124
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-mcp-server-config",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\": {\"svc\": {\"command\": \"svc-mcp\", \"env\": {\"LOGFIRE_TOKEN\": \"\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\"}}}}",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 72,
+          "end": 127
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the key."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-read-token",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LOGFIRE_READ_TOKEN=\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 74
+        }
+      ],
+      "note": "A read token is the same detector and finding type, reported at exactly the value."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-api-key-v2-org-id",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LOGFIRE_API_KEY=\u0070ylf_v2_us_a18f6e5c-7e5c-4b29-18f6-e5c3a2907e6d_3AHOVdkry5DKRYfnu18FNUbipx4BIPXelsz7ELSZhov2\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 108
+        }
+      ],
+      "note": "A v2 API key with a lowercase organization id is one span."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-api-key-v2-org-id-uppercase",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v2_eu_7E5C3B29-4B29-18F6-E5C3-B2907F6D4B3A_07ELSahov2AHOVckry5CKRYfmu18FMUbipw4BIPWelsz",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 92
+        }
+      ],
+      "note": "The organization id hex is case-insensitive."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-ai-gateway-key",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PYDANTIC_AI_GATEWAY_API_KEY=\u0070ylf_v1_eu_DKRYfnu18FNUbipx4BIPXelsz7ELSZhov29HOVcjry5C\n",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 83
+        }
+      ],
+      "note": "The AI Gateway key is a role of the same detector and finding type."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-region-staging",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_stagingus_QXels07ELSahov2AHOVckry5CKRYfmu18FMUbipw4BIP",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 62
+        }
+      ],
+      "note": "A staging region is accepted."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-region-ap",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_ap_dkry5DKRYfnu18FNUbipx4BIPXelsz7ELSZhov29HOVc",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 55
+        }
+      ],
+      "note": "Any lowercase region of 2 to 16 letters is accepted."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-body-20",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_qx4BIQXels07ELSahov2",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 31
+        }
+      ],
+      "note": "The policy floor of 20 body bytes is accepted."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-body-80",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_3AHOVdkry5DKRYfnu18FNUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FMTbipw3BIPWdlsz6D",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 91
+        }
+      ],
+      "note": "The body has no upper bound."
+    },
+    {
+      "id": "pydantic-logfire-token-positive-region-16-letters",
+      "detector": "pydantic-logfire-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v12_aaaaaaaaaaaaaaaa_GNUbiqx4BIQXels07ELSahov2AHOVckry5CKRYfmu18F",
+      "expected": [
+        {
+          "detector": "pydantic-logfire-token",
+          "type": "pydantic_logfire_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "The region cap of 16 letters and a two-digit version are accepted."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-body-19",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_Tahov3AHOVdkry5DKRY",
+      "expected": [],
+      "note": "A 19-byte body is below the policy floor of 20."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-v2-body-19",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v2_us_c3a1807e-907e-6d4b-3a18-07e5c4b2908f_Tahov3AHOVdkry5DKRY",
+      "expected": [],
+      "note": "A 19-byte body behind an organization id is below the floor."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-no-version-digits",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "The version needs at least one digit."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-no-region",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1__t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "The region is required."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-uppercase-region",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_US_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "The region is lowercase."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-region-1-letter",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_u_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "A one-letter region is under the policy minimum of 2."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-region-17-letters",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_aaaaaaaaaaaaaaaaa_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "A 17-letter region is over the policy cap of 16."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-version-4-digits",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1234_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "A version of four digits is over the policy cap of 3."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-uppercase-prefix",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PYLF_v1_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-hyphen-separator",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1-us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "The separators are underscores."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-org-id-wrong-group-width",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v2_us_d4b2a18-3a18-07e5-d4b2-a18f6e5c3a29_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "An organization id with a 7-byte first group is not a UUID, and a dash is outside the body."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-dash-in-body",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_t07ELTahov3AHOVdkry5DK-Yfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "A dash outside an organization id is not in the body alphabet."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-underscore-in-body",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_t07ELTahov3AHOVdkry5DK_Yfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "An underscore inside the body is not in the body alphabet."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-glued-prefix",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0070ylf_v1_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-glued-underscore-prefix",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "_\u0070ylf_v1_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels",
+      "expected": [],
+      "note": "An underscore glued before the prefix rejects the match."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-glued-trailing-underscore",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels_",
+      "expected": [],
+      "note": "An underscore glued after the body rejects the match."
+    },
+    {
+      "id": "pydantic-logfire-token-boundary-glued-trailing-dash",
+      "detector": "pydantic-logfire-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_t07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BIPXels-x",
+      "expected": [],
+      "note": "A dash glued after the body rejects the match."
+    },
+    {
+      "id": "pydantic-logfire-token-negative-placeholders",
+      "detector": "pydantic-logfire-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_xxx \u0070ylf_v1_us_token1 \u0070ylf_v1_us_fake \u0070ylf_v1_us_...",
+      "expected": [],
+      "note": "Placeholders from provider tests and docs fail the floor."
+    },
+    {
+      "id": "pydantic-logfire-token-negative-masked-cli-form",
+      "detector": "pydantic-logfire-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_0kYhc****",
+      "expected": [],
+      "note": "The masked CLI form is not a token."
+    },
+    {
+      "id": "pydantic-logfire-token-negative-scrubber-pattern",
+      "detector": "pydantic-logfire-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v\\d+_",
+      "expected": [],
+      "note": "The provider's scrubber pattern in config text is not a token."
+    },
+    {
+      "id": "pydantic-logfire-token-negative-env-reference",
+      "detector": "pydantic-logfire-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LOGFIRE_TOKEN=${LOGFIRE_TOKEN}\n",
+      "expected": [],
+      "note": "A variable reference is not a literal token."
+    },
+    {
+      "id": "pydantic-logfire-token-negative-bare-44-alphanumerics",
+      "detector": "pydantic-logfire-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "JQXelt07ELTahov3AHOVdkry5DKRYfnu18FNUbipx4BI",
+      "expected": [],
+      "note": "A bare alphanumeric run without the prefix stays unclaimed."
+    },
+    {
+      "id": "pydantic-logfire-token-adversarial-prefix-run",
+      "detector": "pydantic-logfire-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v\u0070ylf_v",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach the floor, and the scan stays linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "pydantic-logfire-token-adversarial-glued-tokens",
+      "detector": "pydantic-logfire-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM\u0070ylf_v1_us_NUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FM",
+      "expected": [],
+      "note": "Glued copies continue into each other through the underscore, so no copy has both boundaries.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
     }
   ]
 }

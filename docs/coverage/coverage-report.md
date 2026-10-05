@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 152/152 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 153/153 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 152 |
+| supported | 153 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 163.
+Coverage declarations: 164.
 
 ## Coverage by detector
 
@@ -110,6 +110,7 @@ Coverage declarations: 163.
 | postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| pydantic-logfire-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -257,6 +258,7 @@ Coverage declarations: 163.
 | postman_collection_access_key | postman-collection-access-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
+| pydantic_logfire_token | pydantic-logfire-token | provider | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | resend_api_key | resend-api-key | provider | supported | not-applicable | none |
@@ -321,15 +323,15 @@ Coverage declarations: 163.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 163 | 0 | 0 |
-| boundary | 152 | 0 | 0 |
-| host-context | 152 | 0 | 0 |
+| adversarial | 164 | 0 | 0 |
+| boundary | 153 | 0 | 0 |
+| host-context | 153 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 163 | 0 | 0 |
-| near-miss-negative | 152 | 0 | 0 |
-| overlap | 152 | 0 | 0 |
-| positive | 152 | 0 | 0 |
-| range | 163 | 0 | 0 |
+| malformed | 164 | 0 | 0 |
+| near-miss-negative | 153 | 0 | 0 |
+| overlap | 153 | 0 | 0 |
+| positive | 153 | 0 | 0 |
+| range | 164 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

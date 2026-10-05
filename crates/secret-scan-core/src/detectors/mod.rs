@@ -74,6 +74,7 @@ mod posthog;
 mod postman;
 mod prefilter;
 mod private_key;
+mod pydantic_logfire;
 mod resend;
 mod rubygems;
 mod ruleset_adapter;
@@ -411,6 +412,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("sourcegraph-token", &sourcegraph::SOURCEGRAPH),
         row("unkey-root-key", &unkey::UNKEY),
         row("buildkite-token", &buildkite::BUILDKITE),
+        row("pydantic-logfire-token", &pydantic_logfire::LOGFIRE),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -756,6 +758,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     ),
     (buildkite::ID, &[Literals::Shapes(buildkite::SHAPES)]),
     (
+        pydantic_logfire::ID,
+        &[Literals::Shapes(pydantic_logfire::SHAPES)],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -948,6 +954,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("sourcegraph-token", Pack::Provider),
     ("unkey-root-key", Pack::Provider),
     ("buildkite-token", Pack::Provider),
+    ("pydantic-logfire-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1109,6 +1116,7 @@ mod tests {
                 "sourcegraph-token",
                 "unkey-root-key",
                 "buildkite-token",
+                "pydantic-logfire-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1491,6 +1499,7 @@ mod tests {
             "Synthe1c", "SyntheticRevokedUnkeyRootKeyFixture1234567"
         );
         let buildkite_token_input = format!("bkua_{}", "5e7c0ded".repeat(5));
+        let pydantic_logfire_token_input = format!("pylf_v1_us_{}", "5e7c0ded".repeat(5));
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1633,6 +1642,10 @@ mod tests {
             ("sourcegraph-token", sourcegraph_token_input.as_str()),
             ("unkey-root-key", unkey_root_key_input.as_str()),
             ("buildkite-token", buildkite_token_input.as_str()),
+            (
+                "pydantic-logfire-token",
+                pydantic_logfire_token_input.as_str(),
+            ),
         ];
         assert_provider_candidates(&cases);
     }

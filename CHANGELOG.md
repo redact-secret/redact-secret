@@ -58,6 +58,11 @@ evidence is linked from each published version.
     `buildkite_packages_token`, `buildkite_pipeline_token`,
     `buildkite_portal_token`). The `bkjat_`/`bkaj_` JWT bodies are one span that
     wins over `jwt`; the 24-byte floor is the provider redactor's own.
+  - `pydantic-logfire-token` (#1106): Pydantic Logfire write, read and API keys
+    and the AI Gateway key, `pylf_v<n>_<region>_` + optional organization UUID
+    + 20 or more `[A-Za-z0-9]` (`pydantic_logfire_token`). The 20-byte body
+    floor and the 16-letter region cap are narrowing policy (ruling Q7 pending);
+    legacy unprefixed tokens stay with generic context.
 
 ### Fixed
 

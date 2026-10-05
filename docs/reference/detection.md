@@ -212,7 +212,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-114 built-in detectors emit 152 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+115 built-in detectors emit 153 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -330,6 +330,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `sourcegraph-token` | `sourcegraph_access_token` | `always-redact` | — |
 | `unkey-root-key` | `unkey_root_key` | `always-redact` | — |
 | `buildkite-token` | `buildkite_api_access_token`, `buildkite_oauth_token`, `buildkite_agent_token`, `buildkite_job_token`, `buildkite_packages_token`, `buildkite_pipeline_token`, `buildkite_portal_token` | `always-redact` | — |
+| `pydantic-logfire-token` | `pydantic_logfire_token` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles
