@@ -1285,6 +1285,25 @@ fn is_colon_scope_identifier(separator: &str, value: &str) -> bool {
     separator == ":" && value.contains(':') && value.split(':').all(is_scope_segment)
 }
 
+/// `true` when the "value" is the message of a shell or Compose
+/// required-variable expansion: `${NAME:?message}` (Docker Compose
+/// `environment: DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}`).
+/// The name directly follows `${`, the operator is the `:` of the `:?`
+/// modifier and the text after `?` is the error shown when the variable is
+/// unset, never a credential (issue #1205). The `:-` default form is not
+/// matched: a default can be a literal credential. FN cost: a secret written
+/// as the error message of its own required variable, which no tool does.
+fn is_parameter_expansion_message(
+    input: &str,
+    name_start: usize,
+    name_end: usize,
+    value_start: usize,
+) -> bool {
+    &input[name_end..value_start] == ":"
+        && input.as_bytes().get(value_start) == Some(&b'?')
+        && input[..name_start].ends_with("${")
+}
+
 /// A small, explicit set of source-code roots whose member-access syntax is
 /// unambiguous as soon as it opens: a Django/Rails/NestJS `settings`/`config`
 /// object, JS/Python/Ruby `self`/`this` instance access, or a Terraform
@@ -2100,6 +2119,22 @@ enum NameSource {
 
 // --- confidence -----------------------------------------------------------
 
+/// `true` when the value is the assigned name itself, in any spelling that
+/// normalizes to it (`aws_secret_access_key = aws_secret_access_key`,
+/// `{"clientSecret": client_secret}`): a variable passed through under its
+/// own name, never a credential (issue #1205). `name` is already normalized.
+/// FN cost: none, since no issued secret is the name of its own variable.
+fn is_self_reference(name: &str, value: &str) -> bool {
+    // Normalizing only inserts `_` before a camelCase capital, so an equal
+    // result is at most twice as long as the value.
+    value.len() <= name.len()
+        && name.len() <= value.len() * 2
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-' | b'.'))
+        && normalize_name(value) == name
+}
+
 fn assignment_confidence(
     name: &str,
     value: &str,
@@ -2130,6 +2165,7 @@ fn assignment_confidence(
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
         || is_non_secret_reference(value, form)
         || is_confluent_key_id_assignment(name, value)
+        || is_self_reference(name, value)
     {
         return None;
     }
@@ -3043,6 +3079,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             // The templated-lookup check runs only for a pair that would
             // otherwise be reported (issue #989).
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
+                && !is_parameter_expansion_message(input, name_start, name_end, value_start)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
                 && !is_templated_lookup_path(&mut templates, input, name_start, value)
