@@ -1537,6 +1537,33 @@ false negatives.
 | `elastic:elasticsearch-api-key` | `generic-token` recognizes the `ApiKey` scheme of `Authorization` and `Proxy-Authorization` (raw HTTP, quoted curl `-H`, JSON header map) as an `authorization_credential`, beside `Basic`, `Token` and `Key`: the undecoded encoded value is the span, redacted, with the 12-byte floor and entropy-based confidence of the other schemes, no id/api_key split, no alphabet or width inference and no Elastic attribution (`ApiKey` is not unique to Elastic). Taken mid-line like `Basic` and `Key`. Bare `ApiKey` prose, `X-Authorization` and `Authorization-Info`, a newline between scheme and value, placeholders, references, masks and a key id alone stay silent. | [#1212](../audits/evidence/1212/README.md) |
 | `canva:client-secret` | The existing `client_secret` assignment, form-body (the span stops at the delimiter) and JSON reading is `contextual_secret`, and the `Authorization: Basic` envelope is `authorization_credential` over the encoded credential, not a decoded secret-only span; both redacted, generic, with no Canva attribution. No-code. The documented `cnvca` prefix gets no bare-prefix detector (separator, width and alphabet are undocumented): a bare `cnvca` value, `client_id`, placeholders, references, masks and prefix prose stay silent. | [#1213](../audits/evidence/1213/README.md) |
 
+## Batch 2 credential contracts (#1223 to #1226)
+
+Four conditional product contracts for the 58 Batch 2 families of the
+credential-evidence adoption inventory
+([#231](https://github.com/redact-secret/credential-evidence/issues/231), handoff
+[#235](https://github.com/redact-secret/credential-evidence/issues/235)), measured
+by the independent
+[benchmarks#739](https://github.com/redact-secret/redact-secret-benchmarks/issues/739)
+epic. Each row states, per class of rows, the output the product produces once a
+row's reviewed carrier layout and an independent baseline exist, and what is out
+of contract. Every row applies existing policy; none adds a provider detector, a
+registry entry, a bare-prefix grammar, decoding, a width or alphabet claim, or a
+provider subtype from a shared carrier. The findings are the generic
+`contextual_secret`, `bearer_token`, `authorization_credential` (and the existing
+`jwt` and `connection_string_password` readings), with the default action of the
+accepted policy; a user action policy replaces that default exactly as before.
+Provider carrier facts are owned by credential-evidence and stay pending until a
+reviewed contract names them. No family is claimed covered, passing or ready, and
+no measured result is stated; the per-family tables and the product observations
+are in each evidence record.
+
+| Class | Applied rule | Evidence |
+| --- | --- | --- |
+| OAuth access-token rows (G1, 23 families) | Two layouts, each only for a row whose reviewed contract names it. A credential-named field (assignment, quoted assignment, form-body or query parameter, JSON or YAML member) is `contextual_secret` spanning the value only, ending at the form delimiter, redacted at high confidence and warned at medium (a short or low-entropy literal); neighbouring `client_id`, `scope`, `token_type` and `*_expires_in` stay outside. An explicit `Authorization:` or `Proxy-Authorization:` Bearer value is `bearer_token` spanning the value only, redacted, under the RFC 6750 alphabet with the 12-byte explicit-header floor. The carrier proves no provider or subtype (Meta roles, Contentful, Salesforce and Elastic tokens included). A layout the evidence does not name stays carrier-unresolved, and a bare `token` or `*key` name stays unmatched. | [#1223](../audits/evidence/1223/README.md) |
+| OAuth refresh-token rows (G2, 13 families) | Token-endpoint fields, never resource Bearer credentials: only the field layouts above, with `refresh_token` a high-signal name, the span ending at `&` so `client_id` and `scope` stay outside, `contextual_secret`, redacted at high confidence and warned at medium. A refresh token behind a Bearer header is read by its carrier when it occurs, and is not a layout of this contract unless the evidence names it. | [#1223](../audits/evidence/1223/README.md) |
+| OAuth client and application secret rows (G3, 12 families) | A `client_secret` or other credential-named field is `contextual_secret` over the value only (assignment, form body to the delimiter, JSON). An `Authorization: Basic` envelope is `authorization_credential` over the whole encoded envelope, never decoded and never a secret-only span, always redacted; it also covers the public client id half because the encoded value is one credential. Excluded: client, app, account and object ids, HMAC and signature outputs, and the other shared exclusions. | [#1223](../audits/evidence/1223/README.md) |
+
 ## Rules
 
 | Rule | Governing ADR |
