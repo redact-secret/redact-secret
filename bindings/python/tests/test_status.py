@@ -7,7 +7,6 @@ import subprocess
 import sys
 
 import pytest
-
 import redact_secret
 
 OFF = "credentials=full;selectors=off;families=;vocabulary=pii-context/v2"
