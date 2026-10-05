@@ -50,6 +50,14 @@ evidence is linked from each published version.
     base58) and dashboard (`unkey_3Z` + 22 base58) root keys (`unkey_root_key`).
     The CRC-32C never rejects a match (ruling Q1 pending); customer-prefixed
     version 1 keys stay unclaimed until ruling Q10.
+  - `buildkite-token` (#1105): Buildkite `bkua_`, `bkur_`, `bktx_`, `bkaa_`,
+    `bkar_`, `bkct_`, `bkcqt_`, `bkaj_`, `bkjat_`, `bkpt_`, `bkrt_`, `bktr_`,
+    `bkat_`, `bkpat_` and `bkps_` + 24 to 2048 `[A-Za-z0-9_.-]` tokens
+    (`buildkite_api_access_token`, `buildkite_oauth_token`,
+    `buildkite_agent_token`, `buildkite_job_token`,
+    `buildkite_packages_token`, `buildkite_pipeline_token`,
+    `buildkite_portal_token`). The `bkjat_`/`bkaj_` JWT bodies are one span that
+    wins over `jwt`; the 24-byte floor is the provider redactor's own.
 
 ### Fixed
 

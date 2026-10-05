@@ -163,6 +163,7 @@ export const CANONICAL_IDS = [
   "xata-api-key",
   "sourcegraph-token",
   "unkey-root-key",
+  "buildkite-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -271,6 +272,7 @@ export const GROUPS = {
     "inngest-signing-key",
     "sonarqube-token",
     "sourcegraph-token",
+    "buildkite-token",
   ],
   "pkg-registry": [
     "pypi-token",

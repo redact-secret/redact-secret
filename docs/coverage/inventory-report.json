@@ -6696,12 +6696,277 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "unkey_root_key"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-bare",
+        "buildkite-token-positive-body-2048",
+        "buildkite-token-positive-body-2049-capped",
+        "buildkite-token-positive-body-23-plus-period-reaches-floor",
+        "buildkite-token-positive-body-24",
+        "buildkite-token-positive-chat-sentence",
+        "buildkite-token-positive-crlf-unicode-prefix",
+        "buildkite-token-positive-curl-bearer",
+        "buildkite-token-positive-dotenv",
+        "buildkite-token-positive-json-config",
+        "buildkite-token-positive-json-token-key",
+        "buildkite-token-positive-log",
+        "buildkite-token-positive-prefix-bkua",
+        "buildkite-token-positive-punctuation-adjacent",
+        "buildkite-token-positive-repeated-value",
+        "buildkite-token-positive-sdk-call",
+        "buildkite-token-positive-shell-export",
+        "buildkite-token-positive-tool-call-arguments",
+        "buildkite-token-positive-trailing-dot-run-trimmed",
+        "buildkite-token-positive-x-api-key-header",
+        "buildkite-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_api_access_token"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-prefix-bktx",
+        "buildkite-token-positive-prefix-bkur"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_oauth_token"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-agent-start-command",
+        "buildkite-token-positive-organization-id-base58-agent-token",
+        "buildkite-token-positive-prefix-bkaa",
+        "buildkite-token-positive-prefix-bkar",
+        "buildkite-token-positive-prefix-bkcqt",
+        "buildkite-token-positive-prefix-bkct"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_agent_token"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-agent-job-jwt",
+        "buildkite-token-positive-job-acquisition-jwt",
+        "buildkite-token-positive-long-job-token-capped",
+        "buildkite-token-positive-prefix-bkaj",
+        "buildkite-token-positive-prefix-bkjat"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_job_token"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-prefix-bkpt",
+        "buildkite-token-positive-prefix-bkrt"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_packages_token"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-prefix-bkat",
+        "buildkite-token-positive-prefix-bktr"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_pipeline_token"
+    },
+    {
+      "detector": "buildkite-token",
+      "evidence": {
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "buildkite-token-positive-organization-id-hex-portal-token",
+        "buildkite-token-positive-prefix-bkpat",
+        "buildkite-token-positive-prefix-bkps"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "buildkite_portal_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 145,
+    "supported": 152,
     "unresolved": 0
   }
 }

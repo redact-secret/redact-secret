@@ -35,6 +35,13 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `bitwarden_secrets_manager_access_token` | `bitwarden-secrets-manager-access-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider parser, server generator and docs example, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
+| `buildkite_agent_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `buildkite_api_access_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `buildkite_job_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `buildkite_oauth_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `buildkite_packages_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `buildkite_pipeline_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `buildkite_portal_token` | `buildkite-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider-authored redaction rule, R2, dated 2026-09-29 under R9; prefix list cross-checked against the provider docs, R1), the 24-byte floor is the provider redactor's own and rests on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
 | `cerebras_api_key` | `cerebras-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 prefixes and width (provider validator, R1; staff statement, R3 as of 2025-10), alphabet by policy (R10), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `clickhouse_cloud_api_secret` | `clickhouse-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-04 (provider staff statement and staff-authored regex, R2 and R3; the older 39-byte example is set aside by R3 date order), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `clojars_deploy_token` | `clojars-deploy-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator and server validator, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
@@ -1267,6 +1274,7 @@ evidence.
 | `xata:api-key` | `xata-api-key` | `xau_` or `xao_` + `[0-9A-Za-z]{32,36}` (36 to 40 in total) | `xata_user_api_key` (`xau_`), `xata_organization_api_key` (`xao_`) | T1 (provider generator and validator, R1 and R9; width derived from the generator's encoder) |
 | `sourcegraph:access-token` | `sourcegraph-token` | `sgp_` + optional `[A-Za-z0-9]{1,32}_` instance identifier + exactly 40 hex (44 to 77 in total) | `sourcegraph_access_token` | T1 as of 2025-11-18 (provider generator and the vendored validator, R1 and R9) |
 | `unkey:root-key` | `unkey-root-key` | `unkey_` + 8 base58 + `unkeyv1` + 42 base58 (63 in total); `unkey_3Z` + 22 base58 (30 in total); base58 is `[1-9A-HJ-NP-Za-km-z]` | `unkey_root_key` | T1 (RFC 0017, generator and handler test; dashboard width and `3Z` lead derived, R1 and R9) |
+| `buildkite:user-access-token` (and the other Buildkite roles) | `buildkite-token` | one of 15 prefixes (`bkua_`, `bkur_`, `bktx_`, `bkaa_`, `bkar_`, `bkct_`, `bkcqt_`, `bkaj_`, `bkjat_`, `bkpt_`, `bkrt_`, `bktr_`, `bkat_`, `bkpat_`, `bkps_`) + `[A-Za-z0-9_.-]{24,2048}`, one trailing `.` run left outside the span | `buildkite_api_access_token` (`bkua_`), `buildkite_oauth_token` (`bkur_`, `bktx_`), `buildkite_agent_token` (`bkaa_`, `bkar_`, `bkct_`, `bkcqt_`), `buildkite_job_token` (`bkaj_`, `bkjat_`), `buildkite_packages_token` (`bkpt_`, `bkrt_`), `buildkite_pipeline_token` (`bktr_`, `bkat_`), `buildkite_portal_token` (`bkpat_`, `bkps_`) | T1 (provider-authored redaction rule, R2; prefix list also in the provider docs; floor per the Q7 recommendation) |
 
 Xata ([#1102](https://github.com/redact-secret/redact-secret/issues/1102),
 [handoff](../audits/evidence/1014/xata.md)). The body is 20 random bytes plus a
@@ -1329,6 +1337,41 @@ unrelated `unkey_3Z` + 22 base58 run; none is known (the lead is a 1 in 3,400
 coincidence for a random base58 run). Cost: one prefix on the shared
 known-format scan with a 7-byte marker check.
 
+Buildkite ([#1105](https://github.com/redact-secret/redact-secret/issues/1105),
+[handoff](../audits/evidence/1014/buildkite.md)). The grammar is exactly the
+provider redactor's own: the 15 documented prefixes, the body alphabet
+`[A-Za-z0-9_.-]` (base64url plus `.`, the separator inside organization-id and
+JWT tokens), a floor of 24 and a cap of 2048. No per-type exact length is
+claimed because none is stated anywhere and the open-ended body is the only
+grammar that stays correct across the organization-id, base58, hex and JWT
+layouts. The seven finding types are the handoff's role split; the grammar is
+the same for all. The floor of 24 is the provider's `TokenBodyLengthMin`,
+chosen below the real-token minimum of 38 so truncated `ps` fragments are
+caught while short placeholders (`bkjat_encoded-token`, `bkua_xxx`) stay out;
+using it as the T1 floor when no alphabet is narrowed is the pending Q7
+recommendation, and a floor of 38 is a one-constant change. The span is the
+maximal body run capped at 2048 bytes, as the provider's `{24,2048}` rule
+reads it: a longer or glued run is reported up to the cap and the tail is not
+part of the finding (the one exception to the shared never-truncate rule), and
+one trailing run of `.` stays outside the span so sentence punctuation is not
+swallowed unless that would leave the body under 24 (a period after a 23-byte
+body is its 24th byte, as in the provider's rule). A `bkjat_` or `bkaj_` JWT
+is one span from the prefix to the last JWT byte; the `jwt` detector cannot
+start a match inside it because the `_` before `eyJ` is a token byte, and the
+Bearer-header candidate over the same bytes loses to the provider type, so the
+prefix always wins. Reconciling with the one peer rule that exists (third-party
+`bkua_` + 40 lowercase hex): the shipped grammar is a strict superset of it, so
+every value that rule reports is also reported here with the same start, and
+the benchmarks co-detection scoring is a benchmarks-side follow-up. False
+negatives: the unprefixed legacy agent and API tokens outside named contexts,
+a prefix Buildkite adds after 2026-09-29, `bka_` + 40 alphanumerics (one
+third-party rule), values under 24 body bytes, and a prefix glued to an
+identifier. False positives (the main trade-off of adopting the provider's
+floor): an unrelated `bkct_`-, `bkat_`- or other listed-prefix identifier whose
+body is 24 or more bytes of the body alphabet, for example a snake_case
+variable name; no real-world collision is known. Cost: 15 prefixes on the
+shared known-format scan.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -1371,6 +1414,7 @@ known-format scan with a 7-byte marker check.
 | Xata `xau_` and `xao_` + 32 to 36 `[A-Za-z0-9]` API keys are reported as `xata_user_api_key` and `xata_organization_api_key` at provider specificity, bare or in any context; the CRC32 never rejects a match, and classic-platform keys stay unclaimed ([#1102](https://github.com/redact-secret/redact-secret/issues/1102), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Sourcegraph `sgp_` + optional alphanumeric instance identifier + 40 hex access tokens are reported as `sourcegraph_access_token` at provider specificity, bare or in any context; bare 40-hex tokens, `sgph_` and `sgd_` stay unclaimed ([#1103](https://github.com/redact-secret/redact-secret/issues/1103), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Unkey `unkey_` + 8 + `unkeyv1` + 42 base58 version 1 root keys and `unkey_3Z` + 22 base58 dashboard root keys are reported as `unkey_root_key` at provider specificity, bare or in any context; customer-prefixed version 1 keys (ruling Q10 open), the deprecated Go form and `unkey_` identifiers stay unclaimed ([#1104](https://github.com/redact-secret/redact-secret/issues/1104), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Buildkite `bkua_`, `bkur_`, `bktx_`, `bkaa_`, `bkar_`, `bkct_`, `bkcqt_`, `bkaj_`, `bkjat_`, `bkpt_`, `bkrt_`, `bktr_`, `bkat_`, `bkpat_` and `bkps_` + 24 to 2048 `[A-Za-z0-9_.-]` tokens are reported as seven role finding types at provider specificity, bare or in any context, including `bkjat_`/`bkaj_` JWT bodies as one span that wins over `jwt`; the unprefixed legacy tokens and values under 24 body bytes stay unclaimed ([#1105](https://github.com/redact-secret/redact-secret/issues/1105), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

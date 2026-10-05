@@ -20,6 +20,7 @@ mod azure_devops;
 mod bearer_token;
 mod bitwarden;
 mod browserbase;
+mod buildkite;
 mod cerebras;
 mod clickhouse_cloud;
 mod clojars;
@@ -409,6 +410,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("xata-api-key", &xata::XATA),
         row("sourcegraph-token", &sourcegraph::SOURCEGRAPH),
         row("unkey-root-key", &unkey::UNKEY),
+        row("buildkite-token", &buildkite::BUILDKITE),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -752,6 +754,7 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         unkey::UNKEY.detector_id(),
         &[Literals::Shapes(unkey::UNKEY.shapes())],
     ),
+    (buildkite::ID, &[Literals::Shapes(buildkite::SHAPES)]),
     (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
@@ -944,6 +947,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("xata-api-key", Pack::Provider),
     ("sourcegraph-token", Pack::Provider),
     ("unkey-root-key", Pack::Provider),
+    ("buildkite-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1104,6 +1108,7 @@ mod tests {
                 "xata-api-key",
                 "sourcegraph-token",
                 "unkey-root-key",
+                "buildkite-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1485,6 +1490,7 @@ mod tests {
             "unkey_{}unkeyv1{}",
             "Synthe1c", "SyntheticRevokedUnkeyRootKeyFixture1234567"
         );
+        let buildkite_token_input = format!("bkua_{}", "5e7c0ded".repeat(5));
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1626,6 +1632,7 @@ mod tests {
             ("xata-api-key", xata_api_key_input.as_str()),
             ("sourcegraph-token", sourcegraph_token_input.as_str()),
             ("unkey-root-key", unkey_root_key_input.as_str()),
+            ("buildkite-token", buildkite_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

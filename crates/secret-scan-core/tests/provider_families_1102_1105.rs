@@ -455,3 +455,269 @@ mod unkey {
         assert_parity(&parity_input(&dashboard(17)));
     }
 }
+
+mod buildkite {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "buildkite-token";
+    const BODY: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.";
+    const B64URL: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    const LOWER_HEX: &[u8] = b"0123456789abcdef";
+    const CAP: usize = 2048;
+
+    const ROLES: [(&str, &str); 15] = [
+        ("bkua_", "buildkite_api_access_token"),
+        ("bkur_", "buildkite_oauth_token"),
+        ("bktx_", "buildkite_oauth_token"),
+        ("bkaa_", "buildkite_agent_token"),
+        ("bkar_", "buildkite_agent_token"),
+        ("bkct_", "buildkite_agent_token"),
+        ("bkcqt_", "buildkite_agent_token"),
+        ("bkaj_", "buildkite_job_token"),
+        ("bkjat_", "buildkite_job_token"),
+        ("bkpt_", "buildkite_packages_token"),
+        ("bkrt_", "buildkite_packages_token"),
+        ("bktr_", "buildkite_pipeline_token"),
+        ("bkat_", "buildkite_pipeline_token"),
+        ("bkpat_", "buildkite_portal_token"),
+        ("bkps_", "buildkite_portal_token"),
+    ];
+
+    /// A body of `len` bytes over the full body alphabet whose first and last
+    /// bytes are alphanumeric.
+    pub(super) fn body(len: usize, seed: usize) -> String {
+        let mut bytes = filler(BODY, len, seed).into_bytes();
+        bytes[0] = b'B';
+        bytes[len - 1] = b'z';
+        String::from_utf8(bytes).unwrap()
+    }
+
+    pub(super) fn token(prefix: &str, len: usize, seed: usize) -> String {
+        format!("{prefix}{}", body(len, seed))
+    }
+
+    fn jwt(seed: usize) -> String {
+        format!(
+            "eyJ{}.eyJ{}.{}",
+            filler(B64URL, 30, seed),
+            filler(B64URL, 60, seed + 1),
+            filler(B64URL, 43, seed + 2)
+        )
+    }
+
+    #[test]
+    fn every_prefix_wins_every_context_as_the_sole_finding() {
+        for (seed, (prefix, type_name)) in ROLES.iter().enumerate() {
+            assert_sole_provider_finding(DETECTOR, type_name, &token(prefix, 40, seed));
+        }
+        let key = token("bkua_", 40, 1);
+        for input in [
+            format!("BUILDKITE_API_ACCESS_TOKEN={key}\n"),
+            format!("BUILDKITE_API_TOKEN={key}\nBUILDKITE_ORGANIZATION_SLUG=acme\n"),
+            format!(
+                "curl -H 'Authorization: Bearer {key}' https://api.buildkite.example/v2/organizations\n"
+            ),
+            format!(
+                "{{\"mcpServers\":{{\"buildkite\":{{\"env\":{{\"BUILDKITE_API_TOKEN\":\"{key}\"}}}}}}}}\n"
+            ),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, "buildkite_api_access_token", &key);
+        }
+        let agent = format!("bkaa_{}.{}", filler(ALNUM, 12, 2), filler(ALNUM, 60, 3));
+        for input in [
+            format!("BUILDKITE_AGENT_TOKEN={agent}\n"),
+            format!("buildkite-agent start --token {agent}\n"),
+            format!("12345 buildkite-agent start --token {agent} --tags queue=default\n"),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, "buildkite_agent_token", &agent);
+        }
+    }
+
+    /// The prefix wins over the `jwt` detector, whole-input and incremental:
+    /// one provider finding over the whole JWT and no `jwt` finding.
+    #[test]
+    fn a_job_token_jwt_is_one_provider_span_that_wins_over_jwt() {
+        for prefix in ["bkjat_", "bkaj_"] {
+            let token = format!("{prefix}{}", jwt(4));
+            assert_sole_provider_finding(DETECTOR, "buildkite_job_token", &token);
+            for input in [
+                format!("Authorization: Bearer {token}\n"),
+                format!("12345 buildkite-agent bootstrap --acquire-job {token} --queue default\n"),
+                format!("BUILDKITE_JOB_TOKEN={token}\nBUILDKITE_JOB_ID=1\n"),
+            ] {
+                let (text, findings) = whole_input(&input);
+                assert!(
+                    findings.iter().all(|f| f.detector() != "jwt"),
+                    "{input}: {findings:?}"
+                );
+                assert_sole_finding_in(&input, DETECTOR, "buildkite_job_token", &token);
+                assert!(!text.contains(&jwt(4)), "{input}");
+                assert_parity(&input);
+            }
+            // The same JWT without the prefix is still a plain `jwt` finding.
+            let bare = jwt(4);
+            assert_sole_finding_in(&format!("x {bare}\n"), "jwt", "jwt", &bare);
+        }
+    }
+
+    #[test]
+    fn the_floor_is_24_and_the_cap_is_2048_body_bytes() {
+        for prefix in ["bkua_", "bkjat_", "bkcqt_"] {
+            assert_sole_provider_finding(
+                DETECTOR,
+                ROLES.iter().find(|(p, _)| p == &prefix).unwrap().1,
+                &token(prefix, 24, 5),
+            );
+            assert_below_floor(&token(prefix, 23, 6));
+        }
+        let at_cap = token("bkua_", CAP, 7);
+        assert_sole_finding_in(&at_cap, DETECTOR, "buildkite_api_access_token", &at_cap);
+        // One byte over: reported up to the cap, the tail is not part of it.
+        let over = token("bkua_", CAP + 1, 8);
+        let (text, findings) = whole_input(&over);
+        let own = detector_findings(&findings, DETECTOR);
+        assert_eq!(own.len(), 1, "{findings:?}");
+        assert_eq!(
+            (own[0].range().start(), own[0].range().end()),
+            (0, "bkua_".len() + CAP)
+        );
+        assert!(text.len() < over.len());
+    }
+
+    /// Every probe context except the one that ends in a sentence period: the
+    /// provider's body alphabet includes `.`, so a period after a 23-byte body
+    /// is the 24th body byte (see the next test).
+    fn assert_below_floor(token: &str) {
+        for input in contexts(token) {
+            if !input.ends_with('.') {
+                assert_unclaimed(DETECTOR, &input);
+            }
+        }
+    }
+
+    #[test]
+    fn a_period_after_a_23_byte_body_counts_toward_the_floor_as_in_the_provider_rule() {
+        let short = token("bkua_", 23, 6);
+        let input = format!("The key is {short}.");
+        let (_, findings) = whole_input(&input);
+        let own = detector_findings(&findings, DETECTOR);
+        assert_eq!(own.len(), 1, "{findings:?}");
+        let start = input.find(&short).unwrap();
+        assert_eq!(
+            (own[0].range().start(), own[0].range().end()),
+            (start, start + short.len() + 1)
+        );
+    }
+
+    #[test]
+    fn a_trailing_dot_run_is_outside_the_span() {
+        let key = token("bkua_", 40, 9);
+        for suffix in [".", "..", ".\n", ". Next"] {
+            assert_sole_finding_in(
+                &format!("The token is {key}{suffix}"),
+                DETECTOR,
+                "buildkite_api_access_token",
+                &key,
+            );
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let long = body(40, 10);
+        let key = format!("bkua_{long}");
+        assert_below_floor(&format!("bkua_{}", &long[..23]));
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("bkzz_{long}"),
+                format!("bka_{long}"),
+                format!("BKUA_{long}"),
+                format!("bkua-{long}"),
+                format!("bkua.{long}"),
+                format!("xbkua_{long}"),
+                format!("_{key}"),
+                format!("my_{key}"),
+                format!("my-{key}"),
+                format!("bkua_{}=pad", &long[..20]),
+                format!("bkua_{}/{}", &long[..20], &long[..10]),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_and_placeholders_are_unclaimed() {
+        for input in [
+            "bkjat_encoded-token\n".to_owned(),
+            "BUILDKITE_API_ACCESS_TOKEN=bkua_xxx\n".to_owned(),
+            format!("bkua_{}\n", "*".repeat(53)),
+            "BUILDKITE_AGENT_TOKEN=${BUILDKITE_AGENT_TOKEN}\n".to_owned(),
+            "bkct_cluster_name_for_builds\n".to_owned(),
+            format!("{}\n", filler(LOWER_HEX, 40, 11)),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    /// The existing peer rule knows only `bkua_` + 40 lowercase hex: every
+    /// value it reports is reported here at the same span.
+    #[test]
+    fn the_peer_rule_shape_is_a_subset_of_this_grammar() {
+        for seed in 0..8 {
+            let key = format!("bkua_{}", filler(LOWER_HEX, 40, seed));
+            assert_sole_provider_finding(DETECTOR, "buildkite_api_access_token", &key);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_repetition_line(DETECTOR, &token("bkua_", 40, 12), 200);
+        assert_repetition_line(DETECTOR, &token("bkpat_", 40, 13), 200);
+        // Glued copies are one open-ended body: one capped span.
+        for glued in [token("bkua_", 40, 14).repeat(200), "bkua_".repeat(10_000)] {
+            let (_, findings) = whole_input(&glued);
+            let own = detector_findings(&findings, DETECTOR);
+            assert_eq!(own.len(), 1, "{findings:?}");
+            assert_eq!(own[0].range().start(), 0);
+            assert_eq!(own[0].range().end(), "bkua_".len() + CAP);
+        }
+    }
+
+    #[test]
+    fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
+        for (seed, (prefix, _)) in ROLES.iter().enumerate() {
+            assert_parity(&parity_input(&token(prefix, 40, seed)));
+        }
+        assert_parity(&parity_input(&format!("bkjat_{}", jwt(15))));
+    }
+
+    /// A body over the cap, at sampled and boundary-adjacent two-chunk
+    /// partitions (every partition of a 2 KB value is slow in a debug build).
+    #[test]
+    fn a_body_over_the_cap_agrees_across_sampled_partitions_and_per_line() {
+        let input = parity_input(&token("bkua_", CAP + 1, 16));
+        let (expected_text, expected) = whole_input(&input);
+        assert_eq!(detector_findings(&expected, DETECTOR).len(), 2);
+        let mut cuts: Vec<usize> = (0..input.len()).step_by(197).collect();
+        let first = input.find("bkua_").unwrap();
+        cuts.extend([
+            first,
+            first + 5,
+            first + 5 + CAP - 1,
+            first + 5 + CAP,
+            first + 5 + CAP + 1,
+        ]);
+        for cut in cuts.into_iter().filter(|&c| input.is_char_boundary(c)) {
+            let session = run(&[&input[..cut], &input[cut..]]);
+            assert_eq!(session.text(), expected_text, "cut {cut}");
+            let findings = session.findings();
+            assert_eq!(findings.len(), expected.len(), "cut {cut}");
+            for (got, want) in findings.iter().zip(&expected) {
+                assert_eq!(got.range(), want.range(), "cut {cut}");
+                assert_eq!(got.type_name(), want.type_name(), "cut {cut}");
+            }
+        }
+        let lines: Vec<&str> = input.split_inclusive('\n').collect();
+        assert_eq!(run(&lines).text(), expected_text);
+    }
+}

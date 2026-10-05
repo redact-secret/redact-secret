@@ -16052,6 +16052,778 @@
       "type": "unkey_root_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-bare",
+            "buildkite-token-positive-body-2048",
+            "buildkite-token-positive-body-2049-capped",
+            "buildkite-token-positive-body-23-plus-period-reaches-floor",
+            "buildkite-token-positive-body-24",
+            "buildkite-token-positive-chat-sentence",
+            "buildkite-token-positive-crlf-unicode-prefix",
+            "buildkite-token-positive-curl-bearer",
+            "buildkite-token-positive-dotenv",
+            "buildkite-token-positive-json-config",
+            "buildkite-token-positive-json-token-key",
+            "buildkite-token-positive-log",
+            "buildkite-token-positive-prefix-bkua",
+            "buildkite-token-positive-punctuation-adjacent",
+            "buildkite-token-positive-repeated-value",
+            "buildkite-token-positive-sdk-call",
+            "buildkite-token-positive-shell-export",
+            "buildkite-token-positive-tool-call-arguments",
+            "buildkite-token-positive-trailing-dot-run-trimmed",
+            "buildkite-token-positive-x-api-key-header",
+            "buildkite-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header",
+            "buildkite-token-overlap-bearer-header-api-access-token",
+            "buildkite-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "buildkite-token-adversarial-glued-tokens",
+            "buildkite-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_api_access_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_api_access_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-prefix-bktx",
+            "buildkite-token-positive-prefix-bkur"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header-oauth-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "buildkite_api_access_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_oauth_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_oauth_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-agent-start-command",
+            "buildkite-token-positive-organization-id-base58-agent-token",
+            "buildkite-token-positive-prefix-bkaa",
+            "buildkite-token-positive-prefix-bkar",
+            "buildkite-token-positive-prefix-bkcqt",
+            "buildkite-token-positive-prefix-bkct"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header-agent-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "buildkite_api_access_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_agent_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_agent_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-agent-job-jwt",
+            "buildkite-token-positive-job-acquisition-jwt",
+            "buildkite-token-positive-long-job-token-capped",
+            "buildkite-token-positive-prefix-bkaj",
+            "buildkite-token-positive-prefix-bkjat"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header-job-jwt",
+            "buildkite-token-overlap-bearer-header-job-token",
+            "buildkite-token-overlap-ps-acquire-job-jwt"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "buildkite_api_access_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_job_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_job_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-prefix-bkpt",
+            "buildkite-token-positive-prefix-bkrt"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header-packages-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "buildkite_api_access_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_packages_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_packages_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-prefix-bkat",
+            "buildkite-token-positive-prefix-bktr"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header-pipeline-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "buildkite_api_access_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_pipeline_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_pipeline_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "buildkite-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "buildkite-token-positive-organization-id-hex-portal-token",
+            "buildkite-token-positive-prefix-bkpat",
+            "buildkite-token-positive-prefix-bkps"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "buildkite-token-overlap-bearer-header-portal-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "buildkite_api_access_token"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "buildkite-token-negative-bare-40-hex",
+            "buildkite-token-negative-cluster-name-below-floor",
+            "buildkite-token-negative-env-reference",
+            "buildkite-token-negative-job-token-placeholder",
+            "buildkite-token-negative-masked-docs-example",
+            "buildkite-token-negative-short-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "buildkite-token-boundary-body-23",
+            "buildkite-token-boundary-dot-separator",
+            "buildkite-token-boundary-equals-splits-body",
+            "buildkite-token-boundary-glued-hyphen-prefix",
+            "buildkite-token-boundary-glued-prefix",
+            "buildkite-token-boundary-glued-underscore-prefix",
+            "buildkite-token-boundary-hyphen-separator",
+            "buildkite-token-boundary-job-token-body-23",
+            "buildkite-token-boundary-slash-splits-body",
+            "buildkite-token-boundary-third-party-only-prefix",
+            "buildkite-token-boundary-unlisted-prefix",
+            "buildkite-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for buildkite_portal_token (buildkite-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "buildkite_portal_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -16203,6 +16975,8 @@
             "bitwarden-sm-access-token-adversarial-padding-run",
             "browserbase-api-key-adversarial-long-body-run",
             "browserbase-api-key-adversarial-long-run",
+            "buildkite-token-adversarial-glued-tokens",
+            "buildkite-token-adversarial-prefix-run",
             "cerebras-api-key-adversarial-long-body-run",
             "cerebras-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",
@@ -16694,6 +17468,8 @@
             "bitwarden-sm-access-token-adversarial-padding-run",
             "browserbase-api-key-adversarial-long-body-run",
             "browserbase-api-key-adversarial-long-run",
+            "buildkite-token-adversarial-glued-tokens",
+            "buildkite-token-adversarial-prefix-run",
             "cerebras-api-key-adversarial-long-body-run",
             "cerebras-api-key-adversarial-long-run",
             "clickhouse-cloud-api-secret-adversarial-long-alphanumeric-run",

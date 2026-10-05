@@ -213,6 +213,50 @@ fn second_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
             "unkey_root_key",
             format!("unkey_3Z{}", filler(BASE58, 22, 3)),
         ),
+        (
+            "buildkite-token",
+            "buildkite_api_access_token",
+            format!("bkua_{}", filler(LOWER_HEX, 40, 1)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_oauth_token",
+            format!("bkur_{}", filler(ALNUM, 40, 2)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_agent_token",
+            format!("bkaa_{}.{}", filler(ALNUM, 12, 3), filler(ALNUM, 60, 4)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_job_token",
+            format!(
+                "bkjat_eyJ{}.eyJ{}.{}",
+                filler(BASE64URL, 30, 5),
+                filler(BASE64URL, 60, 6),
+                filler(BASE64URL, 43, 7)
+            ),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_packages_token",
+            format!("bkpt_{}", filler(ALNUM, 50, 8)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_pipeline_token",
+            format!("bktr_{}", filler(ALNUM, 40, 9)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_portal_token",
+            format!(
+                "bkpat_{}_{}",
+                filler(ALNUM, 12, 10),
+                filler(LOWER_HEX, 40, 11)
+            ),
+        ),
     ]
 }
 

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3927,
+  "fixtureCount": 3999,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -90048,6 +90048,1446 @@
         "maxFindings": 0,
         "maxRuntimeMs": 250
       }
+    },
+    {
+      "id": "buildkite-token-positive-bare",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "buildkite-token-positive-dotenv",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BUILDKITE_API_ACCESS_TOKEN=\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 72
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "buildkite-token-positive-shell-export",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export BUILDKITE_API_ACCESS_TOKEN=\"\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\"\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 80
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "buildkite-token-positive-yaml",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  BUILDKITE_API_ACCESS_TOKEN: \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 80
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "buildkite-token-positive-json-config",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"env\": {\"BUILDKITE_API_ACCESS_TOKEN\": \"\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\"}}",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 40,
+          "end": 85
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "buildkite-token-positive-json-token-key",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\"}",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 56
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "buildkite-token-positive-sdk-call",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client = Buildkite(api_token=\"\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\")\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 75
+        }
+      ],
+      "note": "An SDK or tool configuration is reported at exactly the key."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-x-api-key-header",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 56
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "buildkite-token-positive-curl-bearer",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Bearer \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5' https://api.example.test/v1\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 76
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "buildkite-token-positive-tool-call-arguments",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\": \"configure\", \"arguments\": {\"api_key\": \"\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\"}}",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 93
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "buildkite-token-positive-chat-sentence",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5 can you debug this?",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 60
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the key."
+    },
+    {
+      "id": "buildkite-token-positive-log",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-10-05T09:15:00Z INFO client init api_key=\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5 region=us\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 91
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "buildkite-token-positive-punctuation-adjacent",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5.",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 56
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "buildkite-token-positive-crlf-unicode-prefix",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 \ud0a4 reviewed format\r\n\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\n\r\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 73
+        }
+      ],
+      "note": "CRLF, Hangul and astral characters before the value keep the UTF-8 byte range exact."
+    },
+    {
+      "id": "buildkite-token-overlap-context",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "API_KEY=\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 53
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "buildkite-token-positive-repeated-value",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5 \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        },
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 91
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkua",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_BHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kua_ prefix is reported with the buildkite_api_access_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-api-access-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kua_BHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNz\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The buildkite_api_access_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkur",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kur_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_oauth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kur_ prefix is reported with the buildkite_oauth_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-oauth-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kur_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_oauth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The buildkite_oauth_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bktx",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062ktx_Bhov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_oauth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062ktx_ prefix is reported with the buildkite_oauth_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkaa",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kaa_Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt0z",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kaa_ prefix is reported with the buildkite_agent_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-agent-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kaa_Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt0z\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The buildkite_agent_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkar",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kar_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6Az",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kar_ prefix is reported with the buildkite_agent_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkct",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kct_BHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kct_ prefix is reported with the buildkite_agent_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkcqt",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kcqt_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The \u0062kcqt_ prefix is reported with the buildkite_agent_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkaj",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kaj_Bhov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kaj_ prefix is reported with the buildkite_job_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-job-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kaj_Bhov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnz\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The buildkite_job_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkjat",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kjat_Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt0z",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The \u0062kjat_ prefix is reported with the buildkite_job_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkpt",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kpt_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6Az",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_packages_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kpt_ prefix is reported with the buildkite_packages_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-packages-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kpt_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6Az\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_packages_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The buildkite_packages_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkrt",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062krt_BHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_packages_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062krt_ prefix is reported with the buildkite_packages_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bktr",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062ktr_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_pipeline_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062ktr_ prefix is reported with the buildkite_pipeline_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-pipeline-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062ktr_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_pipeline_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "The buildkite_pipeline_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkat",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kat_Bhov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_pipeline_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kat_ prefix is reported with the buildkite_pipeline_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkpat",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kpat_Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt0z",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_portal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The \u0062kpat_ prefix is reported with the buildkite_portal_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-portal-token",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kpat_Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt0z\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_portal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 68
+        }
+      ],
+      "note": "The buildkite_portal_token type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "buildkite-token-positive-prefix-bkps",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kps_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6Az",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_portal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "The \u0062kps_ prefix is reported with the buildkite_portal_token role at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-organization-id-base58-agent-token",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kaa_ahov2AHOVckr.nu18FNUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FMTbipw3BIPWd",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 78
+        }
+      ],
+      "note": "An organization id, a dot and a base58 body are one span."
+    },
+    {
+      "id": "buildkite-token-positive-organization-id-hex-portal-token",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kpat_07ELSahov2AH_18f6d5c3a1907e5d4b2918f6d5c3a1907e5d4b29",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_portal_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "An organization id, an underscore and a hex body are one span."
+    },
+    {
+      "id": "buildkite-token-positive-job-acquisition-jwt",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kjat_eyJOVcjqy5AHOWdkry6BIPWelsz6CJQXe.eyJbipw3-GNUbjqx4-HOVcjry5AHPWdkrz6BIPXelsz7CJQXfmt07DKRYfnu18D.ov29EMTahow3_FMUbipw4-GNUcjqx4AHOVckry5AIPW",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 147
+        }
+      ],
+      "note": "A \u0062kjat_ JWT body is one span from the prefix to the last JWT byte, never a separate jwt finding."
+    },
+    {
+      "id": "buildkite-token-positive-agent-job-jwt",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kaj_eyJbipw3-GNUbjqx4-HOVcjry5AHPWdkr.eyJov29EMTahow3_FMUbipw4-GNUcjqx4AHOVckry5AIPWdksz6BIQXels07CJQ.18DKRZgnu19ELSZhov29FMTahpw3_FNUbipx4-GNVcj",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 146
+        }
+      ],
+      "note": "A \u0062kaj_ JWT body is one span from the prefix to the last JWT byte, never a separate jwt finding."
+    },
+    {
+      "id": "buildkite-token-overlap-bearer-header-job-jwt",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0062kjat_eyJOVcjqy5AHOWdkry6BIPWelsz6CJQXe.eyJbipw3-GNUbjqx4-HOVcjry5AHPWdkrz6BIPXelsz7CJQXfmt07DKRYfnu18D.ov29EMTahow3_FMUbipw4-GNUcjqx4AHOVckry5AIPW\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 169
+        }
+      ],
+      "note": "The provider type wins over both the Bearer-header and the jwt candidates: one finding for the whole JWT."
+    },
+    {
+      "id": "buildkite-token-overlap-ps-acquire-job-jwt",
+      "detector": "buildkite-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "12345 buildkite-agent bootstrap --acquire-job \u0062kaj_eyJbipw3-GNUbjqx4-HOVcjry5AHPWdkr.eyJov29EMTahow3_FMUbipw4-GNUcjqx4AHOVckry5AIPWdksz6BIQXels07CJQ.18DKRZgnu19ELSZhov29FMTahpw3_FNUbipx4-GNVcj --queue default\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 192
+        }
+      ],
+      "note": "A process-list line carrying a JWT job token reports the provider type once."
+    },
+    {
+      "id": "buildkite-token-positive-agent-start-command",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "buildkite-agent start --token \u0062kaa_ahov2AHOVckr.nu18FNUbipx4BIPXelsz7ELSZhov29HOVcjry5CJRYfmt18FMTbipw3BIPWd\n",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_agent_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 108
+        }
+      ],
+      "note": "An agent start command line is reported at exactly the token."
+    },
+    {
+      "id": "buildkite-token-positive-body-24",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_BUbipx4-FMUbipw4-FMTbipz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 29
+        }
+      ],
+      "note": "The provider redactor's floor of 24 body bytes is accepted."
+    },
+    {
+      "id": "buildkite-token-positive-body-23-plus-period-reaches-floor",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0062kua_Bu18CKRYfmu18CJRYfmt18z.",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 40
+        }
+      ],
+      "note": "A period after a 23-byte body is the 24th body byte of the provider's grammar and is part of the span."
+    },
+    {
+      "id": "buildkite-token-positive-trailing-dot-run-trimmed",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Token \u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5... end",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6,
+          "end": 51
+        }
+      ],
+      "note": "A trailing dot run is sentence punctuation and stays outside the span."
+    },
+    {
+      "id": "buildkite-token-positive-body-2048",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 2053
+        }
+      ],
+      "note": "A body at the provider's cap of 2048 is one span."
+    },
+    {
+      "id": "buildkite-token-positive-body-2049-capped",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 2053
+        }
+      ],
+      "note": "A 2049-byte body is reported up to the cap and the tail is not part of the finding."
+    },
+    {
+      "id": "buildkite-token-positive-long-job-token-capped",
+      "detector": "buildkite-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kjat_BHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahov3_ELSahov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnu29DKRZgnu19DKRYgnu18DKRYfnu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt07CJQXemt07BJQXelt07BIQXels07BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6AHPWdkrz6AHOWdkry6AHOVdkry5AHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNUcjqx4.GNUbjqx4-GNUbiqx4-FNUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTahpw3_EMTahow3_ELTahoz",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_job_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 2054
+        }
+      ],
+      "note": "A far longer run is reported up to the cap."
+    },
+    {
+      "id": "buildkite-token-adversarial-prefix-run",
+      "detector": "buildkite-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_\u0062kua_",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 2053
+        }
+      ],
+      "note": "Repeated prefixes are one open-ended body: one capped span, and the scan stays linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "buildkite-token-adversarial-glued-tokens",
+      "detector": "buildkite-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5\u0062kua_d4b2918f6d5c3a1907e5d4b2918f6d5c3a1907e5",
+      "expected": [
+        {
+          "detector": "buildkite-token",
+          "type": "buildkite_api_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 2053
+        }
+      ],
+      "note": "Glued copies are one open-ended body: one capped span, never a finding per copy.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "buildkite-token-boundary-body-23",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_Bhov2_ELSZhov29ELSZgovz",
+      "expected": [],
+      "note": "A 23-byte body is below the provider redactor's floor of 24."
+    },
+    {
+      "id": "buildkite-token-boundary-job-token-body-23",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kjat_Bu18CKRYfmu18CJRYfmt18z",
+      "expected": [],
+      "note": "A 23-byte job acquisition body is below the floor."
+    },
+    {
+      "id": "buildkite-token-boundary-unlisted-prefix",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kzz_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6Az",
+      "expected": [],
+      "note": "The provider's prefix list is closed."
+    },
+    {
+      "id": "buildkite-token-boundary-third-party-only-prefix",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062ka_JQXelt07ELTahov3AHOVdkry5DKRYfnu18FNUbip",
+      "expected": [],
+      "note": "\u0062ka_ rests on one third-party rule and stays unclaimed."
+    },
+    {
+      "id": "buildkite-token-boundary-uppercase-prefix",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0042KUA_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "buildkite-token-boundary-hyphen-separator",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bkua-Bhov2_ELSZhov29ELSZgov29DLSZgnv29DKSZgnz",
+      "expected": [],
+      "note": "The separator is an underscore."
+    },
+    {
+      "id": "buildkite-token-boundary-dot-separator",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bkua.Bu18CKRYfmu18CJRYfmt18CJQYfmt08CJQXfmt0z",
+      "expected": [],
+      "note": "The separator is an underscore."
+    },
+    {
+      "id": "buildkite-token-boundary-glued-prefix",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0062kua_B7BIPXelsz7BIPWelsz6BIPWdlsz6AIPWdksz6Az",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "buildkite-token-boundary-glued-underscore-prefix",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "my_\u0062kua_BHOVckry5.HOVcjry5.GOVcjqy5.GNVcjqx5.GNz",
+      "expected": [],
+      "note": "An identifier glued before the prefix rejects the match."
+    },
+    {
+      "id": "buildkite-token-boundary-glued-hyphen-prefix",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "my-\u0062kua_BUbipx4-FMUbipw4-FMTbipw3-FMTaipw3_FMTaz",
+      "expected": [],
+      "note": "A hyphen-joined identifier before the prefix rejects the match."
+    },
+    {
+      "id": "buildkite-token-boundary-equals-splits-body",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_Bhov2_ELSZhov29ELSZz=Bu18CKRYfmu18CJRYfmz",
+      "expected": [],
+      "note": "An equals sign ends the run under the floor."
+    },
+    {
+      "id": "buildkite-token-boundary-slash-splits-body",
+      "detector": "buildkite-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_B7BIPXelsz7BIPWelszz/BHOVckry5.HOVcjry5.z",
+      "expected": [],
+      "note": "A slash ends the run under the floor."
+    },
+    {
+      "id": "buildkite-token-negative-job-token-placeholder",
+      "detector": "buildkite-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kjat_encoded-token\n",
+      "expected": [],
+      "note": "The provider's own placeholder is below the floor."
+    },
+    {
+      "id": "buildkite-token-negative-short-placeholder",
+      "detector": "buildkite-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BUILDKITE_API_ACCESS_TOKEN=\u0062kua_xxx\n",
+      "expected": [],
+      "note": "A short placeholder is below the floor."
+    },
+    {
+      "id": "buildkite-token-negative-masked-docs-example",
+      "detector": "buildkite-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kua_*****************************************************\n",
+      "expected": [],
+      "note": "The docs mask is not a token."
+    },
+    {
+      "id": "buildkite-token-negative-env-reference",
+      "detector": "buildkite-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BUILDKITE_AGENT_TOKEN=${BUILDKITE_AGENT_TOKEN}\n",
+      "expected": [],
+      "note": "A variable reference is not a literal token."
+    },
+    {
+      "id": "buildkite-token-negative-bare-40-hex",
+      "detector": "buildkite-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "2907e6d4b2a18f6e5c3a2907e6d4b2a18f6e5c3a\n",
+      "expected": [],
+      "note": "A bare 40-hex legacy API token has no distinctive shape and stays unclaimed."
+    },
+    {
+      "id": "buildkite-token-negative-cluster-name-below-floor",
+      "detector": "buildkite-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0062kct_cluster_name_for_builds\n",
+      "expected": [],
+      "note": "A snake_case identifier whose body is under the floor is not a token."
     }
   ]
 }
