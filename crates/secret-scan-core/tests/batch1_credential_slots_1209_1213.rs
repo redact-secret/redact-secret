@@ -350,3 +350,150 @@ fn airtable_hook_response_with_the_hmac_header_reports_only_the_secret() {
     );
     assert_value(&input, MAC_JSON, "contextual_secret");
 }
+
+// -------------------------------------- #1212 Authorization / Proxy: ApiKey
+
+// Undecoded encoded values; the tests never decode them and claim no width.
+const KEY_RAW: &str = "U1lOVEhFVElDLUlELTAwMDAxMDAwOlNZTlRIRVRJQy1LRVktMDAwMDEwMDA=";
+const KEY_PROXY: &str = "U1lOVEhFVElDLUlELTAwMDAyMDAwOlNZTlRIRVRJQy1LRVktMDAwMDIwMDA=";
+const KEY_UNI: &str = "U1lOVEhFVElDLUlELTAwMDAzMDAwOlNZTlRIRVRJQy1LRVktMDAwMDMwMDA=";
+const KEY_C1: &str = "U1lOVEhFVElDLUlELTAwMDA0MDAwOlNZTlRIRVRJQy1LRVktMDAwMDQwMDA=";
+const KEY_C2: &str = "U1lOVEhFVElDLUlELTAwMDA1MDAwOlNZTlRIRVRJQy1LRVktMDAwMDUwMDA=";
+const KEY_C3: &str = "U1lOVEhFVElDLUlELTAwMDA2MDAwOlNZTlRIRVRJQy1LRVktMDAwMDYwMDA=";
+const KEY_MAP: &str = "U1lOVEhFVElDLUlELTAwMDA3MDAwOlNZTlRIRVRJQy1LRVktMDAwMDcwMDA=";
+const KEY_PMAP: &str = "U1lOVEhFVElDLUlELTAwMDA4MDAwOlNZTlRIRVRJQy1LRVktMDAwMDgwMDA=";
+
+#[test]
+fn apikey_authorization_value_is_redacted_in_every_supported_layout() {
+    for (input, value) in [
+        (
+            format!(
+                "GET /_security/_authenticate HTTP/1.1\r\nHost: es.example.test:9200\r\nAuthorization: ApiKey {KEY_RAW}\r\nAccept: application/json\r\n\r\n"
+            ),
+            KEY_RAW,
+        ),
+        (
+            format!(
+                "GET /_cluster/health HTTP/1.1\r\nHost: es.example.test:9200\r\nProxy-Authorization: ApiKey {KEY_PROXY}\r\n\r\n"
+            ),
+            KEY_PROXY,
+        ),
+        (
+            format!(
+                "# caf\u{e9} \u{1F680}\nGET / HTTP/1.1\r\nAuthorization: ApiKey {KEY_UNI}\r\n\r\n"
+            ),
+            KEY_UNI,
+        ),
+        (
+            format!(
+                "curl -s -H 'Authorization: ApiKey {KEY_C1}' https://es.example.test:9200/_cat/indices\n"
+            ),
+            KEY_C1,
+        ),
+        (
+            format!(
+                "curl -s -H \"Authorization: ApiKey {KEY_C2}\" https://es.example.test:9200/_cat/indices\n"
+            ),
+            KEY_C2,
+        ),
+        (
+            format!(
+                "curl -x http://proxy.example.test:3128 -H \"Proxy-Authorization: ApiKey {KEY_C3}\" https://es.example.test:9200/\n"
+            ),
+            KEY_C3,
+        ),
+        (
+            format!(
+                "{{\"headers\":{{\"Accept\":\"application/json\",\"Authorization\":\"ApiKey {KEY_MAP}\"}}}}\n"
+            ),
+            KEY_MAP,
+        ),
+        (
+            format!("{{\"headers\":{{\"Proxy-Authorization\":\"ApiKey {KEY_PMAP}\"}}}}\n"),
+            KEY_PMAP,
+        ),
+    ] {
+        // Generic attribution: ApiKey is not unique to one provider, and the
+        // encoded value is not decoded or split into id and key.
+        assert_value(&input, value, "authorization_credential");
+    }
+}
+
+#[test]
+fn apikey_scheme_case_and_spacing_are_explicit() {
+    // The scheme and header name are case-insensitive and a tab separates
+    // the scheme from the value, as for `Basic`.
+    for input in [
+        format!("authorization: apikey {KEY_RAW}\r\n"),
+        format!("AUTHORIZATION:ApiKey\t{KEY_RAW}\r\n"),
+        format!("  Authorization :  APIKEY   {KEY_RAW}\r\n"),
+    ] {
+        assert_value(&input, KEY_RAW, "authorization_credential");
+    }
+}
+
+#[test]
+fn apikey_value_offset_is_in_utf8_bytes() {
+    let prefix = "# caf\u{e9} \u{1F680}\nGET / HTTP/1.1\r\nAuthorization: ApiKey ";
+    let input = format!("{prefix}{KEY_UNI}\r\n\r\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_ne!(prefix.len(), prefix.chars().count());
+    assert_eq!(findings[0].range().start(), prefix.len());
+    assert_eq!(findings[0].range().end(), prefix.len() + KEY_UNI.len());
+}
+
+#[test]
+fn apikey_controls_stay_clean() {
+    for input in [
+        // Bare ApiKey prose with no header carrier.
+        format!(
+            "Send the key after the ApiKey scheme: ApiKey {KEY_RAW} is how the docs show it.\n"
+        ),
+        // Header-name prefix and suffix lookalikes.
+        format!("X-Authorization: ApiKey {KEY_RAW}\r\n"),
+        format!("Authorization-Info: ApiKey {KEY_RAW}\r\n"),
+        format!("curl -H 'X-Proxy-Authorization: ApiKey {KEY_RAW}' https://es.example.test/\n"),
+        // A newline between the scheme and the value.
+        format!("Authorization: ApiKey\r\n{KEY_RAW}\r\n"),
+        // Placeholders, references, masks.
+        "Authorization: ApiKey <your-api-key>\r\n".to_owned(),
+        "curl -H \"Authorization: ApiKey YOUR_API_KEY\" https://es.example.test:9200/\n".to_owned(),
+        "curl -H \"Authorization: ApiKey ${ES_API_KEY}\" https://es.example.test:9200/\n"
+            .to_owned(),
+        "Authorization: ApiKey ****************************\r\n".to_owned(),
+        // A key id alone (not claimed, not assumed benign): the id field has
+        // no credential slot.
+        "{\"id\":\"SYNTHETICKEYID000100\",\"name\":\"ingest-key\",\"expiration\":1791200000000}\n"
+            .to_owned(),
+    ] {
+        assert_clean(&input);
+    }
+}
+
+#[test]
+fn apikey_does_not_change_the_other_authorization_schemes() {
+    // `Key` (fal), `Basic` and `Bearer` keep their own readings and types.
+    let basic = format!("Authorization: Basic {KEY_RAW}\r\n");
+    assert_value(&basic, KEY_RAW, "authorization_credential");
+    let keyed = format!("Authorization: Key {KEY_RAW}\r\n");
+    assert_value(&keyed, KEY_RAW, "authorization_credential");
+    // `ApiKey` is one scheme word: a different word that starts with `Api`
+    // is not it, and neither is the scheme glued to its value.
+    assert_clean(&format!("Authorization: Apis {KEY_RAW}\r\n"));
+    assert_clean(&format!("Authorization: ApiKey{KEY_RAW}\r\n"));
+}
+
+#[test]
+fn apikey_values_overlap_with_a_provider_finding_resolves_to_one_finding() {
+    // A Mailchimp key under the lowercase `apikey` scheme is one typed
+    // provider finding over the same span, not two.
+    let value = "0123456789abcdef0123456789abcdef-us6";
+    let input = format!("Authorization: apikey {value}\r\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    let start = input.find(value).unwrap();
+    assert_eq!(findings[0].range().start(), start);
+    assert_eq!(findings[0].range().end(), start + value.len());
+    assert_eq!(findings[0].action(), Action::Redact);
+}

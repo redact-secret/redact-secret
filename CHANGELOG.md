@@ -61,6 +61,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` redacts an `Authorization: ApiKey <value>` or
+  `Proxy-Authorization: ApiKey <value>` credential in raw HTTP, quoted curl `-H`
+  and JSON header maps, as a generic `authorization_credential` over the
+  undecoded encoded value (#1212). Before this the scheme produced no finding.
+  The value is not decoded or split into id and key, no width is assumed, and no
+  Elastic type is claimed because `ApiKey` is not unique to one provider. Bare
+  `ApiKey` prose, `X-Authorization` and `Authorization-Info`, a newline between
+  scheme and value, placeholders, references and masks are not reported.
 - `generic-token` redacts the value of Airtable's `macSecretBase64` field (the
   Base64 MAC secret returned when a webhook is created) in JSON, YAML and
   direct assignment, as a generic `contextual_secret` over the complete encoded
