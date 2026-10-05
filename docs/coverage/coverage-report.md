@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 155/155 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 156/156 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 155 |
+| supported | 156 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 166.
+Coverage declarations: 167.
 
 ## Coverage by detector
 
@@ -87,6 +87,7 @@ Coverage declarations: 166.
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| mapbox-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mistral-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | neon-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -233,6 +234,7 @@ Coverage declarations: 166.
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
+| mapbox_secret_access_token | mapbox-token | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
 | mistral_api_key | mistral-api-key | provider | supported | not-applicable | none |
 | neon_api_key | neon-api-key | provider | supported | not-applicable | none |
@@ -326,15 +328,15 @@ Coverage declarations: 166.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 166 | 0 | 0 |
-| boundary | 155 | 0 | 0 |
-| host-context | 155 | 0 | 0 |
+| adversarial | 167 | 0 | 0 |
+| boundary | 156 | 0 | 0 |
+| host-context | 156 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 166 | 0 | 0 |
-| near-miss-negative | 155 | 0 | 0 |
-| overlap | 155 | 0 | 0 |
-| positive | 155 | 0 | 0 |
-| range | 166 | 0 | 0 |
+| malformed | 167 | 0 | 0 |
+| near-miss-negative | 156 | 0 | 0 |
+| overlap | 156 | 0 | 0 |
+| positive | 156 | 0 | 0 |
+| range | 167 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

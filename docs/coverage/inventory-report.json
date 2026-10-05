@@ -7103,12 +7103,69 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "square_oauth_application_secret"
+    },
+    {
+      "detector": "mapbox-token",
+      "evidence": {
+        "fixtureCount": 49,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "mapbox-token-positive-bare",
+        "mapbox-token-positive-chat-sentence",
+        "mapbox-token-positive-crlf-unicode-prefix",
+        "mapbox-token-positive-curl-bearer",
+        "mapbox-token-positive-dash-and-underscore",
+        "mapbox-token-positive-dotenv",
+        "mapbox-token-positive-gradle-properties",
+        "mapbox-token-positive-json-config",
+        "mapbox-token-positive-json-token-key",
+        "mapbox-token-positive-log",
+        "mapbox-token-positive-mcp-server-config",
+        "mapbox-token-positive-npmrc-downloads-credential",
+        "mapbox-token-positive-payload-100",
+        "mapbox-token-positive-payload-20",
+        "mapbox-token-positive-payload-250",
+        "mapbox-token-positive-payload-55",
+        "mapbox-token-positive-payload-60",
+        "mapbox-token-positive-punctuation-adjacent",
+        "mapbox-token-positive-repeated-value",
+        "mapbox-token-positive-sdk-call",
+        "mapbox-token-positive-shell-export",
+        "mapbox-token-positive-tool-call-arguments",
+        "mapbox-token-positive-trailing-segment-is-outside-the-span",
+        "mapbox-token-positive-x-api-key-header",
+        "mapbox-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "mapbox_secret_access_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 155,
+    "supported": 156,
     "unresolved": 0
   }
 }

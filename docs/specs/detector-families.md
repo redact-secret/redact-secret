@@ -105,6 +105,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `linear_token` | `linear-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `mailchimp_api_key` | `mailchimp-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailchimp`'s own module doc, per issue #313; issue #931 relaxes the #313 same-line `mailchimp` keyword gate for the complete shape only (32 hex, `-us`, 1–3 digit datacenter): a keyword-free match that is a DNS label or URL path segment is not reported; issue #936 raises the complete shape outside a DNS label or URL path to `high` (redact) with or without a keyword, so only a keyword-kept DNS-label or path match stays `medium` (warn) |
 | `mailgun_api_key` | `mailgun-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailgun`'s own module doc, per issue #314 |
+| `mapbox_secret_access_token` | `mapbox-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and the provider's token parser, R1; signature width by R5), the payload floor of 20 is derived rather than provider-stated and rests on the Q7 recommendation (pending ruling), `pk.` is public and never claimed, `tk.` is unclaimed on the Q9 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `microsoft_entra_client_secret` | `microsoft-entra-client-secret` | `always-redact` | [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `mistral_api_key` | `mistral-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `neon_api_key` | `neon-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -1396,6 +1397,7 @@ handoff's stated recommendation and records the open ruling as a bounded limit.
 | --- | --- | --- | --- | --- |
 | `pydantic:logfire-token` (write and read tokens, API keys, AI Gateway key) | `pydantic-logfire-token` | `pylf_v` + 1 to 3 digits + `_` + `[a-z]{2,16}` region + `_` + optional 8-4-4-4-12 hex organization id (either case) + `_` + `[A-Za-z0-9]{20,}` | `pydantic_logfire_token` | T1 (SDK parsers, R1; provider scrubber, R2); the body floor and region cap are narrowing policy (pending ruling Q7, recommendation: allowed) |
 | `square:access-token` (and the OAuth application secret) | `square-token` | `EAAA` + exactly 60, `sq0csp-` + 43 or 44, or `sandbox-sq0csb-` + exactly 43, all `[A-Za-z0-9_-]` | `square_access_token` (`EAAA`), `square_oauth_application_secret` (`sq0csp-`, `sandbox-sq0csb-`) | T1 (provider docs examples, R4 and R5, corroborated by scanner rules); exact widths under the Q8 recommendation (pending ruling) |
+| `mapbox:secret-access-token` | `mapbox-token` | `sk.` + `eyJ` + `[A-Za-z0-9_-]{20,}` payload + `.` + exactly 22 `[A-Za-z0-9_-]` signature | `mapbox_secret_access_token` | T1 (provider docs and parser, R1; signature width by R5); the payload floor is derived (pending ruling Q7, recommendation: allowed); `tk.` unclaimed (pending ruling Q9, recommendation: unclaimed) |
 
 Pydantic Logfire ([#1106](https://github.com/redact-secret/redact-secret/issues/1106),
 [handoff](../audits/evidence/1014/pydantic-logfire.md)). The write token, read
@@ -1447,6 +1449,34 @@ includes a Base64 line made almost entirely of `A` bytes after a lone `E`; the
 boundary makes this very rare, and an almost-constant-body post-check is an
 option for a later issue, not part of this contract. Cost: three prefixes on
 the shared known-format scan.
+
+Mapbox ([#1108](https://github.com/redact-secret/redact-secret/issues/1108),
+[handoff](../audits/evidence/1014/mapbox.md)). A Mapbox access token is
+`<usage>.<payload>.<signature>` with the usage header `pk`, `sk` or `tk`; only
+`sk.` is claimed, whole, as one span. The payload is the base64url of a JSON
+object that begins `{"`, so it begins `eyJ`; it has no provider-stated length
+(it grows with the account and token contents, a Drupal tracker records 98
+characters in 2022 and later growth), so the floor of 20 characters after `eyJ`
+is derived from the documented two-claim object, not stated by Mapbox, and the
+22-byte signature tail (docs example plus provider fixtures, R5) is the real
+anchor. Ruling Q7 (may a derived floor serve as the T1 floor) is open; the row
+follows its recommendation (yes) and, if it is refused, falls back to a payload
+pinned to the documented `u` claim lead, which is narrower. Ruling Q9 is also
+open: `pk.` tokens are public by design and are never claimed, and `tk.`
+temporary tokens (expire within an hour, richer payload) stay unclaimed until a
+provider source states their length, a bounded false negative. The `jwt`
+detector cannot start inside the token: it needs a three-segment `eyJ.eyJ.sig`
+shape and rejects a match whose preceding byte is a token byte, `.` included,
+and the byte before the payload's `eyJ` is the header's `.`. The provider type
+is therefore the only finding for the span, whole-input and incremental, and
+the same JWT without the `sk.` header stays a plain `jwt` finding. A signature
+that itself begins `eyJ` is claimed to its 22 bytes and any further segment is
+outside the span. False negatives: `tk.` tokens, a signature of any width
+other than 22 (a 23rd byte rejects the whole token, never truncating it), a
+payload that does not begin `eyJ`, a future signature length, `SK.`, `sk_` and
+`sk-` forms and a glued value. False positives: a non-Mapbox `sk.eyJ...`
+followed by exactly 22 base64url bytes; none is known. Cost: one prefix on the
+shared known-format scan plus a 23-byte tail check.
 
 ## Batch 1 credential slots (#1209 to #1213)
 

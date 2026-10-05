@@ -70,6 +70,12 @@ evidence is linked from each published version.
     disagree, so the `EAAl` 63-character access token, the `EQAA` refresh token
     and every other width stay unclaimed (ruling Q8 pending); JWT-format tokens
     stay with `jwt`.
+  - `mapbox-token` (#1108): Mapbox secret access tokens, `sk.eyJ` + 20 or more
+    base64url + `.` + exactly 22 base64url (`mapbox_secret_access_token`). The
+    payload floor is derived, not provider-stated (ruling Q7 pending); public
+    `pk.` tokens are never claimed and `tk.` temporary tokens stay unclaimed
+    (ruling Q9 pending). The span is one provider finding with no `jwt` finding
+    over it.
 
 ### Fixed
 

@@ -424,3 +424,201 @@ mod square {
         assert_parity(&parity_input(&token("sandbox-sq0csb-", 43, 33)));
     }
 }
+
+mod mapbox {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "mapbox-token";
+    const TYPE: &str = "mapbox_secret_access_token";
+
+    pub(super) fn token(
+        header: &str,
+        payload_tail: usize,
+        signature: usize,
+        seed: usize,
+    ) -> String {
+        format!(
+            "{header}.eyJ{}.{}",
+            filler(B64URL, payload_tail, seed),
+            filler(B64URL, signature, seed + 1)
+        )
+    }
+
+    fn jwt(seed: usize) -> String {
+        format!(
+            "eyJ{}.eyJ{}.{}",
+            filler(B64URL, 30, seed),
+            filler(B64URL, 60, seed + 1),
+            filler(B64URL, 43, seed + 2)
+        )
+    }
+
+    #[test]
+    fn secret_tokens_win_every_context_as_the_sole_finding_at_every_payload_width() {
+        for (seed, payload_tail) in [20, 21, 55, 60, 100, 250].into_iter().enumerate() {
+            assert_sole_provider_finding(DETECTOR, TYPE, &token("sk", payload_tail, 22, seed));
+        }
+        let token = token("sk", 60, 22, 7);
+        assert!(token.contains('-') || token.contains('_'));
+        for input in [
+            format!("MAPBOX_SECRET_TOKEN={token}\n"),
+            format!("SK_MAPBOX={token}\n"),
+            format!("MAPBOX_DOWNLOADS_TOKEN={token}\n"),
+            format!("//api.mapbox.example/downloads/v2/:_authToken={token}\n"),
+            format!("systemProp.mapboxAccessToken={token}\n"),
+            format!("{{\"token\": \"{token}\"}}\n"),
+            format!(
+                "curl -H 'Authorization: Bearer {token}' https://api.mapbox.example/styles/v1\n"
+            ),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, TYPE, &token);
+        }
+    }
+
+    /// The `jwt` detector cannot start inside `sk.eyJ...`: the byte before the
+    /// payload's `eyJ` is a `.`, which it treats as part of a wider token. The
+    /// provider type is the only finding, whole-input and incremental, and the
+    /// same JWT without an `sk.` header stays a plain `jwt` finding.
+    #[test]
+    fn a_secret_token_is_one_provider_span_with_no_jwt_finding() {
+        let token = token("sk", 60, 22, 8);
+        for input in [
+            format!("{token}\n"),
+            format!("Authorization: Bearer {token}\n"),
+            format!("MAPBOX_SECRET_TOKEN={token}\n"),
+            format!("# \u{d0a4}\u{1f511} 키\n{token}\n"),
+        ] {
+            let (_, findings) = whole_input(&input);
+            assert!(
+                findings.iter().all(|f| f.detector() != "jwt"),
+                "{input}: {findings:?}"
+            );
+            assert_sole_finding_in(&input, DETECTOR, TYPE, &token);
+            assert_parity(&input);
+            let lines: Vec<&str> = input.split_inclusive('\n').collect();
+            let session = run(&lines);
+            assert!(
+                session.findings().iter().all(|f| f.detector() != "jwt"),
+                "{input}"
+            );
+        }
+        // A signature that itself starts with `eyJ` and is followed by more
+        // base64url segments is still claimed only up to its 22 bytes, with no
+        // `jwt` finding over any of it.
+        let tricky = format!(
+            "sk.eyJ{}.eyJ{}.{}",
+            filler(B64URL, 30, 9),
+            filler(B64URL, 19, 10),
+            filler(B64URL, 20, 11)
+        );
+        let claimed = &tricky[..tricky.len() - 21];
+        let (_, findings) = whole_input(&tricky);
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        assert_eq!(findings[0].detector(), DETECTOR);
+        assert_eq!(
+            (findings[0].range().start(), findings[0].range().end()),
+            (0, claimed.len())
+        );
+        assert_parity(&format!("{tricky}\n"));
+        // The same JWT without a header is a plain `jwt` finding, and a
+        // two-segment `eyJ...` value is neither.
+        let bare = jwt(12);
+        assert_sole_finding_in(&format!("x {bare}\n"), "jwt", "jwt", &bare);
+        assert_parity(&format!("x {bare}\n"));
+        let two_segments = format!("eyJ{}.{}", filler(B64URL, 60, 13), filler(B64URL, 22, 14));
+        let (_, findings) = whole_input(&format!("x {two_segments}\n"));
+        assert!(findings.is_empty(), "{findings:?}");
+    }
+
+    #[test]
+    fn a_secret_token_glued_to_a_jwt_shape_is_not_claimed_as_a_fourth_segment() {
+        let (_, findings) = whole_input(&format!("sk.{}\n", jwt(15)));
+        assert!(
+            detector_findings(&findings, DETECTOR).is_empty(),
+            "{findings:?}"
+        );
+    }
+
+    #[test]
+    fn public_and_temporary_tokens_are_never_claimed() {
+        // `pk.` is public by design; `tk.` stays unclaimed until ruling Q9 on
+        // #1014 (a bounded false negative of this detector).
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token("pk", 60, 22, 16),
+                token("tk", 60, 22, 17),
+                token("pk", 20, 22, 18),
+            ],
+        );
+    }
+
+    #[test]
+    fn the_payload_floor_is_20_and_the_signature_is_exactly_22() {
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token("sk", 19, 22, 19),
+                token("sk", 1, 22, 19),
+                token("sk", 60, 21, 20),
+                token("sk", 60, 23, 20),
+                token("sk", 60, 0, 20),
+            ],
+        );
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let payload = filler(B64URL, 60, 21);
+        let signature = filler(B64URL, 22, 22);
+        let base = token("sk", 60, 22, 21);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token("SK", 60, 22, 21),
+                format!("sk_eyJ{payload}.{signature}"),
+                format!("sk-eyJ{payload}.{signature}"),
+                format!("sk.eyI{payload}.{signature}"),
+                format!("sk.abc{payload}.{signature}"),
+                format!("sk.eyJ{payload}{signature}"),
+                format!("sk.eyJ{payload}"),
+                format!("sk.eyJ{payload}.{signature}_"),
+                format!("sk.eyJ{payload}.{signature}-x"),
+                format!("sk.eyJ{payload}..{signature}"),
+                format!("task.eyJ{payload}.{signature}"),
+                format!("desk.eyJ{payload}.{signature}"),
+                format!("x{base}"),
+                format!("_{base}"),
+                format!("-{base}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            format!("{}\n", jwt(23)),
+            format!("MAPBOX_ACCESS_TOKEN={}\n", token("pk", 60, 22, 24)),
+            "mapbox://styles/user/ckabc123 user.abc123 mapbox.mapbox-streets-v8\n".to_owned(),
+            "an sk. prefix and a task.list\n".to_owned(),
+            "MAPBOX_SECRET_TOKEN=${MAPBOX_SECRET_TOKEN}\n".to_owned(),
+            "MAPBOX_SECRET_TOKEN=sk.eyJ****.****\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"sk.eyJ".repeat(10_000));
+        assert_unclaimed(DETECTOR, &format!("sk.eyJ{}", filler(B64URL, 100_000, 25)));
+        assert_unclaimed(DETECTOR, &token("sk", 60, 22, 26).repeat(100));
+        assert_repetition_line(DETECTOR, &token("sk", 60, 22, 26), 200);
+    }
+
+    #[test]
+    fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
+        assert_parity(&parity_input(&token("sk", 60, 22, 27)));
+        assert_parity(&parity_input(&token("sk", 20, 22, 28)));
+    }
+}

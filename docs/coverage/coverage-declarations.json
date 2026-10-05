@@ -17212,6 +17212,138 @@
       "type": "square_oauth_application_secret"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "mapbox-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "mapbox-token-positive-bare",
+            "mapbox-token-positive-chat-sentence",
+            "mapbox-token-positive-crlf-unicode-prefix",
+            "mapbox-token-positive-curl-bearer",
+            "mapbox-token-positive-dash-and-underscore",
+            "mapbox-token-positive-dotenv",
+            "mapbox-token-positive-gradle-properties",
+            "mapbox-token-positive-json-config",
+            "mapbox-token-positive-json-token-key",
+            "mapbox-token-positive-log",
+            "mapbox-token-positive-mcp-server-config",
+            "mapbox-token-positive-npmrc-downloads-credential",
+            "mapbox-token-positive-payload-100",
+            "mapbox-token-positive-payload-20",
+            "mapbox-token-positive-payload-250",
+            "mapbox-token-positive-payload-55",
+            "mapbox-token-positive-payload-60",
+            "mapbox-token-positive-punctuation-adjacent",
+            "mapbox-token-positive-repeated-value",
+            "mapbox-token-positive-sdk-call",
+            "mapbox-token-positive-shell-export",
+            "mapbox-token-positive-tool-call-arguments",
+            "mapbox-token-positive-trailing-segment-is-outside-the-span",
+            "mapbox-token-positive-x-api-key-header",
+            "mapbox-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "mapbox-token-overlap-bearer-header",
+            "mapbox-token-overlap-context",
+            "mapbox-token-overlap-signature-looks-like-a-jwt-segment"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "mapbox-token-adversarial-glued-tokens",
+            "mapbox-token-adversarial-long-payload-without-signature",
+            "mapbox-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "mapbox-token-boundary-glued-prefix",
+            "mapbox-token-boundary-glued-trailing-dash",
+            "mapbox-token-boundary-glued-trailing-underscore",
+            "mapbox-token-boundary-hyphen-separator",
+            "mapbox-token-boundary-missing-second-dot",
+            "mapbox-token-boundary-payload-19",
+            "mapbox-token-boundary-payload-without-json-lead",
+            "mapbox-token-boundary-public-pk-token",
+            "mapbox-token-boundary-signature-21",
+            "mapbox-token-boundary-signature-23",
+            "mapbox-token-boundary-temporary-tk-token",
+            "mapbox-token-boundary-underscore-separator",
+            "mapbox-token-boundary-uppercase-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "mapbox-token-negative-env-reference",
+            "mapbox-token-negative-masked",
+            "mapbox-token-negative-prefix-in-prose",
+            "mapbox-token-negative-style-and-tileset-ids",
+            "mapbox-token-negative-two-segment-eyj-value"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "mapbox-token-boundary-glued-prefix",
+            "mapbox-token-boundary-glued-trailing-dash",
+            "mapbox-token-boundary-glued-trailing-underscore",
+            "mapbox-token-boundary-hyphen-separator",
+            "mapbox-token-boundary-missing-second-dot",
+            "mapbox-token-boundary-payload-19",
+            "mapbox-token-boundary-payload-without-json-lead",
+            "mapbox-token-boundary-public-pk-token",
+            "mapbox-token-boundary-signature-21",
+            "mapbox-token-boundary-signature-23",
+            "mapbox-token-boundary-temporary-tk-token",
+            "mapbox-token-boundary-underscore-separator",
+            "mapbox-token-boundary-uppercase-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for mapbox_secret_access_token (mapbox-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "mapbox_secret_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -17434,6 +17566,9 @@
             "linear-adversarial-long-suffix",
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
+            "mapbox-token-adversarial-glued-tokens",
+            "mapbox-token-adversarial-long-payload-without-signature",
+            "mapbox-token-adversarial-prefix-run",
             "microsoft-entra-client-secret-adversarial-long-padding",
             "mistral-api-key-adversarial-dense-findings",
             "neon-api-key-adversarial-dense-findings",
@@ -17931,6 +18066,9 @@
             "linear-adversarial-long-suffix",
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
+            "mapbox-token-adversarial-glued-tokens",
+            "mapbox-token-adversarial-long-payload-without-signature",
+            "mapbox-token-adversarial-prefix-run",
             "microsoft-entra-client-secret-adversarial-long-padding",
             "mistral-api-key-adversarial-dense-findings",
             "neon-api-key-adversarial-dense-findings",

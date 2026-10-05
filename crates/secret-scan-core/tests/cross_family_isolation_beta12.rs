@@ -205,6 +205,15 @@ fn third_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
             "square_oauth_application_secret",
             format!("sandbox-sq0csb-{}", filler(BASE64URL, 43, 3)),
         ),
+        (
+            "mapbox-token",
+            "mapbox_secret_access_token",
+            format!(
+                "sk.eyJ{}.{}",
+                filler(BASE64URL, 60, 1),
+                filler(BASE64URL, 22, 2)
+            ),
+        ),
     ]
 }
 

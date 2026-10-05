@@ -1114,6 +1114,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0073q0csp-SyntheticRevokedSquareAppSecret000000000000",
       "schemes": null
+    },
+    {
+      "type": "mapbox_secret_access_token",
+      "detector": "mapbox-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073k.eyJSyntheticRevokedMapboxPayloadFixture.SyntheticRevokedMbxSig",
+      "schemes": null
     }
   ],
   "consumers": [

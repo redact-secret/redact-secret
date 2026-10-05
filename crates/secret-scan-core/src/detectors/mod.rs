@@ -56,6 +56,7 @@ mod langsmith;
 mod linear;
 mod mailchimp;
 mod mailgun;
+mod mapbox;
 mod microsoft_entra;
 mod neon;
 mod netlify;
@@ -415,6 +416,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("buildkite-token", &buildkite::BUILDKITE),
         row("pydantic-logfire-token", &pydantic_logfire::LOGFIRE),
         row("square-token", &square::SQUARE),
+        row("mapbox-token", &mapbox::MAPBOX),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -767,6 +769,7 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         square::SQUARE.detector_id(),
         &[Literals::Shapes(square::SQUARE.shapes())],
     ),
+    (mapbox::ID, &[Literals::Shapes(mapbox::SHAPES)]),
     (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
@@ -962,6 +965,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("buildkite-token", Pack::Provider),
     ("pydantic-logfire-token", Pack::Provider),
     ("square-token", Pack::Provider),
+    ("mapbox-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1125,6 +1129,7 @@ mod tests {
                 "buildkite-token",
                 "pydantic-logfire-token",
                 "square-token",
+                "mapbox-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1509,6 +1514,12 @@ mod tests {
         let buildkite_token_input = format!("bkua_{}", "5e7c0ded".repeat(5));
         let pydantic_logfire_token_input = format!("pylf_v1_us_{}", "5e7c0ded".repeat(5));
         let square_token_input = format!("EAAA{}{}", "5e7c0ded".repeat(7), "5e7c");
+        let mapbox_token_input = format!(
+            "sk.eyJ{}.{}{}",
+            "5e7c0ded".repeat(3),
+            "5e7c0ded".repeat(2),
+            "5e7c0d"
+        );
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1656,6 +1667,7 @@ mod tests {
                 pydantic_logfire_token_input.as_str(),
             ),
             ("square-token", square_token_input.as_str()),
+            ("mapbox-token", mapbox_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

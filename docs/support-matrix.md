@@ -11,7 +11,7 @@ python3 -B scripts/generate-support-matrix-docs.py
 
 92 providers, 173 credential families.
 
-Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `fe6e9234d40e` (`0.1.0-beta.13`) with benchmarks revision `573e128863e0` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 116 credential detectors, 110 of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](reference/detection.md#opt-in-pii-availability-is-not-support).
+Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `fe6e9234d40e` (`0.1.0-beta.13`) with benchmarks revision `573e128863e0` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 117 credential detectors, 110 of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](reference/detection.md#opt-in-pii-availability-is-not-support).
 
 Identity of the counts above:
 
@@ -261,11 +261,12 @@ Evidence tiers across all families:
 
 ### Not yet measured
 
-6 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
+7 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
 
 | Detector | Measured support status |
 | --- | --- |
 | `buildkite-token` | not yet measured |
+| `mapbox-token` | not yet measured |
 | `pydantic-logfire-token` | not yet measured |
 | `sourcegraph-token` | not yet measured |
 | `square-token` | not yet measured |
