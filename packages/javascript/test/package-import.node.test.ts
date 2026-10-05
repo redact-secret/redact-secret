@@ -34,6 +34,7 @@ describe("Node package import", () => {
       "redact",
       "scan",
       "scanAndRedact",
+      "status",
       "typedPlaceholderFormatter",
     ]);
   });
@@ -94,6 +95,7 @@ describe("Node package import", () => {
         "redact",
         "scan",
         "scanAndRedact",
+        "status",
         "typedPlaceholderFormatter",
       ],
       profile: "common",

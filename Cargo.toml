@@ -99,6 +99,7 @@ forbidden-dependencies = [
 # `crates/secret-scan-core/tests/public_api.rs` pins that each one is usable.
 core-public-api = [
   "Action",
+  "BuiltInRegistry",
   "ByteRange",
   "Candidate",
   "Confidence",

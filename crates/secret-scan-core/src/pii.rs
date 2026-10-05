@@ -214,7 +214,7 @@ pub(crate) fn is_reserved_detector_id(id: &str) -> bool {
     id == ADAPTER_ID || id.starts_with("pii:")
 }
 
-pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
+pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector + Send + Sync> {
     Box::new(production_domain(selection.clone()))
 }
 
@@ -297,7 +297,7 @@ struct Alternative {
     reject_invisible_normalization: bool,
 }
 
-trait PiiFamily {
+trait PiiFamily: Send + Sync {
     fn id(&self) -> &'static str;
     fn context_requirement(&self) -> ContextRequirement;
     fn occurrence_exclusions(&self) -> &'static [&'static str];

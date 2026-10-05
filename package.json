@@ -97,7 +97,7 @@
     "wasm-profiles:test": "node --test scripts/tests/measure-wasm-profiles.test.mjs",
     "shadow-determinism:test": "node --test scripts/tests/shadow-determinism.test.mjs",
     "precision-context-matrix:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_generate_precision_context_matrix.py'",
-    "release-manifest:test": "node --test scripts/tests/npm-registry-metadata.test.mjs && python3 -B -m unittest discover -s scripts/tests -p 'test_release_manifest.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_verify_recovery_artifact.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_validate_release_records.py' && python3 -B scripts/validate-release-records.py",
+    "release-manifest:test": "node --test scripts/tests/npm-registry-metadata.test.mjs && python3 -B -m unittest discover -s scripts/tests -p 'test_release_manifest.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_settle_registry_state.py' &&python3 -B -m unittest discover -s scripts/tests -p 'test_verify_recovery_artifact.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_validate_release_records.py' && python3 -B scripts/validate-release-records.py",
     "rehearsal-version:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_rehearsal_version.py'",
     "reconcile-guard:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_reconcile_guard.py'",
     "reconcile-artifact-plan:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_reconcile_artifact_plan.py'",

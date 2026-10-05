@@ -126,6 +126,108 @@ describe("initialization contract", () => {
     }
   });
 
+  describe("status()", () => {
+    const OFF = "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
+
+    it("reports not initialized and never loads, initializes or calls the binding", () => {
+      let loads = 0;
+      const binding = createFakeBinding();
+      const runtime = createRedactSecretRuntime(async () => {
+        loads += 1;
+        return binding;
+      }, "full");
+
+      expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null });
+      expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null });
+      expect(loads).toBe(0);
+      expect(binding.calls).toEqual([]);
+    });
+
+    it("reports the public activation after initialize and changes nothing", async () => {
+      const binding = createFakeBinding();
+      const runtime = createRedactSecretRuntime(async () => binding, "full");
+      await runtime.initialize({ pii: ["pii"] });
+      const callsBefore = [...binding.calls];
+
+      const first = runtime.status();
+      expect(first).toEqual({
+        initialized: true,
+        profile: "full",
+        activation: runtime.piiActivation(),
+      });
+      expect(first.activation).toContain("selectors=pii:global");
+      expect(runtime.status()).toEqual(first);
+      expect(binding.calls).toEqual(callsBefore);
+      expect(Object.isFrozen(first)).toBe(true);
+      expect(Object.keys(first).sort()).toEqual(["activation", "initialized", "profile"]);
+    });
+
+    it("is not initialized while a load is pending, and starts no load", async () => {
+      let release: (() => void) | undefined;
+      let loads = 0;
+      const runtime = createRedactSecretRuntime(async () => {
+        loads += 1;
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        return createFakeBinding({ profile: "common" });
+      }, "common");
+      const pending = runtime.initialize();
+      await Promise.resolve();
+
+      expect(runtime.status()).toEqual({ initialized: false, profile: "common", activation: null });
+      release?.();
+      await pending;
+      expect(runtime.status()).toEqual({
+        initialized: true,
+        profile: "common",
+        activation: "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
+      });
+      expect(loads).toBe(1);
+    });
+
+    it("stays not initialized after a failed load and exposes no failure text", async () => {
+      const runtime = createRedactSecretRuntime(async () => {
+        throw new Error("/private/path/to/redact-secret.node SYNTHETIC_REVOKED_VALUE");
+      }, "full");
+      await expect(runtime.initialize()).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
+
+      const status = runtime.status();
+      expect(status).toEqual({ initialized: false, profile: "full", activation: null });
+      expect(JSON.stringify(status)).not.toMatch(/private|SYNTHETIC/);
+    });
+
+    it("keeps an activation conflict from changing the reported activation", async () => {
+      const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+      await runtime.initialize();
+      await expect(runtime.initialize({ pii: ["pii"] })).rejects.toMatchObject({
+        code: "PII_ACTIVATION_CONFLICT",
+      });
+
+      expect(runtime.status()).toEqual({ initialized: true, profile: "full", activation: OFF });
+    });
+
+    it("falls back to the off identity for a binding without piiActivation", async () => {
+      const binding = createFakeBinding();
+      delete (binding as { piiActivation?: unknown }).piiActivation;
+      const runtime = createRedactSecretRuntime(async () => binding, "full");
+      await runtime.initialize();
+
+      expect(runtime.status().activation).toBe(OFF);
+    });
+
+    it("never throws when the binding's accessor fails", async () => {
+      const binding = createFakeBinding();
+      (binding as { piiActivation?: () => string }).piiActivation = () => {
+        throw new Error("/private/path SYNTHETIC_REVOKED_VALUE");
+      };
+      const runtime = createRedactSecretRuntime(async () => binding, "full");
+      await runtime.initialize();
+
+      expect(runtime.status()).toEqual({ initialized: true, profile: "full", activation: null });
+    });
+  });
+
   it("does not cache a failed attempt, so a caller may retry", async () => {
     let attempts = 0;
     const runtime = createRedactSecretRuntime(async () => {

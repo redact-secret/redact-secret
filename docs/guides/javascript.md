@@ -35,6 +35,31 @@ idempotent; a later different selection fails with the fixed,
 input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
 the same contract while retaining `credentials=common` in its identity.
 
+## Status query
+
+`status()` reports whether this entry point is initialized, and its public
+activation, without loading, initializing or reconfiguring anything. It is
+synchronous, takes no input, never throws, and returns a frozen object with
+three fixed fields and nothing else.
+
+```ts
+import { status } from "@redact-secret/core";
+
+status();
+// { initialized: false, profile: "full", activation: null }   before initialize()
+// { initialized: true, profile: "full", activation: "credentials=full;selectors=off;..." }
+```
+
+`initialized` is `true` only after an `initialize()` call has succeeded, so it
+is `false` while a load is pending and after a failed load. `activation` is
+the `piiActivation()` string once initialized and `null` before; a failure
+never appears in the result. It is a point-in-time answer about this module,
+not a guarantee about detection coverage or a later call. A release that
+predates `status()` does not export it: probe with `typeof status ===
+"function"` (a namespace import of an older release has no such property) and
+fall back to the existing calls. The `./common` entry point exports the same
+function with `profile: "common"`.
+
 In a browser, a Cloudflare Worker, or the Node WebAssembly fallback, the PII
 runtime lives in a separate WebAssembly build of each profile. The
 `initialize()` call that loads the binding fetches the default build, which

@@ -56,6 +56,12 @@ import { runtime } from "./session-common.js";
 export const initialize = runtime.initialize;
 /** Returns the canonical credentials/PII activation identity. */
 export const piiActivation = runtime.piiActivation;
+/**
+ * Reports whether the `common` runtime is initialized and its public
+ * activation, without loading, initializing or reconfiguring anything. Takes
+ * no input, never throws, and returns fixed values only.
+ */
+export const status = runtime.status;
 
 /**
  * Which artifact `initialize()` loaded: `"addon"` (the native N-API addon)

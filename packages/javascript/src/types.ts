@@ -43,6 +43,24 @@ export interface InitializeOptions {
 }
 
 /**
+ * What `status()` reports, without initializing or reconfiguring anything.
+ *
+ * Fixed values and public capability metadata only: no input, exception text,
+ * path or secret-derived value.
+ */
+export interface CoreStatus {
+  /** `true` once an `initialize()` call has succeeded and operations are usable. */
+  readonly initialized: boolean;
+  /** The detector profile of this entry point. */
+  readonly profile: "full" | "common";
+  /**
+   * The canonical credentials/PII activation identity (the `piiActivation()`
+   * string) once initialized; `null` before.
+   */
+  readonly activation: string | null;
+}
+
+/**
  * A finding before policy evaluation: the safe metadata a policy callback
  * receives. It never carries the input or the matched value.
  */

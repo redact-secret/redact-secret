@@ -77,6 +77,13 @@
       "rationale": "The URL is built from a fixed, hardcoded registry host (pypi.org, crates.io, or registry.npmjs.org) with only a package/crate name path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
     },
+    "e82c2cb0f81fcf27": {
+      "classification": "false_positive",
+      "line": 78,
+      "path": "scripts/settle-registry-state.py",
+      "rationale": "The URL is built from a fixed, hardcoded registry host (pypi.org, crates.io, or registry.npmjs.org) with only a quoted package/crate name and version path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
+      "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
+    },
     "08675bcb8e6608d2": {
       "classification": "false_positive",
       "line": 430,

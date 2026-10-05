@@ -25,6 +25,7 @@ import {
 } from "./native.js";
 import type {
   ArtifactKind,
+  CoreStatus,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
@@ -240,6 +241,7 @@ function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): Nativ
 export interface RedactSecretRuntime {
   initialize(options?: InitializeOptions): Promise<void>;
   piiActivation(): string;
+  status(): CoreStatus;
   artifact(): ArtifactKind;
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
   redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string;
@@ -366,6 +368,26 @@ export function createRedactSecretRuntime(
     );
   }
 
+  /**
+   * Reports initialization state and the activation identity without loading,
+   * initializing or reconfiguring anything. Never throws and never carries an
+   * error: a binding exists only after a successful load, so a failed or
+   * pending `initialize()` reads as not initialized.
+   */
+  function status(): CoreStatus {
+    const native = binding;
+    if (native === undefined) {
+      return Object.freeze({ initialized: false, profile: expectedProfile, activation: null });
+    }
+    let activation: string | null;
+    try {
+      activation = piiActivation();
+    } catch {
+      activation = null;
+    }
+    return Object.freeze({ initialized: true, profile: expectedProfile, activation });
+  }
+
   function scan(input: string, options?: ScanOptions): readonly SecretFinding[] {
     const native = active();
     const text = requireString(input);
@@ -487,6 +509,7 @@ export function createRedactSecretRuntime(
   return {
     initialize,
     piiActivation,
+    status,
     artifact,
     scan,
     redact,

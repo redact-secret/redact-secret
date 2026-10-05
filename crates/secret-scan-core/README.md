@@ -106,6 +106,7 @@ documentation, inside a function that returns `Result`.)
 | Result | `ScanResult`, `IncrementalResult` |
 | Sanitized error | `SecretScanError`, `SecretScanErrorCode`, `DetectorFailure`, `PolicyFailure`, `FormatterFailure` |
 | Custom detectors | `Detector`, `Candidate`, `DetectorContext`, `DetectorRegistry`, `RegisteredDetector` |
+| Thread-shareable built-in registry | `BuiltInRegistry` |
 | Profiles | `Profile` |
 | PII selection | `PiiSelection` |
 | Declarative rulesets | `load_ruleset`, `RulesetError`, `RulesetErrorClass` |

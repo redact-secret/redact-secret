@@ -15,6 +15,7 @@ import { createWebStreamSanitizer as createCommonWebStreamSanitizer } from "../s
 import type * as publicApi from "../src/index.js";
 import type {
   ArtifactKind,
+  CoreStatus,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
@@ -45,6 +46,7 @@ import {
   SecretScanError,
   scan,
   scanAndRedact,
+  type status,
   typedPlaceholderFormatter,
   VERSION,
 } from "../src/index.js";
@@ -82,6 +84,11 @@ type InitializeIsAsync = Expect<Equal<ReturnType<typeof initialize>, Promise<voi
 type ScanIsSync = Expect<Equal<ReturnType<typeof scan>, readonly SecretFinding[]>>;
 type RedactIsSync = Expect<Equal<ReturnType<typeof redact>, string>>;
 type ScanAndRedactIsSync = Expect<Equal<ReturnType<typeof scanAndRedact>, ScanResult>>;
+/** status() is synchronous, input-free, and carries only fixed fields. */
+type StatusIsSync = Expect<Equal<ReturnType<typeof status>, CoreStatus>>;
+type StatusTakesNoInput = Expect<Equal<Parameters<typeof status>, []>>;
+type StatusIsImmutable = Expect<Equal<CoreStatus, Readonly<CoreStatus>>>;
+type StatusFieldsAreFixed = Expect<Equal<keyof CoreStatus, "initialized" | "profile" | "activation">>;
 
 const policy: SecretPolicy = {
   evaluate(finding: DetectedSecretFinding, context: PolicyContext): SecretAction {

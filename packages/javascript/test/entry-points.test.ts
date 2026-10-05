@@ -8,6 +8,7 @@ import type { SecretFinding } from "../src/types.js";
 const OPERATIONS = [
   "initialize",
   "piiActivation",
+  "status",
   "artifact",
   "scan",
   "redact",

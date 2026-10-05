@@ -279,11 +279,11 @@ mapped to the same fixed error vocabulary.
 ## Public API
 
 Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
-`piiActivation`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
+`piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`, `VERSION`,
 `PROFILE`.
 
-Types: `InitializeOptions`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
+Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 `SecretConfidence`, `SecretObfuscation`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
 `PlaceholderContext`, `ScanOptions`, `RedactOptions`, `ScanAndRedactOptions`,
 `ScanResult`, `WholeInputLimits`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,

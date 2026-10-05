@@ -22,6 +22,7 @@ const PUBLIC_RUNTIME_EXPORTS = [
   "redact",
   "scan",
   "scanAndRedact",
+  "status",
   "typedPlaceholderFormatter",
 ];
 

@@ -1259,6 +1259,10 @@ jobs:
           WRAPPER_ARTIFACT_DIGEST_JSON: ${{ needs.publish.outputs.artifact_digest_json }}
           CRATES_ARTIFACT_DIGEST_JSON: ${{ needs.publish-crates.outputs.artifact_digest_json }}
           PYPI_ARTIFACT_DIGEST_JSON: ${{ needs.publish-pypi.outputs.artifact_digest_json }}
+          # Issue #1197: which registries may be re-observed for propagation lag.
+          NPM_PUBLISH_RESULTS: ${{ needs.publish.result }} ${{ needs.publish-native-dependencies.result }} ${{ needs.publish-wasm-dependency.result }}
+          CRATES_PUBLISH_RESULT: ${{ needs.publish-crates.result }}
+          PYPI_PUBLISH_RESULT: ${{ needs.publish-pypi.result }}
         run: |
           version=$(node -p "require('./packages/javascript/package.json').version" 2>/dev/null || true)
           conformance_identity=$(git rev-parse "$GITHUB_SHA:conformance" 2>/dev/null || true)
@@ -1298,14 +1302,6 @@ jobs:
             --argjson pypi "$pypi_json" \
             '$expected + $npm + $native + $wasm + $crates + $pypi')
 
-          artifact_args=()
-          registry_args=()
-          while IFS= read -r key; do
-            value=$(jq -r --arg k "$key" '.[$k]' <<<"$merged")
-            artifact_args+=(--artifact "$key")
-            registry_args+=(--registry-state "$key=$value")
-          done < <(jq -r 'keys[]' <<<"$merged")
-
           # Issue #528: the same defaulting rule as the registry-state
           # variables above -- a job that never reached its digest-recording
           # step leaves its output empty, so that contributes nothing rather
@@ -1333,6 +1329,35 @@ jobs:
           jq -s -c '.[0] + .[1] + .[2] + .[3] + .[4]' \
             "$digest_dir/native.json" "$digest_dir/wasm.json" "$digest_dir/wrapper.json" \
             "$digest_dir/crates.json" "$digest_dir/pypi.json" > "$digest_dir/artifact-digests.json"
+
+          # Issue #1197: each publish job read its registry once, seconds after
+          # publishing, so registry propagation lag recorded published versions
+          # as `unpublished` or digest-less (beta.13). Re-observe, for a bounded
+          # time, only the registries whose publisher jobs all succeeded; a
+          # failed publisher is recorded as it observed itself, without waiting.
+          # The script only upgrades a state backed by a registry digest, never
+          # fails the step, and leaves what is still unseen after the bound as is.
+          settle_args=()
+          [[ "$NPM_PUBLISH_RESULTS" == "success success success" ]] && settle_args+=(--settle npm)
+          [[ "$CRATES_PUBLISH_RESULT" == "success" ]] && settle_args+=(--settle crate)
+          [[ "$PYPI_PUBLISH_RESULT" == "success" ]] && settle_args+=(--settle pypi)
+          printf '%s\n' "$merged" > "$digest_dir/registry-state.json"
+          if [[ ${#settle_args[@]} -gt 0 ]]; then
+            python3 -B scripts/settle-registry-state.py \
+              --states-file "$digest_dir/registry-state.json" \
+              --digests-file "$digest_dir/artifact-digests.json" \
+              --version "${version:-unknown}" \
+              "${settle_args[@]}"
+          fi
+          merged=$(jq -c . "$digest_dir/registry-state.json")
+
+          artifact_args=()
+          registry_args=()
+          while IFS= read -r key; do
+            value=$(jq -r --arg k "$key" '.[$k]' <<<"$merged")
+            artifact_args+=(--artifact "$key")
+            registry_args+=(--registry-state "$key=$value")
+          done < <(jq -r 'keys[]' <<<"$merged")
 
           if [[ -f support-matrix-drift/support-matrix-drift.json ]]; then
             cp support-matrix-drift/support-matrix-drift.json "$digest_dir/support-matrix-drift.json"

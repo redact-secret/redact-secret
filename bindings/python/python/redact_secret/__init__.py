@@ -70,6 +70,7 @@ try:
         RANGE_UNIT,
         VERSION,
         BufferLimitExceededError,
+        CoreStatus,
         DetectedFinding,
         DetectorFailureError,
         Finding,
@@ -110,6 +111,7 @@ try:
         redact,
         scan,
         scan_and_redact,
+        status,
         typed_placeholder_formatter,
     )
 except ImportError:
@@ -121,6 +123,7 @@ __all__ = [
     "RANGE_UNIT",
     "VERSION",
     "BufferLimitExceededError",
+    "CoreStatus",
     "DetectedFinding",
     "DetectorFailureError",
     "Finding",
@@ -161,5 +164,6 @@ __all__ = [
     "redact",
     "scan",
     "scan_and_redact",
+    "status",
     "typed_placeholder_formatter",
 ]

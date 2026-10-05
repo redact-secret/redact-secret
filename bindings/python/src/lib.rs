@@ -1401,6 +1401,53 @@ fn pii_activation() -> String {
     active_pii_selection().activation_identity(redact_secret::Profile::Full)
 }
 
+/// A read-only snapshot of the binding's initialization state (issue #1172).
+///
+/// Holds fixed values only: whether `initialize` has fixed the PII selection,
+/// the detector profile this binding runs, and, once initialized, the same
+/// canonical activation identity `pii_activation()` returns. Never
+/// constructed from Python; only produced by `status`.
+#[pyclass(module = "redact_secret._native", name = "CoreStatus", frozen)]
+struct PyCoreStatus {
+    /// `True` once `initialize` has succeeded in this process.
+    #[pyo3(get)]
+    initialized: bool,
+    /// The detector profile this binding runs: always `"full"`.
+    #[pyo3(get)]
+    profile: String,
+    /// The canonical activation identity once initialized, otherwise `None`.
+    #[pyo3(get)]
+    activation: Option<String>,
+}
+
+#[pymethods]
+impl PyCoreStatus {
+    fn __repr__(&self) -> String {
+        format!(
+            "CoreStatus(initialized={}, profile={:?}, activation={:?})",
+            if self.initialized { "True" } else { "False" },
+            self.profile,
+            self.activation,
+        )
+    }
+}
+
+/// Reports whether `initialize` has fixed the PII selection, without
+/// initializing, locking in or changing anything. Takes no input and returns
+/// fixed values and public capability metadata only.
+#[pyfunction]
+fn status() -> PyCoreStatus {
+    let selection = PII_SELECTION
+        .get()
+        .and_then(|state| state.lock().ok().and_then(|guard| guard.clone()));
+    PyCoreStatus {
+        initialized: selection.is_some(),
+        profile: redact_secret::Profile::Full.as_str().to_owned(),
+        activation: selection
+            .map(|active| active.activation_identity(redact_secret::Profile::Full)),
+    }
+}
+
 /// Returns the shared product version.
 #[pyfunction]
 fn version() -> &'static str {
@@ -1423,6 +1470,7 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(typed_placeholder_formatter, module)?)?;
     module.add_function(wrap_pyfunction!(initialize, module)?)?;
     module.add_function(wrap_pyfunction!(pii_activation, module)?)?;
+    module.add_function(wrap_pyfunction!(status, module)?)?;
 
     module.add_class::<PyDetectedFinding>()?;
     module.add_class::<PyFinding>()?;
@@ -1430,6 +1478,7 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyPlaceholderContext>()?;
     module.add_class::<PyScanResult>()?;
     module.add_class::<PyWholeInputLimits>()?;
+    module.add_class::<PyCoreStatus>()?;
 
     incremental::register(module)?;
     register_exceptions(module)?;

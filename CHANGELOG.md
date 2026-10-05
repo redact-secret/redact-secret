@@ -5,8 +5,38 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- `status()` in `@redact-secret/core` (root and `./common`) and
+  `redact_secret.status()` in Python report whether the binding is initialized
+  and its public activation, without loading, initializing or reconfiguring
+  anything (#1172). Both take no input, never throw, and return only the fixed
+  fields `initialized`, `profile` and `activation` (`null`/`None` before
+  initialization) as `CoreStatus`. Detection, policy and initialization
+  semantics are unchanged; releases before this one do not export the call. A
+  core-published readiness probe is deferred
+  (`decision-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe`).
+- Rust: `BuiltInRegistry`, a `Send + Sync` registry for the `full` or `common`
+  built-in detectors with optional PII (#1178). One value can be shared by
+  reference or through an `Arc` across threads, so a pool no longer builds a
+  registry per worker. It has `with_built_in`, `with_common_built_in`,
+  `with_built_in_and_pii` and `with_common_built_in_and_pii` constructors and
+  `scan`, `scan_with_limits`, `scan_and_redact` and
+  `scan_and_redact_with_limits` methods that return exactly what the
+  `DetectorRegistry` functions return for the same profile and PII selection.
+  It accepts no custom detector or ruleset. The `Detector` trait is unchanged
+  and `DetectorRegistry` stays `!Send + !Sync`; `IncrementalSanitizer` still
+  builds its own registry per session. This is additive: the root name count
+  is 55.
+
 ### Fixed
 
+- The release manifest no longer records a version as `unpublished`, or leaves
+  its published digest empty, because the registry had not caught up right after
+  publishing (#1197, seen on 0.1.0-beta.13). `record-manifest` now re-reads the
+  registry for up to 10 minutes, only for artifacts that still look unsettled
+  and only when their publish jobs succeeded. A version still absent after that
+  stays `unpublished`, and a state is never promoted without a registry digest.
 - `connection-string` reports the whole password of a URI whose userinfo
   password contains an unencoded single quote (#1201). RFC 3986 allows `'`
   there and the grammar already accepted it, but the authority scan ended at

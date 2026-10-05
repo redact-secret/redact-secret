@@ -63,6 +63,7 @@ describe("browser package import", () => {
       "redact",
       "scan",
       "scanAndRedact",
+      "status",
       "typedPlaceholderFormatter",
     ]);
     expect(globals.secretScanRangeUnit).toBe("utf16-code-units");
@@ -96,6 +97,7 @@ describe("browser package import", () => {
       "redact",
       "scan",
       "scanAndRedact",
+      "status",
       "typedPlaceholderFormatter",
     ]);
     expect(globals.secretScanCommonProfile).toBe("common");

@@ -23,16 +23,17 @@
 mod support;
 
 use redact_secret::{
-    Action, ByteRange, Candidate, Confidence, DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES,
-    DefaultPolicy, DetectedFinding, Detector, DetectorContext, DetectorFailure, DetectorRegistry,
-    Finding, FormatterFailure, IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext,
-    IncrementalResult, IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH,
-    Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    PolicyFailure, Profile, RANGE_UNIT, RegisteredDetector, RulesetError, RulesetErrorClass,
-    ScanResult, SecretScanError, SecretScanErrorCode, SessionState, Specificity, VERSION,
-    WholeInputLimits, default_placeholder_formatter, is_identifier, load_ruleset, redact,
-    redact_with_limits, run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits,
-    scan_with_limits, shannon_entropy, typed_placeholder_formatter,
+    Action, BuiltInRegistry, ByteRange, Candidate, Confidence, DEFAULT_MAX_FINDINGS,
+    DEFAULT_MAX_INPUT_BYTES, DefaultPolicy, DetectedFinding, Detector, DetectorContext,
+    DetectorFailure, DetectorRegistry, Finding, FormatterFailure, IncrementalLimits,
+    IncrementalPolicy, IncrementalPolicyContext, IncrementalResult, IncrementalSanitizer,
+    MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH, Obfuscation, PiiSelection, PlaceholderContext,
+    PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile, RANGE_UNIT,
+    RegisteredDetector, RulesetError, RulesetErrorClass, ScanResult, SecretScanError,
+    SecretScanErrorCode, SessionState, Specificity, VERSION, WholeInputLimits,
+    default_placeholder_formatter, is_identifier, load_ruleset, redact, redact_with_limits,
+    run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
+    shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -851,4 +852,24 @@ fn common_profile_incremental_session_selects_the_same_built_ins_as_the_whole_in
 
     assert_eq!(text, expected.text());
     assert_eq!(findings, expected.findings().to_vec());
+}
+
+#[test]
+fn built_in_registry_is_a_shareable_whole_input_entry_point() {
+    fn assert_send_sync<T: Send + Sync>() {}
+    assert_send_sync::<BuiltInRegistry>();
+
+    let shared = BuiltInRegistry::with_built_in().unwrap();
+    assert_eq!(shared.profile(), Profile::Full);
+    let expected = scan_and_redact(
+        FIXTURE,
+        &registry(),
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+    )
+    .unwrap();
+    let actual = shared
+        .scan_and_redact(FIXTURE, &DefaultPolicy, &default_placeholder_formatter)
+        .unwrap();
+    assert_eq!(actual, expected);
 }

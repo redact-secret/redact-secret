@@ -12,8 +12,10 @@ use crate::detectors::{
     common_built_in_entries,
 };
 use crate::error::{SecretScanError, SecretScanErrorCode};
+use crate::limits::WholeInputLimits;
 use crate::pii::{PiiSelection, adapter, is_reserved_detector_id};
-use crate::types::{Detector, is_identifier};
+use crate::pipeline::{scan_and_redact_in, scan_in};
+use crate::types::{Detector, Finding, PlaceholderFormatter, Policy, ScanResult, is_identifier};
 
 /// A named, reviewed built-in detector composition
 /// (`decision-define-detector-profile-and-pack-contract`).
@@ -88,6 +90,7 @@ impl RegisteredDetector {
     pub fn detector(&self) -> &dyn Detector {
         match &self.detector {
             Held::BuiltIn(detector) => *detector,
+            Held::Pii(detector) => detector.as_ref(),
             Held::Custom(detector) => detector.as_ref(),
         }
     }
@@ -101,9 +104,13 @@ impl RegisteredDetector {
 /// How a [`RegisteredDetector`] holds its detector: a built-in is a
 /// reference into the crate's static table of built-ins, so building a
 /// built-in registry constructs and allocates nothing per detector
-/// (issue #1043); a custom detector, and the PII-domain adapter, are owned.
+/// (issue #1043); the PII-domain adapter and a custom detector are owned. The
+/// adapter is its own variant because, unlike a custom detector, it is
+/// `Send + Sync`: that is what lets [`BuiltInRegistry`] move a built-in-only
+/// registry's detectors into a thread-shareable value (issue #1178).
 enum Held {
     BuiltIn(BuiltInDetector),
+    Pii(Box<dyn Detector + Send + Sync>),
     Custom(Box<dyn Detector>),
 }
 
@@ -116,6 +123,27 @@ impl std::fmt::Debug for RegisteredDetector {
 }
 
 /// An ordered, duplicate-free set of detectors.
+///
+/// A registry may hold a custom [`Detector`], and that trait carries no
+/// `Send` or `Sync` bound, so a `DetectorRegistry` is neither `Send` nor
+/// `Sync`: build one per thread. To share one registry across threads, use
+/// [`BuiltInRegistry`], which holds only built-in detectors (issue #1178).
+/// Both properties below are pinned, so a change to either fails a doctest:
+///
+/// ```compile_fail,E0277
+/// fn assert_send<T: Send>() {}
+/// assert_send::<redact_secret::DetectorRegistry>();
+/// ```
+///
+/// ```compile_fail,E0277
+/// fn assert_sync<T: Sync>() {}
+/// assert_sync::<redact_secret::DetectorRegistry>();
+/// ```
+///
+/// ```
+/// fn assert_send_sync<T: Send + Sync>() {}
+/// assert_send_sync::<redact_secret::BuiltInRegistry>();
+/// ```
 #[derive(Debug, Default)]
 pub struct DetectorRegistry {
     detectors: Vec<RegisteredDetector>,
@@ -329,7 +357,7 @@ impl DetectorRegistry {
         if !selection.is_off() {
             registry.detectors.push(RegisteredDetector {
                 id: Cow::Borrowed("pii-domain"),
-                detector: Held::Custom(adapter(selection)),
+                detector: Held::Pii(adapter(selection)),
                 required: None,
             });
         }
@@ -477,6 +505,328 @@ impl DetectorRegistry {
         self.detectors.iter().any(|registered| registered.id == id)
     }
 }
+
+/// One detector of a [`DetectorSet`], as the pipeline reads it.
+#[derive(Clone, Copy)]
+pub(crate) struct DetectorEntry<'a> {
+    pub(crate) id: &'a Cow<'static, str>,
+    pub(crate) detector: &'a dyn Detector,
+    /// Whether the detector declared literals for the shared prefilter.
+    pub(crate) declares_literals: bool,
+}
+
+/// What the pipeline needs from a registry, so one pipeline serves both
+/// [`DetectorRegistry`] and [`BuiltInRegistry`] and neither is a copy of the
+/// other (issue #1178). Crate-private: it is not an extension point.
+pub(crate) trait DetectorSet {
+    /// Number of detectors.
+    fn detector_count(&self) -> usize;
+    /// Detectors in registration order.
+    fn detector_entries(&self) -> impl Iterator<Item = DetectorEntry<'_>>;
+    /// The compiled prefilter indexed by registration position, if any.
+    fn compiled_prefilter(&self) -> Option<&'static LiteralMatcher>;
+}
+
+impl DetectorSet for DetectorRegistry {
+    fn detector_count(&self) -> usize {
+        self.len()
+    }
+
+    fn detector_entries(&self) -> impl Iterator<Item = DetectorEntry<'_>> {
+        self.detectors.iter().map(|registered| DetectorEntry {
+            id: registered.id_cow(),
+            detector: registered.detector(),
+            declares_literals: registered.required_literals().is_some(),
+        })
+    }
+
+    fn compiled_prefilter(&self) -> Option<&'static LiteralMatcher> {
+        Self::prefilter(self)
+    }
+}
+
+/// How a [`BuiltInRegistry`] holds one detector. Both variants are
+/// `Send + Sync` by type, which is what makes the registry shareable.
+enum SharedHeld {
+    BuiltIn(BuiltInDetector),
+    Pii(Box<dyn Detector + Send + Sync>),
+}
+
+struct SharedDetector {
+    id: Cow<'static, str>,
+    detector: SharedHeld,
+    required: Option<RequiredLiterals>,
+}
+
+impl SharedDetector {
+    fn detector(&self) -> &dyn Detector {
+        match &self.detector {
+            SharedHeld::BuiltIn(detector) => *detector,
+            SharedHeld::Pii(detector) => detector.as_ref(),
+        }
+    }
+}
+
+/// A built-in-only detector registry that is `Send + Sync`, so one value can
+/// be shared by reference or through an [`Arc`](std::sync::Arc) across
+/// threads (issue #1178).
+///
+/// [`DetectorRegistry`] is `!Send + !Sync` because it may hold a custom
+/// [`Detector`], and that trait promises no thread safety; adding a bound to
+/// it would break existing custom detectors. This type holds only what the
+/// crate itself constructs: the `full` or `common` built-in detectors, and the
+/// PII-domain adapter when PII is activated. It accepts no custom detector,
+/// so it needs no bound on one. It is immutable after construction: there is
+/// no `register`, and nothing a scan reads is written, so concurrent scans
+/// need no lock. The shared prefilter is a process-wide `OnceLock` that is
+/// compiled once and then only read.
+///
+/// For the same profile and PII selection, every method returns exactly what
+/// the corresponding [`DetectorRegistry`] function returns: findings, ids,
+/// order, ranges, output bytes and error codes are the same, because both run
+/// one pipeline over the same detector table. Use [`DetectorRegistry`] for
+/// custom detectors or rulesets, and for [`IncrementalSanitizer`], which owns
+/// its own registry per session.
+///
+/// A `Policy` or `PlaceholderFormatter` you pass to a method is used on the
+/// calling thread and needs no thread-safety bound.
+///
+/// [`IncrementalSanitizer`]: crate::IncrementalSanitizer
+///
+/// # Examples
+///
+/// ```
+/// use std::sync::Arc;
+///
+/// use redact_secret::{BuiltInRegistry, DefaultPolicy, default_placeholder_formatter};
+///
+/// // Build once; clone the `Arc` into every worker.
+/// let registry = Arc::new(BuiltInRegistry::with_built_in()?);
+/// fn assert_send_sync<T: Send + Sync>(_: &T) {}
+/// assert_send_sync(&registry);
+///
+/// let result = registry.scan_and_redact(
+///     "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+///     &DefaultPolicy,
+///     &default_placeholder_formatter,
+/// )?;
+/// assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+/// # Ok::<(), redact_secret::SecretScanError>(())
+/// ```
+pub struct BuiltInRegistry {
+    detectors: Vec<SharedDetector>,
+    profile: Profile,
+    activation_identity: String,
+    prefilter: Option<&'static LiteralMatcher>,
+}
+
+impl BuiltInRegistry {
+    /// Moves the detectors of a registry that was built from a profile
+    /// constructor with no custom detector into a shareable value. A custom
+    /// detector or a registry without a profile cannot be shared and yields
+    /// [`SecretScanErrorCode::InvalidDetector`]; the public constructors
+    /// below never pass one.
+    fn from_built_in_only(registry: DetectorRegistry) -> Result<Self, SecretScanError> {
+        let invalid = || SecretScanError::from(SecretScanErrorCode::InvalidDetector);
+        let profile = registry.profile.ok_or_else(invalid)?;
+        let mut detectors = Vec::with_capacity(registry.detectors.len());
+        for registered in registry.detectors {
+            let held = match registered.detector {
+                Held::BuiltIn(detector) => SharedHeld::BuiltIn(detector),
+                Held::Pii(detector) => SharedHeld::Pii(detector),
+                Held::Custom(_) => return Err(invalid()),
+            };
+            detectors.push(SharedDetector {
+                id: registered.id,
+                detector: held,
+                required: registered.required,
+            });
+        }
+        Ok(Self {
+            detectors,
+            profile,
+            activation_identity: registry.activation_identity,
+            prefilter: registry.prefilter,
+        })
+    }
+
+    /// The `full` built-in detectors with PII off: the shareable form of
+    /// [`DetectorRegistry::with_built_in`] with no custom detectors.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] only if the built-in
+    /// table itself is malformed, which cannot happen in a released build.
+    pub fn with_built_in() -> Result<Self, SecretScanError> {
+        Self::from_built_in_only(DetectorRegistry::with_built_in([])?)
+    }
+
+    /// The `common` built-in detectors with PII off: the shareable form of
+    /// [`DetectorRegistry::with_common_built_in`] with no custom detectors.
+    /// A `common` handle never makes the `full` constructor reachable from
+    /// this call.
+    ///
+    /// # Errors
+    ///
+    /// See [`Self::with_built_in`].
+    pub fn with_common_built_in() -> Result<Self, SecretScanError> {
+        Self::from_built_in_only(DetectorRegistry::with_common_built_in([])?)
+    }
+
+    /// The `full` built-in detectors plus the PII-domain adapter selected by
+    /// `selection`: the shareable form of
+    /// [`DetectorRegistry::with_built_in_and_pii`].
+    ///
+    /// # Errors
+    ///
+    /// See [`Self::with_built_in`].
+    pub fn with_built_in_and_pii(selection: &PiiSelection) -> Result<Self, SecretScanError> {
+        Self::from_built_in_only(DetectorRegistry::with_built_in_and_pii(selection)?)
+    }
+
+    /// The `common` built-in detectors plus the PII-domain adapter selected
+    /// by `selection`: the shareable form of
+    /// [`DetectorRegistry::with_common_built_in_and_pii`].
+    ///
+    /// # Errors
+    ///
+    /// See [`Self::with_built_in`].
+    pub fn with_common_built_in_and_pii(selection: &PiiSelection) -> Result<Self, SecretScanError> {
+        Self::from_built_in_only(DetectorRegistry::with_common_built_in_and_pii(selection)?)
+    }
+
+    /// The profile this registry was built from. Always present, unlike
+    /// [`DetectorRegistry::profile`]: nothing can be registered afterwards.
+    #[must_use]
+    pub const fn profile(&self) -> Profile {
+        self.profile
+    }
+
+    /// Canonical credentials/PII activation identity, the same string
+    /// [`DetectorRegistry::activation_identity`] reports for the same
+    /// profile and selection.
+    #[must_use]
+    pub fn activation_identity(&self) -> &str {
+        &self.activation_identity
+    }
+
+    /// Registered ids in registration order.
+    pub fn ids(&self) -> impl Iterator<Item = &str> {
+        self.detectors
+            .iter()
+            .map(|registered| registered.id.as_ref())
+    }
+
+    /// Number of registered detectors.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.detectors.len()
+    }
+
+    /// `true` when no detector is registered. Never the case for a value
+    /// built by this type's constructors.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.detectors.is_empty()
+    }
+
+    /// `true` when a detector with `id` is registered.
+    #[must_use]
+    pub fn contains(&self, id: &str) -> bool {
+        self.detectors.iter().any(|registered| registered.id == id)
+    }
+
+    /// [`scan`](crate::scan) over this registry.
+    ///
+    /// # Errors
+    ///
+    /// The errors [`scan`](crate::scan) reports.
+    pub fn scan(&self, input: &str, policy: &dyn Policy) -> Result<Vec<Finding>, SecretScanError> {
+        self.scan_with_limits(input, policy, &WholeInputLimits::default())
+    }
+
+    /// [`scan_with_limits`](crate::scan_with_limits) over this registry.
+    ///
+    /// # Errors
+    ///
+    /// The errors [`scan_with_limits`](crate::scan_with_limits) reports.
+    pub fn scan_with_limits(
+        &self,
+        input: &str,
+        policy: &dyn Policy,
+        limits: &WholeInputLimits,
+    ) -> Result<Vec<Finding>, SecretScanError> {
+        scan_in(input, self, policy, limits)
+    }
+
+    /// [`scan_and_redact`](crate::scan_and_redact) over this registry.
+    ///
+    /// # Errors
+    ///
+    /// The errors [`scan_and_redact`](crate::scan_and_redact) reports.
+    pub fn scan_and_redact(
+        &self,
+        input: &str,
+        policy: &dyn Policy,
+        formatter: &dyn PlaceholderFormatter,
+    ) -> Result<ScanResult, SecretScanError> {
+        self.scan_and_redact_with_limits(input, policy, formatter, &WholeInputLimits::default())
+    }
+
+    /// [`scan_and_redact_with_limits`](crate::scan_and_redact_with_limits)
+    /// over this registry.
+    ///
+    /// # Errors
+    ///
+    /// The errors
+    /// [`scan_and_redact_with_limits`](crate::scan_and_redact_with_limits)
+    /// reports.
+    pub fn scan_and_redact_with_limits(
+        &self,
+        input: &str,
+        policy: &dyn Policy,
+        formatter: &dyn PlaceholderFormatter,
+        limits: &WholeInputLimits,
+    ) -> Result<ScanResult, SecretScanError> {
+        scan_and_redact_in(input, self, policy, formatter, limits)
+    }
+}
+
+impl DetectorSet for BuiltInRegistry {
+    fn detector_count(&self) -> usize {
+        self.detectors.len()
+    }
+
+    fn detector_entries(&self) -> impl Iterator<Item = DetectorEntry<'_>> {
+        self.detectors.iter().map(|registered| DetectorEntry {
+            id: &registered.id,
+            detector: registered.detector(),
+            declares_literals: registered.required.is_some(),
+        })
+    }
+
+    fn compiled_prefilter(&self) -> Option<&'static LiteralMatcher> {
+        self.prefilter
+    }
+}
+
+impl std::fmt::Debug for BuiltInRegistry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("BuiltInRegistry")
+            .field("profile", &self.profile)
+            .field("detectors", &self.detectors.len())
+            .finish_non_exhaustive()
+    }
+}
+
+// The point of the type, checked at compile time: a change that makes a held
+// detector, the prefilter or any field non-shareable fails the build instead
+// of silently dropping the guarantee. `DetectorRegistry` stays
+// `!Send + !Sync` (the compile-fail doctest on `DetectorRegistry`).
+const _: () = {
+    const fn assert_send_sync<T: Send + Sync>() {}
+    assert_send_sync::<BuiltInRegistry>();
+};
 
 #[cfg(test)]
 mod tests {
