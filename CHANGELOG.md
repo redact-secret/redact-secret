@@ -21,8 +21,22 @@ evidence is linked from each published version.
   template's `PRIVATE_KEY`, or `EXA_API_KEY=your_exa_api_key_here` (#1203). Each
   exclusion is exact; a real value next to the marker, a base64 PEM body, and a
   placeholder glued to random material are still reported.
+- `generic-token` no longer reports the message of a Compose or shell
+  required-variable expansion (`${DB_PASSWORD:?DB_PASSWORD must be set}`) or a
+  value that is the assigned name itself (`aws_secret_access_key =
+  aws_secret_access_key`) (#1205). The `${NAME:-default}` form and any other
+  identifier under the name are still reported.
 
 ### Documented scope
+
+- The core does not read a token behind a percent-encoded delimiter (`%22`), a
+  JSON `{"name", "value"}` object pair, a credential name that keys an object
+  holding a `value` member, or a secret split across notebook `source` array
+  elements, and a value ended by a JSON-escaped `\n` keeps the escape. These
+  are the 24 base cases behind the 57 open root causes of
+  credential-evidence `snapshot-2026.10.04.4` (#1205,
+  `decision-settle-the-snapshot-2026-10-04-4-added-case-roots`), not a beta.13
+  regression.
 
 - A credential cut by a line break, string-literal operator, line continuation
   or escaped newline is outside the raw-input contract, as base64 and hex
