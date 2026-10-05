@@ -61,6 +61,21 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` redacts an `Authorization: ApiKey <value>` or
+  `Proxy-Authorization: ApiKey <value>` credential in raw HTTP, quoted curl `-H`
+  and JSON header maps, as a generic `authorization_credential` over the
+  undecoded encoded value (#1212). Before this the scheme produced no finding.
+  The value is not decoded or split into id and key, no width is assumed, and no
+  Elastic type is claimed because `ApiKey` is not unique to one provider. Bare
+  `ApiKey` prose, `X-Authorization` and `Authorization-Info`, a newline between
+  scheme and value, placeholders, references and masks are not reported.
+- `generic-token` redacts the value of Airtable's `macSecretBase64` field (the
+  Base64 MAC secret returned when a webhook is created) in JSON, YAML and
+  direct assignment, as a generic `contextual_secret` over the complete encoded
+  value including padding (#1211). Before this the field produced no finding.
+  Only that exact name is added: other `*Base64` fields, suffix lookalikes such
+  as `macSecretBase64Length` and `Id`, and the `X-Airtable-Content-MAC` HMAC
+  header are not matched. The value is not decoded and no width is assumed.
 - The release manifest no longer records a version as `unpublished`, or leaves
   its published digest empty, because the registry had not caught up right after
   publishing (#1197, seen on 0.1.0-beta.13). `record-manifest` now re-reads the
@@ -86,6 +101,25 @@ evidence is linked from each published version.
   value that is the assigned name itself (`aws_secret_access_key =
   aws_secret_access_key`) (#1205). The `${NAME:-default}` form and any other
   identifier under the name are still reported.
+- `generic-token` no longer reports the instructional placeholder
+  `YOUR_FIGMA_TOKEN` (and `your-figma-token`, `replace-with-your-figma-token`)
+  in an `X-Figma-Token` header or any other contextual slot (#1209). The
+  explicit `X-Figma-Token` header value was already redacted in raw HTTP,
+  quoted curl `-H` and JSON header maps as a generic `contextual_secret`, and
+  still is, with no personal-access-token subtype and no `figd_` grammar. A
+  placeholder glued to random material and a random value are still reported.
+- An Asana `X-Hook-Secret` header value (raw HTTP, quoted curl `-H`, JSON header
+  map) is redacted as a generic `contextual_secret` spanning only the value; the
+  HMAC `X-Hook-Signature`, `X-Hook-Secret-Id` and longer names are not (#1210).
+  This was validated against an independent corpus and needed no code change;
+  a regression test now pins it.
+- A Canva `client_secret` (assignment, form body, JSON) and an `Authorization:
+  Basic` envelope carrying a Canva client id and secret are redacted as a
+  generic `contextual_secret` and `authorization_credential`, the `Basic` span
+  being the encoded envelope (#1213). This was validated against an independent
+  corpus and needed no code change; a regression test now pins it. A bare
+  `cnvca` value outside a credential slot is not reported, because the
+  prefix's separator, length and alphabet are not documented.
 
 ### Documented scope
 

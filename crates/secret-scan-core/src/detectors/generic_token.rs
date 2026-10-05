@@ -58,7 +58,14 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// credential variable, `FAL_KEY`), and Convex's `convex_deploy_key` and
 /// `convex_self_hosted_admin_key`. Only these whole names match; `fal_key_id`
 /// (the public id half), `convex_key` and `my_fal_key` do not.
+///
+/// Issue #1211 adds `mac_secret_base64`, Airtable's documented create-webhook
+/// response field `macSecretBase64` (the Base64 MAC secret whose HMAC the
+/// `X-Airtable-Content-MAC` header carries). It is exactly this one name, not
+/// a `*_base64` rule: `thumbnailBase64`, `macSecretBase64Length`,
+/// `macSecretBase64Id` and a prefixed `oldMacSecretBase64` do not match.
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "mac_secret_base64",
     "db_pass",
     "fal_key",
     "convex_deploy_key",
@@ -3339,7 +3346,7 @@ fn call_argument_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-// --- `AUTHORIZATION_PATTERN`: (?:^|[\r\n])[ \t]*authorization[ \t]*:[ \t]*(basic|token|key)[ \t]+([A-Za-z0-9+/=_-]{12,}) ---
+// --- `AUTHORIZATION_PATTERN`: (?:^|[\r\n])[ \t]*authorization[ \t]*:[ \t]*(basic|token|key|apikey)[ \t]+([A-Za-z0-9+/=_-]{12,}) ---
 
 fn is_space_or_tab_byte(byte: u8) -> bool {
     byte == b' ' || byte == b'\t'
@@ -3399,6 +3406,12 @@ fn parse_authorization_from(input: &str, start: usize) -> Option<AuthorizationMa
         // fal's scheme (issue #919): `Authorization: Key <id>:<secret>`.
         cursor += "key".len();
         "key"
+    } else if starts_with_ci(input, cursor, "apikey") {
+        // The `ApiKey` scheme word (issue #1212), used by Elasticsearch and
+        // not unique to it: the whole encoded value is the credential, read
+        // undecoded under the authorization alphabet, with no id/key split.
+        cursor += "apikey".len();
+        "apikey"
     } else {
         return None;
     };
@@ -3444,7 +3457,8 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
         // detectors (`travisci-api-token`, `github-token`) key on, and an
         // always-redact generic candidate would take the span from them.
         // `Key` is taken mid-line too (issue #919): fal documents it in a
-        // curl `-H` argument, and no provider detector keys on it.
+        // curl `-H` argument, and no provider detector keys on it. `ApiKey`
+        // is taken the same way (issue #1212).
         Some(ch)
             if matches!(ch, 'a' | 'A' | 'p' | 'P')
                 && prev_char(input, pos).is_some_and(|previous| {
@@ -3452,7 +3466,8 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
                         && !matches!(previous, '_' | '-' | '\r' | '\n')
                 }) =>
         {
-            parse_authorization_from(input, pos).filter(|m| matches!(m.scheme, "basic" | "key"))
+            parse_authorization_from(input, pos)
+                .filter(|m| matches!(m.scheme, "basic" | "key" | "apikey"))
         }
         _ => None,
     }
@@ -3799,6 +3814,7 @@ mod tests {
             "basic",
             "Token",
             "Key",
+            "ApiKey",
             " ",
             "  ",
             "\t",
@@ -3820,6 +3836,7 @@ mod tests {
             "x",
             "Authorization: Basic U1lOVEhFVElDX1JFVk9LRUQ=",
             "Proxy-Authorization: Key SYNTHETICREVOKED0123",
+            "Proxy-Authorization: ApiKey U1lOVEhFVElDUkVWT0tFRDowMTIz",
             "authorization : token U1lOVEhFVElDX1JFVk9LRUQ=",
         ];
         let mut state: u64 = 0x1234_5678_9ABC_DEF1;

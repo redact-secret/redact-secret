@@ -1372,6 +1372,31 @@ body is 24 or more bytes of the body alphabet, for example a snake_case
 variable name; no real-world collision is known. Cost: 15 prefixes on the
 shared known-format scan.
 
+## Batch 1 credential slots (#1209 to #1213)
+
+Five bounded credential carriers from the credential-evidence adoption
+inventory ([#232](https://github.com/redact-secret/credential-evidence/issues/232)),
+measured against the independent
+[benchmarks#717 corpus](https://github.com/redact-secret/redact-secret-benchmarks/blob/14271c7e85ad9300e100c6a4b5e33105e7429166/evidence/717/report.md).
+Each row applies the existing contextual and authorization policy to one
+documented slot. None adds a provider detector, a registry entry, a bare-prefix
+grammar, decoding, a width or alphabet claim, or a provider subtype from a
+shared carrier; the finding is the generic `contextual_secret` or
+`authorization_credential`, redacted by default. Provider documentation
+establishes the slot and role, never a universal byte shape. The accepted
+false-positive tradeoff is the contextual-policy one: a non-secret literal put
+into the exact credential slot is redacted by default; unsupported layouts,
+excluded values and values under the 8-byte contextual floor are documented
+false negatives.
+
+| Family | Applied rule | Evidence |
+| --- | --- | --- |
+| `figma:personal-access-token` | The explicit `X-Figma-Token` header value (raw HTTP, quoted curl `-H`, JSON header map) is `contextual_secret`, redacted, spanning the value only, with no PAT subtype, no `figd_`/`figp_` grammar and no width claim; it was already covered through the prefixed `_token` name rule. Since #1209 `figma` is a placeholder provider word, so `YOUR_FIGMA_TOKEN` is silent. `X-Figma-Token-Id`, suffixed names, references, masks, public ids and a newline-separated value stay silent. | [#1209](../audits/evidence/1209/README.md) |
+| `asana:webhook-secret` | The exact `X-Hook-Secret` header value (raw request or response header, quoted curl `-H`, JSON header map) is `contextual_secret`, redacted, spanning the value only, with no Asana attribution and no alphabet or width claim; no-code, covered through the prefixed `secret` name rule. `X-Hook-Signature` (an HMAC), `X-Hook-Secret-Id`, `X-Hook-Secrets`, placeholders, references, masks and bare strings stay silent. | [#1210](../audits/evidence/1210/README.md) |
+| `airtable:webhook-mac-secret` | The whole normalized field name `macSecretBase64` (JSON, YAML and direct assignment) is a high-signal contextual name, so its complete encoded value, padding included, is `contextual_secret`, redacted, never decoded, with no width claim. Only that one name: `thumbnailBase64`, `macSecretBase64Length`, `macSecretBase64Id`, a prefixed name, the `X-Airtable-Content-MAC` HMAC header, hook and base ids, placeholders, references and masks stay silent. | [#1211](../audits/evidence/1211/README.md) |
+| `elastic:elasticsearch-api-key` | `generic-token` recognizes the `ApiKey` scheme of `Authorization` and `Proxy-Authorization` (raw HTTP, quoted curl `-H`, JSON header map) as an `authorization_credential`, beside `Basic`, `Token` and `Key`: the undecoded encoded value is the span, redacted, with the 12-byte floor and entropy-based confidence of the other schemes, no id/api_key split, no alphabet or width inference and no Elastic attribution (`ApiKey` is not unique to Elastic). Taken mid-line like `Basic` and `Key`. Bare `ApiKey` prose, `X-Authorization` and `Authorization-Info`, a newline between scheme and value, placeholders, references, masks and a key id alone stay silent. | [#1212](../audits/evidence/1212/README.md) |
+| `canva:client-secret` | The existing `client_secret` assignment, form-body (the span stops at the delimiter) and JSON reading is `contextual_secret`, and the `Authorization: Basic` envelope is `authorization_credential` over the encoded credential, not a decoded secret-only span; both redacted, generic, with no Canva attribution. No-code. The documented `cnvca` prefix gets no bare-prefix detector (separator, width and alphabet are undocumented): a bare `cnvca` value, `client_id`, placeholders, references, masks and prefix prose stay silent. | [#1213](../audits/evidence/1213/README.md) |
+
 ## Rules
 
 | Rule | Governing ADR |
