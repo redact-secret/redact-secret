@@ -6961,12 +6961,277 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "buildkite_portal_token"
+    },
+    {
+      "detector": "pydantic-logfire-token",
+      "evidence": {
+        "fixtureCount": 51,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "pydantic-logfire-token-positive-ai-gateway-key",
+        "pydantic-logfire-token-positive-api-key-v2-org-id",
+        "pydantic-logfire-token-positive-api-key-v2-org-id-uppercase",
+        "pydantic-logfire-token-positive-bare",
+        "pydantic-logfire-token-positive-body-20",
+        "pydantic-logfire-token-positive-body-80",
+        "pydantic-logfire-token-positive-chat-sentence",
+        "pydantic-logfire-token-positive-crlf-unicode-prefix",
+        "pydantic-logfire-token-positive-curl-bearer",
+        "pydantic-logfire-token-positive-dotenv",
+        "pydantic-logfire-token-positive-json-config",
+        "pydantic-logfire-token-positive-json-token-key",
+        "pydantic-logfire-token-positive-log",
+        "pydantic-logfire-token-positive-mcp-server-config",
+        "pydantic-logfire-token-positive-punctuation-adjacent",
+        "pydantic-logfire-token-positive-read-token",
+        "pydantic-logfire-token-positive-region-16-letters",
+        "pydantic-logfire-token-positive-region-ap",
+        "pydantic-logfire-token-positive-region-staging",
+        "pydantic-logfire-token-positive-repeated-value",
+        "pydantic-logfire-token-positive-sdk-call",
+        "pydantic-logfire-token-positive-shell-export",
+        "pydantic-logfire-token-positive-tool-call-arguments",
+        "pydantic-logfire-token-positive-x-api-key-header",
+        "pydantic-logfire-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "pydantic_logfire_token"
+    },
+    {
+      "detector": "square-token",
+      "evidence": {
+        "fixtureCount": 49,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "square-token-positive-access-token-with-dash-and-underscore",
+        "square-token-positive-bare",
+        "square-token-positive-chat-sentence",
+        "square-token-positive-crlf-unicode-prefix",
+        "square-token-positive-curl-bearer",
+        "square-token-positive-dotenv",
+        "square-token-positive-json-config",
+        "square-token-positive-json-token-key",
+        "square-token-positive-log",
+        "square-token-positive-mcp-server-config",
+        "square-token-positive-punctuation-adjacent",
+        "square-token-positive-repeated-value",
+        "square-token-positive-sdk-call",
+        "square-token-positive-shell-export",
+        "square-token-positive-tool-call-arguments",
+        "square-token-positive-x-api-key-header",
+        "square-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "square_access_token"
+    },
+    {
+      "detector": "square-token",
+      "evidence": {
+        "fixtureCount": 49,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "square-token-positive-sandbox-secret",
+        "square-token-positive-secret-43",
+        "square-token-positive-secret-44",
+        "square-token-positive-secret-client-secret-field"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "square_oauth_application_secret"
+    },
+    {
+      "detector": "mapbox-token",
+      "evidence": {
+        "fixtureCount": 49,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "mapbox-token-positive-bare",
+        "mapbox-token-positive-chat-sentence",
+        "mapbox-token-positive-crlf-unicode-prefix",
+        "mapbox-token-positive-curl-bearer",
+        "mapbox-token-positive-dash-and-underscore",
+        "mapbox-token-positive-dotenv",
+        "mapbox-token-positive-gradle-properties",
+        "mapbox-token-positive-json-config",
+        "mapbox-token-positive-json-token-key",
+        "mapbox-token-positive-log",
+        "mapbox-token-positive-mcp-server-config",
+        "mapbox-token-positive-npmrc-downloads-credential",
+        "mapbox-token-positive-payload-100",
+        "mapbox-token-positive-payload-20",
+        "mapbox-token-positive-payload-250",
+        "mapbox-token-positive-payload-55",
+        "mapbox-token-positive-payload-60",
+        "mapbox-token-positive-punctuation-adjacent",
+        "mapbox-token-positive-repeated-value",
+        "mapbox-token-positive-sdk-call",
+        "mapbox-token-positive-shell-export",
+        "mapbox-token-positive-tool-call-arguments",
+        "mapbox-token-positive-trailing-segment-is-outside-the-span",
+        "mapbox-token-positive-x-api-key-header",
+        "mapbox-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "mapbox_secret_access_token"
+    },
+    {
+      "detector": "fly-token",
+      "evidence": {
+        "fixtureCount": 53,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "fly-token-positive-authorization-flyv1-header",
+        "fly-token-positive-bare",
+        "fly-token-positive-body-2000",
+        "fly-token-positive-body-64",
+        "fly-token-positive-body-700",
+        "fly-token-positive-body-alphabet",
+        "fly-token-positive-chat-sentence",
+        "fly-token-positive-comma-before-a-non-member-ends-the-span",
+        "fly-token-positive-crlf-unicode-prefix",
+        "fly-token-positive-curl-bearer",
+        "fly-token-positive-dotenv",
+        "fly-token-positive-flyv1-scheme-quoted",
+        "fly-token-positive-flyv1-scheme-unquoted",
+        "fly-token-positive-github-actions-env",
+        "fly-token-positive-json-config",
+        "fly-token-positive-json-token-key",
+        "fly-token-positive-log",
+        "fly-token-positive-mcp-server-config",
+        "fly-token-positive-padding-one",
+        "fly-token-positive-padding-two",
+        "fly-token-positive-prefix-fm1a",
+        "fly-token-positive-prefix-fm1r",
+        "fly-token-positive-punctuation-adjacent",
+        "fly-token-positive-q9-fo1-before-the-first-fm-member",
+        "fly-token-positive-repeated-value",
+        "fly-token-positive-sdk-call",
+        "fly-token-positive-session-bundle-with-fo1-member",
+        "fly-token-positive-shell-export",
+        "fly-token-positive-three-member-bundle",
+        "fly-token-positive-tool-call-arguments",
+        "fly-token-positive-two-member-bundle",
+        "fly-token-positive-two-member-bundle-with-scheme",
+        "fly-token-positive-x-api-key-header",
+        "fly-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "fly_access_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 152,
+    "supported": 157,
     "unresolved": 0
   }
 }

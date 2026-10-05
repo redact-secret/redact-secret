@@ -58,6 +58,30 @@ evidence is linked from each published version.
     `buildkite_packages_token`, `buildkite_pipeline_token`,
     `buildkite_portal_token`). The `bkjat_`/`bkaj_` JWT bodies are one span that
     wins over `jwt`; the 24-byte floor is the provider redactor's own.
+  - `pydantic-logfire-token` (#1106): Pydantic Logfire write, read and API keys
+    and the AI Gateway key, `pylf_v<n>_<region>_` + optional organization UUID
+    + 20 or more `[A-Za-z0-9]` (`pydantic_logfire_token`). The 20-byte body
+    floor and the 16-letter region cap are narrowing policy (ruling Q7 pending);
+    legacy unprefixed tokens stay with generic context.
+  - `square-token` (#1107): Square `EAAA` + 60 access tokens
+    (`square_access_token`) and `sq0csp-` + 43 or 44 and `sandbox-sq0csb-` + 43
+    OAuth application secrets (`square_oauth_application_secret`), all over
+    `[A-Za-z0-9_-]`. Square disclaims length validation and its examples
+    disagree, so the `EAAl` 63-character access token, the `EQAA` refresh token
+    and every other width stay unclaimed (ruling Q8 pending); JWT-format tokens
+    stay with `jwt`.
+  - `mapbox-token` (#1108): Mapbox secret access tokens, `sk.eyJ` + 20 or more
+    base64url + `.` + exactly 22 base64url (`mapbox_secret_access_token`). The
+    payload floor is derived, not provider-stated (ruling Q7 pending); public
+    `pk.` tokens are never claimed and `tk.` temporary tokens stay unclaimed
+    (ruling Q9 pending). The span is one provider finding with no `jwt` finding
+    over it.
+  - `fly-token` (#1109): Fly.io macaroon tokens, `fm1r_`, `fm1a_` or `fm2_` +
+    64 or more `[A-Za-z0-9+/_-]` with optional `=` padding
+    (`fly_access_token`). A comma-joined session bundle, including a `fo1_`
+    member, is one span; the `FlyV1 ` scheme stays outside it. The 64-byte floor
+    is derived from the wire-format minimum (ruling Q7 pending); a standalone
+    `fo1_` token stays unclaimed (ruling Q9 pending).
 
 ### Fixed
 

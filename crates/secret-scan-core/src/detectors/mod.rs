@@ -40,6 +40,7 @@ mod e2b;
 mod elevenlabs;
 mod firebase;
 mod firecrawl;
+mod fly;
 mod generic_token;
 mod github;
 mod gitlab;
@@ -56,6 +57,7 @@ mod langsmith;
 mod linear;
 mod mailchimp;
 mod mailgun;
+mod mapbox;
 mod microsoft_entra;
 mod neon;
 mod netlify;
@@ -74,6 +76,7 @@ mod posthog;
 mod postman;
 mod prefilter;
 mod private_key;
+mod pydantic_logfire;
 mod resend;
 mod rubygems;
 mod ruleset_adapter;
@@ -84,6 +87,7 @@ mod shopify;
 mod slack;
 mod sonarqube;
 mod sourcegraph;
+mod square;
 mod stripe;
 mod telegram;
 mod terraform;
@@ -411,6 +415,10 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("sourcegraph-token", &sourcegraph::SOURCEGRAPH),
         row("unkey-root-key", &unkey::UNKEY),
         row("buildkite-token", &buildkite::BUILDKITE),
+        row("pydantic-logfire-token", &pydantic_logfire::LOGFIRE),
+        row("square-token", &square::SQUARE),
+        row("mapbox-token", &mapbox::MAPBOX),
+        row("fly-token", &fly::FLY),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -756,6 +764,16 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
     ),
     (buildkite::ID, &[Literals::Shapes(buildkite::SHAPES)]),
     (
+        pydantic_logfire::ID,
+        &[Literals::Shapes(pydantic_logfire::SHAPES)],
+    ),
+    (
+        square::SQUARE.detector_id(),
+        &[Literals::Shapes(square::SQUARE.shapes())],
+    ),
+    (mapbox::ID, &[Literals::Shapes(mapbox::SHAPES)]),
+    (fly::ID, &[Literals::Shapes(fly::SHAPES)]),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -948,6 +966,10 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("sourcegraph-token", Pack::Provider),
     ("unkey-root-key", Pack::Provider),
     ("buildkite-token", Pack::Provider),
+    ("pydantic-logfire-token", Pack::Provider),
+    ("square-token", Pack::Provider),
+    ("mapbox-token", Pack::Provider),
+    ("fly-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1109,6 +1131,10 @@ mod tests {
                 "sourcegraph-token",
                 "unkey-root-key",
                 "buildkite-token",
+                "pydantic-logfire-token",
+                "square-token",
+                "mapbox-token",
+                "fly-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1491,6 +1517,15 @@ mod tests {
             "Synthe1c", "SyntheticRevokedUnkeyRootKeyFixture1234567"
         );
         let buildkite_token_input = format!("bkua_{}", "5e7c0ded".repeat(5));
+        let pydantic_logfire_token_input = format!("pylf_v1_us_{}", "5e7c0ded".repeat(5));
+        let square_token_input = format!("EAAA{}{}", "5e7c0ded".repeat(7), "5e7c");
+        let fly_token_input = format!("fm2_{}", "5e7c0ded".repeat(8));
+        let mapbox_token_input = format!(
+            "sk.eyJ{}.{}{}",
+            "5e7c0ded".repeat(3),
+            "5e7c0ded".repeat(2),
+            "5e7c0d"
+        );
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1633,6 +1668,13 @@ mod tests {
             ("sourcegraph-token", sourcegraph_token_input.as_str()),
             ("unkey-root-key", unkey_root_key_input.as_str()),
             ("buildkite-token", buildkite_token_input.as_str()),
+            (
+                "pydantic-logfire-token",
+                pydantic_logfire_token_input.as_str(),
+            ),
+            ("square-token", square_token_input.as_str()),
+            ("mapbox-token", mapbox_token_input.as_str()),
+            ("fly-token", fly_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

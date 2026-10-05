@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 152/152 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 157/157 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 152 |
+| supported | 157 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 163.
+Coverage declarations: 168.
 
 ## Coverage by detector
 
@@ -66,6 +66,7 @@ Coverage declarations: 163.
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firecrawl-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | fireworks-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| fly-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-runner-authentication-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -87,6 +88,7 @@ Coverage declarations: 163.
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| mapbox-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mistral-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | neon-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -110,6 +112,7 @@ Coverage declarations: 163.
 | postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| pydantic-logfire-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | resend-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -122,6 +125,7 @@ Coverage declarations: 163.
 | slack-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | sonarqube-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | sourcegraph-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| square-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -205,6 +209,7 @@ Coverage declarations: 163.
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
 | firecrawl_api_key | firecrawl-api-key | provider | supported | not-applicable | none |
 | fireworks_ai_api_key | fireworks-ai-api-key | provider | supported | not-applicable | none |
+| fly_access_token | fly-token | provider | supported | not-applicable | none |
 | github_app_installation_token | github-token | provider | supported | not-applicable | none |
 | github_app_refresh_token | github-token | provider | supported | not-applicable | none |
 | github_app_user_to_server_token | github-token | provider | supported | not-applicable | none |
@@ -231,6 +236,7 @@ Coverage declarations: 163.
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
+| mapbox_secret_access_token | mapbox-token | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
 | mistral_api_key | mistral-api-key | provider | supported | not-applicable | none |
 | neon_api_key | neon-api-key | provider | supported | not-applicable | none |
@@ -257,6 +263,7 @@ Coverage declarations: 163.
 | postman_collection_access_key | postman-collection-access-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
+| pydantic_logfire_token | pydantic-logfire-token | provider | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | resend_api_key | resend-api-key | provider | supported | not-applicable | none |
@@ -272,6 +279,8 @@ Coverage declarations: 163.
 | sonarqube_analysis_token | sonarqube-token | provider | supported | not-applicable | none |
 | sonarqube_user_token | sonarqube-token | provider | supported | not-applicable | none |
 | sourcegraph_access_token | sourcegraph-token | provider | supported | not-applicable | none |
+| square_access_token | square-token | provider | supported | not-applicable | none |
+| square_oauth_application_secret | square-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
@@ -321,15 +330,15 @@ Coverage declarations: 163.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 163 | 0 | 0 |
-| boundary | 152 | 0 | 0 |
-| host-context | 152 | 0 | 0 |
+| adversarial | 168 | 0 | 0 |
+| boundary | 157 | 0 | 0 |
+| host-context | 157 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 163 | 0 | 0 |
-| near-miss-negative | 152 | 0 | 0 |
-| overlap | 152 | 0 | 0 |
-| positive | 152 | 0 | 0 |
-| range | 163 | 0 | 0 |
+| malformed | 168 | 0 | 0 |
+| near-miss-negative | 157 | 0 | 0 |
+| overlap | 157 | 0 | 0 |
+| positive | 157 | 0 | 0 |
+| range | 168 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

@@ -1093,6 +1093,41 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0062kpat_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
       "schemes": null
+    },
+    {
+      "type": "pydantic_logfire_token",
+      "detector": "pydantic-logfire-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0070ylf_v1_us_SyntheticRevokedLogfireToken0000",
+      "schemes": null
+    },
+    {
+      "type": "square_access_token",
+      "detector": "square-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0045AAASyntheticRevokedSquareAccessToken000000000000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "square_oauth_application_secret",
+      "detector": "square-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073q0csp-SyntheticRevokedSquareAppSecret000000000000",
+      "schemes": null
+    },
+    {
+      "type": "mapbox_secret_access_token",
+      "detector": "mapbox-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073k.eyJSyntheticRevokedMapboxPayloadFixture.SyntheticRevokedMbxSig",
+      "schemes": null
+    },
+    {
+      "type": "fly_access_token",
+      "detector": "fly-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0066m2_SyntheticRevokedFlyMacaroonFixture0000000000000000000000000000000000",
+      "schemes": null
     }
   ],
   "consumers": [

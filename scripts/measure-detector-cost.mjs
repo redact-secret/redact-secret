@@ -164,6 +164,10 @@ export const CANONICAL_IDS = [
   "sourcegraph-token",
   "unkey-root-key",
   "buildkite-token",
+  "pydantic-logfire-token",
+  "square-token",
+  "mapbox-token",
+  "fly-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -258,6 +262,8 @@ export const GROUPS = {
     "honeycomb-api-key",
     "axiom-token",
     "xata-api-key",
+    "pydantic-logfire-token",
+    "fly-token",
   ],
   devtools: [
     "github-token",
@@ -303,6 +309,8 @@ export const GROUPS = {
     "polar-token",
     "paddle-api-key",
     "unkey-root-key",
+    "square-token",
+    "mapbox-token",
   ],
 };
 

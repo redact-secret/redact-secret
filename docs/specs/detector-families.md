@@ -79,6 +79,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `firecrawl_api_key` | `firecrawl-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (docs, SDK), UUIDv4 body T1 (provider server code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `fireworks_ai_api_key` | `fireworks-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `fly_access_token` | `fly-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (the `superfly/macaroon` wire format, R1, and flyctl's own redaction rule, R2), the 64-byte first-member floor is derived from the wire format rather than provider-stated and rests on the Q7 recommendation (pending ruling), a standalone `fo1_` is unclaimed on the Q9 recommendation (pending ruling), the `FlyV1 ` scheme is outside the span, grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `github_app_installation_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_refresh_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_user_to_server_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
@@ -105,6 +106,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `linear_token` | `linear-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `mailchimp_api_key` | `mailchimp-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailchimp`'s own module doc, per issue #313; issue #931 relaxes the #313 same-line `mailchimp` keyword gate for the complete shape only (32 hex, `-us`, 1–3 digit datacenter): a keyword-free match that is a DNS label or URL path segment is not reported; issue #936 raises the complete shape outside a DNS label or URL path to `high` (redact) with or without a keyword, so only a keyword-kept DNS-label or path match stays `medium` (warn) |
 | `mailgun_api_key` | `mailgun-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailgun`'s own module doc, per issue #314 |
+| `mapbox_secret_access_token` | `mapbox-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs and the provider's token parser, R1; signature width by R5), the payload floor of 20 is derived rather than provider-stated and rests on the Q7 recommendation (pending ruling), `pk.` is public and never claimed, `tk.` is unclaimed on the Q9 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `microsoft_entra_client_secret` | `microsoft-entra-client-secret` | `always-redact` | [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `mistral_api_key` | `mistral-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `neon_api_key` | `neon-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -131,6 +133,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `postman_collection_access_key` | `postman-collection-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `private_key` | `private-key` | `block` | generic policy default, no dedicated ADR in this repository |
 | `pulumi_access_token` | `pulumi-access-token` | `always-redact` | [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `pydantic_logfire_token` | `pydantic-logfire-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider SDK parsers, R1, and the provider scrubber, R2), the 20-byte body floor and 16-letter region cap are narrowing policy rather than provider-stated widths and rest on the Q7 recommendation (pending ruling), grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `pypi_api_token` | `pypi-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `replicate_api_token` | `replicate-api-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `resend_api_key` | `resend-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (Resend CLI), layout T1 by example (docs response example and SDK fixtures, R5), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
@@ -146,6 +149,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `sonarqube_analysis_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `sonarqube_user_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `sourcegraph_access_token` | `sourcegraph-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-11-18 (provider generator and validator, R1; dated provider code, R9), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `square_access_token` | `square-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs examples, R4 and R5, corroborated by scanner rules), exact widths rest on the Q8 recommendation (pending ruling) because the provider disclaims length validation, the conflicting `EAAl` and `EQAA` shapes are unclaimed, grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
+| `square_oauth_application_secret` | `square-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs examples, R4 and R5, corroborated by scanner rules), exact widths rest on the Q8 recommendation (pending ruling) because the provider disclaims length validation, the conflicting `EAAl` and `EQAA` shapes are unclaimed, grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #934 excludes a body that is one repeated character (`sk_test_` plus a run of `x`). Organization keys: `sk_org_`, `sk_org_live_` and `sk_org_test_` each + at least 20 `[A-Za-z0-9]`, same type and action (#1030, research #1012). The prefix is T1 (Stripe docs); the `live_`/`test_` segment rests on two independent implementations that branch on it and is not provider-documented; no issued key has been observed, so body length and alphabet after the segment are unverified and the floor stays the conservative lexical one. Trade-off: no new false-positive surface worth naming (the prefix is unique); it removes a likely total false negative for org keys outside named contexts; a body that is shorter than 20, holds `_`/`-`, or uses another mode word stays unclaimed (intentional false negative), and `rk_org_` stays excluded (Stripe: no such prefix). Not a support-status claim; `docs/support-matrix.md` keeps the organization row Unsupported |
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -1371,6 +1376,141 @@ floor): an unrelated `bkct_`-, `bkat_`- or other listed-prefix identifier whose
 body is 24 or more bytes of the body alphabet, for example a snake_case
 variable name; no real-world collision is known. Cost: 15 prefixes on the
 shared known-format scan.
+
+## Beta.14 broad-discovery families, third wave (#1106 to #1109)
+
+The third wave of the [#1014 broad-discovery handoffs](../audits/evidence/1014/README.md)
+(Pydantic Logfire, Square, Mapbox, Fly) follows the same route as the
+[second wave](#beta14-broad-discovery-families-second-wave-1102-to-1105): each
+is a new detector with its own finding types, `Provider` specificity, high
+confidence and always redacted, so overlap resolution reports one provider
+finding per span over `contextual_secret`, `bearer_token`,
+`authorization_credential` and `jwt`. The frozen contract for each family is
+its step-3 handoff in that folder; this section records only the implemented
+grammar, the ruling it rests on and its trade-offs. The shared rules of the
+second wave apply (identifier boundary on both sides unless a row says
+otherwise, no checksum, no addition to `generic-token`'s dedicated-provider
+deferral list, no support-status claim until the benchmarks arrival and profile
+evidence lands). Rulings Q7 to Q10 on #1014 are all open: each row follows the
+handoff's stated recommendation and records the open ruling as a bounded limit.
+
+| Family | Detector | Grammar | Finding type | Tier |
+| --- | --- | --- | --- | --- |
+| `pydantic:logfire-token` (write and read tokens, API keys, AI Gateway key) | `pydantic-logfire-token` | `pylf_v` + 1 to 3 digits + `_` + `[a-z]{2,16}` region + `_` + optional 8-4-4-4-12 hex organization id (either case) + `_` + `[A-Za-z0-9]{20,}` | `pydantic_logfire_token` | T1 (SDK parsers, R1; provider scrubber, R2); the body floor and region cap are narrowing policy (pending ruling Q7, recommendation: allowed) |
+| `square:access-token` (and the OAuth application secret) | `square-token` | `EAAA` + exactly 60, `sq0csp-` + 43 or 44, or `sandbox-sq0csb-` + exactly 43, all `[A-Za-z0-9_-]` | `square_access_token` (`EAAA`), `square_oauth_application_secret` (`sq0csp-`, `sandbox-sq0csb-`) | T1 (provider docs examples, R4 and R5, corroborated by scanner rules); exact widths under the Q8 recommendation (pending ruling) |
+| `mapbox:secret-access-token` | `mapbox-token` | `sk.` + `eyJ` + `[A-Za-z0-9_-]{20,}` payload + `.` + exactly 22 `[A-Za-z0-9_-]` signature | `mapbox_secret_access_token` | T1 (provider docs and parser, R1; signature width by R5); the payload floor is derived (pending ruling Q7, recommendation: allowed); `tk.` unclaimed (pending ruling Q9, recommendation: unclaimed) |
+| `fly:access-token` | `fly-token` | first member `fm1r_`, `fm1a_` or `fm2_` + `[A-Za-z0-9+/_-]{64,}` + `={0,2}`, then any number of `,` + `fm1r_`, `fm1a_`, `fm2_` or `fo1_` + `[A-Za-z0-9+/_-]+` + `={0,2}` members; the `FlyV1 ` scheme is outside the span | `fly_access_token` | T1 (wire-format code, R1; flyctl's own redaction rule, R2); the 64-byte floor is derived (pending ruling Q7, recommendation: allowed); a standalone `fo1_` unclaimed (pending ruling Q9, recommendation: unclaimed) |
+
+Pydantic Logfire ([#1106](https://github.com/redact-secret/redact-secret/issues/1106),
+[handoff](../audits/evidence/1014/pydantic-logfire.md)). The write token, read
+token, organization or project API key and AI Gateway key share one namespace
+that no text feature splits, so they are one detector and one finding type; a
+v1 body is observed at exactly 44 bytes (provider fixtures and a scanner rule)
+but the provider regexes have no bound, so no exact width is claimed. The floor
+of 20 is below every observed token and removes the placeholders in provider
+tests and docs (`..._xxx`, `..._token1`); the region cap of 16 is a policy cap
+on a class the provider leaves open. Neither widens the provider grammar.
+Ruling Q7 (may a narrowing policy floor serve as the T1 floor) is open; the row
+follows its recommendation, and if it is refused the floor becomes `{1,}`, a
+one-constant change. The whole `[A-Za-z0-9_-]` run after `pylf_v` is read and
+rejected, never truncated, unless it has exactly the grammar. False negatives:
+a body under 20 (the provider scrubber still redacts the bare prefix, a
+stronger posture than this detector takes), legacy tokens with no `pylf_`
+prefix, a non-UUID `-` or `_` in the body, `pylf_v3`/`pylf_v4` 80-byte shapes
+that only a scanner fixture shows, an uppercase region and a glued value. False
+positives: a hand-written placeholder with more than 19 alphanumerics after the
+prefix; none is known. Cost: one prefix on the shared known-format scan plus a
+linear grammar check over the run.
+
+Square ([#1107](https://github.com/redact-secret/redact-secret/issues/1107),
+[handoff](../audits/evidence/1014/square.md)). Square tells integrators not to
+validate token length and its own examples disagree (an access token of 64
+characters in one place and a 63-character `EAAl` form in the `ObtainToken`
+reference; an application secret of 43 characters in the walkthrough and 44 in
+the reference and its generated SDK fixture). Ruling Q8 (may R5 still support
+an exact-width grammar when the provider disclaims length) is open; the row
+follows its recommendation: the stable widths are claimed, `EAAA` + exactly 60
+(four independent scanner and request sources also use 60) and the 43 or 44
+union for `sq0csp-` (the era-union precedent of Polar), and every conflicting
+shape is unclaimed and recorded as a bounded false negative: the `EAAl` + 59
+access token and the `EQAA` + 60 refresh token (one provider example each, not
+independent of the generated SDK fixture), `EAAA` and `sq0csp-` of any other
+width, and `sandbox-sq0csb-` of any width but 43 (one docs example). The
+structure-only issuance check that would settle the widths is a benchmarks-side
+item and is pending. Both secrets and the access token share the boundary
+`[A-Za-z0-9_-]` on both sides and are case-sensitive, so a longer run (a Meta
+`EAAA` Graph token, a Base64 blob) or a lowercase image digest cannot match;
+a `+`, `=` or `/` inside the body ends the run under the width (trufflehog's
+class would accept them, Square's own example has none). JWT-format access
+tokens stay with `jwt`; `sq0atp-` (scanner rules only), the `sq0cgb-`
+authorization code and the public application ids (`sq0idp-`, `sq0ids-`,
+`sq0idb-`, `sandbox-sq0idb-`) are unclaimed. False negatives: the above, any
+future traditional-token width change, and a glued value. False positives: an
+unrelated run of `EAAA` + 60 URL-safe bytes at identifier boundaries, which
+includes a Base64 line made almost entirely of `A` bytes after a lone `E`; the
+boundary makes this very rare, and an almost-constant-body post-check is an
+option for a later issue, not part of this contract. Cost: three prefixes on
+the shared known-format scan.
+
+Mapbox ([#1108](https://github.com/redact-secret/redact-secret/issues/1108),
+[handoff](../audits/evidence/1014/mapbox.md)). A Mapbox access token is
+`<usage>.<payload>.<signature>` with the usage header `pk`, `sk` or `tk`; only
+`sk.` is claimed, whole, as one span. The payload is the base64url of a JSON
+object that begins `{"`, so it begins `eyJ`; it has no provider-stated length
+(it grows with the account and token contents, a Drupal tracker records 98
+characters in 2022 and later growth), so the floor of 20 characters after `eyJ`
+is derived from the documented two-claim object, not stated by Mapbox, and the
+22-byte signature tail (docs example plus provider fixtures, R5) is the real
+anchor. Ruling Q7 (may a derived floor serve as the T1 floor) is open; the row
+follows its recommendation (yes) and, if it is refused, falls back to a payload
+pinned to the documented `u` claim lead, which is narrower. Ruling Q9 is also
+open: `pk.` tokens are public by design and are never claimed, and `tk.`
+temporary tokens (expire within an hour, richer payload) stay unclaimed until a
+provider source states their length, a bounded false negative. The `jwt`
+detector cannot start inside the token: it needs a three-segment `eyJ.eyJ.sig`
+shape and rejects a match whose preceding byte is a token byte, `.` included,
+and the byte before the payload's `eyJ` is the header's `.`. The provider type
+is therefore the only finding for the span, whole-input and incremental, and
+the same JWT without the `sk.` header stays a plain `jwt` finding. A signature
+that itself begins `eyJ` is claimed to its 22 bytes and any further segment is
+outside the span. False negatives: `tk.` tokens, a signature of any width
+other than 22 (a 23rd byte rejects the whole token, never truncating it), a
+payload that does not begin `eyJ`, a future signature length, `SK.`, `sk_` and
+`sk-` forms and a glued value. False positives: a non-Mapbox `sk.eyJ...`
+followed by exactly 22 base64url bytes; none is known. Cost: one prefix on the
+shared known-format scan plus a 23-byte tail check.
+
+Fly ([#1109](https://github.com/redact-secret/redact-secret/issues/1109),
+[handoff](../audits/evidence/1014/fly.md)). The grammar is flyctl's own log
+redaction rule, `(fo1_|fm1[ar]_|fm2_)[a-zA-Z0-9/+_-]+=*` (R2), read with the
+`superfly/macaroon` wire format (R1): the member prefixes, an alphabet that
+covers standard and URL-safe Base64, optional `=` padding (up to two bytes
+here), no upper length bound, and `,` between the members of a bundle. The span
+starts at the first `fm1r_`, `fm1a_` or `fm2_` member and ends at the last body
+or `=` byte of the last member, so a session bundle (`fm2_...,fo1_...`) is one
+finding, and the documented `FlyV1 ` scheme and its space stay in place; that
+also closes the unquoted `FLY_API_TOKEN=FlyV1 fm2_...` form, which generic
+context misses because the space ends the contextual value. A comma followed by
+anything but a member prefix with at least one body byte ends the bundle. The
+64-byte floor on the first member is derived from the wire format (a decoded
+macaroon holds a 16-byte nonce and a 32-byte HMAC-SHA256 tail, 48 bytes, which
+is at least 64 standard-Base64 characters), not stated by Fly. Ruling Q7 (may a
+derived floor serve as the T1 floor) is open; the row follows its recommendation
+(yes), and a floor of 100 is a one-constant change if it is refused. Ruling Q9 is
+also open: a `fo1_` token with no `fm` member before it has no provider-stated
+length (43 URL-safe bytes rests on one scanner) and stays unclaimed, as does a
+`fo1_` member that precedes the first `fm` member, a bounded false negative that
+stays with generic coverage. The boundary before the first prefix is
+`[A-Za-z0-9_-]`; the first member's run is the maximal body-alphabet run, so a
+longer run is claimed in full and never truncated, and a padded member that an
+identifier continues is rejected whole. The body alphabet includes `-` and `_`,
+so a delimiter glued after a token is more body, not a boundary (the provider
+rule reads it the same way). False negatives: a standalone `fo1_`, a body under
+64 (including the `fm2_hi` test fixtures), a future prefix (`fm3`), a separator
+other than `,` between members and `FM2_`. False positives: an unrelated `fm2_`
+followed by 64 or more body-alphabet bytes (a Base64 blob after a delimiter);
+none is known. Cost: three prefixes on the shared known-format scan plus a
+linear bundle extension.
 
 ## Batch 1 credential slots (#1209 to #1213)
 

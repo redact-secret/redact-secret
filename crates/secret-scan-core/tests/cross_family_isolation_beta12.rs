@@ -178,7 +178,57 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
         ("vercel-token", "vercel_app_refresh_token", vercel("vcr_")),
     ];
     values.extend(second_wave_family_values());
+    values.extend(third_wave_family_values());
     values
+}
+
+/// The #1014 third wave (#1106 to #1109): one value per finding type.
+fn third_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
+    vec![
+        (
+            "pydantic-logfire-token",
+            "pydantic_logfire_token",
+            format!("pylf_v1_us_{}", filler(ALNUM, 44, 1)),
+        ),
+        (
+            "square-token",
+            "square_access_token",
+            format!("EAAA{}", filler(BASE64URL, 60, 1)),
+        ),
+        (
+            "square-token",
+            "square_oauth_application_secret",
+            format!("sq0csp-{}", filler(BASE64URL, 44, 2)),
+        ),
+        (
+            "square-token",
+            "square_oauth_application_secret",
+            format!("sandbox-sq0csb-{}", filler(BASE64URL, 43, 3)),
+        ),
+        (
+            "mapbox-token",
+            "mapbox_secret_access_token",
+            format!(
+                "sk.eyJ{}.{}",
+                filler(BASE64URL, 60, 1),
+                filler(BASE64URL, 22, 2)
+            ),
+        ),
+        (
+            "fly-token",
+            "fly_access_token",
+            format!("fm2_{}", filler(BASE64, 100, 1)),
+        ),
+        (
+            "fly-token",
+            "fly_access_token",
+            format!(
+                "fm2_{},fo1_{}",
+                filler(BASE64, 80, 2),
+                filler(BASE64URL, 43, 3)
+            ),
+        ),
+    ]
 }
 
 /// The #1014 second wave (#1102 to #1105): one value per finding type.
