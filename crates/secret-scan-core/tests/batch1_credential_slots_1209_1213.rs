@@ -497,3 +497,124 @@ fn apikey_values_overlap_with_a_provider_finding_resolves_to_one_finding() {
     assert_eq!(findings[0].range().end(), start + value.len());
     assert_eq!(findings[0].action(), Action::Redact);
 }
+
+// -------------------------------------------- #1213 Canva client_secret
+
+// `cnvca` is the provider-documented prefix; the separator, body length and
+// alphabet are not documented, so no test depends on them and no bare-prefix
+// grammar is claimed.
+const CANVA_AS: &str = "cnvcaXq7Lm2Zp9TrW4vKc8NbY3hJd6FsA1eGuQw5Rt0Y";
+const CANVA_ASQ: &str = "cnvcaHn4Vd8Ks2PxQ7mLb3ZcW9tRy6FjA1eGuTo5Ek0M";
+const CANVA_FORM: &str = "cnvcaBd5Kx9Rn2VmP7qLc3ZtW8yHs4FjA6eGuQo1Ek0M";
+const CANVA_LAST: &str = "cnvcaPw3Rn8Kd5VxL2mQb7ZcT9yHs4FjA1eGuXo6Rt0Y";
+const CANVA_JSON: &str = "cnvcaTz6Qm1Vd9KxP4nLb8RcW2yHs5FjA7eGuYo3Ek0M";
+const CANVA_UNI: &str = "cnvcaLm8Qw2Vd6KxP9nTb4RcZ1yHs7FjA3eGuDo5Ek0M";
+const CANVA_ID: &str = "OC-SYNTHETIC01";
+
+/// Standard Base64 of `bytes`, to build a `Basic` envelope without decoding.
+fn base64(bytes: &[u8]) -> String {
+    const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut out = String::new();
+    for chunk in bytes.chunks(3) {
+        let n = chunk
+            .iter()
+            .enumerate()
+            .fold(0u32, |acc, (i, b)| acc | (u32::from(*b) << (16 - 8 * i)));
+        for i in 0..4 {
+            if i <= chunk.len() {
+                out.push(TABLE[((n >> (18 - 6 * i)) & 63) as usize] as char);
+            } else {
+                out.push('=');
+            }
+        }
+    }
+    out
+}
+
+#[test]
+fn canva_client_secret_is_redacted_in_assignment_form_and_json_layouts() {
+    for (input, value) in [
+        (
+            format!("CANVA_APP_ORIGIN=https://app.example.test\nclient_secret={CANVA_AS}\n"),
+            CANVA_AS,
+        ),
+        (format!("client_secret = \"{CANVA_ASQ}\"\n"), CANVA_ASQ),
+        (
+            format!(
+                "POST /rest/v1/oauth/token HTTP/1.1\r\nHost: api.example.test\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\ngrant_type=authorization_code&client_id={CANVA_ID}&client_secret={CANVA_FORM}&code=AUTHCODE0\r\n"
+            ),
+            CANVA_FORM,
+        ),
+        (
+            format!(
+                "grant_type=client_credentials&client_id={CANVA_ID}&client_secret={CANVA_LAST}\n"
+            ),
+            CANVA_LAST,
+        ),
+        (
+            format!(
+                "{{\"client_id\":\"{CANVA_ID}\",\"client_secret\":\"{CANVA_JSON}\",\"grant_type\":\"authorization_code\"}}\n"
+            ),
+            CANVA_JSON,
+        ),
+        (
+            format!("{{\"note\":\"caf\u{e9} \u{1F680}\",\"client_secret\":\"{CANVA_UNI}\"}}\n"),
+            CANVA_UNI,
+        ),
+    ] {
+        // The form-body span stops at the `&` delimiter; type is generic.
+        assert_value(&input, value, "contextual_secret");
+    }
+}
+
+#[test]
+fn canva_basic_envelope_span_is_the_encoded_credential() {
+    for (head, tail) in [
+        (
+            "POST /rest/v1/oauth/token HTTP/1.1\r\nHost: api.example.test\r\nAuthorization: Basic ",
+            "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n",
+        ),
+        (
+            "curl -s -H \"Authorization: Basic ",
+            "\" -d grant_type=client_credentials https://api.example.test/rest/v1/oauth/token\n",
+        ),
+    ] {
+        let envelope = base64(format!("{CANVA_ID}:{CANVA_AS}").as_bytes());
+        let input = format!("{head}{envelope}{tail}");
+        // Not a decoded secret-only span: the whole encoded envelope.
+        assert_value(&input, &envelope, "authorization_credential");
+    }
+}
+
+#[test]
+fn canva_client_secret_offset_is_in_utf8_bytes() {
+    let prefix = "{\"note\":\"caf\u{e9} \u{1F680}\",\"client_secret\":\"";
+    let input = format!("{prefix}{CANVA_UNI}\"}}\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_ne!(prefix.len(), prefix.chars().count());
+    assert_eq!(findings[0].range().start(), prefix.len());
+    assert_eq!(findings[0].range().end(), prefix.len() + CANVA_UNI.len());
+}
+
+#[test]
+fn canva_public_ids_placeholders_references_masks_and_prose_stay_clean() {
+    for input in [
+        format!("client_id={CANVA_ID}\n"),
+        format!("{{\"client_id\":\"{CANVA_ID}\",\"name\":\"Example app\"}}\n"),
+        "client_secret=<your-client-secret>\n".to_owned(),
+        "client_secret=YOUR_CLIENT_SECRET\n".to_owned(),
+        "client_secret=${CANVA_CLIENT_SECRET}\n".to_owned(),
+        "{\"client_secret\":\"{{ secrets.canva_client_secret }}\"}\n".to_owned(),
+        "client_secret=****************\n".to_owned(),
+        "Canva client secrets are issued with a cnvca prefix in the developer portal.\n".to_owned(),
+        // Public form parameters around the carrier.
+        format!(
+            "grant_type=authorization_code&client_id={CANVA_ID}&redirect_uri=https%3A%2F%2Fapp.example.test%2Fcallback&state=SYNTHETICSTATE0123456789\n"
+        ),
+        // A bare `cnvca` value outside a credential slot: no bare-prefix detector.
+        format!("export CANVA_TOKEN_NOTE={CANVA_AS}\n"),
+    ] {
+        assert_clean(&input);
+    }
+}

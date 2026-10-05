@@ -113,6 +113,13 @@ evidence is linked from each published version.
   HMAC `X-Hook-Signature`, `X-Hook-Secret-Id` and longer names are not (#1210).
   This was validated against an independent corpus and needed no code change;
   a regression test now pins it.
+- A Canva `client_secret` (assignment, form body, JSON) and an `Authorization:
+  Basic` envelope carrying a Canva client id and secret are redacted as a
+  generic `contextual_secret` and `authorization_credential`, the `Basic` span
+  being the encoded envelope (#1213). This was validated against an independent
+  corpus and needed no code change; a regression test now pins it. A bare
+  `cnvca` value outside a credential slot is not reported, because the
+  prefix's separator, length and alphabet are not documented.
 
 ### Documented scope
 
