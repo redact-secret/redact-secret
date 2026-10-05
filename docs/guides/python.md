@@ -45,6 +45,68 @@ Catch `redact_secret.SecretScanError` for library failures and stop downstream
 processing. Do not fall back to the raw input. The binding maps callback
 failures to fixed exceptions instead of forwarding the callback's message.
 
+## Request-wide placeholder numbering
+
+Every call numbers its placeholders from 1, so scanning the string leaves of
+one request one call at a time gives each leaf its own `<SECRET_1>`. To keep the
+numbers unique across the request, give each call a formatter that adds the
+number of placeholders already used. The package adds no helper for this: the
+formatter already receives `PlaceholderContext.placeholder_index`, and the only
+state the host keeps is one integer.
+
+```python
+import redact_secret
+
+
+class RequestNumbering:
+    """One per request. Create a new one for the next request."""
+
+    def __init__(self) -> None:
+        self.replaced_so_far = 0
+
+    def redact_leaf(self, leaf: str) -> str:
+        base = self.replaced_so_far
+        used = 0
+
+        def formatter(finding: redact_secret.Finding, context: redact_secret.PlaceholderContext) -> str:
+            nonlocal used
+            used = context.placeholder_index
+            return f"<SECRET_{base + context.placeholder_index}>"
+
+        text = redact_secret.scan_and_redact(leaf, formatter=formatter).text
+        self.replaced_so_far = base + used
+        return text
+```
+
+Call `redact_leaf` for each leaf in the order your traversal visits them. The
+tests in `bindings/python/tests/test_request_wide_numbering.py` run this code
+against the real extension and prove the following, and nothing more:
+
+- A bare call restarts at `<SECRET_1>`; with the recipe, leaves holding the
+  same or different values continue from the previous leaf's last number. A
+  second request starts at 1 because it has its own `RequestNumbering`.
+- `placeholder_index` is one-based within one call. A leaf with several
+  findings uses consecutive numbers, and a leaf with none uses none.
+- Each occurrence gets its own number, including two identical values in one
+  leaf or in two leaves. Numbers do not identify a value.
+- The formatter runs only for findings that are replaced. `redact` and `block`
+  take a number; `warn` (for example `password=hunter2xyz` under the default
+  policy) keeps its text and takes none. The offset therefore equals the count
+  of findings whose `action` is `redact` or `block`, so a host that prefers to
+  count `result.findings` gets the same offset.
+- A formatter that raises fails the call with `PlaceholderFailureError` and no
+  partial text. The offset moves only after a call returns; treat any
+  exception as a failure of the whole request and discard the redacted leaves.
+- An `IncrementalSanitizer` per streamed leaf works the same way: its
+  `placeholder_index` counts across that session's `append` calls, so read the
+  offset after `finalize` and give the next leaf's formatter the new base.
+
+The closure holds integers only, never a matched value, and the formatter still
+sees no input. To keep key context, record the leaf's path and the first and
+last number it used (`base + 1` through `replaced_so_far`) in a host-side list.
+Keep the path out of the placeholder text: a key name is caller-controlled
+input.
+
 ## Exceptions
 
 Every library failure is a `redact_secret.SecretScanError` or one of its

@@ -151,6 +151,71 @@ formats. To reject a request, choose `block` and check the returned actions
 before any downstream use. [Safe integration](safe-integration.md) explains
 that distinction and failure handling.
 
+## Request-wide placeholder numbering
+
+Every call numbers its placeholders from 1, so scanning the string leaves of
+one request one call at a time gives each leaf its own `<SECRET_1>`. To keep the
+numbers unique across the request, give each call a `placeholderFormatter` that
+adds the number of placeholders already used. The package adds no helper for
+this: the formatter already receives `context.placeholderIndex`, and the only
+state the host keeps is one integer.
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+import type { PlaceholderFormatter } from "@redact-secret/core";
+
+await initialize();
+
+/** One per request. Create a new one for the next request. */
+function createRequestNumbering() {
+  let replacedSoFar = 0;
+  return {
+    redactLeaf(leaf: string): string {
+      const base = replacedSoFar;
+      let used = 0;
+      const placeholderFormatter: PlaceholderFormatter = (_finding, context) => {
+        used = context.placeholderIndex;
+        return `<SECRET_${base + context.placeholderIndex}>`;
+      };
+      const { text } = scanAndRedact(leaf, { placeholderFormatter });
+      replacedSoFar = base + used;
+      return text;
+    },
+  };
+}
+```
+
+Call `redactLeaf` for each leaf in the order your traversal visits them. The
+tests in `packages/javascript/test/request-wide-numbering.test.ts` run this code
+against the real engine, through the built package, and prove the following,
+and nothing more:
+
+- A bare call restarts at `<SECRET_1>`; with the recipe, leaves holding the
+  same or different values continue from the previous leaf's last number. A
+  second request starts at 1 because it has its own
+  `createRequestNumbering()`.
+- `placeholderIndex` is one-based within one call. A leaf with several findings
+  uses consecutive numbers, and a leaf with none uses none.
+- Each occurrence gets its own number, including two identical values in one
+  leaf or in two leaves. Numbers do not identify a value.
+- The formatter runs only for findings that are replaced. `redact` and `block`
+  take a number; `warn` (for example `password=hunter2xyz` under the default
+  policy) keeps its text and takes none. The offset therefore equals the count
+  of `redact` and `block` entries in `result.findings`, so a host that prefers
+  to count findings gets the same offset.
+- A formatter that throws fails the call with `PLACEHOLDER_FAILURE` and no
+  partial text. The offset moves only after a call returns; treat any throw as
+  a failure of the whole request and discard the redacted leaves.
+- A `createIncrementalSanitizer` per streamed leaf works the same way: its
+  `placeholderIndex` counts across that session's `append` calls, so read the
+  offset after `finalize` and give the next leaf's formatter the new base.
+
+The closure holds integers only, never a matched value, and the formatter still
+sees no input. To keep key context, record the leaf's path and the first and
+last number it used (`base + 1` through `replacedSoFar`) in a host-side list.
+Keep the path out of the placeholder text: a key name is caller-controlled
+input.
+
 ## Whole-input limits
 
 `scan`, `redact`, and `scanAndRedact` default to a 64 MiB input bound and a

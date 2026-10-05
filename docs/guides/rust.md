@@ -106,6 +106,80 @@ cancelled and have no deadline; the limits above are the only bounds. See
 [Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
 [Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
 
+## Request-wide placeholder numbering
+
+Every call numbers its placeholders from 1, so scanning the string leaves of
+one request one call at a time gives each leaf its own `<SECRET_1>`. To keep the
+numbers unique across the request, give each call a formatter that adds the
+number of placeholders already used. The core adds no helper for this: the
+formatter already receives `PlaceholderContext::placeholder_index`, and the
+only state the host keeps is one integer.
+
+```rust
+use std::cell::Cell;
+
+use redact_secret::{
+    DefaultPolicy, DetectorRegistry, Finding, FormatterFailure, PlaceholderContext,
+    SecretScanError, scan_and_redact,
+};
+
+/// One per request. Create a new one for the next request.
+struct RequestNumbering {
+    replaced_so_far: usize,
+}
+
+impl RequestNumbering {
+    fn redact_leaf(
+        &mut self,
+        registry: &DetectorRegistry,
+        leaf: &str,
+    ) -> Result<String, SecretScanError> {
+        let base = self.replaced_so_far;
+        let used = Cell::new(0_usize);
+        let formatter = |_finding: &Finding,
+                         context: &PlaceholderContext|
+         -> Result<String, FormatterFailure> {
+            used.set(context.placeholder_index());
+            Ok(format!("<SECRET_{}>", base + context.placeholder_index()))
+        };
+        let result = scan_and_redact(leaf, registry, &DefaultPolicy, &formatter)?;
+        self.replaced_so_far = base + used.get();
+        Ok(result.text().to_owned())
+    }
+}
+```
+
+Call `redact_leaf` for each leaf in the order your traversal visits them. The
+tests in `crates/secret-scan-core/tests/request_wide_numbering_1180.rs` run this
+code against the real engine and prove the following, and nothing more:
+
+- A bare call restarts at `<SECRET_1>`; with the recipe, leaves holding the
+  same or different values continue from the previous leaf's last number.
+  A second request starts at 1 because it has its own `RequestNumbering`.
+- `placeholder_index` is one-based within one call. A leaf with several
+  findings uses consecutive numbers, and a leaf with none uses none.
+- Each occurrence gets its own number, including two identical values in one
+  leaf or in two leaves. Numbers do not identify a value.
+- The formatter runs only for findings that are replaced. `redact` and `block`
+  take a number; `warn` (for example `password=hunter2xyz` under
+  `DefaultPolicy`) keeps its text and takes none. The offset therefore equals
+  the count of `redact` and `block` findings, so a host that prefers to count
+  `result.findings()` gets the same offset.
+- A failing formatter fails the call with `PlaceholderFailure` and no partial
+  text. The offset moves only after a call returns `Ok`; treat any `Err` as a
+  failure of the whole request and discard the redacted leaves, because the
+  numbering up to that point is not a result you can forward.
+- An `IncrementalSanitizer` per streamed leaf works the same way: its
+  `placeholder_index` counts across that session's `append` calls, so read the
+  offset after `finalize` and give the next leaf's formatter the new base. The
+  formatter is boxed, so share the counter with `Rc<Cell<usize>>`.
+
+The closure holds integers only, never a matched value, and the formatter still
+sees no input. To keep key context, record the leaf's path and the first and
+last number it used in a host-side list (a leaf used `base + 1` through
+`replaced_so_far`). Keep the path out of the placeholder text: a key name is
+caller-controlled input.
+
 ## Detector profiles
 
 `DetectorRegistry::with_built_in` builds `full`: every built-in detector, and
