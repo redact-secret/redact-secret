@@ -50,6 +50,12 @@ benchmark_repo=$(cd -- "$benchmark_repo" && pwd)
 [ -z "$(git -C "$product_root"   status --porcelain)" ] || die "product worktree is dirty: $product_root"
 [ -z "$(git -C "$benchmark_repo" status --porcelain)" ] || die "benchmarks worktree is dirty: $benchmark_repo"
 
+# The validate step reuses this checkout's install (it needs tsx). Without it the
+# failure would only surface after the whole candidate build and measurement.
+[ "$skip_validate" -eq 1 ] || [ -d "$benchmark_repo/node_modules/tsx" ] \
+  || die "benchmarks checkout has no installed dependencies (node_modules/tsx): $benchmark_repo
+       run 'npm ci' there, or pass --skip-validate"
+
 # scripts/build-browser-artifact.mjs requires the wasm-bindgen CLI to be the
 # exact version the crate links; a mismatch surfaces late as wasm-build-failed.
 wasm_bindgen_need=$(awk '/^name = "wasm-bindgen"$/ { found = 1 } found && /^version/ { gsub(/"/, "", $3); print $3; exit }' "$product_root/Cargo.lock")
