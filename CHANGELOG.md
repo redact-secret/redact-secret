@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- The release manifest no longer records a version as `unpublished`, or leaves
+  its published digest empty, because the registry had not caught up right after
+  publishing (#1197, seen on 0.1.0-beta.13). `record-manifest` now re-reads the
+  registry for up to 10 minutes, only for artifacts that still look unsettled
+  and only when their publish jobs succeeded. A version still absent after that
+  stays `unpublished`, and a state is never promoted without a registry digest.
 - `connection-string` reports the whole password of a URI whose userinfo
   password contains an unencoded single quote (#1201). RFC 3986 allows `'`
   there and the grammar already accepted it, but the authority scan ended at

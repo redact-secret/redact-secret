@@ -313,6 +313,21 @@ version, expected artifact identities, observed registry states, and (issue
 qualification` computed for this candidate. Its success does not establish
 tag or registry-install success: those jobs are separate.
 
+Issue #1197: each publish job reads its registry once, right after publishing,
+and registries lag, so beta.13's manifest recorded published packages as
+`unpublished` and left their published digests empty. Before building the
+manifest, `record-manifest` runs `scripts/settle-registry-state.py`, which
+re-reads the registry, for up to 10 minutes, only for artifacts that still look
+unsettled (state not `published`, or a record without a published digest). It
+waits on a registry only when every publish job for it succeeded, so a failed
+publish is recorded after a single read. It only upgrades: an artifact becomes
+`published` only with a digest the registry returned, a recorded `published`
+state or digest is never downgraded or replaced, and whatever is still unseen
+after the bound is recorded as the publish job observed it. The manifest is
+still written for a failed run. A real run under registry lag has not yet
+demonstrated this; the unit tests inject the clock and registry
+(`npm run release-manifest:test`).
+
 ### Version tag signing
 
 Version tags (`v{version}`) are annotated and **unsigned**: the workflow
