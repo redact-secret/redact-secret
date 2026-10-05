@@ -36,6 +36,13 @@ evidence is linked from each published version.
   that `warn` takes no number and `block` does, and that the same recipe works
   for an incremental session per leaf. No new public API
   (`decision-keep-request-wide-placeholder-numbering-a-documented-recipe`).
+- Beta.14 provider detectors from the #1014 handoffs, always redacted at
+  provider specificity and unmeasured until their benchmarks arrival evidence
+  lands (no support-status claim):
+  - `xata-api-key` (#1102): Xata `xau_` and `xao_` + 32 to 36 alphanumeric API
+    keys (`xata_user_api_key`, `xata_organization_api_key`). The CRC32 never
+    rejects a match (ruling Q1 pending); classic-platform keys stay with generic
+    context.
 
 ### Fixed
 

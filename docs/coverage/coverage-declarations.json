@@ -15557,6 +15557,226 @@
       "type": "axiom_personal_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "xata-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "xata-api-key-positive-bare",
+            "xata-api-key-positive-body-32",
+            "xata-api-key-positive-chat-sentence",
+            "xata-api-key-positive-crlf-unicode-prefix",
+            "xata-api-key-positive-curl-bearer",
+            "xata-api-key-positive-dotenv",
+            "xata-api-key-positive-json-config",
+            "xata-api-key-positive-json-token-key",
+            "xata-api-key-positive-log",
+            "xata-api-key-positive-punctuation-adjacent",
+            "xata-api-key-positive-repeated-value",
+            "xata-api-key-positive-sdk-call",
+            "xata-api-key-positive-shell-export",
+            "xata-api-key-positive-tool-call-arguments",
+            "xata-api-key-positive-x-api-key-header",
+            "xata-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "xata-api-key-overlap-bearer-header",
+            "xata-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "xata-api-key-adversarial-glued-keys",
+            "xata-api-key-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "xata-api-key-boundary-body-31",
+            "xata-api-key-boundary-body-37",
+            "xata-api-key-boundary-dash-in-body",
+            "xata-api-key-boundary-glued-prefix",
+            "xata-api-key-boundary-glued-trailing-dash",
+            "xata-api-key-boundary-glued-trailing-underscore",
+            "xata-api-key-boundary-hyphen-separator",
+            "xata-api-key-boundary-org-body-37",
+            "xata-api-key-boundary-other-prefix",
+            "xata-api-key-boundary-underscore-in-body",
+            "xata-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "xata-api-key-negative-bare-33-alphanumerics",
+            "xata-api-key-negative-env-reference",
+            "xata-api-key-negative-masked",
+            "xata-api-key-negative-placeholders",
+            "xata-api-key-negative-snake-case-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "xata-api-key-boundary-body-31",
+            "xata-api-key-boundary-body-37",
+            "xata-api-key-boundary-dash-in-body",
+            "xata-api-key-boundary-glued-prefix",
+            "xata-api-key-boundary-glued-trailing-dash",
+            "xata-api-key-boundary-glued-trailing-underscore",
+            "xata-api-key-boundary-hyphen-separator",
+            "xata-api-key-boundary-org-body-37",
+            "xata-api-key-boundary-other-prefix",
+            "xata-api-key-boundary-underscore-in-body",
+            "xata-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for xata_user_api_key (xata-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "xata_user_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "xata-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "xata-api-key-positive-body-36",
+            "xata-api-key-positive-mcp-server-config",
+            "xata-api-key-positive-organization-key"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "xata-api-key-overlap-bearer-header-organization"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "xata-api-key-adversarial-glued-keys",
+            "xata-api-key-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "xata-api-key-boundary-body-31",
+            "xata-api-key-boundary-body-37",
+            "xata-api-key-boundary-dash-in-body",
+            "xata-api-key-boundary-glued-prefix",
+            "xata-api-key-boundary-glued-trailing-dash",
+            "xata-api-key-boundary-glued-trailing-underscore",
+            "xata-api-key-boundary-hyphen-separator",
+            "xata-api-key-boundary-org-body-37",
+            "xata-api-key-boundary-other-prefix",
+            "xata-api-key-boundary-underscore-in-body",
+            "xata-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "xata-api-key-negative-bare-33-alphanumerics",
+            "xata-api-key-negative-env-reference",
+            "xata-api-key-negative-masked",
+            "xata-api-key-negative-placeholders",
+            "xata-api-key-negative-snake-case-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "xata-api-key-boundary-body-31",
+            "xata-api-key-boundary-body-37",
+            "xata-api-key-boundary-dash-in-body",
+            "xata-api-key-boundary-glued-prefix",
+            "xata-api-key-boundary-glued-trailing-dash",
+            "xata-api-key-boundary-glued-trailing-underscore",
+            "xata-api-key-boundary-hyphen-separator",
+            "xata-api-key-boundary-org-body-37",
+            "xata-api-key-boundary-other-prefix",
+            "xata-api-key-boundary-underscore-in-body",
+            "xata-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for xata_organization_api_key (xata-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "xata_organization_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -15836,7 +16056,9 @@
             "vercel-adversarial-long-suffix",
             "vercel-pat-adversarial-long-suffix",
             "wandb-api-key-adversarial-long-run",
-            "xai-api-key-adversarial-long-suffix"
+            "xai-api-key-adversarial-long-suffix",
+            "xata-api-key-adversarial-glued-keys",
+            "xata-api-key-adversarial-prefix-run"
           ],
           "state": "supported"
         }
@@ -16320,7 +16542,9 @@
             "vercel-adversarial-long-suffix",
             "vercel-pat-adversarial-long-suffix",
             "wandb-api-key-adversarial-long-run",
-            "xai-api-key-adversarial-long-suffix"
+            "xai-api-key-adversarial-long-suffix",
+            "xata-api-key-adversarial-glued-keys",
+            "xata-api-key-adversarial-prefix-run"
           ],
           "state": "supported"
         }

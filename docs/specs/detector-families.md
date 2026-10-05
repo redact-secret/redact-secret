@@ -159,6 +159,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; since issue #1036 the unqualified compatibility type: every `vci_` and `vck_` match, and every `vcp_`/`vca_`/`vcr_` match off the exact-56 contract (security-first fallback), all at the unchanged pre-split `>= 20` `[A-Za-z0-9_-]` shape. It claims no grammar (pending maintainer ruling Q-VC); see [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
 | `wandb_api_key` | `wandb-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (W&B test constant, R5), alphabet T1 (SDK validator, R1); the 64–96 band is a tolerant range around the documented width, grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
 | `xai_api_key` | `xai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `xata_organization_api_key` | `xata-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator and validator, R1 and R9; body width derived from the generator's encoder), the CRC32 is not a rejection gate (pending ruling Q1), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `xata_user_api_key` | `xata-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider generator and validator, R1 and R9; body width derived from the generator's encoder), the CRC32 is not a rejection gate (pending ruling Q1), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
 <!-- detector-families:end -->
 
 ## Policy-based credential contracts
@@ -1234,6 +1236,51 @@ token. False positives: an unrelated `xaat-`/`xapt-` + lowercase UUID; none is
 known. Cost: two prefixes on the shared known-format scan plus a 36-byte post
 check.
 
+## Beta.14 broad-discovery families, second wave (#1102 to #1105)
+
+The second wave of the [#1014 broad-discovery handoffs](../audits/evidence/1014/README.md)
+(Xata, Sourcegraph, Unkey, Buildkite) is each a new detector with its own
+finding types, `Provider` specificity, high confidence and always redacted, so
+overlap resolution reports one provider finding per span over
+`contextual_secret`, `bearer_token`, `authorization_credential` and `jwt`. The
+frozen contract for each family, with its sources, tier rationale, excluded
+shapes and issuance checklist, is its step-3 handoff in that folder; this
+section records only the implemented grammar and its trade-offs. Before these
+detectors, a bare value, a chat sentence and a JSON `"token"` value of every
+one of these families were missed.
+
+Shared rules: a value is rejected when the byte before it or after it
+continues an identifier (`[A-Za-z0-9_-]`, adjusted per family where noted), so
+an embedded, over-long or glued value is an intentional false negative, never
+a truncated match (Buildkite's documented 2048-byte cap is the one stated
+exception). A provider checksum is never a rejection gate (a shape-valid value
+is reported whatever its check value; maintainer ruling Q1 on #1014 is
+pending). None of these providers is added to `generic-token`'s
+dedicated-provider deferral list. No row is a support-status claim; promotion
+stays gated on core conformance and the benchmarks arrival and profile
+evidence.
+
+| Family | Detector | Grammar | Finding type | Tier |
+| --- | --- | --- | --- | --- |
+| `xata:api-key` | `xata-api-key` | `xau_` or `xao_` + `[0-9A-Za-z]{32,36}` (36 to 40 in total) | `xata_user_api_key` (`xau_`), `xata_organization_api_key` (`xao_`) | T1 (provider generator and validator, R1 and R9; width derived from the generator's encoder) |
+
+Xata ([#1102](https://github.com/redact-secret/redact-secret/issues/1102),
+[handoff](../audits/evidence/1014/xata.md)). The body is 20 random bytes plus a
+little-endian CRC32 in the `jxskiss/base62` bit-packed encoding, which emits
+32 to 39 characters; the contract is the 32 to 36 window the provider's own
+validator can accept (`MaxLength` 40), and 99.9 percent of keys have 32 to 34.
+`xau_` is a 4-byte prefix, so the leading boundary carries the precision:
+`xau_` inside `maxau_...` or any longer identifier is not a key, and a run is
+rejected whole when it is under 32 or over 36 bytes or when `_` or `-`
+follows it. The CRC32 stays lexical (ruling Q1 recommendation); a later
+post-check must decode with the non-standard bit-packed base62. False
+negatives: classic-platform (pre-2026) keys, which no provider source
+describes, a future generator change, and a key glued to identifier bytes.
+False positives: an unrelated `xau_`/`xao_` followed by 32 to 36
+alphanumerics with no `_` or `-`; none is known, but without the checksum a
+random alphanumeric run after the prefix is accepted. Cost: two prefixes on
+the shared known-format scan plus a 4-byte-offset width check.
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -1273,6 +1320,7 @@ check.
 | Paddle `pdl_live_apikey_`/`pdl_sdbx_apikey_` + 26 + `_` + 22 + `_` + 3 API keys are reported as `paddle_api_key` at provider specificity, bare or in any context; the `apikey_` key id alone and legacy unprefixed keys stay unclaimed ([#1033](https://github.com/redact-secret/redact-secret/issues/1033), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Honeycomb `hc[a-z]ik_`/`hc[a-z]ic_` + 58 lowercase alphanumeric ingest keys are reported as `honeycomb_ingest_key` at provider specificity, bare or in any context; management keys stay unclaimed until their issuance check, and key ids, configuration and classic hex keys stay unclaimed ([#1034](https://github.com/redact-secret/redact-secret/issues/1034), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Axiom `xaat-` and `xapt-` + lowercase-hex UUID tokens are reported as `axiom_api_token` and `axiom_personal_token` at provider specificity, bare or in any context; placeholders and bare UUIDs stay unclaimed ([#1035](https://github.com/redact-secret/redact-secret/issues/1035), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Xata `xau_` and `xao_` + 32 to 36 `[A-Za-z0-9]` API keys are reported as `xata_user_api_key` and `xata_organization_api_key` at provider specificity, bare or in any context; the CRC32 never rejects a match, and classic-platform keys stay unclaimed ([#1102](https://github.com/redact-secret/redact-secret/issues/1102), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

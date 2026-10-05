@@ -1016,6 +1016,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0078apt-deadbeef-5e7c-4ded-9000-000000000002",
       "schemes": null
+    },
+    {
+      "type": "xata_user_api_key",
+      "detector": "xata-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078au_SyntheticRevokedXataApiKey0000000",
+      "schemes": null
+    },
+    {
+      "type": "xata_organization_api_key",
+      "detector": "xata-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078ao_SyntheticRevokedXataOrgApiKey0000",
+      "schemes": null
     }
   ],
   "consumers": [

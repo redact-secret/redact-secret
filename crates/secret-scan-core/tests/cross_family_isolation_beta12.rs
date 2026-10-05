@@ -164,6 +164,16 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
             format!("xapt-{}", uuid(2)),
         ),
         (
+            "xata-api-key",
+            "xata_user_api_key",
+            format!("xau_{}", filler(ALNUM, 33, 1)),
+        ),
+        (
+            "xata-api-key",
+            "xata_organization_api_key",
+            format!("xao_{}", filler(ALNUM, 34, 2)),
+        ),
+        (
             "google-oauth-client-secret",
             "google_oauth_client_secret",
             format!("GOCSPX-{}", filler(BASE64URL, 28, 1)),

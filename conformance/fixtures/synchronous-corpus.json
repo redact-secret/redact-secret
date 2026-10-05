@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3788,
+  "fixtureCount": 3828,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -87570,6 +87570,742 @@
       "input": "\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001\u0078aat-5e7c0ded-0000-4000-8000-deadbeef0001",
       "expected": [],
       "note": "A long run of glued values is one wider identifier: no carved-out match, and the scan stays linear and bounded."
+    },
+    {
+      "id": "xata-api-key-positive-bare",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 37
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "xata-api-key-positive-dotenv",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "XATA_API_KEY=\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 50
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "xata-api-key-positive-shell-export",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export XATA_API_KEY=\"\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\"\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 58
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "xata-api-key-positive-yaml",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  XATA_API_KEY: \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 58
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "xata-api-key-positive-json-config",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"env\": {\"XATA_API_KEY\": \"\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\"}}",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 63
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "xata-api-key-positive-json-token-key",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\"}",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 48
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "xata-api-key-positive-sdk-call",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client = XataClient(api_key=\"\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\")\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 66
+        }
+      ],
+      "note": "An SDK or tool configuration is reported at exactly the key."
+    },
+    {
+      "id": "xata-api-key-overlap-bearer-header",
+      "detector": "xata-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 59
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "xata-api-key-positive-x-api-key-header",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 48
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "xata-api-key-positive-curl-bearer",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Bearer \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5' https://api.example.test/v1\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 68
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "xata-api-key-positive-tool-call-arguments",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\": \"configure\", \"arguments\": {\"api_key\": \"\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\"}}",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 85
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "xata-api-key-positive-chat-sentence",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5 can you debug this?",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 52
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the key."
+    },
+    {
+      "id": "xata-api-key-positive-log",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-10-05T09:15:00Z INFO client init api_key=\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5 region=us\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 83
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "xata-api-key-positive-punctuation-adjacent",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5.",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 48
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "xata-api-key-positive-crlf-unicode-prefix",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 \ud0a4 reviewed format\r\n\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\n\r\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 65
+        }
+      ],
+      "note": "CRLF, Hangul and astral characters before the value keep the UTF-8 byte range exact."
+    },
+    {
+      "id": "xata-api-key-overlap-context",
+      "detector": "xata-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "API_KEY=\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 45
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "xata-api-key-positive-repeated-value",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5 \u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 37
+        },
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 75
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "xata-api-key-positive-organization-key",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078ao_ahov2AHOVckry5CKRYfmu18FMUbipw4BIP",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_organization_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "An organization key (\u0078ao_) is its own finding type."
+    },
+    {
+      "id": "xata-api-key-overlap-bearer-header-organization",
+      "detector": "xata-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0078ao_ahov2AHOVckry5CKRYfmu18FMUbipw4BIP\n",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_organization_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 60
+        }
+      ],
+      "note": "The organization type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "xata-api-key-positive-body-32",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "key: \u0078au_nu18FNUbipx4BIPXelsz7ELSZhov29HO",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_user_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5,
+          "end": 41
+        }
+      ],
+      "note": "The lower bound of the derived body width (32) is accepted."
+    },
+    {
+      "id": "xata-api-key-positive-body-36",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "key: \u0078ao_07ELSahov2AHOVckry5CKRYfmu18FMUbipw4",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_organization_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5,
+          "end": 45
+        }
+      ],
+      "note": "The upper bound of the validator-derived body width (36) is accepted."
+    },
+    {
+      "id": "xata-api-key-positive-mcp-server-config",
+      "detector": "xata-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\": {\"xata\": {\"command\": \"xata-mcp\", \"env\": {\"XATA_API_KEY\": \"\u0078ao_ahov2AHOVckry5CKRYfmu18FMUbipw4BIP\"}}}}",
+      "expected": [
+        {
+          "detector": "xata-api-key",
+          "type": "xata_organization_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 73,
+          "end": 111
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the key."
+    },
+    {
+      "id": "xata-api-key-boundary-body-31",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_DKRYfnu18FNUbipx4BIPXelsz7ELSZh",
+      "expected": [],
+      "note": "A 31-byte body is below the derived width."
+    },
+    {
+      "id": "xata-api-key-boundary-body-37",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_QXels07ELSahov2AHOVckry5CKRYfmu18FMUb",
+      "expected": [],
+      "note": "A 37-byte body is above the validator's length cap."
+    },
+    {
+      "id": "xata-api-key-boundary-org-body-37",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078ao_dkry5DKRYfnu18FNUbipx4BIPXelsz7ELSZho",
+      "expected": [],
+      "note": "A 37-byte organization body is above the cap."
+    },
+    {
+      "id": "xata-api-key-boundary-dash-in-body",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_DKRYfnu18F-Ubipx4BIPXelsz7ELSZhov",
+      "expected": [],
+      "note": "A dash is outside the base62 body alphabet."
+    },
+    {
+      "id": "xata-api-key-boundary-underscore-in-body",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_DKRYfnu18F_Ubipx4BIPXelsz7ELSZhov",
+      "expected": [],
+      "note": "An underscore is outside the base62 body alphabet."
+    },
+    {
+      "id": "xata-api-key-boundary-uppercase-prefix",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "XAU_DKRYfnu18FNUbipx4BIPXelsz7ELSZhov",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "xata-api-key-boundary-other-prefix",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xat_DKRYfnu18FNUbipx4BIPXelsz7ELSZhov",
+      "expected": [],
+      "note": "xat_ is not a Xata key prefix."
+    },
+    {
+      "id": "xata-api-key-boundary-hyphen-separator",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xau-DKRYfnu18FNUbipx4BIPXelsz7ELSZhov",
+      "expected": [],
+      "note": "The separator is an underscore."
+    },
+    {
+      "id": "xata-api-key-boundary-glued-prefix",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ma\u0078au_DKRYfnu18FNUbipx4BIPXelsz7ELSZhov",
+      "expected": [],
+      "note": "Letters glued before the prefix reject the match."
+    },
+    {
+      "id": "xata-api-key-boundary-glued-trailing-underscore",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_DKRYfnu18FNUbipx4BIPXelsz7ELSZhov_x",
+      "expected": [],
+      "note": "An underscore glued after the body rejects the match."
+    },
+    {
+      "id": "xata-api-key-boundary-glued-trailing-dash",
+      "detector": "xata-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078ao_DKRYfnu18FNUbipx4BIPXelsz7ELSZhov-x",
+      "expected": [],
+      "note": "A dash glued after the body rejects the match."
+    },
+    {
+      "id": "xata-api-key-negative-placeholders",
+      "detector": "xata-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_test \u0078au_redacted \u0078au_some_key \u0078au_test123\n",
+      "expected": [],
+      "note": "Placeholders from provider SDK repositories fail the width."
+    },
+    {
+      "id": "xata-api-key-negative-masked",
+      "detector": "xata-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "XATA_API_KEY=\u0078au_*********************************\n",
+      "expected": [],
+      "note": "A masked value is not a key."
+    },
+    {
+      "id": "xata-api-key-negative-env-reference",
+      "detector": "xata-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "XATA_API_KEY=${XATA_API_KEY}\n",
+      "expected": [],
+      "note": "A variable reference is not a literal key."
+    },
+    {
+      "id": "xata-api-key-negative-snake-case-identifier",
+      "detector": "xata-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_snake_case_identifier_name_that_is_long\n",
+      "expected": [],
+      "note": "A snake_case identifier carries underscores in its run."
+    },
+    {
+      "id": "xata-api-key-negative-bare-33-alphanumerics",
+      "detector": "xata-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DKRYfnu18FNUbipx4BIPXelsz7ELSZhov\n",
+      "expected": [],
+      "note": "A bare alphanumeric run without the prefix stays unclaimed."
+    },
+    {
+      "id": "xata-api-key-adversarial-prefix-run",
+      "detector": "xata-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_\u0078au_",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach 32 bytes, and the scan stays linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "xata-api-key-adversarial-glued-keys",
+      "detector": "xata-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5",
+      "expected": [],
+      "note": "Glued copies continue into each other, so no copy has both boundaries.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
     }
   ]
 }

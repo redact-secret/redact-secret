@@ -160,6 +160,7 @@ export const CANONICAL_IDS = [
   "paddle-api-key",
   "honeycomb-api-key",
   "axiom-token",
+  "xata-api-key",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -253,6 +254,7 @@ export const GROUPS = {
     "dynatrace-token",
     "honeycomb-api-key",
     "axiom-token",
+    "xata-api-key",
   ],
   devtools: [
     "github-token",

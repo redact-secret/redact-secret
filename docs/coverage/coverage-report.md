@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 141/141 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 143/143 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 141 |
+| supported | 143 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 152.
+Coverage declarations: 154.
 
 ## Coverage by detector
 
@@ -135,6 +135,7 @@ Coverage declarations: 152.
 | vercel-token | 4 | supported: 4, intentionally-unsupported: 0, unresolved: 0 |
 | wandb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | xai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| xata-api-key | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 
 ## Coverage by finding type
 
@@ -281,6 +282,8 @@ Coverage declarations: 152.
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
 | wandb_api_key | wandb-api-key | provider | supported | not-applicable | none |
 | xai_api_key | xai-api-key | provider | supported | not-applicable | none |
+| xata_organization_api_key | xata-api-key | provider | supported | not-applicable | none |
+| xata_user_api_key | xata-api-key | provider | supported | not-applicable | none |
 
 ## Coverage by scheme
 
@@ -306,15 +309,15 @@ Coverage declarations: 152.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 152 | 0 | 0 |
-| boundary | 141 | 0 | 0 |
-| host-context | 141 | 0 | 0 |
+| adversarial | 154 | 0 | 0 |
+| boundary | 143 | 0 | 0 |
+| host-context | 143 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 152 | 0 | 0 |
-| near-miss-negative | 141 | 0 | 0 |
-| overlap | 141 | 0 | 0 |
-| positive | 141 | 0 | 0 |
-| range | 152 | 0 | 0 |
+| malformed | 154 | 0 | 0 |
+| near-miss-negative | 143 | 0 | 0 |
+| overlap | 143 | 0 | 0 |
+| positive | 143 | 0 | 0 |
+| range | 154 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

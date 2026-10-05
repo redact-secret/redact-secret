@@ -6508,12 +6508,95 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "axiom_personal_token"
+    },
+    {
+      "detector": "xata-api-key",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "xata-api-key-positive-bare",
+        "xata-api-key-positive-body-32",
+        "xata-api-key-positive-chat-sentence",
+        "xata-api-key-positive-crlf-unicode-prefix",
+        "xata-api-key-positive-curl-bearer",
+        "xata-api-key-positive-dotenv",
+        "xata-api-key-positive-json-config",
+        "xata-api-key-positive-json-token-key",
+        "xata-api-key-positive-log",
+        "xata-api-key-positive-punctuation-adjacent",
+        "xata-api-key-positive-repeated-value",
+        "xata-api-key-positive-sdk-call",
+        "xata-api-key-positive-shell-export",
+        "xata-api-key-positive-tool-call-arguments",
+        "xata-api-key-positive-x-api-key-header",
+        "xata-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "xata_user_api_key"
+    },
+    {
+      "detector": "xata-api-key",
+      "evidence": {
+        "fixtureCount": 40,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "xata-api-key-positive-body-36",
+        "xata-api-key-positive-mcp-server-config",
+        "xata-api-key-positive-organization-key"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "xata_organization_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 141,
+    "supported": 143,
     "unresolved": 0
   }
 }
