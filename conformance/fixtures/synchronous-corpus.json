@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 4148,
+  "fixtureCount": 4201,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -94193,6 +94193,1051 @@
       "resource": {
         "maxInputBytes": 12000,
         "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "fly-token-positive-bare",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 104
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "fly-token-positive-dotenv",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FLY_API_TOKEN=\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 118
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "fly-token-positive-shell-export",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export FLY_API_TOKEN=\"\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\"\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 126
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "fly-token-positive-yaml",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  FLY_API_TOKEN: \u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 126
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "fly-token-positive-json-config",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"env\": {\"FLY_API_TOKEN\": \"\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\"}}",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 131
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "fly-token-positive-json-token-key",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\"}",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 115
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "fly-token-positive-sdk-call",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client = FlyClient(token=\"\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\")\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 130
+        }
+      ],
+      "note": "An SDK or tool configuration is reported at exactly the key."
+    },
+    {
+      "id": "fly-token-overlap-bearer-header",
+      "detector": "fly-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 126
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "fly-token-positive-x-api-key-header",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 115
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "fly-token-positive-curl-bearer",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Bearer \u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z' https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 135
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "fly-token-positive-tool-call-arguments",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\": \"call_api\", \"arguments\": {\"api_key\": \"\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\", \"limit\": 10}}",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 47,
+          "end": 151
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "fly-token-positive-chat-sentence",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z can you debug why it fails?",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 119
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the key."
+    },
+    {
+      "id": "fly-token-positive-log",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-10-05T12:00:00Z INFO client init token=\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z region=us\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 148
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "fly-token-positive-punctuation-adjacent",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z.\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 115
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "fly-token-positive-crlf-unicode-prefix",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 \ud0a4 reviewed format\r\n\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\n\r\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 132
+        }
+      ],
+      "note": "CRLF, Hangul and astral characters before the value keep the UTF-8 byte range exact."
+    },
+    {
+      "id": "fly-token-overlap-context",
+      "detector": "fly-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 115
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "fly-token-positive-repeated-value",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "first=\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z second=\u0066m2_ahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_Fz\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6,
+          "end": 110
+        },
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 118,
+          "end": 222
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "fly-token-positive-mcp-server-config",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\": {\"svc\": {\"command\": \"svc-mcp\", \"env\": {\"FLY_API_TOKEN\": \"\u0066m2_NUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6z\"}}}}",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 72,
+          "end": 176
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the key."
+    },
+    {
+      "id": "fly-token-positive-flyv1-scheme-unquoted",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FLY_API_TOKEN=FlyV1 \u0066m2_nu18BJQXelt07AHPWdkrz6-GNVcjqx5_FMTbipw3/ELSZhov29DKRYfnu18BJQXelt07AHPWdkrz6-GNVcjqx5_FMTbipw3/ELSZhov29DKRYfnu18BJQXez\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 144
+        }
+      ],
+      "note": "The FlyV1 scheme and its space stay outside the span, so the unquoted assignment is reported at the token."
+    },
+    {
+      "id": "fly-token-positive-flyv1-scheme-quoted",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FLY_API_TOKEN=\"FlyV1 \u0066m2_07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkrz\"\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 145
+        }
+      ],
+      "note": "A quoted value carrying the scheme is reported at the token alone."
+    },
+    {
+      "id": "fly-token-positive-authorization-flyv1-header",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: FlyV1 \u0066m2_-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4z\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 145
+        }
+      ],
+      "note": "A FlyV1 Authorization header is reported at exactly the token."
+    },
+    {
+      "id": "fly-token-positive-github-actions-env",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "    env:\n      FLY_API_TOKEN: \u0066m2_MTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5z\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 134
+        }
+      ],
+      "note": "A CI environment line is reported at exactly the token."
+    },
+    {
+      "id": "fly-token-positive-two-member-bundle",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_Zgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQz,\u0066m2_mt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 219
+        }
+      ],
+      "note": "A comma-joined bundle is one span."
+    },
+    {
+      "id": "fly-token-positive-two-member-bundle-with-scheme",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: FlyV1 \u0066m2_Zgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQz,\u0066m2_mt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELz\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 240
+        }
+      ],
+      "note": "The whole comma-joined bundle is one span and the scheme stays outside it."
+    },
+    {
+      "id": "fly-token-positive-three-member-bundle",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_Zgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQz,\u0066m2_mt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELz,\u0066m1r_z6-GNVcjqx5_FMTbipw3/ELSZhov29DKRYfnu18BJQXelt07AHPWdkrz6-GNVcjqx5_FMTbipw3/ELSz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 305
+        }
+      ],
+      "note": "Every member of a bundle is part of the span."
+    },
+    {
+      "id": "fly-token-positive-session-bundle-with-fo1-member",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2__FMTaipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18BIQXelz,\u0066o1_LSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 252
+        }
+      ],
+      "note": "A trailing fo1_ member inside a bundle that has an fm member is part of the span."
+    },
+    {
+      "id": "fly-token-positive-prefix-fm1r",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m1r_Yfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        }
+      ],
+      "note": "The fm1r_ prefix is accepted."
+    },
+    {
+      "id": "fly-token-positive-prefix-fm1a",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m1a_lsz6-HOVcjry5_FNUbipx4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        }
+      ],
+      "note": "The fm1a_ prefix is accepted."
+    },
+    {
+      "id": "fly-token-positive-padding-one",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_y5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbiz=",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        }
+      ],
+      "note": "One padding byte is part of the span."
+    },
+    {
+      "id": "fly-token-positive-padding-two",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_/ELSZhov29DKRYfnu18BJQXelt07AHPWdkrz6-GNVcjqx5_FMTbipw3/ELSZhovz==",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "Two padding bytes are part of the span."
+    },
+    {
+      "id": "fly-token-positive-body-alphabet",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_ab+cd/ef_gh-ijab+cd/ef_gh-ijab+cd/ef_gh-ijab+cd/ef_gh-ijab+cd/ef_gh-ijab+cd/ef_gh-ijklmn",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 92
+        }
+      ],
+      "note": "The body alphabet is standard and URL-safe Base64: plus, slash, underscore and dash."
+    },
+    {
+      "id": "fly-token-positive-body-64",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_KRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18z",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 68
+        }
+      ],
+      "note": "A body of 64 bytes is accepted; the body has no upper bound."
+    },
+    {
+      "id": "fly-token-positive-body-700",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_Xelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 704
+        }
+      ],
+      "note": "A body of 700 bytes is accepted; the body has no upper bound."
+    },
+    {
+      "id": "fly-token-positive-body-2000",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_kry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahz",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 2004
+        }
+      ],
+      "note": "A body of 2000 bytes is accepted; the body has no upper bound."
+    },
+    {
+      "id": "fly-token-boundary-body-63",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_x4/ELTahov3+DKRZgnu19CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTaz",
+      "expected": [],
+      "note": "A 63-byte body is below the 64-byte floor."
+    },
+    {
+      "id": "fly-token-boundary-unlisted-prefix",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m3_+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipz",
+      "expected": [],
+      "note": "The provider's prefix list is closed."
+    },
+    {
+      "id": "fly-token-boundary-hyphen-separator",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2-JQXelt07AHPWdkrz6-GNVcjqx5_FMTbipw3/ELSZhov29DKRYfnu18BJQXelt07AHPWdkrz6-GNVcjqx5_FMTbipw3/ELSZhov2z",
+      "expected": [],
+      "note": "The separator is an underscore."
+    },
+    {
+      "id": "fly-token-boundary-uppercase-prefix",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0046M2_Wdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSZgov29CKRYfmu18Bz",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "fly-token-boundary-glued-prefix",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0066m2_jqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfmt18BIPXelsz7AHOz",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "fly-token-boundary-glued-underscore-prefix",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "config_\u0066m2_w3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz6AHOVckry5_GNUbz",
+      "expected": [],
+      "note": "An identifier glued before the prefix rejects the match."
+    },
+    {
+      "id": "fly-token-boundary-q9-standalone-fo1-43",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066o1_9CJQXfmt07BIPWdlsz6-HOVcjry5_FNUbipx4/ELTaz",
+      "expected": [],
+      "note": "A standalone fo1_ token has no provider-stated length and stays unclaimed until ruling Q9 on #1014."
+    },
+    {
+      "id": "fly-token-boundary-q9-standalone-fo1-100",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066o1_IPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu18CJQXemt07AIPWdksz6-GOVcjqy5_FMUbipw4/ELSahov2+DKRYgnu1z",
+      "expected": [],
+      "note": "A standalone fo1_ token of any width stays unclaimed until ruling Q9 on #1014."
+    },
+    {
+      "id": "fly-token-positive-q9-fo1-before-the-first-fm-member",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066o1_Vcjqx5_FMTbipw3/ELSZhov29DKRYfnu18BJQXelt0z,\u0066m2_ipw3+ELSZgov29CKRYfmu18BIQXels07AHOWdkry6-GNUcjqx4_FMTaipw3+ELSz\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 116
+        }
+      ],
+      "note": "A fo1_ member that precedes the first fm member is outside the span: the span starts at the first fm prefix."
+    },
+    {
+      "id": "fly-token-positive-comma-before-a-non-member-ends-the-span",
+      "detector": "fly-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_v29CJRYfmt18BIPXelsz7AHOVdkry5-GNUbjqx4/FMTahpw3+DLSZgnv29CJRYfz,next\n",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 68
+        }
+      ],
+      "note": "A comma followed by anything but a member prefix ends the span."
+    },
+    {
+      "id": "fly-token-boundary-padded-member-continued-by-identifier",
+      "detector": "fly-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_8BIPWelsz6AHOVckry5_GNUbiqx4/EMTahow3+DKSZgnu29CJQYfmt08BIPWelsz==x",
+      "expected": [],
+      "note": "A padded member that an identifier continues is rejected whole."
+    },
+    {
+      "id": "fly-token-negative-tiny-fixtures",
+      "detector": "fly-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_hi \u0066m1r_b \u0066m1a_c",
+      "expected": [],
+      "note": "Tiny provider test fixtures are below the floor."
+    },
+    {
+      "id": "fly-token-negative-identifier-config-path",
+      "detector": "fly-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_config_path",
+      "expected": [],
+      "note": "A snake_case identifier is under the floor."
+    },
+    {
+      "id": "fly-token-negative-scheme-alone",
+      "detector": "fly-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "the FlyV1 scheme alone",
+      "expected": [],
+      "note": "The scheme without a token is not a token."
+    },
+    {
+      "id": "fly-token-negative-env-reference",
+      "detector": "fly-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FLY_API_TOKEN=${FLY_API_TOKEN}\n",
+      "expected": [],
+      "note": "A variable reference is not a literal token."
+    },
+    {
+      "id": "fly-token-negative-masked",
+      "detector": "fly-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_****************************************************************",
+      "expected": [],
+      "note": "A masked value is not a token."
+    },
+    {
+      "id": "fly-token-adversarial-prefix-run",
+      "detector": "fly-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ \u0066m2_ ",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach the floor, and the scan stays linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "fly-token-adversarial-comma-prefix-run",
+      "detector": "fly-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,\u0066m2_,",
+      "expected": [],
+      "note": "Comma-joined prefixes with no body never reach the floor, and the scan stays linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "fly-token-adversarial-glued-prefixes-are-one-body",
+      "detector": "fly-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_\u0066m2_",
+      "expected": [
+        {
+          "detector": "fly-token",
+          "type": "fly_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 10000
+        }
+      ],
+      "note": "Prefixes joined without a delimiter are one open-ended body: one span, never one per prefix, in linear time.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 1,
         "maxRuntimeMs": 250
       }
     }

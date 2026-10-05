@@ -1121,6 +1121,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0073k.eyJSyntheticRevokedMapboxPayloadFixture.SyntheticRevokedMbxSig",
       "schemes": null
+    },
+    {
+      "type": "fly_access_token",
+      "detector": "fly-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0066m2_SyntheticRevokedFlyMacaroonFixture0000000000000000000000000000000000",
+      "schemes": null
     }
   ],
   "consumers": [

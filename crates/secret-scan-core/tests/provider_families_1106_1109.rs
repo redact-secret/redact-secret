@@ -622,3 +622,204 @@ mod mapbox {
         assert_parity(&parity_input(&token("sk", 20, 22, 28)));
     }
 }
+
+mod fly {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "fly-token";
+    const TYPE: &str = "fly_access_token";
+    /// Standard and URL-safe Base64: the body alphabet of flyctl's own rule.
+    const BODY: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/_-";
+
+    /// A body of `len` bytes over the full body alphabet whose last byte is
+    /// alphanumeric, so a following delimiter is never part of the body.
+    pub(super) fn body(len: usize, seed: usize) -> String {
+        let mut bytes = filler(BODY, len, seed).into_bytes();
+        bytes[len - 1] = b'z';
+        String::from_utf8(bytes).unwrap()
+    }
+
+    pub(super) fn member(prefix: &str, len: usize, seed: usize) -> String {
+        format!("{prefix}{}", body(len, seed))
+    }
+
+    pub(super) fn bundle(seed: usize) -> String {
+        format!(
+            "{},{},{}",
+            member("fm2_", 200, seed),
+            member("fm2_", 150, seed + 1),
+            member("fo1_", 43, seed + 2)
+        )
+    }
+
+    #[test]
+    fn every_prefix_and_width_wins_every_context_as_the_sole_finding() {
+        for (seed, prefix) in ["fm1r_", "fm1a_", "fm2_"].into_iter().enumerate() {
+            for len in [64, 65, 100, 700] {
+                assert_sole_provider_finding(DETECTOR, TYPE, &member(prefix, len, seed + len));
+            }
+        }
+        assert_sole_provider_finding(DETECTOR, TYPE, &member("fm2_", 2000, 1));
+        let key = member("fm2_", 100, 2);
+        assert!(key.contains('+') || key.contains('/'));
+        assert!(key.contains('-') || key.contains('_'));
+    }
+
+    #[test]
+    fn the_flyv1_scheme_stays_outside_the_span_in_every_host_form() {
+        let key = member("fm2_", 120, 3);
+        let two = format!("{key},{}", member("fm2_", 90, 4));
+        for token in [&key, &two] {
+            for input in [
+                format!("FLY_API_TOKEN=FlyV1 {token}\n"),
+                format!("FLY_API_TOKEN=\"FlyV1 {token}\"\n"),
+                format!("export FLY_API_TOKEN='FlyV1 {token}'\n"),
+                format!("FLY_API_TOKEN={token}\n"),
+                format!("FLY_ACCESS_TOKEN={token}\n"),
+                format!("env:\n  FLY_API_TOKEN: {token}\n"),
+                format!("      FLY_API_TOKEN: FlyV1 {token}\n"),
+                format!("Authorization: FlyV1 {token}\n"),
+                format!("Authorization: Bearer {token}\n"),
+                format!(
+                    "curl -H 'Authorization: FlyV1 {token}' https://api.machines.example/v1/apps\n"
+                ),
+                format!("{{\"token\": \"FlyV1 {token}\"}}\n"),
+                format!(
+                    "{{\"mcpServers\":{{\"fly\":{{\"env\":{{\"FLY_API_TOKEN\":\"{token}\"}}}}}}}}\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, token);
+                let (text, _) = whole_input(&input);
+                assert_eq!(
+                    text.contains("FlyV1 "),
+                    input.contains("FlyV1 "),
+                    "the scheme and its space are left in place: {input}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_comma_joined_bundle_is_one_span_including_the_fo1_member() {
+        let session = bundle(5);
+        assert_sole_provider_finding(DETECTOR, TYPE, &session);
+        let two = format!("{},{}", member("fm1r_", 64, 6), member("fm1a_", 64, 7));
+        assert_sole_provider_finding(DETECTOR, TYPE, &two);
+        let padded = format!("{}=,{}==", member("fm2_", 64, 8), member("fo1_", 50, 9));
+        assert_sole_provider_finding(DETECTOR, TYPE, &padded);
+        // A comma followed by anything but a member prefix with a body ends
+        // the bundle, and the tail is not part of the span.
+        let first = member("fm2_", 64, 10);
+        for tail in [
+            ",x", ", fm2_x", ",fm3_x", ",fo1_", ",fm2_", ",,fm2_x", ";fm2_x",
+        ] {
+            assert_sole_finding_in(&format!("{first}{tail}\n"), DETECTOR, TYPE, &first);
+        }
+    }
+
+    #[test]
+    fn padding_is_part_of_the_span_up_to_two_bytes() {
+        let key = member("fm2_", 64, 11);
+        for padding in ["=", "=="] {
+            assert_sole_provider_finding(DETECTOR, TYPE, &format!("{key}{padding}"));
+        }
+        let (_, findings) = whole_input(&format!("{key}===\n"));
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        assert_eq!(findings[0].range().end(), key.len() + 2);
+        // A padded member that an identifier continues is rejected whole.
+        assert_unclaimed(DETECTOR, &format!("{key}==x\n"));
+    }
+
+    #[test]
+    fn the_floor_is_64_for_the_first_member() {
+        assert_sole_provider_finding(DETECTOR, TYPE, &member("fm2_", 64, 12));
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                member("fm2_", 63, 12),
+                member("fm1r_", 63, 12),
+                member("fm1a_", 1, 12),
+                "fm2_hi".to_owned(),
+            ],
+        );
+    }
+
+    /// Ruling Q9 on #1014 is open: a standalone `fo1_` has no provider-stated
+    /// length (43 URL-safe bytes rests on one scanner), so it stays unclaimed
+    /// until a provider source states it, and a `fo1_` member that comes before
+    /// the first `fm` member is outside the span. A bounded false negative.
+    #[test]
+    fn a_standalone_fo1_token_is_a_bounded_false_negative_until_ruling_q9() {
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                member("fo1_", 43, 13),
+                member("fo1_", 100, 14),
+                member("fo1_", 700, 15),
+            ],
+        );
+        let first = member("fo1_", 43, 16);
+        let second = member("fm2_", 64, 17);
+        assert_sole_finding_in(&format!("{first},{second}\n"), DETECTOR, TYPE, &second);
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = body(100, 18);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("fm3_{body}"),
+                format!("fm2-{body}"),
+                format!("fm2{body}"),
+                format!("FM2_{body}"),
+                format!("Fm2_{body}"),
+                format!("fm1x_{body}"),
+                format!("fm1_{body}"),
+                format!("xfm2_{body}"),
+                format!("_fm2_{body}"),
+                format!("-fm2_{body}"),
+                format!("config_fm2_{body}"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "fm2_hi fm2_config_path fm2_a fm1r_b fm1a_c\n".to_owned(),
+            "the FlyV1 scheme alone and FlyV1 fm2_\n".to_owned(),
+            "FLY_API_TOKEN=${FLY_API_TOKEN}\n".to_owned(),
+            format!("FLY_API_TOKEN=fm2_{}\n", "*".repeat(64)),
+            "fm2_snake_case_identifier_name\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"fm2_ ".repeat(10_000));
+        assert_unclaimed(DETECTOR, &"fm2_,".repeat(10_000));
+        // Prefixes joined without a delimiter are one body run: a single
+        // finding, never one per prefix, found in linear time.
+        let (_, findings) = whole_input(&"fm2_".repeat(10_000));
+        assert_eq!(detector_findings(&findings, DETECTOR).len(), 1);
+        let (_, findings) = whole_input(&"+fm2_".repeat(10_000));
+        assert!(detector_findings(&findings, DETECTOR).len() <= 1);
+        let (_, findings) = whole_input(&format!("fm2_{}", body(63, 19)).repeat(500));
+        assert!(detector_findings(&findings, DETECTOR).len() <= 1);
+        assert_repetition_line(DETECTOR, &member("fm2_", 64, 20), 200);
+        assert_repetition_line(DETECTOR, &bundle(21), 100);
+    }
+
+    #[test]
+    fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
+        assert_parity(&parity_input(&member("fm2_", 64, 22)));
+        assert_parity(&format!(
+            "# \u{d0a4}\u{1f511} 키\nFLY_API_TOKEN=FlyV1 {},{}\n",
+            member("fm2_", 70, 23),
+            member("fo1_", 40, 24)
+        ));
+    }
+}

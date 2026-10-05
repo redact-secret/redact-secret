@@ -17344,6 +17344,138 @@
       "type": "mapbox_secret_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "fly-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "fly-token-positive-authorization-flyv1-header",
+            "fly-token-positive-bare",
+            "fly-token-positive-body-2000",
+            "fly-token-positive-body-64",
+            "fly-token-positive-body-700",
+            "fly-token-positive-body-alphabet",
+            "fly-token-positive-chat-sentence",
+            "fly-token-positive-comma-before-a-non-member-ends-the-span",
+            "fly-token-positive-crlf-unicode-prefix",
+            "fly-token-positive-curl-bearer",
+            "fly-token-positive-dotenv",
+            "fly-token-positive-flyv1-scheme-quoted",
+            "fly-token-positive-flyv1-scheme-unquoted",
+            "fly-token-positive-github-actions-env",
+            "fly-token-positive-json-config",
+            "fly-token-positive-json-token-key",
+            "fly-token-positive-log",
+            "fly-token-positive-mcp-server-config",
+            "fly-token-positive-padding-one",
+            "fly-token-positive-padding-two",
+            "fly-token-positive-prefix-fm1a",
+            "fly-token-positive-prefix-fm1r",
+            "fly-token-positive-punctuation-adjacent",
+            "fly-token-positive-q9-fo1-before-the-first-fm-member",
+            "fly-token-positive-repeated-value",
+            "fly-token-positive-sdk-call",
+            "fly-token-positive-session-bundle-with-fo1-member",
+            "fly-token-positive-shell-export",
+            "fly-token-positive-three-member-bundle",
+            "fly-token-positive-tool-call-arguments",
+            "fly-token-positive-two-member-bundle",
+            "fly-token-positive-two-member-bundle-with-scheme",
+            "fly-token-positive-x-api-key-header",
+            "fly-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "fly-token-overlap-bearer-header",
+            "fly-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "fly-token-adversarial-comma-prefix-run",
+            "fly-token-adversarial-glued-prefixes-are-one-body",
+            "fly-token-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "fly-token-boundary-body-63",
+            "fly-token-boundary-glued-prefix",
+            "fly-token-boundary-glued-underscore-prefix",
+            "fly-token-boundary-hyphen-separator",
+            "fly-token-boundary-padded-member-continued-by-identifier",
+            "fly-token-boundary-q9-standalone-fo1-100",
+            "fly-token-boundary-q9-standalone-fo1-43",
+            "fly-token-boundary-unlisted-prefix",
+            "fly-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "fly-token-negative-env-reference",
+            "fly-token-negative-identifier-config-path",
+            "fly-token-negative-masked",
+            "fly-token-negative-scheme-alone",
+            "fly-token-negative-tiny-fixtures"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "fly-token-boundary-body-63",
+            "fly-token-boundary-glued-prefix",
+            "fly-token-boundary-glued-underscore-prefix",
+            "fly-token-boundary-hyphen-separator",
+            "fly-token-boundary-padded-member-continued-by-identifier",
+            "fly-token-boundary-q9-standalone-fo1-100",
+            "fly-token-boundary-q9-standalone-fo1-43",
+            "fly-token-boundary-unlisted-prefix",
+            "fly-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for fly_access_token (fly-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "fly_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -17534,6 +17666,9 @@
             "firebase-server-key-adversarial-near-miss-body",
             "firecrawl-api-key-adversarial-long-suffix",
             "fireworks-ai-api-key-adversarial-long-suffix",
+            "fly-token-adversarial-comma-prefix-run",
+            "fly-token-adversarial-glued-prefixes-are-one-body",
+            "fly-token-adversarial-prefix-run",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
             "gitlab-routable-pat-adversarial-repeated-dotted-prefix",
@@ -18034,6 +18169,9 @@
             "firebase-server-key-adversarial-near-miss-body",
             "firecrawl-api-key-adversarial-long-suffix",
             "fireworks-ai-api-key-adversarial-long-suffix",
+            "fly-token-adversarial-comma-prefix-run",
+            "fly-token-adversarial-glued-prefixes-are-one-body",
+            "fly-token-adversarial-prefix-run",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
             "gitlab-routable-pat-adversarial-repeated-dotted-prefix",

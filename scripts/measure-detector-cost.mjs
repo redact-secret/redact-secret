@@ -167,6 +167,7 @@ export const CANONICAL_IDS = [
   "pydantic-logfire-token",
   "square-token",
   "mapbox-token",
+  "fly-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -262,6 +263,7 @@ export const GROUPS = {
     "axiom-token",
     "xata-api-key",
     "pydantic-logfire-token",
+    "fly-token",
   ],
   devtools: [
     "github-token",

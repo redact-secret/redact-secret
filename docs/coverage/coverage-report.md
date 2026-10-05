@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 156/156 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 157/157 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 156 |
+| supported | 157 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 167.
+Coverage declarations: 168.
 
 ## Coverage by detector
 
@@ -66,6 +66,7 @@ Coverage declarations: 167.
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firecrawl-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | fireworks-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| fly-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-runner-authentication-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -208,6 +209,7 @@ Coverage declarations: 167.
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
 | firecrawl_api_key | firecrawl-api-key | provider | supported | not-applicable | none |
 | fireworks_ai_api_key | fireworks-ai-api-key | provider | supported | not-applicable | none |
+| fly_access_token | fly-token | provider | supported | not-applicable | none |
 | github_app_installation_token | github-token | provider | supported | not-applicable | none |
 | github_app_refresh_token | github-token | provider | supported | not-applicable | none |
 | github_app_user_to_server_token | github-token | provider | supported | not-applicable | none |
@@ -328,15 +330,15 @@ Coverage declarations: 167.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 167 | 0 | 0 |
-| boundary | 156 | 0 | 0 |
-| host-context | 156 | 0 | 0 |
+| adversarial | 168 | 0 | 0 |
+| boundary | 157 | 0 | 0 |
+| host-context | 157 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 167 | 0 | 0 |
-| near-miss-negative | 156 | 0 | 0 |
-| overlap | 156 | 0 | 0 |
-| positive | 156 | 0 | 0 |
-| range | 167 | 0 | 0 |
+| malformed | 168 | 0 | 0 |
+| near-miss-negative | 157 | 0 | 0 |
+| overlap | 157 | 0 | 0 |
+| positive | 157 | 0 | 0 |
+| range | 168 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

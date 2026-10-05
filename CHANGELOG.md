@@ -76,6 +76,12 @@ evidence is linked from each published version.
     `pk.` tokens are never claimed and `tk.` temporary tokens stay unclaimed
     (ruling Q9 pending). The span is one provider finding with no `jwt` finding
     over it.
+  - `fly-token` (#1109): Fly.io macaroon tokens, `fm1r_`, `fm1a_` or `fm2_` +
+    64 or more `[A-Za-z0-9+/_-]` with optional `=` padding
+    (`fly_access_token`). A comma-joined session bundle, including a `fo1_`
+    member, is one span; the `FlyV1 ` scheme stays outside it. The 64-byte floor
+    is derived from the wire-format minimum (ruling Q7 pending); a standalone
+    `fo1_` token stays unclaimed (ruling Q9 pending).
 
 ### Fixed
 

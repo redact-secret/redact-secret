@@ -214,6 +214,20 @@ fn third_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
                 filler(BASE64URL, 22, 2)
             ),
         ),
+        (
+            "fly-token",
+            "fly_access_token",
+            format!("fm2_{}", filler(BASE64, 100, 1)),
+        ),
+        (
+            "fly-token",
+            "fly_access_token",
+            format!(
+                "fm2_{},fo1_{}",
+                filler(BASE64, 80, 2),
+                filler(BASE64URL, 43, 3)
+            ),
+        ),
     ]
 }
 

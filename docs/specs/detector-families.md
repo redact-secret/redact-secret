@@ -79,6 +79,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `firecrawl_api_key` | `firecrawl-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (docs, SDK), UUIDv4 body T1 (provider server code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `fireworks_ai_api_key` | `fireworks-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `fly_access_token` | `fly-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (the `superfly/macaroon` wire format, R1, and flyctl's own redaction rule, R2), the 64-byte first-member floor is derived from the wire format rather than provider-stated and rests on the Q7 recommendation (pending ruling), a standalone `fo1_` is unclaimed on the Q9 recommendation (pending ruling), the `FlyV1 ` scheme is outside the span, grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `github_app_installation_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_refresh_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_user_to_server_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
@@ -1398,6 +1399,7 @@ handoff's stated recommendation and records the open ruling as a bounded limit.
 | `pydantic:logfire-token` (write and read tokens, API keys, AI Gateway key) | `pydantic-logfire-token` | `pylf_v` + 1 to 3 digits + `_` + `[a-z]{2,16}` region + `_` + optional 8-4-4-4-12 hex organization id (either case) + `_` + `[A-Za-z0-9]{20,}` | `pydantic_logfire_token` | T1 (SDK parsers, R1; provider scrubber, R2); the body floor and region cap are narrowing policy (pending ruling Q7, recommendation: allowed) |
 | `square:access-token` (and the OAuth application secret) | `square-token` | `EAAA` + exactly 60, `sq0csp-` + 43 or 44, or `sandbox-sq0csb-` + exactly 43, all `[A-Za-z0-9_-]` | `square_access_token` (`EAAA`), `square_oauth_application_secret` (`sq0csp-`, `sandbox-sq0csb-`) | T1 (provider docs examples, R4 and R5, corroborated by scanner rules); exact widths under the Q8 recommendation (pending ruling) |
 | `mapbox:secret-access-token` | `mapbox-token` | `sk.` + `eyJ` + `[A-Za-z0-9_-]{20,}` payload + `.` + exactly 22 `[A-Za-z0-9_-]` signature | `mapbox_secret_access_token` | T1 (provider docs and parser, R1; signature width by R5); the payload floor is derived (pending ruling Q7, recommendation: allowed); `tk.` unclaimed (pending ruling Q9, recommendation: unclaimed) |
+| `fly:access-token` | `fly-token` | first member `fm1r_`, `fm1a_` or `fm2_` + `[A-Za-z0-9+/_-]{64,}` + `={0,2}`, then any number of `,` + `fm1r_`, `fm1a_`, `fm2_` or `fo1_` + `[A-Za-z0-9+/_-]+` + `={0,2}` members; the `FlyV1 ` scheme is outside the span | `fly_access_token` | T1 (wire-format code, R1; flyctl's own redaction rule, R2); the 64-byte floor is derived (pending ruling Q7, recommendation: allowed); a standalone `fo1_` unclaimed (pending ruling Q9, recommendation: unclaimed) |
 
 Pydantic Logfire ([#1106](https://github.com/redact-secret/redact-secret/issues/1106),
 [handoff](../audits/evidence/1014/pydantic-logfire.md)). The write token, read
@@ -1477,6 +1479,38 @@ payload that does not begin `eyJ`, a future signature length, `SK.`, `sk_` and
 `sk-` forms and a glued value. False positives: a non-Mapbox `sk.eyJ...`
 followed by exactly 22 base64url bytes; none is known. Cost: one prefix on the
 shared known-format scan plus a 23-byte tail check.
+
+Fly ([#1109](https://github.com/redact-secret/redact-secret/issues/1109),
+[handoff](../audits/evidence/1014/fly.md)). The grammar is flyctl's own log
+redaction rule, `(fo1_|fm1[ar]_|fm2_)[a-zA-Z0-9/+_-]+=*` (R2), read with the
+`superfly/macaroon` wire format (R1): the member prefixes, an alphabet that
+covers standard and URL-safe Base64, optional `=` padding (up to two bytes
+here), no upper length bound, and `,` between the members of a bundle. The span
+starts at the first `fm1r_`, `fm1a_` or `fm2_` member and ends at the last body
+or `=` byte of the last member, so a session bundle (`fm2_...,fo1_...`) is one
+finding, and the documented `FlyV1 ` scheme and its space stay in place; that
+also closes the unquoted `FLY_API_TOKEN=FlyV1 fm2_...` form, which generic
+context misses because the space ends the contextual value. A comma followed by
+anything but a member prefix with at least one body byte ends the bundle. The
+64-byte floor on the first member is derived from the wire format (a decoded
+macaroon holds a 16-byte nonce and a 32-byte HMAC-SHA256 tail, 48 bytes, which
+is at least 64 standard-Base64 characters), not stated by Fly. Ruling Q7 (may a
+derived floor serve as the T1 floor) is open; the row follows its recommendation
+(yes), and a floor of 100 is a one-constant change if it is refused. Ruling Q9 is
+also open: a `fo1_` token with no `fm` member before it has no provider-stated
+length (43 URL-safe bytes rests on one scanner) and stays unclaimed, as does a
+`fo1_` member that precedes the first `fm` member, a bounded false negative that
+stays with generic coverage. The boundary before the first prefix is
+`[A-Za-z0-9_-]`; the first member's run is the maximal body-alphabet run, so a
+longer run is claimed in full and never truncated, and a padded member that an
+identifier continues is rejected whole. The body alphabet includes `-` and `_`,
+so a delimiter glued after a token is more body, not a boundary (the provider
+rule reads it the same way). False negatives: a standalone `fo1_`, a body under
+64 (including the `fm2_hi` test fixtures), a future prefix (`fm3`), a separator
+other than `,` between members and `FM2_`. False positives: an unrelated `fm2_`
+followed by 64 or more body-alphabet bytes (a Base64 blob after a delimiter);
+none is known. Cost: three prefixes on the shared known-format scan plus a
+linear bundle extension.
 
 ## Batch 1 credential slots (#1209 to #1213)
 

@@ -212,7 +212,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-117 built-in detectors emit 156 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+118 built-in detectors emit 157 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -333,6 +333,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `pydantic-logfire-token` | `pydantic_logfire_token` | `always-redact` | — |
 | `square-token` | `square_access_token`, `square_oauth_application_secret` | `always-redact` | — |
 | `mapbox-token` | `mapbox_secret_access_token` | `always-redact` | — |
+| `fly-token` | `fly_access_token` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles
