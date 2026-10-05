@@ -58,7 +58,14 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// credential variable, `FAL_KEY`), and Convex's `convex_deploy_key` and
 /// `convex_self_hosted_admin_key`. Only these whole names match; `fal_key_id`
 /// (the public id half), `convex_key` and `my_fal_key` do not.
+///
+/// Issue #1211 adds `mac_secret_base64`, Airtable's documented create-webhook
+/// response field `macSecretBase64` (the Base64 MAC secret whose HMAC the
+/// `X-Airtable-Content-MAC` header carries). It is exactly this one name, not
+/// a `*_base64` rule: `thumbnailBase64`, `macSecretBase64Length`,
+/// `macSecretBase64Id` and a prefixed `oldMacSecretBase64` do not match.
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "mac_secret_base64",
     "db_pass",
     "fal_key",
     "convex_deploy_key",

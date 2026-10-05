@@ -254,3 +254,99 @@ fn asana_signature_ids_lookalikes_placeholders_and_bare_strings_stay_clean() {
         assert_clean(&input);
     }
 }
+
+// ------------------------------------------- #1211 Airtable macSecretBase64
+
+// 44-byte standard Base64 (32 bytes, one `=` pad) and a variant with `+`/`/`.
+const MAC_JSON: &str = "q7L2m9Zp4TrW8vKc3NbY6hJd1FsA5eGuXo0Rt2Yk7Mw=";
+const MAC_PRETTY: &str = "Hn4Vd8Ks2PxQ7mLb3ZcW9tRy6FjA1eGuTo5Ek0Ms7Nx=";
+const MAC_YAML: &str = "Bd5Kx9Rn2VmP7qLc3ZtW8yHs4FjA6eGu+o1Ek0Ms7N/=";
+const MAC_YAMLQ: &str = "Pw3Rn8Kd5VxL2mQb7ZcT9yHs4FjA1eGuXo6Rt0Yk2Mq=";
+const MAC_SPACED: &str = "Tz6Qm1Vd9KxP4nLb8RcW2yHs5FjA7eGuYo3Ek0Ms1Nx=";
+const MAC_ENV: &str = "Zc9Wn3Kd7VxL1mQb5PtR8yHs2FjA4eGuBo6Ek0Ms3Nq=";
+const MAC_UNI: &str = "Lm8Qw2Vd6KxP9nTb4RcZ1yHs7FjA3eGuDo5Ek0Ms9Nx=";
+
+#[test]
+fn airtable_mac_secret_base64_value_is_redacted_in_every_supported_layout() {
+    for (input, value) in [
+        (
+            format!(
+                "{{\"id\":\"achSYNTHETICHOOK01\",\"macSecretBase64\":\"{MAC_JSON}\",\"expirationTime\":\"2026-10-19T00:00:00.000Z\"}}\n"
+            ),
+            MAC_JSON,
+        ),
+        (
+            format!(
+                "{{\n  \"macSecretBase64\": \"{MAC_PRETTY}\",\n  \"expirationTime\": \"2026-10-19T00:00:00.000Z\"\n}}\n"
+            ),
+            MAC_PRETTY,
+        ),
+        (
+            format!(
+                "webhook:\n  id: achSYNTHETICHOOK02\n  macSecretBase64: {MAC_YAML}\n  expirationTime: 2026-10-19\n"
+            ),
+            MAC_YAML,
+        ),
+        (
+            format!("webhook:\n  macSecretBase64: \"{MAC_YAMLQ}\"\n"),
+            MAC_YAMLQ,
+        ),
+        (format!("macSecretBase64 = \"{MAC_SPACED}\"\n"), MAC_SPACED),
+        (
+            format!("macSecretBase64={MAC_ENV}\nAIRTABLE_BASE=appSYNTHETICBASE01\n"),
+            MAC_ENV,
+        ),
+        (
+            format!("{{\"note\":\"caf\u{e9} \u{1F680}\",\"macSecretBase64\":\"{MAC_UNI}\"}}\n"),
+            MAC_UNI,
+        ),
+    ] {
+        // The whole encoded value, padding included; generic type.
+        assert_value(&input, value, "contextual_secret");
+    }
+}
+
+#[test]
+fn airtable_value_offset_is_in_utf8_bytes_and_keeps_the_padding() {
+    let prefix = "{\"note\":\"caf\u{e9} \u{1F680}\",\"macSecretBase64\":\"";
+    let input = format!("{prefix}{MAC_UNI}\"}}\n");
+    let findings = findings_with_parity(&input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_ne!(prefix.len(), prefix.chars().count());
+    assert_eq!(findings[0].range().start(), prefix.len());
+    assert_eq!(findings[0].range().end(), prefix.len() + MAC_UNI.len());
+    assert!(MAC_UNI.ends_with('='));
+}
+
+#[test]
+fn airtable_controls_stay_clean() {
+    let hmac = "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0";
+    for input in [
+        // HMAC output in the notification header.
+        format!("X-Airtable-Content-MAC: hmac-sha256={hmac}\r\n"),
+        // Hook and base ids and adjacent public fields.
+        "{\"id\":\"achSYNTHETICHOOK01\",\"baseId\":\"appSYNTHETICBASE01\",\"expirationTime\":\"2026-10-19T00:00:00.000Z\"}\n".to_owned(),
+        // Another Base64 field: the vocabulary is exactly one name.
+        format!("{{\"thumbnailBase64\":\"{MAC_JSON}\",\"name\":\"logo.png\"}}\n"),
+        format!("{{\"imageBase64\":\"{MAC_JSON}\"}}\n"),
+        // Field-name suffix and prefix lookalikes.
+        "{\"macSecretBase64Length\":44,\"macSecretBase64Present\":true}\n".to_owned(),
+        "{\"macSecretBase64Id\":\"SYNTHETICIDVALUE01\"}\n".to_owned(),
+        format!("{{\"macSecretBase64Hash\":\"{MAC_JSON}\"}}\n"),
+        format!("{{\"oldMacSecretBase64\":\"{MAC_JSON}\"}}\n"),
+        // Placeholder, reference, masked.
+        "macSecretBase64: <mac-secret-base64>\n".to_owned(),
+        "macSecretBase64=${AIRTABLE_MAC_SECRET}\n".to_owned(),
+        "{\"macSecretBase64\":\"****************************************\"}\n".to_owned(),
+    ] {
+        assert_clean(&input);
+    }
+}
+
+#[test]
+fn airtable_hook_response_with_the_hmac_header_reports_only_the_secret() {
+    let input = format!(
+        "{{\"macSecretBase64\":\"{MAC_JSON}\"}}\nX-Airtable-Content-MAC: hmac-sha256=0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0\n"
+    );
+    assert_value(&input, MAC_JSON, "contextual_secret");
+}

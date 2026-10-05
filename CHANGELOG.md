@@ -61,6 +61,13 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` redacts the value of Airtable's `macSecretBase64` field (the
+  Base64 MAC secret returned when a webhook is created) in JSON, YAML and
+  direct assignment, as a generic `contextual_secret` over the complete encoded
+  value including padding (#1211). Before this the field produced no finding.
+  Only that exact name is added: other `*Base64` fields, suffix lookalikes such
+  as `macSecretBase64Length` and `Id`, and the `X-Airtable-Content-MAC` HMAC
+  header are not matched. The value is not decoded and no width is assumed.
 - The release manifest no longer records a version as `unpublished`, or leaves
   its published digest empty, because the registry had not caught up right after
   publishing (#1197, seen on 0.1.0-beta.13). `record-manifest` now re-reads the
