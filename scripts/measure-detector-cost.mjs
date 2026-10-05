@@ -162,6 +162,7 @@ export const CANONICAL_IDS = [
   "axiom-token",
   "xata-api-key",
   "sourcegraph-token",
+  "unkey-root-key",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -299,6 +300,7 @@ export const GROUPS = {
     "browserbase-api-key",
     "polar-token",
     "paddle-api-key",
+    "unkey-root-key",
   ],
 };
 

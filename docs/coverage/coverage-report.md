@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 144/144 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 145/145 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 144 |
+| supported | 145 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 155.
+Coverage declarations: 156.
 
 ## Coverage by detector
 
@@ -132,6 +132,7 @@ Coverage declarations: 155.
 | trigger-dev-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| unkey-root-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vercel-token | 4 | supported: 4, intentionally-unsupported: 0, unresolved: 0 |
 | wandb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -276,6 +277,7 @@ Coverage declarations: 155.
 | trigger_dev_secret_api_key | trigger-dev-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
+| unkey_root_key | unkey-root-key | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
 | vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
 | vercel_app_access_token | vercel-token | provider | supported | not-applicable | none |
@@ -311,15 +313,15 @@ Coverage declarations: 155.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 155 | 0 | 0 |
-| boundary | 144 | 0 | 0 |
-| host-context | 144 | 0 | 0 |
+| adversarial | 156 | 0 | 0 |
+| boundary | 145 | 0 | 0 |
+| host-context | 145 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 155 | 0 | 0 |
-| near-miss-negative | 144 | 0 | 0 |
-| overlap | 144 | 0 | 0 |
-| positive | 144 | 0 | 0 |
-| range | 155 | 0 | 0 |
+| malformed | 156 | 0 | 0 |
+| near-miss-negative | 145 | 0 | 0 |
+| overlap | 145 | 0 | 0 |
+| positive | 145 | 0 | 0 |
+| range | 156 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

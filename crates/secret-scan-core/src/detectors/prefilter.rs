@@ -899,14 +899,14 @@ mod tests {
     }
 
     #[test]
-    fn full_declares_95_detectors_and_common_4() {
+    fn full_declares_96_detectors_and_common_4() {
         let declared = |entries: Vec<super::super::BuiltIn>| {
             entries
                 .iter()
                 .filter(|entry| entry.required.is_some())
                 .count()
         };
-        assert_eq!(declared(built_in_entries()), 95);
+        assert_eq!(declared(built_in_entries()), 96);
         assert_eq!(declared(common_built_in_entries()), 4);
     }
 

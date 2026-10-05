@@ -1037,6 +1037,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0073gp_local_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
       "schemes": null
+    },
+    {
+      "type": "unkey_root_key",
+      "detector": "unkey-root-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0075nkey_Synthe1cunkeyv1SyntheticRevokedUnkeyRootKeyFixture1234567",
+      "schemes": null
     }
   ],
   "consumers": [

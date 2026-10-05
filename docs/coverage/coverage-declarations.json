@@ -15907,6 +15907,151 @@
       "type": "sourcegraph_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "unkey-root-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "unkey-root-key-positive-bare",
+            "unkey-root-key-positive-chat-sentence",
+            "unkey-root-key-positive-chat-sentence-dashboard",
+            "unkey-root-key-positive-crlf-unicode-prefix",
+            "unkey-root-key-positive-curl-bearer",
+            "unkey-root-key-positive-dashboard-dotenv",
+            "unkey-root-key-positive-dashboard-form",
+            "unkey-root-key-positive-dotenv",
+            "unkey-root-key-positive-json-config",
+            "unkey-root-key-positive-json-token-key",
+            "unkey-root-key-positive-log",
+            "unkey-root-key-positive-punctuation-adjacent",
+            "unkey-root-key-positive-repeated-value",
+            "unkey-root-key-positive-sdk-call",
+            "unkey-root-key-positive-shell-export",
+            "unkey-root-key-positive-tool-call-arguments",
+            "unkey-root-key-positive-version-1-head-begins-3z",
+            "unkey-root-key-positive-x-api-key-header",
+            "unkey-root-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "unkey-root-key-overlap-bearer-header",
+            "unkey-root-key-overlap-bearer-header-dashboard",
+            "unkey-root-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "unkey-root-key-adversarial-glued-keys",
+            "unkey-root-key-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "unkey-root-key-boundary-customer-prefixed-v1-key-long-prefix-q10",
+            "unkey-root-key-boundary-customer-prefixed-v1-key-q10",
+            "unkey-root-key-boundary-dashboard-body-21",
+            "unkey-root-key-boundary-dashboard-body-23",
+            "unkey-root-key-boundary-dashboard-lead-3y",
+            "unkey-root-key-boundary-dashboard-zero-in-random-part",
+            "unkey-root-key-boundary-glued-prefix",
+            "unkey-root-key-boundary-glued-trailing-dash-dashboard",
+            "unkey-root-key-boundary-glued-trailing-underscore",
+            "unkey-root-key-boundary-go-deprecated-form-22",
+            "unkey-root-key-boundary-hyphen-separator",
+            "unkey-root-key-boundary-uppercase-prefix",
+            "unkey-root-key-boundary-v1-body-56",
+            "unkey-root-key-boundary-v1-body-58",
+            "unkey-root-key-boundary-v1-capital-i-in-random-part",
+            "unkey-root-key-boundary-v1-capital-o-in-random-part",
+            "unkey-root-key-boundary-v1-lowercase-l-in-random-part",
+            "unkey-root-key-boundary-v1-marker-offset-7",
+            "unkey-root-key-boundary-v1-marker-offset-9",
+            "unkey-root-key-boundary-v1-marker-uppercase",
+            "unkey-root-key-boundary-v1-marker-v2",
+            "unkey-root-key-boundary-v1-underscore-in-random-part",
+            "unkey-root-key-boundary-v1-zero-in-random-part"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "unkey-root-key-negative-env-reference",
+            "unkey-root-key-negative-identifiers",
+            "unkey-root-key-negative-key-and-api-ids",
+            "unkey-root-key-negative-lowercase-24-without-lead",
+            "unkey-root-key-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "unkey-root-key-boundary-customer-prefixed-v1-key-long-prefix-q10",
+            "unkey-root-key-boundary-customer-prefixed-v1-key-q10",
+            "unkey-root-key-boundary-dashboard-body-21",
+            "unkey-root-key-boundary-dashboard-body-23",
+            "unkey-root-key-boundary-dashboard-lead-3y",
+            "unkey-root-key-boundary-dashboard-zero-in-random-part",
+            "unkey-root-key-boundary-glued-prefix",
+            "unkey-root-key-boundary-glued-trailing-dash-dashboard",
+            "unkey-root-key-boundary-glued-trailing-underscore",
+            "unkey-root-key-boundary-go-deprecated-form-22",
+            "unkey-root-key-boundary-hyphen-separator",
+            "unkey-root-key-boundary-uppercase-prefix",
+            "unkey-root-key-boundary-v1-body-56",
+            "unkey-root-key-boundary-v1-body-58",
+            "unkey-root-key-boundary-v1-capital-i-in-random-part",
+            "unkey-root-key-boundary-v1-capital-o-in-random-part",
+            "unkey-root-key-boundary-v1-lowercase-l-in-random-part",
+            "unkey-root-key-boundary-v1-marker-offset-7",
+            "unkey-root-key-boundary-v1-marker-offset-9",
+            "unkey-root-key-boundary-v1-marker-uppercase",
+            "unkey-root-key-boundary-v1-marker-v2",
+            "unkey-root-key-boundary-v1-underscore-in-random-part",
+            "unkey-root-key-boundary-v1-zero-in-random-part"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for unkey_root_key (unkey-root-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "unkey_root_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -16185,6 +16330,8 @@
             "trigger-dev-token-adversarial-long-suffix",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
+            "unkey-root-key-adversarial-glued-keys",
+            "unkey-root-key-adversarial-prefix-run",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix",
             "vercel-pat-adversarial-long-suffix",
@@ -16674,6 +16821,8 @@
             "trigger-dev-token-adversarial-long-suffix",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
+            "unkey-root-key-adversarial-glued-keys",
+            "unkey-root-key-adversarial-prefix-run",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix",
             "vercel-pat-adversarial-long-suffix",

@@ -152,6 +152,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `trigger_dev_secret_api_key` | `trigger-dev-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider SDK regex and generator code under R1), grammar and trade-offs in [Tier A provider families (#860)](#tier-a-provider-families-860) |
 | `twilio_api_key_secret` | `twilio-api-key-secret` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `twilio_auth_token` | `twilio-auth-token` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); issue #933 also reads the `Auth Token` column of a `twilio` CLI table (bounded, with an incremental retention hint), reported `high` (redact) since issue #936 |
+| `unkey_root_key` | `unkey-root-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider design document RFC 0017, generator and handler test, R1 and R9; dashboard width and lead derived from the generator), the CRC-32C is not a rejection gate (pending ruling Q1), customer-prefixed keys are out of contract until ruling Q10, grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
 | `vault_token` | `vault-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `vendor_prefixed_credential` | `generic-token` | `always-redact` | [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md) |
 | `vercel_app_access_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #1036 splits `vca_` + exactly 56 `[A-Za-z0-9]` out of `vercel_token` (T2, one provider value), following [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md); grammar and trade-offs in [Vercel per-class split (#1036)](#vercel-per-class-split-1036) |
@@ -1265,6 +1266,7 @@ evidence.
 | --- | --- | --- | --- | --- |
 | `xata:api-key` | `xata-api-key` | `xau_` or `xao_` + `[0-9A-Za-z]{32,36}` (36 to 40 in total) | `xata_user_api_key` (`xau_`), `xata_organization_api_key` (`xao_`) | T1 (provider generator and validator, R1 and R9; width derived from the generator's encoder) |
 | `sourcegraph:access-token` | `sourcegraph-token` | `sgp_` + optional `[A-Za-z0-9]{1,32}_` instance identifier + exactly 40 hex (44 to 77 in total) | `sourcegraph_access_token` | T1 as of 2025-11-18 (provider generator and the vendored validator, R1 and R9) |
+| `unkey:root-key` | `unkey-root-key` | `unkey_` + 8 base58 + `unkeyv1` + 42 base58 (63 in total); `unkey_3Z` + 22 base58 (30 in total); base58 is `[1-9A-HJ-NP-Za-km-z]` | `unkey_root_key` | T1 (RFC 0017, generator and handler test; dashboard width and `3Z` lead derived, R1 and R9) |
 
 Xata ([#1102](https://github.com/redact-secret/redact-secret/issues/1102),
 [handoff](../audits/evidence/1014/xata.md)). The body is 20 random bytes plus a
@@ -1301,6 +1303,31 @@ change cannot be ruled out; the maintained validators would have followed it.
 False positives: an unrelated `sgp_<word>_` + exactly 40 hex; none is known.
 Cost: one prefix on the shared known-format scan plus a linear post check over
 the run.
+
+Unkey ([#1104](https://github.com/redact-secret/redact-secret/issues/1104),
+[handoff](../audits/evidence/1014/unkey.md)). Both current root-key forms are
+one type: the version 1 key the RFC 0017 generator and the root-key handler
+mint (the last 6 characters are a CRC-32C, which stays lexical under the Q1
+recommendation) and the dashboard key the `KeyV1` encoder mints (18 bytes
+whose first two are fixed, so always 24 characters beginning `3Z`). They are
+constructed as one `unkey_` shape with two accepted body widths, 57 and 24,
+and the longer one is tried first, so a version 1 key whose random head begins
+`3Z` (about 1 in 3,400) is still one 63-byte key and never a truncated
+dashboard key. The base58 alphabet has no `0`, `O`, `I`, `l` or `_`, which
+keeps `unkey_`-prefixed identifiers (`unkey_root_key`, `unkey_mutations`)
+unclaimed. The step-1 single `unkey_[Base58]{21,24}` window and the third-party
+`unkey_[A-Za-z0-9]{20,32}` rule are not followed: the first is superseded by
+the derivation, and the second misses version 1 and accepts non-base58 bytes.
+**Customer-prefixed version 1 keys** (`<1 to 16 byte prefix>_` + 8 +
+`unkeyv1` + 42) are credentials for the customer's own product, anchored on
+the `unkeyv1` marker; claiming them as a separate type needs ruling Q10 on
+#1014, which is open, so they are an explicit, bounded false negative that
+stays with generic context until Q10 is ruled. Other false negatives: the
+deprecated Go 21 to 22 form, root keys older than the current generators,
+imported keys, and a key glued to identifier bytes. False positives: an
+unrelated `unkey_3Z` + 22 base58 run; none is known (the lead is a 1 in 3,400
+coincidence for a random base58 run). Cost: one prefix on the shared
+known-format scan with a 7-byte marker check.
 
 ## Rules
 
@@ -1343,6 +1370,7 @@ the run.
 | Axiom `xaat-` and `xapt-` + lowercase-hex UUID tokens are reported as `axiom_api_token` and `axiom_personal_token` at provider specificity, bare or in any context; placeholders and bare UUIDs stay unclaimed ([#1035](https://github.com/redact-secret/redact-secret/issues/1035), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Xata `xau_` and `xao_` + 32 to 36 `[A-Za-z0-9]` API keys are reported as `xata_user_api_key` and `xata_organization_api_key` at provider specificity, bare or in any context; the CRC32 never rejects a match, and classic-platform keys stay unclaimed ([#1102](https://github.com/redact-secret/redact-secret/issues/1102), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Sourcegraph `sgp_` + optional alphanumeric instance identifier + 40 hex access tokens are reported as `sourcegraph_access_token` at provider specificity, bare or in any context; bare 40-hex tokens, `sgph_` and `sgd_` stay unclaimed ([#1103](https://github.com/redact-secret/redact-secret/issues/1103), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Unkey `unkey_` + 8 + `unkeyv1` + 42 base58 version 1 root keys and `unkey_3Z` + 22 base58 dashboard root keys are reported as `unkey_root_key` at provider specificity, bare or in any context; customer-prefixed version 1 keys (ruling Q10 open), the deprecated Go form and `unkey_` identifiers stay unclaimed ([#1104](https://github.com/redact-secret/redact-secret/issues/1104), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

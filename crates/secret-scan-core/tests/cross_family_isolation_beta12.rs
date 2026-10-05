@@ -41,6 +41,7 @@ const LOWER_ALNUM: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
 const LOWER_HEX: &[u8] = b"0123456789abcdef";
 const BASE32: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 const BASE64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const BASE58: &[u8] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 const BASE64URL: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 const UPPER_ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -98,7 +99,7 @@ fn aws_id(prefix: &str, seed: usize) -> String {
 /// type that must own it. The AWS secret access key is context-constrained
 /// and is checked separately below.
 fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
-    vec![
+    let mut values = vec![
         (
             "bitwarden-secrets-manager-access-token",
             "bitwarden_secrets_manager_access_token",
@@ -164,6 +165,26 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
             format!("xapt-{}", uuid(2)),
         ),
         (
+            "google-oauth-client-secret",
+            "google_oauth_client_secret",
+            format!("GOCSPX-{}", filler(BASE64URL, 28, 1)),
+        ),
+        (
+            "vercel-token",
+            "vercel_personal_access_token",
+            vercel("vcp_"),
+        ),
+        ("vercel-token", "vercel_app_access_token", vercel("vca_")),
+        ("vercel-token", "vercel_app_refresh_token", vercel("vcr_")),
+    ];
+    values.extend(second_wave_family_values());
+    values
+}
+
+/// The #1014 second wave (#1102 to #1105): one value per finding type.
+fn second_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
+    vec![
+        (
             "xata-api-key",
             "xata_user_api_key",
             format!("xau_{}", filler(ALNUM, 33, 1)),
@@ -179,17 +200,19 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
             format!("sgp_local_{}", filler(LOWER_HEX, 40, 3)),
         ),
         (
-            "google-oauth-client-secret",
-            "google_oauth_client_secret",
-            format!("GOCSPX-{}", filler(BASE64URL, 28, 1)),
+            "unkey-root-key",
+            "unkey_root_key",
+            format!(
+                "unkey_{}unkeyv1{}",
+                filler(BASE58, 8, 1),
+                filler(BASE58, 42, 2)
+            ),
         ),
         (
-            "vercel-token",
-            "vercel_personal_access_token",
-            vercel("vcp_"),
+            "unkey-root-key",
+            "unkey_root_key",
+            format!("unkey_3Z{}", filler(BASE58, 22, 3)),
         ),
-        ("vercel-token", "vercel_app_access_token", vercel("vca_")),
-        ("vercel-token", "vercel_app_refresh_token", vercel("vcr_")),
     ]
 }
 

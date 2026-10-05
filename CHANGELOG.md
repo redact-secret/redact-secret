@@ -46,6 +46,10 @@ evidence is linked from each published version.
   - `sourcegraph-token` (#1103): Sourcegraph `sgp_` + optional instance
     identifier + 40 hex access tokens (`sourcegraph_access_token`). A bare
     40-hex token (a git SHA shape), `sgph_` and `sgd_` stay unclaimed.
+  - `unkey-root-key` (#1104): Unkey version 1 (`unkey_` + 8 + `unkeyv1` + 42
+    base58) and dashboard (`unkey_3Z` + 22 base58) root keys (`unkey_root_key`).
+    The CRC-32C never rejects a match (ruling Q1 pending); customer-prefixed
+    version 1 keys stay unclaimed until ruling Q10.
 
 ### Fixed
 

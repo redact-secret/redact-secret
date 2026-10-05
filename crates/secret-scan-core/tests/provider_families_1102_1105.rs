@@ -336,3 +336,122 @@ mod sourcegraph {
         }
     }
 }
+
+mod unkey {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "unkey-root-key";
+    const TYPE: &str = "unkey_root_key";
+    const BASE58: &[u8] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+    fn b58(len: usize, seed: usize) -> String {
+        filler(BASE58, len, seed)
+    }
+
+    pub(super) fn v1(seed: usize) -> String {
+        format!("unkey_{}unkeyv1{}", b58(8, seed), b58(42, seed + 1))
+    }
+
+    pub(super) fn dashboard(seed: usize) -> String {
+        format!("unkey_3Z{}", b58(22, seed))
+    }
+
+    #[test]
+    fn both_forms_win_every_context_as_the_sole_finding() {
+        let (v1, dashboard) = (v1(1), dashboard(2));
+        assert_eq!((v1.len(), dashboard.len()), (63, 30));
+        assert_sole_provider_finding(DETECTOR, TYPE, &v1);
+        assert_sole_provider_finding(DETECTOR, TYPE, &dashboard);
+        // A version 1 head that begins 3Z is still one 63-byte key.
+        let head_3z = format!("unkey_3Z{}unkeyv1{}", b58(6, 3), b58(42, 4));
+        assert_sole_provider_finding(DETECTOR, TYPE, &head_3z);
+        for key in [&v1, &dashboard] {
+            for input in [
+                format!("UNKEY_ROOT_KEY={key}\n"),
+                format!("# .env\nUNKEY_ROOT_KEY={key}\nUNKEY_API_ID=api_3ZsyntheticRevokedApiId\n"),
+                format!("const unkey = new Unkey({{ rootKey: \"{key}\" }});\n"),
+                format!(
+                    "curl -H 'Authorization: Bearer {key}' https://api.unkey.example/v2/keys.createKey\n"
+                ),
+            ] {
+                assert_sole_finding_in(&input, DETECTOR, TYPE, key);
+            }
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let head = b58(8, 5);
+        let tail = b58(42, 6);
+        let key = v1(7);
+        let dash = dashboard(8);
+        let swap = |text: &str, offset: usize, byte: &str| {
+            let mut copy = text.to_owned();
+            copy.replace_range(offset..=offset, byte);
+            copy
+        };
+        let mut twins = vec![
+            format!("unkey_{head}unkeyv1{}", &tail[..41]),
+            format!("unkey_{head}unkeyv1{tail}A"),
+            format!("unkey_{head}unkeyv2{tail}"),
+            format!("unkey_{head}Unkeyv1{tail}"),
+            format!("unkey_{}unkeyv1{tail}A", &head[..7]),
+            format!("unkey_3Y{}", b58(22, 9)),
+            format!("unkey_3Z{}", b58(21, 10)),
+            format!("unkey_3Z{}", b58(23, 11)),
+            format!("UNKEY_{}", &key[6..]),
+            format!("unkey-{}", &key[6..]),
+            format!("x{key}"),
+            format!("_{key}"),
+            format!("my_{key}"),
+            format!("{key}_x"),
+            format!("{dash}-x"),
+        ];
+        for offset in [6, 13, 40, 62] {
+            for bad in ["0", "O", "I", "l", "_"] {
+                twins.push(swap(&key, offset, bad));
+            }
+        }
+        for offset in [8, 20, 29] {
+            for bad in ["0", "O", "I", "l"] {
+                twins.push(swap(&dash, offset, bad));
+            }
+        }
+        assert_twins_unclaimed(DETECTOR, &twins);
+    }
+
+    #[test]
+    fn customer_prefixed_version_1_keys_are_a_bounded_false_negative_until_ruling_q10() {
+        for prefix in ["acme", "my_product", "a", "sixteen_chars_pfx"] {
+            let key = format!("{prefix}_{}unkeyv1{}", b58(8, 12), b58(42, 13));
+            assert_twins_unclaimed(DETECTOR, std::slice::from_ref(&key));
+        }
+    }
+
+    #[test]
+    fn benign_siblings_are_unclaimed() {
+        for input in [
+            "unkey_root_key unkey_mutations unkey_api_id\n".to_owned(),
+            "key_3ZsyntheticRevokedKeyId api_3ZsyntheticRevokedApiId\n".to_owned(),
+            "UNKEY_ROOT_KEY=unkey_xxxxxxxxxxxxxxxxxxxxxxxx\n".to_owned(),
+            "UNKEY_ROOT_KEY=${UNKEY_ROOT_KEY}\n".to_owned(),
+            "unkey_abcdefghijkmnopqrstuvwxy\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"unkey_".repeat(10_000));
+        assert_unclaimed(DETECTOR, &v1(14).repeat(100));
+        assert_repetition_line(DETECTOR, &v1(14), 200);
+        assert_repetition_line(DETECTOR, &dashboard(15), 200);
+    }
+
+    #[test]
+    fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
+        assert_parity(&parity_input(&v1(16)));
+        assert_parity(&parity_input(&dashboard(17)));
+    }
+}

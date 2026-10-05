@@ -6645,12 +6645,63 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "sourcegraph_access_token"
+    },
+    {
+      "detector": "unkey-root-key",
+      "evidence": {
+        "fixtureCount": 52,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "unkey-root-key-positive-bare",
+        "unkey-root-key-positive-chat-sentence",
+        "unkey-root-key-positive-chat-sentence-dashboard",
+        "unkey-root-key-positive-crlf-unicode-prefix",
+        "unkey-root-key-positive-curl-bearer",
+        "unkey-root-key-positive-dashboard-dotenv",
+        "unkey-root-key-positive-dashboard-form",
+        "unkey-root-key-positive-dotenv",
+        "unkey-root-key-positive-json-config",
+        "unkey-root-key-positive-json-token-key",
+        "unkey-root-key-positive-log",
+        "unkey-root-key-positive-punctuation-adjacent",
+        "unkey-root-key-positive-repeated-value",
+        "unkey-root-key-positive-sdk-call",
+        "unkey-root-key-positive-shell-export",
+        "unkey-root-key-positive-tool-call-arguments",
+        "unkey-root-key-positive-version-1-head-begins-3z",
+        "unkey-root-key-positive-x-api-key-header",
+        "unkey-root-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "unkey_root_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 144,
+    "supported": 145,
     "unresolved": 0
   }
 }

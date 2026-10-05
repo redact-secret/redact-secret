@@ -91,6 +91,7 @@ mod together_tavily;
 mod travisci;
 mod trigger_dev;
 mod twilio;
+mod unkey;
 mod vault;
 mod vercel;
 mod wandb;
@@ -407,6 +408,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("axiom-token", &axiom::AXIOM),
         row("xata-api-key", &xata::XATA),
         row("sourcegraph-token", &sourcegraph::SOURCEGRAPH),
+        row("unkey-root-key", &unkey::UNKEY),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -747,6 +749,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(sourcegraph::SOURCEGRAPH.shapes())],
     ),
     (
+        unkey::UNKEY.detector_id(),
+        &[Literals::Shapes(unkey::UNKEY.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -937,6 +943,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("axiom-token", Pack::Provider),
     ("xata-api-key", Pack::Provider),
     ("sourcegraph-token", Pack::Provider),
+    ("unkey-root-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1096,6 +1103,7 @@ mod tests {
                 "axiom-token",
                 "xata-api-key",
                 "sourcegraph-token",
+                "unkey-root-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1473,6 +1481,10 @@ mod tests {
         let axiom_token_input = format!("xaat-{}", "5e7c0ded-0000-4000-8000-deadbeef0001");
         let xata_api_key_input = format!("xau_{}{}", "SyntheticRevokedXataApiKey", "0".repeat(7));
         let sourcegraph_token_input = format!("sgp_local_{}", "5e7c0ded".repeat(5));
+        let unkey_root_key_input = format!(
+            "unkey_{}unkeyv1{}",
+            "Synthe1c", "SyntheticRevokedUnkeyRootKeyFixture1234567"
+        );
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1613,6 +1625,7 @@ mod tests {
             ("axiom-token", axiom_token_input.as_str()),
             ("xata-api-key", xata_api_key_input.as_str()),
             ("sourcegraph-token", sourcegraph_token_input.as_str()),
+            ("unkey-root-key", unkey_root_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }
