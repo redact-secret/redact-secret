@@ -19,7 +19,7 @@ use crate::policy::DefaultPolicy;
 use crate::policy::default_action_for;
 use crate::redact::default_placeholder_formatter;
 use crate::redact::redact_with_limits;
-use crate::registry::{DetectorRegistry, Profile, RegisteredDetector};
+use crate::registry::{DetectorEntry, DetectorRegistry, DetectorSet, Profile};
 use crate::types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     Obfuscation, PlaceholderFormatter, Policy, PolicyContext, ScanResult, Specificity,
@@ -97,7 +97,7 @@ impl RankedCandidate<'_> {
 fn validate_candidate<'a>(
     input: &str,
     normalized: &NormalizedInput<'_>,
-    registered: &'a RegisteredDetector,
+    registered: &DetectorEntry<'a>,
     candidate: &'a Candidate,
     detector_order: usize,
     candidate_order: usize,
@@ -115,7 +115,7 @@ fn validate_candidate<'a>(
     // A candidate whose matched text is exactly its public type or detector
     // id would let a public field mirror input; reject it as malformed.
     let matched = &scanned[scanned_range.start()..scanned_range.end()];
-    if matched == type_name || matched == registered.id() {
+    if matched == type_name || *registered.id == matched {
         return Err(SecretScanErrorCode::InvalidCandidate.into());
     }
 
@@ -142,7 +142,7 @@ fn validate_candidate<'a>(
 
     Ok(RankedCandidate {
         type_name: type_name_cow,
-        detector: registered.id_cow(),
+        detector: registered.id,
         confidence,
         specificity: candidate.effective_specificity(),
         resolved_severity,
@@ -179,22 +179,22 @@ fn validate_candidate<'a>(
 /// ruleset detector of the call.
 ///
 /// [`LiteralMatcher`]: crate::detectors::LiteralMatcher
-fn collect_candidates(
+fn collect_candidates<R: DetectorSet + ?Sized>(
     scanned: &str,
-    registry: &DetectorRegistry,
+    registry: &R,
     boundaries: &[usize],
 ) -> Result<Vec<Vec<Candidate>>, SecretScanError> {
     let context = DetectorContext::new(scanned.len());
     // Sized once up front: collecting through `Result` loses the iterator's
     // size hint, so the list grew by doubling on every call, and an
     // incremental session makes one call per closed line (issue #950).
-    let mut per_detector = Vec::with_capacity(registry.len());
+    let mut per_detector = Vec::with_capacity(registry.detector_count());
     let present = registry
-        .prefilter()
+        .compiled_prefilter()
         .map(|matcher| matcher.present(scanned.as_bytes()));
     let _scope = ScanScope::enter(scanned);
-    for (position, registered) in registry.detectors().iter().enumerate() {
-        if registered.required_literals().is_some()
+    for (position, registered) in registry.detector_entries().enumerate() {
+        if registered.declares_literals
             && present
                 .as_ref()
                 .is_some_and(|present| !present.contains(position))
@@ -204,8 +204,8 @@ fn collect_candidates(
             per_detector.push(Vec::new());
             continue;
         }
-        let detector = registered.detector();
-        let candidates = if boundaries.is_empty() || !is_reserved_detector_id(registered.id()) {
+        let detector = registered.detector;
+        let candidates = if boundaries.is_empty() || !is_reserved_detector_id(registered.id) {
             detector.detect(scanned, &context)
         } else {
             detect_each_unit(detector, scanned, boundaries)
@@ -222,13 +222,13 @@ fn collect_candidates(
 /// failure means the detector's declared literals miss one of its
 /// emission paths.
 #[cfg(debug_assertions)]
-fn assert_skip_is_exact(scanned: &str, context: DetectorContext, registered: &RegisteredDetector) {
-    let skipped = registered.detector().detect(scanned, &context);
+fn assert_skip_is_exact(scanned: &str, context: DetectorContext, registered: DetectorEntry<'_>) {
+    let skipped = registered.detector.detect(scanned, &context);
     assert!(
         skipped.as_ref().is_ok_and(Vec::is_empty),
         "prefilter skipped `{}`, which proposes candidates on this input: \
          its declared literals miss an emission path",
-        registered.id()
+        registered.id
     );
 }
 
@@ -572,9 +572,9 @@ pub fn run_detector_pipeline(
 /// from the selected candidates only, and they read the candidate and its
 /// text in the scan copy; the returned findings are the same either way.
 /// A candidate that loses overlap resolution is never evaluated.
-pub(crate) fn detect(
+pub(crate) fn detect<R: DetectorSet + ?Sized>(
     input: &str,
-    registry: &DetectorRegistry,
+    registry: &R,
     shadow: Option<&mut Vec<ShadowComparison>>,
 ) -> Result<Vec<DetectedFinding>, SecretScanError> {
     detect_units(input, 0, registry, &[], shadow).map(Option::unwrap_or_default)
@@ -613,10 +613,10 @@ pub(crate) fn detect(
 /// findings are returned, and every returned range and shadow comparison is
 /// relative to `input[lead..]`. The incremental session passes the already
 /// released line above a batch this way instead of holding it.
-pub(crate) fn detect_units(
+pub(crate) fn detect_units<R: DetectorSet + ?Sized>(
     input: &str,
     lead: usize,
-    registry: &DetectorRegistry,
+    registry: &R,
     unit_ends: &[usize],
     shadow: Option<&mut Vec<ShadowComparison>>,
 ) -> Result<Option<Vec<DetectedFinding>>, SecretScanError> {
@@ -643,7 +643,7 @@ pub(crate) fn detect_units(
     let mut ranked: Vec<RankedCandidate<'_>> = Vec::new();
     let mut unit_counts: Vec<usize> = Vec::new();
     for ((detector_order, registered), candidates) in
-        registry.detectors().iter().enumerate().zip(&per_detector)
+        registry.detector_entries().enumerate().zip(&per_detector)
     {
         if !boundaries.is_empty() && !candidates.is_empty() {
             unit_counts.clear();
@@ -674,7 +674,7 @@ pub(crate) fn detect_units(
             ranked.push(validate_candidate(
                 input,
                 &normalized,
-                registered,
+                &registered,
                 candidate,
                 detector_order,
                 candidate_order,
@@ -779,8 +779,20 @@ pub fn scan_with_limits(
     policy: &dyn Policy,
     limits: &WholeInputLimits,
 ) -> Result<Vec<Finding>, SecretScanError> {
+    scan_in(input, registry, policy, limits)
+}
+
+/// [`scan_with_limits`] over any detector set. The one implementation behind
+/// the [`DetectorRegistry`] function and the
+/// [`BuiltInRegistry`](crate::BuiltInRegistry) method, so the two cannot drift.
+pub(crate) fn scan_in<R: DetectorSet + ?Sized>(
+    input: &str,
+    registry: &R,
+    policy: &dyn Policy,
+    limits: &WholeInputLimits,
+) -> Result<Vec<Finding>, SecretScanError> {
     limits.check_input(input)?;
-    let detected = run_detector_pipeline(input, registry)?;
+    let detected = detect(input, registry, None)?;
     limits.check_findings(detected.len())?;
     let finding_count = detected.len();
     detected
@@ -861,7 +873,18 @@ pub fn scan_and_redact_with_limits(
     formatter: &dyn PlaceholderFormatter,
     limits: &WholeInputLimits,
 ) -> Result<ScanResult, SecretScanError> {
-    let findings = scan_with_limits(input, registry, policy, limits)?;
+    scan_and_redact_in(input, registry, policy, formatter, limits)
+}
+
+/// [`scan_and_redact_with_limits`] over any detector set; see [`scan_in`].
+pub(crate) fn scan_and_redact_in<R: DetectorSet + ?Sized>(
+    input: &str,
+    registry: &R,
+    policy: &dyn Policy,
+    formatter: &dyn PlaceholderFormatter,
+    limits: &WholeInputLimits,
+) -> Result<ScanResult, SecretScanError> {
+    let findings = scan_in(input, registry, policy, limits)?;
     let text = redact_with_limits(input, &findings, formatter, limits)?;
     Ok(ScanResult::new(text, findings))
 }

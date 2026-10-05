@@ -16,6 +16,18 @@ evidence is linked from each published version.
   semantics are unchanged; releases before this one do not export the call. A
   core-published readiness probe is deferred
   (`decision-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe`).
+- Rust: `BuiltInRegistry`, a `Send + Sync` registry for the `full` or `common`
+  built-in detectors with optional PII (#1178). One value can be shared by
+  reference or through an `Arc` across threads, so a pool no longer builds a
+  registry per worker. It has `with_built_in`, `with_common_built_in`,
+  `with_built_in_and_pii` and `with_common_built_in_and_pii` constructors and
+  `scan`, `scan_with_limits`, `scan_and_redact` and
+  `scan_and_redact_with_limits` methods that return exactly what the
+  `DetectorRegistry` functions return for the same profile and PII selection.
+  It accepts no custom detector or ruleset. The `Detector` trait is unchanged
+  and `DetectorRegistry` stays `!Send + !Sync`; `IncrementalSanitizer` still
+  builds its own registry per session. This is additive: the root name count
+  is 55.
 
 ### Fixed
 

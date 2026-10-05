@@ -48,7 +48,16 @@ fn main() -> Result<(), SecretScanError> {
 }
 ```
 
-Reuse the registry for repeated scans. `scan` returns policy-evaluated findings;
+Reuse the registry for repeated scans. A `DetectorRegistry` is `!Send` and `!Sync`
+(a custom `Detector` carries no thread-safety bound), so each thread builds its own.
+To build one registry and share it across threads, use `BuiltInRegistry`: the
+`full` or `common` built-ins plus optional PII, no custom detector, `Send + Sync`,
+with `scan`, `scan_with_limits`, `scan_and_redact` and `scan_and_redact_with_limits`
+methods that return exactly what the `DetectorRegistry` functions return
+(`BuiltInRegistry::with_built_in()`, `with_common_built_in()`,
+`with_built_in_and_pii(&selection)`, `with_common_built_in_and_pii(&selection)`).
+Wrap it in an `Arc` to hand it to workers. `IncrementalSanitizer` still builds its
+own registry per session. `scan` returns policy-evaluated findings;
 `redact` takes the original input, findings, and a formatter. `scan_and_redact`
 combines those operations. Ranges are half-open UTF-8 byte offsets on character
 boundaries. Never apply them to redacted output or log the selected input span.

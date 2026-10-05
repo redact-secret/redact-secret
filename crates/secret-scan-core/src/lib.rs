@@ -60,6 +60,7 @@
 //! | Result | [`ScanResult`], [`IncrementalResult`] |
 //! | Sanitized error | [`SecretScanError`], [`SecretScanErrorCode`], [`DetectorFailure`], [`PolicyFailure`], [`FormatterFailure`] |
 //! | Custom detectors | [`Detector`], [`Candidate`], [`DetectorContext`], [`DetectorRegistry`], [`RegisteredDetector`] |
+//! | Thread-shareable built-in registry | [`BuiltInRegistry`] |
 //! | Declarative rulesets | [`load_ruleset`], [`RulesetError`], [`RulesetErrorClass`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
@@ -172,7 +173,7 @@ pub use redact::{
     MAX_PLACEHOLDER_LENGTH, default_placeholder_formatter, redact, redact_with_limits,
     typed_placeholder_formatter,
 };
-pub use registry::{DetectorRegistry, Profile, RegisteredDetector};
+pub use registry::{BuiltInRegistry, DetectorRegistry, Profile, RegisteredDetector};
 pub use ruleset::{RulesetError, RulesetErrorClass, load_ruleset};
 pub use types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
