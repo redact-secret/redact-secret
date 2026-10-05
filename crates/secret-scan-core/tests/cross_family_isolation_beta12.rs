@@ -184,11 +184,28 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
 
 /// The #1014 third wave (#1106 to #1109): one value per finding type.
 fn third_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
-    vec![(
-        "pydantic-logfire-token",
-        "pydantic_logfire_token",
-        format!("pylf_v1_us_{}", filler(ALNUM, 44, 1)),
-    )]
+    vec![
+        (
+            "pydantic-logfire-token",
+            "pydantic_logfire_token",
+            format!("pylf_v1_us_{}", filler(ALNUM, 44, 1)),
+        ),
+        (
+            "square-token",
+            "square_access_token",
+            format!("EAAA{}", filler(BASE64URL, 60, 1)),
+        ),
+        (
+            "square-token",
+            "square_oauth_application_secret",
+            format!("sq0csp-{}", filler(BASE64URL, 44, 2)),
+        ),
+        (
+            "square-token",
+            "square_oauth_application_secret",
+            format!("sandbox-sq0csb-{}", filler(BASE64URL, 43, 3)),
+        ),
+    ]
 }
 
 /// The #1014 second wave (#1102 to #1105): one value per finding type.

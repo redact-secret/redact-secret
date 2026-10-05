@@ -7018,12 +7018,97 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "pydantic_logfire_token"
+    },
+    {
+      "detector": "square-token",
+      "evidence": {
+        "fixtureCount": 49,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "square-token-positive-access-token-with-dash-and-underscore",
+        "square-token-positive-bare",
+        "square-token-positive-chat-sentence",
+        "square-token-positive-crlf-unicode-prefix",
+        "square-token-positive-curl-bearer",
+        "square-token-positive-dotenv",
+        "square-token-positive-json-config",
+        "square-token-positive-json-token-key",
+        "square-token-positive-log",
+        "square-token-positive-mcp-server-config",
+        "square-token-positive-punctuation-adjacent",
+        "square-token-positive-repeated-value",
+        "square-token-positive-sdk-call",
+        "square-token-positive-shell-export",
+        "square-token-positive-tool-call-arguments",
+        "square-token-positive-x-api-key-header",
+        "square-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "square_access_token"
+    },
+    {
+      "detector": "square-token",
+      "evidence": {
+        "fixtureCount": 49,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "square-token-positive-sandbox-secret",
+        "square-token-positive-secret-43",
+        "square-token-positive-secret-44",
+        "square-token-positive-secret-client-secret-field"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "square_oauth_application_secret"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 153,
+    "supported": 155,
     "unresolved": 0
   }
 }

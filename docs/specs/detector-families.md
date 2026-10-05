@@ -147,6 +147,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `sonarqube_analysis_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `sonarqube_user_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `sourcegraph_access_token` | `sourcegraph-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-11-18 (provider generator and validator, R1; dated provider code, R9), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
+| `square_access_token` | `square-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs examples, R4 and R5, corroborated by scanner rules), exact widths rest on the Q8 recommendation (pending ruling) because the provider disclaims length validation, the conflicting `EAAl` and `EQAA` shapes are unclaimed, grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
+| `square_oauth_application_secret` | `square-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs examples, R4 and R5, corroborated by scanner rules), exact widths rest on the Q8 recommendation (pending ruling) because the provider disclaims length validation, the conflicting `EAAl` and `EQAA` shapes are unclaimed, grammar and trade-offs in [Beta.14 broad-discovery families, third wave (#1106 to #1109)](#beta14-broad-discovery-families-third-wave-1106-to-1109) |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #934 excludes a body that is one repeated character (`sk_test_` plus a run of `x`). Organization keys: `sk_org_`, `sk_org_live_` and `sk_org_test_` each + at least 20 `[A-Za-z0-9]`, same type and action (#1030, research #1012). The prefix is T1 (Stripe docs); the `live_`/`test_` segment rests on two independent implementations that branch on it and is not provider-documented; no issued key has been observed, so body length and alphabet after the segment are unverified and the floor stays the conservative lexical one. Trade-off: no new false-positive surface worth naming (the prefix is unique); it removes a likely total false negative for org keys outside named contexts; a body that is shorter than 20, holds `_`/`-`, or uses another mode word stays unclaimed (intentional false negative), and `rk_org_` stays excluded (Stripe: no such prefix). Not a support-status claim; `docs/support-matrix.md` keeps the organization row Unsupported |
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -1393,6 +1395,7 @@ handoff's stated recommendation and records the open ruling as a bounded limit.
 | Family | Detector | Grammar | Finding type | Tier |
 | --- | --- | --- | --- | --- |
 | `pydantic:logfire-token` (write and read tokens, API keys, AI Gateway key) | `pydantic-logfire-token` | `pylf_v` + 1 to 3 digits + `_` + `[a-z]{2,16}` region + `_` + optional 8-4-4-4-12 hex organization id (either case) + `_` + `[A-Za-z0-9]{20,}` | `pydantic_logfire_token` | T1 (SDK parsers, R1; provider scrubber, R2); the body floor and region cap are narrowing policy (pending ruling Q7, recommendation: allowed) |
+| `square:access-token` (and the OAuth application secret) | `square-token` | `EAAA` + exactly 60, `sq0csp-` + 43 or 44, or `sandbox-sq0csb-` + exactly 43, all `[A-Za-z0-9_-]` | `square_access_token` (`EAAA`), `square_oauth_application_secret` (`sq0csp-`, `sandbox-sq0csb-`) | T1 (provider docs examples, R4 and R5, corroborated by scanner rules); exact widths under the Q8 recommendation (pending ruling) |
 
 Pydantic Logfire ([#1106](https://github.com/redact-secret/redact-secret/issues/1106),
 [handoff](../audits/evidence/1014/pydantic-logfire.md)). The write token, read
@@ -1414,6 +1417,36 @@ that only a scanner fixture shows, an uppercase region and a glued value. False
 positives: a hand-written placeholder with more than 19 alphanumerics after the
 prefix; none is known. Cost: one prefix on the shared known-format scan plus a
 linear grammar check over the run.
+
+Square ([#1107](https://github.com/redact-secret/redact-secret/issues/1107),
+[handoff](../audits/evidence/1014/square.md)). Square tells integrators not to
+validate token length and its own examples disagree (an access token of 64
+characters in one place and a 63-character `EAAl` form in the `ObtainToken`
+reference; an application secret of 43 characters in the walkthrough and 44 in
+the reference and its generated SDK fixture). Ruling Q8 (may R5 still support
+an exact-width grammar when the provider disclaims length) is open; the row
+follows its recommendation: the stable widths are claimed, `EAAA` + exactly 60
+(four independent scanner and request sources also use 60) and the 43 or 44
+union for `sq0csp-` (the era-union precedent of Polar), and every conflicting
+shape is unclaimed and recorded as a bounded false negative: the `EAAl` + 59
+access token and the `EQAA` + 60 refresh token (one provider example each, not
+independent of the generated SDK fixture), `EAAA` and `sq0csp-` of any other
+width, and `sandbox-sq0csb-` of any width but 43 (one docs example). The
+structure-only issuance check that would settle the widths is a benchmarks-side
+item and is pending. Both secrets and the access token share the boundary
+`[A-Za-z0-9_-]` on both sides and are case-sensitive, so a longer run (a Meta
+`EAAA` Graph token, a Base64 blob) or a lowercase image digest cannot match;
+a `+`, `=` or `/` inside the body ends the run under the width (trufflehog's
+class would accept them, Square's own example has none). JWT-format access
+tokens stay with `jwt`; `sq0atp-` (scanner rules only), the `sq0cgb-`
+authorization code and the public application ids (`sq0idp-`, `sq0ids-`,
+`sq0idb-`, `sandbox-sq0idb-`) are unclaimed. False negatives: the above, any
+future traditional-token width change, and a glued value. False positives: an
+unrelated run of `EAAA` + 60 URL-safe bytes at identifier boundaries, which
+includes a Base64 line made almost entirely of `A` bytes after a lone `E`; the
+boundary makes this very rare, and an almost-constant-body post-check is an
+option for a later issue, not part of this contract. Cost: three prefixes on
+the shared known-format scan.
 
 ## Batch 1 credential slots (#1209 to #1213)
 

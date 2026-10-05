@@ -63,6 +63,13 @@ evidence is linked from each published version.
     + 20 or more `[A-Za-z0-9]` (`pydantic_logfire_token`). The 20-byte body
     floor and the 16-letter region cap are narrowing policy (ruling Q7 pending);
     legacy unprefixed tokens stay with generic context.
+  - `square-token` (#1107): Square `EAAA` + 60 access tokens
+    (`square_access_token`) and `sq0csp-` + 43 or 44 and `sandbox-sq0csb-` + 43
+    OAuth application secrets (`square_oauth_application_secret`), all over
+    `[A-Za-z0-9_-]`. Square disclaims length validation and its examples
+    disagree, so the `EAAl` 63-character access token, the `EQAA` refresh token
+    and every other width stay unclaimed (ruling Q8 pending); JWT-format tokens
+    stay with `jwt`.
 
 ### Fixed
 

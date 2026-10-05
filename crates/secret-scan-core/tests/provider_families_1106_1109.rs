@@ -34,6 +34,7 @@ fn filler(alphabet: &[u8], len: usize, seed: usize) -> String {
 }
 
 const ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const B64URL: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 const LOWER_HEX: &[u8] = b"0123456789abcdef";
 
 /// The probe contexts plus a few host forms, including a multibyte lead so a
@@ -270,5 +271,156 @@ mod pydantic_logfire {
     fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
         assert_parity(&parity_input(&v1("us", 44, 11)));
         assert_parity(&parity_input(&v2("eu", 30, 12)));
+    }
+}
+
+mod square {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "square-token";
+    const ACCESS: &str = "square_access_token";
+    const SECRET: &str = "square_oauth_application_secret";
+
+    pub(super) fn token(prefix: &str, len: usize, seed: usize) -> String {
+        format!("{prefix}{}", filler(B64URL, len, seed))
+    }
+
+    #[test]
+    fn every_stable_form_wins_every_context_as_the_sole_finding() {
+        assert_sole_provider_finding(DETECTOR, ACCESS, &token("EAAA", 60, 1));
+        assert_sole_provider_finding(DETECTOR, SECRET, &token("sq0csp-", 43, 2));
+        assert_sole_provider_finding(DETECTOR, SECRET, &token("sq0csp-", 44, 3));
+        assert_sole_provider_finding(DETECTOR, SECRET, &token("sandbox-sq0csb-", 43, 4));
+        // The body alphabet includes `-` and `_`.
+        let access = token("EAAA", 60, 5);
+        assert!(access.contains('-') || access.contains('_'));
+        for input in [
+            format!("SQUARE_ACCESS_TOKEN={access}\n"),
+            format!("const client = new Client({{ accessToken: \"{access}\" }});\n"),
+            format!(
+                "curl -H 'Authorization: Bearer {access}' https://connect.example.test/v2/payments\n"
+            ),
+            format!(
+                "{{\"mcpServers\":{{\"square\":{{\"env\":{{\"SQUARE_ACCESS_TOKEN\":\"{access}\"}}}}}}}}\n"
+            ),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, ACCESS, &access);
+        }
+        let secret = token("sq0csp-", 44, 6);
+        for input in [
+            format!("client_secret={secret}\n"),
+            format!(
+                "{{\"client_id\": \"sq0idp-{}\", \"client_secret\": \"{secret}\"}}\n",
+                filler(B64URL, 22, 7)
+            ),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, SECRET, &secret);
+        }
+    }
+
+    /// Ruling Q8 on #1014 is open: the provider disclaims length validation and
+    /// its own examples disagree (64 vs 63 characters, 43 vs 44), so the stable
+    /// widths are claimed and every conflicting shape is a bounded false
+    /// negative of this detector (it stays with generic context).
+    #[test]
+    fn conflicting_widths_and_shapes_are_a_bounded_false_negative_until_ruling_q8() {
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                token("EAAA", 59, 8),
+                token("EAAA", 61, 9),
+                // The 63-character access token and the 64-character refresh
+                // token of the `ObtainToken` reference.
+                token("EAAl", 59, 10),
+                token("EQAA", 60, 11),
+                token("EAAB", 60, 12),
+                token("sq0csp-", 42, 13),
+                token("sq0csp-", 45, 14),
+                token("sandbox-sq0csb-", 42, 15),
+                token("sandbox-sq0csb-", 44, 16),
+            ],
+        );
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let access = token("EAAA", 60, 17);
+        let secret = token("sq0csp-", 43, 18);
+        let body = filler(B64URL, 60, 19);
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("eaaa{body}"),
+                format!("EAAA{}+{}", &body[..30], &body[31..]),
+                format!("EAAA{}={}", &body[..30], &body[31..]),
+                format!("EAAA{}/{}", &body[..30], &body[31..]),
+                format!("SQ0CSP-{}", filler(B64URL, 43, 20)),
+                format!("sq0csp_{}", filler(B64URL, 43, 20)),
+                token("sq0idp-", 22, 21),
+                token("sq0ids-", 22, 21),
+                token("sq0idb-", 22, 21),
+                token("sandbox-sq0idb-", 22, 21),
+                token("sq0atp-", 22, 22),
+                token("sq0cgb-", 22, 23),
+                token("sandbox-sq0csp-", 43, 24),
+                format!("x{access}"),
+                format!("_{access}"),
+                format!("-{access}"),
+                format!("{access}_"),
+                format!("{access}-x"),
+                format!("{access}0"),
+                format!("x{secret}"),
+                format!("{secret}_x"),
+                format!("{secret}-x"),
+            ],
+        );
+    }
+
+    #[test]
+    fn benign_siblings_and_lookalikes_are_unclaimed() {
+        let digest = filler(LOWER_HEX, 64, 25);
+        let padding = format!("iVBORw0KGgoAAAANSUhEUgAAAEAAAAB{}\n", "A".repeat(80));
+        for input in [
+            format!("sha256:eaaa{}\n", &digest[..60]),
+            format!("sha256:{digest}\n"),
+            padding,
+            format!("EAAAAAAA{}\n", "A".repeat(100)),
+            "EAAA-your-access-token sq0csp-xxxxxxxx\n".to_owned(),
+            "SQUARE_ACCESS_TOKEN=${SQUARE_ACCESS_TOKEN}\n".to_owned(),
+            format!("SQUARE_ACCESS_TOKEN=EAAA{}\n", "*".repeat(60)),
+            "the sq0csp- prefix and the EAAA prefix\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_jwt_format_square_token_stays_with_the_jwt_detector() {
+        let jwt = format!(
+            "eyJ{}.eyJ{}.{}",
+            filler(B64URL, 30, 26),
+            filler(B64URL, 60, 27),
+            filler(B64URL, 43, 28)
+        );
+        let (_, findings) = whole_input(&format!("SQUARE_ACCESS_TOKEN={jwt}\n"));
+        assert!(detector_findings(&findings, DETECTOR).is_empty());
+        assert_sole_finding_in(&format!("x {jwt}\n"), "jwt", "jwt", &jwt);
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"EAAA".repeat(10_000));
+        assert_unclaimed(DETECTOR, &"sq0csp-".repeat(10_000));
+        assert_unclaimed(DETECTOR, &"sandbox-sq0csb-".repeat(5_000));
+        assert_unclaimed(DETECTOR, &token("EAAA", 60, 29).repeat(200));
+        assert_repetition_line(DETECTOR, &token("EAAA", 60, 29), 200);
+        assert_repetition_line(DETECTOR, &token("sq0csp-", 44, 30), 200);
+    }
+
+    #[test]
+    fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
+        assert_parity(&parity_input(&token("EAAA", 60, 31)));
+        assert_parity(&parity_input(&token("sq0csp-", 43, 32)));
+        assert_parity(&parity_input(&token("sandbox-sq0csb-", 43, 33)));
     }
 }

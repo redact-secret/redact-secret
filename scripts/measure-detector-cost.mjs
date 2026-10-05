@@ -165,6 +165,7 @@ export const CANONICAL_IDS = [
   "unkey-root-key",
   "buildkite-token",
   "pydantic-logfire-token",
+  "square-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -305,6 +306,7 @@ export const GROUPS = {
     "polar-token",
     "paddle-api-key",
     "unkey-root-key",
+    "square-token",
   ],
 };
 

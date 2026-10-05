@@ -1100,6 +1100,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0070ylf_v1_us_SyntheticRevokedLogfireToken0000",
       "schemes": null
+    },
+    {
+      "type": "square_access_token",
+      "detector": "square-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0045AAASyntheticRevokedSquareAccessToken000000000000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "square_oauth_application_secret",
+      "detector": "square-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073q0csp-SyntheticRevokedSquareAppSecret000000000000",
+      "schemes": null
     }
   ],
   "consumers": [

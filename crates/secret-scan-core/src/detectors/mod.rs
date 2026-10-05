@@ -85,6 +85,7 @@ mod shopify;
 mod slack;
 mod sonarqube;
 mod sourcegraph;
+mod square;
 mod stripe;
 mod telegram;
 mod terraform;
@@ -413,6 +414,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("unkey-root-key", &unkey::UNKEY),
         row("buildkite-token", &buildkite::BUILDKITE),
         row("pydantic-logfire-token", &pydantic_logfire::LOGFIRE),
+        row("square-token", &square::SQUARE),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -762,6 +764,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(pydantic_logfire::SHAPES)],
     ),
     (
+        square::SQUARE.detector_id(),
+        &[Literals::Shapes(square::SQUARE.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -955,6 +961,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("unkey-root-key", Pack::Provider),
     ("buildkite-token", Pack::Provider),
     ("pydantic-logfire-token", Pack::Provider),
+    ("square-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1117,6 +1124,7 @@ mod tests {
                 "unkey-root-key",
                 "buildkite-token",
                 "pydantic-logfire-token",
+                "square-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1500,6 +1508,7 @@ mod tests {
         );
         let buildkite_token_input = format!("bkua_{}", "5e7c0ded".repeat(5));
         let pydantic_logfire_token_input = format!("pylf_v1_us_{}", "5e7c0ded".repeat(5));
+        let square_token_input = format!("EAAA{}{}", "5e7c0ded".repeat(7), "5e7c");
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1646,6 +1655,7 @@ mod tests {
                 "pydantic-logfire-token",
                 pydantic_logfire_token_input.as_str(),
             ),
+            ("square-token", square_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }
