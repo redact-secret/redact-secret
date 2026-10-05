@@ -69,7 +69,12 @@ scanned; validation cannot establish that a finding belongs to that input.
 
 Only `redact` and `block` consume placeholders. Default labels are `<SECRET_1>`,
 `<SECRET_2>`, etc.; `warn` and `allow` preserve input. Placeholders are not an
-encoding of the removed text and cannot be used to recover it.
+encoding of the removed text and cannot be used to recover it. Numbering restarts
+at 1 on every call; a host that scans several leaves of one request offsets the
+index in its own formatter, as the [Rust](../guides/rust.md#request-wide-placeholder-numbering),
+[JavaScript](../guides/javascript.md#request-wide-placeholder-numbering) and
+[Python](../guides/python.md#request-wide-placeholder-numbering) guides show. The
+core provides no helper for it.
 
 ## Detector profiles
 

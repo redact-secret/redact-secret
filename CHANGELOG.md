@@ -28,6 +28,14 @@ evidence is linked from each published version.
   and `DetectorRegistry` stays `!Send + !Sync`; `IncrementalSanitizer` still
   builds its own registry per session. This is additive: the root name count
   is 55.
+- Documented, tested recipe for request-wide placeholder numbering across the
+  string leaves of one request (#1180), in the Rust, JavaScript and Python
+  guides. A custom formatter adds a running offset to the placeholder index it
+  already receives; the host keeps one integer. Tests in each language prove
+  unique numbering across leaves, per-occurrence numbering of identical values,
+  that `warn` takes no number and `block` does, and that the same recipe works
+  for an incremental session per leaf. No new public API
+  (`decision-keep-request-wide-placeholder-numbering-a-documented-recipe`).
 
 ### Fixed
 

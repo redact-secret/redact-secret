@@ -51,6 +51,7 @@ Current rules: `docs/specs/engine.md`.
 - [Settle the structured-file, URL-carrier and control root causes that #1203 collected](2026-10-04-settle-the-open-structured-file-url-carrier-and-control-roots-of-1203.md)
 - [Add a Send + Sync built-in-only registry as a distinct type](2026-10-05-add-a-send-sync-built-in-only-registry-as-a-distinct-type.md)
 - [Add a side-effect-free status query and defer a published readiness probe](2026-10-05-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe.md)
+- [Keep request-wide placeholder numbering a documented recipe, not a helper](2026-10-05-keep-request-wide-placeholder-numbering-a-documented-recipe.md)
 - [Settle the root causes that credential-evidence snapshot-2026.10.04.4 added](2026-10-05-settle-the-snapshot-2026-10-04-4-added-case-roots.md)
 
 ## Distribution
