@@ -227,3 +227,112 @@ mod xata {
         assert_parity(&parity_input(&key("xao_", 36, 6)));
     }
 }
+
+mod sourcegraph {
+    use super::*;
+
+    pub(super) const DETECTOR: &str = "sourcegraph-token";
+    const TYPE: &str = "sourcegraph_access_token";
+    const LOWER_HEX: &[u8] = b"0123456789abcdef";
+
+    fn hex(seed: usize) -> String {
+        filler(LOWER_HEX, 40, seed)
+    }
+
+    pub(super) fn forms(seed: usize) -> Vec<String> {
+        vec![
+            format!("sgp_{}", hex(seed)),
+            format!("sgp_local_{}", hex(seed + 1)),
+            format!("sgp_{}_{}", filler(LOWER_HEX, 16, seed + 2), hex(seed + 3)),
+            format!("sgp_{}", hex(seed + 4).to_uppercase()),
+            format!("sgp_{}_{}", filler(ALNUM, 32, seed + 5), hex(seed + 6)),
+        ]
+    }
+
+    #[test]
+    fn every_form_wins_every_context_as_the_sole_finding() {
+        for token in forms(1) {
+            assert_sole_provider_finding(DETECTOR, TYPE, &token);
+        }
+        let token = &forms(2)[1];
+        for input in [
+            format!("SRC_ACCESS_TOKEN={token}\n"),
+            format!(
+                "# .env\nSRC_ENDPOINT=https://sourcegraph.example.test\nSRC_ACCESS_TOKEN={token}\n"
+            ),
+            format!("Authorization: token {token}\n"),
+            format!("src login -endpoint https://sourcegraph.example.test -token {token}\n"),
+            format!(
+                "{{\"mcpServers\":{{\"sourcegraph\":{{\"env\":{{\"SRC_ACCESS_TOKEN\":\"{token}\"}}}}}}}}\n"
+            ),
+        ] {
+            assert_sole_finding_in(&input, DETECTOR, TYPE, token);
+        }
+    }
+
+    #[test]
+    fn twins_are_unclaimed() {
+        let body = hex(3);
+        let base = format!("sgp_{body}");
+        let mut non_hex = body.clone();
+        non_hex.replace_range(39..40, "g");
+        assert_twins_unclaimed(
+            DETECTOR,
+            &[
+                format!("sgp_{}", &body[..39]),
+                format!("sgp_{body}a"),
+                format!("sgp_local_{}", &body[..39]),
+                format!("sgp_local_{body}0"),
+                format!("sgp_{non_hex}"),
+                format!("sgp_local{body}"),
+                format!("sgp__{body}"),
+                format!("sgp_{}_{body}", filler(ALNUM, 33, 4)),
+                format!("SGP_{body}"),
+                format!("sgp-{body}"),
+                format!("xsgp_{body}"),
+                format!("_{base}"),
+                format!("{base}-x"),
+                format!("{base}_tail"),
+            ],
+        );
+    }
+
+    #[test]
+    fn excluded_shapes_and_benign_text_are_unclaimed() {
+        let sha = hex(5);
+        for input in [
+            format!("commit {sha}\n"),
+            format!("sgph_{sha}\n"),
+            format!("sgph_local_{sha}\n"),
+            format!("sgd_{}\n", filler(LOWER_HEX, 64, 6)),
+            format!("slk_{sha}\n"),
+            format!("sgp_{}\n", "x".repeat(40)),
+            "SRC_ACCESS_TOKEN=${SRC_ACCESS_TOKEN}\n".to_owned(),
+            "SRC_ACCESS_TOKEN=sgp_xxxxxxxx\n".to_owned(),
+            "the sgp_token word alone\n".to_owned(),
+        ] {
+            assert_unclaimed(DETECTOR, &input);
+        }
+    }
+
+    #[test]
+    fn a_bare_40_hex_value_is_never_a_finding_of_any_detector_without_context() {
+        let (_, findings) = whole_input(&format!("see commit {}\n", hex(7)));
+        assert!(findings.is_empty(), "{findings:?}");
+    }
+
+    #[test]
+    fn a_repetition_line_stays_bounded_and_exact() {
+        assert_unclaimed(DETECTOR, &"sgp_".repeat(10_000));
+        assert_unclaimed(DETECTOR, &format!("sgp_{}", "a_".repeat(5_000)));
+        assert_unclaimed(DETECTOR, &format!("sgp_{}", hex(8)).repeat(200));
+        assert_repetition_line(DETECTOR, &format!("sgp_local_{}", hex(8)), 200);
+    }
+
+    #[test]
+    fn whole_input_every_two_chunk_partition_and_per_line_sessions_agree() {
+        for token in forms(9) {
+            assert_parity(&parity_input(&token));
+        }
+    }
+}

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 3828,
+  "fixtureCount": 3875,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -88299,6 +88299,856 @@
         "plain-text"
       ],
       "input": "\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5\u0078au_NUbipx4BIPXelsz7ELSZhov29HOVcjry5",
+      "expected": [],
+      "note": "Glued copies continue into each other, so no copy has both boundaries.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "sourcegraph-token-positive-bare",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 61
+        }
+      ],
+      "note": "The reviewed shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "sourcegraph-token-positive-dotenv",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SRC_ACCESS_TOKEN=\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 78
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "sourcegraph-token-positive-shell-export",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export SRC_ACCESS_TOKEN=\"\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\"\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 86
+        }
+      ],
+      "note": "A quoted shell export is reported at exactly the value."
+    },
+    {
+      "id": "sourcegraph-token-positive-yaml",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  SRC_ACCESS_TOKEN: \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 86
+        }
+      ],
+      "note": "A YAML mapping value is reported at exactly the value."
+    },
+    {
+      "id": "sourcegraph-token-positive-json-config",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"env\": {\"SRC_ACCESS_TOKEN\": \"\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\"}}",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 91
+        }
+      ],
+      "note": "A JSON config value is reported at exactly the value."
+    },
+    {
+      "id": "sourcegraph-token-positive-json-token-key",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\"}",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 72
+        }
+      ],
+      "note": "A JSON \"token\" value, which generic detection misses, is reported at exactly the value."
+    },
+    {
+      "id": "sourcegraph-token-positive-sdk-call",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client = SourcegraphClient(token=\"\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\")\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 34,
+          "end": 95
+        }
+      ],
+      "note": "An SDK or tool configuration is reported at exactly the key."
+    },
+    {
+      "id": "sourcegraph-token-overlap-bearer-header",
+      "detector": "sourcegraph-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 83
+        }
+      ],
+      "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+    },
+    {
+      "id": "sourcegraph-token-positive-x-api-key-header",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 72
+        }
+      ],
+      "note": "A request header value is reported at exactly the key."
+    },
+    {
+      "id": "sourcegraph-token-positive-curl-bearer",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Bearer \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2' https://api.example.test/v1\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 92
+        }
+      ],
+      "note": "A curl Bearer header is reported at exactly the key, once."
+    },
+    {
+      "id": "sourcegraph-token-positive-tool-call-arguments",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\": \"configure\", \"arguments\": {\"api_key\": \"\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\"}}",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 109
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the key."
+    },
+    {
+      "id": "sourcegraph-token-positive-chat-sentence",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2 can you debug this?",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 76
+        }
+      ],
+      "note": "A key pasted into a chat sentence, which generic detection misses, is reported at exactly the key."
+    },
+    {
+      "id": "sourcegraph-token-positive-log",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-10-05T09:15:00Z INFO client init api_key=\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2 region=us\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 107
+        }
+      ],
+      "note": "A log line value is reported at exactly the key."
+    },
+    {
+      "id": "sourcegraph-token-positive-punctuation-adjacent",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2.",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 72
+        }
+      ],
+      "note": "Sentence punctuation after the key is not part of the span."
+    },
+    {
+      "id": "sourcegraph-token-positive-crlf-unicode-prefix",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 \ud0a4 reviewed format\r\n\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\n\r\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 89
+        }
+      ],
+      "note": "CRLF, Hangul and astral characters before the value keep the UTF-8 byte range exact."
+    },
+    {
+      "id": "sourcegraph-token-overlap-context",
+      "detector": "sourcegraph-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "API_KEY=\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 69
+        }
+      ],
+      "note": "The provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "sourcegraph-token-positive-repeated-value",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2 \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 61
+        },
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 62,
+          "end": 123
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "sourcegraph-token-positive-local-identifier",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_local_7e5c3b2907f6d4b3a18f7e5c3b2907f6d4b3a18f",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        }
+      ],
+      "note": "The `local` instance identifier form is reported at exactly the token."
+    },
+    {
+      "id": "sourcegraph-token-positive-no-identifier",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        }
+      ],
+      "note": "The form with no instance identifier is reported at exactly the token."
+    },
+    {
+      "id": "sourcegraph-token-positive-uppercase-hex",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_18F6D5C3A1907E5D4B2918F6D5C3A1907E5D4B29",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        }
+      ],
+      "note": "The validator accepts an upper-case hex body, so it is claimed."
+    },
+    {
+      "id": "sourcegraph-token-positive-alphanumeric-identifier",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_QXels07ELSahov2AHOVckry5CKRYfmu1_b2907f6d4b3a18f7e5c3b2907f6d4b3a18f7e5c3",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 77
+        }
+      ],
+      "note": "The 2025 validator accepts any alphanumeric identifier up to the 32-byte cap."
+    },
+    {
+      "id": "sourcegraph-token-positive-authorization-token-scheme",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: token \u0073gp_local_7e5c3b2907f6d4b3a18f7e5c3b2907f6d4b3a18f\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 71
+        }
+      ],
+      "note": "The `token` scheme the src CLI sends is reported at exactly the token."
+    },
+    {
+      "id": "sourcegraph-token-positive-src-login-command",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "src login -endpoint https://sourcegraph.example.test -token \u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\n",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 60,
+          "end": 121
+        }
+      ],
+      "note": "A src login command line is reported at exactly the token."
+    },
+    {
+      "id": "sourcegraph-token-positive-mcp-server-config",
+      "detector": "sourcegraph-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mcpServers\": {\"sourcegraph\": {\"env\": {\"SRC_ACCESS_TOKEN\": \"\u0073gp_d4b2918f6d5c3a19_a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2\"}}}}",
+      "expected": [
+        {
+          "detector": "sourcegraph-token",
+          "type": "sourcegraph_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 61,
+          "end": 122
+        }
+      ],
+      "note": "An MCP server env block is reported at exactly the token."
+    },
+    {
+      "id": "sourcegraph-token-boundary-hex-39",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b29",
+      "expected": [],
+      "note": "A 39-hex body is below the provider's 40."
+    },
+    {
+      "id": "sourcegraph-token-boundary-hex-41",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290a",
+      "expected": [],
+      "note": "A 41-hex body is above the provider's 40."
+    },
+    {
+      "id": "sourcegraph-token-boundary-local-hex-39",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_local_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b29",
+      "expected": [],
+      "note": "A 39-hex body behind an identifier is below 40."
+    },
+    {
+      "id": "sourcegraph-token-boundary-local-hex-41",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_local_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290a",
+      "expected": [],
+      "note": "A 41-hex body behind an identifier is above 40."
+    },
+    {
+      "id": "sourcegraph-token-boundary-non-hex-tail",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b29g",
+      "expected": [],
+      "note": "A non-hex byte in the body fails the grammar."
+    },
+    {
+      "id": "sourcegraph-token-boundary-identifier-without-underscore",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_local8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290",
+      "expected": [],
+      "note": "An identifier must be closed by an underscore."
+    },
+    {
+      "id": "sourcegraph-token-boundary-identifier-too-long",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_3AHOVdkry5DKRYfnu18FNUbipx4BIPXel_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290",
+      "expected": [],
+      "note": "An identifier over the 32-byte cap is out of contract."
+    },
+    {
+      "id": "sourcegraph-token-boundary-empty-identifier",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp__8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290",
+      "expected": [],
+      "note": "An empty identifier is not an identifier."
+    },
+    {
+      "id": "sourcegraph-token-boundary-uppercase-prefix",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SGP_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290",
+      "expected": [],
+      "note": "The prefix is case-sensitive."
+    },
+    {
+      "id": "sourcegraph-token-boundary-hyphen-separator",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sgp-8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290",
+      "expected": [],
+      "note": "The separator is an underscore."
+    },
+    {
+      "id": "sourcegraph-token-boundary-glued-prefix",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x\u0073gp_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290",
+      "expected": [],
+      "note": "A letter glued before the prefix rejects the match."
+    },
+    {
+      "id": "sourcegraph-token-boundary-glued-trailing-dash",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290-x",
+      "expected": [],
+      "note": "A dash glued after the body rejects the match."
+    },
+    {
+      "id": "sourcegraph-token-boundary-glued-trailing-underscore",
+      "detector": "sourcegraph-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290_tail",
+      "expected": [],
+      "note": "An underscore run glued after the body rejects the match."
+    },
+    {
+      "id": "sourcegraph-token-negative-bare-40-hex-commit-id",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "commit 8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290\n",
+      "expected": [],
+      "note": "A bare 40-hex value collides with commit ids and is never claimed."
+    },
+    {
+      "id": "sourcegraph-token-negative-sgph-prefix",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gph_8f6d4c3a1807e5c4b2908f6d4c3a1807e5c4b290\n",
+      "expected": [],
+      "note": "\u0073gph_ is a later extension and stays unclaimed."
+    },
+    {
+      "id": "sourcegraph-token-negative-sgd-cody-gateway-key",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gd_2907e6d4b2a18f6e5c3a2907e6d4b2a18f6e5c3a2907e6d4b2a18f6e5c3a2907\n",
+      "expected": [],
+      "note": "\u0073gd_ is a later extension and stays unclaimed."
+    },
+    {
+      "id": "sourcegraph-token-negative-placeholder",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SRC_ACCESS_TOKEN=\u0073gp_xxxxxxxx\n",
+      "expected": [],
+      "note": "A help-text placeholder fails the 40-hex body."
+    },
+    {
+      "id": "sourcegraph-token-negative-non-hex-run",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "40 non-hex letters are not a token."
+    },
+    {
+      "id": "sourcegraph-token-negative-env-reference",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SRC_ACCESS_TOKEN=${SRC_ACCESS_TOKEN}\n",
+      "expected": [],
+      "note": "A variable reference is not a literal token."
+    },
+    {
+      "id": "sourcegraph-token-negative-word",
+      "detector": "sourcegraph-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "the \u0073gp_token word alone\n",
+      "expected": [],
+      "note": "A short identifier is not a token."
+    },
+    {
+      "id": "sourcegraph-token-adversarial-prefix-run",
+      "detector": "sourcegraph-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_\u0073gp_",
+      "expected": [],
+      "note": "Repeated prefixes with no body never reach 40 bytes, and the scan stays linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "sourcegraph-token-adversarial-underscore-run",
+      "detector": "sourcegraph-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_a_",
+      "expected": [],
+      "note": "A long underscore run after the prefix is rejected in one linear pass.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "sourcegraph-token-adversarial-glued-tokens",
+      "detector": "sourcegraph-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c\u0073gp_4b2908f6d4c3a1807e5c4b2908f6d4c3a1807e5c",
       "expected": [],
       "note": "Glued copies continue into each other, so no copy has both boundaries.",
       "resource": {

@@ -138,6 +138,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `slack_user_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `sonarqube_analysis_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `sonarqube_user_token` | `sonarqube-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider server generator and token type enum, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
+| `sourcegraph_access_token` | `sourcegraph-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 as of 2025-11-18 (provider generator and validator, R1; dated provider code, R9), grammar and trade-offs in [Beta.14 broad-discovery families, second wave (#1102 to #1105)](#beta14-broad-discovery-families-second-wave-1102-to-1105) |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #934 excludes a body that is one repeated character (`sk_test_` plus a run of `x`). Organization keys: `sk_org_`, `sk_org_live_` and `sk_org_test_` each + at least 20 `[A-Za-z0-9]`, same type and action (#1030, research #1012). The prefix is T1 (Stripe docs); the `live_`/`test_` segment rests on two independent implementations that branch on it and is not provider-documented; no issued key has been observed, so body length and alphabet after the segment are unverified and the floor stays the conservative lexical one. Trade-off: no new false-positive surface worth naming (the prefix is unique); it removes a likely total false negative for org keys outside named contexts; a body that is shorter than 20, holds `_`/`-`, or uses another mode word stays unclaimed (intentional false negative), and `rk_org_` stays excluded (Stripe: no such prefix). Not a support-status claim; `docs/support-matrix.md` keeps the organization row Unsupported |
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -1263,6 +1264,7 @@ evidence.
 | Family | Detector | Grammar | Finding type | Tier |
 | --- | --- | --- | --- | --- |
 | `xata:api-key` | `xata-api-key` | `xau_` or `xao_` + `[0-9A-Za-z]{32,36}` (36 to 40 in total) | `xata_user_api_key` (`xau_`), `xata_organization_api_key` (`xao_`) | T1 (provider generator and validator, R1 and R9; width derived from the generator's encoder) |
+| `sourcegraph:access-token` | `sourcegraph-token` | `sgp_` + optional `[A-Za-z0-9]{1,32}_` instance identifier + exactly 40 hex (44 to 77 in total) | `sourcegraph_access_token` | T1 as of 2025-11-18 (provider generator and the vendored validator, R1 and R9) |
 
 Xata ([#1102](https://github.com/redact-secret/redact-secret/issues/1102),
 [handoff](../audits/evidence/1014/xata.md)). The body is 20 random bytes plus a
@@ -1280,6 +1282,25 @@ False positives: an unrelated `xau_`/`xao_` followed by 32 to 36
 alphanumerics with no `_` or `-`; none is known, but without the checksum a
 random alphanumeric run after the prefix is accepted. Cost: two prefixes on
 the shared known-format scan plus a 4-byte-offset width check.
+
+Sourcegraph ([#1103](https://github.com/redact-secret/redact-secret/issues/1103),
+[handoff](../audits/evidence/1014/sourcegraph.md)). The instance identifier the
+generator issues is `local` or 16 hex; the detector claims the wider
+alphanumeric identifier the 2025 validator accepts, capped at 32 bytes so a
+long `sgp_<word>_` cannot consume a line, and takes the body in either hex case
+as the validator does. A **bare 40-hex token is never claimed**: it has no
+distinctive shape and collides with git SHAs (the scanners' fallback
+alternative is deliberately not copied). `sgph_` (accepted by the validator,
+issuer unknown) and `sgd_` + 64 hex (the Cody Gateway user key, one provider
+source) are a later extension and stay unclaimed, as do `slk_` tokens. The run
+after `sgp_` is rejected whole unless it has exactly the grammar: a 39- or
+41-hex body, an identifier with no closing `_`, an identifier over 32 bytes, a
+byte of `[A-Za-z0-9_-]` before `sgp_` and a `-` after the token are intentional
+false negatives. The server repository is private, so a post-2025 generator
+change cannot be ruled out; the maintained validators would have followed it.
+False positives: an unrelated `sgp_<word>_` + exactly 40 hex; none is known.
+Cost: one prefix on the shared known-format scan plus a linear post check over
+the run.
 
 ## Rules
 
@@ -1321,6 +1342,7 @@ the shared known-format scan plus a 4-byte-offset width check.
 | Honeycomb `hc[a-z]ik_`/`hc[a-z]ic_` + 58 lowercase alphanumeric ingest keys are reported as `honeycomb_ingest_key` at provider specificity, bare or in any context; management keys stay unclaimed until their issuance check, and key ids, configuration and classic hex keys stay unclaimed ([#1034](https://github.com/redact-secret/redact-secret/issues/1034), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Axiom `xaat-` and `xapt-` + lowercase-hex UUID tokens are reported as `axiom_api_token` and `axiom_personal_token` at provider specificity, bare or in any context; placeholders and bare UUIDs stay unclaimed ([#1035](https://github.com/redact-secret/redact-secret/issues/1035), section above). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Xata `xau_` and `xao_` + 32 to 36 `[A-Za-z0-9]` API keys are reported as `xata_user_api_key` and `xata_organization_api_key` at provider specificity, bare or in any context; the CRC32 never rejects a match, and classic-platform keys stay unclaimed ([#1102](https://github.com/redact-secret/redact-secret/issues/1102), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
+| Sourcegraph `sgp_` + optional alphanumeric instance identifier + 40 hex access tokens are reported as `sourcegraph_access_token` at provider specificity, bare or in any context; bare 40-hex tokens, `sgph_` and `sgd_` stay unclaimed ([#1103](https://github.com/redact-secret/redact-secret/issues/1103), section above, #1014). | generic policy default, no dedicated ADR; applies the existing prefixed-provider policy to one more family |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | Clerk `sk_live_`/`sk_test_` secret keys are reported as `stripe_credential` and stay under that type: known limitation, no Clerk family. Both providers use the same lead and a bare alphanumeric body, and neither publishes a documented body length to separate them (Stripe's is open-ended `at_least` 20 by design; Clerk's public docs show only placeholders, and no issued sample is recorded under `docs/audits/evidence/860/`), so a length or alphabet split would rest on unrecorded observation and would either leave real Stripe keys under a Clerk label or miss Clerk keys. Redaction is unaffected (both types are `always-redact`); only the type label is wrong. Revisit with an issued Clerk key body plus a recorded provider source ([#957](https://github.com/redact-secret/redact-secret/issues/957), [#860](https://github.com/redact-secret/redact-secret/issues/860) disposition row 49). | generic policy default, no dedicated ADR; records the ambiguity as a known limitation |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

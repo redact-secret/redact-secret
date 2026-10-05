@@ -43,6 +43,9 @@ evidence is linked from each published version.
     keys (`xata_user_api_key`, `xata_organization_api_key`). The CRC32 never
     rejects a match (ruling Q1 pending); classic-platform keys stay with generic
     context.
+  - `sourcegraph-token` (#1103): Sourcegraph `sgp_` + optional instance
+    identifier + 40 hex access tokens (`sourcegraph_access_token`). A bare
+    40-hex token (a git SHA shape), `sgph_` and `sgd_` stay unclaimed.
 
 ### Fixed
 

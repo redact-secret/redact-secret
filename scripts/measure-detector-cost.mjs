@@ -161,6 +161,7 @@ export const CANONICAL_IDS = [
   "honeycomb-api-key",
   "axiom-token",
   "xata-api-key",
+  "sourcegraph-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -268,6 +269,7 @@ export const GROUPS = {
     "trigger-dev-token",
     "inngest-signing-key",
     "sonarqube-token",
+    "sourcegraph-token",
   ],
   "pkg-registry": [
     "pypi-token",

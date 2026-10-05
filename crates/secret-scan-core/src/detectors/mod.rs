@@ -82,6 +82,7 @@ mod sentry;
 mod shopify;
 mod slack;
 mod sonarqube;
+mod sourcegraph;
 mod stripe;
 mod telegram;
 mod terraform;
@@ -405,6 +406,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("honeycomb-api-key", &honeycomb::HONEYCOMB_INGEST_KEY),
         row("axiom-token", &axiom::AXIOM),
         row("xata-api-key", &xata::XATA),
+        row("sourcegraph-token", &sourcegraph::SOURCEGRAPH),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -741,6 +743,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         &[Literals::Shapes(xata::XATA.shapes())],
     ),
     (
+        sourcegraph::SOURCEGRAPH.detector_id(),
+        &[Literals::Shapes(sourcegraph::SOURCEGRAPH.shapes())],
+    ),
+    (
         additional_providers::HUGGING_FACE.detector_id(),
         &[Literals::Shapes(
             additional_providers::HUGGING_FACE.shapes(),
@@ -930,6 +936,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("honeycomb-api-key", Pack::Provider),
     ("axiom-token", Pack::Provider),
     ("xata-api-key", Pack::Provider),
+    ("sourcegraph-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1088,6 +1095,7 @@ mod tests {
                 "honeycomb-api-key",
                 "axiom-token",
                 "xata-api-key",
+                "sourcegraph-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1464,6 +1472,7 @@ mod tests {
         );
         let axiom_token_input = format!("xaat-{}", "5e7c0ded-0000-4000-8000-deadbeef0001");
         let xata_api_key_input = format!("xau_{}{}", "SyntheticRevokedXataApiKey", "0".repeat(7));
+        let sourcegraph_token_input = format!("sgp_local_{}", "5e7c0ded".repeat(5));
         let wandb_api_key_input = format!(
             "wandb_v1_{}",
             &"SyntheticRevokedWandbApiKeyFixture".repeat(3)[..77]
@@ -1603,6 +1612,7 @@ mod tests {
             ("honeycomb-api-key", honeycomb_api_key_input.as_str()),
             ("axiom-token", axiom_token_input.as_str()),
             ("xata-api-key", xata_api_key_input.as_str()),
+            ("sourcegraph-token", sourcegraph_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

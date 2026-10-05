@@ -174,6 +174,11 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
             format!("xao_{}", filler(ALNUM, 34, 2)),
         ),
         (
+            "sourcegraph-token",
+            "sourcegraph_access_token",
+            format!("sgp_local_{}", filler(LOWER_HEX, 40, 3)),
+        ),
+        (
             "google-oauth-client-secret",
             "google_oauth_client_secret",
             format!("GOCSPX-{}", filler(BASE64URL, 28, 1)),

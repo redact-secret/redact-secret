@@ -1030,6 +1030,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0078ao_SyntheticRevokedXataOrgApiKey0000",
       "schemes": null
+    },
+    {
+      "type": "sourcegraph_access_token",
+      "detector": "sourcegraph-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073gp_local_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
     }
   ],
   "consumers": [

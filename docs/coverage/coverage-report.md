@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 143/143 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 144/144 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 143 |
+| supported | 144 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 154.
+Coverage declarations: 155.
 
 ## Coverage by detector
 
@@ -120,6 +120,7 @@ Coverage declarations: 154.
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | sonarqube-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
+| sourcegraph-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -261,6 +262,7 @@ Coverage declarations: 154.
 | slack_user_token | slack-token | provider | supported | not-applicable | none |
 | sonarqube_analysis_token | sonarqube-token | provider | supported | not-applicable | none |
 | sonarqube_user_token | sonarqube-token | provider | supported | not-applicable | none |
+| sourcegraph_access_token | sourcegraph-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
@@ -309,15 +311,15 @@ Coverage declarations: 154.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 154 | 0 | 0 |
-| boundary | 143 | 0 | 0 |
-| host-context | 143 | 0 | 0 |
+| adversarial | 155 | 0 | 0 |
+| boundary | 144 | 0 | 0 |
+| host-context | 144 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 154 | 0 | 0 |
-| near-miss-negative | 143 | 0 | 0 |
-| overlap | 143 | 0 | 0 |
-| positive | 143 | 0 | 0 |
-| range | 154 | 0 | 0 |
+| malformed | 155 | 0 | 0 |
+| near-miss-negative | 144 | 0 | 0 |
+| overlap | 144 | 0 | 0 |
+| positive | 144 | 0 | 0 |
+| range | 155 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

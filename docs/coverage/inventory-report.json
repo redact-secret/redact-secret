@@ -6591,12 +6591,66 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "xata_organization_api_key"
+    },
+    {
+      "detector": "sourcegraph-token",
+      "evidence": {
+        "fixtureCount": 47,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sourcegraph-token-positive-alphanumeric-identifier",
+        "sourcegraph-token-positive-authorization-token-scheme",
+        "sourcegraph-token-positive-bare",
+        "sourcegraph-token-positive-chat-sentence",
+        "sourcegraph-token-positive-crlf-unicode-prefix",
+        "sourcegraph-token-positive-curl-bearer",
+        "sourcegraph-token-positive-dotenv",
+        "sourcegraph-token-positive-json-config",
+        "sourcegraph-token-positive-json-token-key",
+        "sourcegraph-token-positive-local-identifier",
+        "sourcegraph-token-positive-log",
+        "sourcegraph-token-positive-mcp-server-config",
+        "sourcegraph-token-positive-no-identifier",
+        "sourcegraph-token-positive-punctuation-adjacent",
+        "sourcegraph-token-positive-repeated-value",
+        "sourcegraph-token-positive-sdk-call",
+        "sourcegraph-token-positive-shell-export",
+        "sourcegraph-token-positive-src-login-command",
+        "sourcegraph-token-positive-tool-call-arguments",
+        "sourcegraph-token-positive-uppercase-hex",
+        "sourcegraph-token-positive-x-api-key-header",
+        "sourcegraph-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sourcegraph_access_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 143,
+    "supported": 144,
     "unresolved": 0
   }
 }

@@ -15777,6 +15777,136 @@
       "type": "xata_organization_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "sourcegraph-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "sourcegraph-token-positive-alphanumeric-identifier",
+            "sourcegraph-token-positive-authorization-token-scheme",
+            "sourcegraph-token-positive-bare",
+            "sourcegraph-token-positive-chat-sentence",
+            "sourcegraph-token-positive-crlf-unicode-prefix",
+            "sourcegraph-token-positive-curl-bearer",
+            "sourcegraph-token-positive-dotenv",
+            "sourcegraph-token-positive-json-config",
+            "sourcegraph-token-positive-json-token-key",
+            "sourcegraph-token-positive-local-identifier",
+            "sourcegraph-token-positive-log",
+            "sourcegraph-token-positive-mcp-server-config",
+            "sourcegraph-token-positive-no-identifier",
+            "sourcegraph-token-positive-punctuation-adjacent",
+            "sourcegraph-token-positive-repeated-value",
+            "sourcegraph-token-positive-sdk-call",
+            "sourcegraph-token-positive-shell-export",
+            "sourcegraph-token-positive-src-login-command",
+            "sourcegraph-token-positive-tool-call-arguments",
+            "sourcegraph-token-positive-uppercase-hex",
+            "sourcegraph-token-positive-x-api-key-header",
+            "sourcegraph-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "sourcegraph-token-overlap-bearer-header",
+            "sourcegraph-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "sourcegraph-token-adversarial-glued-tokens",
+            "sourcegraph-token-adversarial-prefix-run",
+            "sourcegraph-token-adversarial-underscore-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "sourcegraph-token-boundary-empty-identifier",
+            "sourcegraph-token-boundary-glued-prefix",
+            "sourcegraph-token-boundary-glued-trailing-dash",
+            "sourcegraph-token-boundary-glued-trailing-underscore",
+            "sourcegraph-token-boundary-hex-39",
+            "sourcegraph-token-boundary-hex-41",
+            "sourcegraph-token-boundary-hyphen-separator",
+            "sourcegraph-token-boundary-identifier-too-long",
+            "sourcegraph-token-boundary-identifier-without-underscore",
+            "sourcegraph-token-boundary-local-hex-39",
+            "sourcegraph-token-boundary-local-hex-41",
+            "sourcegraph-token-boundary-non-hex-tail",
+            "sourcegraph-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "sourcegraph-token-negative-bare-40-hex-commit-id",
+            "sourcegraph-token-negative-env-reference",
+            "sourcegraph-token-negative-non-hex-run",
+            "sourcegraph-token-negative-placeholder",
+            "sourcegraph-token-negative-sgd-cody-gateway-key",
+            "sourcegraph-token-negative-sgph-prefix",
+            "sourcegraph-token-negative-word"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "sourcegraph-token-boundary-empty-identifier",
+            "sourcegraph-token-boundary-glued-prefix",
+            "sourcegraph-token-boundary-glued-trailing-dash",
+            "sourcegraph-token-boundary-glued-trailing-underscore",
+            "sourcegraph-token-boundary-hex-39",
+            "sourcegraph-token-boundary-hex-41",
+            "sourcegraph-token-boundary-hyphen-separator",
+            "sourcegraph-token-boundary-identifier-too-long",
+            "sourcegraph-token-boundary-identifier-without-underscore",
+            "sourcegraph-token-boundary-local-hex-39",
+            "sourcegraph-token-boundary-local-hex-41",
+            "sourcegraph-token-boundary-non-hex-tail",
+            "sourcegraph-token-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for sourcegraph_access_token (sourcegraph-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "sourcegraph_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -16041,6 +16171,9 @@
             "slack-user-token-adversarial-long-suffix",
             "sonarqube-token-adversarial-glued-tokens",
             "sonarqube-token-adversarial-prefix-run",
+            "sourcegraph-token-adversarial-glued-tokens",
+            "sourcegraph-token-adversarial-prefix-run",
+            "sourcegraph-token-adversarial-underscore-run",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
             "supabase-management-adversarial-long-suffix",
@@ -16527,6 +16660,9 @@
             "slack-user-token-adversarial-long-suffix",
             "sonarqube-token-adversarial-glued-tokens",
             "sonarqube-token-adversarial-prefix-run",
+            "sourcegraph-token-adversarial-glued-tokens",
+            "sourcegraph-token-adversarial-prefix-run",
+            "sourcegraph-token-adversarial-underscore-run",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
             "supabase-management-adversarial-long-suffix",
