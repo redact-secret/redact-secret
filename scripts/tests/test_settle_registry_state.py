@@ -87,7 +87,14 @@ class SettleTests(unittest.TestCase):
     def test_lagging_pypi_files_get_their_own_digests(self) -> None:
         world = FakeWorld({"pypi:redact-secret": 10})
         records = [
-            {"file": "a.whl", "built": SHA256, "qualified": SHA256, "published": None, "comparable": True, "note": None},
+            {
+                "file": "a.whl",
+                "built": SHA256,
+                "qualified": SHA256,
+                "published": None,
+                "comparable": True,
+                "note": None,
+            },
             {
                 "file": "a.tar.gz",
                 "built": SHA256[::-1],
@@ -97,7 +104,9 @@ class SettleTests(unittest.TestCase):
                 "note": None,
             },
         ]
-        states, digests, _ = world.settle({"pypi:redact-secret": "published"}, {"pypi:redact-secret": records}, {"pypi"})
+        states, digests, _ = world.settle(
+            {"pypi:redact-secret": "published"}, {"pypi:redact-secret": records}, {"pypi"}
+        )
         self.assertEqual([r["published"] for r in digests["pypi:redact-secret"]], [SHA256, SHA256[::-1]])
         self.assertEqual(states["pypi:redact-secret"], "published")
 

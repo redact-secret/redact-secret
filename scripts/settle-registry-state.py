@@ -115,7 +115,9 @@ def observe_registry(identity: str, version: str) -> Observation:
         }
         return Observation("published", file_digests=files)
     if registry == "crate":
-        status, body = _get_json(f"https://crates.io/api/v1/crates/{urllib.parse.quote(name)}/{urllib.parse.quote(version)}")
+        status, body = _get_json(
+            f"https://crates.io/api/v1/crates/{urllib.parse.quote(name)}/{urllib.parse.quote(version)}"
+        )
         if status == 404:
             return Observation("unpublished")
         checksum = body.get("version", {}).get("checksum") if isinstance(body, dict) else None
@@ -184,7 +186,9 @@ def settle(
             return states, digests, log
         if not first and clock() >= deadline:
             for identity in pending:
-                log.append(f"{identity}: still unsettled after {timeout_seconds:g}s; recorded as observed by its publisher job")
+                log.append(
+                    f"{identity}: still unsettled after {timeout_seconds:g}s; recorded as observed by its publisher job"
+                )
             return states, digests, log
         for identity in pending:
             try:
@@ -195,15 +199,21 @@ def settle(
             if _apply(identity, observation, states, digests):
                 log.append(f"{identity}: settled as {states[identity]} after re-observation")
         first = False
-        if not any(identity.partition(":")[0] in registries and _unsettled(identity, states, digests) for identity in states):
+        if not any(
+            identity.partition(":")[0] in registries and _unsettled(identity, states, digests) for identity in states
+        ):
             return states, digests, log
         sleep(interval_seconds)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--states-file", required=True, type=Path, help="merged registry-state JSON object, rewritten in place")
-    parser.add_argument("--digests-file", required=True, type=Path, help="merged artifact-digests JSON object, rewritten in place")
+    parser.add_argument(
+        "--states-file", required=True, type=Path, help="merged registry-state JSON object, rewritten in place"
+    )
+    parser.add_argument(
+        "--digests-file", required=True, type=Path, help="merged artifact-digests JSON object, rewritten in place"
+    )
     parser.add_argument("--version", required=True)
     parser.add_argument("--settle", dest="registries", action="append", default=[], choices=REGISTRIES)
     parser.add_argument("--timeout-seconds", type=float, default=DEFAULT_TIMEOUT_SECONDS)
