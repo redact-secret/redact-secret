@@ -91,6 +91,21 @@ for profile membership and the false-negative tradeoff, and the
 [JavaScript](../guides/javascript.md#detector-profiles) and
 [Rust](../guides/rust.md#detector-profiles) guides for per-runtime usage.
 
+## Status query
+
+`status()` (JavaScript, root and `./common`) and `redact_secret.status()`
+(Python) report whether the binding is initialized and its public activation
+without initializing or reconfiguring anything. They take no input, never
+throw or raise, and return only fixed fields: `initialized` (boolean),
+`profile` (`"full"` or `"common"`) and `activation` (the `piiActivation()` /
+`pii_activation()` identity once initialized, otherwise `null` / `None`). Both
+types are named `CoreStatus`. They are additive stable names, not available in
+releases before the one that adds them, and they are not a detection-readiness
+claim. The Rust crate and the CLI add nothing: Rust has no lifecycle to query
+and the CLI runs one shot. A core-published synthetic readiness probe is
+deliberately not part of the contract
+([`decision-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe`](../decisions/2026-10-05-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe.md)).
+
 ## Errors and extensions
 
 Failures use fixed codes and input-free messages. JavaScript exposes

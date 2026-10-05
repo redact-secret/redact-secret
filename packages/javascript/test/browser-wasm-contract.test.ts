@@ -74,6 +74,20 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
     expect(runtime.artifact()).toBe("wasm");
   });
 
+  it("reports status through the wasm-shaped binding without extra binding calls", async () => {
+    const wasm = createWasmShapedBinding();
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
+
+    expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null });
+    await runtime.initialize();
+
+    expect(runtime.status()).toEqual({
+      initialized: true,
+      profile: "full",
+      activation: runtime.piiActivation(),
+    });
+  });
+
   it("rejects an artifact that reports a different detector profile", async () => {
     const wasm = createWasmShapedBinding({ profile: "common" });
     const runtime = createRedactSecretRuntime(wasm.load, "full");

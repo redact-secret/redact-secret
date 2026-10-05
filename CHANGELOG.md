@@ -5,6 +5,18 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- `status()` in `@redact-secret/core` (root and `./common`) and
+  `redact_secret.status()` in Python report whether the binding is initialized
+  and its public activation, without loading, initializing or reconfiguring
+  anything (#1172). Both take no input, never throw, and return only the fixed
+  fields `initialized`, `profile` and `activation` (`null`/`None` before
+  initialization) as `CoreStatus`. Detection, policy and initialization
+  semantics are unchanged; releases before this one do not export the call. A
+  core-published readiness probe is deferred
+  (`decision-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe`).
+
 ### Fixed
 
 - The release manifest no longer records a version as `unpublished`, or leaves

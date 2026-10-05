@@ -22,6 +22,7 @@ export const RANGE_UNIT: RangeUnit = "utf16-code-units";
 
 export type {
   ArtifactKind,
+  CoreStatus,
   DetectedSecretFinding,
   IncrementalLimits,
   IncrementalPolicyContext,

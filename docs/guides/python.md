@@ -165,3 +165,21 @@ assert redact_secret.pii_activation() == (
     "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
 )
 ```
+
+`status()` reports whether `initialize()` has fixed the selection and its
+public activation, without initializing or changing anything. It takes no
+input, never raises, and returns an immutable `CoreStatus` with exactly three
+fields, `initialized`, `profile` (always `"full"`) and `activation` (the
+`pii_activation()` string once initialized, otherwise `None`). Scanning works
+without `initialize()` and is then credential-only, but `status()` reports
+`initialized=False` and `activation=None` until a selection was fixed, and
+calling it never fixes one. A release that predates `status()` has no such
+attribute: use `getattr(redact_secret, "status", None)`.
+
+```python
+import redact_secret
+
+assert redact_secret.status().initialized is False
+redact_secret.initialize(pii=("pii",))
+assert redact_secret.status().activation == redact_secret.pii_activation()
+```
