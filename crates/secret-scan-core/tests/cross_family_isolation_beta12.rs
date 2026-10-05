@@ -41,6 +41,7 @@ const LOWER_ALNUM: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
 const LOWER_HEX: &[u8] = b"0123456789abcdef";
 const BASE32: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 const BASE64: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const BASE58: &[u8] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 const BASE64URL: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 const UPPER_ALNUM: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -98,7 +99,7 @@ fn aws_id(prefix: &str, seed: usize) -> String {
 /// type that must own it. The AWS secret access key is context-constrained
 /// and is checked separately below.
 fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
-    vec![
+    let mut values = vec![
         (
             "bitwarden-secrets-manager-access-token",
             "bitwarden_secrets_manager_access_token",
@@ -175,6 +176,87 @@ fn every_new_family_value() -> Vec<(&'static str, &'static str, String)> {
         ),
         ("vercel-token", "vercel_app_access_token", vercel("vca_")),
         ("vercel-token", "vercel_app_refresh_token", vercel("vcr_")),
+    ];
+    values.extend(second_wave_family_values());
+    values
+}
+
+/// The #1014 second wave (#1102 to #1105): one value per finding type.
+fn second_wave_family_values() -> Vec<(&'static str, &'static str, String)> {
+    vec![
+        (
+            "xata-api-key",
+            "xata_user_api_key",
+            format!("xau_{}", filler(ALNUM, 33, 1)),
+        ),
+        (
+            "xata-api-key",
+            "xata_organization_api_key",
+            format!("xao_{}", filler(ALNUM, 34, 2)),
+        ),
+        (
+            "sourcegraph-token",
+            "sourcegraph_access_token",
+            format!("sgp_local_{}", filler(LOWER_HEX, 40, 3)),
+        ),
+        (
+            "unkey-root-key",
+            "unkey_root_key",
+            format!(
+                "unkey_{}unkeyv1{}",
+                filler(BASE58, 8, 1),
+                filler(BASE58, 42, 2)
+            ),
+        ),
+        (
+            "unkey-root-key",
+            "unkey_root_key",
+            format!("unkey_3Z{}", filler(BASE58, 22, 3)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_api_access_token",
+            format!("bkua_{}", filler(LOWER_HEX, 40, 1)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_oauth_token",
+            format!("bkur_{}", filler(ALNUM, 40, 2)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_agent_token",
+            format!("bkaa_{}.{}", filler(ALNUM, 12, 3), filler(ALNUM, 60, 4)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_job_token",
+            format!(
+                "bkjat_eyJ{}.eyJ{}.{}",
+                filler(BASE64URL, 30, 5),
+                filler(BASE64URL, 60, 6),
+                filler(BASE64URL, 43, 7)
+            ),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_packages_token",
+            format!("bkpt_{}", filler(ALNUM, 50, 8)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_pipeline_token",
+            format!("bktr_{}", filler(ALNUM, 40, 9)),
+        ),
+        (
+            "buildkite-token",
+            "buildkite_portal_token",
+            format!(
+                "bkpat_{}_{}",
+                filler(ALNUM, 12, 10),
+                filler(LOWER_HEX, 40, 11)
+            ),
+        ),
     ]
 }
 

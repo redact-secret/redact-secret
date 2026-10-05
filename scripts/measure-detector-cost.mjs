@@ -160,6 +160,10 @@ export const CANONICAL_IDS = [
   "paddle-api-key",
   "honeycomb-api-key",
   "axiom-token",
+  "xata-api-key",
+  "sourcegraph-token",
+  "unkey-root-key",
+  "buildkite-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -253,6 +257,7 @@ export const GROUPS = {
     "dynatrace-token",
     "honeycomb-api-key",
     "axiom-token",
+    "xata-api-key",
   ],
   devtools: [
     "github-token",
@@ -266,6 +271,8 @@ export const GROUPS = {
     "trigger-dev-token",
     "inngest-signing-key",
     "sonarqube-token",
+    "sourcegraph-token",
+    "buildkite-token",
   ],
   "pkg-registry": [
     "pypi-token",
@@ -295,6 +302,7 @@ export const GROUPS = {
     "browserbase-api-key",
     "polar-token",
     "paddle-api-key",
+    "unkey-root-key",
   ],
 };
 

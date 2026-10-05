@@ -1016,6 +1016,83 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0078apt-deadbeef-5e7c-4ded-9000-000000000002",
       "schemes": null
+    },
+    {
+      "type": "xata_user_api_key",
+      "detector": "xata-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078au_SyntheticRevokedXataApiKey0000000",
+      "schemes": null
+    },
+    {
+      "type": "xata_organization_api_key",
+      "detector": "xata-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0078ao_SyntheticRevokedXataOrgApiKey0000",
+      "schemes": null
+    },
+    {
+      "type": "sourcegraph_access_token",
+      "detector": "sourcegraph-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0073gp_local_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "unkey_root_key",
+      "detector": "unkey-root-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0075nkey_Synthe1cunkeyv1SyntheticRevokedUnkeyRootKeyFixture1234567",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_api_access_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062kua_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_oauth_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062kur_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_agent_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062kaa_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_job_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062kaj_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_packages_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062kpt_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_pipeline_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062ktr_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
+    },
+    {
+      "type": "buildkite_portal_token",
+      "detector": "buildkite-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062kpat_5e7c0ded5e7c0ded5e7c0ded5e7c0ded5e7c0ded",
+      "schemes": null
     }
   ],
   "consumers": [

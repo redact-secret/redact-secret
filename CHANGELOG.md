@@ -36,6 +36,28 @@ evidence is linked from each published version.
   that `warn` takes no number and `block` does, and that the same recipe works
   for an incremental session per leaf. No new public API
   (`decision-keep-request-wide-placeholder-numbering-a-documented-recipe`).
+- Beta.14 provider detectors from the #1014 handoffs, always redacted at
+  provider specificity and unmeasured until their benchmarks arrival evidence
+  lands (no support-status claim):
+  - `xata-api-key` (#1102): Xata `xau_` and `xao_` + 32 to 36 alphanumeric API
+    keys (`xata_user_api_key`, `xata_organization_api_key`). The CRC32 never
+    rejects a match (ruling Q1 pending); classic-platform keys stay with generic
+    context.
+  - `sourcegraph-token` (#1103): Sourcegraph `sgp_` + optional instance
+    identifier + 40 hex access tokens (`sourcegraph_access_token`). A bare
+    40-hex token (a git SHA shape), `sgph_` and `sgd_` stay unclaimed.
+  - `unkey-root-key` (#1104): Unkey version 1 (`unkey_` + 8 + `unkeyv1` + 42
+    base58) and dashboard (`unkey_3Z` + 22 base58) root keys (`unkey_root_key`).
+    The CRC-32C never rejects a match (ruling Q1 pending); customer-prefixed
+    version 1 keys stay unclaimed until ruling Q10.
+  - `buildkite-token` (#1105): Buildkite `bkua_`, `bkur_`, `bktx_`, `bkaa_`,
+    `bkar_`, `bkct_`, `bkcqt_`, `bkaj_`, `bkjat_`, `bkpt_`, `bkrt_`, `bktr_`,
+    `bkat_`, `bkpat_` and `bkps_` + 24 to 2048 `[A-Za-z0-9_.-]` tokens
+    (`buildkite_api_access_token`, `buildkite_oauth_token`,
+    `buildkite_agent_token`, `buildkite_job_token`,
+    `buildkite_packages_token`, `buildkite_pipeline_token`,
+    `buildkite_portal_token`). The `bkjat_`/`bkaj_` JWT bodies are one span that
+    wins over `jwt`; the 24-byte floor is the provider redactor's own.
 
 ### Fixed
 

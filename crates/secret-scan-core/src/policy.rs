@@ -44,7 +44,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 124] = [
+const ALWAYS_REDACT_TYPES: [&str; 135] = [
     "anthropic_admin_api_key",
     "anthropic_api_key",
     "anthropic_enterprise_api_key",
@@ -61,6 +61,13 @@ const ALWAYS_REDACT_TYPES: [&str; 124] = [
     "bearer_token",
     "bitwarden_secrets_manager_access_token",
     "browserbase_api_key",
+    "buildkite_agent_token",
+    "buildkite_api_access_token",
+    "buildkite_job_token",
+    "buildkite_oauth_token",
+    "buildkite_packages_token",
+    "buildkite_pipeline_token",
+    "buildkite_portal_token",
     "cerebras_api_key",
     "clickhouse_cloud_api_secret",
     "clojars_deploy_token",
@@ -151,6 +158,7 @@ const ALWAYS_REDACT_TYPES: [&str; 124] = [
     "slack_user_token",
     "sonarqube_analysis_token",
     "sonarqube_user_token",
+    "sourcegraph_access_token",
     "stripe_credential",
     "stripe_webhook_signing_secret",
     "supabase_personal_access_token",
@@ -161,6 +169,7 @@ const ALWAYS_REDACT_TYPES: [&str; 124] = [
     "together_ai_api_key",
     "trigger_dev_personal_access_token",
     "trigger_dev_secret_api_key",
+    "unkey_root_key",
     "vault_token",
     "vendor_prefixed_credential",
     "vercel_app_access_token",
@@ -169,6 +178,8 @@ const ALWAYS_REDACT_TYPES: [&str; 124] = [
     "vercel_token",
     "wandb_api_key",
     "xai_api_key",
+    "xata_organization_api_key",
+    "xata_user_api_key",
 ];
 
 /// Chooses the default action for a candidate identified only by `type_name`

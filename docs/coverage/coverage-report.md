@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 141/141 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 152/152 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 141 |
+| supported | 152 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 152.
+Coverage declarations: 163.
 
 ## Coverage by detector
 
@@ -38,6 +38,7 @@ Coverage declarations: 152.
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bitwarden-secrets-manager-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| buildkite-token | 7 | supported: 7, intentionally-unsupported: 0, unresolved: 0 |
 | cerebras-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | clickhouse-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | clojars-deploy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -120,6 +121,7 @@ Coverage declarations: 152.
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | sonarqube-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
+| sourcegraph-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -131,10 +133,12 @@ Coverage declarations: 152.
 | trigger-dev-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| unkey-root-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vercel-token | 4 | supported: 4, intentionally-unsupported: 0, unresolved: 0 |
 | wandb-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | xai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| xata-api-key | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 
 ## Coverage by finding type
 
@@ -157,6 +161,13 @@ Coverage declarations: 152.
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | bitwarden_secrets_manager_access_token | bitwarden-secrets-manager-access-token | provider | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
+| buildkite_agent_token | buildkite-token | provider | supported | not-applicable | none |
+| buildkite_api_access_token | buildkite-token | provider | supported | not-applicable | none |
+| buildkite_job_token | buildkite-token | provider | supported | not-applicable | none |
+| buildkite_oauth_token | buildkite-token | provider | supported | not-applicable | none |
+| buildkite_packages_token | buildkite-token | provider | supported | not-applicable | none |
+| buildkite_pipeline_token | buildkite-token | provider | supported | not-applicable | none |
+| buildkite_portal_token | buildkite-token | provider | supported | not-applicable | none |
 | cerebras_api_key | cerebras-api-key | provider | supported | not-applicable | none |
 | clickhouse_cloud_api_secret | clickhouse-cloud-api-secret | provider | supported | not-applicable | none |
 | clojars_deploy_token | clojars-deploy-token | provider | supported | not-applicable | none |
@@ -260,6 +271,7 @@ Coverage declarations: 152.
 | slack_user_token | slack-token | provider | supported | not-applicable | none |
 | sonarqube_analysis_token | sonarqube-token | provider | supported | not-applicable | none |
 | sonarqube_user_token | sonarqube-token | provider | supported | not-applicable | none |
+| sourcegraph_access_token | sourcegraph-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
@@ -273,6 +285,7 @@ Coverage declarations: 152.
 | trigger_dev_secret_api_key | trigger-dev-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
+| unkey_root_key | unkey-root-key | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
 | vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
 | vercel_app_access_token | vercel-token | provider | supported | not-applicable | none |
@@ -281,6 +294,8 @@ Coverage declarations: 152.
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
 | wandb_api_key | wandb-api-key | provider | supported | not-applicable | none |
 | xai_api_key | xai-api-key | provider | supported | not-applicable | none |
+| xata_organization_api_key | xata-api-key | provider | supported | not-applicable | none |
+| xata_user_api_key | xata-api-key | provider | supported | not-applicable | none |
 
 ## Coverage by scheme
 
@@ -306,15 +321,15 @@ Coverage declarations: 152.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 152 | 0 | 0 |
-| boundary | 141 | 0 | 0 |
-| host-context | 141 | 0 | 0 |
+| adversarial | 163 | 0 | 0 |
+| boundary | 152 | 0 | 0 |
+| host-context | 152 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 152 | 0 | 0 |
-| near-miss-negative | 141 | 0 | 0 |
-| overlap | 141 | 0 | 0 |
-| positive | 141 | 0 | 0 |
-| range | 152 | 0 | 0 |
+| malformed | 163 | 0 | 0 |
+| near-miss-negative | 152 | 0 | 0 |
+| overlap | 152 | 0 | 0 |
+| positive | 152 | 0 | 0 |
+| range | 163 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

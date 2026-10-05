@@ -11,7 +11,7 @@ python3 -B scripts/generate-support-matrix-docs.py
 
 92 providers, 173 credential families.
 
-Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `fe6e9234d40e` (`0.1.0-beta.13`) with benchmarks revision `573e128863e0` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 110 credential detectors, all of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](reference/detection.md#opt-in-pii-availability-is-not-support).
+Counts are families and statuses, not detectors: a family is one provider x credential-family entry, one detector can back several families, and some families have no shipped detector. Measured on product commit `fe6e9234d40e` (`0.1.0-beta.13`) with benchmarks revision `573e128863e0` over 5950 fixtures; code shipped after the measured build is not covered by these statuses. This source ships 114 credential detectors, 110 of them mapped to at least one family. The opt-in PII families are outside this count and outside the matrix; their statuses are in [the detection reference](reference/detection.md#opt-in-pii-availability-is-not-support).
 
 Identity of the counts above:
 
@@ -258,3 +258,14 @@ Evidence tiers across all families:
 | pinecone | Legacy API key (bare UUID) | Unsupported | — | None | — | — | Beta.8 context-gated arrival family pinecone-api-key-legacy (#212, research #228); the UUID shape is corroborated by unpinned tools only. Owned by the product pinecone-api-key detector since product main 2420e80 (redact-secret#766 and its ADR 2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name): the UUID is redacted at high confidence under a Pinecone API-key name (PINECONE_API_KEY, pinecone_api_key, PINECONE_KEY, or api_key/apiKey/Api-Key on a line naming pinecone), and a bare UUID stays unclaimed. The detector reports it with the same pinecone_api_key finding type as pcsk_, so detectors stays empty: mapping the family to pinecone-api-key would merge it into that contract (#253). Provider source: https://docs.pinecone.io/reference/api/authentication. |
 | slack | Workflow webhook token | Unsupported | — | None | — | — | classifyFixture explicitly routes xwfp- values to the "needs a separate format contract" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: "Variant support must not be inferred from a related family name."). |
 | stripe | Organization API key | Unsupported | — | None | — | — | stripe-token's live/test secret-key pattern does not claim sk_org_ values. Since redact-secret#1030 (product #1101) classifyFixture resolves sk_org_, sk_org_live_ and sk_org_test_ followed by at least 20 [A-Za-z0-9] to this one family as policy/T3 rows at core's support-policy floor (not a provider grammar; no organization key issued or observed); other sk_org_ values and whsec_ stay pending. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: "Variant support must not be inferred from a related family name."). |
+
+### Not yet measured
+
+4 built-in detectors ship in the core but are not covered by the pinned measurement above, so they have no support status yet. Their absence from the tables above means "not yet measured", not "unsupported": do not read a status into them. The next pinned matrix that measures them moves each into a status section.
+
+| Detector | Measured support status |
+| --- | --- |
+| `buildkite-token` | not yet measured |
+| `sourcegraph-token` | not yet measured |
+| `unkey-root-key` | not yet measured |
+| `xata-api-key` | not yet measured |

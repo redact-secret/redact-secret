@@ -1,6 +1,11 @@
 {
   "$comment": "Reviewed exceptions for scripts/check-detector-family-coverage.py --strict (issue #995). Each entry is a known gap with the reason it is accepted. A detector missing from the pinned support matrix that is not listed here fails CI, and an entry that is no longer a gap also fails, so the list can only shrink.",
-  "unmeasured": {},
+  "unmeasured": {
+    "buildkite-token": "Shipped by #1105 (Buildkite API, agent, job, packages, pipeline and portal tokens) before its benchmarks arrival evidence: the family joins the pinned support matrix with its redact-secret-benchmarks arrival counterpart (redact-secret-benchmarks#583) and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
+    "sourcegraph-token": "Shipped by #1103 (Sourcegraph personal access tokens) before its benchmarks arrival evidence: the family joins the pinned support matrix with its redact-secret-benchmarks arrival counterpart (redact-secret-benchmarks#583) and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
+    "unkey-root-key": "Shipped by #1104 (Unkey root keys) before its benchmarks arrival evidence: the family joins the pinned support matrix with its redact-secret-benchmarks arrival counterpart (redact-secret-benchmarks#583) and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.",
+    "xata-api-key": "Shipped by #1102 (Xata user and organization API keys) before its benchmarks arrival evidence: the family joins the pinned support matrix with its redact-secret-benchmarks arrival counterpart (redact-secret-benchmarks#583) and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim."
+  },
   "stale": {
     "anthropic-admin01-key": "The benchmarks harness scores this finding type of the shipped `anthropic-token` detector as its own arrival family (redact-secret-benchmarks #730 scoredArrivalIds), so the Beta.11 matrix (benchmarks 0ecd501) keys it by this id, which the inventory folds into `anthropic-token`.",
     "anthropic-api01-key": "The benchmarks harness scores this finding type of the shipped `anthropic-token` detector as its own arrival family (redact-secret-benchmarks #730 scoredArrivalIds), so the Beta.11 matrix (benchmarks 0ecd501) keys it by this id, which the inventory folds into `anthropic-token`.",
