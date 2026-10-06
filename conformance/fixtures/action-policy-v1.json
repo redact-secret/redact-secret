@@ -1,0 +1,1390 @@
+{
+  "$schema": "action-policy-v1",
+  "schemaVersion": 1,
+  "contract": "docs/decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md",
+  "description": "The reference conformance fixture for the revision 1 declarative action policy (issue #1217). It is data only and carries no implementation. Every surface that accepts an action policy runs it as part of the shared behavioral contract: the Rust core (semantics, through `evaluations` and `rejections`), then the Node addon, the WebAssembly artifact, the Python binding and the CLI (plumbing, through the public API and `endToEnd`). Every finding, document and input here is synthetic; nothing reproduces a real credential. `base` is a sentinel, never a literal action: a runner resolves it by asking its own surface's default evaluation of the same finding, so this file copies no part of the default table.",
+  "revision": 1,
+  "baseSentinel": "base",
+  "limits": {
+    "maxDocumentBytes": 65536,
+    "maxRules": 128,
+    "maxSetMembers": 256
+  },
+  "vocabulary": {
+    "matchKeys": [
+      "type",
+      "detector",
+      "confidence",
+      "obfuscation"
+    ],
+    "actions": [
+      "redact",
+      "block",
+      "warn",
+      "allow"
+    ],
+    "ruleActions": [
+      "redact",
+      "block",
+      "warn",
+      "allow",
+      "default"
+    ],
+    "confidence": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "obfuscation": [
+      "none",
+      "invisible-characters"
+    ]
+  },
+  "errorCode": "INVALID_ACTION_POLICY",
+  "errorMessage": "The supplied action policy is invalid.",
+  "findings": {
+    "private-key-high": {
+      "type": "private_key",
+      "detector": "private-key",
+      "confidence": "high",
+      "obfuscation": "none"
+    },
+    "github-high": {
+      "type": "github_token",
+      "detector": "github-token",
+      "confidence": "high",
+      "obfuscation": "none"
+    },
+    "github-high-invisible": {
+      "type": "github_token",
+      "detector": "github-token",
+      "confidence": "high",
+      "obfuscation": "invisible-characters"
+    },
+    "jwt-medium": {
+      "type": "jwt",
+      "detector": "jwt",
+      "confidence": "medium",
+      "obfuscation": "none"
+    },
+    "bearer-high": {
+      "type": "bearer_token",
+      "detector": "bearer-token",
+      "confidence": "high",
+      "obfuscation": "none"
+    },
+    "contextual-high": {
+      "type": "contextual_secret",
+      "detector": "generic-token",
+      "confidence": "high",
+      "obfuscation": "none"
+    },
+    "contextual-medium": {
+      "type": "contextual_secret",
+      "detector": "generic-token",
+      "confidence": "medium",
+      "obfuscation": "none"
+    },
+    "contextual-low": {
+      "type": "contextual_secret",
+      "detector": "generic-token",
+      "confidence": "low",
+      "obfuscation": "none"
+    },
+    "ruleset-medium": {
+      "type": "acme-alnum-token",
+      "detector": "acme-alnum-token",
+      "confidence": "medium",
+      "obfuscation": "none"
+    },
+    "unknown-high": {
+      "type": "acme-future-type",
+      "detector": "acme-future-detector",
+      "confidence": "high",
+      "obfuscation": "none"
+    },
+    "unknown-medium": {
+      "type": "acme-future-type",
+      "detector": "acme-future-detector",
+      "confidence": "medium",
+      "obfuscation": "none"
+    },
+    "future-named-high": {
+      "type": "acme-not-yet-emitted",
+      "detector": "acme-not-yet-detector",
+      "confidence": "high",
+      "obfuscation": "none"
+    },
+    "future-detector-only-high": {
+      "type": "acme-other-type",
+      "detector": "acme-not-yet-detector",
+      "confidence": "high",
+      "obfuscation": "none"
+    }
+  },
+  "baseAnchors": {
+    "description": "Findings whose default action an accepted decision freezes, so a runner whose `base` resolution is broken fails visibly. These are anchors, not the default table.",
+    "cases": [
+      {
+        "finding": "private-key-high",
+        "expectedAction": "block",
+        "source": "default_action_for: private_key always blocks"
+      },
+      {
+        "finding": "jwt-medium",
+        "expectedAction": "redact",
+        "source": "decision-keep-credential-role-facts-out-of-detection-attribution-and-default-action, item 3"
+      },
+      {
+        "finding": "contextual-high",
+        "expectedAction": "redact",
+        "source": "the same item: contextual_secret redacts at high confidence"
+      },
+      {
+        "finding": "contextual-medium",
+        "expectedAction": "warn",
+        "source": "the same item: contextual_secret warns at medium confidence"
+      },
+      {
+        "finding": "ruleset-medium",
+        "expectedAction": "warn",
+        "source": "decision-define-declarative-ruleset-revisioning, item 8"
+      },
+      {
+        "finding": "unknown-high",
+        "expectedAction": "redact",
+        "source": "a type no list names redacts at high confidence"
+      },
+      {
+        "finding": "unknown-medium",
+        "expectedAction": "warn",
+        "source": "a type no list names warns below high confidence"
+      }
+    ]
+  },
+  "policies": [
+    {
+      "id": "empty-rules",
+      "description": "No rules: the document is the explicit default base and nothing else.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": []
+      }
+    },
+    {
+      "id": "exact-type",
+      "description": "One exact type override.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "warn-jwt",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "warn"
+          }
+        ]
+      }
+    },
+    {
+      "id": "type-and-obfuscation",
+      "description": "AND across two keys: both must hold.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "block-obfuscated-github",
+            "match": {
+              "type": [
+                "github_token"
+              ],
+              "obfuscation": [
+                "invisible-characters"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "id": "detector-and-confidence-set",
+      "description": "Explicit set membership inside one key (medium or low), AND with a detector.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "redact-generic-weak",
+            "match": {
+              "detector": [
+                "generic-token"
+              ],
+              "confidence": [
+                "medium",
+                "low"
+              ]
+            },
+            "action": "redact"
+          }
+        ]
+      }
+    },
+    {
+      "id": "all-four-actions",
+      "description": "One rule per action value.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "redact-ruleset-type",
+            "match": {
+              "type": [
+                "acme-alnum-token"
+              ]
+            },
+            "action": "redact"
+          },
+          {
+            "id": "block-github",
+            "match": {
+              "type": [
+                "github_token"
+              ]
+            },
+            "action": "block"
+          },
+          {
+            "id": "warn-jwt",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "warn"
+          },
+          {
+            "id": "allow-contextual",
+            "match": {
+              "type": [
+                "contextual_secret"
+              ]
+            },
+            "action": "allow"
+          }
+        ]
+      }
+    },
+    {
+      "id": "order-allow-first",
+      "description": "Ordering conflict: a jwt finding at medium confidence matches both rules; the first wins.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "allow-jwt",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "allow"
+          },
+          {
+            "id": "block-medium",
+            "match": {
+              "confidence": [
+                "medium"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "id": "order-block-first",
+      "description": "The same two rules in the opposite order.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "block-medium",
+            "match": {
+              "confidence": [
+                "medium"
+              ]
+            },
+            "action": "block"
+          },
+          {
+            "id": "allow-jwt",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "allow"
+          }
+        ]
+      }
+    },
+    {
+      "id": "default-carve-out",
+      "description": "The rule action `default` stops evaluation and returns the base action: an exception to a later broader rule.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "keep-default-jwt",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "default"
+          },
+          {
+            "id": "allow-medium",
+            "match": {
+              "confidence": [
+                "medium"
+              ]
+            },
+            "action": "allow"
+          }
+        ]
+      }
+    },
+    {
+      "id": "names-not-yet-emitted",
+      "description": "Rules naming a type and a detector no built-in emits: the document loads, and matches only when such a finding exists.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "future-type",
+            "match": {
+              "type": [
+                "acme-not-yet-emitted"
+              ]
+            },
+            "action": "block"
+          },
+          {
+            "id": "future-detector",
+            "match": {
+              "detector": [
+                "acme-not-yet-detector"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "id": "set-membership-and",
+      "description": "OR inside the type set, AND with the confidence set.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "block-weak-credentials",
+            "match": {
+              "type": [
+                "jwt",
+                "github_token",
+                "acme-alnum-token"
+              ],
+              "confidence": [
+                "medium"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "id": "catch-all-by-full-confidence-set",
+      "description": "A full confidence set is a catch-all; private_key is not special-cased.",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "warn-everything",
+            "match": {
+              "confidence": [
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "action": "warn"
+          }
+        ]
+      }
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "empty-rules--private-key-high",
+      "policy": "empty-rules",
+      "finding": "private-key-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "empty-rules--github-high",
+      "policy": "empty-rules",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "empty-rules--contextual-medium",
+      "policy": "empty-rules",
+      "finding": "contextual-medium",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "empty-rules--ruleset-medium",
+      "policy": "empty-rules",
+      "finding": "ruleset-medium",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "empty-rules--unknown-high",
+      "policy": "empty-rules",
+      "finding": "unknown-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "empty-rules--unknown-medium",
+      "policy": "empty-rules",
+      "finding": "unknown-medium",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "exact-type--github-high",
+      "policy": "exact-type",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "exact-type--jwt-medium",
+      "policy": "exact-type",
+      "finding": "jwt-medium",
+      "expectedAction": "warn",
+      "expectedRule": "warn-jwt",
+      "group": "matched-rule"
+    },
+    {
+      "id": "type-and-obfuscation--github-high-invisible",
+      "policy": "type-and-obfuscation",
+      "finding": "github-high-invisible",
+      "expectedAction": "block",
+      "expectedRule": "block-obfuscated-github",
+      "group": "matched-rule"
+    },
+    {
+      "id": "type-and-obfuscation--github-high",
+      "policy": "type-and-obfuscation",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback",
+      "note": "type matches, obfuscation does not: AND fails"
+    },
+    {
+      "id": "detector-and-confidence-set--contextual-medium",
+      "policy": "detector-and-confidence-set",
+      "finding": "contextual-medium",
+      "expectedAction": "redact",
+      "expectedRule": "redact-generic-weak",
+      "group": "matched-rule"
+    },
+    {
+      "id": "detector-and-confidence-set--contextual-low",
+      "policy": "detector-and-confidence-set",
+      "finding": "contextual-low",
+      "expectedAction": "redact",
+      "expectedRule": "redact-generic-weak",
+      "group": "matched-rule"
+    },
+    {
+      "id": "detector-and-confidence-set--contextual-high",
+      "policy": "detector-and-confidence-set",
+      "finding": "contextual-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback",
+      "note": "confidence not in the set"
+    },
+    {
+      "id": "detector-and-confidence-set--jwt-medium",
+      "policy": "detector-and-confidence-set",
+      "finding": "jwt-medium",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback",
+      "note": "confidence matches, detector does not"
+    },
+    {
+      "id": "all-four-actions--ruleset-medium",
+      "policy": "all-four-actions",
+      "finding": "ruleset-medium",
+      "expectedAction": "redact",
+      "expectedRule": "redact-ruleset-type",
+      "group": "four-actions",
+      "note": "upgrades a ruleset detection from the default warn to redact without a callback"
+    },
+    {
+      "id": "all-four-actions--github-high",
+      "policy": "all-four-actions",
+      "finding": "github-high",
+      "expectedAction": "block",
+      "expectedRule": "block-github",
+      "group": "four-actions"
+    },
+    {
+      "id": "all-four-actions--jwt-medium",
+      "policy": "all-four-actions",
+      "finding": "jwt-medium",
+      "expectedAction": "warn",
+      "expectedRule": "warn-jwt",
+      "group": "four-actions"
+    },
+    {
+      "id": "all-four-actions--contextual-high",
+      "policy": "all-four-actions",
+      "finding": "contextual-high",
+      "expectedAction": "allow",
+      "expectedRule": "allow-contextual",
+      "group": "four-actions"
+    },
+    {
+      "id": "all-four-actions--contextual-medium",
+      "policy": "all-four-actions",
+      "finding": "contextual-medium",
+      "expectedAction": "allow",
+      "expectedRule": "allow-contextual",
+      "group": "four-actions"
+    },
+    {
+      "id": "all-four-actions--private-key-high",
+      "policy": "all-four-actions",
+      "finding": "private-key-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "order-allow-first--jwt-medium",
+      "policy": "order-allow-first",
+      "finding": "jwt-medium",
+      "expectedAction": "allow",
+      "expectedRule": "allow-jwt",
+      "group": "ordering",
+      "note": "both rules match; first wins"
+    },
+    {
+      "id": "order-allow-first--contextual-medium",
+      "policy": "order-allow-first",
+      "finding": "contextual-medium",
+      "expectedAction": "block",
+      "expectedRule": "block-medium",
+      "group": "ordering"
+    },
+    {
+      "id": "order-allow-first--github-high",
+      "policy": "order-allow-first",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "order-block-first--jwt-medium",
+      "policy": "order-block-first",
+      "finding": "jwt-medium",
+      "expectedAction": "block",
+      "expectedRule": "block-medium",
+      "group": "ordering",
+      "note": "the same finding as order-allow-first, opposite outcome"
+    },
+    {
+      "id": "order-block-first--contextual-medium",
+      "policy": "order-block-first",
+      "finding": "contextual-medium",
+      "expectedAction": "block",
+      "expectedRule": "block-medium",
+      "group": "ordering"
+    },
+    {
+      "id": "default-carve-out--jwt-medium",
+      "policy": "default-carve-out",
+      "finding": "jwt-medium",
+      "expectedAction": "base",
+      "expectedRule": "keep-default-jwt",
+      "group": "default-action",
+      "note": "matched rule, action is the base action, later rule never consulted"
+    },
+    {
+      "id": "default-carve-out--contextual-medium",
+      "policy": "default-carve-out",
+      "finding": "contextual-medium",
+      "expectedAction": "allow",
+      "expectedRule": "allow-medium",
+      "group": "default-action"
+    },
+    {
+      "id": "default-carve-out--github-high",
+      "policy": "default-carve-out",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unmatched-fallback"
+    },
+    {
+      "id": "names-not-yet-emitted--future-named-high",
+      "policy": "names-not-yet-emitted",
+      "finding": "future-named-high",
+      "expectedAction": "block",
+      "expectedRule": "future-type",
+      "group": "unknown-type",
+      "note": "a type introduced later is covered by a document written before it existed"
+    },
+    {
+      "id": "names-not-yet-emitted--future-detector-only-high",
+      "policy": "names-not-yet-emitted",
+      "finding": "future-detector-only-high",
+      "expectedAction": "block",
+      "expectedRule": "future-detector",
+      "group": "unknown-type"
+    },
+    {
+      "id": "names-not-yet-emitted--unknown-high",
+      "policy": "names-not-yet-emitted",
+      "finding": "unknown-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unknown-type",
+      "note": "a finding type no rule names falls back to the base"
+    },
+    {
+      "id": "names-not-yet-emitted--github-high",
+      "policy": "names-not-yet-emitted",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "unknown-type"
+    },
+    {
+      "id": "set-membership-and--jwt-medium",
+      "policy": "set-membership-and",
+      "finding": "jwt-medium",
+      "expectedAction": "block",
+      "expectedRule": "block-weak-credentials",
+      "group": "set-membership"
+    },
+    {
+      "id": "set-membership-and--ruleset-medium",
+      "policy": "set-membership-and",
+      "finding": "ruleset-medium",
+      "expectedAction": "block",
+      "expectedRule": "block-weak-credentials",
+      "group": "set-membership"
+    },
+    {
+      "id": "set-membership-and--github-high",
+      "policy": "set-membership-and",
+      "finding": "github-high",
+      "expectedAction": "base",
+      "expectedRule": null,
+      "group": "set-membership",
+      "note": "type is in the set, confidence is not"
+    },
+    {
+      "id": "catch-all-by-full-confidence-set--private-key-high",
+      "policy": "catch-all-by-full-confidence-set",
+      "finding": "private-key-high",
+      "expectedAction": "warn",
+      "expectedRule": "warn-everything",
+      "group": "set-membership",
+      "note": "a rule may lower even a blocking default; the overlay is the user's override path"
+    },
+    {
+      "id": "catch-all-by-full-confidence-set--unknown-medium",
+      "policy": "catch-all-by-full-confidence-set",
+      "finding": "unknown-medium",
+      "expectedAction": "warn",
+      "expectedRule": "warn-everything",
+      "group": "set-membership"
+    }
+  ],
+  "acceptedDocuments": [
+    {
+      "id": "never-co-occurring-type-and-detector",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "odd-pair",
+            "match": {
+              "type": [
+                "jwt"
+              ],
+              "detector": [
+                "github-token"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      },
+      "note": "Open sets: the core cannot know that no detector emits this pair, so it loads and never matches. Contradiction is not a load error."
+    },
+    {
+      "id": "shadowed-rule",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "first",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "warn"
+          },
+          {
+            "id": "second",
+            "match": {
+              "type": [
+                "jwt"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      },
+      "note": "A rule an earlier rule fully covers is valid; it can never fire. Revision 1 does not analyse shadowing."
+    },
+    {
+      "id": "same-type-in-two-rules",
+      "document": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "a",
+            "match": {
+              "type": [
+                "jwt"
+              ],
+              "confidence": [
+                "high"
+              ]
+            },
+            "action": "warn"
+          },
+          {
+            "id": "b",
+            "match": {
+              "type": [
+                "jwt"
+              ],
+              "confidence": [
+                "low"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pretty-printed",
+      "documentText": "{\n\t\"actionPolicyRevision\": 1,\r\n\t\"base\": \"default\",\n\t\"rules\": [\n\t\t{ \"id\": \"warn-jwt\", \"match\": { \"type\": [ \"jwt\" ] }, \"action\": \"warn\" }\n\t]\n}\n",
+      "note": "Insignificant whitespace is space, tab, LF and CR."
+    },
+    {
+      "id": "document-at-byte-limit",
+      "synthesis": {
+        "kind": "padded",
+        "base": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[]}",
+        "totalBytes": 65536
+      }
+    },
+    {
+      "id": "rules-at-limit",
+      "synthesis": {
+        "kind": "rule-count",
+        "count": 128
+      }
+    },
+    {
+      "id": "set-members-at-limit",
+      "synthesis": {
+        "kind": "set-size",
+        "count": 256
+      }
+    }
+  ],
+  "rejections": [
+    {
+      "class": "ACTION_POLICY_TOO_LARGE",
+      "id": "one-byte-over-the-limit",
+      "synthesis": {
+        "kind": "padded",
+        "base": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[]}",
+        "totalBytes": 65537
+      },
+      "ruleIndex": null,
+      "note": "checked before anything is parsed"
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "trailing-comma",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[],}",
+      "ruleIndex": null
+    },
+    {
+      "class": "UNKNOWN_REVISION",
+      "id": "revision-two",
+      "documentText": "{\"actionPolicyRevision\":2,\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "UNKNOWN_FIELD",
+      "id": "unknown-top-level-field",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[],\"extra\":1}",
+      "ruleIndex": null,
+      "note": "rejected at the key, before its value is read"
+    },
+    {
+      "class": "DUPLICATE_FIELD",
+      "id": "repeated-base",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "no-rules",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\"}",
+      "ruleIndex": null
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "rules-is-an-object",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":{}}",
+      "ruleIndex": null
+    },
+    {
+      "class": "UNKNOWN_BASE",
+      "id": "base-allow",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"allow\",\"rules\":[]}",
+      "ruleIndex": null,
+      "note": "no fail-open base exists in revision 1"
+    },
+    {
+      "class": "INVALID_ACTION",
+      "id": "action-mask",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"mask\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "INVALID_IDENTIFIER",
+      "id": "rule-id-uppercase",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"Warn-Jwt\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "DUPLICATE_RULE_ID",
+      "id": "repeated-rule-id",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"},{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 1
+    },
+    {
+      "class": "EMPTY_MATCH",
+      "id": "empty-match",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{},\"action\":\"warn\"}]}",
+      "ruleIndex": 0,
+      "note": "an empty matcher would be a silent catch-all"
+    },
+    {
+      "class": "EMPTY_SET",
+      "id": "empty-type-set",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "DUPLICATE_SET_MEMBER",
+      "id": "repeated-type-member",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\",\"jwt\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "UNKNOWN_VOCABULARY_ENTRY",
+      "id": "confidence-critical",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"confidence\":[\"critical\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "TOO_MANY_RULES",
+      "id": "one-rule-over-the-limit",
+      "synthesis": {
+        "kind": "rule-count",
+        "count": 129
+      },
+      "ruleIndex": 128
+    },
+    {
+      "class": "SET_TOO_LARGE",
+      "id": "one-member-over-the-limit",
+      "synthesis": {
+        "kind": "set-size",
+        "count": 257
+      },
+      "ruleIndex": 0
+    }
+  ],
+  "additionalRejections": [
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "byte-order-mark",
+      "documentText": "\ufeff{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "line-comment",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\n// note\n\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "trailing-content",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[]} {}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "escape-in-string",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"j\\u0077t\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": null,
+      "note": "no escape sequence is accepted in any string"
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "non-ascii-in-string",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jw\u00e9t\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "null-literal",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":null}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "fractional-revision",
+      "documentText": "{\"actionPolicyRevision\":1.0,\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "leading-zero-revision",
+      "documentText": "{\"actionPolicyRevision\":01,\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "truncated",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[",
+      "ruleIndex": null
+    },
+    {
+      "class": "MALFORMED_DOCUMENT",
+      "id": "empty-document",
+      "documentText": "",
+      "ruleIndex": null
+    },
+    {
+      "class": "UNKNOWN_REVISION",
+      "id": "revision-zero",
+      "documentText": "{\"actionPolicyRevision\":0,\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "revision-is-a-string",
+      "documentText": "{\"actionPolicyRevision\":\"1\",\"base\":\"default\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "top-level-array",
+      "documentText": "[]",
+      "ruleIndex": null
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "revision-not-first",
+      "documentText": "{\"base\":\"default\",\"actionPolicyRevision\":1,\"rules\":[]}",
+      "ruleIndex": null,
+      "note": "the revision selects the grammar, so it must be the first member"
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "empty-object",
+      "documentText": "{}",
+      "ruleIndex": null
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "rule-without-action",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]}}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "rule-without-id",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "rule-without-match",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "MISSING_FIELD",
+      "id": "no-base",
+      "documentText": "{\"actionPolicyRevision\":1,\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "UNKNOWN_FIELD",
+      "id": "unknown-rule-field-note",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\",\"note\":\"x\"}]}",
+      "ruleIndex": 0,
+      "note": "no free-text field exists in revision 1"
+    },
+    {
+      "class": "UNKNOWN_FIELD",
+      "id": "role-matcher",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"role\":[\"public\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0,
+      "note": "findings carry no role; decision-keep-credential-role-facts-out-of-detection-attribution-and-default-action"
+    },
+    {
+      "class": "UNKNOWN_FIELD",
+      "id": "specificity-matcher",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"specificity\":[\"provider\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "UNKNOWN_FIELD",
+      "id": "range-matcher",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"start\":[0]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "DUPLICATE_FIELD",
+      "id": "repeated-action",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\",\"action\":\"block\"}]}",
+      "ruleIndex": 0,
+      "note": "the last occurrence does not win"
+    },
+    {
+      "class": "DUPLICATE_FIELD",
+      "id": "repeated-match-key",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"],\"type\":[\"github_token\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "scalar-type-instead-of-set",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":\"jwt\"},\"action\":\"warn\"}]}",
+      "ruleIndex": 0,
+      "note": "no scalar shorthand"
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "action-is-an-array",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":[\"warn\"]}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "match-is-an-array",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":[],\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "WRONG_TYPE",
+      "id": "set-member-is-an-integer",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"confidence\":[1]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "UNKNOWN_BASE",
+      "id": "base-uppercase",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"DEFAULT\",\"rules\":[]}",
+      "ruleIndex": null
+    },
+    {
+      "class": "INVALID_ACTION",
+      "id": "action-title-case",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"Redact\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "INVALID_ACTION",
+      "id": "action-empty",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "INVALID_IDENTIFIER",
+      "id": "type-wildcard",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"aws_*\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0,
+      "note": "no glob, prefix or regex"
+    },
+    {
+      "class": "INVALID_IDENTIFIER",
+      "id": "type-uppercase",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"JWT\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "INVALID_IDENTIFIER",
+      "id": "detector-trailing-separator",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"detector\":[\"jwt-\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "INVALID_IDENTIFIER",
+      "id": "rule-id-too-long",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0,
+      "note": "65 bytes; the identifier bound is 64"
+    },
+    {
+      "class": "EMPTY_SET",
+      "id": "empty-confidence-set",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"confidence\":[]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "DUPLICATE_SET_MEMBER",
+      "id": "repeated-confidence-member",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"confidence\":[\"high\",\"high\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "UNKNOWN_VOCABULARY_ENTRY",
+      "id": "confidence-title-case",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"confidence\":[\"Medium\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0
+    },
+    {
+      "class": "UNKNOWN_VOCABULARY_ENTRY",
+      "id": "obfuscation-future-value",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"obfuscation\":[\"homoglyph\"]},\"action\":\"warn\"}]}",
+      "ruleIndex": 0,
+      "note": "a vocabulary entry added after revision 1 is a revision 2 name"
+    },
+    {
+      "class": "DUPLICATE_RULE_ID",
+      "id": "repeated-rule-id-different-bodies",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"},{\"id\":\"r\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"block\"}]}",
+      "ruleIndex": 1
+    }
+  ],
+  "endToEnd": {
+    "description": "End-to-end cases through each surface's public scan API. A surface that cannot construct a finding without scanning runs these instead of, or in addition to, `evaluations`. `base` resolves to the action the same input yields with no policy at all. Offsets are UTF-8 bytes in the original input; a UTF-16 or code-point surface converts them. Findings are listed in input order.",
+    "ruleset": "ruleset-revision: 1\ndetector: acme-alnum-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n",
+    "cases": [
+      {
+        "id": "overlap-loser-is-never-an-input",
+        "policy": {
+          "actionPolicyRevision": 1,
+          "base": "default",
+          "rules": [
+            {
+              "id": "allow-bearer",
+              "match": {
+                "type": [
+                  "bearer_token"
+                ]
+              },
+              "action": "allow"
+            }
+          ]
+        },
+        "input": "twilio Authorization: \u0042earer fedcba9876543210fedcba9876543210",
+        "expectedFindings": [
+          {
+            "type": "bearer_token",
+            "detector": "bearer-token",
+            "confidence": "high",
+            "obfuscation": "none",
+            "start": 29,
+            "end": 61,
+            "expectedAction": "allow",
+            "expectedRule": "allow-bearer"
+          }
+        ],
+        "alsoIncremental": true,
+        "note": "Overlap resolution ranks by the fixed default and picks bearer_token over the lower twilio_auth_token candidate before any policy runs. Allowing the winner leaves the text unchanged and does not resurrect the loser (decision-resolve-overlap-precedence-by-resolved-action-severity)."
+      },
+      {
+        "id": "unmatched-falls-back-to-base",
+        "policy": "names-not-yet-emitted",
+        "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+        "expectedFindings": [
+          {
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48,
+            "expectedAction": "base",
+            "expectedRule": null
+          }
+        ],
+        "alsoIncremental": true
+      },
+      {
+        "id": "obfuscated-finding-blocks",
+        "policy": "type-and-obfuscation",
+        "input": "API_KEY=ghp_SYNTHE\u200bTICREVOKED00000000000000000000",
+        "expectedFindings": [
+          {
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "obfuscation": "invisible-characters",
+            "start": 8,
+            "end": 51,
+            "expectedAction": "block",
+            "expectedRule": "block-obfuscated-github"
+          }
+        ],
+        "alsoIncremental": true,
+        "note": "The input holds one U+200B inside the credential; the range is in original-input coordinates."
+      },
+      {
+        "id": "ruleset-type-upgraded-to-redact",
+        "policy": "all-four-actions",
+        "useRuleset": true,
+        "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN",
+        "expectedFindings": [
+          {
+            "type": "acme-alnum-token",
+            "detector": "acme-alnum-token",
+            "confidence": "medium",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 28,
+            "expectedAction": "redact",
+            "expectedRule": "redact-ruleset-type"
+          }
+        ],
+        "alsoIncremental": false,
+        "note": "Incremental sessions accept no ruleset on any surface, so this case is whole-input only."
+      },
+      {
+        "id": "private-key-default-blocks",
+        "policy": "empty-rules",
+        "input": "\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+        "expectedFindings": [
+          {
+            "type": "private_key",
+            "detector": "private-key",
+            "confidence": "high",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 90,
+            "expectedAction": "base",
+            "expectedRule": null
+          }
+        ],
+        "alsoIncremental": true
+      }
+    ]
+  },
+  "hostObligations": [
+    {
+      "id": "legacy-callback-replaces-the-default",
+      "statement": "A policy callback still replaces the default entirely: its return value is the action, with no overlay or base consulted.",
+      "expectedCode": null
+    },
+    {
+      "id": "legacy-callback-throws",
+      "statement": "A callback that throws fails the whole call with the existing fixed code.",
+      "expectedCode": "POLICY_FAILURE"
+    },
+    {
+      "id": "legacy-callback-invalid-action",
+      "statement": "A callback that returns anything but redact, block, warn or allow fails the whole call with the existing fixed code.",
+      "expectedCode": "INVALID_POLICY_ACTION"
+    },
+    {
+      "id": "callback-and-action-policy-together",
+      "statement": "Supplying both a callback policy and an action policy to one call or session is rejected before any scan.",
+      "expectedCode": "INVALID_OPTIONS"
+    },
+    {
+      "id": "invalid-document-fails-before-scanning",
+      "statement": "A rejected document fails construction or the call with the fixed code, never a partial load and never the default.",
+      "expectedCode": "INVALID_ACTION_POLICY"
+    },
+    {
+      "id": "session-binds-policy-at-construction",
+      "statement": "An incremental session evaluates the policy it was constructed with; building another policy afterwards changes nothing about it.",
+      "expectedCode": null
+    },
+    {
+      "id": "no-process-global-policy-slot",
+      "statement": "Two live policies of different content on one surface evaluate independently, in either construction order.",
+      "expectedCode": null
+    }
+  ]
+}

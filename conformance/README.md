@@ -182,6 +182,23 @@ depend on `src/`.
   than literal text, the same provenance idea
   [Mutation provenance](#mutation-provenance) uses for a reproducible case
   too large to commit as data.
+- [`fixtures/action-policy-v1.json`](./fixtures/action-policy-v1.json) —
+  the revision 1 declarative action policy truth table (issue #1217,
+  `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+  It is data only and has no consumer yet; #1219 adds the Rust, Node,
+  WebAssembly, Python and CLI runners. It holds named synthetic finding
+  metadata, the policy documents, 37 evaluations (matched rule, unmatched
+  fallback, unknown type, all four actions, the `default` rule action, AND,
+  set membership and an ordering conflict in both orders), one rejection per
+  fixed class plus additional rejections, accepted edge documents at every
+  bound, five end-to-end cases with UTF-8 byte offsets, and the host
+  obligations (legacy callback, mutual exclusion, no process-global slot). Like
+  the ruleset fixture it is not in the canonical `input`/`expected[]` shape and
+  is not registered with `schema.ts`. `base` is a sentinel, not a literal
+  action: a runner resolves it through its own surface's default evaluation, so
+  the file copies no part of the default table, and `baseAnchors` checks that
+  resolution. The oversized, rule-count and set-size documents are
+  generator-described (`synthesis`) rather than literal text.
 - [`fixtures/common-profile-expectations.json`](./fixtures/common-profile-expectations.json) —
   the reviewed findings of the `common` detector profile for every evaluated
   `synchronous-corpus.json` fixture, by id
