@@ -92,7 +92,7 @@ const PAT_ROUTABLE_SIGNALS: [&str; 3] = [
 
 /// The end of a routable personal access token whose `glpat-` prefix starts
 /// at `start` and whose payload run ends at `run_end`, or `None` when the
-/// value is not one (issue #1022, `docs/audits/evidence/1012/`
+/// value is not one (issue #1022, [`docs/audits/evidence/1012/`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012)
 /// `gitlab-routable-personal-access-token.md`, READY-T1 from GitLab's
 /// generator, decoder and design document):
 /// `glpat-<base64url 27-300>.<2 base36 version>.<2 base36 payload length><7
@@ -231,7 +231,7 @@ fn routable_end(
 }
 
 /// Every boundary-delimited `glrt-` runner authentication token, left to
-/// right (issue #730, `docs/audits/evidence/726/README.md`): the prefix plus
+/// right (issue #730, [`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md)): the prefix plus
 /// either the exact 20-byte friendly-token body (optionally after the legacy
 /// `t<hex>_` partition segment), or the routable
 /// `<base64url>.<2 base36>.<2 base36 length><7 base36 CRC-32>` form whose

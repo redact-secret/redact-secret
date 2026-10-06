@@ -537,7 +537,7 @@ accepted in
   `--no-default-features`, linking only the `common` ones. Each artifact
   reports its profile through its own `profile()` export. Measured savings
   and build evidence are in
-  [the #381 record](./docs/audits/evidence/381/README.md). A second,
+  [the #381 record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/381/README.md). A second,
   off-by-default feature, `pii` (#937), links the PII domain runtime; every
   profile ships a default build without it and a `pii` build with it, and
   `@redact-secret/core` loads the `pii` build only when `initialize()` is
@@ -584,7 +584,7 @@ publishing, refusing to publish a `common` or otherwise non-`full` build
 under the `full`/default package identity.
 
 Evidence and the named-pack recommendation are in
-[the #382 record](./docs/audits/evidence/382/README.md); user-facing usage is
+[the #382 record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/382/README.md); user-facing usage is
 in the [detection reference](./docs/reference/detection.md#detector-profiles),
 [API concepts](./docs/reference/api-contract.md#detector-profiles), and the
 [JavaScript](./docs/guides/javascript.md#detector-profiles) and

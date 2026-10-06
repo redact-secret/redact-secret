@@ -1,5 +1,5 @@
 //! Axiom API token and personal access token detection (issue #1035,
-//! handoff `docs/audits/evidence/1014/axiom.md`).
+//! handoff [`docs/audits/evidence/1014/axiom.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/axiom.md)).
 //!
 //! | Shape | Finding type | Evidence |
 //! | --- | --- | --- |

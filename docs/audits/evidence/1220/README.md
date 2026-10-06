@@ -1,3 +1,10 @@
+---
+owner: #1220
+reviewed_source: db0e5c8ddf706988967e971593f509daf460c222
+status: deferred
+retire_on: after-issue:#1220
+---
+
 # Evidence: #1220, WebAssembly size of the comparison, and JavaScript conformance coverage
 
 Measurement record for

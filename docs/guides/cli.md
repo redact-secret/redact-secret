@@ -106,7 +106,7 @@ These three are the only statuses the CLI chooses. A status of any other value
 internal failure outside the contract: treat it like `2`, and discard any
 output. Standard output may then hold a sanitized but incomplete prefix; the
 CLI never writes an unsanitized byte
-([measured](../audits/evidence/1130/README.md)).
+([measured](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1130/README.md)).
 
 A path is a whole-input call, so exit `0` or `1` for it means every detector
 inspected the whole file; standard input is incremental, so a failed

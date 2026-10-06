@@ -156,7 +156,12 @@ class BaselineDerivationTests(unittest.TestCase):
 
 
 class CommittedEvidenceTests(unittest.TestCase):
-    """The committed evidence files must be exactly what the contracts derive."""
+    """The committed baseline and corpus audit must be exactly what the contracts derive."""
+
+    def test_no_live_path_resolves_under_the_audit_archive(self) -> None:
+        archive = AUDIT.ROOT / "docs" / "audits"
+        for path in (AUDIT.CONTRACTS_PATH, AUDIT.BASELINE_PATH, AUDIT.CORPUS_AUDIT_PATH):
+            self.assertFalse(path.is_relative_to(archive), path)
 
     def test_committed_baseline_and_corpus_audit_are_current(self) -> None:
         contracts = AUDIT.load_json(AUDIT.CONTRACTS_PATH)

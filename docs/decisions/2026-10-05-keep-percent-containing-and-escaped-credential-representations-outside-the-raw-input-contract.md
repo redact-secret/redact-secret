@@ -104,8 +104,8 @@ names the layout and the provider or a reviewed reproduction states the form.
 
 `docs/specs/engine.md` gains one row citing this record. No detector, fixture or
 public interface changes; no version change and no release. The Batch 2 evidence
-records `docs/audits/evidence/1223` to `1226` apply it to their rows, and
-[the #1223 record](../audits/evidence/1223/README.md) holds the shared
+records [`docs/audits/evidence/1223`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1223) to `1226` apply it to their rows, and
+[the #1223 record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1223/README.md) holds the shared
 Bearer-grammar observation.
 
 ## Amendments

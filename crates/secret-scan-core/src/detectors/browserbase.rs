@@ -1,5 +1,5 @@
 //! Browserbase API key detection (issue #973, handoff
-//! `docs/audits/evidence/860/browserbase.md`).
+//! [`docs/audits/evidence/860/browserbase.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/browserbase.md)).
 //!
 //! The provider's own CI gate accepts `bb_live_` followed by at least 20
 //! alphanumerics (provider-authored, ruling R2), and no provider source

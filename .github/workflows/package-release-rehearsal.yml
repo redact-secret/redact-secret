@@ -23,7 +23,7 @@ name: Package Release Rehearsal
 # digest check and every job's post-publish registry-state read cannot be
 # rehearsed this way: both compare against what a registry reports about a
 # file it actually received, which only exists after a real publish. See
-# `docs/audits/release-rehearsal-coverage.md` for the full breakdown of what
+# `docs/releasing.md` ("Rehearsing at a throwaway unpublished version") for the full breakdown of what
 # this workflow does and does not cover, and why.
 #
 # Issue #632: every job here first moves its own checkout to a throwaway,
@@ -33,7 +33,7 @@ name: Package Release Rehearsal
 # scope of beta.6's #607 and #608 -- run on `main`, not first on an RC. The
 # bump is never committed or pushed; `version` proves npm, crates.io, and PyPI
 # all answer 404 for it before anything is built. What that covers, and what
-# it still cannot, is in `docs/audits/release-rehearsal-coverage.md`.
+# it still cannot, is in `docs/releasing.md` under the same heading.
 #
 # `NODE_AUTH_TOKEN` is never supplied to this workflow and no job requests
 # `registry-url` from `actions/setup-node`, so a `--dry-run` invocation that

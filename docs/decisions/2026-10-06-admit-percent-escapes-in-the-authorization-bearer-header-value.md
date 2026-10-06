@@ -85,5 +85,5 @@ them in the same header value when the header value is itself followed by escape
 text; a header whose token is longer than 12 bytes only because of escapes now
 matches. The 2026-10-05 record is amended for the `Authorization`/`Proxy-Authorization`
 Bearer carrier only; it is not superseded. `docs/specs/engine.md` carries the amended text; the evidence is
-`docs/audits/evidence/1224/addendum-bearer-percent-escapes.md`. No version,
+[`docs/audits/evidence/1224/addendum-bearer-percent-escapes.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1224/addendum-bearer-percent-escapes.md). No version,
 public interface or finding type changes.

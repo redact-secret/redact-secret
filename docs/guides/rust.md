@@ -269,7 +269,7 @@ session. The linker keeps only the constructors a program references, so call
 value only known at run time, `sanitize_with_profile` references both
 constructors and links every detector (a minimal program measured 517,872 B
 with `with_common_built_in` and 734,816 B through `sanitize_with_profile` with
-a run-time `Profile`; see [evidence](../audits/evidence/1127/README.md)).
+a run-time `Profile`; see [evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1127/README.md)).
 Both profile constructors report their identity through `profile()`,
 which returns `Some(Profile::Full)`, `Some(Profile::Common)`, or `None` for a
 registry assembled through `DetectorRegistry::new()`.

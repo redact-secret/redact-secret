@@ -28,15 +28,15 @@ so they queue and run one at a time; they never race each other.
 | --- | --- | --- | --- |
 | What it does | Packs and checks npm runtime dependency packages only | Publishes to crates.io, npm, and PyPI for real, then tags | Repairs a **partially** failed `Release`: fills in only what's missing |
 | Publishes anything? | No — nothing is ever published | Yes, everything | Only what the failed run didn't already publish |
-| When to run it | Optional, while preparing the release commit | Once, after final approval | Only after a `Release` run fails partway, with separate recovery authorization |
+| When to run it | On the exact final SHA, before `Release` | Once, after final approval | Only after a `Release` run fails partway, with separate recovery authorization |
 | Has a dry-run? | It *is* the dry-run | No — there is no rehearsal mode for `Release` itself | Yes: `dry_run=true` prints the plan before anything is touched |
 
 Normal path:
 
 ```
-merge the prepared version to main
+merge the prepared version to main, with historical audit bodies already retired
   → Performance evaluation (benchmarks)    -- paired same-job run of the frozen main SHA; must judge accepted
-  → (optional) Package Release Rehearsal   -- npm dependency check only, publishes nothing
+  → Package Release Rehearsal on the exact final SHA -- npm dependency check only, publishes nothing; run before Release
   → Artifact qualification + SAST + approval
   → Release                                -- the actual publish, run once
        success      → close out
@@ -152,7 +152,28 @@ and must use the qualified binaries and recorded digests.
    [`docs/getting-started.md`](getting-started.md#install-a-published-release).
    Change them in the same commit, and at `0.1.0` drop the `@beta` and
    `--version` qualifiers the quickstart explains.
-4. Run the local checks below before merging. After merge, record the exact
+4. Retire historical review bodies before qualification, in the same reviewed
+   pull request or an earlier one. Every `docs/audits/` unit whose front
+   matter says `status: final` (or whose `retire_on` has come due) leaves the
+   tree once its full 40-hex permalink to an existing reachable `main` commit
+   holding the complete record is verified, its current conclusions are in the
+   authoritative spec, contract or release record, and nothing live reads it
+   (rule: [`decision-retire-historical-audit-bodies-before-release-qualification`](decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)).
+   Leave no per-issue stub. Only the one `retained` current candidate review
+   may stay. The tree changes here or not at all: any later change, including
+   cleanup, is a new candidate SHA and needs fresh qualification, and
+   `Release` itself edits and deletes nothing. Existing tags and history are
+   never touched. `npm run lifecycle:release` runs the offline check that
+   enforces this on the checked-out tree (it fails on every `final`,
+   `in-progress`, `before-qualification` or unclassified unit and names each
+   path); development (`npm run lifecycle:check`, part of `npm run ci`) accepts
+   a declared temporary unit. For a `deferred` unit, confirm `after-issue:#N`
+   is still open, optionally with `--closed-issues FILE` from
+   `gh issue list --state closed --limit 1000 --json number --jq '.[].number'`;
+   the check never calls the API. `Artifact qualification` (dispatch and `rc/*`
+   pushes), `Release` and `Reconcile Release` run it in release mode before
+   anything is built or published, and it approves and publishes nothing.
+5. Run the local checks below before merging. After merge, record the exact
    `main` commit to qualify. Selecting any later source commit requires fresh
    qualification.
 
@@ -223,8 +244,11 @@ rehearsal, not a simulated publication to all registries. It qualifies a
 throwaway `<X.Y.Z>-beta.<run id>` version that no registry carries, moved onto
 its own uncommitted checkout, so unpublished-version defects surface before an
 RC exists (what that covers:
-[release rehearsal coverage](audits/release-rehearsal-coverage.md#rehearsing-at-a-throwaway-unpublished-version)). `Release` has no
-`publish=false` or `dry_run` input; never dispatch it as a rehearsal.
+[rehearsing at a throwaway unpublished version](#rehearsing-at-a-throwaway-unpublished-version)). `Release` has no
+`publish=false` or `dry_run` input; never dispatch it as a rehearsal. Run
+`Package Release Rehearsal` on the exact final SHA, after cleanup has merged
+and before dispatching `Release`; a rehearsal on any earlier commit does not
+cover the cleaned tree.
 
 Also require passing SAST evidence for the frozen revision. An acknowledged
 baseline is not zero findings or complete parser coverage. Assessment results
@@ -246,6 +270,73 @@ explicit, rationale-bearing override for it. Refresh
 measured against this candidate's published-artifact evidence path (issue
 #508's distinction) before qualification, not from a local build.
 
+### Rehearsing at a throwaway unpublished version
+
+On `main` the repository version is always already on every registry, so a
+rehearsal at that version cannot surface a defect that only appears for a
+version no registry has (beta.6's `cargo package` resolution of the exact core
+requirement and its npm dependency digest scope are the two that did). The
+rehearsal therefore qualifies a throwaway version instead, and publishes
+nothing.
+
+How it works:
+
+- `package-release-rehearsal.yml` starts with a `version` job. It derives
+  `<X.Y.Z>-beta.<run id>` from the branch version
+  (`scripts/rehearsal-version.py derive`) and proves that npm (all eleven
+  scoped packages), crates.io (both crates) and PyPI answer 404 for it
+  (`check-unpublished`). Any other answer, including a rate limit, fails the
+  run.
+- Every job that builds, packs or qualifies a version-bearing artifact then
+  runs `.github/actions/apply-rehearsal-version` right after its checkout. That
+  rewrites the lockstep set in the job's own working tree: the workspace
+  `Cargo.toml` (version and exact core requirement), `Cargo.lock`'s workspace
+  members, every lockstep JSON manifest and exact `@redact-secret/*` pin, both
+  npm lockfiles, the TypeScript `VERSION` and the quickstart pins. Nothing is
+  committed, pushed or published.
+- `artifact-qualification.yml` and `python-wheels.yml` take the version as an
+  optional `rehearsal-version` input, empty for `release.yml` and for every
+  push or pull request run, so those paths are unchanged. The inventory job's
+  `cargo package` passes `--allow-dirty` only when a rehearsal version is set.
+- The suffix is `-beta.<run id>` because the Python wheel qualification
+  (`scripts/qualify-python-wheel.py`) and the quickstart pin check
+  (`scripts/clean-install-doc.mjs`) accept only `X.Y.Z-beta.N`, and PEP 440 has
+  no spelling for a `-rehearsal` segment. A run id is far above any published
+  beta, and the registry probe checks that claim instead of assuming it.
+
+What it covers before an RC exists:
+
+| Path | Runs at the unpublished version |
+| --- | --- |
+| Inventory crate packaging | `cargo package` of both crates together against a core version crates.io does not have |
+| Lockstep and `--locked` resolution | every manifest, exact pin and lockfile agrees on the new version |
+| Digest checks | `scripts/verify-python-digest.py` on the node-addon, browser and browser-common, Python wheel and sdist, and npm dependency artifacts, each the check `release.yml`'s `publish-native-dependencies`, `publish-wasm-dependency` and `publish-pypi` run before their own publish step |
+| Wheel and quickstart | the PEP 440 spelling of the version in the wheel and the pinned quickstart install lines |
+| Unpublished-state probe | that no registry carries the version, so a probe that assumed absence is checked, not trusted |
+
+What it cannot cover, because each needs a real publish first:
+
+- `redact-secret` and `redact-secret-cli` crate digest verification
+  (`verify-crate-digest.py`) compares the qualified digest with the checksum
+  crates.io reports for the file it received.
+- Every post-publish registry-state read (the npm `unpublished` and `published`
+  probes, the PyPI `state` step, the crates.io `state` step). The bounded wait
+  they depend on is exercised instead by
+  `scripts/tests/npm-registry-metadata.test.mjs`, including a simulated slow
+  registry.
+- `verify-registry-install` (the Node and browser lanes) installs the real,
+  published package from the real registry.
+- The annotated tag and the durable manifest's published state are written only
+  after every publish job succeeds.
+
+It also does not rehearse the RC-branch preparation itself (changelog, release
+notes, `docs/releases/<version>/`). `Reconcile Release` is recovery, not
+rehearsal: see [Recover a partial publication](#recover-a-partial-publication),
+and the authorized live dispatches are recorded in the
+[readiness checklist](releases/release-readiness-v0.1.0.md). The review that
+introduced this section is
+[`release-rehearsal-coverage.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-rehearsal-coverage.md#rehearsing-at-a-throwaway-unpublished-version).
+
 ## Review and approval
 
 Before requesting final release approval for v0.1.0 stable, check the
@@ -261,7 +352,11 @@ Before requesting final release approval, assemble a reviewable record of:
   verdict (or the accepted-tradeoff ledger entry for each breach).
 - Exact-revision qualification, rehearsal, SAST, artifact inventory, and any
   applicable assessment evidence. Hashing an old review document does not make
-  it a current API review.
+  it a current API review: the inventory selects the one `docs/audits/` review
+  whose front matter binds it to this `candidate_version`, checks that its
+  `reviewed_source` is an ancestor of the qualified SHA, and records its path,
+  SHA-256, scope and disposition. A review of another version is history and
+  fails qualification. The record is evidence only; it approves nothing.
 - Live `release` environment reviewers and `main` branch restriction; repository
   review/status/tag rules; npm and crates.io publisher rights; PyPI Trusted
   Publisher identity for this repository, workflow, and environment.
@@ -398,6 +493,13 @@ run and qualified inventory. The selected source must remain in the current
 `main` history, including its tip. A source outside that history cannot be
 recovered through this path.
 
+`Reconcile Release` checks the audit lifecycle of the recorded source
+revision, in release mode, with the check that revision carries, before it
+repairs anything. A source revision that predates the check was qualified before
+the policy existed and is repaired without it; any other source must pass, which
+the original `Release` run already required. It is not an input and cannot be
+skipped.
+
 Review the exact skip/publish/block plan and evidence before authorizing
 `dry_run=false`. Existing artifacts must match the qualified content; missing
 compiled artifacts come from the original run, not a new build. Expired
@@ -427,7 +529,9 @@ attestation. Dry runs publish nothing and sign nothing.
 
 ## Close out
 
-Preserve evidence under `docs/releases/<version>/`, following the
+After publication, move the retained candidate review's conclusions into the
+release record and retire its body through a reviewed pull request; that is a
+post-release change, never a step of `Release`. Preserve evidence under `docs/releases/<version>/`, following the
 [beta.1 record](releases/0.1.0-beta.1/README.md): approved source, artifact and
 corpus identity, registry file checksums, qualification/publication/recovery run
 IDs, clean-install results, and annotated tag target. Label reconstructed

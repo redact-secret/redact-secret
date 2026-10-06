@@ -1,5 +1,5 @@
 //! Google OAuth client secret detection (issue #1029, #1012 handoff
-//! `docs/audits/evidence/1012/google-oauth2-credential.md`).
+//! [`docs/audits/evidence/1012/google-oauth2-credential.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012/google-oauth2-credential.md)).
 //!
 //! Google publishes no grammar for OAuth client secrets. Google's own
 //! osv-scalibr rule `gcpoauth2client` (`@google.com` authors) is

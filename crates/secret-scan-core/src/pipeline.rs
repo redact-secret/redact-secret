@@ -588,7 +588,7 @@ pub(crate) fn detect<R: DetectorSet + ?Sized>(
 /// The result equals running [`detect`] on each unit alone and
 /// concatenating, apart from finding ids, provided each detector's
 /// candidates inside a unit do not depend on the text of other units (the
-/// per-detector audit in `docs/audits/evidence/985/`; the incremental session
+/// per-detector audit in [`docs/audits/evidence/985/`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/985); the incremental session
 /// never batches a unit the audit found a detector reading across). Three
 /// things this function makes hold by construction rather than by that
 /// audit:

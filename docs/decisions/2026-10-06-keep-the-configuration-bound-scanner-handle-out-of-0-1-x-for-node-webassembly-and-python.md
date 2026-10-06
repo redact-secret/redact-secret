@@ -33,7 +33,7 @@ What exists, with its evidence:
   [`decision-add-a-send-sync-built-in-only-registry-as-a-distinct-type`](2026-10-05-add-a-send-sync-built-in-only-registry-as-a-distinct-type.md)
   (#1178) is an immutable `Send + Sync` value with its own PII selection, and
   that record is the Rust-side answer #1097 named as a reopen trigger. The
-  executed A/B/C tests of [#1221](../audits/evidence/1221/README.md)
+  executed A/B/C tests of [#1221](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1221/README.md)
   (`crates/secret-scan-core/tests/pii_instance_isolation_1221.rs`, 7 tests) show
   three PII configurations coexisting in every construction order, across
   threads, in interleaved sessions and across teardown. A second ownership model
@@ -48,7 +48,7 @@ What exists, with its evidence:
 - **Isolation without new API works, and this change ran it.** #1221 executed
   Node (one `worker_threads` Worker per owner), WebAssembly (one module instance
   per owner) and Python (one process per owner) on the raw bindings; the
-  [#1222 evidence](../audits/evidence/1222/README.md) re-ran the Node recipe
+  [#1222 evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1222/README.md) re-ran the Node recipe
   through the built `@redact-secret/core` facade, which #1221 had left as source
   inspection only. A Worker that imports the package gets its own runtime and
   three Workers produce `[]`, email plus network address, and network address

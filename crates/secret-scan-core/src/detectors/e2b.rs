@@ -1,5 +1,5 @@
 //! E2B API key detection (issue #905, handoff
-//! `docs/audits/evidence/860/e2b.md`).
+//! [`docs/audits/evidence/860/e2b.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/e2b.md)).
 //!
 //! The grammar is `e2b_` + exactly 40 lowercase hex, all T1 under ruling R1:
 //! the provider's key package sets `ApiKeyPrefix = "e2b_"` and generates

@@ -17,7 +17,7 @@ values the issue left open: cost bounds, the ordering/specificity cap, the
 closed validator enum's starting membership, the profile and conformance
 interaction, and which surfaces accept a ruleset first. The measured evidence
 the issue required before this ADR was written is
-[`docs/audits/evidence/441/README.md`](../audits/evidence/441/README.md).
+[`docs/audits/evidence/441/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/441/README.md).
 This record authorizes, but does not itself perform, the parser and loader
 implementation; that is separate follow-up work. It changes no shipped
 detector, no compiled artifact, and no public API by itself.
@@ -223,7 +223,7 @@ diverge on *which rulesets load at all*, which is the exact
 divergent-implementation failure the callback exclusion exists to prevent,
 re-entering through the loader instead of through per-candidate execution.
 One parser in the core means every surface rejects the same bytes with the
-same fixed error, the property [`docs/audits/evidence/441/README.md`](../audits/evidence/441/README.md)'s
+same fixed error, the property [`docs/audits/evidence/441/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/441/README.md)'s
 prototype demonstrates directly: 7 rejection-class unit tests, each a fixed
 enum variant carrying no content from the rejected input.
 
@@ -233,7 +233,7 @@ detector-independent "engine floor"
 WASM size, paid by every consumer including `common` browser users who load
 no ruleset) — is a real ~2.9% brotli WASM increment for a representative
 371-line prototype covering a subset of the full validation surface below
-(see [evidence/441](../audits/evidence/441/README.md) for the exact
+(see [evidence/441](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/441/README.md) for the exact
 before/after artifact sizes and methodology). Treat that as a lower bound:
 the real implementation's fuller validation (all cost bounds, the complete
 error catalog, ordering enforcement) adds somewhat more. It stays in the low
@@ -303,7 +303,7 @@ is unchanged):
   (added at implementation).
 
 The implementation issue adds one test per class to the conformance corpus
-(see [Conformance](#conformance)); [`docs/audits/evidence/441/README.md`](../audits/evidence/441/README.md)'s
+(see [Conformance](#conformance)); [`docs/audits/evidence/441/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/441/README.md)'s
 prototype already demonstrates 7 of these classes end to end as real,
 passing unit tests, so the catalog above is proven parseable and rejectable
 in the actual constrained environment (no parser or matching dependency, no `unsafe`,
@@ -559,7 +559,7 @@ cap that guarantees it can add detections but never silently outrank a
 built-in one. The measured cost is real but bounded — a low single-digit
 percent WASM size increment paid once by every consumer regardless of
 profile or of whether they ever load a ruleset — and is now a number in
-[evidence/441](../audits/evidence/441/README.md) rather than an estimate.
+[evidence/441](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/441/README.md) rather than an estimate.
 
 The follow-up implementation issue must, at minimum: add the parser and
 loader with the exact [cost bounds](#cost-bounds) and
@@ -570,7 +570,7 @@ path) into registrable detectors under the
 [reference ruleset conformance fixture](#conformance); add the
 JavaScript/Python/CLI surfaces from [Surface exposure](#surface-exposure)
 through the reviewed `core-public-api` manifest; and re-measure the real
-compiled artifact against [evidence/441](../audits/evidence/441/README.md)'s
+compiled artifact against [evidence/441](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/441/README.md)'s
 baseline once it exists, the same way
 `decision-define-detector-profile-and-pack-contract`'s own triggers call for
 re-measurement with `scripts/measure-detector-cost.mjs`.

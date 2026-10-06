@@ -1,5 +1,5 @@
 //! Unkey root key detection (issue #1104, handoff
-//! `docs/audits/evidence/1014/unkey.md`).
+//! [`docs/audits/evidence/1014/unkey.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/unkey.md)).
 //!
 //! An Unkey root key authorizes the Unkey management API for a workspace.
 //! Both grammars are T1 under rulings R1 and R9 from the provider's own

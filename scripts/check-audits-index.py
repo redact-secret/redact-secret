@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""Gate `docs/audits/README.md` on indexing every audit and evidence unit (#593; DS1).
+"""Gate `docs/audits/README.md` on indexing every long-lived audit unit (#593; #1266).
 
-`docs/audits/` is the review and audit archive: a standalone review document
-sitting next to `evidence/<issue>/`, frozen evidence for a product judgement
-(`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`).
-Neither kind is useful to a reader who cannot find it. This script re-derives
-the two unit sets straight from the filesystem -- every `docs/audits/*.md`
-file except `README.md` itself, and every `docs/audits/evidence/<unit>/`
-directory -- and fails when a unit's own path is never a link target
-anywhere in `docs/audits/README.md`.
+`docs/audits/` holds temporary reviews: a standalone review document sitting
+next to `evidence/<unit>/`, each declaring its lifecycle in a front matter
+block (`decision-retire-historical-audit-bodies-before-release-qualification`,
+checked by `check-audit-lifecycle.py`). A unit that stays in the tree is not
+useful to a reader who cannot find it. This script re-derives the two unit
+sets straight from the filesystem -- every `docs/audits/*.md` file except
+`README.md` itself, and every `docs/audits/evidence/<unit>/` directory -- and
+fails when a unit's own path is never a link target anywhere in
+`docs/audits/README.md`.
+
+A unit whose valid block says `status: in-progress` or `final` is temporary and
+tracked by the lifecycle check, so writing one never requires an index edit;
+`deferred`, `retained` and any unit without a block must be indexed. Indexing
+is a navigation aid and never implies permanent retention: the index lists
+what is in the tree and shrinks when a unit is retired.
 
 It checks that the unit is *linked*, not merely mentioned: an issue number
 can appear in ordinary prose (as `#145`, for instance) without the document
@@ -19,6 +26,7 @@ link destination counts.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import re
 import sys
 from pathlib import Path
@@ -45,15 +53,36 @@ def index_link_targets(index_text: str) -> list[str]:
     return [match.group(1).split("#", 1)[0] for match in LINK_RE.finditer(index_text)]
 
 
+def temporary_units(audits_dir: Path) -> set[str]:
+    """Unit paths relative to `audits_dir` that the lifecycle check tracks instead."""
+    spec = importlib.util.spec_from_file_location(
+        "check_audit_lifecycle", Path(__file__).with_name("check-audit-lifecycle.py")
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("check_audit_lifecycle", module)
+    spec.loader.exec_module(module)
+    resolved = audits_dir.resolve()
+    root = resolved.parent.parent
+    if resolved != root / "docs" / "audits":
+        return set()
+    prefix = "docs/audits/"
+    return {path[len(prefix) :] for path in module.temporary_units(root)}
+
+
 def validate(audits_dir: Path, index_text: str) -> list[str]:
     targets = index_link_targets(index_text)
     errors: list[str] = []
+    temporary = temporary_units(audits_dir)
 
     for name in list_audit_docs(audits_dir):
+        if name in temporary:
+            continue
         if not any(target == name for target in targets):
             errors.append(f"docs/audits/{name} is not indexed in docs/audits/README.md")
 
     for unit in list_evidence_units(audits_dir):
+        if f"evidence/{unit}" in temporary:
+            continue
         prefix = f"evidence/{unit}/"
         if not any(target.startswith(prefix) for target in targets):
             errors.append(f"docs/audits/evidence/{unit}/ is not indexed in docs/audits/README.md")

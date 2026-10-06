@@ -1,5 +1,5 @@
 //! Polar organization access token and API credential detection (issue
-//! #1020, handoff `docs/audits/evidence/1014/polar.md`).
+//! #1020, handoff [`docs/audits/evidence/1014/polar.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/polar.md)).
 //!
 //! Every fact is T1 under rulings R1 and R9, from the provider's server code
 //! (`polarsource/polar`, re-checked 2026-09-29). `kit/crypto.py` has

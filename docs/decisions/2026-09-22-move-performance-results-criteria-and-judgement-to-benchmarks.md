@@ -77,9 +77,9 @@ needed recalibration regardless of ownership.
   judgement run.
 - `assessment/README.md`, `docs/reference/detection-reliability.md`, and
   `docs/releasing.md` are updated to describe this ownership split; every
-  other document that linked a removed path (`docs/audits/evidence/376/`,
-  `docs/audits/detection-assurance-epic-closeout.md`,
-  `docs/audits/detection-reliability-published-evidence.md`) is repointed at
+  other document that linked a removed path ([`docs/audits/evidence/376/`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/376),
+  [`docs/audits/detection-assurance-epic-closeout.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-assurance-epic-closeout.md),
+  [`docs/audits/detection-reliability-published-evidence.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-reliability-published-evidence.md)) is repointed at
   the pre-removal commit rather than left broken.
 
 ## Amendment to the cross-language evaluation protocol

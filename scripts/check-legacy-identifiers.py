@@ -70,28 +70,6 @@ LEGACY_IDENTIFIER_ALLOWLIST: dict[str, str] = {
         "rationale cite the old identity as the decision's own record of "
         "what changed, not a missed rename"
     ),
-    "docs/audits/ci-release-automation-supply-chain-review.md": ("a closed, dated, commit-pinned independent review"),
-    "docs/audits/closed-issue-acceptance-evidence-ledger.md": (
-        "a closed-issue acceptance-evidence ledger, dated and commit-pinned"
-    ),
-    "docs/audits/core-conformance-cli-boundary-review.md": ("a closed, dated, commit-pinned independent review"),
-    "docs/audits/detection-assurance-closeout-audit.md": ("a closed, dated, commit-pinned closeout audit"),
-    "docs/audits/javascript-python-bindings-package-contracts-review.md": (
-        "a closed, dated, commit-pinned independent review"
-    ),
-    "docs/audits/release-approval-and-registry-publisher-evidence.md": (
-        "a closed, dated, commit-pinned evidence record"
-    ),
-    "docs/audits/release-gap-disposition.md": ("a closed, dated disposition of four independent reviews' findings"),
-    "docs/audits/release-readiness-audit.md": ("a closed, dated, commit-pinned independent review"),
-    "docs/audits/repository-transfer-evidence.md": (
-        "a dated pre/post transfer evidence record that must identify the former path"
-    ),
-    "docs/audits/evidence/1012/cartesia.md": (
-        "a frozen #1012 research record whose permalink cites a third-party "
-        "repository file named `secret-scan.ts`; the text is another "
-        "project's path, not this project's former name"
-    ),
     "scripts/check-legacy-identifiers.py": (
         "this script's own docstring and token patterns must name the "
         "legacy identifier literally to detect and document it; not a "

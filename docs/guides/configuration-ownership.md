@@ -8,7 +8,7 @@ independent configurations in one deployment. The decision behind this page is
 ([#1222](https://github.com/redact-secret/redact-secret/issues/1222)): no new
 configuration-bound scanner handle is added for Node, WebAssembly or Python in
 0.1.x. This page is the supported alternative, and the
-[evidence](../audits/evidence/1222/README.md) records that every example below
+[evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1222/README.md) records that every example below
 was run.
 
 ## Three kinds of configuration

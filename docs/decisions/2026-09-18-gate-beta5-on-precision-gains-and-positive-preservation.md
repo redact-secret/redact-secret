@@ -22,7 +22,7 @@ shared context/streaming matrix (#375), and the contract freeze (#367) as
 producing a genuine, evidenced precision gain over beta.4, with no measured
 loss on required positives, no new collateral redaction, and every intended
 behavioral change explicitly recorded. Full evidence remains in
-[`docs/audits/evidence/376/README.md`](../audits/evidence/376/README.md) and,
+[`docs/audits/evidence/376/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/376/README.md) and,
 for the durable candidate comparison, `redact-secret-benchmarks`'s
 [`docs/reports/beta-5/results.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/beta-5/results.md).
 In summary: fixed-corpus twin discrimination moved 32/56 → 56/56 (24 twin

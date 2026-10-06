@@ -318,7 +318,7 @@ emits both and that your server serves both with `application/wasm`; a page
 that never enables PII never requests the PII asset. Transfer sizes of the
 default builds are in [detector profiles](../reference/detection.md#detector-profiles);
 raw, gzip and brotli sizes of all four assets, including the PII split, are in
-the [#1127 measurement](../audits/evidence/1127/README.md).
+the [#1127 measurement](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1127/README.md).
 
 A PII selection fails with one of three fixed, input-free errors:
 

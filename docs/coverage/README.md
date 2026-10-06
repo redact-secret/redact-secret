@@ -55,7 +55,7 @@ files that had no freshness test (`fp-fn-summary.json`,
   closed by issue #105; the remaining evidence-*breadth* gaps
   (`coverage-declarations.json`'s `pending` dimension cells, below) are
   tracked as
-  [`docs/audits/detection-assurance-residual-evidence-backlog.md`](../audits/detection-assurance-residual-evidence-backlog.md).
+  [`docs/audits/detection-assurance-residual-evidence-backlog.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-assurance-residual-evidence-backlog.md).
   Issue [#136](https://github.com/redact-secret/redact-secret/issues/136)
   closed the historical tracking artifact; its exit work was split across
   [#186](https://github.com/redact-secret/redact-secret/issues/186),
@@ -196,6 +196,16 @@ only because a test fails when it falls out of date with that input — see
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`,
   including a regeneration-equality test against the committed file.
 
+- [`precision-corpus-audit.json`](./precision-corpus-audit.json) — generated
+  by `scripts/audit-precision-contracts.py --write` (issue
+  [#367](https://github.com/redact-secret/redact-secret/issues/367), moved
+  here by [#1262](https://github.com/redact-secret/redact-secret/issues/1262)):
+  every fixture in the synchronous, incremental and accuracy corpora (and
+  every `reconciliationTrigger` in `detector-inventory.json`) that names one
+  of the seven frozen provider detectors, evaluated against
+  `docs/contracts/precision/precision-contracts.json`, with its disposition
+  and exact retained or lost ranges. It never contains an input. `npm run
+  precision-contracts:check` regenerates it and fails on any byte difference.
 - [`precision-context-matrix.json`](./precision-context-matrix.json) — the
   paired precision-regression matrix issue
   [#375](https://github.com/redact-secret/redact-secret/issues/375) asks for,
@@ -210,7 +220,8 @@ only because a test fails when it falls out of date with that input — see
   `intentionally-unsupported` row is stated, never omitted. The one genuine,
   measured before/after in this repo — beta.4's actual ranges versus the
   frozen contract's `expected`, for the 24 must-not-flag twins and their 24
-  paired positives — is reported separately as `beta4TwinBaseline` rather
+  paired positives, read from
+  `docs/contracts/precision/beta4-twin-baseline.json` — is reported separately as `beta4TwinBaseline` rather
   than force-joined onto the live corpus rows by id (that baseline's ids are
   audit-internal, not corpus fixture ids, and a guessed join would itself be
   an unexercised parity claim). Regenerate after any change to either
@@ -301,7 +312,7 @@ define, and that model encoded as data:
   declaration types (above) — that model, machine-validated (issue #103).
 - `coverage-report.md` and "Coverage drift is a CI failure" (above) — that
   baseline and model, summarized for review and enforced in CI (issue #104).
-- [`docs/audits/detection-assurance-closeout-audit.md`](../audits/detection-assurance-closeout-audit.md) —
+- [`docs/audits/detection-assurance-closeout-audit.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-assurance-closeout-audit.md) —
   the Epic [#95](https://github.com/redact-secret/redact-secret/issues/95) closeout
   (issue #118): coverage by capability and risk dimension, the classification
   and ownership of every currently `pending` cell, and confirmation that

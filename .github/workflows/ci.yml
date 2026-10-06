@@ -733,3 +733,10 @@ jobs:
 
       - name: Every ADR full_record permalink must name a reachable commit
         run: npm run decision-permalinks:check
+
+      # Surviving historical permalinks (documents, source comments, release
+      # records) are verified offline against the same full history: commit an
+      # ancestor of origin/main, path and anchor present at it, integrity
+      # digests valid (issue #1264). It makes no network call.
+      - name: Every historical permalink must resolve at an ancestor of main
+        run: npm run historical-permalinks:check

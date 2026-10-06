@@ -13,7 +13,7 @@ Issue [#379](https://github.com/redact-secret/redact-secret/issues/379), under
 epic [#377](https://github.com/redact-secret/redact-secret/issues/377). The
 evidence is the measured baseline from
 [#378](https://github.com/redact-secret/redact-secret/issues/378),
-[`docs/audits/evidence/378/README.md`](../audits/evidence/378/README.md). This
+[`docs/audits/evidence/378/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/378/README.md). This
 record fixes the contract that #380 (registry composition), #381 (full and
 common WebAssembly artifacts), and #382 (qualification) implement. It changes no
 detector, public API, artifact, or release by itself, and authorizes no release.

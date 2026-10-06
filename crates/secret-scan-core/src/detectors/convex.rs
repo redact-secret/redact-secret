@@ -1,5 +1,5 @@
 //! Convex deployment and admin key detection (issue #912, handoff
-//! `docs/audits/evidence/860/convex.md`).
+//! [`docs/audits/evidence/860/convex.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/convex.md)).
 //!
 //! Convex's Apache-2.0 backend (`get-convex/convex-backend` at `032e81e`)
 //! is the issuer for self-hosted deployments and fixes the key layout:

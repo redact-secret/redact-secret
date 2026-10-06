@@ -18,7 +18,7 @@ costs, or which sets are allowed to grow
 ([#1066](https://github.com/redact-secret/redact-secret/issues/1066), under
 [#1065](https://github.com/redact-secret/redact-secret/issues/1065)).
 
-The audit in [`docs/audits/evidence/1066`](../audits/evidence/1066/README.md)
+The audit in [`docs/audits/evidence/1066`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1066/README.md)
 reconciled every public name of the four surfaces (54 Rust root names, 44
 Python names, the JavaScript exports and the CLI) against its documentation,
 declaration and tests, and listed nine surfaces likely to break after a
@@ -103,7 +103,7 @@ Rejected alternatives:
   new code breaking.
 - Catch panics and exit `2`. It cannot cover aborts or signals and would
   promise a status the CLI cannot always deliver
-  ([#1130](../audits/evidence/1130/README.md)).
+  ([#1130](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1130/README.md)).
 - Freeze the finding `type` set. Detector coverage grows.
 - Change Python `ScanResult.findings` to a `tuple` now. It would give O(1)
   reads and enforced immutability, but it breaks `append`, `sort`,

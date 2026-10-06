@@ -1,5 +1,5 @@
 //! `RubyGems.org` API key detection (issue #1023, handoff
-//! `docs/audits/evidence/1014/rubygems.md`).
+//! [`docs/audits/evidence/1014/rubygems.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/rubygems.md)).
 //!
 //! The grammar is `rubygems_` + exactly 48 lowercase hex, all T1 under ruling
 //! R1: rubygems.org's `generate_rubygems_key` returns

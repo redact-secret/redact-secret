@@ -230,7 +230,7 @@ pub(crate) fn is_open_tail_neutral(appended: &str) -> bool {
 /// incremental unit) as the continuation of text on an earlier line, so
 /// scanning it after that text can differ from scanning it alone. The
 /// incremental session never batches such a unit with the units before it
-/// (issue #985; the per-detector audit is in `docs/audits/evidence/985/`).
+/// (issue #985; the per-detector audit is in [`docs/audits/evidence/985/`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/985)).
 ///
 /// Two built-in grammars skip [`text::is_js_whitespace`], line terminators
 /// included, between their parts:

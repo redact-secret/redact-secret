@@ -29,7 +29,7 @@
 //!   alphabet with `={0,2}` padding. Total length and IAM user-name
 //!   variants other than `BedrockAPIKey-` stay T2/unspecified; the blog is
 //!   accepted as provider evidence for the prefix and alphabet only, not a
-//!   format specification. See `docs/audits/evidence/864/README.md`.
+//!   format specification. See [`docs/audits/evidence/864/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/864/README.md).
 //! - **Short-term prefix, head and alphabet, T1.** Accepted on the
 //!   AWS-authored token generators `aws-bedrock-token-generator-python`
 //!   (`token_generator.py`: `AUTH_PREFIX = "bedrock-api-key-"`,

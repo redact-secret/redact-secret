@@ -1,5 +1,5 @@
 //! Square access token and OAuth application secret detection (issue #1107,
-//! handoff `docs/audits/evidence/1014/square.md`).
+//! handoff [`docs/audits/evidence/1014/square.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/square.md)).
 //!
 //! A Square access token (`SQUARE_ACCESS_TOKEN`, sent as `Authorization:
 //! Bearer`) acts for a merchant or the developer's own account, and the OAuth

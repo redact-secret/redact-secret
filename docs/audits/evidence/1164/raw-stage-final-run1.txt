@@ -1,9 +1,0 @@
-sparse-ascii         bytes   72050 old    93802.3ns | A    34789.1 (-62.9%) | B(prod)    35101.3 (-62.6%) | A/A    90301.8 (-3.7%)
-sparse-unicode       bytes   40550 old    52875.1ns | A    30663.5 (-42.0%) | B(prod)    29378.8 (-44.4%) | A/A    56862.2 (+7.5%)
-dense                bytes   75000 old   204940.6ns | A   203091.5 (-0.9%) | B(prod)   208147.4 (+1.6%) | A/A   191320.0 (-6.6%)
-dense-short-gap      bytes   75000 old   177845.0ns | A   172802.8 (-2.8%) | B(prod)   178600.0 (+0.4%) | A/A   179217.8 (+0.8%)
-prefix-noise         bytes   60000 old   106221.0ns | A   117864.4 (+11.0%) | B(prod)   102248.1 (-3.7%) | A/A   106975.6 (+0.7%)
-eyJ-header-only      bytes   72000 old   318345.1ns | A   310101.7 (-2.6%) | B(prod)   294488.2 (-7.5%) | A/A   304109.3 (-4.5%)
-no-match             bytes   72000 old    75045.5ns | A    27633.2 (-63.2%) | B(prod)    27216.0 (-63.7%) | A/A    68357.1 (-8.9%)
-one-long-run         bytes  100003 old   192646.5ns | A   118019.9 (-38.7%) | B(prod)   122352.8 (-36.5%) | A/A   196682.2 (+2.1%)
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1820 filtered out; finished in 51.53s

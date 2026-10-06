@@ -17,7 +17,7 @@ passed at the frozen source revision.
 
 Detection qualification is recorded on
 [#584](https://github.com/redact-secret/redact-secret/issues/584) and in
-[its evidence](../../audits/evidence/584/README.md). The benchmark evaluation
+[its evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/584/README.md). The benchmark evaluation
 was re-run on the addon and wasm files that CI built for this revision, and it
 matched the recorded candidate fixture for fixture, 1,466 of 1,466. Publication
 was then explicitly approved for this source revision.

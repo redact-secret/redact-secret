@@ -1,5 +1,5 @@
 //! `PostHog` personal and project secret API key detection (issue #906,
-//! handoff `docs/audits/evidence/860/posthog.md`).
+//! handoff [`docs/audits/evidence/860/posthog.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/posthog.md)).
 //!
 //! | Prefix | Finding type | Decision |
 //! | --- | --- | --- |

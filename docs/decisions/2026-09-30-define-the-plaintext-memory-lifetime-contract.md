@@ -18,7 +18,7 @@ avoid holding it: detection needs the text, and an incremental session must
 keep unresolved text until a detector window closes
 ([#1079](https://github.com/redact-secret/redact-secret/issues/1079)).
 
-The audit in [`docs/audits/evidence/1079`](../audits/evidence/1079/README.md)
+The audit in [`docs/audits/evidence/1079`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1079/README.md)
 found what the core owns. A whole-input scan borrows the caller's `&str` and
 makes one owned copy only when invisible code points are removed. An
 incremental session owns `retained`, an optional normalized `scanned` copy, a
@@ -100,7 +100,7 @@ blanket wrapper around the scanner. The decision changes no code, API or
 detection behavior.
 
 Follow-up, not a change to this decision: the measured zeroization design for
-#1080 is in [`docs/audits/evidence/1080`](../audits/evidence/1080/README.md).
+#1080 is in [`docs/audits/evidence/1080`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1080/README.md).
 It stays a proposal until a maintainer rules and a new ADR amends the core's
 no-Cargo-features rule; this decision's vocabulary and "no erasure claim
 without a mechanism" rule apply to it unchanged.

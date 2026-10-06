@@ -62,9 +62,9 @@ current.
 
 Counts at the candidate (regenerate with
 `python3 -B scripts/report-detection-support.py --source-revision fe6e9234d40e7d5964de27d00d33544f9c621dbf`;
-method in the [#1067 evidence record](../audits/evidence/1067/README.md), the
-per-detector join in
-[`detector-support-join.md`](../audits/evidence/1067/detector-support-join.md)):
+method in the [#1067 evidence record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1067/README.md), the
+Beta.13 per-detector join snapshot in
+[`detector-support-join.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1067/detector-support-join.md)):
 
 - 110 shipped credential detectors emit 141 finding types; 6 opt-in PII
   families also ship. These are the denominators.
@@ -100,7 +100,7 @@ current main from public fixtures reproduces none of the four (every public conf
 detectors matches its declared span exactly), but the recorded case is not
 named in the pinned matrix, so its absence is not shown and the family stays
 provisional. Per-family result and method:
-[#1187 recheck](../audits/evidence/1067/README.md#generic-family-recheck-on-current-main-1187).
+[#1187 recheck](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1067/README.md#generic-family-recheck-on-current-main-1187).
 
 ### Known false-positive classes
 
@@ -135,9 +135,11 @@ An empty finding list does not show that text is secret-free.
 The per-family status table is the generated
 [support matrix](../support-matrix.md) for credential families and the
 [Opt-in PII table](detection.md#opt-in-pii-availability-is-not-support) for
-PII. The per-detector join of both against the shipped code is
-[`detector-support-join.md`](../audits/evidence/1067/detector-support-join.md).
-That file is regenerated for the candidate named in the identity table.
+PII. The per-detector join of both against the shipped code is produced on
+demand by `python3 -B scripts/report-detection-support.py --source-revision
+<sha>`, which writes to standard output. The join for the candidate named in the
+identity table is the Beta.13 snapshot
+[`detector-support-join.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1067/detector-support-join.md).
 
 ### What this contract does not claim
 
@@ -222,7 +224,7 @@ The accuracy adapter checks emitted findings; it does not establish a universal
 redaction-success rate. CLI additionally compares `--redact` output with the
 placeholders implied by its emitted findings. Python checks whole-input and
 incremental output equivalence. Neither detects a secret the scanner missed.
-The [canonical conformance review](../audits/public-contract-cross-runtime-conformance.md)
+The [canonical conformance review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/public-contract-cross-runtime-conformance.md)
 owns redaction correctness for supported behavior.
 
 Historical Rust timing in
@@ -243,7 +245,7 @@ judgement now belong to
 
 ## Historical evidence and reproduction
 
-The earlier [9-fixture audit](../audits/evidence/200/verification-summary.json)
+The earlier [9-fixture audit](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/200/verification-summary.json)
 is preserved for its original revision. It does not describe the current v3
 corpus. That audit does not claim that those artifacts were published.
 

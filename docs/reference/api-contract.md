@@ -129,8 +129,8 @@ custom detector callbacks are a direct Rust surface only.
 > [`decision-define-declarative-ruleset-revisioning`](../decisions/2026-10-02-define-declarative-ruleset-revisioning.md).
 > The name-by-name audit, the surfaces that were likely to break, the owner
 > decisions and the verification this rests on are in the
-> [contract audit](../audits/evidence/1066/README.md) and the
-> [ruleset audit](../audits/evidence/1072/README.md). Conformance against the
+> [contract audit](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1066/README.md) and the
+> [ruleset audit](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1072/README.md). Conformance against the
 > exact candidate artifacts is a separate, later step
 > ([#199](https://github.com/redact-secret/redact-secret/issues/199)).
 

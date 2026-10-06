@@ -16,7 +16,7 @@ and Vercel Edge resolve `@redact-secret/core`'s `browser` condition, and left
 whether that path actually works under either platform's real runtime as an
 open, explicitly unclaimed question (issue #462). It is now settled for both,
 by running the real artifact against each platform's real engine rather than
-a synthetic harness (full transcripts: `docs/audits/evidence/462/README.md`).
+a synthetic harness (full transcripts: [`docs/audits/evidence/462/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/462/README.md)).
 
 **Cloudflare Workers is now supported.** A real `wrangler dev` sandbox (a
 real local `workerd` server, the same engine Cloudflare Workers runs in

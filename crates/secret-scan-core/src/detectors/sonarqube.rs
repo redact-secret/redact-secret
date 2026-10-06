@@ -1,5 +1,5 @@
 //! `SonarQube` Server user and analysis token detection (issue #1021, handoff
-//! `docs/audits/evidence/1014/sonarqube.md`).
+//! [`docs/audits/evidence/1014/sonarqube.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/sonarqube.md)).
 //!
 //! Every fact is T1 under ruling R1, from the provider's own server code
 //! (`SonarSource/sonarqube`, re-checked 2026-09-29): `TokenGeneratorImpl`

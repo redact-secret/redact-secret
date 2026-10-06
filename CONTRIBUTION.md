@@ -47,11 +47,14 @@ the ADR and spec-file rules bind it:
   an ADR rather than an undocumented convention.
 - New evidence goes where
   [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](docs/decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
-  places its kind, not wherever is convenient: a product-judgement record
-  under `docs/audits/evidence/<issue>/`, frozen once written; a benchmark or
-  scanner measurement in `redact-secret-benchmarks`, never copied into this
-  repository; and an iterative or exploratory log as an issue comment, cited
-  by permalink from whichever final record needs it, not restated there.
+  places its kind, not wherever is convenient: a product-judgement review
+  under `docs/audits/` as a temporary review with its lifecycle block, retired
+  before release qualification under
+  [`decision-retire-historical-audit-bodies-before-release-qualification`](docs/decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md);
+  a benchmark or scanner measurement in `redact-secret-benchmarks`, never
+  copied into this repository; and an iterative or exploratory log as an
+  issue comment, cited by permalink from whichever final record needs it, not
+  restated there.
 - Current rules are stated in the five spec files under `docs/specs/`
   (`detector-families.md`, `contextual-detection.md`, `engine.md`,
   `distribution.md`, `evidence-and-gates.md`); each links the ADR that
@@ -171,8 +174,9 @@ passes without anyone having to read the checker script itself:
    ([issue form](.github/ISSUE_TEMPLATE/request-detector.yml)) is routed to
    the benchmarks `research-family` form. This repository keeps no dossier of
    its own: the detector module doc, the `docs/specs/detector-families.md`
-   row, and `docs/audits/evidence/<issue>/` remain the implementation record,
-   and the dossier links to them. Until the dossier convention lands in
+   row, and any temporary review under `docs/audits/` are the implementation
+   record until that review is retired; the dossier links to the spec row and
+   to a 40-hex permalink for anything retired. Until the dossier convention lands in
    `redact-secret-benchmarks` (issue #473 there), a family with no dossier
    entry cites its research issue instead.
 1. **Provider or tool evidence.** In `benchmarks/lib/assessment.ts`, record

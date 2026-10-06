@@ -6,11 +6,15 @@ Slack, Hugging Face, Cloudflare, Linear), the reviewed lexical contract each
 default detector must enforce, the beta.4 negative-twin baseline those
 contracts were measured against, and an audit of every fixture this
 repository already ships for those families. The contract text is a live
-input CI reads on every run, so it lives outside the frozen-evidence archive
+input CI reads on every run, so it lives outside docs/audits
 at ``docs/contracts/precision/precision-contracts.json``
 (``decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement``);
-this script derives the two evidence files still frozen under
-``docs/audits/evidence/367/`` and keeps them honest:
+this script derives and keeps honest two further files: the baseline, a live
+contract that is both the recipe's input and its checked output, at
+``docs/contracts/precision/beta4-twin-baseline.json``, and the corpus audit,
+pure generated data, at ``docs/coverage/precision-corpus-audit.json``. The
+baseline's values are reconstructed from the recipe, not an independent
+measurement of beta.4:
 
 ``beta4-twin-baseline.json``
     The 24 must-not-flag twins and their 24 paired positives from the beta.4
@@ -25,7 +29,7 @@ this script derives the two evidence files still frozen under
     lookalikes, while ``--check`` still proves the recipe reproduces the
     recorded hashes and ranges.
 
-``corpus-audit.json``
+``precision-corpus-audit.json``
     Every fixture in ``conformance/fixtures/synchronous-corpus.json``,
     ``conformance/fixtures/incremental-corpus.json``,
     ``assessment/fixtures/accuracy-corpus.json`` and every
@@ -59,9 +63,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS_DIR = ROOT / "docs" / "contracts" / "precision"
 CONTRACTS_PATH = CONTRACTS_DIR / "precision-contracts.json"
-EVIDENCE_DIR = ROOT / "docs" / "audits" / "evidence" / "367"
-BASELINE_PATH = EVIDENCE_DIR / "beta4-twin-baseline.json"
-CORPUS_AUDIT_PATH = EVIDENCE_DIR / "corpus-audit.json"
+BASELINE_PATH = CONTRACTS_DIR / "beta4-twin-baseline.json"
+CORPUS_AUDIT_PATH = ROOT / "docs" / "coverage" / "precision-corpus-audit.json"
 
 SYNCHRONOUS_CORPUS = ROOT / "conformance" / "fixtures" / "synchronous-corpus.json"
 INCREMENTAL_CORPUS = ROOT / "conformance" / "fixtures" / "incremental-corpus.json"
@@ -428,9 +431,9 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument(
         "--check",
         action="store_true",
-        help="verify the committed evidence files are consistent with the contracts (default)",
+        help="verify the committed baseline and corpus audit are consistent with the contracts (default)",
     )
-    mode.add_argument("--write", action="store_true", help="rewrite the derived evidence files")
+    mode.add_argument("--write", action="store_true", help="rewrite the derived baseline and corpus audit")
     mode.add_argument(
         "--print-fixture", metavar="ID", help="reconstruct one frozen fixture's literal content on stdout"
     )

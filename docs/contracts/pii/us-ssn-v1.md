@@ -5,7 +5,7 @@ arrival policy to one jurisdictional family. It is the product-side contract
 for issue #879, not a benchmark qualification or support-promotion claim.
 
 The frozen product judgement is recorded in
-[`docs/audits/evidence/879/README.md`](../../audits/evidence/879/README.md).
+[`docs/audits/evidence/879/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/879/README.md).
 
 ## Identity, activation, and support row
 

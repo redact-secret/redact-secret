@@ -1,5 +1,5 @@
 //! Mapbox secret access token detection (issue #1108, handoff
-//! `docs/audits/evidence/1014/mapbox.md`).
+//! [`docs/audits/evidence/1014/mapbox.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/mapbox.md)).
 //!
 //! A Mapbox access token is three dot-separated parts: a usage header (`pk`,
 //! `sk` or `tk`), a base64url-encoded JSON payload and a signature. Only the

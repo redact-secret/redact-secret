@@ -1,5 +1,5 @@
 //! Apify API token detection (issue #916, handoff
-//! `docs/audits/evidence/860/apify.md`).
+//! [`docs/audits/evidence/860/apify.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/apify.md)).
 //!
 //! The Apify docs placeholders are `apify_api_...` (ruling R4: a placeholder
 //! is T1 for its prefix). The provider's own leak linter in

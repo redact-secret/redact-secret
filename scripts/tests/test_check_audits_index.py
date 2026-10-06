@@ -65,5 +65,43 @@ class CheckAuditsIndexTest(unittest.TestCase):
         self.assertEqual(CHECK.validate(self.audits_dir, index), [])
 
 
+class TemporaryUnitIndexTest(unittest.TestCase):
+    """A declared temporary unit is tracked by the lifecycle check, not the index (#1266)."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        self.audits_dir = self.root / "docs" / "audits"
+
+    def write(self, relative: str, status: str, retire: str) -> None:
+        path = self.audits_dir / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            "---\nowner: #1266\nreviewed_source: "
+            + "a" * 40
+            + "\nstatus: {status}\nretire_on: {retire}\n---\n\n# Review\n".format(status=status, retire=retire),
+            encoding="utf-8",
+        )
+
+    def test_in_progress_and_final_units_need_no_index_row(self) -> None:
+        self.write("wip.md", "in-progress", "before-qualification")
+        self.write("evidence/5/README.md", "final", "before-qualification")
+        self.assertEqual(CHECK.validate(self.audits_dir, "# Index\n"), [])
+
+    def test_deferred_and_retained_units_must_be_indexed(self) -> None:
+        self.write("backlog.md", "deferred", "after-issue:#9")
+        self.write("candidate.md", "retained", "after-release:0.1.0-beta.14")
+        errors = CHECK.validate(self.audits_dir, "# Index\n")
+        self.assertEqual(len(errors), 2, errors)
+        self.assertEqual(CHECK.validate(self.audits_dir, "[a](backlog.md) [b](candidate.md)\n"), [])
+
+    def test_a_unit_without_a_block_must_still_be_indexed(self) -> None:
+        path = self.audits_dir / "old.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# Old\n", encoding="utf-8")
+        self.assertEqual(len(CHECK.validate(self.audits_dir, "# Index\n")), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

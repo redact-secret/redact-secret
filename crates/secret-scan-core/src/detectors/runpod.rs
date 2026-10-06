@@ -1,5 +1,5 @@
 //! `RunPod` API key detection (issue #974, handoff
-//! `docs/audits/evidence/860/runpod.md`).
+//! [`docs/audits/evidence/860/runpod.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/runpod.md)).
 //!
 //! The `RunPod` blog on scoped keys (2024-11) states that new keys carry an
 //! `rpa_` prefix, and a provider-authored scrubber in `runpod/runpod-mcp`

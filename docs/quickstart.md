@@ -45,7 +45,7 @@ It reads them from this page, so a change here changes the qualification too.
 For the Rust and command-line sections CI checks the version pin and the page's
 shape but does not execute them, because no candidate registry serves crates.
 They were executed from this page's text against the published crates when
-the page was last revised ([evidence](audits/evidence/1070/README.md)).
+the page was last revised ([evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1070/README.md)).
 Commands are POSIX shell. On Windows, run them from Git Bash or WSL, or use
 `.venv\Scripts\python` in place of `.venv/bin/python`.
 

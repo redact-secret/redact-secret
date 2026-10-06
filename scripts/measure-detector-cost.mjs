@@ -22,10 +22,16 @@
  *     cargo build --release --locked -p redact-secret-cli  # warms the cache
  *
  *     node scripts/measure-detector-cost.mjs --variant full \
- *       --out-dir docs/audits/evidence/378 --scratch-dir /tmp/detector-cost
+ *       --out-dir target/measure/detector-cost --scratch-dir target/detector-cost
  *
  *     node scripts/measure-detector-cost.mjs --aggregate \
- *       --out-dir docs/audits/evidence/378
+ *       --out-dir target/measure/detector-cost
+ *
+ * `--out-dir` is scratch output, kept under the ignored `target/` directory by
+ * the examples above. Results that should be kept and judged belong in
+ * `redact-secret-benchmarks`
+ * (`decision-move-performance-results-criteria-and-judgement-to-benchmarks`),
+ * not in this repository's audit archive.
  *
  * `--variant <name>` builds and measures exactly one named variant (see
  * `VARIANTS` below), writing `<out-dir>/raw/<name>/{cli-whole,wasm-whole,

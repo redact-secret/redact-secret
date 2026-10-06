@@ -1,5 +1,5 @@
 //! Honeycomb ingest key detection (issue #1034, handoff
-//! `docs/audits/evidence/1014/honeycomb.md`).
+//! [`docs/audits/evidence/1014/honeycomb.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/honeycomb.md)).
 //!
 //! | Key | Grammar | Evidence |
 //! | --- | --- | --- |

@@ -8,18 +8,21 @@ precision contract in docs/audits/evidence/367/precision-contracts.json,
 ...)"` -- is invisible to it whether it lives in Markdown or JSON. Issue
 #638 found 41 such citations left dangling by a path move that no checker
 caught. This script closes the JSON half of that gap: Markdown prose
-citations are excluded because `docs/audits/evidence/<issue>/` and similar
-narrative archives cite paths as of when they were written and are
-correctly allowed to go stale (a frozen record's job is to say what was
-true then, not what is true now); every corpus fixture and generated
+citations are excluded because a temporary review under
+`docs/audits/evidence/<unit>/` cites paths as of its `reviewed_source`, and a
+release record cites the tree it recorded; neither is a live contract, and
+the review is deleted before qualification
+(`decision-retire-historical-audit-bodies-before-release-qualification`);
+every corpus fixture and generated
 report, in contrast, describes current behavior, so a dangling path there
-is always a defect, not a historical fact.
+is always a defect, not a historical fact. A historical citation is written as a
+40-hex permalink instead, which this gate skips and
+`scripts/check-historical-permalinks.py` verifies.
 
-`docs/audits/evidence/` and `docs/releases/` are excluded for the same
-reason: both are frozen narrative/record archives under this repository's
-artifact taxonomy (`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`),
-not live contracts or generated reports, so a path they cite is allowed to
-outlive the file it names.
+`docs/audits/evidence/` (temporary reviews, retired before release
+qualification) and `docs/releases/` (permanent release records) are excluded
+for that reason, so a path they cite may outlive the file it names. A file a
+script or CI reads is a live input and does not belong under either prefix.
 
 This is a read-only gate: it fixes nothing.
 
@@ -39,7 +42,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 CITATION_KEYS = ("note", "reference")
 
-FROZEN_PREFIXES = ("docs/audits/evidence/", "docs/releases/")
+# Temporary review units and permanent release records describe a past tree.
+EXCLUDED_PREFIXES = ("docs/audits/evidence/", "docs/releases/")
 
 # Repo-relative path citations always start with one of these top-level
 # directories, followed by at least one more path segment and a file
@@ -60,6 +64,14 @@ TOP_LEVEL_DIRS = (
 )
 PATH_RE = re.compile(r"\b(?:" + "|".join(TOP_LEVEL_DIRS) + r")(?:/[\w.-]+)+\.[A-Za-z0-9]+\b")
 
+# A 40-hex blob/tree permalink into this repository names a path *as of a past
+# commit*, which is exactly what a historical citation is meant to say. It is
+# not a current-tree path, so this gate must not read the path inside it as one.
+# `check-historical-permalinks.py` verifies each such permalink instead (commit
+# reachable from main, path and anchor present at it) and is the only check that
+# makes a permalink in a `note` safe to rely on (issue #1264).
+PERMALINK_RE = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/(?:blob|tree)/[0-9a-f]{40}/[^\s)>\]`\"']+")
+
 
 def list_tracked_json_files(root: Path) -> list[str]:
     output = subprocess.run(["git", "ls-files", "*.json"], cwd=root, check=True, capture_output=True, text=True).stdout
@@ -76,7 +88,7 @@ def citations(value: object) -> list[str]:
         if isinstance(node, dict):
             for key, child in node.items():
                 if key in CITATION_KEYS and isinstance(child, str):
-                    found.extend(PATH_RE.findall(child))
+                    found.extend(PATH_RE.findall(PERMALINK_RE.sub(" ", child)))
                 else:
                     walk(child)
         elif isinstance(node, list):
@@ -104,7 +116,7 @@ def validate(root: Path, files: list[str] | None = None) -> list[str]:
     root = root.resolve()
     errors: list[str] = []
     for relative in files if files is not None else list_tracked_json_files(root):
-        if relative.startswith(FROZEN_PREFIXES):
+        if relative.startswith(EXCLUDED_PREFIXES):
             continue
         errors.extend(check_file(root, relative))
     return sorted(errors)

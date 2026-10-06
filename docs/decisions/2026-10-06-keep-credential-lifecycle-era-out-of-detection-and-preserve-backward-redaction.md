@@ -84,7 +84,7 @@ The false-positive cost is a long-dead credential, or a documentation example
 of one, masked in a fixture or a log. The false-negative cost is a retired form
 in a carrier the grammar does not read, the same blind spots as for any
 credential. `docs/specs/detector-families.md` gains one row citing this record,
-and the [#1230 record](../audits/evidence/1230/README.md) applies it to the nine
+and the [#1230 record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1230/README.md) applies it to the nine
 rows and records which carriers are read today. No detector, vocabulary name,
 type or public interface changes; no version change and no release.
 

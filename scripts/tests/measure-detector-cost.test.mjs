@@ -16,6 +16,12 @@ const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs");
 const REAL_SOURCE = readFileSync(MOD_RS, "utf8");
 
+test("the usage text steers results away from the audit archive", () => {
+  const source = readFileSync(join(REPO_ROOT, "scripts", "measure-detector-cost.mjs"), "utf8");
+  assert.ok(!source.includes("docs/audits"), "no example or default may name docs/audits");
+  assert.ok(source.includes("redact-secret-benchmarks"));
+});
+
 test("parseVecBlock finds exactly one vec entry per canonical id in the real registry", () => {
   const { lines } = parseVecBlock(REAL_SOURCE);
   assert.equal(lines.length, CANONICAL_IDS.length);

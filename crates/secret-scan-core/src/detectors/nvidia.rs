@@ -1,5 +1,5 @@
 //! NVIDIA API key detection (issue #972, handoff
-//! `docs/audits/evidence/860/nvidia.md`).
+//! [`docs/audits/evidence/860/nvidia.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/nvidia.md)).
 //!
 //! NVIDIA documents that keys "typically start with nvapi-", and the `ngcsdk`
 //! CLI constant `SCOPED_KEY_PREFIX = "nvapi-"` has an executing `startswith`

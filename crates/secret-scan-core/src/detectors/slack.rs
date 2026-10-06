@@ -43,7 +43,7 @@
 //! `xapp-` app-level tokens have their own `slack_app_level_token` finding
 //! type and section grammar since issue #729: `xapp-<digits>-<alnum>-<digits>-<alnum>`,
 //! `-`-separated, every section a non-empty run. The order is the frozen
-//! anatomy in `docs/audits/evidence/726/README.md`; widths and alphabets stay
+//! anatomy in [`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md); widths and alphabets stay
 //! open because tool sources disagree (Nosey Parker's two-section rule
 //! contradicts it), so no width is a negative rule. This retires beta.4's
 //! opaque `xapp-[A-Za-z0-9_-]{20,}` guard, which admitted a `_` separator and
@@ -233,7 +233,7 @@ fn scan(input: &str) -> Vec<Match> {
 
 /// Every boundary-delimited `xapp-` app-level value, left to right: the
 /// frozen section anatomy `xapp-<digits>-<alnum>-<digits>-<alnum>` (issue
-/// #729, `docs/audits/evidence/726/README.md`). Every section is a
+/// #729, [`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md)). Every section is a
 /// non-empty run; widths are open on purpose (tool sources disagree, so no
 /// width is a negative rule), but the digit sections stay all-digit and the
 /// separators stay `-`, so a `_` separator or a letter inside a digit
@@ -320,7 +320,7 @@ fn scan_bot(input: &str) -> Vec<(usize, usize)> {
 
 /// Every boundary-delimited `xoxp-` user value, left to right: the frozen
 /// anatomy `xoxp-<digits>-<digits>-<digits>-<alnum>` (issue #730,
-/// `docs/audits/evidence/726/README.md`). Every section is a non-empty run;
+/// [`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md)). Every section is a non-empty run;
 /// the provider states only the prefix, the `-`-separated sections and the
 /// three-numeric-section example, so no width is a negative rule (tools say
 /// 10-13 digits and a 28+ byte secret, but pre-2016 tokens carry 6 or 10 byte

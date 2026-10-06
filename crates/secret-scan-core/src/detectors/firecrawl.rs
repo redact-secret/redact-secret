@@ -1,5 +1,5 @@
 //! Firecrawl API key detection (issue #908, handoff
-//! `docs/audits/evidence/860/firecrawl.md`).
+//! [`docs/audits/evidence/860/firecrawl.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/firecrawl.md)).
 //!
 //! The grammar is `fc-` + exactly 32 lowercase hex forming a dashless UUID v4:
 //! body byte 12 is `4` (the version nibble) and body byte 16 is one of

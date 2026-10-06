@@ -24,11 +24,12 @@ excluded before scanning, by removing fenced lines and stripping inline code
 spans line by line -- the same shape of exclusion this script's own docstring
 examples would otherwise trip.
 
-This is a read-only gate: it fixes nothing. `docs/audits/evidence/<issue>/`
-is frozen evidence (`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`);
-a broken link discovered inside a file covered by a sibling `SHA256SUMS.txt`
-must be corrected by editing the *linking* prose elsewhere or accepted and
-recorded, never by silently rewriting the hashed file's bytes.
+This is a read-only gate: it fixes nothing. A file under `docs/audits/` is a
+temporary review (`decision-retire-historical-audit-bodies-before-release-qualification`),
+not a permanent record; a broken link inside one is fixed by correcting the
+link or by retiring the unit. A file covered by a sibling `SHA256SUMS.txt`
+is never edited to fix a link: correct the *linking* prose elsewhere, or
+retire the whole unit with its bundle, so the hashed bytes are never rewritten.
 """
 
 from __future__ import annotations

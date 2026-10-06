@@ -132,7 +132,7 @@ jobs:
                   pr=true
                   break
                   ;;
-                scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py)
+                scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py|scripts/release_review_identity.py)
                   pr=true
                   break
                   ;;
@@ -162,10 +162,48 @@ jobs:
             echo "pr=$pr"
           } >> "$GITHUB_STEP_SUMMARY"
 
+  # Issue #1266: no artifact is built or qualified from a tree that still
+  # carries a historical review body
+  # (`decision-retire-historical-audit-bodies-before-release-qualification`).
+  # `policy` waits on this job and every other job waits on `policy`, so a
+  # failure here stops the whole fan-out before anything is built or
+  # published. Release mode applies to every qualification entry point: a
+  # `workflow_dispatch` run (a direct dispatch, `release.yml` and
+  # `package-release-rehearsal.yml` all arrive as one) and a push to `rc/*`.
+  # An ordinary push to `main` and a pull request run the development mode,
+  # which accepts a declared temporary review. The check only reads: it
+  # approves nothing and publishes nothing.
+  lifecycle:
+    name: Audit lifecycle
+    runs-on: ubuntu-latest
+    needs: plan
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Check that no historical review body is carried into qualification
+        env:
+          RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/rc/')) }}
+        run: |
+          python3 -B -m unittest discover -s scripts/tests -p 'test_check_audit_lifecycle.py'
+          if [[ "$RELEASE_MODE" == "true" ]]; then
+            python3 -B scripts/check-audit-lifecycle.py --release
+          else
+            python3 -B scripts/check-audit-lifecycle.py
+          fi
+
   policy:
     name: Artifact matrix policy
     runs-on: ubuntu-latest
-    needs: plan
+    needs:
+      - plan
+      - lifecycle
     permissions:
       contents: read
 
@@ -1185,6 +1223,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # `record-artifact-inventory.py` proves the candidate review's
+          # `reviewed_source` is an ancestor of this revision (issue #1263),
+          # which needs the history, not a depth-one clone.
+          fetch-depth: 0
 
       - name: Apply the rehearsal version (no-op outside a rehearsal)
         if: needs.plan.outputs.full == 'true'
@@ -1267,6 +1309,9 @@ jobs:
           # which no clone can resolve; the head commit is the revision the
           # artifacts were actually built from.
           SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          # A rehearsal bumps the tree to a throwaway version; the review
+          # obligation is that of the committed version it rehearses.
+          REHEARSAL_VERSION: ${{ inputs.rehearsal-version }}
         run: |
           python3 -B scripts/record-artifact-inventory.py \
             --artifacts qualification-artifacts \

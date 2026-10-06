@@ -7,6 +7,11 @@ Markdown links breadth-first from `docs/README.md` and fails when a tracked
 links. A prose mention (`docs/specs/engine.md` in backticks) does not count; only a
 link destination does, because only a link is clickable.
 
+A page inside a temporary audit unit (`status: in-progress` or `final` in its
+front matter block, `check-audit-lifecycle.py`, #1266) is tracked by the
+lifecycle check instead, so writing a review never requires a navigation edit;
+a `deferred` or `retained` unit must still be reachable.
+
 A page that should stay off the index goes in `EXEMPT`, with the reason beside
 it, so an exemption is a reviewed decision rather than silent drift.
 """
@@ -14,6 +19,7 @@ it, so an exemption is a reviewed decision rather than silent drift.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import re
 import subprocess
 import sys
@@ -71,6 +77,16 @@ def reachable(start: Path) -> set[Path]:
     return seen
 
 
+def temporary_unit_paths(root: Path) -> set[Path]:
+    spec = importlib.util.spec_from_file_location(
+        "check_audit_lifecycle", Path(__file__).with_name("check-audit-lifecycle.py")
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("check_audit_lifecycle", module)
+    spec.loader.exec_module(module)
+    return {(root / path).resolve() for path in module.temporary_units(root)}
+
+
 def validate(root: Path, exempt: dict[str, str] | None = None) -> list[str]:
     root = root.resolve()
     exempt = EXEMPT if exempt is None else exempt
@@ -80,8 +96,11 @@ def validate(root: Path, exempt: dict[str, str] | None = None) -> list[str]:
     pages = tracked_docs(root)
     seen = reachable(index)
     exempt_paths = {(root / name).resolve() for name in exempt}
+    temporary = temporary_unit_paths(root)
     errors: list[str] = []
     for page in sorted(pages - seen - exempt_paths):
+        if any(page == unit or unit in page.parents for unit in temporary):
+            continue
         errors.append(f"{page.relative_to(root)} is not reachable by Markdown links from docs/README.md")
     for name in sorted(exempt):
         path = (root / name).resolve()

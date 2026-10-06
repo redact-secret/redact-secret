@@ -1,5 +1,5 @@
 //! Pydantic Logfire token detection (issue #1106, handoff
-//! `docs/audits/evidence/1014/pydantic-logfire.md`).
+//! [`docs/audits/evidence/1014/pydantic-logfire.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/pydantic-logfire.md)).
 //!
 //! Logfire write tokens (`LOGFIRE_TOKEN`), read tokens and organization or
 //! project API keys (`LOGFIRE_READ_TOKEN`, `LOGFIRE_API_KEY`) and the Pydantic

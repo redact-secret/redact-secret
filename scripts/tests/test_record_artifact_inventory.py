@@ -603,7 +603,7 @@ class InventoryTests(unittest.TestCase):
             "productVersion": "0.1.0-beta.1",
             "artifacts": self.collect(),
             "packageContents": {"@redact-secret/core": ["dist/index.js"]},
-            "releaseReadiness": RECORD.release_readiness_record(),
+            "releaseReadiness": self.readiness(),
         }
         summary = RECORD.render_summary(inventory)
         self.assertIn("0" * 40, summary)
@@ -611,32 +611,130 @@ class InventoryTests(unittest.TestCase):
         self.assertIn("separate approval required", summary)
         self.assertIn("post-publication-release-workflow", summary)
         self.assertIn("dist/index.js", summary)
+        self.assertIn("Candidate review: `docs/audits/review.md`", summary)
+        self.assertIn("evidence only", summary)
+
+    def readiness_root(self, **overrides: str | None) -> Path:
+        """A throwaway root that holds only the candidate's own review: no
+        historical review body, as after the lifecycle cleanup."""
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        root = Path(directory.name)
+        (root / "docs/audits").mkdir(parents=True)
+        fields: dict[str, str | None] = {
+            "owner": "#1263",
+            "reviewed_source": "c" * 40,
+            "status": "retained",
+            "retire_on": f"after-release:{PRODUCT_VERSION}",
+            "candidate_version": PRODUCT_VERSION,
+            "review_scope": "public-api-and-compatibility",
+            "disposition": "accepted",
+        }
+        fields.update(overrides)
+        block = "".join(f"{key}: {value}\n" for key, value in fields.items() if value is not None)
+        (root / "docs/audits/review.md").write_text(f"---\n{block}---\n\n# Review\n", encoding="utf-8")
+        (root / "CHANGELOG.md").write_text("# Changelog\n", encoding="utf-8")
+        return root
+
+    def readiness(self, root: Path | None = None, **kwargs: object) -> dict:
+        kwargs.setdefault("relation", lambda *_: "ancestor")
+        return RECORD.release_readiness_record(
+            PRODUCT_VERSION, SOURCE_COMMIT, root=root or self.readiness_root(), **kwargs
+        )
 
     def test_release_readiness_record_pins_review_and_registry_boundaries(self) -> None:
-        record = RECORD.release_readiness_record()
-        self.assertEqual(record["issue"], 1112)
+        record = self.readiness()
+        self.assertEqual(record["schemaVersion"], 2)
         review = record["publicApiAndChangelogReview"]
         self.assertEqual(review["status"], "required-before-release-approval")
-        self.assertEqual(
-            review["currentPublicApiReview"]["path"],
-            "docs/audits/beta12-candidate-public-contract-review.md",
-        )
-        self.assertRegex(review["currentPublicApiReview"]["sha256"], r"^[0-9a-f]{64}$")
-        self.assertEqual(
-            review["publicApiReview"]["path"],
-            "docs/audits/candidate-public-contract-review.md",
-        )
-        self.assertEqual(
-            review["publicApiReview"]["scope"],
-            "historical-beta.1-candidate-review",
-        )
-        self.assertRegex(review["publicApiReview"]["sha256"], r"^[0-9a-f]{64}$")
+        candidate = review["candidateReview"]
+        self.assertEqual(candidate["status"], "bound")
+        self.assertEqual(candidate["version"], PRODUCT_VERSION)
+        self.assertEqual(candidate["path"], "docs/audits/review.md")
+        self.assertRegex(candidate["sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(candidate["reviewedSource"], "c" * 40)
+        self.assertEqual(candidate["scope"], "public-api-and-compatibility")
+        self.assertEqual(candidate["disposition"], "accepted")
+        self.assertIs(candidate["reviewAuthorizesRelease"], False)
+        self.assertNotIn("currentPublicApiReview", review)
+        self.assertNotIn("publicApiReview", review)
         self.assertEqual(review["changelog"]["path"], "CHANGELOG.md")
         self.assertRegex(review["changelog"]["sha256"], r"^[0-9a-f]{64}$")
         registry = record["registryInstallVerification"]
         self.assertEqual(registry["status"], "post-publication-release-workflow")
         self.assertEqual(registry["verifier"], "scripts/verify-registry-install.mjs")
         self.assertEqual(registry["authorization"], "separate release approval required")
+
+    def test_a_candidate_with_no_review_of_its_own_fails_clearly(self) -> None:
+        root = self.readiness_root(candidate_version="0.1.0-beta.12", retire_on="after-release:0.1.0-beta.12")
+        with self.assertRaisesRegex(RECORD.review_identity.ReviewIdentityError, "no candidate public-contract review"):
+            self.readiness(root)
+
+    def test_a_mismatched_review_identity_fails_for_source_scope_and_disposition(self) -> None:
+        for overrides, relation, expected in (
+            ({}, lambda *_: "not-ancestor", "is not an ancestor"),
+            ({"review_scope": "docs"}, None, "requires 'public-api-and-compatibility'"),
+            ({"disposition": "rejected"}, None, "does not accept"),
+            ({"status": "final"}, None, "must be 'retained'"),
+        ):
+            with self.subTest(expected):
+                kwargs = {"relation": relation} if relation else {}
+                with self.assertRaisesRegex(RECORD.review_identity.ReviewIdentityError, expected):
+                    self.readiness(self.readiness_root(**overrides), **kwargs)
+
+    def test_a_digest_follows_the_review_bytes(self) -> None:
+        root = self.readiness_root()
+        first = self.readiness(root)["publicApiAndChangelogReview"]["candidateReview"]["sha256"]
+        (root / "docs/audits/review.md").write_text(
+            (root / "docs/audits/review.md").read_text() + "edited\n", encoding="utf-8"
+        )
+        second = self.readiness(root)["publicApiAndChangelogReview"]["candidateReview"]["sha256"]
+        self.assertNotEqual(first, second)
+
+    def test_the_generator_hardcodes_no_review_path_and_reads_no_historical_review(self) -> None:
+        source = SCRIPT.read_text(encoding="utf-8")
+        for retired in (
+            "docs/audits/candidate-public-contract-review.md",
+            "docs/audits/beta12-candidate-public-contract-review.md",
+        ):
+            self.assertNotIn(retired, source)
+        # Generation needs only the candidate's own review: this root has none
+        # of the historical review bodies and still records a bound identity.
+        root = self.readiness_root()
+        self.assertEqual(sorted(path.name for path in (root / "docs/audits").iterdir()), ["review.md"])
+        self.assertEqual(self.readiness(root)["publicApiAndChangelogReview"]["candidateReview"]["status"], "bound")
+
+    def test_this_repository_binds_its_own_version_to_its_own_review(self) -> None:
+        # The tree's declared product version must have a satisfied review
+        # obligation: its own retained review while it is a candidate, or its
+        # release record once published.
+        with (RECORD.ROOT / RECORD.NPM_PACKAGE / "package.json").open(encoding="utf-8") as handle:
+            version = json.load(handle)["version"]
+        record = RECORD.release_readiness_record(version, "d" * 40, relation=lambda *_: "ancestor")
+        candidate = record["publicApiAndChangelogReview"]["candidateReview"]
+        self.assertIn(candidate["status"], ("bound", "recorded-in-release-record"))
+        self.assertEqual(candidate["version"], version)
+        if candidate["status"] == "bound":
+            self.assertRegex(candidate["reviewedSource"], r"^[0-9a-f]{40}$")
+            self.assertIn(candidate["disposition"], ("accepted", "accepted-with-limitations"))
+
+    def test_review_version_is_the_committed_version_during_a_rehearsal(self) -> None:
+        with (RECORD.ROOT / RECORD.NPM_PACKAGE / "package.json").open(encoding="utf-8") as handle:
+            committed = json.load(handle)["version"]
+        with unittest.mock.patch.dict(os.environ, {"REHEARSAL_VERSION": "0.1.0-beta.99"}):
+            self.assertEqual(RECORD.review_version("0.1.0-beta.99"), (committed, True))
+            self.assertEqual(RECORD.review_version(committed), (committed, False))
+        with unittest.mock.patch.dict(os.environ, {"REHEARSAL_VERSION": ""}):
+            self.assertEqual(RECORD.review_version("0.1.0-beta.99"), ("0.1.0-beta.99", False))
+
+    def test_a_rehearsal_without_a_review_records_that_it_is_not_release_evidence(self) -> None:
+        root = self.readiness_root(candidate_version="0.1.0-beta.12", retire_on="after-release:0.1.0-beta.12")
+        with unittest.mock.patch.dict(os.environ, {"REHEARSAL_VERSION": "0.1.0-beta.99"}):
+            record = self.readiness(root, rehearsal=True)
+        candidate = record["publicApiAndChangelogReview"]["candidateReview"]
+        self.assertEqual(candidate["status"], "not-required-rehearsal")
+        self.assertEqual(candidate["rehearsalVersion"], "0.1.0-beta.99")
+        self.assertIs(candidate["reviewAuthorizesRelease"], False)
 
 
 class CratePackageDigestTests(unittest.TestCase):

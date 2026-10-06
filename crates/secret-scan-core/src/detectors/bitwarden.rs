@@ -1,5 +1,5 @@
 //! Bitwarden Secrets Manager access token detection (issue #1019, handoff
-//! `docs/audits/evidence/1014/bitwarden.md`).
+//! [`docs/audits/evidence/1014/bitwarden.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/bitwarden.md)).
 //!
 //! A machine-account access token carries both the client secret and the
 //! symmetric key that decrypts the account's secrets. Every fact is T1 under

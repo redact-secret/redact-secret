@@ -5,7 +5,7 @@ the product-side contract for issue #878, not a claim of benchmark
 qualification or stable support.
 
 The supporting product judgment and typed source provenance are frozen in
-[`docs/audits/evidence/878/README.md`](../../audits/evidence/878/README.md).
+[`docs/audits/evidence/878/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/878/README.md).
 
 ## Identity and activation
 

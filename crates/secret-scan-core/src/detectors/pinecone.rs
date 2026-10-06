@@ -1,6 +1,6 @@
 //! Pinecone API key detection (issue #730, Beta.8 wave 2).
 //!
-//! Frozen by issue #726 (`docs/audits/evidence/726/README.md`): the current
+//! Frozen by issue #726 ([`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md)): the current
 //! key shape is `pcsk_<label>_<secret>` with a 5-6 byte `[A-Za-z0-9]` label
 //! and an exact 63 byte `[A-Za-z0-9]` secret (T2: the prefix and segmenting
 //! are provider code, the widths are tool-corroborated). It is one

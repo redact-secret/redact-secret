@@ -266,8 +266,8 @@ names the `unsafe` keyword outside a comment, so `grep -rn unsafe crates/` finds
 only the `forbid(unsafe_code)` declarations and prose. A counting allocator
 needs `unsafe impl GlobalAlloc`, so allocation measurement lives outside this
 repository, in the separate measurement engine, which uses a third-party
-counting allocator ([`docs/audits/evidence/1151`](audits/evidence/1151/README.md),
-[`docs/audits/evidence/1152`](audits/evidence/1152/README.md)).
+counting allocator ([`docs/audits/evidence/1151`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1151/README.md),
+[`docs/audits/evidence/1152`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1152/README.md)).
 
 ### Generated invisible-code-point table
 
@@ -448,7 +448,7 @@ repetitions (default 21) after one warm-up. `--filter` (or a bare argument)
 selects workloads by substring, `--no-detectors` skips attribution, and
 `--json` prints one JSON document for evidence records to cite. Progress goes
 to stderr. The workloads, their known limits, and a baseline on `main` are in
-[`docs/audits/evidence/981/README.md`](audits/evidence/981/README.md).
+[`docs/audits/evidence/981/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/981/README.md).
 Since #1053 through #1060 it also covers the one-line value, query, brace and
 paren rescan workloads, source with provider prefixes, and one-line PII input
 at 64 and 256 KiB. Every row reports throughput in MB/s. Incremental timing

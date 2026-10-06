@@ -312,7 +312,7 @@ def check_node_engines(root: Path) -> list[str]:
     """Every lockstep manifest's and every native platform package's
     `engines.node` names exactly the Node majors `ci.yml`'s `test` job matrix
     exercises — narrowed to that finite set rather than left open-ended, so
-    the two cannot drift apart (`docs/audits/release-gap-disposition.md`
+    the two cannot drift apart (`https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md`
     `R/F-23`). A native platform package that claims fewer majors than the
     wrapper silently narrows what an installer can actually run on without
     that narrowing ever being reviewed."""

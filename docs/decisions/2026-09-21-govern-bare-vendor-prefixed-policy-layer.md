@@ -146,12 +146,12 @@ heuristic, not a contract match.
 - `docs/coverage/detector-inventory.json` gains a `vendor_prefixed_credential`
   row (`always-redact` policy class); `coverage-declarations.json`,
   `inventory-report.json`, and `coverage-report.md` are regenerated.
-  `docs/audits/evidence/367/corpus-audit.json` is regenerated to reflect the
+  `docs/coverage/precision-corpus-audit.json` (then still `docs/audits/evidence/367/corpus-audit.json`) is regenerated to reflect the
   five reclassified fixtures' new `kind`/`tier`; `docs/audits/evidence/367/
   precision-contracts.json` — the frozen contract description of
   `openai-token` itself — is untouched, since `openai-token`'s own behavior
   does not change.
-- `docs/audits/evidence/552/README.md`, written against an earlier framing
+- [`docs/audits/evidence/552/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/552/README.md), written against an earlier framing
   of this issue that concluded no product code change was warranted for the
   four provider families, is superseded for `openai-token` specifically by
   this decision and the fix it describes; it is not rewritten, per

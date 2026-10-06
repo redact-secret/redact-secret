@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Documentation
+
+- Documentation lifecycle (#1265, epic #1259,
+  `decision-retire-historical-audit-bodies-before-release-qualification`):
+  historical audit bodies, rejected research artifacts and the archive index
+  are retired from the tree. History is preserved by 40-hex permalinks, and
+  `docs/audits/` keeps only the retained reviews, each with an owner and a
+  retirement trigger. No detection, redaction or public API behavior changes.
+
 ## 0.1.0-beta.14 — 2026-10-06
 
 ### Support status
@@ -1183,7 +1192,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   which has no provider detectors, now redacts provider-named assignments.
   Cost: a non-secret literal under a provider-named credential variable,
   such as a malformed near miss, is reported. See
-  `docs/audits/evidence/948/README.md`.
+  [`docs/audits/evidence/948/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/948/README.md).
 
 ### Fixed
 
@@ -1202,7 +1211,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
 
   Random material glued to a placeholder, secret-key prefixes, a short
   `********x` mask and a longer visible head stay reported. See
-  `docs/audits/evidence/993/README.md`.
+  [`docs/audits/evidence/993/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/993/README.md).
 
 - Streaming false negatives: an incremental session missed a credential that
   a whole-input scan of the same text redacts (#990, found by the #985
@@ -1386,7 +1395,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   Measured on the benchmarks performance workflow, all ten
   `latency/*/processing-ratio` rows are within budget (0.54-0.83 of beta.8;
   `browser-wasm` `scale-logs-small-whole` 1.23 against its 1.30 allowance).
-  See `docs/audits/evidence/950/README.md`.
+  See [`docs/audits/evidence/950/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/950/README.md).
 - Detectors no longer allocate an 8-byte-per-input-byte run-length table on
   every call (#982). Detectors anchored on a literal (`firebase`, `gitlab`
   runner, `grafana`, `microsoft-entra`, `notion`, `openai`, `sendgrid`,
@@ -1397,7 +1406,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   runs on demand without a table. A whole-input scan of 10 MiB of prose
   allocated 1,952 MiB before and 32 MiB after. The #981 harness's 10 MiB
   mixed workload runs about 22% faster whole-input and incremental.
-  Findings and output are unchanged. See `docs/audits/evidence/982/README.md`.
+  Findings and output are unchanged. See [`docs/audits/evidence/982/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/982/README.md).
 - Built-in detectors that can only match text containing one of a few
   literals (a provider prefix such as `ghp_`, a marker such as `.atlasv1.`)
   are skipped when the scan copy cannot contain any of them (#983). The
@@ -1407,7 +1416,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   (`generic-token`, `bearer-token`, the keyword-gated and bare-shape
   detectors) always run. On the #981 harness the 64 KiB logs workload runs
   43% faster whole-input and 48% faster incremental, on top of #982.
-  Findings and output are unchanged. See `docs/audits/evidence/983/README.md`.
+  Findings and output are unchanged. See [`docs/audits/evidence/983/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/983/README.md).
 - An incremental session now detects all the lines that close in one
   `append` call together, instead of running every detector once per line
   (#985). Policy and redaction still run line by line, so text, findings,
@@ -1417,7 +1426,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   19.8 ms). A line that a detector could read together with an earlier line
   (after a lone `\r`, or one starting with `=`, `:` or `bearer`) starts a
   new batch, and PII detection still runs per line. See
-  `docs/audits/evidence/985/README.md`.
+  [`docs/audits/evidence/985/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/985/README.md).
 - PII context association no longer grows faster than linearly with the
   number of PII candidates (#902). For every candidate it used to scan from
   the start of the input to find the candidate's line, compare it with every
@@ -1430,7 +1439,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   line from about 21 s to about 1.4 ms. The `_pii` WebAssembly builds grow
   by about 5.8 KB (2.4 KB gzip), and building a registry, a session or
   `initialize()` does no extra work. Findings, ranges, actions and output
-  are unchanged. See `docs/audits/evidence/902/README.md`.
+  are unchanged. See [`docs/audits/evidence/902/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/902/README.md).
 
 ## 0.1.0-beta.10 — 2026-09-28
 
@@ -1785,7 +1794,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
 ## 0.1.0-beta.8 — 2026-09-25
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.8/README.md).
-Candidate measurement record: [#731](docs/audits/evidence/731/README.md).
+Candidate measurement record: [#731](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/731/README.md).
 
 Beta.8 moves 19 existing families to `stable` against the beta.7 matrix (16
 provisional through the empirical profile, 3 reclassified from unsupported or
@@ -2126,7 +2135,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it w
   families, Hugging Face, Microsoft Entra, and both Docker families. 51 of 93
   families are now `stable`. The published beta.6 package, measured on the
   same corpus with the same scanner pins, reads 43, and no family left
-  `stable` (#575, #584, [evidence](docs/audits/evidence/584/README.md)). The
+  `stable` (#575, #584, [evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/584/README.md)). The
   matrix shipped with beta.6 read 3 `stable` under an earlier benchmark
   corpus and ledger, so it is not a like-for-like baseline.
 - `microsoft-entra-client-secret` now detects a client secret whose first
@@ -2145,13 +2154,13 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it w
   Postman, Databricks and Okta stay `provisional` at T2; no provider source
   states their grammar. The beta.7 candidate measurement still records
   unresolved differential items for Databricks (6) and Okta (9)
-  ([#584 evidence](docs/audits/evidence/584/README.md#open-items)).
+  ([#584 evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/584/README.md#open-items)).
 - `Package Release Rehearsal` now qualifies a throwaway, never-published
   `<X.Y.Z>-beta.<run id>` version instead of the branch's already-published
   one, moved onto its own uncommitted checkout after proving npm, crates.io,
   and PyPI carry no such version, so unpublished-version release-path defects
   (beta.6's #607 and #608) surface before an RC exists (#632,
-  [`docs/audits/release-rehearsal-coverage.md`](docs/audits/release-rehearsal-coverage.md)).
+  [`docs/audits/release-rehearsal-coverage.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-rehearsal-coverage.md)).
 - The [safe browser/server integration example](examples/safe-integration/README.md)
   now documents why the browser's default policy and the server's explicit
   `serverPolicy` are declared independently, states that the server never
@@ -2363,7 +2372,7 @@ intentional false negatives stay in the linked decision records and
   instead of one byte long. A value whose own first byte is an unmatched
   backtick (an unterminated template literal or command substitution) is still
   reported; a real secret containing a literal backtick, unquoted, is the
-  accepted false negative. Evidence: `docs/audits/evidence/548/README.md`.
+  accepted false negative. Evidence: [`docs/audits/evidence/548/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/548/README.md).
 - `generic-token` now also redacts a bare, marker-less `sk-`/`sk-proj-`/
   `sk-svcacct-`/`sk-admin-` value at OpenAI's documented legacy/early-project
   body width (exactly 48 `[A-Za-z0-9]` bytes) with no surrounding context at
@@ -2413,7 +2422,7 @@ intentional false negatives stay in the linked decision records and
   key authenticates in 2024, but a leaked key is still redacted. A tail
   shorter or longer than 140 bytes, or a separator other than `:`, is an
   intentional false negative. The detector is always-redact and in the
-  provider pack only. Evidence: `docs/audits/evidence/520/README.md`.
+  provider pack only. Evidence: [`docs/audits/evidence/520/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/520/README.md).
 - Added a `terraform-cloud-token` detector (finding type
   `terraform_cloud_token`) for HCP Terraform and Terraform Enterprise user,
   team, and organization API tokens: exactly 14 `[A-Za-z0-9]` bytes, the
@@ -2427,7 +2436,7 @@ intentional false negatives stay in the linked decision records and
   or long, a malformed marker (`.atlasv2.`, `.ATLASV1.`), a masked value, or
   HashiCorp's short `xxxxxx.atlasv1.` documentation placeholder. The
   detector is always-redact and in the provider pack only. Evidence:
-  `docs/audits/evidence/521/README.md`.
+  [`docs/audits/evidence/521/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/521/README.md).
 - `stripe-token` now also detects organization API keys (`sk_org_`) and
   webhook signing secrets (`whsec_`), each followed by 20 or more
   `[A-Za-z0-9]` bytes, the same floor and alphabet `sk_`/`rk_` already use
@@ -2460,7 +2469,7 @@ intentional false negatives stay in the linked decision records and
   `redact-secret-benchmarks`' `context.markdown` metamorphic sweep). A
   backtick is now accepted as the boundary before the assignment name and
   after the value's closing quote. Before, the whole assignment was missed
-  instead of merely mis-spanned. Evidence: `docs/audits/evidence/552/README.md`.
+  instead of merely mis-spanned. Evidence: [`docs/audits/evidence/552/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/552/README.md).
 - `slack-token` now requires Slack's documented section structure for the
   user token and the three rotation-family prefixes (#512,
   `decision-freeze-slack-user-and-rotation-token-grammar`). Beta.5 accepted
@@ -2530,7 +2539,7 @@ intentional false negatives stay in the linked decision records and
   observation — so a contributor or agent can satisfy the check
   `redact-secret-benchmarks` enforces (`scripts/check-evidence-arrival.mjs`,
   issue #52 there) without reading the checker itself (#525).
-- Recorded the [0.1.0-beta.5 release retrospective](docs/audits/beta5-release-retrospective.md)
+- Recorded the [0.1.0-beta.5 release retrospective](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-retrospective.md)
   (#531, closing Epic #526): what published, the three release-engineering
   failures (npm propagation false negatives, the forced recovery run, and the
   non-byte-identical qualified/published Python wheel), how #527/#528/#529
@@ -2549,7 +2558,7 @@ intentional false negatives stay in the linked decision records and
   Detection is unchanged. The new pinned test also records that bytes after
   the break fall outside the redacted span. The #553 benchmark twin
   failures are fixture expectations, to be corrected in
-  `redact-secret-benchmarks#66`. Evidence: `docs/audits/evidence/553/README.md`.
+  `redact-secret-benchmarks#66`. Evidence: [`docs/audits/evidence/553/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/553/README.md).
 
 ## 0.1.0-beta.5 — 2026-09-20
 
@@ -2623,7 +2632,7 @@ intentional false negatives stay in the linked decision records and
   corpus expectations are pinned in
   `conformance/fixtures/common-profile-expectations.json`. The `common`
   WebAssembly artifact is 15.8% smaller (brotli) and scans 2.9–6.1× faster in
-  the three browser engines ([evidence](docs/audits/evidence/381/README.md)).
+  the three browser engines ([evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/381/README.md)).
   - Rust: `Profile`, `DetectorRegistry::with_common_built_in` and `profile()`,
     and `IncrementalSanitizer::with_common_built_in`,
     `with_common_built_in_policy_and_formatter`, and `profile()`. A profile
@@ -2701,7 +2710,7 @@ intentional false negatives stay in the linked decision records and
 
   Per-family provenance, the beta.4 negative-twin baseline, and fixture
   reclassifications are in `docs/audits/evidence/367/` and
-  `docs/audits/evidence/376/`.
+  [`docs/audits/evidence/376/`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/376).
 
 ### Reduced false positives
 

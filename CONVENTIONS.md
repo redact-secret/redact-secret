@@ -28,6 +28,32 @@ Use `current`, `planned`, `proposed`, or `unknown` when a state label makes the 
 
 Prefer links over copied detail. The source code, repository architecture, and planning records remain authoritative. Do not create separate architecture, resource, requirements, or roadmap documents for every feature; add another file only when the single page genuinely becomes difficult to use. The project-wide [ROADMAP.md](ROADMAP.md) is not a feature document and is the one roadmap the repository keeps.
 
+## Review and evidence lifecycle
+
+Commit a review or evidence unit under `docs/audits/` while the work is in
+progress. Its entry file (`<name>.md` or `evidence/<unit>/README.md`) starts
+with a front matter block naming `owner`, `reviewed_source` (a 40-hex commit),
+`status` (`in-progress`, `final`, `deferred` or `retained`) and `retire_on`
+(`before-qualification`, `after-issue:#N` or `after-release:<version>`); a
+`final` unit also carries `record`, the 40-hex main-commit permalink to its
+complete text. It is a temporary review, not a permanent record.
+
+`npm run lifecycle:check` (in `npm run ci`) accepts a declared unit and fails
+on a new unit without a block, a stale `after-release` or `after-issue`
+exception, or a `record` that is not a verified 40-hex permalink.
+`npm run lifecycle:release` is the qualification form: it also fails on every
+`final`, `in-progress` or `before-qualification` unit. Scripts must not write
+under `docs/audits/`.
+
+Before release qualification, retire every `final` unit: verify the permalink,
+keep current conclusions in the authoritative spec, contract or release record,
+and delete the body without leaving a per-issue stub. Anything a script or CI
+reads moves to a live-input or generated path first. Never move the same
+archive to another tracked folder and call it retired. Benchmark results and
+credential-evidence dossiers stay in `redact-secret-benchmarks`; cite them by
+permalink and do not copy them here. The rule and its reasons are in
+[`decision-retire-historical-audit-bodies-before-release-qualification`](docs/decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md).
+
 ## Governed convention records
 
 - [Keep feature notes small and useful](conventions/feature-documentation.md)

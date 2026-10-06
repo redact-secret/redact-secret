@@ -1,7 +1,7 @@
 //! The Group C format-conflict boundaries (redact-secret#1228), driven through
 //! the public default pipeline.
 //!
-//! The contract adopted in `docs/audits/evidence/1228/README.md` makes no row
+//! The contract adopted in [`docs/audits/evidence/1228/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1228/README.md) makes no row
 //! covered. It decides four boundaries that are cheap to pin and that no
 //! detector, registry or vocabulary change touches:
 //!

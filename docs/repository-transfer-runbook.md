@@ -8,7 +8,7 @@ the repository with a new Git history.
 
 The safe pre/post inventory and the limitations of the reconstructed baseline
 are recorded in
-[`docs/audits/repository-transfer-evidence.md`](./audits/repository-transfer-evidence.md).
+[`docs/audits/repository-transfer-evidence.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/repository-transfer-evidence.md).
 This document authorizes no release, tag, publication, deployment, credential
 creation, credential revocation, or archival operation.
 
