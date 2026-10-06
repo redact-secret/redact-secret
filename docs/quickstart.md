@@ -18,8 +18,8 @@ spent downloading packages or compiling.
 ## Which version you get
 
 Every release so far is a beta; the stable `0.1.0` is not published yet. The
-commands below pin the newest published beta, `0.1.0-beta.13` (PyPI spells it
-`0.1.0b13`), so they give the same result tomorrow as today. Pin the version in
+commands below pin the newest published beta, `0.1.0-beta.14` (PyPI spells it
+`0.1.0b14`), so they give the same result tomorrow as today. Pin the version in
 your own lockfile too.
 
 - A bare `npm install @redact-secret/core` resolves the `latest` tag, which a
@@ -56,7 +56,7 @@ Requires Node.js 20, 22, or 24. In an empty directory:
 ```sh qualify=node:setup
 npm init -y
 npm pkg set type=module
-npm install @redact-secret/core@0.1.0-beta.13
+npm install @redact-secret/core@0.1.0-beta.14
 ```
 
 Save this as `quickstart.mjs`:
@@ -80,7 +80,7 @@ node quickstart.mjs
 Expected output:
 
 ```text qualify=node:expect
-redact-secret 0.1.0-beta.13 loaded addon
+redact-secret 0.1.0-beta.14 loaded addon
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -98,7 +98,7 @@ Requires CPython 3.10 or newer on a platform with a published wheel (see
 
 ```sh qualify=python:setup
 python3 -m venv .venv
-.venv/bin/python -m pip install --only-binary=:all: redact-secret==0.1.0b13
+.venv/bin/python -m pip install --only-binary=:all: redact-secret==0.1.0b14
 ```
 
 `--only-binary=:all:` makes an unsupported platform fail during install
@@ -122,7 +122,7 @@ Run it:
 Expected output:
 
 ```text qualify=python:expect
-redact-secret 0.1.0-beta.13
+redact-secret 0.1.0-beta.14
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -135,7 +135,7 @@ conditions and emits the WebAssembly asset. In an empty directory:
 ```sh qualify=browser:setup
 npm init -y
 npm pkg set type=module
-npm install @redact-secret/core@0.1.0-beta.13 vite@7.3.6
+npm install @redact-secret/core@0.1.0-beta.14 vite@7.3.6
 ```
 
 Save this as `index.html`:
@@ -182,7 +182,7 @@ npx vite preview --port 4173 --strictPort
 Expected page text:
 
 ```text qualify=browser:expect
-redact-secret 0.1.0-beta.13 loaded wasm
+redact-secret 0.1.0-beta.14 loaded wasm
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -198,7 +198,7 @@ Requires Rust 1.88 or newer. In an empty directory:
 ```sh qualify=rust:setup
 cargo new redact-quickstart
 cd redact-quickstart
-cargo add redact-secret@0.1.0-beta.13
+cargo add redact-secret@0.1.0-beta.14
 ```
 
 Replace `src/main.rs` with:
@@ -224,7 +224,7 @@ cargo run --quiet
 Expected output:
 
 ```text qualify=rust:expect
-redact-secret 0.1.0-beta.13
+redact-secret 0.1.0-beta.14
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -240,7 +240,7 @@ and `--version` is required while every release is a beta. In an empty
 directory:
 
 ```sh qualify=cli:setup
-cargo install redact-secret-cli --version 0.1.0-beta.13 --locked
+cargo install redact-secret-cli --version 0.1.0-beta.14 --locked
 ```
 
 Save this as `input.txt`:
@@ -260,7 +260,7 @@ redact-secret input.txt || echo "exit $?"
 Expected output:
 
 ```text qualify=cli:expect
-redact-secret 0.1.0-beta.13
+redact-secret 0.1.0-beta.14
 API_KEY=<SECRET_1>
 input.txt:8-39 contextual_secret detector=generic-token confidence=high action=redact obfuscation=none id=finding-1
 exit 1
