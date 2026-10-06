@@ -21,8 +21,8 @@ epic), and **evidence** (a single issue's record, `evidence/<issue>/`).
 
 ## Releases
 
-Start with the [beta.12 candidate public-contract review](beta12-candidate-public-contract-review.md).
-The [beta.11](beta11-candidate-public-contract-review.md),
+Start with the [beta.14 candidate public-contract review](beta14-candidate-public-contract-review.md).
+The [beta.12 candidate public-contract review](beta12-candidate-public-contract-review.md), the [beta.11](beta11-candidate-public-contract-review.md),
 [beta.10](beta10-candidate-public-contract-review.md) and
 [beta.9](beta9-candidate-public-contract-review.md) candidate public-contract reviews,
 the [beta.6 candidate public-contract review](beta6-candidate-public-contract-review.md),
@@ -35,7 +35,8 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 
 | Topic | Evidence |
 | --- | --- |
-| Beta.12 candidate identity and public contract | [Current candidate review](beta12-candidate-public-contract-review.md) |
+| Beta.14 candidate identity and public contract | [Retained candidate review](beta14-candidate-public-contract-review.md) (the artifact inventory selects it by `candidate_version`) |
+| Beta.12 candidate identity and public contract | [Historical candidate review](beta12-candidate-public-contract-review.md) |
 | Beta.11 candidate identity and public contract | [Historical candidate review](beta11-candidate-public-contract-review.md) |
 | Beta.10 candidate identity and public contract | [Historical candidate review](beta10-candidate-public-contract-review.md) |
 | Beta.9 candidate identity and public contract | [Historical candidate review](beta9-candidate-public-contract-review.md) |

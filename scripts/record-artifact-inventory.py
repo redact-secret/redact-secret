@@ -33,6 +33,10 @@ Four things are recorded, all tied to one source commit:
    adapter packages its ``package-lock.json`` locks, and binaries that must be
    byte-identical to artifacts recorded in (1). The Python lane was retired
    with the Python MCP twins (#810).
+7. **Candidate review identity** (issue #1263) - the public-contract review
+   bound to this exact version, selected by `candidate_version` front matter
+   (`release_review_identity.py`), never a hardcoded older review. Missing,
+   mismatched or historical-only fails the run. It is evidence, not approval.
 
     python3 -B scripts/record-artifact-inventory.py \\
         --artifacts qualification-artifacts --out artifact-inventory.json
@@ -51,6 +55,9 @@ from pathlib import Path
 
 import tomllib
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import release_review_identity as review_identity  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "conformance" / "fixtures"
 
@@ -67,8 +74,6 @@ CRATE = "redact-secret"
 # this recorded digest instead of trusting the two builds agree.
 CRATES = (CRATE, "redact-secret-cli")
 CRATE_PACKAGE_DIR = Path("target") / "package"
-PUBLIC_API_REVIEW = Path("docs/audits/candidate-public-contract-review.md")
-CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta12-candidate-public-contract-review.md")
 CHANGELOG = Path("CHANGELOG.md")
 RELEASE_WORKFLOW = Path(".github/workflows/release.yml")
 REGISTRY_INSTALL_VERIFIER = Path("scripts/verify-registry-install.mjs")
@@ -511,24 +516,65 @@ def incremental_corpus_fixture_count() -> int:
     return len(fixtures) if isinstance(fixtures, list) else 0
 
 
-def release_readiness_record() -> dict:
-    """Record the non-artifact review and post-publication boundaries."""
+def review_version(product_version: str) -> tuple[str, bool]:
+    """The version whose public-contract review this run must carry, and
+    whether the run is a throwaway rehearsal.
+
+    A rehearsal bumps the working tree to a never-published version
+    (`scripts/rehearsal-version.py`), so the reviewed version is the one the
+    committed tree names.
+    """
+    rehearsal = os.environ.get("REHEARSAL_VERSION", "").strip()
+    if not rehearsal or rehearsal != product_version:
+        return product_version, False
+    committed = subprocess.run(
+        ["git", "show", f"HEAD:{(NPM_PACKAGE / 'package.json').as_posix()}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    return json.loads(committed)["version"], True
+
+
+def _candidate_review_line(candidate: object) -> str:
+    if not isinstance(candidate, dict):
+        return "not recorded"
+    if candidate.get("status") == review_identity.STATUS_BOUND:
+        return (
+            f"`{candidate['path']}` (SHA-256 `{candidate['sha256'][:12]}`), reviewed source "
+            f"`{candidate['reviewedSource'][:12]}`, disposition {candidate['disposition']}; evidence only"
+        )
+    return str(candidate.get("status", "not recorded"))
+
+
+def release_readiness_record(
+    product_version: str,
+    revision: str,
+    *,
+    root: Path = ROOT,
+    rehearsal: bool = False,
+    relation=review_identity.git_relation,
+) -> dict:
+    """Record the non-artifact review and post-publication boundaries.
+
+    The review identity is bound to `product_version` and `revision`; this
+    raises `ReviewIdentityError` when the candidate has none. The record is
+    evidence only: it never approves, publishes or tags.
+    """
+    candidate = review_identity.select_candidate_review(
+        product_version, revision, root=root, rehearsal=rehearsal, relation=relation
+    )
+    if rehearsal:
+        candidate["rehearsalVersion"] = os.environ.get("REHEARSAL_VERSION", "").strip()
     return {
-        "issue": 1112,
+        "schemaVersion": review_identity.SCHEMA_VERSION,
         "publicApiAndChangelogReview": {
             "status": "required-before-release-approval",
-            "currentPublicApiReview": {
-                "path": str(CURRENT_PUBLIC_API_REVIEW),
-                "sha256": digest(ROOT / CURRENT_PUBLIC_API_REVIEW),
-            },
-            "publicApiReview": {
-                "path": str(PUBLIC_API_REVIEW),
-                "sha256": digest(ROOT / PUBLIC_API_REVIEW),
-                "scope": "historical-beta.1-candidate-review",
-            },
+            "candidateReview": candidate,
             "changelog": {
                 "path": str(CHANGELOG),
-                "sha256": digest(ROOT / CHANGELOG),
+                "sha256": digest(root / CHANGELOG),
             },
         },
         "registryInstallVerification": {
@@ -706,6 +752,7 @@ def render_summary(inventory: dict) -> str:
                 "### Release readiness boundaries",
                 "",
                 f"- Public API/changelog review: {review.get('status', 'not recorded')}",
+                f"- Candidate review: {_candidate_review_line(review.get('candidateReview'))}",
                 f"- Registry install verification: {registry.get('status', 'not recorded')}",
                 f"- Registry verifier: `{registry.get('verifier', 'not recorded')}`",
                 "- This inventory does not authorize publication, tagging, deployment, or release approval.",
@@ -756,6 +803,16 @@ def main() -> int:
     errors.extend(golden_path_errors)
     errors.extend(require_golden_path_qualification(golden_path, collected, revision, product_version))
 
+    reviewed_version, rehearsal = review_version(product_version)
+    try:
+        release_readiness = release_readiness_record(reviewed_version, revision, rehearsal=rehearsal)
+    except review_identity.ReviewIdentityError as failure:
+        errors.extend(f"public API review: {message}" for message in failure.messages)
+        release_readiness = {
+            "schemaVersion": review_identity.SCHEMA_VERSION,
+            "publicApiAndChangelogReview": {"status": "unsatisfied"},
+        }
+
     inventory = {
         "sourceCommit": revision,
         "sourceRef": os.environ.get("GITHUB_REF", ""),
@@ -780,7 +837,7 @@ def main() -> int:
         "installedJavaScriptQualification": qualification,
         "cleanInstallQualification": clean_install,
         "goldenPathQualification": golden_path,
-        "releaseReadiness": release_readiness_record(),
+        "releaseReadiness": release_readiness,
     }
 
     arguments.out.write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")

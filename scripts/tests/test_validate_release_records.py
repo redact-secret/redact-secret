@@ -150,6 +150,47 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
         with self.assertRaisesRegex(MODULE.InvalidRecord, "8 Node install lanes"):
             self.validate(root, version="0.1.0-beta.5")
 
+    def with_readiness(self, readiness: dict) -> Path:
+        root = self.fixture()
+        record = root / "docs/releases/1.2.3-beta.4"
+        inventory = json.loads((record / "artifact-inventory.json").read_text())
+        inventory["releaseReadiness"] = readiness
+        (record / "artifact-inventory.json").write_text(json.dumps(inventory))
+        manifest = json.loads((record / "manifest.json").read_text())
+        manifest["artifact_inventory_sha256"] = hashlib.sha256((record / "artifact-inventory.json").read_bytes()).hexdigest()
+        (record / "manifest.json").write_text(json.dumps(manifest))
+        return root
+
+    def test_reads_the_recorded_review_identity_without_the_review_file(self) -> None:
+        legacy = {
+            "publicApiAndChangelogReview": {
+                "currentPublicApiReview": {"path": "docs/audits/gone.md", "sha256": "1" * 64},
+                "publicApiReview": {"path": "docs/audits/also-gone.md", "sha256": "2" * 64, "scope": "historical"},
+            }
+        }
+        self.validate(self.with_readiness(legacy))
+        schema2 = {
+            "schemaVersion": 2,
+            "publicApiAndChangelogReview": {
+                "candidateReview": {
+                    "status": "bound",
+                    "path": "docs/audits/gone.md",
+                    "sha256": "1" * 64,
+                    "reviewedSource": "c" * 40,
+                    "reviewAuthorizesRelease": False,
+                }
+            },
+        }
+        self.validate(self.with_readiness(schema2))
+
+    def test_rejects_an_unreadable_recorded_review_identity(self) -> None:
+        broken = {"publicApiAndChangelogReview": {"currentPublicApiReview": {"path": "x.md", "sha256": "nope"}}}
+        with self.assertRaisesRegex(MODULE.InvalidRecord, "review identity"):
+            self.validate(self.with_readiness(broken))
+        unknown = {"schemaVersion": 99, "publicApiAndChangelogReview": {}}
+        with self.assertRaisesRegex(MODULE.InvalidRecord, "review identity"):
+            self.validate(self.with_readiness(unknown))
+
     def test_rejects_missing_changelog_link(self) -> None:
         with self.assertRaisesRegex(MODULE.InvalidRecord, "CHANGELOG"):
             self.validate(self.fixture(), changelog="")

@@ -132,7 +132,7 @@ jobs:
                   pr=true
                   break
                   ;;
-                scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py)
+                scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py|scripts/release_review_identity.py)
                   pr=true
                   break
                   ;;
@@ -1185,6 +1185,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # `record-artifact-inventory.py` proves the candidate review's
+          # `reviewed_source` is an ancestor of this revision (issue #1263),
+          # which needs the history, not a depth-one clone.
+          fetch-depth: 0
 
       - name: Apply the rehearsal version (no-op outside a rehearsal)
         if: needs.plan.outputs.full == 'true'
@@ -1267,6 +1271,9 @@ jobs:
           # which no clone can resolve; the head commit is the revision the
           # artifacts were actually built from.
           SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          # A rehearsal bumps the tree to a throwaway version; the review
+          # obligation is that of the committed version it rehearses.
+          REHEARSAL_VERSION: ${{ inputs.rehearsal-version }}
         run: |
           python3 -B scripts/record-artifact-inventory.py \
             --artifacts qualification-artifacts \

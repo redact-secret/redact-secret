@@ -11,6 +11,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import release_review_identity as review_identity  # noqa: E402
+
 EXPECTED_ARTIFACTS = {
     "crate:redact-secret",
     "crate:redact-secret-cli",
@@ -198,6 +201,13 @@ def validate_record(root: Path, directory: Path, changelog: str) -> None:
         isinstance(fixtures, dict) and fixtures and all(SHA64.fullmatch(str(v)) for v in fixtures.values()),
         f"{label}: invalid conformance fixture hashes",
     )
+    # The recorded public-API review identity is read from the inventory alone
+    # (legacy `{path, sha256}` pairs or schema 2), never from a file that the
+    # lifecycle policy may since have retired from the tree.
+    try:
+        review_identity.read_recorded_identity(inventory)
+    except review_identity.ReviewIdentityError as failure:
+        raise InvalidRecord(f"{label}: unreadable release readiness review identity: {failure}") from failure
     local_identity = conformance_identity(root, source)
     if local_identity is not None:
         require(manifest.get("conformance_identity") == local_identity, f"{label}: conformance identity mismatch")

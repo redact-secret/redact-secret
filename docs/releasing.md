@@ -276,7 +276,11 @@ Before requesting final release approval, assemble a reviewable record of:
   verdict (or the accepted-tradeoff ledger entry for each breach).
 - Exact-revision qualification, rehearsal, SAST, artifact inventory, and any
   applicable assessment evidence. Hashing an old review document does not make
-  it a current API review.
+  it a current API review: the inventory selects the one `docs/audits/` review
+  whose front matter binds it to this `candidate_version`, checks that its
+  `reviewed_source` is an ancestor of the qualified SHA, and records its path,
+  SHA-256, scope and disposition. A review of another version is history and
+  fails qualification. The record is evidence only; it approves nothing.
 - Live `release` environment reviewers and `main` branch restriction; repository
   review/status/tag rules; npm and crates.io publisher rights; PyPI Trusted
   Publisher identity for this repository, workflow, and environment.
