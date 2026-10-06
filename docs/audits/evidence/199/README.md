@@ -1,7 +1,7 @@
 # Issue #199 — public contract and cross-runtime conformance evidence
 
 [Audit archive](../../README.md) · [Issue #199](https://github.com/redact-secret/redact-secret/issues/199) ·
-[Current contract review](../../public-contract-cross-runtime-conformance.md)
+[Current contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/public-contract-cross-runtime-conformance.md)
 
 Recorded 2026-09-13 at commit `5607de8973ddb83f9b61f840f67eb8534d5cea0d`,
 `0.1.0-beta.1` development. This is the raw

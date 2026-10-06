@@ -1,7 +1,7 @@
 # Issue #145 — independent release-readiness audit evidence
 
 [Audit archive](../../README.md) · [Issue #145](https://github.com/redact-secret/redact-secret/issues/145) ·
-[Independent repeat audit](../../repeated-release-readiness-audit.md)
+[Independent repeat audit](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/repeated-release-readiness-audit.md)
 
 Recorded 2026-09-11T16:17–16:27 UTC at commit `eb9edea0945b2a74077e4c45a1dad17ddbe0a590`
 (conformance tree `f4023bf298c65c62ea0eab41ca74227782f741cb`), macOS arm64;

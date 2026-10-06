@@ -1,7 +1,7 @@
 # Issue #174 — release-qualification rehearsal evidence
 
 [Audit archive](../../README.md) · [Issue #174](https://github.com/redact-secret/redact-secret/issues/174) ·
-[Qualification follow-up](../../release-qualification-follow-up.md)
+[Qualification follow-up](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-qualification-follow-up.md)
 
 Recorded 2026-09-11T15:20–15:30 UTC. Two source revisions appear because the
 rehearsal's first attempt failed and was corrected: `initial_source_revision`

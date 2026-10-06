@@ -1,7 +1,7 @@
 # Issue #200 — detection reliability published-evidence run
 
 [Audit archive](../../README.md) · [Issue #200](https://github.com/redact-secret/redact-secret/issues/200) ·
-[Published evidence review](../../detection-reliability-published-evidence.md)
+[Published evidence review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-reliability-published-evidence.md)
 
 Recorded 2026-09-13 at commit `a356e702e59b03cf297e0af15ba0423bc8466d48`.
 Verdict: `evidence-published-formal-same-revision-rc-matrix-pending`. This is

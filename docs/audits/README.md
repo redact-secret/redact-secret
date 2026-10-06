@@ -30,22 +30,14 @@ the [beta.5 release readiness review](https://github.com/redact-secret/redact-se
 [beta.5](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-candidate-public-contract-review.md) and
 [beta.4](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta4-candidate-public-contract-review.md) candidate public-contract reviews, and the
 [beta.2 final code review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta2-final-code-review.md) remain historical evidence.
-The earlier [local pre-release review](pre-release-code-and-docs-review.md)
-and [qualification follow-up](release-qualification-follow-up.md) describe beta.1.
+The earlier [local pre-release review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/pre-release-code-and-docs-review.md)
+and [qualification follow-up](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-qualification-follow-up.md) describe beta.1.
 
 | Topic | Evidence |
 | --- | --- |
 | Beta.14 candidate identity and public contract | [Retained candidate review](beta14-candidate-public-contract-review.md) (the artifact inventory selects it by `candidate_version`) |
-| Beta.1 local pre-release review | [Local review](pre-release-code-and-docs-review.md) |
-| Beta.1 qualification follow-up | [Follow-up](release-qualification-follow-up.md) |
 | Beta.2 final review reproduction probes | [Offline synthetic-input probes for issues #234–#238](evidence/beta2-final-review/README.md) |
-| Release artifact installation and qualification | [Evidence path and authority boundary](release-artifact-installation-and-qualification.md) |
-| Release authority and publishers | [Recorded evidence](release-approval-and-registry-publisher-evidence.md) |
-| CI, release automation, and supply chain (release-candidate scope) | [Automation review](ci-release-automation-supply-chain-review.md) |
-| Remediation classification | [Release gaps](release-gap-disposition.md), [deferred quality](deferred-quality-backlog.md) |
-| Earlier release readiness | [Readiness audit](release-readiness-audit.md) |
-| Independent repeat audit (#145, top-level review) | [Revision-bound verdict and residual findings](repeated-release-readiness-audit.md) |
-| Release rehearsal coverage and the Reconcile Release exercise (#530) | [What the no-publication rehearsal covers, what it cannot, and the pending live Reconcile Release commands](release-rehearsal-coverage.md) |
+| Remediation classification | [Release gaps](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md), [deferred quality](deferred-quality-backlog.md) |
 | Beta.5 release retrospective and v0.1.0 readiness criteria (#531) | [What failed, how each problem was resolved, what remains open](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-retrospective.md); checklist at [v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md) |
 | Beta.6 release retrospective (#615) | [What went well, what went wrong, what #614 fixed, what remains open](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-release-retrospective.md); release record at [0.1.0-beta.6](../releases/0.1.0-beta.6/README.md) |
 
@@ -53,21 +45,12 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 
 | Topic | Evidence |
 | --- | --- |
-| Rust migration acceptance | [Closed-issue ledger](closed-issue-acceptance-evidence-ledger.md) |
-| Modular detector profiles and size-aware WASM distribution (#377) | [Epic closeout](modular-detector-profiles-epic-closeout.md) |
-| Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Epic D close-out measurement (#548) | [`stable` 2 of 46 on a candidate of clean `main` under the pinned scanners; all 17 T1 families clear every product-quality gate; ledger re-keying and the trufflehog pin/ledger mismatch attributed; `generic-token` Markdown inline-code fix](evidence/548/README.md) |
 
 ## Subsystem reviews
 
 | Topic | Evidence |
 | --- | --- |
-| Detection reliability | [Published evidence review](detection-reliability-published-evidence.md) |
-| Public contract and cross-runtime conformance | [Current contract review](public-contract-cross-runtime-conformance.md) |
-| Core and CLI | [Boundary review](core-conformance-cli-boundary-review.md) |
-| JavaScript and Python | [Binding and package review](javascript-python-bindings-package-contracts-review.md) |
-| CI workflow inspection | [Maintenance review](ci-maintenance-review.md) |
-| Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
 
 ## Evidence
 
