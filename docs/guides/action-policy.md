@@ -9,10 +9,10 @@ changes only what a few rules name and leaves every other finding at the default
 action the running artifact computes. The contract is
 [`decision-define-the-versioned-declarative-action-policy-and-default-overlay`](../decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md).
 
-Support today (`current`): the Rust core (`load_action_policy`) and the
-command line (`--action-policy <path>`). The Node, WebAssembly, Python and
-JavaScript surfaces are `planned` in the same issue (#1219); until they ship,
-those surfaces accept no document.
+Support today (`current`): the Rust core (`load_action_policy`), the command
+line (`--action-policy <path>`) and Python (`action_policy=`). The Node,
+WebAssembly and JavaScript surfaces are `planned` in the same issue (#1219);
+until they ship, those surfaces accept no document.
 
 ## Write a policy
 
@@ -95,6 +95,39 @@ detection, and it changes no default.
 The legacy callback is unchanged and replaces the default entirely: a call takes
 a callback or an action policy, never both.
 
+## Python
+
+`scan` and `scan_and_redact` take a keyword-only `action_policy`, and
+`IncrementalSanitizer` takes the same keyword. It is a `dict` or the document
+itself as `bytes`, `bytearray` or `str`:
+
+```python
+import redact_secret
+
+policy = {
+    "actionPolicyRevision": 1,
+    "base": "default",
+    "rules": [{"id": "warn-jwt", "match": {"type": ["jwt"]}, "action": "warn"}],
+}
+result = redact_secret.scan_and_redact(text, action_policy=policy)
+```
+
+A `dict` is serialized once, when the call or session is built, with
+`json.dumps(value, separators=(",", ":"))`, so a later change to it affects
+nothing. A value the encoder cannot serialize is `MALFORMED_DOCUMENT`. Because
+the document is compact JSON in insertion order, the revision must be the first
+key. Any other type raises `InvalidOptionsError`, and so does passing both a
+`policy` callback and an `action_policy`; nothing is scanned in either case.
+
+A whole-input call parses its document on every call. A session validates its
+document once at construction and keeps the compiled policy for its whole life,
+so an `IncrementalSanitizer` is the reusable form for a stream. No compiled
+policy is kept anywhere but in the call or session that was given the document.
+A rejected document raises `InvalidActionPolicyError` with `code`
+`INVALID_ACTION_POLICY`, `error_class` (one of the classes below) and
+`rule_index`. The message stays the fixed text and repeats no byte of the
+document. See the [Python guide](python.md#declarative-action-policy).
+
 ## Command line
 
 ```bash
@@ -113,7 +146,7 @@ A rejected document fails whole, with the fixed code `INVALID_ACTION_POLICY`
 and the message "The supplied action policy is invalid." There is no partial
 load and no fallback to the default. Rust and the CLI also report the fixed
 class and `rule_index`, the zero-based index of the rule being read (none for a
-document-level violation). No error repeats a byte of the document. The first
+document-level violation); Python exposes them as `error_class` and `rule_index`. No error repeats a byte of the document. The first
 violation in document order is reported, after two fixed precedences: the size
 bound before any parsing, and the revision, which must be the first member.
 

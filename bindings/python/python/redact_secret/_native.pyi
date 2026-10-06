@@ -85,6 +85,17 @@ class InvalidRulesetError(SecretScanError):
 
     code: str
 
+class InvalidActionPolicyError(SecretScanError):
+    """An ``action_policy`` was rejected while loading. The message is fixed
+    and repeats no byte of the document."""
+
+    code: str
+    error_class: str | None
+    """The fixed rejection class, for example ``"INVALID_ACTION"``."""
+    rule_index: int | None
+    """The zero-based index of the rule being read, or ``None`` for a
+    document-level violation."""
+
 class PiiSelectorInvalidError(SecretScanError):
     code: str
 
@@ -166,6 +177,11 @@ Policy = Callable[[DetectedFinding, PolicyContext], str]
 IncrementalPolicy = Callable[[DetectedFinding, IncrementalPolicyContext], str]
 Formatter = Callable[[Finding, PlaceholderContext], str]
 
+# A declarative action policy: a ``dict`` (serialized once with the standard
+# compact JSON encoder) or the document itself as ``bytes``, ``bytearray`` or
+# ``str``. A call or session takes ``policy`` or ``action_policy``, never both.
+ActionPolicyDocument = dict[str, object] | bytes | bytearray | str
+
 # ---------------------------------------------------------------------
 # Incremental sanitization
 # ---------------------------------------------------------------------
@@ -228,6 +244,8 @@ class IncrementalSanitizer:
         limits: IncrementalLimits,
         policy: IncrementalPolicy | None = None,
         formatter: Formatter | None = None,
+        *,
+        action_policy: ActionPolicyDocument | None = None,
     ) -> None: ...
     @property
     def state(self) -> str: ...
@@ -258,6 +276,8 @@ def scan(
     policy: Policy | None = None,
     limits: WholeInputLimits | None = None,
     ruleset: bytes | bytearray | str | None = None,
+    *,
+    action_policy: ActionPolicyDocument | None = None,
 ) -> list[Finding]: ...
 def redact(
     text: str,
@@ -271,6 +291,8 @@ def scan_and_redact(
     formatter: Formatter | None = None,
     limits: WholeInputLimits | None = None,
     ruleset: bytes | bytearray | str | None = None,
+    *,
+    action_policy: ActionPolicyDocument | None = None,
 ) -> ScanResult: ...
 def default_policy(finding: DetectedFinding, context: PolicyContext) -> str: ...
 def default_placeholder_formatter(finding: Finding, context: PlaceholderContext) -> str: ...

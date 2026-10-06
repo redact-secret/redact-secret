@@ -24,6 +24,21 @@ evidence is linked from each published version.
   Node, WebAssembly, Python and JavaScript surfaces follow in the same issue.
   Existing no-policy results are unchanged.
 
+- Python: `action_policy`, a keyword-only argument of `scan`,
+  `scan_and_redact` and `IncrementalSanitizer` (#1219,
+  `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+  It takes a `dict` (serialized once with `json.dumps(value,
+  separators=(",", ":"))`) or the document as `bytes`, `bytearray` or `str`,
+  hands the bytes to the core's `load_action_policy`, and changes only what its
+  rules name. A whole-input call validates its document on every call; a session
+  validates once at construction and keeps the compiled policy, which is never
+  held in a process-wide cache. A rejected document raises the new
+  `InvalidActionPolicyError` (`code` `INVALID_ACTION_POLICY`, fixed message)
+  with `error_class` and `rule_index`; supplying a `policy` callback together
+  with `action_policy`, or a value of another type, raises
+  `InvalidOptionsError`. The legacy callback and every no-policy result are
+  unchanged. The package runs the shared `action-policy-v1.json` fixture.
+
 - `status()` in `@redact-secret/core` (root and `./common`) and
   `redact_secret.status()` in Python report whether the binding is initialized
   and its public activation, without loading, initializing or reconfiguring

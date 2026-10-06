@@ -46,6 +46,24 @@ whole-session input, so they index ``"".join(chunks)`` exactly as the
 synchronous API's findings index the same joined string. Limits are
 mandatory: a session declares its own bounds and there are no defaults.
 
+To change what a few rules name and keep the default action for every other
+finding, pass a declarative ``action_policy`` (a ``dict``, or its JSON document
+as ``bytes``, ``bytearray`` or ``str``) instead of a ``policy`` callback; a
+call or session takes one or the other, never both::
+
+    result = redact_secret.scan_and_redact(
+        text,
+        action_policy={
+            "actionPolicyRevision": 1,
+            "base": "default",
+            "rules": [{"id": "warn-jwt", "match": {"type": ["jwt"]}, "action": "warn"}],
+        },
+    )
+
+A rejected document raises :class:`InvalidActionPolicyError`, whose
+``error_class`` and ``rule_index`` attributes name the fixed rejection class and
+the rule being read.
+
 ``policy`` and ``formatter`` callbacks only ever receive the safe metadata
 types below, never the input or a matched value. A callback that raises, or
 that returns something other than the documented protocol, never
@@ -80,6 +98,7 @@ try:
         IncrementalResult,
         IncrementalSanitizer,
         InputLimitExceededError,
+        InvalidActionPolicyError,
         InvalidCandidateError,
         InvalidDetectorError,
         InvalidFindingsError,
@@ -133,6 +152,7 @@ __all__ = [
     "IncrementalResult",
     "IncrementalSanitizer",
     "InputLimitExceededError",
+    "InvalidActionPolicyError",
     "InvalidCandidateError",
     "InvalidDetectorError",
     "InvalidFindingsError",

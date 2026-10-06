@@ -33,6 +33,7 @@ def test_exception_hierarchy_is_importable_and_rooted() -> None:
         redact_secret.PlaceholderFailureError,
         redact_secret.InvalidPlaceholderError,
         redact_secret.InvalidRulesetError,
+        redact_secret.InvalidActionPolicyError,
         redact_secret.PiiSelectorInvalidError,
         redact_secret.PiiSelectorUnsupportedError,
         redact_secret.PiiSelectorUnavailableError,
@@ -52,9 +53,10 @@ def test_no_custom_detector_callback_surface() -> None:
     `decision-define-declarative-detector-ruleset-contract`) is not a
     callback: it is caller-supplied data the core parses and matches
     itself, never host code running per candidate, so it does not reopen
-    the excluded surface."""
+    the excluded surface. `action_policy` (issue #1219) is data too: a
+    declarative document the core validates and evaluates itself."""
     scan_params = set(inspect.signature(redact_secret.scan).parameters)
-    assert scan_params <= {"text", "policy", "limits", "ruleset"}
+    assert scan_params <= {"text", "policy", "limits", "ruleset", "action_policy"}
     for name in redact_secret.__all__:
         assert "detector" not in name.lower() or name in {
             "DetectorFailureError",

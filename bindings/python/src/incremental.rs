@@ -32,7 +32,7 @@ use redact_secret::{
 
 use crate::{
     PyDetectedFinding, PyFinding, PyPlaceholderContext, extract_text, map_core_error,
-    map_error_code,
+    map_error_code, resolve_action_policy,
 };
 
 // ---------------------------------------------------------------------
@@ -705,31 +705,44 @@ impl PyIncrementalSanitizer {
     /// offsets, never the input or a matched value, and both are numbered
     /// across the whole session rather than per call.
     ///
+    /// `action_policy`, keyword-only, is a declarative action policy as a
+    /// `dict`, or its document as `bytes`, `bytearray`, or `str`. It is
+    /// validated here, once, and the session keeps that compiled policy for
+    /// its whole life. Supplying both `policy` and `action_policy` raises
+    /// `InvalidOptionsError`; a rejected document raises
+    /// `InvalidActionPolicyError`.
+    ///
     /// # Errors
     ///
     /// Raises `InvalidDetectorError` only if the built-in detector registry
     /// itself is malformed, which cannot happen for the detectors this
     /// package ships.
     #[new]
-    #[pyo3(signature = (limits, policy=None, formatter=None))]
+    #[pyo3(signature = (limits, policy=None, formatter=None, *, action_policy=None))]
     #[allow(clippy::needless_pass_by_value)]
     fn new(
         limits: PyRef<'_, PyIncrementalLimits>,
         policy: Option<Bound<'_, PyAny>>,
         formatter: Option<Bound<'_, PyAny>>,
+        action_policy: Option<Bound<'_, PyAny>>,
     ) -> PyResult<Self> {
+        // Validated once, here, before any input: the session owns the
+        // compiled policy for its whole life, and a later change to a native
+        // object passed in changes nothing.
+        let declared = resolve_action_policy(policy.as_ref(), action_policy.as_ref())?;
         let index = Rc::new(RefCell::new(CodePointIndex::new(
             limits.inner.max_buffered_bytes(),
         )));
         let policy_failure = Rc::new(Cell::new(None));
 
-        let core_policy: Box<dyn IncrementalPolicy> = match policy {
-            None => Box::new(DefaultPolicy),
-            Some(callable) => Box::new(PyIncrementalPolicyAdapter {
+        let core_policy: Box<dyn IncrementalPolicy> = match (policy, declared) {
+            (Some(callable), _) => Box::new(PyIncrementalPolicyAdapter {
                 callable: callable.unbind(),
                 index: Rc::clone(&index),
                 policy_failure: Rc::clone(&policy_failure),
             }),
+            (None, Some(declared)) => Box::new(declared),
+            (None, None) => Box::new(DefaultPolicy),
         };
         let core_formatter: Box<dyn PlaceholderFormatter> = match formatter {
             None => Box::new(core_default_formatter),

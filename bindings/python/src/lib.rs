@@ -25,14 +25,15 @@ use std::sync::{Mutex, OnceLock};
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::types::{PyList, PyString};
+use pyo3::types::{PyByteArray, PyBytes, PyDict, PyList, PyString};
 use pyo3::{create_exception, wrap_pyfunction};
 
 use redact_secret::{
-    Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
-    Finding as CoreFinding, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter,
-    Policy, PolicyContext, RulesetError, SecretScanError as CoreError, SecretScanErrorCode,
-    WholeInputLimits, default_placeholder_formatter as core_default_formatter, load_ruleset,
+    Action, ActionPolicy, ActionPolicyError, ActionPolicyErrorClass, ByteRange, Confidence,
+    DefaultPolicy, DetectedFinding, DetectorRegistry, Finding as CoreFinding, Obfuscation,
+    PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, RulesetError,
+    SecretScanError as CoreError, SecretScanErrorCode, WholeInputLimits,
+    default_placeholder_formatter as core_default_formatter, load_action_policy, load_ruleset,
     redact_with_limits as core_redact, run_detector_pipeline,
     typed_placeholder_formatter as core_typed_formatter,
 };
@@ -211,6 +212,12 @@ create_exception!(
     SecretScanError,
     "A `ruleset` argument to `scan`/`scan_and_redact` was rejected while loading (issue #495). The fixed rejection class is folded into the message, in parentheses."
 );
+create_exception!(
+    redact_secret._native,
+    InvalidActionPolicyError,
+    SecretScanError,
+    "An `action_policy` argument was rejected while loading (issue #1219). The fixed rejection class is `error_class` and the zero-based index of the rule being read is `rule_index` (`None` for a document-level violation); the message is fixed and repeats no byte of the document."
+);
 
 /// Maps a fixed core error code to its exception type and fixed message.
 pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
@@ -253,6 +260,13 @@ pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
         // directly; every real rejection instead goes through
         // `map_ruleset_error`, which also folds in the fixed class.
         SecretScanErrorCode::InvalidRuleset => PyErr::new::<InvalidRulesetError, _>(message),
+        // Reached only if a `SecretScanError` ever carried this code
+        // directly; every real rejection instead goes through
+        // `map_action_policy_error`, which also sets the fixed class and rule
+        // index (both stay `None` here, their class-level default).
+        SecretScanErrorCode::InvalidActionPolicy => {
+            PyErr::new::<InvalidActionPolicyError, _>(message)
+        }
         SecretScanErrorCode::PiiSelectorInvalid => {
             PyErr::new::<PiiSelectorInvalidError, _>(message)
         }
@@ -288,6 +302,31 @@ pub(crate) fn map_ruleset_error(error: RulesetError) -> PyErr {
         error.message(),
         error.class().as_str()
     ))
+}
+
+/// Builds the `InvalidActionPolicyError` for a rejected `action_policy`.
+///
+/// The message is the core's fixed one; `error_class` is the fixed
+/// [`ActionPolicyErrorClass::as_str`] and `rule_index` the zero-based index of
+/// the rule being read, or `None`. Neither carries a byte of the rejected
+/// document.
+fn invalid_action_policy(class: ActionPolicyErrorClass, rule_index: Option<usize>) -> PyErr {
+    let error = PyErr::new::<InvalidActionPolicyError, _>(
+        SecretScanErrorCode::InvalidActionPolicy.message(),
+    );
+    Python::attach(|py| {
+        let value = error.value(py);
+        // Setting an attribute on a fresh exception instance cannot fail; if
+        // it ever did, the class-level `None` defaults still read safely.
+        let _ = value.setattr("error_class", class.as_str());
+        let _ = value.setattr("rule_index", rule_index);
+    });
+    error
+}
+
+/// Maps a rejected `action_policy` document to `InvalidActionPolicyError`.
+pub(crate) fn map_action_policy_error(error: ActionPolicyError) -> PyErr {
+    invalid_action_policy(error.class(), error.rule_index())
 }
 
 /// Registers every exception type and sets its fixed `code` class attribute.
@@ -396,6 +435,16 @@ fn register_exceptions(module: &Bound<'_, PyModule>) -> PyResult<()> {
         InvalidRulesetError,
         SecretScanErrorCode::InvalidRuleset
     );
+    register!(
+        "InvalidActionPolicyError",
+        InvalidActionPolicyError,
+        SecretScanErrorCode::InvalidActionPolicy
+    );
+    // Class-level defaults: an instance built from the bare code (no class to
+    // report) still reads both attributes.
+    let action_policy_error = py.get_type::<InvalidActionPolicyError>();
+    action_policy_error.setattr("error_class", py.None())?;
+    action_policy_error.setattr("rule_index", py.None())?;
     register!(
         "PiiSelectorInvalidError",
         PiiSelectorInvalidError,
@@ -992,6 +1041,74 @@ fn extract_ruleset_bytes(value: &Bound<'_, PyAny>) -> PyResult<Vec<u8>> {
     Err(map_error_code(SecretScanErrorCode::InvalidOptions))
 }
 
+/// The bytes a host hands the core for an `action_policy` argument
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// "Document").
+///
+/// `bytes`, `bytearray` and `str` are the document itself, passed unchanged
+/// (a `str` is UTF-8 encoded; one that cannot be, such as an unpaired
+/// surrogate, is invalid UTF-8 and so `MALFORMED_DOCUMENT`). A `dict` is a
+/// native object, serialized once, here, with the standard compact encoder
+/// (`json.dumps(value, separators=(",", ":"))`); any serializer failure is
+/// `MALFORMED_DOCUMENT`, as the contract decides. The core then validates
+/// every byte: nothing here interprets the document. Any other type is an
+/// option of the wrong type, `INVALID_OPTIONS`, as for `ruleset`.
+fn action_policy_bytes(value: &Bound<'_, PyAny>) -> PyResult<Vec<u8>> {
+    let malformed = || invalid_action_policy(ActionPolicyErrorClass::MalformedDocument, None);
+    if let Ok(bytes) = value.cast::<PyBytes>() {
+        return Ok(bytes.as_bytes().to_vec());
+    }
+    if let Ok(bytes) = value.cast::<PyByteArray>() {
+        return Ok(bytes.to_vec());
+    }
+    if let Ok(text) = value.cast::<PyString>() {
+        return text
+            .to_str()
+            .map(|text| text.as_bytes().to_vec())
+            .map_err(|_| malformed());
+    }
+    if value.cast::<PyDict>().is_ok() {
+        let py = value.py();
+        let serialized = py
+            .import("json")
+            .and_then(|json| {
+                let kwargs = PyDict::new(py);
+                kwargs.set_item("separators", (",", ":"))?;
+                json.call_method("dumps", (value,), Some(&kwargs))
+            })
+            .and_then(|text| text.extract::<String>())
+            .map_err(|_| malformed())?;
+        return Ok(serialized.into_bytes());
+    }
+    Err(map_error_code(SecretScanErrorCode::InvalidOptions))
+}
+
+/// Loads one `action_policy` argument into the immutable core policy, or
+/// rejects the whole document. The compiled policy is returned to the caller,
+/// which owns it: it is never stored in a cache another call can see.
+pub(crate) fn load_action_policy_argument(value: &Bound<'_, PyAny>) -> PyResult<ActionPolicy> {
+    let bytes = action_policy_bytes(value)?;
+    load_action_policy(&bytes).map_err(map_action_policy_error)
+}
+
+/// Resolves a call's or session's `action_policy` option.
+///
+/// A call or session takes a `policy` callback or an `action_policy`, never
+/// both: supplying both is `INVALID_OPTIONS`, before the document is read.
+/// `None` means no overlay.
+pub(crate) fn resolve_action_policy(
+    callback: Option<&Bound<'_, PyAny>>,
+    action_policy: Option<&Bound<'_, PyAny>>,
+) -> PyResult<Option<ActionPolicy>> {
+    let Some(document) = action_policy else {
+        return Ok(None);
+    };
+    if callback.is_some() {
+        return Err(map_error_code(SecretScanErrorCode::InvalidOptions));
+    }
+    load_action_policy_argument(document).map(Some)
+}
+
 /// Runs every built-in detector, plus `ruleset`'s when given, over `text`
 /// and resolves overlaps.
 ///
@@ -1072,19 +1189,37 @@ fn call_python_policy(
         .ok_or_else(|| map_error_code(SecretScanErrorCode::InvalidPolicyAction))
 }
 
-/// Evaluates `policy` (or the default policy when `None`) once per finding;
-/// `offsets` converts each range `policy` sees.
+/// Evaluates the declarative `policy` for one finding. Evaluation is total
+/// and infallible, so this never reports a failure in practice; one is still
+/// mapped to `PolicyFailureError` rather than panicking.
+fn declarative_action(
+    policy: &ActionPolicy,
+    finding: &DetectedFinding,
+    index: usize,
+    count: usize,
+) -> PyResult<Action> {
+    let context = PolicyContext::new(index, count);
+    Policy::evaluate(policy, finding, &context)
+        .map_err(|_| map_error_code(SecretScanErrorCode::PolicyFailure))
+}
+
+/// Evaluates `policy` (a callback), else `action_policy` (a declarative
+/// document), else the default policy, once per finding; `offsets` converts
+/// each range a callback sees. The caller has already rejected a call that
+/// supplies both a callback and an `action_policy`.
 fn apply_policy(
     offsets: &RefCell<CharOffsets<'_>>,
     detected: Vec<DetectedFinding>,
     policy: Option<&Bound<'_, PyAny>>,
+    action_policy: Option<&ActionPolicy>,
 ) -> PyResult<Vec<CoreFinding>> {
     let count = detected.len();
     let mut findings = Vec::with_capacity(count);
     for (index, finding) in detected.into_iter().enumerate() {
-        let action = match policy {
-            None => default_action(&finding, index, count)?,
-            Some(callable) => call_python_policy(callable, offsets, &finding, index, count)?,
+        let action = match (policy, action_policy) {
+            (Some(callable), _) => call_python_policy(callable, offsets, &finding, index, count)?,
+            (None, Some(declared)) => declarative_action(declared, &finding, index, count)?,
+            (None, None) => default_action(&finding, index, count)?,
         };
         findings.push(finding.with_action(action));
     }
@@ -1213,8 +1348,17 @@ fn redact_core(
 /// `bytearray`, or `str`; its declared detectors register after every
 /// built-in, so a ruleset detector can add detections but never outrank a
 /// built-in's resolved finding.
+///
+/// `action_policy`, keyword-only, is a declarative action policy
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`)
+/// as a `dict`, or its document as `bytes`, `bytearray`, or `str`. It changes
+/// only what its rules name; every other finding keeps the default action. It
+/// is validated before any scan and applies to finalized findings only.
+/// Supplying both `policy` and `action_policy` raises `InvalidOptionsError`;
+/// a rejected document raises `InvalidActionPolicyError` (`error_class`,
+/// `rule_index`); a value of any other type raises `InvalidOptionsError`.
 #[pyfunction]
-#[pyo3(signature = (text, policy=None, limits=None, ruleset=None))]
+#[pyo3(signature = (text, policy=None, limits=None, ruleset=None, *, action_policy=None))]
 // pyo3 argument extraction produces owned `Bound`/`Option<Bound>` values;
 // there is no borrowed form to take instead.
 #[allow(clippy::needless_pass_by_value)]
@@ -1223,12 +1367,14 @@ fn scan<'py>(
     policy: Option<Bound<'py, PyAny>>,
     limits: Option<PyRef<'py, PyWholeInputLimits>>,
     ruleset: Option<Bound<'py, PyAny>>,
+    action_policy: Option<Bound<'py, PyAny>>,
 ) -> PyResult<Vec<PyFinding>> {
     let text_owned = extract_text(&text)?;
+    let declared = resolve_action_policy(policy.as_ref(), action_policy.as_ref())?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
     let detected = detect(text.py(), text_owned, &limits, ruleset.as_ref())?;
     let offsets = RefCell::new(CharOffsets::new(text_owned));
-    let findings = apply_policy(&offsets, detected, policy.as_ref())?;
+    let findings = apply_policy(&offsets, detected, policy.as_ref(), declared.as_ref())?;
     findings_to_py(&offsets, findings)
 }
 
@@ -1285,10 +1431,10 @@ fn redact<'py>(
 /// `ScanResult.findings` are exactly the findings used to produce
 /// `ScanResult.text`.
 ///
-/// See `scan` and `redact` for the `policy`, `formatter`, `limits`, and
-/// `ruleset` contracts and error conditions.
+/// See `scan` and `redact` for the `policy`, `formatter`, `limits`,
+/// `ruleset`, and `action_policy` contracts and error conditions.
 #[pyfunction]
-#[pyo3(signature = (text, policy=None, formatter=None, limits=None, ruleset=None))]
+#[pyo3(signature = (text, policy=None, formatter=None, limits=None, ruleset=None, *, action_policy=None))]
 #[allow(clippy::needless_pass_by_value)]
 fn scan_and_redact<'py>(
     text: Bound<'py, PyAny>,
@@ -1296,14 +1442,16 @@ fn scan_and_redact<'py>(
     formatter: Option<Bound<'py, PyAny>>,
     limits: Option<PyRef<'py, PyWholeInputLimits>>,
     ruleset: Option<Bound<'py, PyAny>>,
+    action_policy: Option<Bound<'py, PyAny>>,
 ) -> PyResult<PyScanResult> {
     let text_owned = extract_text(&text)?;
+    let declared = resolve_action_policy(policy.as_ref(), action_policy.as_ref())?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
     let detected = detect(text.py(), text_owned, &limits, ruleset.as_ref())?;
     // One converter for the whole call: the policy callback, the formatter
     // callback, and the returned findings all convert through it.
     let offsets = RefCell::new(CharOffsets::new(text_owned));
-    let findings = apply_policy(&offsets, detected, policy.as_ref())?;
+    let findings = apply_policy(&offsets, detected, policy.as_ref(), declared.as_ref())?;
     let redacted_text = redact_core(text_owned, &findings, formatter.as_ref(), &limits, &offsets)?;
     let py = text.py();
     let py_findings = findings_to_py(&offsets, findings)?;
@@ -1492,7 +1640,8 @@ mod tests {
 
     use super::{
         ByteRange, CharOffsets, PII_EPOCH, REGISTRY_BUILDS, RegistryError,
-        byte_offset_to_char_offset, char_offset, char_range, run_detector_pipeline, with_registry,
+        byte_offset_to_char_offset, char_offset, char_range, declarative_action,
+        run_detector_pipeline, with_registry,
     };
 
     /// A minimal, valid declarative ruleset.
@@ -1707,5 +1856,65 @@ validator: none\n";
             converter.offset(offset);
         }
         assert_eq!(converter.walked, input.len());
+    }
+
+    /// The binding's declarative evaluation path agrees with every
+    /// `evaluations` row of the shared action policy fixture
+    /// (`conformance/fixtures/action-policy-v1.json`). A Python caller cannot
+    /// construct a `DetectedFinding`, so the Python suite runs the fixture's
+    /// end-to-end cases and this test runs the truth table. `base` is a
+    /// sentinel resolved by the core's own `DefaultPolicy`, never a copy of the
+    /// default table.
+    #[test]
+    fn declarative_evaluation_matches_the_shared_fixture_truth_table() {
+        use redact_secret::{
+            Action, Confidence, DefaultPolicy, DetectedFinding, Obfuscation, Policy, PolicyContext,
+            load_action_policy,
+        };
+
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/fixtures/action-policy-v1.json"
+        ))
+        .unwrap();
+        let finding_for = |id: &str| {
+            let entry = &fixture["findings"][id];
+            DetectedFinding::new(
+                "finding-1",
+                entry["type"].as_str().unwrap(),
+                entry["detector"].as_str().unwrap(),
+                Confidence::from_name(entry["confidence"].as_str().unwrap()).unwrap(),
+                ByteRange::new(0, 1).unwrap(),
+            )
+            .unwrap()
+            .with_obfuscation(
+                Obfuscation::from_name(entry["obfuscation"].as_str().unwrap()).unwrap(),
+            )
+        };
+        let evaluations = fixture["evaluations"].as_array().unwrap();
+        assert_eq!(evaluations.len(), 37);
+        for case in evaluations {
+            let id = case["id"].as_str().unwrap();
+            let policy_entry = fixture["policies"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|policy| policy["id"] == case["policy"])
+                .unwrap();
+            let policy =
+                load_action_policy(&serde_json::to_vec(&policy_entry["document"]).unwrap())
+                    .unwrap();
+            let finding = finding_for(case["finding"].as_str().unwrap());
+            let expected = match case["expectedAction"].as_str().unwrap() {
+                "base" => {
+                    Policy::evaluate(&DefaultPolicy, &finding, &PolicyContext::new(0, 1)).unwrap()
+                }
+                name => Action::from_name(name).unwrap(),
+            };
+            assert_eq!(
+                declarative_action(&policy, &finding, 0, 1).unwrap(),
+                expected,
+                "{id}"
+            );
+        }
     }
 }

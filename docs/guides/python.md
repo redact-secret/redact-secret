@@ -41,6 +41,54 @@ The policy returns `redact`, `block`, `warn`, or `allow`. A `block` action must
 also be enforced by your application; the library replaces its range without
 throwing merely because it found a blocked credential.
 
+## Declarative action policy
+
+To change what a few rules name and keep the default action for every other
+finding, pass `action_policy` instead of writing a callback that must copy the
+default. The contract and the document format are in the
+[action policy guide](action-policy.md).
+
+```python
+import redact_secret
+
+result = redact_secret.scan_and_redact(
+    "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE",
+    formatter=redact_secret.typed_placeholder_formatter,
+    action_policy={
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [{"id": "warn-contextual", "match": {"type": ["contextual_secret"]}, "action": "warn"}],
+    },
+)
+assert result.text == "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE"
+assert [finding.action for finding in result.findings] == ["warn"]
+```
+
+`scan`, `scan_and_redact` and `IncrementalSanitizer` take `action_policy` as a
+keyword-only argument. It is a `dict`, or the document as `bytes`, `bytearray`
+or `str`; `None` means no overlay. A `dict` is serialized once, when the call or
+session is built, with `json.dumps(value, separators=(",", ":"))`, so the
+revision must be its first key and a later change to the `dict` affects
+nothing.
+
+- A call or session takes a `policy` callback or an `action_policy`, never
+  both. Supplying both raises `InvalidOptionsError` before anything is scanned,
+  as does a value of any other type. The callback is unchanged: it replaces the
+  default entirely, and `PolicyFailureError` and `InvalidPolicyActionError` keep
+  their meaning. A declarative policy never raises either.
+- The document is validated before any input is read: a whole-input call parses
+  it on every call, and an `IncrementalSanitizer` validates it once at
+  construction and keeps the compiled policy for its life. A rejected document
+  raises `InvalidActionPolicyError` and nothing falls back to the default.
+- `error.error_class` is the fixed rejection class (`"INVALID_ACTION"`,
+  `"UNKNOWN_FIELD"`, and the others in the
+  [error table](action-policy.md#errors)) and `error.rule_index` is the
+  zero-based index of the rule being read, or `None` for a document-level
+  violation. Neither repeats a byte of the document.
+- A policy sees finalized findings only, and the base for an unmatched finding
+  is the same evaluation `default_policy` gives, computed by the core. Public
+  findings gain no field.
+
 Catch `redact_secret.SecretScanError` for library failures and stop downstream
 processing. Do not fall back to the raw input. The binding maps callback
 failures to fixed exceptions instead of forwarding the callback's message.
@@ -120,7 +168,7 @@ not name as a failure, and never fall back to the raw input.
 | --- | --- | --- |
 | `SecretScanError` | none | Base class of every error below; catch it for any library failure. |
 | `InvalidInputError` | `INVALID_INPUT` | The text is not a `str`, or contains an unpaired surrogate. |
-| `InvalidOptionsError` | `INVALID_OPTIONS` | An option has the wrong type, such as a `ruleset` that is not `bytes`, `bytearray` or `str`. |
+| `InvalidOptionsError` | `INVALID_OPTIONS` | An option has the wrong type, such as a `ruleset` that is not `bytes`, `bytearray` or `str` or an `action_policy` that is not a `dict`, `bytes`, `bytearray` or `str`, or a call or session was given both a `policy` callback and an `action_policy`. |
 | `InvalidDetectorError` | `INVALID_DETECTOR` | The detector registry is malformed. Not reachable with the detectors this package ships. |
 | `DetectorFailureError` | `DETECTOR_FAILURE` | A detector failed while scanning. |
 | `InvalidCandidateError` | `INVALID_CANDIDATE` | A detector returned a candidate the core rejects. Not expected with the detectors this package ships. |
@@ -137,6 +185,7 @@ not name as a failure, and never fall back to the raw input.
 | `MultilineLimitExceededError` | `MULTILINE_LIMIT_EXCEEDED` | An open multiline construct exceeded `max_multiline_bytes`. |
 | `InvalidStateError` | `INVALID_STATE` | An incremental session received an operation after it left the `accepting` state. |
 | `InvalidRulesetError` | `INVALID_RULESET` | A `ruleset` was rejected while loading; the message ends with the fixed rejection class in parentheses. See [rulesets](rulesets.md). |
+| `InvalidActionPolicyError` | `INVALID_ACTION_POLICY` | An `action_policy` was rejected while loading. The message is fixed; `error_class` holds the fixed rejection class and `rule_index` the zero-based rule being read (`None` for a document-level violation). See [action policy](action-policy.md#errors). |
 | `PiiSelectorInvalidError` | `PII_SELECTOR_INVALID` | A PII selector given to `initialize` is not valid. |
 | `PiiSelectorUnsupportedError` | `PII_SELECTOR_UNSUPPORTED` | A PII jurisdiction or family is unsupported. |
 | `PiiSelectorUnavailableError` | `PII_SELECTOR_UNAVAILABLE` | The selection is unavailable in this artifact. |
