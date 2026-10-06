@@ -195,6 +195,9 @@ class RealRepoReconciliationTests(unittest.TestCase):
     ``python3 -B scripts/generate-precision-context-matrix.py`` would catch
     it."""
 
+    def test_the_baseline_input_does_not_live_under_the_audit_archive(self) -> None:
+        self.assertFalse(GEN.BASELINE_PATH.is_relative_to(ROOT / "docs" / "audits"))
+
     def test_committed_precision_context_matrix_is_up_to_date(self) -> None:
         matrix = GEN.build_matrix(
             GEN.load_json(GEN.SYNC_PATH),

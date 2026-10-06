@@ -19,12 +19,40 @@ core remains the only authoritative implementation
   OpenAI, DigitalOcean, Docker, Slack, Hugging Face, Cloudflare, and Linear.
   Read by `scripts/audit-precision-contracts.py` (`npm run
   precision-contracts:check`, part of `npm run ci`), which derives and
-  checks the beta.4 twin baseline and corpus audit still frozen at
-  [`docs/audits/evidence/367/`](../audits/evidence/367/README.md) — that
-  directory carries the full review narrative, source ledger, and beta.4
-  measurement provenance this contract was reviewed against. Moved here from
-  the evidence archive by
+  checks the beta.4 twin baseline below and the generated
+  [`corpus audit`](../coverage/precision-corpus-audit.json). The review
+  narrative, source ledger, and beta.4 measurement provenance this contract
+  was reviewed against remain in
+  [`docs/audits/evidence/367/`](../audits/evidence/367/README.md) while the
+  audit archive is retired. Moved here from the evidence archive by
   [#596](https://github.com/redact-secret/redact-secret/issues/596) (DS4).
+- [`precision/beta4-twin-baseline.json`](precision/beta4-twin-baseline.json)
+  — the 24 must-not-flag twins and their 24 paired positives from the beta.4
+  `common-formats` snapshot, each frozen by construction recipe, content
+  SHA-256, byte length, expected ranges and the ranges beta.4 produced. It is
+  both the input and the checked output of the same recipe
+  (`scripts/audit-precision-contracts.py --check` regenerates the derived
+  `contractView` and fails on any byte difference) and the baseline
+  `scripts/generate-precision-context-matrix.py` reads. The values are
+  reconstructed from the recipe against the recorded beta.4 corpus and run
+  provenance, not an independent measurement taken here. Moved from
+  `docs/audits/evidence/367/` by
+  [#1262](https://github.com/redact-secret/redact-secret/issues/1262) with
+  its bytes unchanged.
+- [`precision/shape-inventory.json`](precision/shape-inventory.json) — the
+  reviewed inventory of valid-but-non-secret shapes the `generic-token`,
+  `bearer-token`, `connection-string` and `jwt` detectors recognize, each
+  citing its code or decision basis and the paired negative, positive and
+  boundary fixtures in `conformance/fixtures/synchronous-corpus.json`.
+  `scripts/check-shape-inventory.py` (`npm run shape-inventory:check`, part
+  of `npm run ci`) fails when a cited fixture, detector, kind, implementation
+  file or decision document no longer matches. A new exclusion or accepted
+  tradeoff for one of these detectors adds its shape here
+  ([`conformance/README.md`](../../conformance/README.md#negative-coverage-shape-tracking)).
+  Moved from `docs/audits/evidence/475/` by
+  [#1262](https://github.com/redact-secret/redact-secret/issues/1262); one
+  note was corrected to cite the live contract path, and the data is
+  unchanged.
 - [`scoring/shadow-scoring-artifact.json`](scoring/shadow-scoring-artifact.json)
   and its schema
   [`scoring/shadow-scoring-artifact.schema.json`](scoring/shadow-scoring-artifact.schema.json)

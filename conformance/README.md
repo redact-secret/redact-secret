@@ -397,8 +397,9 @@ secret **shape** — an exclusion predicate or accepted tradeoff in the
 detector's own source, each with a paired negative/positive fixture proving
 it — not by a raw fixture count, which hides how unevenly coverage is
 distributed across shapes (issue #475).
-[`docs/audits/evidence/475/shape-inventory.json`](../docs/audits/evidence/475/shape-inventory.json)
-is the reviewed inventory, comparable in form to the provider-grammar
+[`docs/contracts/precision/shape-inventory.json`](../docs/contracts/precision/shape-inventory.json)
+is the reviewed inventory (checked against this corpus by
+`npm run shape-inventory:check`), comparable in form to the provider-grammar
 contracts in [`docs/contracts/precision/precision-contracts.json`](../docs/contracts/precision/precision-contracts.json).
 A new exclusion or accepted tradeoff for one of these four detectors should
 add its shape (and cited fixtures) there, not just its fixtures here.

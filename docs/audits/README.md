@@ -95,7 +95,7 @@ why.
 
 | Issue | Evidence | Kind | Disposition |
 | --- | --- | --- | --- |
-| Precision contracts (#367) | [Beta.4 twin baseline and corpus audit; the live contract itself moved to `docs/contracts/precision/`](evidence/367/README.md) | mixed — a live CI contract embedded in frozen evidence | kept in place; DS4 (#596) resolves the live-contract half |
+| Precision contracts (#367) | [Review narrative and source ledger; the contract, the beta.4 twin baseline and the corpus audit moved to `docs/contracts/precision/` and `docs/coverage/`](evidence/367/README.md) | product judgement | narrative kept in place; live files relocated by #596 and #1262 |
 | Beta.5 precision gate (#376) | [One-line result and permalink to the full measurement](evidence/376/README.md) | benchmark measurement | **moved** — full record now in `redact-secret-benchmarks`'s [`evidence/376/`](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/evidence/376/README.md) and [`docs/reports/beta-5/results.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md), per BDS3; this folder is now the stub the convention specifies |
 | Per-detector artifact/runtime cost baseline (#378) | [Compositions, artifact sizes, runtime cost](evidence/378/README.md) | product judgement | kept in place — this repository's own performance evidence, not a benchmark-repo run |
 | Full and common WebAssembly artifacts (#381) | [Real-artifact sizes, build evidence, performance, browser qualification, decision gate](evidence/381/README.md) | product judgement | kept in place |
@@ -107,7 +107,7 @@ why.
 | Release-regression discovery evidence triage, Cloudflare shape-1 (#408) | [Candidate fe4f1d1 regression triage](evidence/408/README.md) | product judgement | kept in place; its `evidence/376` citation now points at the moved record |
 | Closing the six gates in benchmark-regressions.json (#429) | [Product conformance and benchmark rerun evidence, pin-manifest staleness finding](evidence/429/README.md) | product judgement | kept in place |
 | Declarative ruleset parser WebAssembly size increment (#441) | [Before/after artifact sizes, prototype parser, build evidence](evidence/441/README.md) | product judgement | kept in place |
-| Structural/contextual detector shape inventory (#475) | [Valid-but-non-secret shapes for generic-token, bearer-token, connection-string, jwt, cited fixtures](evidence/475/README.md) | product judgement | kept in place |
+| Structural/contextual detector shape inventory (#475) | [Review narrative for the shape inventory, which moved to `docs/contracts/precision/shape-inventory.json`](evidence/475/README.md) | product judgement | narrative kept in place; inventory relocated by #1262 |
 | Declarative ruleset names section false-positive/containment evidence (#484) | [Design rationale, corpus regression evidence, conformance coverage, and the open external benchmark gap](evidence/484/README.md) | product judgement | kept in place |
 | Google OAuth credential coverage evidence (#487) | [`GOCSPX-`/`1//`/`ya29.` tool-corroboration research; none adopted](evidence/487/README.md) | product judgement | kept in place |
 | Declarative ruleset implementation WebAssembly size re-measurement (#495) | [Real compiled artifact sizes vs. the #441 baseline, covering #483 and #495 together](evidence/495/README.md) | product judgement | kept in place |

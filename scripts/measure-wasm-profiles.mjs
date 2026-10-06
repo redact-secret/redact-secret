@@ -34,8 +34,18 @@
  * exports a different surface. Usage:
  *
  *     npm run js:build   # once; the facade is not profile-sensitive
- *     node scripts/measure-wasm-profiles.mjs --out-dir docs/audits/evidence/381 \
- *       [--scratch-dir <dir>] [--runs 10] [--engine chromium ...]
+ *     node scripts/measure-wasm-profiles.mjs --out-dir target/measure/wasm-profiles \
+ *       [--baseline <artifact-sizes.json>] [--scratch-dir <dir>] [--runs 10] [--engine chromium ...]
+ *
+ * `--out-dir` is scratch output, kept under the ignored `target/` directory by
+ * the example above. Results that should be kept and judged belong in
+ * `redact-secret-benchmarks`
+ * (`decision-move-performance-results-criteria-and-judgement-to-benchmarks`),
+ * not in this repository's audit archive.
+ *
+ * `--baseline` names an earlier `artifact-sizes.json` (the `variants` shape
+ * `measure-detector-cost.mjs --aggregate` writes) to report size deltas
+ * against; without it no delta is recorded.
  *     node scripts/measure-wasm-profiles.mjs --guard-only [--scratch-dir <dir>]
  *
  * `--guard-only` builds every artifact and checks the guards, and measures
@@ -75,7 +85,6 @@ import { brotliSize, gzipSize } from "./measure-detector-cost.mjs";
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 /** Inside the gitignored Cargo target directory, so recorded paths stay repo-relative. */
 const DEFAULT_SCRATCH_DIR = join("target", "wasm-profiles");
-const BASELINE_378 = join(REPO_ROOT, "docs", "audits", "evidence", "378", "artifact-sizes.json");
 
 export const PROFILES = ["full", "common"];
 /** Every artifact the guard inspects: each profile's default build and its `pii` variant (#937). */
@@ -442,7 +451,14 @@ function toolchain() {
 }
 
 function parseArguments(argv) {
-  const options = { outDir: undefined, scratchDir: undefined, runs: 10, engines: [], guardOnly: false };
+  const options = {
+    outDir: undefined,
+    baseline: undefined,
+    scratchDir: undefined,
+    runs: 10,
+    engines: [],
+    guardOnly: false,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     const value = argv[index + 1];
@@ -451,6 +467,7 @@ function parseArguments(argv) {
       continue;
     }
     if (argument === "--out-dir") options.outDir = value;
+    else if (argument === "--baseline") options.baseline = value;
     else if (argument === "--scratch-dir") options.scratchDir = value;
     else if (argument === "--runs") options.runs = Number(value);
     else if (argument === "--engine") {
@@ -520,7 +537,9 @@ function main() {
     bytes: full.sizes[key] - common.sizes[key],
     percent: -percentChange(common.sizes[key], full.sizes[key]),
   });
-  const baseline = existsSync(BASELINE_378) ? JSON.parse(readFileSync(BASELINE_378, "utf8")).variants : undefined;
+  const baselinePath = options.baseline === undefined ? undefined : resolve(REPO_ROOT, options.baseline);
+  if (baselinePath !== undefined && !existsSync(baselinePath)) fail(`--baseline file not found: ${options.baseline}`);
+  const baseline = baselinePath === undefined ? undefined : JSON.parse(readFileSync(baselinePath, "utf8")).variants;
   const versus378 =
     baseline === undefined
       ? undefined

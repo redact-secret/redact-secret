@@ -131,6 +131,13 @@ test("each profile has a pii variant built with the pii feature under its own na
   }
 });
 
+test("the usage text and defaults never name the audit archive", () => {
+  const source = readFileSync(join(REPO_ROOT, "scripts", "measure-wasm-profiles.mjs"), "utf8");
+  assert.ok(!source.includes("docs/audits"), "no example or default may name docs/audits");
+  assert.ok(!source.includes('"audits"'), "no path may be assembled from an audits segment");
+  assert.ok(source.includes("redact-secret-benchmarks"));
+});
+
 test("detectorModules reads module names from mangled name-section symbols", () => {
   const section = [
     "<redact_secret[7f632526a786e8f3]::detectors::jwt::JwtDetector as redact_secret[7f632526a786e8f3]::types::Detector>::detect",

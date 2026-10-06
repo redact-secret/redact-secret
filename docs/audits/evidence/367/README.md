@@ -13,16 +13,18 @@ The reviewed contract text itself is a live input CI reads on every run, so
 per `decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`
 it lives outside this frozen archive, at
 [`docs/contracts/precision/precision-contracts.json`](../../../contracts/precision/precision-contracts.json)
-(moved by #596). The two files below stay here: they are derived, frozen
-evidence the script below verifies for staleness, not a live contract a
-detector or policy reads.
+(moved by #596). The two derived files below were relocated by #1262 for the same reason:
+the baseline is both input and checked output of the recipe, so it lives
+with the contract under `docs/contracts/precision/`, and the corpus audit is
+generated data under `docs/coverage/`. Their bytes are unchanged; only their
+location moved.
 
 ## Files
 
 | File | Contents | Maintained by |
 | --- | --- | --- |
-| [`beta4-twin-baseline.json`](beta4-twin-baseline.json) | The 24 must-not-flag twins and their 24 paired positives from the beta.4 `common-formats` snapshot, frozen by construction recipe, content SHA-256, byte length, assessment, expected ranges and the ranges beta.4 actually produced. The corrected-contract view is derived separately under `contractView`. | `scripts/audit-precision-contracts.py --write` (derived fields) |
-| [`corpus-audit.json`](corpus-audit.json) | Every fixture in this repository that names one of the seven detectors, evaluated against its frozen contract, with a disposition and the exact ranges retained or lost. Never contains inputs. | `scripts/audit-precision-contracts.py --write` |
+| [`beta4-twin-baseline.json`](../../../contracts/precision/beta4-twin-baseline.json) | The 24 must-not-flag twins and their 24 paired positives from the beta.4 `common-formats` snapshot, frozen by construction recipe, content SHA-256, byte length, assessment, expected ranges and the ranges beta.4 actually produced. The corrected-contract view is derived separately under `contractView`. | `scripts/audit-precision-contracts.py --write` (derived fields) |
+| [`precision-corpus-audit.json`](../../../coverage/precision-corpus-audit.json) | Every fixture in this repository that names one of the seven detectors, evaluated against its frozen contract, with a disposition and the exact ranges retained or lost. Never contains inputs. | `scripts/audit-precision-contracts.py --write` |
 
 `npm run precision-contracts:check` (part of `npm run ci`) runs the unit
 tests and `--check`, which reconstructs every frozen fixture from its recipe
@@ -104,7 +106,7 @@ CRLF), giving the 24 twins.
 
 ## Existing fixtures under the contracts
 
-`corpus-audit.json` evaluates the conformance synchronous and incremental
+`precision-corpus-audit.json` evaluates the conformance synchronous and incremental
 corpora, the assessment accuracy corpus and the coverage inventory's
 `reconciliationTrigger` values. Dispositions per detector (rows, not files;
 a fixture that names two detectors appears twice):

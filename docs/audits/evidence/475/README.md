@@ -19,15 +19,17 @@ no corpus evidence at all.
 
 | File | Contents | Maintained by |
 | --- | --- | --- |
-| [`shape-inventory.json`](shape-inventory.json) | One row per valid-but-non-secret shape the four detectors recognize: its description, its evidentiary basis (a cited exclusion function or an accepted ADR), and the negative/positive (and, for one boundary case, `boundary`) fixture ids in `conformance/fixtures/synchronous-corpus.json` that prove it. Comparable in form to [`precision-contracts.json`](../../../contracts/precision/precision-contracts.json), adapted to detectors with no provider grammar to enumerate. | hand-authored review |
+| [`shape-inventory.json`](../../../contracts/precision/shape-inventory.json) | One row per valid-but-non-secret shape the four detectors recognize: its description, its evidentiary basis (a cited exclusion function or an accepted ADR), and the negative/positive (and, for one boundary case, `boundary`) fixture ids in `conformance/fixtures/synchronous-corpus.json` that prove it. Comparable in form to [`precision-contracts.json`](../../../contracts/precision/precision-contracts.json), adapted to detectors with no provider grammar to enumerate. | hand-authored review |
 
-There is no automated `--check` regeneration for this file the way
-`scripts/audit-precision-contracts.py` provides for #367 — every id it cites
-was verified against the live corpus by hand at review time (see below), and
-`crates/secret-scan-core/tests/canonical_corpus.rs` is the actual enforcement
-boundary: an id in this document that stopped matching its cited detector,
-kind, or expected result would be a Rust test failure, not a silent drift
-this document could introduce.
+The inventory moved to `docs/contracts/precision/shape-inventory.json` under
+#1262 and is now a live contract. It is hand-authored, so there is no
+regeneration, but `scripts/check-shape-inventory.py` (`npm run
+shape-inventory:check`, part of `npm run ci`) reconciles every cited fixture
+id against the synchronous corpus for existence, detector and `kind`
+agreement and non-empty or empty `expected`, and checks the cited
+implementation files and decision documents exist.
+`crates/secret-scan-core/tests/canonical_corpus.rs` remains the enforcement
+boundary for the detector behavior itself.
 
 ## What changed under this issue
 

@@ -74,7 +74,7 @@ class CheckJsonPathCitationsTest(unittest.TestCase):
 
     def test_frozen_evidence_archive_is_excluded(self) -> None:
         self.repo.write(
-            "docs/audits/evidence/475/shape-inventory.json",
+            "docs/audits/evidence/1/example.json",
             '{"note": "comparable to docs/audits/evidence/367/precision-contracts.json"}\n',
         )
         self.assertEqual(self.validate(), [])

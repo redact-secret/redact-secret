@@ -923,7 +923,7 @@
     "slack-user-token-boundary-underscore-separator"
   ],
   "provenance": {
-    "beta4TwinBaselineSource": "docs/audits/evidence/367/beta4-twin-baseline.json",
+    "beta4TwinBaselineSource": "docs/contracts/precision/beta4-twin-baseline.json",
     "incrementalCorpus": "conformance/fixtures/incremental-corpus.json",
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"

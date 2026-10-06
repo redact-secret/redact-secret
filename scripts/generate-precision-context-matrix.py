@@ -20,7 +20,7 @@ sources for the seven frozen provider families
   script could misreport. A row never claims a beta.4 "before": most rows
   (including every fixture issue #375 itself adds) postdate the freeze and
   never ran under beta.4 at all.
-- ``docs/audits/evidence/367/beta4-twin-baseline.json`` -- the one source
+- ``docs/contracts/precision/beta4-twin-baseline.json`` -- the one source
   that *does* carry a real, measured "before": the 24 must-not-flag twins and
   their 24 paired positives from the beta.4 benchmark snapshot, each with
   ``actualBeta4`` (what beta.4's ranges actually were) alongside ``expected``
@@ -62,7 +62,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SYNC_PATH = ROOT / "conformance" / "fixtures" / "synchronous-corpus.json"
 INCREMENTAL_PATH = ROOT / "conformance" / "fixtures" / "incremental-corpus.json"
-BASELINE_PATH = ROOT / "docs" / "audits" / "evidence" / "367" / "beta4-twin-baseline.json"
+BASELINE_PATH = ROOT / "docs" / "contracts" / "precision" / "beta4-twin-baseline.json"
 
 ISSUE = "https://github.com/redact-secret/redact-secret/issues/375"
 
@@ -191,7 +191,7 @@ def build_matrix(sync_corpus: dict, incremental_corpus: dict, baseline: dict, de
             "issue": ISSUE,
             "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json",
             "incrementalCorpus": "conformance/fixtures/incremental-corpus.json",
-            "beta4TwinBaselineSource": "docs/audits/evidence/367/beta4-twin-baseline.json",
+            "beta4TwinBaselineSource": "docs/contracts/precision/beta4-twin-baseline.json",
         },
         "detectors": sorted(detectors),
         "rowCount": len(rows),
