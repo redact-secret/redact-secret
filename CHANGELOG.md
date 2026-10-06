@@ -85,6 +85,16 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` redacts the HubSpot CLI personal access key: the
+  `personalAccessKey` field of an account entry in `~/.hscli/config.yml` and the
+  `HUBSPOT_PERSONAL_ACCESS_KEY` environment variable (YAML, quoted, CRLF,
+  `export`, `.env`, docker-compose) as a generic `contextual_secret` over exactly
+  the value, redacted at high confidence and warned at medium (#1233). Before this
+  neither was read. Only these two whole names are added: `personalAccessKeyId`,
+  `personalAccessKeyExpiresAt`, `portalId`, `authType`, prefixed or suffixed
+  lookalikes, placeholders, references and masks are not matched, and no HubSpot
+  type is claimed. The field name rests on HubSpot's own SDK source; the legacy
+  `portals` layout is unresolved.
 - `generic-token` no longer takes the next form parameter as the value of an
   empty one (#1232). `refresh_token=&other=1` and `client_secret=&grant_type=x`
   produced a medium, `warn` `contextual_secret` whose span was `&other=1` or

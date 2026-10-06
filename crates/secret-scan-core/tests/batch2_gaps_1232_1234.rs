@@ -180,3 +180,101 @@ fn an_empty_value_never_yields_a_span_that_starts_at_the_delimiter() {
         assert!(findings.is_empty(), "{input:?}: {findings:?}");
     }
 }
+// --------------------------------------------- #1233 HubSpot personal key
+
+const HUBSPOT_KEY: &str = "Xq7Lm2Zp9TrW4vKc8NbY3hJd6FsA1eGuQw5Rt0YkM2xN";
+
+#[test]
+fn hubspot_personal_access_key_is_redacted_in_every_documented_layout() {
+    assert_eq!(HUBSPOT_KEY.len(), 44);
+    for input in [
+        // yaml-account
+        format!(
+            "defaultAccount: 1\naccounts:\n  - name: dev\n    accountId: 12345\n    authType: personalaccesskey\n    personalAccessKey: {HUBSPOT_KEY}\n    env: qa\n"
+        ),
+        // yaml-quoted
+        format!(
+            "accounts:\n  - authType: personalaccesskey\n    personalAccessKey: '{HUBSPOT_KEY}'\n"
+        ),
+        format!(
+            "accounts:\n  - authType: personalaccesskey\n    personalAccessKey: \"{HUBSPOT_KEY}\"\n"
+        ),
+        // yaml-eof-crlf: no trailing newline, and CRLF line endings
+        format!(
+            "accounts:\r\n  - authType: personalaccesskey\r\n    personalAccessKey: {HUBSPOT_KEY}"
+        ),
+        format!(
+            "accounts:\r\n  - authType: personalaccesskey\r\n    personalAccessKey: {HUBSPOT_KEY}\r\n"
+        ),
+        // yaml-same-shape: a public value of the same alphabet and length
+        format!(
+            "accounts:\n  - name: dev\n    portalId: 1234567890123456789012345678901234567890\n    personalAccessKey: {HUBSPOT_KEY}\n"
+        ),
+        // env, export-quoted, env-eof, docker-compose
+        format!("HUBSPOT_PERSONAL_ACCESS_KEY={HUBSPOT_KEY}\nHUBSPOT_PORTAL_ID=12345\n"),
+        format!("export HUBSPOT_PERSONAL_ACCESS_KEY=\"{HUBSPOT_KEY}\"\n"),
+        format!("HUBSPOT_PERSONAL_ACCESS_KEY={HUBSPOT_KEY}"),
+        format!(
+            "services:\n  app:\n    environment:\n      - HUBSPOT_PERSONAL_ACCESS_KEY={HUBSPOT_KEY}\n"
+        ),
+        format!(
+            "services:\n  app:\n    environment:\n      HUBSPOT_PERSONAL_ACCESS_KEY: {HUBSPOT_KEY}\n"
+        ),
+        // a multi-byte prefix: the span offset is in UTF-8 bytes
+        format!("# caf\u{e9} \u{1F680}\npersonalAccessKey: {HUBSPOT_KEY}\n"),
+    ] {
+        assert_value(&input, HUBSPOT_KEY);
+    }
+}
+
+#[test]
+fn hubspot_personal_access_key_carries_no_provider_attribution() {
+    let findings = findings_with_parity(&format!("personalAccessKey: {HUBSPOT_KEY}\n"));
+    assert_eq!(findings.len(), 1);
+    assert_eq!(findings[0].type_name(), "contextual_secret");
+    assert!(!findings[0].detector().contains("hubspot"));
+}
+
+#[test]
+fn a_low_entropy_hubspot_key_is_a_warn_at_medium_confidence() {
+    let input = "personalAccessKey: abababababababab\n";
+    let findings = findings_with_parity(input);
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].action(), Action::Warn);
+    assert_eq!(findings[0].confidence(), Confidence::Medium);
+}
+
+#[test]
+fn hubspot_public_config_placeholders_references_masks_and_lookalikes_stay_clean() {
+    for input in [
+        // public-only config
+        "defaultAccount: 1\naccounts:\n  - name: dev\n    accountId: 12345\n    portalId: 12345\n    authType: personalaccesskey\n    env: qa\n".to_string(),
+        // placeholders, references, masks
+        "personalAccessKey: YOUR_PERSONAL_ACCESS_KEY\n".to_string(),
+        "personalAccessKey: <personal-access-key>\n".to_string(),
+        "personalAccessKey: ${HUBSPOT_PERSONAL_ACCESS_KEY}\n".to_string(),
+        "personalAccessKey: $HUBSPOT_PERSONAL_ACCESS_KEY\n".to_string(),
+        "personalAccessKey: ****************************\n".to_string(),
+        "HUBSPOT_PERSONAL_ACCESS_KEY=your_personal_access_key_here\n".to_string(),
+        "HUBSPOT_PERSONAL_ACCESS_KEY=${HUBSPOT_PERSONAL_ACCESS_KEY}\n".to_string(),
+        "HUBSPOT_PERSONAL_ACCESS_KEY=\n".to_string(),
+        "personalAccessKey: \"\"\n".to_string(),
+        // neighbouring names and a further-prefixed lookalike
+        format!("personalAccessKeyId: {HUBSPOT_KEY}\n"),
+        format!("personalAccessKeyExpiresAt: {HUBSPOT_KEY}\n"),
+        format!("personalAccessKeyHint: {HUBSPOT_KEY}\n"),
+        format!("personalAccessKeyLength: {HUBSPOT_KEY}\n"),
+        format!("my_personal_access_key: {HUBSPOT_KEY}\n"),
+        format!("oldPersonalAccessKey: {HUBSPOT_KEY}\n"),
+        format!("HUBSPOT_PERSONAL_ACCESS_KEY_ID={HUBSPOT_KEY}\n"),
+        format!("HUBSPOT_PERSONAL_ACCESS_KEY_EXPIRES_AT={HUBSPOT_KEY}\n"),
+        format!("portalId: {HUBSPOT_KEY}\n"),
+        format!("authType: {HUBSPOT_KEY}\n"),
+        // an arbitrary `*key` name is not admitted
+        format!("accessKey: {HUBSPOT_KEY}\n"),
+        format!("personalKey: {HUBSPOT_KEY}\n"),
+        format!("hubspot_key: {HUBSPOT_KEY}\n"),
+    ] {
+        assert_clean(&input);
+    }
+}

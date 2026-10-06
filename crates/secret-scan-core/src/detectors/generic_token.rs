@@ -64,8 +64,19 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// `X-Airtable-Content-MAC` header carries). It is exactly this one name, not
 /// a `*_base64` rule: `thumbnailBase64`, `macSecretBase64Length`,
 /// `macSecretBase64Id` and a prefixed `oldMacSecretBase64` do not match.
+///
+/// Issue #1233 adds the `HubSpot` CLI's personal access key: the
+/// `personalAccessKey` field of an account entry (`authType:
+/// personalaccesskey` in `~/.hscli/config.yml`) and the
+/// `HUBSPOT_PERSONAL_ACCESS_KEY` variable. Exactly these two normalized names
+/// (`personal_access_key`, `hubspot_personal_access_key`), not a `*_key` rule:
+/// `personalAccessKeyId`, `personalAccessKeyExpiresAt`, a further-prefixed
+/// `my_personal_access_key` and `portalId` do not match. The field name rests
+/// on `HubSpot`'s own SDK source, not a documentation sentence.
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
     "mac_secret_base64",
+    "personal_access_key",
+    "hubspot_personal_access_key",
     "db_pass",
     "fal_key",
     "convex_deploy_key",
