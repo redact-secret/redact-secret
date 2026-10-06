@@ -7,6 +7,11 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports `YOUR_<the slot's own name>` placeholders
+  (#1230): `?hapikey=YOUR_HAPIKEY` was a `warn` once `hapikey` became a readable
+  name. A lead word followed by the slot's own name words is silent under every
+  contextual name (`YOUR_ART_API`, `YOUR_ENCODED`, `YOUR_PUBLIC_API_KEY`, ...);
+  real-shaped values and material glued to a placeholder stay detected.
 - `generic-token` now reads the Zendesk `{email}/token:{token}` credential string
   by its `/token:` literal (#1230): the finding is the token only,
   `contextual_secret`, high, `redact`, where the string was one whole-value

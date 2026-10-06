@@ -1960,6 +1960,57 @@ fn is_credential_noun_phrase(value: &str) -> bool {
     all_words && count >= 2 && CREDENTIAL_PHRASE_TAIL_WORDS.contains(&tail)
 }
 
+/// The lead words of an instructional placeholder (`YOUR_`, `INSERT_`, ...),
+/// the set `is_instructional_token_placeholder` reads. `MY_` is not one: `my`
+/// plus `password` is a common weak real password.
+const OWN_NAME_PLACEHOLDER_LEADS: &[&str] = &["your", "insert", "enter", "paste", "replace"];
+
+/// `true` when `value` is a lead word followed by the slot's own name words
+/// (issue #1230 round 2): `?hapikey=YOUR_HAPIKEY`, `"encoded": "YOUR_ENCODED"`,
+/// `HUBSPOT_HAPIKEY=YOUR_HAPIKEY`, `X-JFrog-Art-Api: YOUR_ART_API`. After the
+/// lead word and any `_`, `-`, `.` or space, the rest, with separators removed
+/// and in any case, must equal the concatenation of one or more trailing words
+/// of the normalized slot name, so a vocabulary name admitted later is covered
+/// without a list. A lead glued to random material, a word off the name and a
+/// real-shaped value stay reported. `raw_name` is the name as written (before
+/// any alias). FN cost: a real value spelled exactly as a lead word and the
+/// slot's own name, which no issuer generates.
+fn is_own_name_placeholder(raw_name: &str, value: &str) -> bool {
+    let Some(lead) = OWN_NAME_PLACEHOLDER_LEADS
+        .iter()
+        .find(|lead| starts_with_ci(value, 0, lead))
+    else {
+        return false;
+    };
+    let rest = &value[lead.len()..];
+    if rest.is_empty()
+        || !rest
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-' | b'.' | b' '))
+    {
+        return false;
+    }
+    let glued: String = rest
+        .bytes()
+        .filter(u8::is_ascii_alphanumeric)
+        .map(|b| char::from(b.to_ascii_lowercase()))
+        .collect();
+    // Further lead words (`ENTER_YOUR_HAPIKEY`) are lead words too.
+    let mut glued = glued.as_str();
+    while let Some(next) = OWN_NAME_PLACEHOLDER_LEADS
+        .iter()
+        .find_map(|lead| glued.strip_prefix(lead).filter(|rest| !rest.is_empty()))
+    {
+        glued = next;
+    }
+    if glued.is_empty() {
+        return false;
+    }
+    let name = normalize_name(raw_name);
+    let words: Vec<&str> = name.split('_').collect();
+    (0..words.len()).any(|from| words[from..].concat() == glued)
+}
+
 /// `true` for a value that is itself the name of a credential rather than a
 /// credential (issue #1228): a lowercase credential-noun phrase
 /// ([`is_credential_noun_phrase`], `access_token`, `auth-token-storage-key`) or
@@ -3434,6 +3485,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
                 && !is_parameter_expansion_message(input, name_start, name_end, value_start)
                 && (!name_phrase_is_reference || !is_credential_name_phrase(value))
+                && !is_own_name_placeholder(&input[name_start..name_end], value)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
                 && !is_templated_lookup_path(&mut templates, input, name_start, value)
