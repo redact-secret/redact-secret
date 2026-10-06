@@ -7,6 +7,13 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads a digits-only value of 16 or more digits in a
+  credential-named slot (#1230): `api_key=<24 digits>`, a JSON `access_token`
+  member, a `hapikey` or `X-JFrog-Art-Api` value of digits was silent while the
+  same slot with letters was a finding. The finding is `medium` (`warn`, text
+  unchanged), never `high`; fewer than 16 digits, a counting run, the ambiguous
+  names (`auth`, `credential`) and the bare `token` stay silent. 0 new findings
+  across 9,159 tracked files of the maintainers' repositories.
 - `generic-token` now reads the HubSpot `hapikey` parameter (#1230): the value
   of `?hapikey=`, `&hapikey=`, `HAPIKEY=`, `HUBSPOT_HAPIKEY=` or a `"hapikey"`
   member (the retired account key and the current developer key alike) is a

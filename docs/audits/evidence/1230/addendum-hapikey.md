@@ -66,7 +66,7 @@ is generic: no HubSpot type, no era, no account or developer key subtype.
 * False positive on the prefixed form: any name ending in `hapikey` (a made-up
   word; no other use is known).
 * False negative kept, stated: a value under 8 bytes; a split value; a digits-only
-  value is the digits-only record's case (the next #1230 addendum); the
+  value is the [digits-only record](addendum-digits-only-values.md)'s case; the
   `hapikey` carried in a path segment or a header is not a parameter or member
   name and is not read.
 * No attribution, no width, no alphabet and no era claim: the retired account key
@@ -78,7 +78,7 @@ is generic: no HubSpot type, no era, no account or developer key subtype.
   `hapikey` neighbours stay silent.
 * Benchmarks: the `query-*`, `fx-*`, `developer-key-*` cases are expected to move on
   a re-run at a commit carrying this fix, except `query-shape-digits24`, which
-  moves with the digits-only record.
+  moves with the [digits-only record](addendum-digits-only-values.md).
 * credential-evidence: no correction.
 
 ## Tests

@@ -1634,10 +1634,40 @@ fn is_source_code_expression(value: &str, form: ValueForm) -> bool {
 /// immaterial: the only check that reads it, [`is_truncated_call_expression`],
 /// needs a bracket the character class already forbids.
 fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
+    is_boolean_null_or_digits(value) || is_non_secret_reference_beyond_digits(value, form)
+}
+
+/// The fewest decimal digits a value under a credential name needs to be read
+/// as a numeric secret (issue #1230). Below it a digit run is a count, a port,
+/// an id or a PIN-sized number; from it a run carries at least 53 bits if
+/// random, which no counter or small id reaches.
+const MIN_NUMERIC_SECRET_DIGITS: usize = 16;
+
+/// `true` for a non-empty run of ASCII digits.
+fn is_all_digits(value: &str) -> bool {
+    !value.is_empty() && value.bytes().all(|byte| byte.is_ascii_digit())
+}
+
+/// [`is_non_secret_reference`] for a contextual assignment (issue #1230): a
+/// digits-only value of at least [`MIN_NUMERIC_SECRET_DIGITS`] digits under a
+/// credential name is read as a value by position, not shape, unless it is a
+/// counting run (`1234567890123456`) or one repeated digit. `true`, `false`,
+/// `null` and `undefined` and every other reference stay non-secret. The
+/// authorization-header carrier keeps [`is_non_secret_reference`].
+fn is_non_secret_assignment_reference(value: &str, form: ValueForm) -> bool {
+    let is_literal_word = ["true", "false", "null", "undefined"]
+        .iter()
+        .any(|word| value.eq_ignore_ascii_case(word));
+    let is_small_number = is_all_digits(value)
+        && (value.len() < MIN_NUMERIC_SECRET_DIGITS || is_ascending_digit_run(value));
+    is_literal_word || is_small_number || is_non_secret_reference_beyond_digits(value, form)
+}
+
+/// Every check of [`is_non_secret_reference`] except the digits-only one.
+fn is_non_secret_reference_beyond_digits(value: &str, form: ValueForm) -> bool {
     is_generic_placeholder_word(value)
         || is_instructional_token_placeholder(value)
         || is_glued_my_placeholder(value)
-        || is_boolean_null_or_digits(value)
         || starts_with_env_reference(value)
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
@@ -2407,7 +2437,7 @@ fn assignment_confidence(
     }
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
-        || is_non_secret_reference(value, form)
+        || is_non_secret_assignment_reference(value, form)
         || is_confluent_key_id_assignment(name, value)
         || is_atlas_public_api_key_assignment(name, value)
         || is_self_reference(name, value)
@@ -2419,8 +2449,14 @@ fn assignment_confidence(
     let entropy = crate::shannon_entropy(value);
 
     if high_signal {
+        // A digits-only value is read by its position alone and stays medium
+        // (`warn`, text unchanged): a decimal run has no shape that separates
+        // a secret from a long id (issue #1230).
         return Some(
-            if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
+            if value.len() >= MIN_HIGH_ENTROPY_LENGTH
+                && entropy >= HIGH_ENTROPY_THRESHOLD
+                && !is_all_digits(value)
+            {
                 Confidence::High
             } else {
                 Confidence::Medium
