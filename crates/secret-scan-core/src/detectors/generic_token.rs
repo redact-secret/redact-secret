@@ -82,7 +82,19 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// position, not its shape. Exactly this name: `jfrog_art_api`,
 /// `x_jfrog_art_api_id` and a further-prefixed `my_x_jfrog_art_api` do not
 /// match. `curl -u user:<secret>` is not read (issue #1247).
+///
+/// Issue #1230 (Group E, `HubSpot` legacy API key) adds `hapikey`, the query
+/// parameter that carries both the retired account API key and the current
+/// developer API key (`?hapikey=<value>`; `HAPIKEY=<value>` normalizes to the
+/// same name). credential-evidence Case
+/// `hubspot-legacy-api-key-hapikey-query-parameter-value` flags the value by
+/// its position, not its shape, and no era or key type is inferred. Both
+/// conditions of the #1225 admission rule are met (the evidence names the exact
+/// field; the round-1 baseline reproduced the miss). `hapikeyId`, `hapikeys`
+/// and `hapikey_id` do not match; a user prefix does (see
+/// [`PREFIXED_EXACT_HIGH_SIGNAL_NAMES`]).
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "hapikey",
     "x_jfrog_art_api",
     "mac_secret_base64",
     "personal_access_key",
@@ -102,7 +114,11 @@ const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
 /// secret (`masked_`, `redacted_`, `publishable_`) still excludes it. Only the
 /// whole name is the suffix: `personal_access_key_id`, `_expires_at`, `_hint`
 /// and `_length` do not end in it and stay unmatched.
-const PREFIXED_EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["personal_access_key"];
+///
+/// Issue #1230 adds `hapikey` here too: `HUBSPOT_HAPIKEY`, `MY_HAPIKEY` and
+/// `hubspot.hapikey` are the same field under a user's own prefix, the way
+/// environment variables and configuration keys are written.
+const PREFIXED_EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["personal_access_key", "hapikey"];
 
 const AMBIGUOUS_NAMES: &[&str] = &["auth", "credential", "credentials", "signing_key"];
 

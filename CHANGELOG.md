@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the HubSpot `hapikey` parameter (#1230): the value
+  of `?hapikey=`, `&hapikey=`, `HAPIKEY=`, `HUBSPOT_HAPIKEY=` or a `"hapikey"`
+  member (the retired account key and the current developer key alike) is a
+  `contextual_secret`, high, `redact`, exactly the value, where it was silent and
+  the key stayed in the output. Whole name (and a user prefix) only: `hapikeyId`,
+  `appId`, `portalId`, placeholders and masks stay silent.
 - `generic-token` no longer reports brace, angle, documented-mask and
   upper-case placeholders under credential names (#1234): `{CLIENT_SECRET}`,
   `{your-app_id}|{your-app_secret}` and `{short-lived-access-token}` in a query,
