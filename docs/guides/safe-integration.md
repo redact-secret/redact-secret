@@ -32,6 +32,43 @@ and other high-confidence findings, and warns on other medium/low-confidence
 findings. A stricter policy can redact or block every **detected** finding;
 it does not expand detector coverage.
 
+### Your policy sees finalized findings only
+
+When two detectors report overlapping ranges, the library keeps one and drops
+the other before your policy runs. Overlap resolution ranks candidates with a
+fixed built-in classification (the action each would get under the default
+policy, then specificity and confidence), never your policy. Your policy then
+decides the action for each surviving finding, once. It is never asked about a
+candidate that lost, so a rule written for the losing type does not fire.
+
+This holds identically for whole-input scans and incremental sessions, at any
+chunk boundary.
+
+Example, using the synthetic input
+`newrelic Authorization: Bearer 0123456789abcdef0123456789abcdef01234567`.
+Both a `bearer_token` candidate (default action `redact`) and a
+`new_relic_license_key` candidate (default action `warn`) cover the value, and
+`bearer_token` wins.
+
+| Policy | Findings your policy sees | Output |
+| --- | --- | --- |
+| Default | `bearer_token` | `newrelic Authorization: Bearer <SECRET_1>` |
+| `bearer_token` allowed, `new_relic_license_key` blocked | `bearer_token` | the input unchanged; the block rule never runs |
+| `bearer_token` blocked, `new_relic_license_key` allowed | `bearer_token` | `newrelic Authorization: Bearer <SECRET_1>` |
+
+If you need a rule for the type that lost, choose one of these:
+
+- Write the rule on the winning type. Your policy receives its type name, so a
+  stricter action for it covers the range.
+- Run a second scan with a registry that holds only the detector you care
+  about, and merge the two finding sets in your host. Each scan resolves its
+  own overlaps. This works for custom detectors you register yourself.
+
+Disabling a detector can also change which candidate wins, because the winner
+is chosen among the candidates that remain. The library exposes no hook that
+shows your policy the dropped candidates
+([decision](../decisions/2026-09-19-resolve-overlap-precedence-by-resolved-action-severity.md#applies-to-user-policy-1218)).
+
 This server helper rejects blocked results and propagates sanitized library
 errors. Its caller must initialize the runtime and enforce request limits first:
 
