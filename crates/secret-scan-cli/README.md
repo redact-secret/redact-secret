@@ -22,6 +22,7 @@ which does not carry the opt-in PII families (see the
 ```text
 usage: redact-secret [--json] [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>...]
        redact-secret --redact [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>]
+       redact-secret --compare-action-policy <path>... [--action-policy <path>] [--json] [--ruleset <path>] [--pii <selector>]... [--] <path>
        redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h
@@ -38,6 +39,15 @@ either mode, with a path or standard input, and the first matching rule picks
 action. A rejected policy fails the run with exit 2 and `INVALID_ACTION_POLICY`
 before any source is scanned. Check mode still exits 1 on any finding; see the
 [rulesets guide](../../docs/guides/rulesets.md#default-action).
+
+`--compare-action-policy <path>` (1 to 3 times) previews policies without
+enforcing any: it needs exactly one file path, runs detection once, and reports
+each finalized finding's action and reason under the baseline (`--action-policy`,
+or the default) and every candidate, with each policy document's SHA-256. It
+never redacts, never echoes input, and refuses `--redact` and standard input.
+Exit `0` means every policy agrees, `1` means a finding's action differs, `2` is
+any failure. See the
+[action policy guide](../../docs/guides/action-policy.md#explain-and-compare).
 
 PII selectors are opt-in and repeatable. The activation-print form exits
 without opening input. `pii` closes over the context-required

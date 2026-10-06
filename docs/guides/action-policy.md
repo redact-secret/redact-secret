@@ -79,13 +79,71 @@ detection, and it changes no default.
   matches only when a finding carries it, so a typo in a name is silent. A typo
   in a loosening rule leaves the default; a typo in a tightening rule leaves the
   default instead of the stricter action you meant. Test every rule against a
-  representative input and check the reported action.
+  representative input and check the reported action; the
+  [comparison](#explain-and-compare) names the rule that decided each finding.
 - A rule on `contextual_secret` lowers or raises every finding of that type,
   because findings carry no credential role.
 - A broad early rule shadows a later one. Revision 1 does not analyse shadowing,
   and a rule an earlier rule fully covers loads and never fires.
 - An `allow` rule can leave a credential in the output. The default is unchanged
   and the policy owner owns that change.
+
+## Explain and compare
+
+Before adopting a change, run it against a representative input and read why
+each finding got its action. The Rust core and the command line compare 1 to 4
+policies (a baseline and up to three candidates) over **one** detection pass:
+detection runs once, then every policy decides the same finalized findings.
+
+```bash
+redact-secret --action-policy current.json --compare-action-policy next.json app.env
+redact-secret --json --compare-action-policy next.json app.env   # baseline is the default
+```
+
+For every finding the report gives each policy's action and its reason:
+
+| Basis | Meaning |
+| --- | --- |
+| `rule` | a rule matched; its `ruleId` and zero-based `ruleIndex` are reported |
+| `rule-default` | a rule with action `default` matched, so the action is the base (the running artifact's default) and evaluation stopped there |
+| `no-rule-matched` | no rule matched, so the action is the base |
+| `default-policy` | the side is the default policy, with no document |
+| `callback` | the side is a legacy callback; only its action is known |
+
+Each document-based policy is bound to the SHA-256 of its exact bytes
+(`documentSha256`), so the same file gives the same binding on every surface and
+any changed byte, including whitespace, changes it. The detection configuration
+(activation identity, profile, detector count) is reported separately; a custom
+ruleset's identity is yours to record, for example a digest of its bytes.
+
+What a comparison is, and is not:
+
+- It is a **preview**. It edits no input, renders no placeholder and changes
+  nothing `scan`, `redact` or a session does. The report says `"mode": "preview"`
+  and `"enforced": false`. To get the effect, run the real call with the policy.
+- It covers **finalized findings only**. An overlap loser, a suppressed PII
+  alternative and anything detection missed are not listed, and a clean report is
+  not a coverage claim. A rule that fires on no finding of your sample has not
+  been shown dead; try more inputs.
+- It carries no input byte, matched value, snippet, hash of either, or score.
+- A comparison runs **whole inputs only**. Standard input, incremental sessions
+  and stream adapters are not compared in this version, and the CLI refuses
+  standard input rather than substituting another path.
+- A legacy **callback** can be one side. It is called once per finding in finding
+  order, with the same context `scan` gives it, one side at a time in the order
+  supplied. If it fails, the whole comparison fails with `POLICY_FAILURE` and no
+  partial result. A callback with state or side effects advances them during a
+  comparison like any other call.
+- The result is bounded: the whole-input byte and finding limits apply, and at
+  most 4 policies are accepted (`INVALID_OPTIONS` otherwise).
+
+`--compare-action-policy` exits `0` when every policy chooses the same action for
+every finding (or there are no findings), `1` when at least one finding's action
+differs, and `2` on any failure, with nothing on standard output. Finding
+something is never a failure in this mode. See the
+[command line guide](cli.md#compare-action-policies) and the
+[Rust guide](rust.md#compare-action-policies); the decision is
+[explain and compare action policies](../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md).
 
 ## Rust
 
@@ -198,7 +256,9 @@ git diff --cached | redact-secret --action-policy policy.json
 
 The file is read once with a bounded read before any source is touched. Check
 mode still exits 1 when any finding exists, whatever its action, and redact mode
-replaces only `redact` and `block` spans. See the [command line guide](cli.md).
+replaces only `redact` and `block` spans. To preview a change instead of
+enforcing it, use `--compare-action-policy` (see
+[Explain and compare](#explain-and-compare)). See the [command line guide](cli.md).
 
 ## Errors
 

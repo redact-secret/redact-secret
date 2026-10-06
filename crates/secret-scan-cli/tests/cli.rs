@@ -1634,3 +1634,305 @@ fn the_cli_runs_every_end_to_end_case_of_the_shared_fixture() {
         }
     }
 }
+
+// --- compare action policies (issue #1220) --------------------------------
+
+/// The compact form of the allow-github document, so its SHA-256 is a fixed
+/// fact the tests can assert (`sha256sum` of exactly these bytes).
+const COMPACT_ALLOW_GITHUB: &str = r#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"allow-github","match":{"type":["github_token"]},"action":"allow"}]}"#;
+const COMPACT_ALLOW_GITHUB_SHA256: &str =
+    "639a0e632fdec8204559779bab20cbc975d782cb4e22b17273e3b2c0d53566a9";
+
+fn compare_json(args: &[&Path]) -> (Run, serde_json::Value) {
+    let mut all: Vec<&Path> = vec![Path::new("--json")];
+    all.extend_from_slice(args);
+    let output = run(&all, b"");
+    let report = serde_json::from_str(&output.stdout).unwrap_or(serde_json::Value::Null);
+    (output, report)
+}
+
+#[test]
+fn compare_reports_each_policys_action_and_reason_and_exits_one_on_a_difference() {
+    let scratch = Scratch::new();
+    let candidate = scratch.write("candidate.json", COMPACT_ALLOW_GITHUB);
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+
+    let (output, report) =
+        compare_json(&[Path::new("--compare-action-policy"), &candidate, &source]);
+    assert_eq!(output.code, 1, "{}", output.stderr);
+    output.leaks_nothing();
+    assert_eq!(report["mode"], "preview");
+    assert_eq!(report["enforced"], false);
+    assert_eq!(report["findingCount"], 1);
+    assert_eq!(report["changedCount"], 1);
+    assert_eq!(report["detection"]["profile"], "full");
+    assert!(
+        report["detection"]["activationIdentity"]
+            .as_str()
+            .unwrap()
+            .starts_with("credentials=full;")
+    );
+
+    let policies = report["policies"].as_array().unwrap();
+    assert_eq!(policies.len(), 2);
+    assert_eq!(policies[0]["label"], "baseline");
+    assert_eq!(policies[0]["kind"], "default");
+    assert_eq!(policies[0]["documentSha256"], serde_json::Value::Null);
+    assert_eq!(policies[1]["label"], "candidate-1");
+    assert_eq!(policies[1]["kind"], "action-policy");
+    assert_eq!(policies[1]["documentSha256"], COMPACT_ALLOW_GITHUB_SHA256);
+    assert_eq!(policies[1]["counts"]["allow"], 1);
+
+    let finding = &report["findings"][0];
+    assert_eq!(finding["type"], "github_token");
+    assert_eq!(finding["start"], 8);
+    assert_eq!(finding["differs"], true);
+    let decisions = finding["decisions"].as_array().unwrap();
+    assert_eq!(decisions[0]["action"], "redact");
+    assert_eq!(decisions[0]["basis"], "default-policy");
+    assert_eq!(decisions[0]["ruleId"], serde_json::Value::Null);
+    assert_eq!(decisions[1]["action"], "allow");
+    assert_eq!(decisions[1]["basis"], "rule");
+    assert_eq!(decisions[1]["ruleId"], "allow-github");
+    assert_eq!(decisions[1]["ruleIndex"], 0);
+}
+
+#[test]
+fn compare_text_names_the_basis_and_leaves_the_input_untouched() {
+    let scratch = Scratch::new();
+    let candidate = scratch.write("candidate.json", COMPACT_ALLOW_GITHUB);
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+    let before = fs::read(&source).unwrap();
+
+    let output = run(
+        &[Path::new("--compare-action-policy"), &candidate, &source],
+        b"",
+    );
+    assert_eq!(output.code, 1);
+    output.leaks_nothing();
+    assert!(output.stdout.contains("github_token"));
+    assert!(output.stdout.contains("baseline=redact(default-policy)"));
+    assert!(
+        output
+            .stdout
+            .contains("candidate-1=allow(rule:allow-github#0)")
+    );
+    assert!(output.stdout.trim_end().ends_with("differs"));
+    assert!(output.stderr.contains("preview only, nothing was enforced"));
+    assert!(output.stderr.contains(COMPACT_ALLOW_GITHUB_SHA256));
+    assert_eq!(
+        fs::read(&source).unwrap(),
+        before,
+        "the input is never written"
+    );
+}
+
+#[test]
+fn compare_exits_zero_when_every_policy_agrees_and_findings_alone_are_not_a_failure() {
+    let scratch = Scratch::new();
+    let same = scratch.write(
+        "same.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[]}"#,
+    );
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+    let (output, report) = compare_json(&[Path::new("--compare-action-policy"), &same, &source]);
+    assert_eq!(output.code, 0, "{}", output.stderr);
+    assert_eq!(report["findingCount"], 1);
+    assert_eq!(report["changedCount"], 0);
+    assert_eq!(report["findings"][0]["differs"], false);
+    assert_eq!(
+        report["findings"][0]["decisions"][1]["basis"],
+        "no-rule-matched"
+    );
+
+    let clean = scratch.write("clean.txt", "nothing here\n");
+    let (output, report) = compare_json(&[Path::new("--compare-action-policy"), &same, &clean]);
+    assert_eq!(output.code, 0);
+    assert_eq!(report["findings"].as_array().unwrap().len(), 0);
+}
+
+#[test]
+fn compare_takes_an_explicit_baseline_and_up_to_three_candidates() {
+    let scratch = Scratch::new();
+    let allow = scratch.write("allow.json", COMPACT_ALLOW_GITHUB);
+    let warn = scratch.write(
+        "warn.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#,
+    );
+    let carve = scratch.write(
+        "carve.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"keep","match":{"type":["github_token"]},"action":"default"}]}"#,
+    );
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+    let (output, report) = compare_json(&[
+        Path::new("--action-policy"),
+        &allow,
+        Path::new("--compare-action-policy"),
+        &warn,
+        Path::new("--compare-action-policy"),
+        &carve,
+        &source,
+    ]);
+    assert_eq!(output.code, 1, "{}", output.stderr);
+    let policies = report["policies"].as_array().unwrap();
+    assert_eq!(policies.len(), 3);
+    assert_eq!(policies[0]["kind"], "action-policy");
+    let actions: Vec<(&str, &str)> = report["findings"][0]["decisions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|d| (d["action"].as_str().unwrap(), d["basis"].as_str().unwrap()))
+        .collect();
+    assert_eq!(
+        actions,
+        [
+            ("allow", "rule"),
+            ("warn", "rule"),
+            ("redact", "rule-default")
+        ]
+    );
+}
+
+#[test]
+fn every_compared_action_equals_what_check_mode_enforces_with_that_policy() {
+    let scratch = Scratch::new();
+    let allow = scratch.write("allow.json", COMPACT_ALLOW_GITHUB);
+    let warn = scratch.write(
+        "warn.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"w","match":{"confidence":["high"]},"action":"warn"}]}"#,
+    );
+    let source = scratch.write(
+        "secret.env",
+        &format!("API_KEY={SYNTHETIC_TOKEN}\nAWS={SYNTHETIC_AWS_KEY}\n"),
+    );
+    let (_, report) = compare_json(&[
+        Path::new("--compare-action-policy"),
+        &allow,
+        Path::new("--compare-action-policy"),
+        &warn,
+        &source,
+    ]);
+    let findings = report["findings"].as_array().unwrap();
+    assert!(!findings.is_empty());
+
+    for (side, policy) in [(0, None), (1, Some(&allow)), (2, Some(&warn))] {
+        let mut args: Vec<&Path> = vec![Path::new("--json")];
+        if let Some(policy) = policy {
+            args.extend([Path::new("--action-policy"), policy.as_path()]);
+        }
+        args.push(&source);
+        let enforced = run(&args, b"");
+        let enforced = json_findings(&enforced.stdout);
+        assert_eq!(enforced.len(), findings.len());
+        for (got, want) in enforced.iter().zip(findings) {
+            assert_eq!(got.6, want["decisions"][side]["action"].as_str().unwrap());
+            assert_eq!(got.4, want["start"].as_u64().unwrap());
+        }
+    }
+}
+
+#[test]
+fn compare_rejects_standard_input_redact_and_a_wrong_shape_with_exit_two() {
+    let scratch = Scratch::new();
+    let candidate = scratch.write("candidate.json", COMPACT_ALLOW_GITHUB);
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+
+    for (args, message) in [
+        (
+            vec![Path::new("--compare-action-policy"), candidate.as_path()],
+            "standard input is not compared",
+        ),
+        (
+            vec![
+                Path::new("--redact"),
+                Path::new("--compare-action-policy"),
+                candidate.as_path(),
+                source.as_path(),
+            ],
+            "cannot be combined with --redact",
+        ),
+        (
+            vec![
+                Path::new("--compare-action-policy"),
+                candidate.as_path(),
+                source.as_path(),
+                source.as_path(),
+            ],
+            "reads exactly one path",
+        ),
+        (
+            vec![Path::new("--compare-action-policy")],
+            "requires a path argument",
+        ),
+    ] {
+        let output = run(&args, SYNTHETIC_TOKEN.as_bytes());
+        assert_eq!(output.code, 2, "{message}");
+        assert_eq!(output.stdout, "");
+        assert!(output.stderr.contains(message), "{}", output.stderr);
+        output.leaks_nothing();
+    }
+
+    let policies: Vec<PathBuf> = ["one", "two", "three", "four"]
+        .iter()
+        .map(|name| scratch.write(&format!("{name}.json"), COMPACT_ALLOW_GITHUB))
+        .collect();
+    let mut args: Vec<&Path> = Vec::new();
+    for policy in &policies {
+        args.extend([Path::new("--compare-action-policy"), policy.as_path()]);
+    }
+    args.push(&source);
+    let output = run(&args, b"");
+    assert_eq!(output.code, 2);
+    assert!(output.stderr.contains("at most 3 times"));
+}
+
+#[test]
+fn a_rejected_candidate_fails_the_whole_run_with_no_report() {
+    let scratch = Scratch::new();
+    let bad = scratch.write(
+        "bad.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["jwt"]},"action":"mask"}]}"#,
+    );
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+    let output = run(&[Path::new("--compare-action-policy"), &bad, &source], b"");
+    assert_eq!(output.code, 2);
+    assert_eq!(output.stdout, "");
+    assert!(output.stderr.contains("INVALID_ACTION_POLICY"));
+    assert!(output.stderr.contains("class=INVALID_ACTION"));
+    output.leaks_nothing();
+
+    let missing = scratch.root.join("absent.json");
+    let output = run(
+        &[Path::new("--compare-action-policy"), &missing, &source],
+        b"",
+    );
+    assert_eq!(output.code, 2);
+    assert_eq!(output.stdout, "");
+    assert!(output.stderr.contains("READ_FAILED"));
+}
+
+#[test]
+fn compare_with_a_ruleset_reports_the_ruleset_detection_under_both_policies() {
+    let scratch = Scratch::new();
+    let ruleset = scratch.write(
+        "rules.txt",
+        "ruleset-revision: 1\ndetector: acme-alnum-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n",
+    );
+    let raise = scratch.write(
+        "raise.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"redact-acme","match":{"type":["acme-alnum-token"]},"action":"redact"}]}"#,
+    );
+    let source = scratch.write("acme.txt", "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\n");
+    let (output, report) = compare_json(&[
+        Path::new("--ruleset"),
+        &ruleset,
+        Path::new("--compare-action-policy"),
+        &raise,
+        &source,
+    ]);
+    assert_eq!(output.code, 1, "{}", output.stderr);
+    let decisions = &report["findings"][0]["decisions"];
+    assert_eq!(decisions[0]["action"], "warn");
+    assert_eq!(decisions[1]["action"], "redact");
+    assert_eq!(decisions[1]["ruleId"], "redact-acme");
+}

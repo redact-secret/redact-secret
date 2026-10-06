@@ -32,6 +32,20 @@ pub const RULESET_REQUIRES_FILE: &str =
 pub const ACTION_POLICY_MISSING_PATH: &str = "--action-policy requires a path argument";
 /// `--action-policy` appeared more than once.
 pub const ACTION_POLICY_REPEATED: &str = "--action-policy may be given at most once";
+/// `--compare-action-policy` was the last argument, with no path following it.
+pub const COMPARE_MISSING_PATH: &str = "--compare-action-policy requires a path argument";
+/// More candidate policies than one comparison accepts (the baseline is the
+/// fourth side).
+pub const COMPARE_TOO_MANY: &str = "--compare-action-policy may be given at most 3 times";
+/// A comparison observes one input, and standard input is streamed under
+/// enforcement, so it is not compared.
+pub const COMPARE_REQUIRES_FILE: &str =
+    "--compare-action-policy requires exactly one explicit path; standard input is not compared";
+/// A comparison reports on one input.
+pub const COMPARE_ONE_PATH: &str = "--compare-action-policy reads exactly one path";
+/// A comparison is an observation and `--redact` an enforcement.
+pub const COMPARE_WITH_REDACT: &str =
+    "--compare-action-policy is a preview and cannot be combined with --redact";
 /// `--pii` requires one selector value.
 pub const PII_MISSING_SELECTOR: &str = "--pii requires a selector argument";
 /// Activation printing performs no scan and accepts only selector flags.

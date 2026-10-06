@@ -566,6 +566,48 @@ fn load_action_policy_rejects_with_the_fixed_code_class_and_rule_index() {
 }
 
 #[test]
+fn compare_action_policies_is_public_and_returns_only_safe_metadata() {
+    use redact_secret::{
+        ActionComparison, ActionCounts, ActionDecision, ComparedFinding, ComparedPolicy,
+        ComparedSide, DecisionBasis, DetectionIdentity, MAX_COMPARED_POLICIES, PolicyBinding,
+        compare_action_policies, compare_action_policies_with_limits,
+    };
+
+    let policy = load_action_policy(ACTION_POLICY).unwrap();
+    let sides = [
+        ComparedPolicy::Default,
+        ComparedPolicy::ActionPolicy(&policy),
+    ];
+    let registry = registry();
+    let comparison: ActionComparison = compare_action_policies(FIXTURE, &registry, &sides).unwrap();
+    let same = compare_action_policies_with_limits(
+        FIXTURE,
+        &registry,
+        &sides,
+        &WholeInputLimits::default(),
+    )
+    .unwrap();
+    assert_eq!(comparison, same);
+    assert_eq!(MAX_COMPARED_POLICIES, 4);
+
+    let detection: &DetectionIdentity = comparison.detection();
+    assert_eq!(detection.profile(), Some(Profile::Full));
+    let side: &ComparedSide = &comparison.sides()[1];
+    let binding: &PolicyBinding = side.binding();
+    assert_eq!(binding.kind(), "action-policy");
+    assert_eq!(binding.document_sha256_hex().unwrap().len(), 64);
+    let counts: ActionCounts = side.counts();
+    assert_eq!(counts.warn(), 1);
+    let compared: &ComparedFinding = &comparison.findings()[0];
+    let decision: &ActionDecision = &compared.decisions()[1];
+    assert_eq!(decision.action(), Action::Warn);
+    assert!(matches!(decision.basis(), DecisionBasis::Rule { .. }));
+    assert_eq!(compared.finding().type_name(), "github_token");
+    assert!(compared.differs());
+    assert_eq!(comparison.changed_count(), 1);
+}
+
+#[test]
 fn an_incremental_session_reproduces_the_whole_input_reference() {
     let input = format!("{FIXTURE}\nplain trailing text\n");
     let (expected_text, expected_findings) = support::whole_input(&input);

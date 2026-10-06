@@ -57,6 +57,7 @@ Current rules: `docs/specs/engine.md`.
 - [Keep request-wide placeholder numbering a documented recipe, not a helper](2026-10-05-keep-request-wide-placeholder-numbering-a-documented-recipe.md)
 - [Settle the root causes that credential-evidence snapshot-2026.10.04.4 added](2026-10-05-settle-the-snapshot-2026-10-04-4-added-case-roots.md)
 - [Define the versioned declarative action policy and its default overlay](2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md)
+- [Explain and compare action policies over one detection pass](2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md)
 
 ## Distribution
 

@@ -791,9 +791,7 @@ pub(crate) fn scan_in<R: DetectorSet + ?Sized>(
     policy: &dyn Policy,
     limits: &WholeInputLimits,
 ) -> Result<Vec<Finding>, SecretScanError> {
-    limits.check_input(input)?;
-    let detected = detect(input, registry, None)?;
-    limits.check_findings(detected.len())?;
+    let detected = detect_finalized(input, registry, limits)?;
     let finding_count = detected.len();
     detected
         .into_iter()
@@ -806,6 +804,21 @@ pub(crate) fn scan_in<R: DetectorSet + ?Sized>(
             Ok(finding.with_action(action))
         })
         .collect()
+}
+
+/// The detection half of [`scan_in`]: the whole-input byte bound, one
+/// detection pass, then the finding bound. Shared by the enforcement path and
+/// the policy comparison so both see the same finalized findings and the same
+/// limit failures in the same order.
+pub(crate) fn detect_finalized<R: DetectorSet + ?Sized>(
+    input: &str,
+    registry: &R,
+    limits: &WholeInputLimits,
+) -> Result<Vec<DetectedFinding>, SecretScanError> {
+    limits.check_input(input)?;
+    let detected = detect(input, registry, None)?;
+    limits.check_findings(detected.len())?;
+    Ok(detected)
 }
 
 /// Scans `input` and redacts it in one call, returning the sanitized text

@@ -18,6 +18,7 @@ redact-secret --redact input.txt > sanitized.txt
 redact-secret -- --leading-dash.txt   # stop option parsing
 redact-secret --ruleset org.rules config.txt   # add a declarative ruleset
 redact-secret --action-policy policy.json config.txt   # change what a finding does
+redact-secret --compare-action-policy next.json config.txt   # preview a policy, nothing enforced
 ```
 
 `--ruleset <path>` works in check and redact mode. It loads a
@@ -46,6 +47,26 @@ The exit codes do not change: check mode still exits 1 when any finding exists,
 whatever its action (an `allow` finding is still reported), and redact mode
 replaces only `redact` and `block` spans. `--action-policy` and `--ruleset` can
 be combined, which is how one rule makes a ruleset detection redact.
+
+## Compare action policies
+
+`--compare-action-policy <path>` previews policies instead of enforcing one. It
+is repeatable (1 to 3 times), needs exactly one explicit file path, and refuses
+`--redact` and standard input with a usage error (exit 2). Detection runs once;
+the baseline (`--action-policy <path>`, or the default policy) and every
+candidate then decide the same finalized findings. Each finding line lists
+`baseline=<action>(<basis>)` and `candidate-N=<action>(<basis>)`, where the basis
+is `rule:<id>#<index>`, `rule-default:<id>#<index>`, `no-rule-matched` or
+`default-policy`; `--json` adds `mode: "preview"`, `enforced: false`, the
+detection configuration, each policy's `documentSha256` and per-action counts,
+and per-finding `differs`. `--ruleset` and `--pii` apply to every side.
+
+Exit `0`: every policy chooses the same action for every finding. Exit `1`: at
+least one finding's action differs. Exit `2`: any failure, including a rejected
+policy file (`INVALID_ACTION_POLICY`), with nothing on standard output. A finding
+alone is not a failure here. The input is never written and never echoed. See the
+[action policy guide](action-policy.md#explain-and-compare) for what a comparison
+does and does not cover.
 
 PII defaults off. Repeat `--pii <selector>` to request a canonical selector
 set, or use `--print-pii-activation` to print its activation identity and exit

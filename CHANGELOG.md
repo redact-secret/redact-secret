@@ -7,6 +7,30 @@ evidence is linked from each published version.
 
 ### Added
 
+- Rust and CLI: explain and compare action policies over one detection pass
+  (#1220,
+  `decision-explain-and-compare-action-policies-over-one-detection-pass`).
+  `compare_action_policies` (and `_with_limits`, and the same methods on
+  `BuiltInRegistry`) runs detection once and evaluates 1 to 4 policies
+  (`ComparedPolicy::Default`, `ActionPolicy` or `Callback`) on the same finalized
+  findings, returning per finding and per policy the action and a
+  `DecisionBasis` (`Rule`, `RuleDefault`, `NoRuleMatched`, `DefaultPolicy`,
+  `Callback`) with the matched rule id and index, each document policy's
+  SHA-256 binding, per-action counts, and the detection configuration
+  (`DetectionIdentity`) apart from every policy. `ActionPolicy` gains
+  `document_sha256` and `document_sha256_hex`. It is a preview: it edits no
+  input, renders no placeholder and leaves `scan`, `redact` and sessions
+  unchanged; it covers finalized findings only and makes no coverage claim, and
+  incremental and stream comparison is unsupported in this version. A callback
+  side is called once per finding in order, sides one at a time, and a failure is
+  `POLICY_FAILURE` with no partial result. No new error code (the code count
+  stays 23); the root name count is 72, 12 more (the 9 types, the 2 functions and
+  `MAX_COMPARED_POLICIES`). The CLI gains `--compare-action-policy <path>`
+  (1 to 3 times, one file path, never standard input or `--redact`): exit 0 when
+  every policy agrees, 1 when a finding's action differs, 2 on any failure. The
+  shared fixture is `conformance/fixtures/action-policy-compare-v1.json`; the
+  bindings run it in their own entries. Existing results are unchanged.
+
 - Rust and CLI: a versioned declarative action policy (#1219,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
   `load_action_policy` parses a JSON document (`actionPolicyRevision: 1`, at most

@@ -16,9 +16,9 @@ use std::io::{ErrorKind, Read, Write};
 use std::path::Path;
 
 use redact_secret::{
-    ActionPolicy, DefaultPolicy, DetectorRegistry, Finding, IncrementalPolicy,
-    IncrementalSanitizer, Policy, ScanResult, default_placeholder_formatter, load_action_policy,
-    load_ruleset, scan, scan_and_redact,
+    ActionComparison, ActionPolicy, ComparedPolicy, DefaultPolicy, DetectorRegistry, Finding,
+    IncrementalPolicy, IncrementalSanitizer, Policy, ScanResult, compare_action_policies,
+    default_placeholder_formatter, load_action_policy, load_ruleset, scan, scan_and_redact,
 };
 
 use crate::args::Source;
@@ -185,6 +185,39 @@ fn check_file(
     let findings = scan(&text, registry, whole_policy(action_policy))?;
     drop(text);
     Ok(collect(&findings))
+}
+
+/// Reads `path` whole and compares the baseline and every candidate policy
+/// over one detection pass (`redact_secret::compare_action_policies`).
+///
+/// This is an observation. It reads the file, detects once, and evaluates each
+/// policy on the same finalized findings; nothing is redacted and nothing is
+/// written. Standard input is never compared: it is streamed through an
+/// incremental session under enforcement, and a comparison must not change that
+/// path's callback count, order or finalization.
+///
+/// # Errors
+///
+/// Every failure that stops the run, with no partial comparison: the file read,
+/// the registry build, and every core error `compare_action_policies` reports.
+pub fn compare(
+    path: &Path,
+    ruleset: Option<&[u8]>,
+    baseline: Option<&ActionPolicy>,
+    candidates: &[ActionPolicy],
+    selection: &redact_secret::PiiSelection,
+) -> Result<ActionComparison, Failure> {
+    let registry = registry_for(ruleset, selection)?;
+    let text = read_file_text(path)?;
+    let mut sides: Vec<ComparedPolicy<'_>> = Vec::with_capacity(1 + candidates.len());
+    sides.push(match baseline {
+        Some(policy) => ComparedPolicy::ActionPolicy(policy),
+        None => ComparedPolicy::Default,
+    });
+    sides.extend(candidates.iter().map(ComparedPolicy::ActionPolicy));
+    let comparison = compare_action_policies(&text, &registry, &sides)?;
+    drop(text);
+    Ok(comparison)
 }
 
 /// Writes the sanitized form of `source` to `out`.

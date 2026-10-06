@@ -182,6 +182,19 @@ depend on `src/`.
   than literal text, the same provenance idea
   [Mutation provenance](#mutation-provenance) uses for a reproducible case
   too large to commit as data.
+- [`fixtures/action-policy-compare-v1.json`](./fixtures/action-policy-compare-v1.json) —
+  the explain-and-compare truth table (issue #1220,
+  `decision-explain-and-compare-action-policies-over-one-detection-pass`). It is
+  data only: 8 cases (all four actions, the `default` rule action, no rule
+  matched, the default side, a callback side, two callbacks in side-by-side
+  order, an overlap loser that is never reported, an obfuscated finding), 7
+  error cases (callback failure with no partial result and exact call sequence,
+  zero and five sides, both whole-input bounds), four policy-document SHA-256
+  digests and eight host obligations. `base` is a sentinel each runner resolves
+  from its own default evaluation, so the file copies no part of the default
+  table. The Rust core runs it
+  (`crates/secret-scan-core/tests/action_policy_compare.rs`) and the CLI runs the
+  plumbing; each binding that ships the primitive runs it.
 - [`fixtures/action-policy-v1.json`](./fixtures/action-policy-v1.json) —
   the revision 1 declarative action policy truth table (issue #1217,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).

@@ -268,17 +268,17 @@ impl Report {
 
 /// Keeps host-supplied paths on one line without terminal control sequences.
 /// Escape backslashes too, so a literal `\n` differs from an actual newline.
-fn text_identity(identity: &str) -> String {
+pub(crate) fn text_identity(identity: &str) -> String {
     identity.chars().flat_map(char::escape_debug).collect()
 }
 
 /// The comma a JSON array needs after every element but its last.
-fn separator(index: usize, length: usize) -> &'static str {
+pub(crate) fn separator(index: usize, length: usize) -> &'static str {
     if index + 1 < length { "," } else { "" }
 }
 
 /// Writes `value` as a JSON string literal.
-fn write_json_string(out: &mut dyn Write, value: &str) -> io::Result<()> {
+pub(crate) fn write_json_string(out: &mut dyn Write, value: &str) -> io::Result<()> {
     out.write_all(b"\"")?;
     for character in value.chars() {
         match character {

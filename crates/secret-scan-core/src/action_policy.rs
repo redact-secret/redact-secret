@@ -38,6 +38,7 @@
 
 use std::sync::Arc;
 
+use crate::compare::DecisionBasis;
 use crate::error::{PolicyFailure, SecretScanErrorCode};
 use crate::incremental::{IncrementalPolicy, IncrementalPolicyContext};
 use crate::policy::default_action_for;
@@ -256,6 +257,7 @@ enum RuleAction {
 /// never confused.
 #[derive(Clone, Debug)]
 struct Rule {
+    id: Box<str>,
     action: RuleAction,
     types: Box<[Box<str>]>,
     detectors: Box<[Box<str>]>,
@@ -344,6 +346,8 @@ impl Rule {
 #[derive(Clone, Debug)]
 pub struct ActionPolicy {
     rules: Arc<[Rule]>,
+    /// SHA-256 of the exact document bytes this policy was loaded from.
+    document_sha256: [u8; 32],
 }
 
 impl ActionPolicy {
@@ -352,15 +356,56 @@ impl ActionPolicy {
         self.rules.iter().position(|rule| rule.matches(finding))
     }
 
-    fn action_for(&self, finding: &DetectedFinding) -> Action {
+    /// The action for `finding` and the reason it was chosen. The one
+    /// evaluation behind [`Policy::evaluate`], [`IncrementalPolicy::evaluate`]
+    /// and the comparison, so the three cannot disagree.
+    pub(crate) fn explain(&self, finding: &DetectedFinding) -> (Action, DecisionBasis) {
         let base = || default_action_for(finding.type_name(), finding.confidence());
         match self.matching_rule(finding) {
-            Some(index) => match self.rules[index].action {
-                RuleAction::Fixed(action) => action,
-                RuleAction::Default => base(),
-            },
-            None => base(),
+            Some(index) => {
+                let rule = &self.rules[index];
+                match rule.action {
+                    RuleAction::Fixed(action) => (
+                        action,
+                        DecisionBasis::Rule {
+                            rule_id: rule.id.to_string(),
+                            rule_index: index,
+                        },
+                    ),
+                    RuleAction::Default => (
+                        base(),
+                        DecisionBasis::RuleDefault {
+                            rule_id: rule.id.to_string(),
+                            rule_index: index,
+                        },
+                    ),
+                }
+            }
+            None => (base(), DecisionBasis::NoRuleMatched),
         }
+    }
+
+    fn action_for(&self, finding: &DetectedFinding) -> Action {
+        self.explain(finding).0
+    }
+
+    /// The SHA-256 of the exact document bytes this policy was loaded from:
+    /// the policy's revision binding.
+    ///
+    /// Two policies loaded from the same bytes report the same digest on every
+    /// surface, and any changed byte (including insignificant whitespace)
+    /// changes it, so the digest identifies a document, not its meaning. It is
+    /// computed once at load, over the bytes the caller handed the loader, and
+    /// is configuration identity, never a hash of input or of a finding.
+    #[must_use]
+    pub const fn document_sha256(&self) -> [u8; 32] {
+        self.document_sha256
+    }
+
+    /// [`Self::document_sha256`] as 64 lowercase hexadecimal characters.
+    #[must_use]
+    pub fn document_sha256_hex(&self) -> String {
+        crate::sha256::to_hex(&self.document_sha256)
     }
 }
 
@@ -417,7 +462,9 @@ pub fn load_action_policy(bytes: &[u8]) -> Result<ActionPolicy, ActionPolicyErro
             ActionPolicyErrorClass::ActionPolicyTooLarge,
         ));
     }
-    Parser { bytes, pos: 0 }.document()
+    let mut policy = Parser { bytes, pos: 0 }.document()?;
+    policy.document_sha256 = crate::sha256::sha256(bytes);
+    Ok(policy)
 }
 
 /// The kind of value that starts at the parser's position.
@@ -695,6 +742,7 @@ impl<'a> Parser<'a> {
         }
         Ok(ActionPolicy {
             rules: Arc::from(rules),
+            document_sha256: [0; 32],
         })
     }
 
@@ -703,6 +751,7 @@ impl<'a> Parser<'a> {
         self.expect_kind(Kind::Object, Some(index))?;
 
         let mut id_seen = false;
+        let mut rule_id: Option<&'a str> = None;
         let mut action: Option<RuleAction> = None;
         let mut matcher: Option<Matcher> = None;
 
@@ -722,6 +771,7 @@ impl<'a> Parser<'a> {
                         return Err(in_rule(ActionPolicyErrorClass::DuplicateRuleId, index));
                     }
                     ids.push(id);
+                    rule_id = Some(id);
                 }
                 KEY_MATCH => {
                     if matcher.is_some() {
@@ -749,8 +799,9 @@ impl<'a> Parser<'a> {
             Ok(())
         })?;
 
-        match (id_seen, matcher, action) {
-            (true, Some(matcher), Some(action)) => Ok(Rule {
+        match (rule_id, matcher, action) {
+            (Some(id), Some(matcher), Some(action)) => Ok(Rule {
+                id: id.into(),
                 action,
                 types: matcher.types,
                 detectors: matcher.detectors,

@@ -136,6 +136,51 @@ the rule being read (`None` for a document-level violation). No error carries a
 byte of the document. Loading never partially succeeds, and evaluation never
 fails, so an `ActionPolicy` never reports `POLICY_FAILURE`.
 
+### Compare action policies
+
+`compare_action_policies` explains and compares policies without enforcing any of
+them. It runs detection once under the registry, then evaluates 1 to
+`MAX_COMPARED_POLICIES` (4) policies on the same finalized findings. See the
+[action policy guide](action-policy.md#explain-and-compare) for scope and
+the [decision](../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md) for the contract.
+
+```rust
+use redact_secret::{
+    ComparedPolicy, DetectorRegistry, compare_action_policies, load_action_policy,
+};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let next = load_action_policy(
+        br#"{"actionPolicyRevision":1,"base":"default","rules":[
+            {"id":"allow-github","match":{"type":["github_token"]},"action":"allow"}]}"#,
+    )?;
+    let registry = DetectorRegistry::with_built_in([])?;
+    let comparison = compare_action_policies(
+        "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+        &registry,
+        &[ComparedPolicy::Default, ComparedPolicy::ActionPolicy(&next)],
+    )?;
+    let finding = &comparison.findings()[0];
+    assert!(finding.differs());
+    assert_eq!(finding.decisions()[1].basis().rule_id(), Some("allow-github"));
+    assert_eq!(comparison.sides()[1].binding().document_sha256_hex().unwrap().len(), 64);
+    Ok(())
+}
+```
+
+`ComparedPolicy` is `Default`, `ActionPolicy(&ActionPolicy)` or
+`Callback(&dyn Policy)`. The result carries, per side, a `PolicyBinding` (the
+policy document's SHA-256, `ActionPolicy::document_sha256`), action counts, and
+per finding the finalized `DetectedFinding` plus one `ActionDecision` per side
+(`action()` and a `DecisionBasis`: `Rule`, `RuleDefault`, `NoRuleMatched`,
+`DefaultPolicy` or `Callback`). `detection()` names the activation identity,
+profile and detector count apart from every policy. It never carries input,
+a matched value, a hash of either, or a score. A callback is called once per
+finding in finding order, one side at a time; a failure is
+`SecretScanErrorCode::PolicyFailure` with no partial result. The limit errors are
+`scan`'s, and an empty or oversized policy list is `InvalidOptions`.
+`BuiltInRegistry` has the same two methods.
+
 ## Request-wide placeholder numbering
 
 Every call numbers its placeholders from 1, so scanning the string leaves of

@@ -219,7 +219,11 @@ role grammar reopens [that decision](2026-10-06-keep-credential-role-facts-out-o
 negation, wildcards, a note field, and a rule that adds an action.
 
 The core keeps no identity, hash or version of a particular policy. A caller who
-keys evidence to a policy uses the SHA-256 of the exact document bytes.
+keys evidence to a policy uses the SHA-256 of the exact document bytes. (Refined
+by [`decision-explain-and-compare-action-policies-over-one-detection-pass`](2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md):
+the core computes that same digest once at load and reports it, so every surface
+binds a document identically; it still keeps no version and nothing else about
+the policy.)
 
 ### 7. Evaluator ownership: Rust-owned, exposed through each binding
 
