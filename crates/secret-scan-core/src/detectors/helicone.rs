@@ -1,5 +1,5 @@
 //! Helicone API key detection (issue #907, handoff
-//! `docs/audits/evidence/860/helicone.md`).
+//! [`docs/audits/evidence/860/helicone.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/helicone.md)).
 //!
 //! | Prefix | Finding type |
 //! | --- | --- |

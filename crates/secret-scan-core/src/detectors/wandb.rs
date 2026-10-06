@@ -1,5 +1,5 @@
 //! Weights & Biases `wandb_v1_` API key detection (issue #917, handoff
-//! `docs/audits/evidence/860/wandb.md`).
+//! [`docs/audits/evidence/860/wandb.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/wandb.md)).
 //!
 //! A W&B-authored test constant begins `wandb_v1_` (ruling R5). The docs say
 //! W&B "now issues longer API keys (about 86 characters)", and the SDK and

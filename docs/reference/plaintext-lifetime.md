@@ -9,7 +9,7 @@ carry matched text, see [Threat model](../specs/threat-model.md)). It is
 decided by
 [`decision-define-the-plaintext-memory-lifetime-contract`](../decisions/2026-09-30-define-the-plaintext-memory-lifetime-contract.md)
 and the code-path inventory behind every statement here is
-[#1079 evidence](../audits/evidence/1079/README.md), which carries the file and
+[#1079 evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1079/README.md), which carries the file and
 line for each buffer.
 
 ## The contract in one paragraph
@@ -42,7 +42,7 @@ overwrite may be optimized away.
 
 ## Where plaintext can exist
 
-Summary of the [inventory](../audits/evidence/1079/README.md). IDs match it.
+Summary of the [inventory](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1079/README.md). IDs match it.
 
 | Path | Buffer | Who owns it | Released |
 | --- | --- | --- | --- |
@@ -160,7 +160,7 @@ it cannot be equivalent to protected-memory secret storage.
 **No build of the core zeroizes anything today, and nothing above changes.**
 [#1080](https://github.com/redact-secret/redact-secret/issues/1080) evaluated
 an opt-in mode and recorded a measured design in
-[#1080 evidence](../audits/evidence/1080/README.md). If it is adopted, a core
+[#1080 evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1080/README.md). If it is adopted, a core
 Cargo feature would overwrite, with `zeroize`, the current allocation of the
 incremental `retained` and `scanned` buffers, the owned text of a normalized
 copy and the private-key lookbehind, at flush, growth, `finalize`, `abort`,

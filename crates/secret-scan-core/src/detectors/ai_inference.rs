@@ -3,7 +3,7 @@
 //! Beta.8 wave 2).
 //!
 //! The grammars are frozen by issue #726
-//! (`docs/audits/evidence/726/README.md`, `docs/specs/detector-families.md`);
+//! ([`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md), `docs/specs/detector-families.md`);
 //! this module implements those contracts and nothing broader. Every family is
 //! one fixed prefix plus an exact-length run, so each is a single
 //! [`PrefixShape::exact`] on the shared [`KnownFormatProviderDetector`]:

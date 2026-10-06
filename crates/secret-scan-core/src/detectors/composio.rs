@@ -1,5 +1,5 @@
 //! Composio API key detection (issue #909, handoff
-//! `docs/audits/evidence/860/composio.md`).
+//! [`docs/audits/evidence/860/composio.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/composio.md)).
 //!
 //! | Shape | Finding type |
 //! | --- | --- |

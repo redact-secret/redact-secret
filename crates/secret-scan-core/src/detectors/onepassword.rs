@@ -1,5 +1,5 @@
 //! 1Password service-account token detection (issue #913, handoff
-//! `docs/audits/evidence/860/onepassword.md`).
+//! [`docs/audits/evidence/860/onepassword.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/onepassword.md)).
 //!
 //! 1Password's service-account security page states that the token "uses
 //! `ops_` as the token prefix" (chosen "to help code analyzers find

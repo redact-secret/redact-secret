@@ -1,5 +1,5 @@
 //! crates.io API token and trusted-publishing token detection (issue #1031,
-//! handoff `docs/audits/evidence/1014/crates-io.md`).
+//! handoff [`docs/audits/evidence/1014/crates-io.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/crates-io.md)).
 //!
 //! | Shape | Finding type | Evidence |
 //! | --- | --- | --- |

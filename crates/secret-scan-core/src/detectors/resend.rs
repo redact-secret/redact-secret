@@ -1,5 +1,5 @@
 //! Resend API key detection (issue #915, handoff
-//! `docs/audits/evidence/860/resend.md`).
+//! [`docs/audits/evidence/860/resend.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/resend.md)).
 //!
 //! The provider CLI rejects a key that does not start with `re_` (T1,
 //! provider code and README). The create-API-key response example on

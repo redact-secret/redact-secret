@@ -14,7 +14,7 @@ and [Package Release Rehearsal 36370537054](https://github.com/redact-secret/red
 passed at the frozen source revision.
 
 Public API and compatibility review is recorded in
-[the beta.10 candidate public-contract review](../../audits/beta10-candidate-public-contract-review.md)
+[the beta.10 candidate public-contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta10-candidate-public-contract-review.md)
 (issue [#898](https://github.com/redact-secret/redact-secret/issues/898)).
 Its own status line notes two benchmarks-side qualification records were
 still open at review time —

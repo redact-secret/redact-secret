@@ -37,7 +37,7 @@ passed at `0027da0b`, which has the same product source and workflows; it was no
 re-dispatched. Registry preflight, `benchmark-pins:check:ancestry` (0 errors, 2
 expected warnings) and `scripts/verify-release-governance.py` passed on
 2026-10-03 before dispatch. The readiness conditions and the disposition of every
-blocking candidate are in the [#1071 record](../../audits/evidence/1071/README.md)
+blocking candidate are in the [#1071 record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1071/README.md)
 and the [readiness checklist](../release-readiness-v0.1.0.md).
 
 ### Performance evaluation

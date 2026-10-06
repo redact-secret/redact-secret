@@ -1,5 +1,5 @@
 //! Daytona API key detection (issue #970, handoff
-//! `docs/audits/evidence/860/daytona.md`).
+//! [`docs/audits/evidence/860/daytona.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/daytona.md)).
 //!
 //! The provider's key generator is `dtn_` followed by
 //! `crypto.randomBytes(32).toString('hex')` (`daytonaio/daytona`

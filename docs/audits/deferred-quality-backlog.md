@@ -1,7 +1,7 @@
 # Deferred quality backlog
 
 The 25 non-blocking findings the Rust-core migration retrospective produced,
-routed here by [the release-gap disposition](./release-gap-disposition.md)
+routed here by [the release-gap disposition](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md)
 under issue #66.
 
 - **Recorded on:** 2026-09-09, at `fdfd05a`.
@@ -18,9 +18,9 @@ a public contract or a security boundary, does not leave a promised platform or
 artifact unqualified, does not leave lockstep release safety incomplete, and
 does not leave a mandatory original criterion `partially-met` or `unverified`.
 The reasoning per finding is in
-[the disposition](./release-gap-disposition.md#disposition-of-all-55-findings);
+[the disposition](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md#disposition-of-all-55-findings);
 the reasoning for the borderline cases is in
-[the departures table](./release-gap-disposition.md#where-this-disposition-departs-from-an-inputs-severity).
+[the departures table](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md#where-this-disposition-departs-from-an-inputs-severity).
 
 Most of these are *missing guards over behavior the reviews verified correct*.
 That is worth stating plainly: the reviews confirmed, at this revision, that the
@@ -66,7 +66,7 @@ of blocker work and say so.
 | `R/F-16` | `new-risk` | CI | `ci.yml` declares no `timeout-minutes`, and workflow-level `RUSTFLAGS: -D warnings` applies to a third-party `cargo install wasm-bindgen-cli`. | Every job declares a timeout consistent with its measured duration, and the install step clears `RUSTFLAGS` or the flag moves onto the steps that build workspace code. |
 | `R/F-17` | `evidence-gap` | supply chain | `SECURITY.md` prescribes a monthly advisory review with no `schedule:` trigger and no `dependabot.yml` behind it. | A scheduled workflow runs `cargo deny check advisories` and `npm audit --package-lock-only` at least as often as `SECURITY.md` claims, plus a `.github/dependabot.yml` for `github-actions`, `npm`, and `cargo` — or the cadence is rewritten to describe what exists. |
 | `R/F-18` | `stale-claim` | release automation | `docs/python-packaging.md` says release qualification reuses the wheel workflow's `workflow_call`; nothing calls it. | `release.yml` calls it and requires success before publication, or the sentence is reworded. **Closed as a side effect of `RB-7` (#77).** |
-| `R/F-19` | `stale-claim` | documentation | Four links in `test/conformance/README.md:66-70` resolve into `/_notes/`, which `.gitignore` excludes, in a public repository. | The four citations become tracked references — the corresponding issues, or notes moved into `docs/` — and a link check runs in `npm run ci` so a link into an ignored path fails. The ruling this finding asked #66 for is [recorded in the disposition](./release-gap-disposition.md#feature-notes-and-retrospective-audits-are-not-tracked-under-_notes): `_notes/` is deliberately untracked, so tracked files may not cite it. |
+| `R/F-19` | `stale-claim` | documentation | Four links in `test/conformance/README.md:66-70` resolve into `/_notes/`, which `.gitignore` excludes, in a public repository. | The four citations become tracked references — the corresponding issues, or notes moved into `docs/` — and a link check runs in `npm run ci` so a link into an ignored path fails. The ruling this finding asked #66 for is [recorded in the disposition](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md#feature-notes-and-retrospective-audits-are-not-tracked-under-_notes): `_notes/` is deliberately untracked, so tracked files may not cite it. |
 | `R/F-20` | `new-risk` | release automation | No `prepack` or `prepublishOnly`; the publish step depends on an earlier script having built `dist/` in the same checkout. | `release` builds what it publishes, so the artifact cannot be stale or empty regardless of what ran before it. May be subsumed when `RB-2` and `RB-9` change the publish target. |
 | `R/F-21` | `new-risk` | supply chain | Both `upload-artifact` calls omit `retention-days`, so qualification artifacts inherit the repository default. | Both steps declare an explicit `retention-days` chosen for release-evidence retention, with pull-request runs allowed a shorter one, and the choice recorded with the release process. |
 | `R/F-22` | `stale-claim` | documentation | `SECURITY.md`'s supply-chain section never mentions the publish path's `contents: write`, the `release` environment, provenance, retention, or `cargo deny`. | The section covers the publication path and the Cargo supply chain alongside the npm one, and `README.md`'s development instructions use `npm ci --ignore-scripts`. |

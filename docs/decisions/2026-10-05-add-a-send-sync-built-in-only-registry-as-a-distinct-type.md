@@ -95,5 +95,5 @@ The public root surface grows from 54 to 55 names and
 The gateway can build one `BuiltInRegistry` at startup and share it in an `Arc`
 instead of one registry per worker; results are identical, so no detection,
 policy or conformance row changes. Python, JavaScript and the CLI are
-unaffected. `docs/audits/evidence/1066` and the stable-contract record keep
+unaffected. [`docs/audits/evidence/1066`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1066) and the stable-contract record keep
 their historical count of 54.

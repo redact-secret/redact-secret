@@ -1069,7 +1069,7 @@ impl IncrementalSanitizer {
 
     /// Whether the current unit, about to close behind at least one closed
     /// unit, must not share a batch with the units before it. See the audit
-    /// in `docs/audits/evidence/985/README.md`.
+    /// in [`docs/audits/evidence/985/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/985/README.md).
     ///
     /// That is a unit whose text starts with a construct a detector continues
     /// from the text before it ([`continues_previous_line`]).

@@ -1,5 +1,5 @@
 //! Dynatrace access and platform token detection (issue #1032, handoff
-//! `docs/audits/evidence/1014/dynatrace.md`).
+//! [`docs/audits/evidence/1014/dynatrace.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/dynatrace.md)).
 //!
 //! | Part | Grammar | Evidence |
 //! | --- | --- | --- |

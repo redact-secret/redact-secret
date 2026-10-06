@@ -1,5 +1,5 @@
 //! Trigger.dev secret API key and personal access token detection (issue
-//! #904, handoff `docs/audits/evidence/860/trigger-dev.md`).
+//! #904, handoff [`docs/audits/evidence/860/trigger-dev.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/trigger-dev.md)).
 //!
 //! | Shape | Finding type | Evidence |
 //! | --- | --- | --- |

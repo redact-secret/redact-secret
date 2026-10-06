@@ -32,8 +32,8 @@
   `full` artifact, unchanged, and a `common` subpath export ships the
   `common` artifact's own glue and `.wasm` beside it
   (`bindings/wasm/npm/package.json`). Measurements are in
-  `docs/audits/evidence/381/README.md`; qualification and the package export
-  are in `docs/audits/evidence/382/README.md`.
+  [`docs/audits/evidence/381/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/381/README.md); qualification and the package export
+  are in [`docs/audits/evidence/382/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/382/README.md).
 - A second, off-by-default Cargo feature, `pii` (#937), links the PII domain
   runtime: the `pii-domain` adapter, its families, and the Unicode
   normalization tables they use. Without it the artifact links none of that,

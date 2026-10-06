@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -81,6 +84,91 @@ class ValidateTests(unittest.TestCase):
                 files.append(path)
             errors = CHECK.validate(CHECK.collect(files), fake_resolver(set()), Path(temp))
         self.assertEqual([e.split(":")[0] for e in errors], ["one.md", "two.md"])
+
+
+class UnavailableSourceTests(unittest.TestCase):
+    """A remote source that cannot be reached is reported, never passed silently (issue #1264)."""
+
+    def unreachable(self, repo: str, ref: str, path: str) -> bool:
+        raise CHECK.Unverifiable(f"cannot reach {repo}@{ref}")
+
+    def collect_one(self, text: str, temp: str) -> dict:
+        doc = Path(temp) / "doc.md"
+        doc.write_text(text, encoding="utf-8")
+        return CHECK.collect([doc])
+
+    def test_unverifiable_link_is_listed_and_not_an_error(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            links = self.collect_one(f"{BENCH}/blob/main/docs/a.md", temp)
+            unverified: list[str] = []
+            errors = CHECK.validate(links, self.unreachable, Path(temp), unverified)
+        self.assertEqual(errors, [])
+        self.assertEqual(len(unverified), 1)
+        self.assertIn("doc.md: redact-secret-benchmarks/main/docs/a.md: cannot reach", unverified[0])
+
+    def test_unverifiable_link_propagates_when_the_caller_does_not_collect_it(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            links = self.collect_one(f"{BENCH}/blob/main/docs/a.md", temp)
+            with self.assertRaises(CHECK.Unverifiable):
+                CHECK.validate(links, self.unreachable, Path(temp))
+
+    def test_offline_resolver_uses_local_git_and_never_calls_gh(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            run = lambda *a: subprocess.run(["git", "-C", temp, *a], check=True, capture_output=True, text=True).stdout.strip()  # noqa: E731
+            run("init", "-q", "-b", "main")
+            run("config", "user.email", "t@example.invalid")
+            run("config", "user.name", "T")
+            (root / "a.md").write_text("x\n", encoding="utf-8")
+            run("add", "a.md")
+            run("commit", "-q", "-m", "c")
+            sha = run("rev-parse", "HEAD")
+            run("tag", "v0.1.0-beta.1")
+            resolve = CHECK.make_resolver(root, "redact-secret/redact-secret", offline=True)
+            self.assertTrue(resolve("redact-secret", sha, "a.md"))
+            self.assertFalse(resolve("redact-secret", sha, "b.md"))
+            self.assertTrue(resolve("redact-secret", "v0.1.0-beta.1", "a.md"))
+            self.assertFalse(resolve("redact-secret", "v0.1.0-beta.1", "b.md"))
+            with self.assertRaises(CHECK.Unverifiable):
+                resolve("redact-secret", "b" * 40, "a.md")
+            with self.assertRaises(CHECK.Unverifiable):
+                resolve("redact-secret-benchmarks", "main", "a.md")
+
+    def test_gh_failures_are_unverifiable_not_runtime_errors(self) -> None:
+        original = CHECK.subprocess.run
+
+        def broken(*args, **kwargs):
+            raise FileNotFoundError("gh")
+
+        CHECK.subprocess.run = broken
+        try:
+            with self.assertRaises(CHECK.Unverifiable):
+                CHECK.gh_path_exists("redact-secret/x", "main", "a.md")
+        finally:
+            CHECK.subprocess.run = original
+
+    def test_main_exit_status_separates_broken_from_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            run = lambda *a: subprocess.run(["git", "-C", temp, *a], check=True, capture_output=True, text=True)  # noqa: E731
+            run("init", "-q", "-b", "main")
+            run("config", "user.email", "t@example.invalid")
+            run("config", "user.name", "T")
+            (Path(temp) / "doc.md").write_text(f"{BENCH}/blob/main/docs/a.md\n", encoding="utf-8")
+            run("add", "doc.md")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(CHECK.main([temp, "--offline"]), 0)
+            self.assertIn("UNVERIFIED", out.getvalue())
+            self.assertIn("1 unverified", out.getvalue())
+            original = CHECK.gh_path_exists
+            CHECK.gh_path_exists = self.unreachable
+            try:
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    self.assertEqual(CHECK.main([temp]), 2)
+            finally:
+                CHECK.gh_path_exists = original
+            self.assertIn("UNAVAILABLE", out.getvalue())
 
 
 if __name__ == "__main__":

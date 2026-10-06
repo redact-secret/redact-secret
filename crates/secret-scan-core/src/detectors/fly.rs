@@ -1,5 +1,5 @@
 //! Fly.io access token detection (issue #1109, handoff
-//! `docs/audits/evidence/1014/fly.md`).
+//! [`docs/audits/evidence/1014/fly.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/fly.md)).
 //!
 //! Fly.io macaroon tokens authorize the Fly API and the Machines API; a
 //! session bundle (`fm2_...,fo1_...`) from `fly auth login` acts as the user.

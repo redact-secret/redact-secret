@@ -199,7 +199,7 @@ This supersedes section 2's provider exception for high-signal names and the
   excluded under every name by #993; 177 of the 203 benchmark negatives
   stay reported, all random material under a provider credential name.
 
-Evidence: [`docs/audits/evidence/948/README.md`](../audits/evidence/948/README.md).
+Evidence: [`docs/audits/evidence/948/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/948/README.md).
 Tests: `generic_token` unit tests and
 `tests/provider_named_fallback_948.rs`.
 

@@ -9,7 +9,7 @@
 //! table in [`super::additional_providers::STRIPE`]; only the `whsec_`
 //! grammar lives here.
 //!
-//! Frozen `whsec_` contract (`docs/audits/evidence/726/README.md`):
+//! Frozen `whsec_` contract ([`docs/audits/evidence/726/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/726/README.md)):
 //! `whsec_` followed by at least 32 bytes of `[A-Za-z0-9+/]` and up to two
 //! terminal `=` padding bytes. Stripe documents the prefix and where the
 //! secret is configured, never a body length or alphabet; the 32-byte floor

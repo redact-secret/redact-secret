@@ -1,5 +1,5 @@
 //! Sourcegraph personal access token detection (issue #1103, handoff
-//! `docs/audits/evidence/1014/sourcegraph.md`).
+//! [`docs/audits/evidence/1014/sourcegraph.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/sourcegraph.md)).
 //!
 //! A Sourcegraph access token (`SRC_ACCESS_TOKEN`, sent as
 //! `Authorization: token`) acts as the user on a Sourcegraph instance. The

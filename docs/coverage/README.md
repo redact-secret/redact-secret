@@ -55,7 +55,7 @@ files that had no freshness test (`fp-fn-summary.json`,
   closed by issue #105; the remaining evidence-*breadth* gaps
   (`coverage-declarations.json`'s `pending` dimension cells, below) are
   tracked as
-  [`docs/audits/detection-assurance-residual-evidence-backlog.md`](../audits/detection-assurance-residual-evidence-backlog.md).
+  [`docs/audits/detection-assurance-residual-evidence-backlog.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-assurance-residual-evidence-backlog.md).
   Issue [#136](https://github.com/redact-secret/redact-secret/issues/136)
   closed the historical tracking artifact; its exit work was split across
   [#186](https://github.com/redact-secret/redact-secret/issues/186),
@@ -312,7 +312,7 @@ define, and that model encoded as data:
   declaration types (above) — that model, machine-validated (issue #103).
 - `coverage-report.md` and "Coverage drift is a CI failure" (above) — that
   baseline and model, summarized for review and enforced in CI (issue #104).
-- [`docs/audits/detection-assurance-closeout-audit.md`](../audits/detection-assurance-closeout-audit.md) —
+- [`docs/audits/detection-assurance-closeout-audit.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/detection-assurance-closeout-audit.md) —
   the Epic [#95](https://github.com/redact-secret/redact-secret/issues/95) closeout
   (issue #118): coverage by capability and risk dimension, the classification
   and ownership of every currently `pending` cell, and confirmation that

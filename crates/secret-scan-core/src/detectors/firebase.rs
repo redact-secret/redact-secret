@@ -13,7 +13,7 @@
 //!   JSON export is a Google Cloud service-account key -- the same
 //!   structural PEM-delimiter match [`super::private_key`] already finds,
 //!   with no Firebase-specific code path (see issue #519's audit,
-//!   `docs/audits/evidence/519/README.md`, Family 2, which reaches the
+//!   [`docs/audits/evidence/519/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/519/README.md), Family 2, which reaches the
 //!   identical conclusion for Google's own service-account exports).
 //! - **The `AIza`-prefixed key issued for Firebase/Gemini/Cloud use** is
 //!   the same shape [`super::additional_providers`]'s `google-api-key`

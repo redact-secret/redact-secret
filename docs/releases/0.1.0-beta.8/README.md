@@ -19,7 +19,7 @@ passed at the frozen source revision.
 
 Detection qualification is recorded on
 [#731](https://github.com/redact-secret/redact-secret/issues/731) and in
-[its evidence](../../audits/evidence/731/README.md). That measurement ran on
+[its evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/731/README.md). That measurement ran on
 product `9d9ca8e` (declared version `0.1.0-beta.7`) against benchmarks
 `cfaeac4`; the release source `5639a0e` differs from it only by the version
 bump, the changelog and the evidence documents. It was authorized with two

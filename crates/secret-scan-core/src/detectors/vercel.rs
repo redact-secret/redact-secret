@@ -1,6 +1,6 @@
 //! Vercel credential detection, one finding type per credential class
 //! (issue #1036, research #1013, evidence
-//! `docs/audits/evidence/1013/vercel.md`; taxonomy #858).
+//! [`docs/audits/evidence/1013/vercel.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1013/vercel.md); taxonomy #858).
 //!
 //! Every `vcp_`, `vci_`, `vca_`, `vcr_` and `vck_` value is matched exactly as
 //! before #1036: the prefix plus at least 20 `[A-Za-z0-9_-]`, maximal run,

@@ -1,7 +1,7 @@
 //! The Group D role, confidentiality and family-modelling boundaries
 //! (redact-secret#1229), driven through the public default pipeline.
 //!
-//! `docs/audits/evidence/1229/README.md` adopts a conditional contract and
+//! [`docs/audits/evidence/1229/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1229/README.md) adopts a conditional contract and
 //! claims no row covered. The decision record
 //! `decision-keep-credential-role-facts-out-of-detection-attribution-and-default-action`
 //! freezes four boundaries that are cheap to pin and need no code change:

@@ -4229,7 +4229,7 @@ const NPMRC_CREDENTIAL_KEYS: [&str; 3] = ["_authToken", "_auth", "_password"];
 /// (`//host/path/:_authToken=...`, the `:` directly after a `/`) or bare at
 /// the start of a line (optionally indented), then `=` with optional
 /// horizontal whitespace around it (issue #1024,
-/// `docs/audits/evidence/1012/npm-legacy-token.md`). The value is one
+/// [`docs/audits/evidence/1012/npm-legacy-token.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012/npm-legacy-token.md)). The value is one
 /// quoted literal or the unquoted run up to whitespace or a quote. These keys carry a
 /// credential by construction, whatever the registry and token shape, so
 /// every value that survives the shared reference and placeholder

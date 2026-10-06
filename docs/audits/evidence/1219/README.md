@@ -21,7 +21,7 @@ reach. All inputs are synthetic.
 | Host | macOS 26 (Darwin 25.5.0), arm64, Node v22.16.0 |
 
 The baseline `full` figure, 164,789, equals the figure the
-[#1221 evidence](../1221/README.md) records for the same commit.
+[#1221 evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1221/README.md) records for the same commit.
 
 ## Result
 

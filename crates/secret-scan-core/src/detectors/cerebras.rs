@@ -1,5 +1,5 @@
 //! Cerebras inference API key detection (issue #975, handoff
-//! `docs/audits/evidence/860/cerebras.md`).
+//! [`docs/audits/evidence/860/cerebras.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/cerebras.md)).
 //!
 //! The provider's VS Code extension validator
 //! (`Cerebras/vscode-cerebras-chat`, `src/provider.ts`) rejects any key that

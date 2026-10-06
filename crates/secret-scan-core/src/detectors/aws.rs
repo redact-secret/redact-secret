@@ -15,7 +15,7 @@ const PREFIXES: [&str; 2] = ["AKIA", "ASIA"];
 /// credentials, an identifier usable only with its secret and session
 /// token), each + exactly 16 `[A-Z0-9]`, typed and actioned alike. The
 /// `ASIA` contract is READY-T2 in issue #1012
-/// (`docs/audits/evidence/1012/aws-sts-temporary-access-key.md`, #1027). This intentionally excludes other AWS identifiers such as
+/// ([`docs/audits/evidence/1012/aws-sts-temporary-access-key.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012/aws-sts-temporary-access-key.md), #1027). This intentionally excludes other AWS identifiers such as
 /// role and user IDs; unknown or future prefixes are false negatives until
 /// explicitly added.
 pub(super) struct AwsAccessKeyDetector;
@@ -224,7 +224,7 @@ fn is_named(input: &str, line_start: usize, run_start: usize) -> bool {
 }
 
 /// The secret half of an AWS access key (issue #1028, #1012 READY-T2,
-/// context-constrained; `docs/audits/evidence/1012/`
+/// context-constrained; [`docs/audits/evidence/1012/`](https://github.com/redact-secret/redact-secret/tree/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012)
 /// `aws-iam-user-secret-access-key.md`): exactly 40 `[A-Za-z0-9/+]` with no
 /// `[A-Za-z0-9/+]` byte before it (a `=` there is an assignment operator),
 /// no `[A-Za-z0-9/+=]` byte after it (ferret-scan's boundary), and at least

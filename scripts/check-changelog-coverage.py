@@ -2,7 +2,7 @@
 """Require a `## Unreleased` changelog entry when a pull request changes
 detection behavior or a binding's public surface (issue #633).
 
-The beta.6 retrospective (`docs/audits/beta6-release-retrospective.md`, "What
+The beta.6 retrospective (`https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-release-retrospective.md`, "What
 went wrong", item 5) found nine detector pull requests merged with no
 changelog entry, one entry describing a state that never shipped, and an
 unrecorded finding-type compatibility break; beta.5's second readiness pass

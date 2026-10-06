@@ -25,7 +25,7 @@ best-effort; the scan outcome remains the enforcement signal. Candidate
 reviews must include that evidence at the reviewed revision, not substitute
 `npm run sast:test` (which tests gate machinery) for an actual scan.
 See the [SAST contract](../sast/README.md) and the
-[candidate public-contract review](audits/candidate-public-contract-review.md).
+[candidate public-contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/candidate-public-contract-review.md).
 
 ## The declaration
 
@@ -363,7 +363,7 @@ below).
 platforms resolve this package's `browser` condition (never
 `runtime/node.ts`), and left whether that path actually works under either
 platform's real runtime an explicit open question (issue #462). Full
-transcripts for everything below: `docs/audits/evidence/462/README.md`.
+transcripts for everything below: [`docs/audits/evidence/462/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/462/README.md).
 
 **Cloudflare Workers is a verified, supported runtime.** Against a real
 `wrangler dev` sandbox — a real local `workerd` server, the same engine that
@@ -524,7 +524,7 @@ requires their version pins and expected-output headers to equal the product
 version, and requires the synthetic input, so a release bump that skips them
 fails `npm run ci`. Their commands were executed from the page against the
 published crates as the evidence for the page's last revision
-([#1070](audits/evidence/1070/README.md)); after each publication, run them
+([#1070](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1070/README.md)); after each publication, run them
 again from the page's text.
 
 ## Golden-path qualification

@@ -13,7 +13,9 @@ narrative archives cite paths as of when they were written and are
 correctly allowed to go stale (a frozen record's job is to say what was
 true then, not what is true now); every corpus fixture and generated
 report, in contrast, describes current behavior, so a dangling path there
-is always a defect, not a historical fact.
+is always a defect, not a historical fact. A historical citation is written as a
+40-hex permalink instead, which this gate skips and
+`scripts/check-historical-permalinks.py` verifies.
 
 `docs/audits/evidence/` and `docs/releases/` are excluded for the same
 reason: both are frozen narrative/record archives under this repository's
@@ -60,6 +62,14 @@ TOP_LEVEL_DIRS = (
 )
 PATH_RE = re.compile(r"\b(?:" + "|".join(TOP_LEVEL_DIRS) + r")(?:/[\w.-]+)+\.[A-Za-z0-9]+\b")
 
+# A 40-hex blob/tree permalink into this repository names a path *as of a past
+# commit*, which is exactly what a historical citation is meant to say. It is
+# not a current-tree path, so this gate must not read the path inside it as one.
+# `check-historical-permalinks.py` verifies each such permalink instead (commit
+# reachable from main, path and anchor present at it) and is the only check that
+# makes a permalink in a `note` safe to rely on (issue #1264).
+PERMALINK_RE = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/(?:blob|tree)/[0-9a-f]{40}/[^\s)>\]`\"']+")
+
 
 def list_tracked_json_files(root: Path) -> list[str]:
     output = subprocess.run(["git", "ls-files", "*.json"], cwd=root, check=True, capture_output=True, text=True).stdout
@@ -76,7 +86,7 @@ def citations(value: object) -> list[str]:
         if isinstance(node, dict):
             for key, child in node.items():
                 if key in CITATION_KEYS and isinstance(child, str):
-                    found.extend(PATH_RE.findall(child))
+                    found.extend(PATH_RE.findall(PERMALINK_RE.sub(" ", child)))
                 else:
                     walk(child)
         elif isinstance(node, list):

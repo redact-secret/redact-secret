@@ -144,7 +144,7 @@ fn pii_corpus() -> Vec<String> {
 }
 
 /// The layouts the per-detector audit found a detector reads across a unit
-/// boundary (`docs/audits/evidence/985/README.md`). Scanned together with the
+/// boundary ([`docs/audits/evidence/985/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/985/README.md)). Scanned together with the
 /// unit before them they would differ from per-unit processing; the session
 /// starts a new batch at each of them instead.
 fn cross_unit_layouts() -> Vec<String> {

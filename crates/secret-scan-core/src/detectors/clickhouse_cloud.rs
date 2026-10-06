@@ -1,5 +1,5 @@
 //! `ClickHouse` Cloud API key secret detection (issue #971, handoff
-//! `docs/audits/evidence/860/clickhouse-cloud.md`).
+//! [`docs/audits/evidence/860/clickhouse-cloud.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/clickhouse-cloud.md)).
 //!
 //! A `ClickHouse` employee stated the prefix in gitleaks PR #1826 (merged
 //! 2025-04-16: "we specifically choose a prefix (4b1d...)") and authored the

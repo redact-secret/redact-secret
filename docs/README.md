@@ -76,7 +76,7 @@ list is not proof that input contains no secrets.
   `provisional` / `pending` / `unsupported`), generated from evaluation
   evidence in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
 - [Detection reliability evidence](reference/detection-reliability.md)
-- [Temporary review archive](audits/README.md), retired before release qualification, and [beta.2 final code review](audits/beta2-final-code-review.md)
+- [Temporary review archive](audits/README.md), retired before release qualification, and [beta.2 final code review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta2-final-code-review.md)
 - [Release records](releases/status.md): every published version and its durable record,
   stored per version under [`docs/releases/`](releases/)
 - [Support-matrix drift gate](support-matrix-drift.md): the pre-release regression

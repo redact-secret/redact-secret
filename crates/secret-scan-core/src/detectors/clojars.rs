@@ -1,5 +1,5 @@
 //! Clojars deploy token detection (issue #1025, handoff
-//! `docs/audits/evidence/1014/clojars.md`).
+//! [`docs/audits/evidence/1014/clojars.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/clojars.md)).
 //!
 //! The grammar is `CLOJARS_` + exactly 60 lowercase hex, all T1 under ruling
 //! R1 from `clojars-web` (`src/clojars/db.clj`, re-checked 2026-09-29):

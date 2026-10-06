@@ -62,7 +62,7 @@ type a finding gets, and which action it defaults to?
    transient code is judged by the existing ambiguity tier (`code` warns,
    `code_verifier` redacts); a derived output under a credential name is read by
    that name, as for `oauth_token` in
-   [#1241](../audits/evidence/1241/README.md), and one under an unmatched name
+   [#1241](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1241/README.md), and one under an unmatched name
    (`x-zm-signature`, `appsecret_proof`) is silent.
 
 ### Alternatives considered
@@ -92,7 +92,7 @@ here: because findings carry no role, a user cannot today select "search-only
 keys" in a policy, only a type, a detector, a confidence or a range.
 
 `docs/specs/contextual-detection.md` gains one row citing this record, and the
-[#1229 record](../audits/evidence/1229/README.md) applies it to the 23 rows. No
+[#1229 record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1229/README.md) applies it to the 23 rows. No
 detector, vocabulary name, type or public interface changes; no version change
 and no release.
 

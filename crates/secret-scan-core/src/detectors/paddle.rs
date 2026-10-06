@@ -1,5 +1,5 @@
 //! Paddle Billing API key detection (issue #1033, handoff
-//! `docs/audits/evidence/1014/paddle.md`).
+//! [`docs/audits/evidence/1014/paddle.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/paddle.md)).
 //!
 //! Paddle's "API keys" page publishes the whole grammar as a regex,
 //! `^pdl_(live|sdbx)_apikey_[a-z\d]{26}_[a-zA-Z\d]{22}_[a-zA-Z\d]{3}$`, and

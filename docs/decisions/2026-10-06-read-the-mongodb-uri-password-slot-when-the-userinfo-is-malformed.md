@@ -93,6 +93,6 @@ Residuals: digit-only password before a raw `/`; a raw `@` password with a later
 delimiter; a password containing whitespace.
 
 `docs/specs/detector-families.md` gains the amended row text. The #1226 evidence
-addendum `docs/audits/evidence/1226/addendum-atlas-uri-userinfo.md` holds the
+addendum [`docs/audits/evidence/1226/addendum-atlas-uri-userinfo.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1226/addendum-atlas-uri-userinfo.md) holds the
 measurements. No public interface, finding type, detector id or version changes.
 Item 4 of the 2026-10-05 record is amended for the MongoDB URI only.

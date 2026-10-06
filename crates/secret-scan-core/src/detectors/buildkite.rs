@@ -1,5 +1,5 @@
 //! Buildkite token detection (issue #1105, handoff
-//! `docs/audits/evidence/1014/buildkite.md`).
+//! [`docs/audits/evidence/1014/buildkite.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/buildkite.md)).
 //!
 //! Buildkite issues 15 documented token prefixes. The grammar is T1 under
 //! rulings R2 and R9 from the provider-authored redaction rule in

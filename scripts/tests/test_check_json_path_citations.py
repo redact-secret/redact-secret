@@ -51,6 +51,23 @@ class CheckJsonPathCitationsTest(unittest.TestCase):
         )
         self.assertEqual(self.validate(), [])
 
+    def test_a_historical_permalink_is_not_read_as_a_current_path(self) -> None:
+        sha = "a" * 40
+        url = f"https://github.com/redact-secret/redact-secret/blob/{sha}/docs/audits/evidence/367/gone.json"
+        self.repo.write(
+            "conformance/fixtures/synchronous-corpus.json",
+            '{"fixtures": [{"note": "Frozen in ' + url + '."}]}\n',
+        )
+        self.assertEqual(self.validate(), [])
+
+    def test_a_branch_link_is_still_read_as_a_path(self) -> None:
+        url = "https://github.com/redact-secret/redact-secret/blob/main/docs/audits/evidence/367/gone.json"
+        self.repo.write(
+            "conformance/fixtures/synchronous-corpus.json",
+            '{"fixtures": [{"note": "Frozen in ' + url + '."}]}\n',
+        )
+        self.assertOneError("docs/audits/evidence/367/gone.json")
+
     def test_a_dangling_citation_is_rejected(self) -> None:
         self.repo.write(
             "conformance/fixtures/synchronous-corpus.json",

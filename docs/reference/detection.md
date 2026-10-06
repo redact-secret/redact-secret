@@ -179,7 +179,7 @@ benchmarking ranges and named non-endpoint constants (such as `0.0.0.0`,
 loopback, multicast, and broadcast) are non-sensitive; being private or
 special-purpose alone does not make an address non-sensitive. The frozen
 contract is the
-[network-address evidence record](../audits/evidence/875/README.md). The
+[network-address evidence record](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/875/README.md). The
 family is `provisional` under `pii-v1`, not `stable`.
 
 ### Policy-qualified generic credentials
@@ -376,7 +376,7 @@ Measured against `full` over the whole canonical corpus, `common` saves about
 30% transfer size (default builds of the Beta.12 candidate, 205,068 → 142,525 B
 gzip level 9) and processes 3–6× faster in the browser, with zero new
 false positives and identical findings wherever no provider detector would
-have competed ([evidence](../audits/evidence/382/README.md)).
+have competed ([evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/382/README.md)).
 
 The `@redact-secret/core/web-stream` and `@redact-secret/core/node-stream`
 convenience factories always open a `full` session; a `common` byte stream

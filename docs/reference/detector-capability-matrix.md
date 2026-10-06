@@ -7,7 +7,7 @@ detector selection, incremental sessions, status), who owns that configuration
 in a process, and where each kind of control acts in the pipeline. It answers
 the research of [#1221](https://github.com/redact-secret/redact-secret/issues/1221);
 the executed same-process experiments behind the isolation rows are in
-[`docs/audits/evidence/1221`](../audits/evidence/1221/README.md). It records
+[`docs/audits/evidence/1221`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1221/README.md). It records
 current behavior and decides no policy: the rules it summarizes are in the
 [engine spec](../specs/engine.md) and the records linked below.
 

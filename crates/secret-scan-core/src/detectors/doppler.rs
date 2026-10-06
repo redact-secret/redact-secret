@@ -1,5 +1,5 @@
 //! Doppler token detection (issue #903, handoff
-//! `docs/audits/evidence/860/doppler.md`).
+//! [`docs/audits/evidence/860/doppler.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/860/doppler.md)).
 //!
 //! Doppler documents seven bearer token types under one `dp.<type>.` scheme
 //! on one provider page (<https://docs.doppler.com/reference/auth-token-formats>,

@@ -18,7 +18,7 @@ starts a new one, or how long an old one is supported. The 0.1.x stable
 contract ([`decision-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes`](2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md))
 needs those answers before a ruleset file becomes a stable input format.
 
-The audit in [`docs/audits/evidence/1072`](../audits/evidence/1072/README.md)
+The audit in [`docs/audits/evidence/1072`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1072/README.md)
 ([#1072](https://github.com/redact-secret/redact-secret/issues/1072)) found the
 design sound and three leniencies (a repeated field, an invisible-character
 prefix, non-canonical run counts) that a stable file would have pinned. They
