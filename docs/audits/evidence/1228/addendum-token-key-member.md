@@ -8,7 +8,7 @@ round-1 measurement of Group C (benchmarks, candidate `e1284537`) found the
 finding and 2 with a finding on a neighbouring password only. Before: the token
 stayed in the `--redact` output. After: it is a `contextual_secret`, high,
 `redact`, exactly the value. The Contentful `token` half of `G-token-member` is a
-separate record (the Contentful create-response addendum of #1228).
+separate record ([addendum-contentful-create-response-token.md](addendum-contentful-create-response-token.md)).
 Evidence is project-authored and maintainer-only, not independent validation.
 
 ## Evidence read (read-only, `snapshot-2026.10.06.5`)

@@ -16,6 +16,7 @@
 //! | --- | --- | --- | --- |
 //! | `token_key` | quoted JSON member | none (the quoted member is the carrier) | `access_token` |
 //! | `encoded` | quoted JSON member | an `api_key` member within the sibling window | `api_key` |
+//! | `token` | quoted JSON member | a `sys` or `scopes` member within the sibling window | `access_token` |
 //!
 //! # The window
 //!
@@ -42,7 +43,7 @@ pub(crate) const SCOPED_LOOKBACK_LINES: usize = JSON_WINDOW_LINES;
 pub(crate) const MAX_WINDOW_BYTES: usize = 2_048;
 
 /// JSON member names that can open or complete a sibling window.
-const JSON_TRIGGER_MEMBERS: &[&str] = &["api_key", "encoded"];
+const JSON_TRIGGER_MEMBERS: &[&str] = &["api_key", "encoded", "sys", "scopes", "token"];
 
 /// What a scoped name is judged as, and the extra guard it carries.
 pub(super) struct ScopedRead {
@@ -89,6 +90,12 @@ pub(super) fn scoped_alias(
                 && json_partner(input, name_start, &["api_key"]) =>
         {
             Some(ScopedRead::alias("api_key"))
+        }
+        "token"
+            if is_quoted_member(input, name_start, name_end)
+                && json_partner(input, name_start, &["sys", "scopes"]) =>
+        {
+            Some(ScopedRead::alias("access_token"))
         }
         _ => None,
     }

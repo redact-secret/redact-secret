@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the Contentful create-token response `token` member
+  beside its documented siblings (#1228): a quoted `token` member with a `sys` or
+  `scopes` member within five lines is a `contextual_secret`, high, `redact`,
+  exactly the value. The bare `token` rule is unchanged: a lone `{"token": ...}`
+  or `name` plus `token` is not read, a recorded policy limit with its choices in
+  the evidence addendum. 0 false positives across 9,166 tracked files.
 - `generic-token` now reads the Elastic cross-cluster `encoded` member (#1229):
   in a create-cross-cluster-API-key response the `encoded` value (the base64 of
   `id:api_key`, a complete credential) is a `contextual_secret`, high, `redact`,
