@@ -245,7 +245,7 @@ Recommendation: **keep every deferred construct excluded from revision 1.**
 | --- | --- | --- |
 | Rust | `load_ruleset(&[u8]) -> Vec<Box<dyn Detector>>`, consumed by `DetectorRegistry::with_built_in` or `with_common_built_in` | Detectors are boxed and not `Clone`, so each registry needs its own load. Parse alone for 64 detectors (the maximum) took 55 us, parse plus registry 87 us, and a built-in-only registry 15 us. |
 | JavaScript (Node) | `ruleset?: Uint8Array \| string`; one-entry per-thread cache keyed by (profile, PII selection, ruleset bytes), a rejected ruleset is never cached (#1059) | Alternating between two rulesets rebuilds every call. Measured below. |
-| JavaScript (WebAssembly) | Same one-entry cache keyed by the bytes | The parser is linked into every artifact, including `common`: +23,724 B raw and +7,167 B brotli on `full` when it landed ([#495](../495/README.md)). Consumers who never load a ruleset pay it. |
+| JavaScript (WebAssembly) | Same one-entry cache keyed by the bytes | The parser is linked into every artifact, including `common`: +23,724 B raw and +7,167 B brotli on `full` when it landed ([#495](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/495/README.md)). Consumers who never load a ruleset pay it. |
 | Python | `ruleset=` bytes, bytearray or str; one-entry per-thread cache keyed by (PII epoch, bytes) | Detection runs with the GIL released. |
 | CLI | `--ruleset <path>`; read once, parsed to validate, one registry for all files (#1059) | Requires an explicit file source. |
 
