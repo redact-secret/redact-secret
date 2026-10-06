@@ -5,6 +5,43 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Fixed
+
+- `generic-token` no longer reports documentation placeholders that name a
+  service (#1234): a `YOUR_` lead plus listed service words and a credential
+  noun (`YOUR_DB_PASSWORD`, `YOUR_ZOOM_CLIENT_SECRET`,
+  `YOUR_HUBSPOT_PERSONAL_ACCESS_KEY`, `YOUR_PRIVATE_KEY`, and similar) is
+  silent. The word list is closed and read only by the bare-value rule; a real
+  value that merely contains these words inside random material is still
+  detected.
+- MongoDB Atlas (#1226): the public half of an API key pair is no longer
+  warned when it is exactly 8 bytes under `public_api_key` or
+  `mongodb_atlas_public_api_key`; the programmatic API private key slots
+  `privateKey` and `private_api_key` are pinned by tests (they were already
+  detected). A `mongodb` / `mongodb+srv` URI whose userinfo password has a
+  malformed percent escape or a raw `@`, `/`, `?`, `#` is now read at medium
+  confidence and redacted, where it previously produced no finding and the
+  password stayed in the output (ADR
+  `read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed`). Two
+  conformance cases that were negatives are now regression positives.
+- `Authorization: Bearer` values that contain percent escapes (`%2B`, `%3D`)
+  are redacted whole after an explicit `Authorization:` or
+  `Proxy-Authorization:` header name, where the run previously ended at the
+  first `%` and left the tail in the output (#1224, ADR
+  `admit-percent-escapes-in-the-authorization-bearer-header-value`). The bare
+  `Bearer` form is unchanged.
+- HubSpot (#1225): `personal_access_key` is also read behind a generic prefix
+  (`MY_HUBSPOT_PERSONAL_ACCESS_KEY`); `masked_`, `redacted_` and `publishable_`
+  prefixes and the neighbouring `…Id`, `…ExpiresAt`, `…Hint` and `…Length`
+  names stay silent. This relaxes the whole-name rule recorded for #1233.
+
+### Documentation
+
+- The Batch 2 evidence records (#1223 to #1226, #1232 to #1234) carry the
+  accepted replay of candidate `4e004108` (benchmarks #771), and the stale
+  statements about the programmatic API private key, percent encoding and the
+  declarative overlay are superseded.
+
 ## 0.1.0-beta.14 — 2026-10-06
 
 ### Support status
