@@ -11,7 +11,7 @@ no dependency was added, and nothing public changed.
 
 Issue [#902](https://github.com/redact-secret/redact-secret/issues/902),
 parent [#980](https://github.com/redact-secret/redact-secret/issues/980).
-The #985 record [names this cost](../985/README.md) as the reason the
+The #985 record [names this cost](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/985/README.md) as the reason the
 incremental session runs PII per unit. Base: `main` at `8f97f14d`, which
 includes #985 and #990.
 
