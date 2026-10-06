@@ -16,6 +16,7 @@ Current rules: `docs/specs/detector-families.md`.
 - [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](2026-09-21-govern-bare-vendor-prefixed-policy-layer.md)
 - [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md)
 - [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](2026-09-24-redact-google-api-keys-inside-firebase-web-config.md)
+- [Keep a credential's lifecycle era out of detection and preserve backward redaction](2026-10-06-keep-credential-lifecycle-era-out-of-detection-and-preserve-backward-redaction.md)
 
 ## Contextual detection
 
@@ -26,6 +27,7 @@ Current rules: `docs/specs/contextual-detection.md`.
 - [Redact a value assigned to a provider-named credential name](2026-09-24-redact-provider-named-credential-assignments.md)
 - [Define the versioned English and Korean PII context vocabulary contract](2026-09-26-define-the-pii-context-vocabulary-contract.md)
 - [Version the PII context vocabulary as pii-context/v2 with forward-only field labels and ASCII case folding in every language](2026-09-28-version-the-pii-context-vocabulary-as-v2.md)
+- [Keep credential role and confidentiality facts out of detection, attribution and default action](2026-10-06-keep-credential-role-facts-out-of-detection-attribution-and-default-action.md)
 
 ## Engine
 
