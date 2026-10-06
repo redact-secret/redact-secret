@@ -26,6 +26,7 @@ Current rules: `docs/specs/contextual-detection.md`.
 - [Redact a value assigned to a provider-named credential name](2026-09-24-redact-provider-named-credential-assignments.md)
 - [Define the versioned English and Korean PII context vocabulary contract](2026-09-26-define-the-pii-context-vocabulary-contract.md)
 - [Version the PII context vocabulary as pii-context/v2 with forward-only field labels and ASCII case folding in every language](2026-09-28-version-the-pii-context-vocabulary-as-v2.md)
+- [Keep credential role and confidentiality facts out of detection, attribution and default action](2026-10-06-keep-credential-role-facts-out-of-detection-attribution-and-default-action.md)
 
 ## Engine
 
