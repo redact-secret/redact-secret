@@ -228,3 +228,38 @@ password is one `authorization_credential` span in raw HTTP and a quoted curl
 input equals every two-chunk UTF-8 byte partition equals a per-line session.
 
 No pin, version or release change.
+
+## Round-1 measurement addendum: final dispositions of the measured rows
+
+The independent baseline of Group E ([benchmarks#754](https://github.com/redact-secret/redact-secret-benchmarks/issues/754),
+measured at core `e1284537`, report `<round1 report permalink pending>`) is the
+measurement this record's "baseline open" gate waited for, and it confirms the
+`hapikey` gap this record named as pre-decided. The dispositions follow its gap
+groups and nothing else; "fixed" means the product behaviour changed with a
+deterministic test and an evidence addendum, confirmed only by a replay at a
+commit carrying the fix, which has not run. No row is claimed covered, passing or
+ready by this addendum. Group E measured 343 positives (182 exact, 151 misses) and
+186 controls (2 flagged).
+
+| Row | Measured | Disposition |
+| --- | --- | --- |
+| `adobe:service-account-jwt-private-key` | no positive; 1 control flagged (`<contents of private.key>`) | fixed (spaced angle placeholder, [#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `airtable:legacy-api-key` | 27 of 28 exact; 1 miss (`query-shape-digits24`); 1 control flagged (brace placeholder) | digits-only: fixed ([addendum](addendum-digits-only-values.md)); brace placeholder: fixed |
+| `dropbox:legacy-long-lived-access-token` | 24 of 25 exact; 1 miss (`member-shape-digits24`) | fixed ([digits-only addendum](addendum-digits-only-values.md)) |
+| `hubspot:legacy-api-key` | 0 of 32; 32 misses (`hapikey`) | fixed, the whole-name entry this record pre-decided ([addendum](addendum-hapikey.md)); the digits-only case follows the digits-only addendum |
+| `jfrog:api-key` | 0 of 40; 40 misses | the `X-JFrog-Art-Api` header cases: fixed ([addendum](../1228/addendum-jfrog-art-api-header.md)), `header-shape-digits24` through the digits-only addendum; the `curl -u user:<secret>` cases (`basic-*`): **deferred to issue #1247**, a stated false negative |
+| `reddit:oauth-access-token` | 59 of 86 exact; 27 misses: 24 revoke `token=`, 3 digits-only | `token=`: **partly fixed, partly policy-limited**: read where the request names a revoke or introspect endpoint or carries `token_type_hint=` ([addendum](addendum-revoke-token-parameter.md)), the context-free layouts are recorded false negatives; the digits-only member and fragment cases are fixed ([digits-only addendum](addendum-digits-only-values.md)) |
+| `reddit:oauth-refresh-token` | 46 of 48 exact; 2 misses (digits-only) | fixed ([digits-only addendum](addendum-digits-only-values.md)) |
+| `reddit:app-client-secret` | 0 of 26; 26 misses | **deferred to issue #1247**: every case is the `curl -u` or `--user` password slot, not read; a stated false negative |
+| `zendesk:api-token` | 26 of 58 exact; 22 misses and 10 over-wide (a whole-string `warn` that left the token in the output), 1 masked display flagged | fixed, a reader anchored on `/token:` with a token-only `redact` span ([addendum](addendum-zendesk-email-token-credential.md)); the `curl -u` argument cases are read by the literal as a consequence |
+
+### Deferred, not fixed
+
+* **The `curl -u` / `--user` password slot** (JFrog API key and reference token,
+  Reddit client secret): issue #1247, with the policy for a literal user part. About
+  80 of the measured positives are in this slot.
+* **A bare `token=`** with no revoke context, and the corpus layouts of the Reddit
+  group that hold none: a recorded policy limit under the accepted rule for the
+  bare `token` name ([#1241](../1241/README.md)).
+
+No pin, version or release change.
