@@ -113,15 +113,15 @@
     "examples:python": "python3 -B -m unittest discover -s examples/tracing-masking/python -p 'test_*.py' && python3 -B -m unittest discover -s examples/logging-redaction/python -p 'test_*.py'"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
-    "@types/node": "^24.19.0",
-    "@vitest/coverage-v8": "5.0.2",
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "^24.19.1",
+    "@vitest/coverage-v8": "5.0.3",
     "esbuild": "^0.28.2",
     "fast-check": "4.10.2",
     "playwright": "1.63.0",
     "typescript": "^7.0.2",
-    "vitest": "5.0.2",
-    "wrangler": "^4.143.0"
+    "vitest": "5.0.3",
+    "wrangler": "^4.147.0"
   },
   "engines": {
     "node": "20.x || 22.x || 24.x"
