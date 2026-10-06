@@ -14,12 +14,27 @@ import { createWebStreamSanitizer, WebStreamSanitizer } from "../src/adapters/we
 import { createWebStreamSanitizer as createCommonWebStreamSanitizer } from "../src/adapters/web-stream-common.js";
 import type * as publicApi from "../src/index.js";
 import type {
+  ActionComparison,
+  ActionCounts,
+  ActionDecision,
+  ActionPolicyDocument,
+  ActionPolicyInput,
+  ActionPolicyMatch,
+  ActionPolicyRuleAction,
   ArtifactKind,
+  CompareActionPoliciesOptions,
+  ComparedFinding,
+  ComparedPolicy,
+  ComparedPolicyKind,
+  ComparedPolicySummary,
   CoreStatus,
+  DecisionBasis,
+  DefaultSecretPolicy,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
   IncrementalSanitizerResult,
+  IncrementalSecretPolicy,
   PlaceholderContext,
   PlaceholderFormatter,
   PolicyContext,
@@ -37,8 +52,10 @@ import type {
 } from "../src/index.js";
 import {
   artifact,
+  compareActionPolicies,
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
+  defaultPolicy,
   initialize,
   type PROFILE,
   RANGE_UNIT,
@@ -160,6 +177,120 @@ async function documentedUsage(input: string): Promise<void> {
 }
 
 void documentedUsage;
+
+/**
+ * The declarative action policy (#1219): a typed object, text or bytes, never
+ * together with a callback `policy`, and `defaultPolicy` as a policy object
+ * for both whole-input calls and incremental sessions.
+ */
+const actionPolicyDocument: ActionPolicyDocument = {
+  actionPolicyRevision: 1,
+  base: "default",
+  rules: [
+    { id: "redact-acme-tokens", match: { type: ["acme-alnum-token"] }, action: "redact" },
+    { id: "keep-default-jwt", match: { type: ["jwt"], confidence: ["medium"] }, action: "default" },
+  ],
+};
+const actionPolicyInputs: readonly ActionPolicyInput[] = [
+  actionPolicyDocument,
+  '{"actionPolicyRevision":1,"base":"default","rules":[]}',
+  new Uint8Array(0),
+];
+const withActionPolicy: ScanOptions = { actionPolicy: actionPolicyDocument };
+const textActionPolicy: ActionPolicyInput = '{"actionPolicyRevision":1,"base":"default","rules":[]}';
+const sessionWithActionPolicy: IncrementalSanitizerOptions = {
+  limits: incrementalBytesOptions.limits,
+  actionPolicy: textActionPolicy,
+};
+const mineElseDefault: SecretPolicy = {
+  evaluate: (finding, context) =>
+    finding.type === "acme-alnum-token" ? "redact" : defaultPolicy.evaluate(finding, context),
+};
+const defaultIsBoth: SecretPolicy & IncrementalSecretPolicy = defaultPolicy;
+const defaultAsNamedType: DefaultSecretPolicy = defaultPolicy;
+const directAction: SecretAction = defaultPolicy.evaluate({} as DetectedSecretFinding);
+type DefaultPolicyReturnsAnAction = Expect<Equal<ReturnType<typeof defaultPolicy.evaluate>, SecretAction>>;
+type RuleActionAddsDefault = Expect<Equal<ActionPolicyRuleAction, SecretAction | "default">>;
+type ActionPolicyHasNoThreshold = Expect<"threshold" extends keyof ActionPolicyMatch ? false : true>;
+type InvalidActionPolicyIsACode = Expect<"INVALID_ACTION_POLICY" extends SecretScanErrorCode ? true : false>;
+void [withActionPolicy, sessionWithActionPolicy, mineElseDefault, defaultIsBoth, defaultAsNamedType, directAction];
+
+/**
+ * The comparison primitive (#1220): whole-input only, one to four sides of a
+ * closed set of kinds, and a result of plain readonly data.
+ */
+function documentedComparisonUsage(): void {
+  const options: CompareActionPoliciesOptions = {
+    policies: [
+      { kind: "default" },
+      { kind: "action-policy", actionPolicy: { actionPolicyRevision: 1, base: "default", rules: [] } },
+      { kind: "action-policy", actionPolicy: '{"actionPolicyRevision":1,"base":"default","rules":[]}' },
+      { kind: "callback", policy: defaultPolicy },
+    ],
+    limits: { maxInputBytes: 1_024, maxFindings: 10 },
+    ruleset: "ruleset-revision: 1\n",
+  };
+  const comparison: ActionComparison = compareActionPolicies("input", options);
+  const mode: "preview" = comparison.mode;
+  const enforced: false = comparison.enforced;
+  const profile: "full" | "common" | null = comparison.detection.profile;
+  const summary: ComparedPolicySummary = comparison.policies[0] as ComparedPolicySummary;
+  const kind: ComparedPolicyKind = summary.kind;
+  const digest: string | null = summary.documentSha256;
+  const counts: ActionCounts = summary.counts;
+  const finding: ComparedFinding = comparison.findings[0] as ComparedFinding;
+  const detected: DetectedSecretFinding = finding;
+  const decision: ActionDecision = finding.decisions[0] as ActionDecision;
+  const action: SecretAction = decision.action;
+  const basis: DecisionBasis = decision.basis;
+  const ruleId: string | null = decision.ruleId;
+  const ruleIndex: number | null = decision.ruleIndex;
+
+  // @ts-expect-error a comparison is frozen data: no field is assignable.
+  comparison.findings = [];
+  // @ts-expect-error a decision is frozen data.
+  decision.action = "allow";
+  // @ts-expect-error `enforced` is the literal false: a comparison never enforces.
+  const enforcedTrue: true = comparison.enforced;
+
+  void [mode, enforced, profile, kind, digest, counts, detected, action, basis, ruleId, ruleIndex, enforcedTrue];
+}
+
+void documentedComparisonUsage;
+
+/** No incremental, stream or placeholder option belongs to a comparison, and a side's kind is closed. */
+function rejectedComparisonUsage(): void {
+  // @ts-expect-error a comparison takes no incremental or stream option.
+  const incremental: CompareActionPoliciesOptions = { policies: [{ kind: "default" }], incremental: true };
+  const sessionLimits: CompareActionPoliciesOptions = {
+    policies: [{ kind: "default" }],
+    // @ts-expect-error incremental limits are not whole-input limits.
+    limits: { maxInputBytes: 1, maxFindings: 1, maxBufferedBytes: 1 },
+  };
+  // @ts-expect-error `session` is not a side kind.
+  const sessionSide: ComparedPolicy = { kind: "session" };
+  // @ts-expect-error a default side carries no policy.
+  const defaultWithPolicy: ComparedPolicy = { kind: "default", policy: defaultPolicy };
+  // @ts-expect-error an action policy side carries an action policy, not a callback.
+  const documentWithCallback: ComparedPolicy = { kind: "action-policy", policy: defaultPolicy };
+  // @ts-expect-error a comparison takes a string, never a chunk or a stream.
+  compareActionPolicies(["a", "b"], { policies: [{ kind: "default" }] });
+  // @ts-expect-error the options are required: there is nothing to compare without sides.
+  compareActionPolicies("input");
+
+  void [incremental, sessionLimits, sessionSide, defaultWithPolicy, documentWithCallback];
+}
+
+void rejectedComparisonUsage;
+
+type ComparedKindsAreClosed = Expect<Equal<ComparedPolicy["kind"], ComparedPolicyKind>>;
+type BasisNamesAreTheCores = Expect<
+  Equal<DecisionBasis, "rule" | "rule-default" | "no-rule-matched" | "default-policy" | "callback">
+>;
+/** No incremental or stream surface mentions a comparison. */
+type SessionHasNoComparison = Expect<"compareActionPolicies" extends keyof IncrementalSanitizer ? false : true>;
+type StreamHasNoComparison = Expect<"compareActionPolicies" extends keyof NodeStreamSanitizer ? false : true>;
+type WebStreamHasNoComparison = Expect<"compareActionPolicies" extends keyof WebStreamSanitizer ? false : true>;
 
 /**
  * The stream adapters. Neither is reachable from the root export: they are

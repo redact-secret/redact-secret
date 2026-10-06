@@ -182,6 +182,65 @@ declared confidence-gated today.
 of nondeterminism: `detector_order` and `candidate_order` remain the final,
 already-unique tie breakers, so the ordering stays total.
 
+### Applies to user policy (#1218)
+
+Clarification, not a change of behavior. Issue
+[#1218](https://github.com/redact-secret/redact-secret/issues/1218) asked
+whether a user policy can act on a candidate that loses an overlap. The
+layer boundary above already answers it: **a user policy is evaluated only on
+finalized findings**, once each, in finalized order. A rule for a losing
+candidate's type is never called, in whole-input scans and in incremental
+sessions at every partition. The winner takes the action the user policy gives
+the winner, even when the loser's type would have received a stricter one.
+User-facing wording is in
+[Policy and safe integration](../guides/safe-integration.md#your-policy-sees-finalized-findings-only).
+
+The three options the issue named, with the expected result for the same
+overlap (winner `W` has the stricter default action, loser `L` the weaker; the
+user policy gives `W` the weaker and `L` the stricter action):
+
+| Option | Winner | Action on the range | Policy callback sees |
+| --- | --- | --- | --- |
+| A, finalized-finding policy (this ADR, shipped) | `W` | the user policy's action for `W` | `W` once, with the finalized index and count |
+| B, policy-aware ranking | `L` | the user policy's action for `L` | every candidate, before finality |
+| C, explicit candidate inspection | `W` (unchanged) | the user policy's action for `W`, plus whatever the host does with the alternates | `W`, and a separate view of `L` |
+
+The same expectations hold for an equal range, containment in either
+direction, and partial overlap; the synthetic matrix is pinned in
+`crates/secret-scan-core/tests/policy_after_overlap_1218.rs`, and the built-in
+`bearer_token` over `new_relic_license_key` overlap is pinned for whole input
+and for every two-chunk, and one-character-per-chunk, incremental partition.
+
+**Option B** stays rejected. Replacing it needs a superseding ADR that changes
+the policy trait so a policy can be evaluated before finality, defines what an
+incremental session does when a speculative evaluation is later discarded, and
+re-qualifies every overlap fixture under every policy. The cost is a public
+contract change across the Rust core and the Node, WebAssembly and Python
+bindings, and the loss of the guarantee that which candidate wins is identical
+under every policy.
+
+**Option C is deferred, not adopted.**
+
+- A hook that shows the host the losing candidates runs user code on
+  non-final data. In an incremental session a candidate is not known to be a
+  loser until later input arrives, so the hook would either wait until
+  finality (then it is a finalized-finding annotation, not an inspection seam)
+  or break the "exactly once, after final" guarantee.
+- Candidates carry internal identity alternatives for PII
+  (`decision-define-the-pii-domain-scope-arbitration-and-activation-contract`
+  keeps them internal). A candidate-level seam must either hide them, which
+  leaves a view too thin to act on, or expose them, which breaks that
+  contract. Any future seam must be a metadata-only annotation of a finalized
+  finding, never a view of internal candidates.
+- It adds a public type to every binding and to the conformance corpus.
+- The need has a supported answer today: write the rule on the winning type,
+  or scan twice with a registry that holds only the detector you care about.
+  Both are pinned by tests and described in the user guide.
+
+Revisit C when a real consumer shows a case neither answer covers. It would
+need its own ADR, a metadata-only finalized-finding annotation, and parity
+qualification across bindings.
+
 ## Consequences
 
 - `ARCHITECTURE.md`'s "Canonical processing pipeline" section is updated to

@@ -129,7 +129,7 @@ async function linkWasmPackage(wasmDir) {
 function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
   const entry = detectorProfile === "common" ? "@redact-secret/core/common" : "@redact-secret/core";
   return `
-    import { initialize, artifact, piiActivation, scan, redact, scanAndRedact, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
+    import { initialize, artifact, piiActivation, scan, redact, scanAndRedact, compareActionPolicies, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
 
     const FIXTURE = ${JSON.stringify(fixture.input)};
     const EXPECTED_FINDING_COUNT = ${fixture.expected.length};
@@ -183,6 +183,28 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
             const combined = scanAndRedact(FIXTURE);
             const separate = redact(FIXTURE, scan(FIXTURE));
             if (combined.text !== separate) throw new Error("scanAndRedact disagreed with scan + redact");
+          }));
+          checks.push(check("compareActionPolicies compares sides over one detection pass (#1220)", () => {
+            const scanned = scan(FIXTURE);
+            const calls = [];
+            const comparison = compareActionPolicies(FIXTURE, {
+              policies: [
+                { kind: "default" },
+                { kind: "action-policy", actionPolicy: { actionPolicyRevision: 1, base: "default", rules: [] } },
+                { kind: "callback", policy: { evaluate: (finding, context) => { calls.push(context.findingIndex); return "warn"; } } },
+              ],
+            });
+            if (comparison.findings.length !== scanned.length) throw new Error("the finding count differs from scan");
+            comparison.findings.forEach((compared, index) => {
+              if (compared.id !== scanned[index].id || compared.start !== scanned[index].start) {
+                throw new Error("a compared finding differs from scan's");
+              }
+              if (compared.decisions[0].action !== scanned[index].action) throw new Error("the default side differs from scan");
+              if (compared.decisions[1].basis !== "no-rule-matched") throw new Error("an empty policy had a rule basis");
+              if (compared.decisions[2].basis !== "callback") throw new Error("a callback side had a rule basis");
+            });
+            if (calls.join() !== scanned.map((_, index) => index).join()) throw new Error("callback order differs");
+            if (!/^[0-9a-f]{64}$/.test(comparison.policies[1].documentSha256)) throw new Error("no document digest");
           }));
           checks.push(check("an incremental session matches the whole-input result", () => {
             const whole = scanAndRedact(FIXTURE);

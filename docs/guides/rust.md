@@ -56,7 +56,9 @@ with `scan`, `scan_with_limits`, `scan_and_redact` and `scan_and_redact_with_lim
 methods that return exactly what the `DetectorRegistry` functions return
 (`BuiltInRegistry::with_built_in()`, `with_common_built_in()`,
 `with_built_in_and_pii(&selection)`, `with_common_built_in_and_pii(&selection)`).
-Wrap it in an `Arc` to hand it to workers. `IncrementalSanitizer` still builds its
+Wrap it in an `Arc` to hand it to workers; registries with different PII
+selections coexist with no shared state (see [configuration ownership](configuration-ownership.md)).
+`IncrementalSanitizer` still builds its
 own registry per session. `scan` returns policy-evaluated findings;
 `redact` takes the original input, findings, and a formatter. `scan_and_redact`
 combines those operations. Ranges are half-open UTF-8 byte offsets on character
@@ -105,6 +107,81 @@ whole input, and every error comes with no partial result. The calls cannot be
 cancelled and have no deadline; the limits above are the only bounds. See
 [Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
 [Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
+
+## Action policy
+
+`load_action_policy` parses a declarative action policy document
+(`actionPolicyRevision: 1`, see the [action policy guide](action-policy.md))
+into an `ActionPolicy`. The value is immutable, `Clone`, `Send` and `Sync`, and
+is both a `Policy` and an `IncrementalPolicy`, so it goes anywhere a callback
+does without restating the default table:
+
+```rust
+use redact_secret::{Action, DetectorRegistry, load_action_policy, scan};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let policy = load_action_policy(
+        br#"{"actionPolicyRevision":1,"base":"default","rules":[
+            {"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#,
+    )?;
+    let registry = DetectorRegistry::with_built_in([])?;
+    let findings = scan("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", &registry, &policy)?;
+    assert_eq!(findings[0].action(), Action::Warn);
+    Ok(())
+}
+```
+
+A rejected document is an `ActionPolicyError`: its `code()` is always
+`SecretScanErrorCode::InvalidActionPolicy`, `class()` is one of 17 fixed
+`ActionPolicyErrorClass` values, and `rule_index()` is the zero-based index of
+the rule being read (`None` for a document-level violation). No error carries a
+byte of the document. Loading never partially succeeds, and evaluation never
+fails, so an `ActionPolicy` never reports `POLICY_FAILURE`.
+
+### Compare action policies
+
+`compare_action_policies` explains and compares policies without enforcing any of
+them. It runs detection once under the registry, then evaluates 1 to
+`MAX_COMPARED_POLICIES` (4) policies on the same finalized findings. See the
+[action policy guide](action-policy.md#explain-and-compare) for scope and
+the [decision](../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md) for the contract.
+
+```rust
+use redact_secret::{
+    ComparedPolicy, DetectorRegistry, compare_action_policies, load_action_policy,
+};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let next = load_action_policy(
+        br#"{"actionPolicyRevision":1,"base":"default","rules":[
+            {"id":"allow-github","match":{"type":["github_token"]},"action":"allow"}]}"#,
+    )?;
+    let registry = DetectorRegistry::with_built_in([])?;
+    let comparison = compare_action_policies(
+        "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+        &registry,
+        &[ComparedPolicy::Default, ComparedPolicy::ActionPolicy(&next)],
+    )?;
+    let finding = &comparison.findings()[0];
+    assert!(finding.differs());
+    assert_eq!(finding.decisions()[1].basis().rule_id(), Some("allow-github"));
+    assert_eq!(comparison.sides()[1].binding().document_sha256_hex().unwrap().len(), 64);
+    Ok(())
+}
+```
+
+`ComparedPolicy` is `Default`, `ActionPolicy(&ActionPolicy)` or
+`Callback(&dyn Policy)`. The result carries, per side, a `PolicyBinding` (the
+policy document's SHA-256, `ActionPolicy::document_sha256`), action counts, and
+per finding the finalized `DetectedFinding` plus one `ActionDecision` per side
+(`action()` and a `DecisionBasis`: `Rule`, `RuleDefault`, `NoRuleMatched`,
+`DefaultPolicy` or `Callback`). `detection()` names the activation identity,
+profile and detector count apart from every policy. It never carries input,
+a matched value, a hash of either, or a score. A callback is called once per
+finding in finding order, one side at a time; a failure is
+`SecretScanErrorCode::PolicyFailure` with no partial result. The limit errors are
+`scan`'s, and an empty or oversized policy list is `InvalidOptions`.
+`BuiltInRegistry` has the same two methods.
 
 ## Request-wide placeholder numbering
 

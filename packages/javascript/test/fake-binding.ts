@@ -9,9 +9,12 @@
  */
 
 import type {
+  NativeActionComparison,
   NativeBinding,
+  NativeComparedSide,
   NativeFinding,
   NativeIncrementalLimits,
+  NativeIncrementalOptions,
   NativeIncrementalSanitizer,
   NativeWholeInputLimits,
 } from "../src/native.js";
@@ -24,6 +27,10 @@ export interface FakeBindingOptions {
   readonly findings?: readonly NativeFinding[];
   readonly redacted?: string;
   readonly throwOnScan?: unknown;
+  /** What `compareActionPolicies` throws, when set. */
+  readonly throwOnCompare?: unknown;
+  /** What `compareActionPolicies` returns; an empty one-side comparison when omitted. */
+  readonly comparison?: NativeActionComparison;
   readonly throwOnInitialize?: unknown;
   /**
    * `false` models a WebAssembly artifact built without the PII runtime
@@ -51,7 +58,34 @@ export interface FakeBinding extends NativeBinding {
    * {@link lastLimits}.
    */
   readonly lastRuleset: Uint8Array | undefined;
+  /**
+   * The `actionPolicy` document bytes the most recent `scan`/`scanAndRedact`
+   * call received, with the same "check `calls` first" caveat.
+   */
+  readonly lastActionPolicy: Uint8Array | undefined;
+  /** The options the most recent `createIncrementalSanitizer` call received. */
+  readonly lastIncrementalOptions: NativeIncrementalOptions | undefined;
+  /** The sides, limits and ruleset the most recent `compareActionPolicies` call received. */
+  readonly lastCompare:
+    | {
+        readonly sides: readonly NativeComparedSide[];
+        readonly limits: NativeWholeInputLimits | undefined;
+        readonly ruleset: Uint8Array | undefined;
+      }
+    | undefined;
 }
+
+/** A well-formed comparison with one default side and no findings. */
+export const emptyNativeComparison: NativeActionComparison = Object.freeze({
+  detection: Object.freeze({
+    activationIdentity: "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
+    profile: "full",
+    detectorCount: 42,
+  }),
+  sides: Object.freeze([Object.freeze({ kind: "default", redact: 0, block: 0, warn: 0, allow: 0 })]),
+  changedCount: 0,
+  findings: Object.freeze([]),
+});
 
 export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding {
   const calls: string[] = [];
@@ -60,6 +94,9 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
   let lastLimits: NativeWholeInputLimits | undefined;
   let lastIncrementalLimits: NativeIncrementalLimits | undefined;
   let lastRuleset: Uint8Array | undefined;
+  let lastActionPolicy: Uint8Array | undefined;
+  let lastIncrementalOptions: NativeIncrementalOptions | undefined;
+  let lastCompare: FakeBinding["lastCompare"];
   let activation = "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
 
   function session(): NativeIncrementalSanitizer {
@@ -136,9 +173,10 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
       activation = next;
     },
     piiActivation: () => activation,
-    scan: (input, policy, limits, ruleset) => {
+    scan: (input, policy, limits, ruleset, actionPolicy) => {
       lastLimits = limits;
       lastRuleset = ruleset;
+      lastActionPolicy = actionPolicy;
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);
       if (options.throwOnScan !== undefined) throw options.throwOnScan;
       return findings;
@@ -148,9 +186,10 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
       calls.push(`redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`);
       return redacted;
     },
-    scanAndRedact: (input, policy, formatter, limits, ruleset) => {
+    scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) => {
       lastLimits = limits;
       lastRuleset = ruleset;
+      lastActionPolicy = actionPolicy;
       calls.push(
         `scanAndRedact:${input}:${policy === undefined ? "builtin" : "custom"}:${formatter === undefined ? "builtin" : "custom"}`,
       );
@@ -158,6 +197,7 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
     },
     createIncrementalSanitizer: (incrementalOptions) => {
       lastIncrementalLimits = incrementalOptions.limits;
+      lastIncrementalOptions = incrementalOptions;
       calls.push(`createIncrementalSanitizer:${incrementalOptions.limits.maxInputCodeUnits}`);
       return session();
     },
@@ -170,6 +210,22 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
     get lastRuleset() {
       return lastRuleset;
     },
+    get lastActionPolicy() {
+      return lastActionPolicy;
+    },
+    get lastIncrementalOptions() {
+      return lastIncrementalOptions;
+    },
+    compareActionPolicies: (input, sides, limits, ruleset) => {
+      lastCompare = { sides, limits, ruleset };
+      calls.push(`compareActionPolicies:${input}:${sides.map((side) => side.kind).join(",")}`);
+      if (options.throwOnCompare !== undefined) throw options.throwOnCompare;
+      return options.comparison ?? emptyNativeComparison;
+    },
+    get lastCompare() {
+      return lastCompare;
+    },
+    defaultPolicy: () => "redact",
   };
 }
 

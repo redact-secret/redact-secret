@@ -9,12 +9,12 @@
 //! message (which could echo the input) into the public error surface
 //! (`decision-govern-cross-language-conformance`).
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use js_sys::Function;
 use redact_secret::{
     Action, DetectedFinding, Finding, FormatterFailure, PlaceholderContext, PlaceholderFormatter,
-    Policy, PolicyContext, PolicyFailure,
+    Policy, PolicyContext, PolicyFailure, SecretScanError, SecretScanErrorCode,
 };
 use wasm_bindgen::JsValue;
 
@@ -29,6 +29,12 @@ pub(crate) struct JsPolicy<'a> {
     /// pass across calls, rather than from byte 0 per finding (issue #1053).
     ranges: RefCell<Utf16Ranges<'a>>,
     function: &'a Function,
+    /// The precise code of the last failure: the core's [`PolicyFailure`]
+    /// carries no detail, so a callback that returns a string that is not one
+    /// of the four action names records `INVALID_POLICY_ACTION` here, exactly
+    /// as the incremental adapter and `bindings/node` report it, instead of
+    /// the generic `POLICY_FAILURE`.
+    failure: Cell<Option<SecretScanErrorCode>>,
 }
 
 impl<'a> JsPolicy<'a> {
@@ -36,6 +42,16 @@ impl<'a> JsPolicy<'a> {
         Self {
             ranges: RefCell::new(Utf16Ranges::new(input)),
             function,
+            failure: Cell::new(None),
+        }
+    }
+
+    /// The more precise code of the failure the core reported, if one was
+    /// recorded: the one place a caller refines `POLICY_FAILURE`.
+    pub(crate) fn refine(&self, error: SecretScanError) -> SecretScanError {
+        match (error.code(), self.failure.take()) {
+            (SecretScanErrorCode::PolicyFailure, Some(code)) => code.into(),
+            _ => error,
         }
     }
 }
@@ -55,7 +71,11 @@ impl Policy for JsPolicy<'_> {
             .call2(&JsValue::UNDEFINED, &finding_metadata, &context_metadata)
             .map_err(|_| PolicyFailure)?;
         let action_name = result.as_string().ok_or(PolicyFailure)?;
-        Action::from_name(&action_name).ok_or(PolicyFailure)
+        Action::from_name(&action_name).ok_or_else(|| {
+            self.failure
+                .set(Some(SecretScanErrorCode::InvalidPolicyAction));
+            PolicyFailure
+        })
     }
 }
 

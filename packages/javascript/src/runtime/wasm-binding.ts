@@ -19,6 +19,7 @@
 import { SecretScanError } from "../errors.js";
 import {
   NATIVE_HANDLE,
+  type NativeActionComparison,
   type NativeBinding,
   type NativeDetectedFinding,
   type NativeFinding,
@@ -26,6 +27,7 @@ import {
   type NativeIncrementalPolicyCallback,
   type NativeIncrementalResult,
   type NativePolicyCallback,
+  splitNativeSides,
 } from "../native.js";
 import type { IncrementalSanitizerState, PlaceholderContext, PolicyContext } from "../types.js";
 
@@ -133,6 +135,7 @@ export interface WasmModule {
     maxInputBytes?: number,
     maxFindings?: number,
     ruleset?: Uint8Array,
+    actionPolicy?: Uint8Array,
   ): readonly WasmFinding[];
   redact(
     input: string,
@@ -148,6 +151,7 @@ export interface WasmModule {
     maxInputBytes?: number,
     maxFindings?: number,
     ruleset?: Uint8Array,
+    actionPolicy?: Uint8Array,
   ): WasmScanAndRedactResult;
   createIncrementalSanitizer(
     maxInputCodeUnits: number,
@@ -156,7 +160,32 @@ export interface WasmModule {
     maxMultilineCodeUnits: number,
     policy?: WasmIncrementalPolicyCallback,
     formatter?: WasmFormatterCallback,
+    actionPolicy?: Uint8Array,
   ): WasmIncrementalSanitizer;
+  /**
+   * The whole-input comparison (`bindings/wasm/src/compare.rs`): the sides as
+   * the parallel `kinds`/`documents`/`callbacks` arrays
+   * {@link splitNativeSides} builds, and one flat array that
+   * {@link decodeComparison} rebuilds into the nested shape.
+   */
+  compareActionPolicies(
+    input: string,
+    kinds: string[],
+    documents: Uint8Array[],
+    callbacks: WasmPolicyCallback[],
+    maxInputBytes?: number,
+    maxFindings?: number,
+    ruleset?: Uint8Array,
+  ): readonly unknown[];
+  defaultPolicy(
+    id: string,
+    type: string,
+    detector: string,
+    confidence: string,
+    obfuscation: string,
+    start: number,
+    end: number,
+  ): string;
 }
 
 /**
@@ -174,6 +203,8 @@ const REQUIRED_WASM_EXPORTS = [
   "redact",
   "scanAndRedact",
   "createIncrementalSanitizer",
+  "compareActionPolicies",
+  "defaultPolicy",
 ] as const;
 
 /** Throws `INITIALIZATION_FAILED` unless every required export is present. */
@@ -273,6 +304,73 @@ function toNativeIncrementalResult(result: WasmIncrementalResult): NativeIncreme
 }
 
 /**
+ * Rebuilds the nested comparison the Node addon returns from the flat array
+ * the WebAssembly artifact returns (`bindings/wasm/src/compare.rs`, which
+ * documents the layout). A flat array keeps the artifact small; this is the
+ * one place that knows it, and a value that is not the expected kind fails
+ * closed as an unusable artifact rather than being passed on.
+ *
+ * Exported so a test can exercise the layout against a hand-built array.
+ */
+export function decodeComparison(flat: readonly unknown[]): NativeActionComparison {
+  let cursor = 0;
+  const fail = (): never => {
+    throw new SecretScanError("INITIALIZATION_FAILED");
+  };
+  const text = (): string => {
+    const value = flat[cursor++];
+    return typeof value === "string" ? value : fail();
+  };
+  const nullableText = (): string | null => {
+    const value = flat[cursor++];
+    return value === null || typeof value === "string" ? value : fail();
+  };
+  const number = (): number => {
+    const value = flat[cursor++];
+    return typeof value === "number" ? value : fail();
+  };
+  const nullableNumber = (): number | null => {
+    const value = flat[cursor++];
+    return value === null || typeof value === "number" ? value : fail();
+  };
+  const boolean = (): boolean => {
+    const value = flat[cursor++];
+    return typeof value === "boolean" ? value : fail();
+  };
+
+  const detection = { activationIdentity: text(), profile: nullableText(), detectorCount: number() };
+  const sideCount = number();
+  const sides = Array.from({ length: sideCount }, () => ({
+    kind: text(),
+    documentSha256: nullableText(),
+    redact: number(),
+    block: number(),
+    warn: number(),
+    allow: number(),
+  }));
+  const changedCount = number();
+  const findingCount = number();
+  const findings = Array.from({ length: findingCount }, () => ({
+    id: text(),
+    type: text(),
+    detector: text(),
+    confidence: text(),
+    obfuscation: text(),
+    start: number(),
+    end: number(),
+    differs: boolean(),
+    decisions: Array.from({ length: sideCount }, () => ({
+      action: text(),
+      basis: text(),
+      ruleId: nullableText(),
+      ruleIndex: nullableNumber(),
+    })),
+  }));
+  if (cursor !== flat.length) fail();
+  return { detection, sides, changedCount, findings };
+}
+
+/**
  * Builds the internal binding contract from an already-loaded WebAssembly
  * module.
  *
@@ -290,9 +388,9 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
       wasm.initialize(pii);
     },
     piiActivation: () => wasm.piiActivation(),
-    scan: (input, policy, limits, ruleset) =>
+    scan: (input, policy, limits, ruleset, actionPolicy) =>
       wasm
-        .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset)
+        .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset, actionPolicy)
         .map(toNativeFinding),
     redact: (input, findings, formatter, limits) =>
       wasm.redact(
@@ -302,7 +400,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         limits?.maxInputBytes,
         limits?.maxFindings,
       ),
-    scanAndRedact: (input, policy, formatter, limits, ruleset) => {
+    scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) => {
       const result = wasm.scanAndRedact(
         input,
         toWasmPolicyCallback(policy),
@@ -310,6 +408,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         limits?.maxInputBytes,
         limits?.maxFindings,
         ruleset,
+        actionPolicy,
       );
       try {
         return {
@@ -328,6 +427,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         options.limits.maxMultilineCodeUnits,
         toWasmIncrementalPolicyCallback(options.policy),
         toWasmFormatterCallback(options.formatter),
+        options.actionPolicy,
       );
       return {
         get state() {
@@ -340,5 +440,29 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         },
       };
     },
+    compareActionPolicies: (input, sides, limits, ruleset) => {
+      const { kinds, documents, callbacks } = splitNativeSides(sides);
+      return decodeComparison(
+        wasm.compareActionPolicies(
+          input,
+          kinds,
+          documents,
+          callbacks.map((callback) => toWasmPolicyCallback(callback) as WasmPolicyCallback),
+          limits?.maxInputBytes,
+          limits?.maxFindings,
+          ruleset,
+        ),
+      );
+    },
+    defaultPolicy: (finding) =>
+      wasm.defaultPolicy(
+        finding.id,
+        finding.type,
+        finding.detector,
+        finding.confidence,
+        finding.obfuscation,
+        finding.start,
+        finding.end,
+      ),
   };
 }

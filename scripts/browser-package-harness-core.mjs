@@ -93,8 +93,9 @@ function actualTuples(findings) {
 
 /**
  * Runs every check against `api`, the one package entry's exports
- * (`{ RANGE_UNIT, SecretScanError, VERSION, createIncrementalSanitizer,
- * initialize, redact, scan, scanAndRedact, WebStreamSanitizer? }`).
+ * (`{ RANGE_UNIT, SecretScanError, VERSION, compareActionPolicies,
+ * createIncrementalSanitizer, initialize, redact, scan, scanAndRedact,
+ * WebStreamSanitizer? }`).
  * `WebStreamSanitizer` is optional; see this file's module comment.
  */
 export async function qualify(fixtures, api) {
@@ -102,6 +103,7 @@ export async function qualify(fixtures, api) {
     RANGE_UNIT,
     SecretScanError,
     VERSION,
+    compareActionPolicies,
     createIncrementalSanitizer,
     initialize,
     redact,
@@ -195,6 +197,96 @@ export async function qualify(fixtures, api) {
       pieces.push(fixture.input.slice(cursor));
       assertEqual(text, pieces.join(""), `fixture ${fixture.id} did not produce the exact expected redacted output`);
     }
+  });
+
+  await checkAsync("the package compares policies over one detection pass in the browser (#1220)", async () => {
+    const fixture = synchronous.find((entry) => entry.expected.length > 0);
+    const scanned = scan(fixture.input);
+    const allowAll = {
+      actionPolicyRevision: 1,
+      base: "default",
+      rules: [
+        {
+          id: "allow-the-types",
+          match: { type: [...new Set(scanned.map((finding) => finding.type))] },
+          action: "allow",
+        },
+      ],
+    };
+    const calls = [];
+    const comparison = compareActionPolicies(fixture.input, {
+      policies: [
+        { kind: "default" },
+        { kind: "action-policy", actionPolicy: allowAll },
+        {
+          kind: "callback",
+          policy: {
+            evaluate: (_finding, context) => {
+              calls.push(context.findingIndex);
+              return "warn";
+            },
+          },
+        },
+      ],
+    });
+    assert(Object.isFrozen(comparison) && Object.isFrozen(comparison.findings[0]), "the comparison is mutable");
+    assertEqual(comparison.mode, "preview", "mode");
+    assertEqual(comparison.enforced, false, "enforced");
+    assertEqual(
+      comparison.findings.map((finding) => [finding.id, finding.start, finding.end]),
+      scanned.map((finding) => [finding.id, finding.start, finding.end]),
+      "compared findings against scan's",
+    );
+    assertEqual(
+      comparison.findings.map((finding) => finding.decisions[0].action),
+      scanned.map((finding) => finding.action),
+      "the default side against scan",
+    );
+    assert(
+      comparison.findings.every(
+        (finding) => finding.decisions[1].action === "allow" && finding.decisions[1].basis === "rule",
+      ),
+      "the document side did not allow every finding by rule",
+    );
+    assert(
+      comparison.findings.every(
+        (finding) => finding.decisions[2].action === "warn" && finding.decisions[2].basis === "callback",
+      ),
+      "the callback side did not warn every finding",
+    );
+    assertEqual(
+      calls,
+      scanned.map((_, index) => index),
+      "the callback ran once per finding, in order",
+    );
+    assertEqual(
+      comparison.policies.map((policy) => policy.label),
+      ["baseline", "candidate-1", "candidate-2"],
+      "labels",
+    );
+    assertEqual(
+      comparison.policies.map((policy) => policy.documentSha256 !== null),
+      [false, true, false],
+      "which sides carry a document digest",
+    );
+    if (globalThis.crypto?.subtle !== undefined) {
+      const bytes = encoder.encode(JSON.stringify(allowAll));
+      const digest = new Uint8Array(await globalThis.crypto.subtle.digest("SHA-256", bytes));
+      const hex = [...digest].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      assertEqual(comparison.policies[1].documentSha256, hex, "the document digest against the browser's SHA-256");
+    }
+    const serialized = JSON.stringify(comparison);
+    for (const finding of scanned) {
+      const span = fixture.input.slice(finding.start, finding.end);
+      assert(span.length < 12 || !serialized.includes(span.slice(0, 12)), "the comparison carries matched text");
+    }
+    let thrown;
+    try {
+      compareActionPolicies([fixture.input], { policies: [{ kind: "default" }] });
+    } catch (error) {
+      thrown = error;
+    }
+    assertEqual(thrown?.code, "INVALID_INPUT", "a chunk array as comparison input");
   });
 
   check("a policy callback sees a frozen finding with numeric offsets", () => {

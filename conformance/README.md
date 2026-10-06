@@ -182,6 +182,55 @@ depend on `src/`.
   than literal text, the same provenance idea
   [Mutation provenance](#mutation-provenance) uses for a reproducible case
   too large to commit as data.
+- [`fixtures/action-policy-compare-v1.json`](./fixtures/action-policy-compare-v1.json) —
+  the explain-and-compare truth table (issue #1220,
+  `decision-explain-and-compare-action-policies-over-one-detection-pass`). It is
+  data only: 8 cases (all four actions, the `default` rule action, no rule
+  matched, the default side, a callback side, two callbacks in side-by-side
+  order, an overlap loser that is never reported, an obfuscated finding), 7
+  error cases (callback failure with no partial result and exact call sequence,
+  zero and five sides, both whole-input bounds), four policy-document SHA-256
+  digests and eight host obligations. `base` is a sentinel each runner resolves
+  from its own default evaluation, so the file copies no part of the default
+  table. The Rust core runs it
+  (`crates/secret-scan-core/tests/action_policy_compare.rs`) and the CLI runs the
+  plumbing; each binding that ships the primitive runs it. The Node addon and the
+  WebAssembly artifact (through its Node glue) run it, through their raw exports
+  and through the published package on top of each, in the artifact-qualification
+  workflow through `scripts/lib/action-policy-compare-reference.mjs` (issue
+  #1220): every case, error and digest, the host obligations a JavaScript surface
+  can observe (`detection-runs-once` cannot be, and is counted as such),
+  enforcement parity against the surface's own `scan`, that a comparison leaves
+  enforcement output and callback logs unchanged, and a canonical result digest
+  that the addon and WebAssembly runs of one profile must share. On `common`,
+  where the fixture's findings are not all detected, the fixture's own
+  expectations are skipped and counted while every check that does not depend on
+  them still runs. The Python binding runs the fixture in its own tests.
+- [`fixtures/action-policy-v1.json`](./fixtures/action-policy-v1.json) —
+  the revision 1 declarative action policy truth table (issue #1217,
+  `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+  It is data only. The Rust core runs it for semantics
+  (`crates/secret-scan-core/tests/action_policy_conformance.rs`); the Node addon
+  and the WebAssembly artifact (through its Node glue) run it, through their raw
+  exports and through the published package on top of each, in the
+  artifact-qualification workflow through `scripts/lib/action-policy-reference.mjs`
+  (issue #1219). A JavaScript surface cannot construct a finding without
+  scanning, so it runs the evaluations a synthetic input can produce and
+  reports the rest as not reachable; the raw exports also compare the fixed
+  class and rule index, which the public package hides by design. The Python
+  binding and the CLI have their own runners. It holds named synthetic finding
+  metadata, the policy documents, 37 evaluations (matched rule, unmatched
+  fallback, unknown type, all four actions, the `default` rule action, AND,
+  set membership and an ordering conflict in both orders), one rejection per
+  fixed class plus additional rejections, accepted edge documents at every
+  bound, five end-to-end cases with UTF-8 byte offsets, and the host
+  obligations (legacy callback, mutual exclusion, no process-global slot). Like
+  the ruleset fixture it is not in the canonical `input`/`expected[]` shape and
+  is not registered with `schema.ts`. `base` is a sentinel, not a literal
+  action: a runner resolves it through its own surface's default evaluation, so
+  the file copies no part of the default table, and `baseAnchors` checks that
+  resolution. The oversized, rule-count and set-size documents are
+  generator-described (`synthesis`) rather than literal text.
 - [`fixtures/common-profile-expectations.json`](./fixtures/common-profile-expectations.json) —
   the reviewed findings of the `common` detector profile for every evaluated
   `synchronous-corpus.json` fixture, by id

@@ -125,6 +125,27 @@ pub fn read_file_bytes(path: &Path) -> Result<Vec<u8>, Failure> {
     read_bounded_bytes(file, MAX_INPUT_BYTES)
 }
 
+/// Reads an action policy file, never more than
+/// [`redact_secret::MAX_ACTION_POLICY_BYTES`] plus one byte. The extra byte is
+/// what lets the core, not the CLI, report `ACTION_POLICY_TOO_LARGE` for a file
+/// over the bound, so the size rule exists in one place and a huge or endless
+/// file is never held in memory.
+///
+/// # Errors
+///
+/// [`Failure::ReadFailed`] when the file cannot be opened or read.
+pub fn read_action_policy_bytes(path: &Path) -> Result<Vec<u8>, Failure> {
+    let file = File::open(path).map_err(|_| Failure::ReadFailed)?;
+    let ceiling = u64::try_from(redact_secret::MAX_ACTION_POLICY_BYTES)
+        .unwrap_or(u64::MAX)
+        .saturating_add(1);
+    let mut bytes = Vec::new();
+    file.take(ceiling)
+        .read_to_end(&mut bytes)
+        .map_err(|_| Failure::ReadFailed)?;
+    Ok(bytes)
+}
+
 /// Reads `reader` to the end, bounded by `max_bytes` and decoded as UTF-8.
 ///
 /// # Errors

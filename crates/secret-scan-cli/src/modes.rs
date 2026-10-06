@@ -16,13 +16,14 @@ use std::io::{ErrorKind, Read, Write};
 use std::path::Path;
 
 use redact_secret::{
-    DefaultPolicy, DetectorRegistry, Finding, IncrementalSanitizer, ScanResult,
-    default_placeholder_formatter, load_ruleset, scan, scan_and_redact,
+    ActionComparison, ActionPolicy, ComparedPolicy, DefaultPolicy, DetectorRegistry, Finding,
+    IncrementalPolicy, IncrementalSanitizer, Policy, ScanResult, compare_action_policies,
+    default_placeholder_formatter, load_action_policy, load_ruleset, scan, scan_and_redact,
 };
 
 use crate::args::Source;
 use crate::failure::Failure;
-use crate::input::{Utf8Stream, read_file_bytes, read_file_text};
+use crate::input::{Utf8Stream, read_action_policy_bytes, read_file_bytes, read_file_text};
 use crate::limits::{READ_CHUNK_BYTES, incremental_limits};
 use crate::report::{Report, SafeFinding};
 
@@ -44,6 +45,57 @@ pub fn load_ruleset_file(path: &Path) -> Result<Vec<u8>, Failure> {
     let bytes = read_file_bytes(path)?;
     load_ruleset(&bytes).map_err(Failure::from)?;
     Ok(bytes)
+}
+
+/// Reads `path` and loads the action policy it holds, so a rejected
+/// `--action-policy` file fails the whole run before any source is touched
+/// rather than surfacing as a per-source failure.
+///
+/// The core, not the CLI, performs every size, grammar and vocabulary check
+/// (`redact_secret::load_action_policy`). The read is bounded by the core's
+/// own limit plus one byte, so an oversized file is rejected by the core with
+/// its fixed class.
+///
+/// # Errors
+///
+/// [`Failure::ReadFailed`] when the file cannot be read, and
+/// [`Failure::ActionPolicy`] when the core rejects it.
+pub fn load_action_policy_file(path: &Path) -> Result<ActionPolicy, Failure> {
+    let bytes = read_action_policy_bytes(path)?;
+    load_action_policy(&bytes).map_err(Failure::from)
+}
+
+/// The whole-input policy for a run: the loaded action policy, or the default.
+fn whole_policy(action_policy: Option<&ActionPolicy>) -> &dyn Policy {
+    match action_policy {
+        Some(policy) => policy,
+        None => &DefaultPolicy,
+    }
+}
+
+/// The incremental policy a streamed session binds at construction.
+fn session_policy(action_policy: Option<&ActionPolicy>) -> Box<dyn IncrementalPolicy> {
+    match action_policy {
+        Some(policy) => Box::new(policy.clone()),
+        None => Box::new(DefaultPolicy),
+    }
+}
+
+/// Creates the streaming session both modes use: the full built-in set with the
+/// run's PII selection, the run's policy, and the default placeholder
+/// formatter.
+fn stream_session(
+    selection: &redact_secret::PiiSelection,
+    action_policy: Option<&ActionPolicy>,
+) -> Result<IncrementalSanitizer, Failure> {
+    Ok(
+        IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
+            incremental_limits()?,
+            selection,
+            session_policy(action_policy),
+            Box::new(default_placeholder_formatter),
+        )?,
+    )
 }
 
 /// Builds a registry over the built-in detectors, plus every detector
@@ -70,6 +122,7 @@ pub fn check(
     sources: &[Source],
     stdin: &mut dyn Read,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&ActionPolicy>,
     selection: &redact_secret::PiiSelection,
 ) -> Report {
     let mut report = Report::new();
@@ -80,7 +133,14 @@ pub fn check(
     let mut registry = None;
     for source in sources {
         let identity = source.identity();
-        match check_source(source, stdin, ruleset, selection, &mut registry) {
+        match check_source(
+            source,
+            stdin,
+            ruleset,
+            action_policy,
+            selection,
+            &mut registry,
+        ) {
             Ok(findings) => report.push_source(identity, findings),
             Err(failure) => report.push_failure(identity, failure),
         }
@@ -92,6 +152,7 @@ fn check_source(
     source: &Source,
     stdin: &mut dyn Read,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&ActionPolicy>,
     selection: &redact_secret::PiiSelection,
     registry: &mut Option<DetectorRegistry>,
 ) -> Result<Vec<SafeFinding>, Failure> {
@@ -100,19 +161,19 @@ fn check_source(
         // (its incremental session accepts no custom detector), so `ruleset`
         // is always `None` on this path; nothing here needs to branch on it.
         Source::Stdin => {
-            let mut session =
-                IncrementalSanitizer::with_built_in_and_pii(incremental_limits()?, selection)?;
+            let mut session = stream_session(selection, action_policy)?;
             // Check mode never emits text. The sanitized text each closed
             // unit produces is dropped with the result that carried it.
             stream(stdin, &mut session, &mut |_sanitized| Ok(()))
         }
-        Source::File(path) => check_file(path, ruleset, selection, registry),
+        Source::File(path) => check_file(path, ruleset, action_policy, selection, registry),
     }
 }
 
 fn check_file(
     path: &Path,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&ActionPolicy>,
     selection: &redact_secret::PiiSelection,
     registry: &mut Option<DetectorRegistry>,
 ) -> Result<Vec<SafeFinding>, Failure> {
@@ -121,9 +182,42 @@ fn check_file(
         empty => empty.insert(registry_for(ruleset, selection)?),
     };
     let text = read_file_text(path)?;
-    let findings = scan(&text, registry, &DefaultPolicy)?;
+    let findings = scan(&text, registry, whole_policy(action_policy))?;
     drop(text);
     Ok(collect(&findings))
+}
+
+/// Reads `path` whole and compares the baseline and every candidate policy
+/// over one detection pass (`redact_secret::compare_action_policies`).
+///
+/// This is an observation. It reads the file, detects once, and evaluates each
+/// policy on the same finalized findings; nothing is redacted and nothing is
+/// written. Standard input is never compared: it is streamed through an
+/// incremental session under enforcement, and a comparison must not change that
+/// path's callback count, order or finalization.
+///
+/// # Errors
+///
+/// Every failure that stops the run, with no partial comparison: the file read,
+/// the registry build, and every core error `compare_action_policies` reports.
+pub fn compare(
+    path: &Path,
+    ruleset: Option<&[u8]>,
+    baseline: Option<&ActionPolicy>,
+    candidates: &[ActionPolicy],
+    selection: &redact_secret::PiiSelection,
+) -> Result<ActionComparison, Failure> {
+    let registry = registry_for(ruleset, selection)?;
+    let text = read_file_text(path)?;
+    let mut sides: Vec<ComparedPolicy<'_>> = Vec::with_capacity(1 + candidates.len());
+    sides.push(match baseline {
+        Some(policy) => ComparedPolicy::ActionPolicy(policy),
+        None => ComparedPolicy::Default,
+    });
+    sides.extend(candidates.iter().map(ComparedPolicy::ActionPolicy));
+    let comparison = compare_action_policies(&text, &registry, &sides)?;
+    drop(text);
+    Ok(comparison)
 }
 
 /// Writes the sanitized form of `source` to `out`.
@@ -147,14 +241,14 @@ pub fn redact(
     stdin: &mut dyn Read,
     out: &mut dyn Write,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&ActionPolicy>,
     selection: &redact_secret::PiiSelection,
 ) -> Result<(), Failure> {
     match source {
         // `args::parse` refuses `--ruleset` combined with standard input;
         // see `check_source`'s identical note.
         Source::Stdin => {
-            let mut session =
-                IncrementalSanitizer::with_built_in_and_pii(incremental_limits()?, selection)?;
+            let mut session = stream_session(selection, action_policy)?;
             stream(stdin, &mut session, &mut |sanitized| {
                 write_text(out, sanitized)
             })?;
@@ -166,7 +260,7 @@ pub fn redact(
             let result: ScanResult = scan_and_redact(
                 &text,
                 &registry,
-                &DefaultPolicy,
+                whole_policy(action_policy),
                 &default_placeholder_formatter,
             )?;
             drop(text);

@@ -81,11 +81,17 @@ pub enum SecretScanErrorCode {
     PiiSelectorUnavailable,
     /// PII initialization conflicts with the already active selection.
     PiiActivationConflict,
+    /// A caller-supplied declarative action policy was rejected while loading
+    /// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+    /// The fixed rejection class and the rule index are carried separately by
+    /// [`ActionPolicyError`](crate::ActionPolicyError), never by this code
+    /// alone.
+    InvalidActionPolicy,
 }
 
 impl SecretScanErrorCode {
     /// Every code, in declaration order.
-    pub const ALL: [Self; 22] = [
+    pub const ALL: [Self; 23] = [
         Self::InvalidInput,
         Self::InvalidOptions,
         Self::InvalidDetector,
@@ -108,6 +114,7 @@ impl SecretScanErrorCode {
         Self::PiiSelectorUnsupported,
         Self::PiiSelectorUnavailable,
         Self::PiiActivationConflict,
+        Self::InvalidActionPolicy,
     ];
 
     /// The stable `SCREAMING_SNAKE_CASE` code string.
@@ -136,6 +143,7 @@ impl SecretScanErrorCode {
             Self::PiiSelectorUnsupported => "PII_SELECTOR_UNSUPPORTED",
             Self::PiiSelectorUnavailable => "PII_SELECTOR_UNAVAILABLE",
             Self::PiiActivationConflict => "PII_ACTIVATION_CONFLICT",
+            Self::InvalidActionPolicy => "INVALID_ACTION_POLICY",
         }
     }
 
@@ -165,6 +173,7 @@ impl SecretScanErrorCode {
             Self::PiiSelectorUnsupported => "PII jurisdiction or family is unsupported.",
             Self::PiiSelectorUnavailable => "PII selection is unavailable in this artifact.",
             Self::PiiActivationConflict => "PII activation is already initialized differently.",
+            Self::InvalidActionPolicy => "The supplied action policy is invalid.",
         }
     }
 }
@@ -319,6 +328,10 @@ mod tests {
             (
                 "PII_ACTIVATION_CONFLICT",
                 "PII activation is already initialized differently.",
+            ),
+            (
+                "INVALID_ACTION_POLICY",
+                "The supplied action policy is invalid.",
             ),
         ];
         assert_eq!(SecretScanErrorCode::ALL.len(), expected.len());

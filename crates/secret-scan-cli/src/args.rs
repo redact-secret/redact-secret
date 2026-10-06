@@ -8,9 +8,15 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 use crate::failure::{
-    Failure, JSON_WITH_REDACT, PII_MISSING_SELECTOR, PRINT_PII_STANDALONE, REDACT_ONE_PATH,
-    RULESET_MISSING_PATH, RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
+    ACTION_POLICY_MISSING_PATH, ACTION_POLICY_REPEATED, COMPARE_MISSING_PATH, COMPARE_ONE_PATH,
+    COMPARE_REQUIRES_FILE, COMPARE_TOO_MANY, COMPARE_WITH_REDACT, Failure, JSON_WITH_REDACT,
+    PII_MISSING_SELECTOR, PRINT_PII_STANDALONE, REDACT_ONE_PATH, RULESET_MISSING_PATH,
+    RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
 };
+
+/// The most candidates one comparison takes: with the baseline, the core's
+/// `MAX_COMPARED_POLICIES`.
+const MAX_CANDIDATES: usize = redact_secret::MAX_COMPARED_POLICIES - 1;
 
 /// The identity standard input reports as in a check report.
 pub const STDIN_IDENTITY: &str = "<stdin>";
@@ -47,6 +53,24 @@ pub enum Format {
     Json,
 }
 
+/// One `--compare-action-policy` run.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CompareRequest {
+    /// The single file to detect over, once.
+    pub source: PathBuf,
+    /// How to render the report.
+    pub format: Format,
+    /// The path `--ruleset` named, if any.
+    pub ruleset: Option<PathBuf>,
+    /// The path `--action-policy` named: the baseline. The default evaluation
+    /// when absent.
+    pub baseline: Option<PathBuf>,
+    /// The paths `--compare-action-policy` named, in order (1 to 3).
+    pub candidates: Vec<PathBuf>,
+    /// Repeatable PII selectors.
+    pub selectors: Vec<String>,
+}
+
 /// What the parsed command line asks the binary to do.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Command {
@@ -64,15 +88,24 @@ pub enum Command {
         format: Format,
         /// The path `--ruleset` named, if any.
         ruleset: Option<PathBuf>,
+        /// The path `--action-policy` named, if any.
+        action_policy: Option<PathBuf>,
         /// Repeatable PII selectors.
         selectors: Vec<String>,
     },
+    /// Evaluate the baseline and every candidate action policy over the same
+    /// finalized findings of one file, and report the actions. An
+    /// observation: nothing is redacted and the exit code never reflects
+    /// enforcement.
+    Compare(CompareRequest),
     /// Write the sanitized form of one source to standard output.
     Redact {
         /// The single source to sanitize.
         source: Source,
         /// The path `--ruleset` named, if any.
         ruleset: Option<PathBuf>,
+        /// The path `--action-policy` named, if any.
+        action_policy: Option<PathBuf>,
         /// Repeatable PII selectors.
         selectors: Vec<String>,
     },
@@ -85,8 +118,9 @@ pub enum Command {
 /// Returns [`Failure::Usage`] for an unrecognized option, for `--help` or
 /// `--version` alongside another argument, for `--json` with `--redact`, for
 /// `--redact` with more than one path, for `--ruleset` given more than once
-/// or with no path following it, and for `--ruleset` with no explicit file
-/// path (standard input's incremental session accepts no custom detector).
+/// or with no path following it, for `--ruleset` with no explicit file
+/// path (standard input's incremental session accepts no custom detector), and
+/// for `--action-policy` given more than once or with no path following it.
 pub fn parse<I>(args: I) -> Result<Command, Failure>
 where
     I: IntoIterator<Item = OsString>,
@@ -100,35 +134,45 @@ where
         }
     }
 
-    let mut redact = false;
-    let mut json = false;
+    let mut parsed = Parsed::default();
     let mut paths_only = false;
-    let mut ruleset: Option<PathBuf> = None;
-    let mut selectors = Vec::new();
-    let mut print_pii_activation = false;
-    let mut paths: Vec<PathBuf> = Vec::new();
 
     let mut args = args.into_iter();
     while let Some(arg) = args.next() {
         if paths_only || arg.as_encoded_bytes().first() != Some(&b'-') {
-            paths.push(PathBuf::from(arg));
+            parsed.paths.push(PathBuf::from(arg));
             continue;
         }
         match arg.to_str() {
             Some("--") => paths_only = true,
-            Some("--redact") => redact = true,
-            Some("--json") => json = true,
-            Some("--print-pii-activation") => print_pii_activation = true,
+            Some("--redact") => parsed.redact = true,
+            Some("--json") => parsed.json = true,
+            Some("--print-pii-activation") => parsed.print_pii_activation = true,
             Some("--pii") => {
                 let selector = args.next().ok_or(Failure::Usage(PII_MISSING_SELECTOR))?;
-                selectors.push(selector.into_string().map_err(|_| {
+                parsed.selectors.push(selector.into_string().map_err(|_| {
                     Failure::Core(redact_secret::SecretScanErrorCode::PiiSelectorInvalid)
                 })?);
             }
             Some("--ruleset") => {
                 let path = args.next().ok_or(Failure::Usage(RULESET_MISSING_PATH))?;
-                if ruleset.replace(PathBuf::from(path)).is_some() {
+                if parsed.ruleset.replace(PathBuf::from(path)).is_some() {
                     return Err(Failure::Usage(RULESET_REPEATED));
+                }
+            }
+            Some("--action-policy") => {
+                let path = args
+                    .next()
+                    .ok_or(Failure::Usage(ACTION_POLICY_MISSING_PATH))?;
+                if parsed.action_policy.replace(PathBuf::from(path)).is_some() {
+                    return Err(Failure::Usage(ACTION_POLICY_REPEATED));
+                }
+            }
+            Some("--compare-action-policy") => {
+                let path = args.next().ok_or(Failure::Usage(COMPARE_MISSING_PATH))?;
+                parsed.candidates.push(PathBuf::from(path));
+                if parsed.candidates.len() > MAX_CANDIDATES {
+                    return Err(Failure::Usage(COMPARE_TOO_MANY));
                 }
             }
             Some("--help" | "-h" | "--version" | "-V") => {
@@ -137,47 +181,131 @@ where
             _ => return Err(Failure::Usage(UNKNOWN_OPTION)),
         }
     }
+    parsed.into_command()
+}
 
-    if print_pii_activation {
-        if redact || json || ruleset.is_some() || !paths.is_empty() {
-            return Err(Failure::Usage(PRINT_PII_STANDALONE));
-        }
-        return Ok(Command::PiiActivation { selectors });
-    }
+/// Everything the option loop collected, before it is judged as one command.
+#[derive(Default)]
+struct Parsed {
+    redact: bool,
+    json: bool,
+    print_pii_activation: bool,
+    ruleset: Option<PathBuf>,
+    action_policy: Option<PathBuf>,
+    candidates: Vec<PathBuf>,
+    selectors: Vec<String>,
+    paths: Vec<PathBuf>,
+}
 
-    if redact {
-        if json {
-            return Err(Failure::Usage(JSON_WITH_REDACT));
-        }
-        let mut paths = paths.into_iter();
-        let source = match (paths.next(), paths.next()) {
-            (None, _) if ruleset.is_some() => return Err(Failure::Usage(RULESET_REQUIRES_FILE)),
-            (None, _) => Source::Stdin,
-            (Some(path), None) => Source::File(path),
-            (Some(_), Some(_)) => return Err(Failure::Usage(REDACT_ONE_PATH)),
-        };
-        return Ok(Command::Redact {
-            source,
+impl Parsed {
+    /// Chooses the one command the collected options describe.
+    fn into_command(self) -> Result<Command, Failure> {
+        let Self {
+            redact,
+            json,
+            print_pii_activation,
             ruleset,
+            action_policy,
+            candidates,
             selectors,
-        });
-    }
+            paths,
+        } = self;
 
-    let sources = if paths.is_empty() {
-        if ruleset.is_some() {
-            return Err(Failure::Usage(RULESET_REQUIRES_FILE));
+        if print_pii_activation {
+            let other_inputs = [
+                redact,
+                json,
+                ruleset.is_some(),
+                action_policy.is_some(),
+                !candidates.is_empty(),
+                !paths.is_empty(),
+            ];
+            if other_inputs.contains(&true) {
+                return Err(Failure::Usage(PRINT_PII_STANDALONE));
+            }
+            return Ok(Command::PiiActivation { selectors });
         }
-        vec![Source::Stdin]
-    } else {
-        paths.into_iter().map(Source::File).collect()
+
+        if !candidates.is_empty() {
+            return compare_command(
+                redact,
+                json,
+                paths,
+                (ruleset, action_policy),
+                (candidates, selectors),
+            );
+        }
+
+        if redact {
+            if json {
+                return Err(Failure::Usage(JSON_WITH_REDACT));
+            }
+            let mut paths = paths.into_iter();
+            let source = match (paths.next(), paths.next()) {
+                (None, _) if ruleset.is_some() => {
+                    return Err(Failure::Usage(RULESET_REQUIRES_FILE));
+                }
+                (None, _) => Source::Stdin,
+                (Some(path), None) => Source::File(path),
+                (Some(_), Some(_)) => return Err(Failure::Usage(REDACT_ONE_PATH)),
+            };
+            return Ok(Command::Redact {
+                source,
+                ruleset,
+                action_policy,
+                selectors,
+            });
+        }
+
+        let sources = if paths.is_empty() {
+            if ruleset.is_some() {
+                return Err(Failure::Usage(RULESET_REQUIRES_FILE));
+            }
+            vec![Source::Stdin]
+        } else {
+            paths.into_iter().map(Source::File).collect()
+        };
+        let format = if json { Format::Json } else { Format::Text };
+        Ok(Command::Check {
+            sources,
+            format,
+            ruleset,
+            action_policy,
+            selectors,
+        })
+    }
+}
+
+/// The command a `--compare-action-policy` command line asks for.
+///
+/// `policies` is the `--ruleset` path and the baseline `--action-policy` path;
+/// `rest` is the candidate paths and the PII selectors.
+fn compare_command(
+    redact: bool,
+    json: bool,
+    paths: Vec<PathBuf>,
+    policies: (Option<PathBuf>, Option<PathBuf>),
+    rest: (Vec<PathBuf>, Vec<String>),
+) -> Result<Command, Failure> {
+    if redact {
+        return Err(Failure::Usage(COMPARE_WITH_REDACT));
+    }
+    let (ruleset, baseline) = policies;
+    let (candidates, selectors) = rest;
+    let mut paths = paths.into_iter();
+    let source = match (paths.next(), paths.next()) {
+        (None, _) => return Err(Failure::Usage(COMPARE_REQUIRES_FILE)),
+        (Some(path), None) => path,
+        (Some(_), Some(_)) => return Err(Failure::Usage(COMPARE_ONE_PATH)),
     };
-    let format = if json { Format::Json } else { Format::Text };
-    Ok(Command::Check {
-        sources,
-        format,
+    Ok(Command::Compare(CompareRequest {
+        source,
+        format: if json { Format::Json } else { Format::Text },
         ruleset,
+        baseline,
+        candidates,
         selectors,
-    })
+    }))
 }
 
 #[cfg(test)]
@@ -200,6 +328,7 @@ mod tests {
                 sources: vec![Source::Stdin],
                 format: Format::Text,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -213,6 +342,7 @@ mod tests {
                 sources: vec![file("b.txt"), file("a.txt")],
                 format: Format::Text,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -226,6 +356,7 @@ mod tests {
                 sources: vec![file("a.txt")],
                 format: Format::Json,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -238,6 +369,7 @@ mod tests {
             Command::Redact {
                 source: Source::Stdin,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -246,6 +378,7 @@ mod tests {
             Command::Redact {
                 source: file("a.txt"),
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -259,6 +392,7 @@ mod tests {
                 sources: vec![file("--json")],
                 format: Format::Text,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -272,6 +406,7 @@ mod tests {
                 sources: vec![file("a.txt")],
                 format: Format::Text,
                 ruleset: Some(PathBuf::from("rules.txt")),
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -280,6 +415,7 @@ mod tests {
             Command::Redact {
                 source: file("a.txt"),
                 ruleset: Some(PathBuf::from("rules.txt")),
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -306,6 +442,150 @@ mod tests {
         assert_eq!(
             parse_args(&["--ruleset", "a.txt", "--ruleset", "b.txt", "c.txt"]),
             Err(Failure::Usage(RULESET_REPEATED))
+        );
+    }
+
+    #[test]
+    fn action_policy_names_a_path_alongside_any_source_in_either_mode() {
+        assert_eq!(
+            parse_args(&["--action-policy", "p.json", "a.txt"]).unwrap(),
+            Command::Check {
+                sources: vec![file("a.txt")],
+                format: Format::Text,
+                ruleset: None,
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+        assert_eq!(
+            parse_args(&["--action-policy", "p.json"]).unwrap(),
+            Command::Check {
+                sources: vec![Source::Stdin],
+                format: Format::Text,
+                ruleset: None,
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+        assert_eq!(
+            parse_args(&["--redact", "--action-policy", "p.json"]).unwrap(),
+            Command::Redact {
+                source: Source::Stdin,
+                ruleset: None,
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+        assert_eq!(
+            parse_args(&[
+                "--redact",
+                "--ruleset",
+                "r.txt",
+                "--action-policy",
+                "p.json",
+                "a.txt"
+            ])
+            .unwrap(),
+            Command::Redact {
+                source: file("a.txt"),
+                ruleset: Some(PathBuf::from("r.txt")),
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+    }
+
+    #[test]
+    fn action_policy_rejects_a_missing_value_and_a_repeated_flag() {
+        assert_eq!(
+            parse_args(&["--action-policy"]),
+            Err(Failure::Usage(ACTION_POLICY_MISSING_PATH))
+        );
+        assert_eq!(
+            parse_args(&["--action-policy", "a.json", "--action-policy", "b.json"]),
+            Err(Failure::Usage(ACTION_POLICY_REPEATED))
+        );
+        assert_eq!(
+            parse_args(&["--print-pii-activation", "--action-policy", "a.json"]),
+            Err(Failure::Usage(PRINT_PII_STANDALONE))
+        );
+    }
+
+    #[test]
+    fn compare_takes_one_file_a_baseline_and_up_to_three_candidates() {
+        assert_eq!(
+            parse_args(&[
+                "--action-policy",
+                "base.json",
+                "--compare-action-policy",
+                "a.json",
+                "--compare-action-policy",
+                "b.json",
+                "--json",
+                "in.txt"
+            ])
+            .unwrap(),
+            Command::Compare(CompareRequest {
+                source: PathBuf::from("in.txt"),
+                format: Format::Json,
+                ruleset: None,
+                baseline: Some(PathBuf::from("base.json")),
+                candidates: vec![PathBuf::from("a.json"), PathBuf::from("b.json")],
+                selectors: Vec::new(),
+            })
+        );
+        assert_eq!(
+            parse_args(&["--compare-action-policy", "a.json", "in.txt"]).unwrap(),
+            Command::Compare(CompareRequest {
+                source: PathBuf::from("in.txt"),
+                format: Format::Text,
+                ruleset: None,
+                baseline: None,
+                candidates: vec![PathBuf::from("a.json")],
+                selectors: Vec::new(),
+            })
+        );
+    }
+
+    #[test]
+    fn compare_rejects_every_unsupported_shape_with_a_fixed_reason() {
+        assert_eq!(
+            parse_args(&["--compare-action-policy"]),
+            Err(Failure::Usage(COMPARE_MISSING_PATH))
+        );
+        assert_eq!(
+            parse_args(&["--compare-action-policy", "a.json"]),
+            Err(Failure::Usage(COMPARE_REQUIRES_FILE))
+        );
+        assert_eq!(
+            parse_args(&["--compare-action-policy", "a.json", "x.txt", "y.txt"]),
+            Err(Failure::Usage(COMPARE_ONE_PATH))
+        );
+        assert_eq!(
+            parse_args(&["--redact", "--compare-action-policy", "a.json", "x.txt"]),
+            Err(Failure::Usage(COMPARE_WITH_REDACT))
+        );
+        assert_eq!(
+            parse_args(&[
+                "--compare-action-policy",
+                "a",
+                "--compare-action-policy",
+                "b",
+                "--compare-action-policy",
+                "c",
+                "--compare-action-policy",
+                "d",
+                "x.txt"
+            ]),
+            Err(Failure::Usage(COMPARE_TOO_MANY))
+        );
+        assert_eq!(
+            parse_args(&[
+                "--print-pii-activation",
+                "--compare-action-policy",
+                "a.json"
+            ]),
+            Err(Failure::Usage(PRINT_PII_STANDALONE))
         );
     }
 

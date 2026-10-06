@@ -148,7 +148,7 @@ jobs:
                   pr=true
                   break
                   ;;
-                scripts/qualify-golden-path.mjs|scripts/lib/candidate-install.mjs|scripts/lib/ruleset-reference.mjs)
+                scripts/qualify-golden-path.mjs|scripts/lib/candidate-install.mjs|scripts/lib/ruleset-reference.mjs|scripts/lib/action-policy-reference.mjs|scripts/lib/action-policy-compare-reference.mjs)
                   pr=true
                   break
                   ;;

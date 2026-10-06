@@ -76,9 +76,10 @@ contract, not a gap: the fixed medium confidence is what keeps a ruleset from
 outranking a built-in, and the reference fixture pins `action: warn` for every
 ruleset detection on every surface. To redact a ruleset detection, supply a
 policy that returns `redact` for its detector id (Rust, JavaScript, Python).
-The CLI has no policy hook, so it can report a ruleset detection in check mode
+Without `--action-policy`, the CLI can report a ruleset detection in check mode
 but not remove it in redact mode: `--redact --ruleset` still runs, and
-changes nothing for ruleset matches. Check mode flags it either way. A
+changes nothing for ruleset matches. One rule in an
+[action policy](action-policy.md) (`--action-policy`) makes it redact. Check mode flags it either way. A
 caller-set action is out of scope for revision 1.
 
 ## Grammar

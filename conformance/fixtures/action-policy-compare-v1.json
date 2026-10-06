@@ -1,0 +1,790 @@
+{
+  "$schema": "action-policy-compare-v1",
+  "schemaVersion": 1,
+  "contract": "decision-explain-and-compare-action-policies-over-one-detection-pass",
+  "description": "The shared conformance fixture for the explain-and-compare primitive (issue #1220). It is data only. A surface that exposes the primitive runs every `case`, `error` and `digest` through its public API and asserts the per-finding actions, bases, rule ids and indexes, the `differs` flag, the per-side counts and the callback call sequence. The Rust core runs it for semantics and the Rust CLI for plumbing. `base` is a sentinel, never a literal action: a runner resolves it by asking its own surface's default evaluation of the same input with no policy (`scan` with the default policy), so this file copies no part of the default table. A runner also asserts, for every `policy` side, that each finding's action equals the action `scan` with that same document yields for that finding (enforcement parity), and that the serialized result contains no byte of the input. Offsets are UTF-8 bytes in the original input; a UTF-16 or code-point surface converts them. Every input and document is synthetic.",
+  "revision": 1,
+  "baseSentinel": "base",
+  "ruleset": "ruleset-revision: 1\ndetector: acme-alnum-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n",
+  "limits": {
+    "maxPolicies": 4,
+    "defaultMaxFindings": 50000,
+    "defaultMaxInputBytes": 67108864
+  },
+  "basisNames": [
+    "rule",
+    "rule-default",
+    "no-rule-matched",
+    "default-policy",
+    "callback"
+  ],
+  "sideKinds": [
+    "default",
+    "policy",
+    "callback"
+  ],
+  "policies": [
+    {
+      "id": "empty-rules",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[]}"
+    },
+    {
+      "id": "empty-rules-spaced",
+      "documentText": "{\n  \"actionPolicyRevision\": 1,\n  \"base\": \"default\",\n  \"rules\": []\n}"
+    },
+    {
+      "id": "four-actions",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"redact-acme\",\"match\":{\"type\":[\"acme-alnum-token\"]},\"action\":\"redact\"},{\"id\":\"allow-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"allow\"},{\"id\":\"warn-private-key\",\"match\":{\"type\":[\"private_key\"]},\"action\":\"warn\"}]}"
+    },
+    {
+      "id": "block-high",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"block-high\",\"match\":{\"confidence\":[\"high\"]},\"action\":\"block\"}]}"
+    },
+    {
+      "id": "default-carve-out",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"keep-default-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"default\"},{\"id\":\"allow-high\",\"match\":{\"confidence\":[\"high\"]},\"action\":\"allow\"}]}"
+    },
+    {
+      "id": "explicit-redact-github",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"redact-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"redact\"}]}"
+    },
+    {
+      "id": "allow-bearer",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"allow-bearer\",\"match\":{\"type\":[\"bearer_token\"]},\"action\":\"allow\"}]}"
+    },
+    {
+      "id": "block-obfuscated-github",
+      "documentText": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"block-obfuscated-github\",\"match\":{\"type\":[\"github_token\"],\"obfuscation\":[\"invisible-characters\"]},\"action\":\"block\"}]}"
+    }
+  ],
+  "digests": [
+    {
+      "policy": "empty-rules",
+      "documentSha256": "8d7435054449cc35e59598f47e5c2a586d7bf751748f5b6867453f3dad667786"
+    },
+    {
+      "policy": "empty-rules-spaced",
+      "documentSha256": "898e1162b45450afb2300826cde77a5fd0476ceda33cebea33599f412a817b81"
+    },
+    {
+      "policy": "four-actions",
+      "documentSha256": "7deba4da8b8e7c95dbdbe18d99dee6b435b3d639e198626364b9bdb6f135b6ae"
+    },
+    {
+      "policy": "block-high",
+      "documentSha256": "ef83287e416316c8d9d17d07c7b436b29424085f3cb3430f6737afca001094e6"
+    }
+  ],
+  "cases": [
+    {
+      "id": "three-findings-four-policies",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "policy",
+          "policy": "four-actions"
+        },
+        {
+          "kind": "policy",
+          "policy": "block-high"
+        },
+        {
+          "kind": "policy",
+          "policy": "default-carve-out"
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "acme-alnum-token",
+          "detector": "acme-alnum-token",
+          "confidence": "medium",
+          "obfuscation": "none",
+          "start": 0,
+          "end": 28,
+          "expectedDecisions": [
+            {
+              "action": "base",
+              "basis": "default-policy",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "redact",
+              "basis": "rule",
+              "ruleId": "redact-acme",
+              "ruleIndex": 0
+            },
+            {
+              "action": "base",
+              "basis": "no-rule-matched",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "base",
+              "basis": "no-rule-matched",
+              "ruleId": null,
+              "ruleIndex": null
+            }
+          ],
+          "expectedDiffers": true
+        },
+        {
+          "type": "github_token",
+          "detector": "github-token",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 37,
+          "end": 77,
+          "expectedDecisions": [
+            {
+              "action": "base",
+              "basis": "default-policy",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "allow",
+              "basis": "rule",
+              "ruleId": "allow-github",
+              "ruleIndex": 1
+            },
+            {
+              "action": "block",
+              "basis": "rule",
+              "ruleId": "block-high",
+              "ruleIndex": 0
+            },
+            {
+              "action": "base",
+              "basis": "rule-default",
+              "ruleId": "keep-default-github",
+              "ruleIndex": 0
+            }
+          ],
+          "expectedDiffers": true
+        },
+        {
+          "type": "private_key",
+          "detector": "private-key",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 78,
+          "end": 168,
+          "expectedDecisions": [
+            {
+              "action": "base",
+              "basis": "default-policy",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "warn",
+              "basis": "rule",
+              "ruleId": "warn-private-key",
+              "ruleIndex": 2
+            },
+            {
+              "action": "block",
+              "basis": "rule",
+              "ruleId": "block-high",
+              "ruleIndex": 0
+            },
+            {
+              "action": "allow",
+              "basis": "rule",
+              "ruleId": "allow-high",
+              "ruleIndex": 1
+            }
+          ],
+          "expectedDiffers": true
+        }
+      ],
+      "expectedChangedCount": 3,
+      "note": "Covers all four actions, an explicit rule, the `default` rule action, no rule matched, and the default side, over one detection pass. `base` is resolved by each runner from its own default evaluation of the same finding."
+    },
+    {
+      "id": "same-action-different-reason-is-not-a-difference",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n",
+      "sides": [
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "policy",
+          "policy": "empty-rules"
+        },
+        {
+          "kind": "policy",
+          "policy": "explicit-redact-github"
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "github_token",
+          "detector": "github-token",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 8,
+          "end": 48,
+          "expectedDecisions": [
+            {
+              "action": "redact",
+              "basis": "default-policy",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "redact",
+              "basis": "no-rule-matched",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "redact",
+              "basis": "rule",
+              "ruleId": "redact-github",
+              "ruleIndex": 0
+            }
+          ],
+          "expectedDiffers": false
+        }
+      ],
+      "expectedChangedCount": 0,
+      "note": "Three policies reach `redact` by three different reasons. `differs` compares actions only."
+    },
+    {
+      "id": "overlap-loser-is-never-compared",
+      "input": "twilio Authorization: \u0042earer fedcba9876543210fedcba9876543210",
+      "sides": [
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "policy",
+          "policy": "allow-bearer"
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "bearer_token",
+          "detector": "bearer-token",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 29,
+          "end": 61,
+          "expectedDecisions": [
+            {
+              "action": "base",
+              "basis": "default-policy",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "allow",
+              "basis": "rule",
+              "ruleId": "allow-bearer",
+              "ruleIndex": 0
+            }
+          ],
+          "expectedDiffers": true
+        }
+      ],
+      "expectedChangedCount": 1,
+      "note": "Overlap resolution picks bearer_token over the lower twilio_auth_token candidate before any policy runs. The comparison reports the one finalized finding and nothing about the loser."
+    },
+    {
+      "id": "obfuscated-finding-carries-its-signal",
+      "input": "API_KEY=ghp_SYNTHE\u200bTICREVOKED00000000000000000000",
+      "sides": [
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "policy",
+          "policy": "block-obfuscated-github"
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "github_token",
+          "detector": "github-token",
+          "confidence": "high",
+          "obfuscation": "invisible-characters",
+          "start": 8,
+          "end": 51,
+          "expectedDecisions": [
+            {
+              "action": "base",
+              "basis": "default-policy",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "block",
+              "basis": "rule",
+              "ruleId": "block-obfuscated-github",
+              "ruleIndex": 0
+            }
+          ],
+          "expectedDiffers": true
+        }
+      ],
+      "expectedChangedCount": 1,
+      "note": "The input holds one U+200B inside the credential, so the range is in original-input UTF-8 bytes and the finding carries the obfuscation signal the rule matches."
+    },
+    {
+      "id": "no-findings",
+      "input": "nothing to see here\n",
+      "sides": [
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "policy",
+          "policy": "four-actions"
+        }
+      ],
+      "expectedFindings": [],
+      "expectedChangedCount": 0
+    },
+    {
+      "id": "one-side-is-allowed",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n",
+      "sides": [
+        {
+          "kind": "policy",
+          "policy": "four-actions"
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "github_token",
+          "detector": "github-token",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 8,
+          "end": 48,
+          "expectedDecisions": [
+            {
+              "action": "allow",
+              "basis": "rule",
+              "ruleId": "allow-github",
+              "ruleIndex": 1
+            }
+          ],
+          "expectedDiffers": false
+        }
+      ],
+      "expectedChangedCount": 0
+    },
+    {
+      "id": "callback-participates-as-a-side",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "allow",
+            "warn",
+            "redact"
+          ]
+        },
+        {
+          "kind": "policy",
+          "policy": "four-actions"
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "acme-alnum-token",
+          "detector": "acme-alnum-token",
+          "confidence": "medium",
+          "obfuscation": "none",
+          "start": 0,
+          "end": 28,
+          "expectedDecisions": [
+            {
+              "action": "allow",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "redact",
+              "basis": "rule",
+              "ruleId": "redact-acme",
+              "ruleIndex": 0
+            }
+          ],
+          "expectedDiffers": true
+        },
+        {
+          "type": "github_token",
+          "detector": "github-token",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 37,
+          "end": 77,
+          "expectedDecisions": [
+            {
+              "action": "warn",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "allow",
+              "basis": "rule",
+              "ruleId": "allow-github",
+              "ruleIndex": 1
+            }
+          ],
+          "expectedDiffers": true
+        },
+        {
+          "type": "private_key",
+          "detector": "private-key",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 78,
+          "end": 168,
+          "expectedDecisions": [
+            {
+              "action": "redact",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "warn",
+              "basis": "rule",
+              "ruleId": "warn-private-key",
+              "ruleIndex": 2
+            }
+          ],
+          "expectedDiffers": true
+        }
+      ],
+      "expectedChangedCount": 3,
+      "expectedCallSequence": [
+        "A0",
+        "A1",
+        "A2"
+      ],
+      "note": "A callback runs once per finalized finding, in finding order, and a callback decision has no rule and no reason: basis `callback`."
+    },
+    {
+      "id": "callbacks-run-side-by-side-in-finding-order",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "warn",
+            "warn",
+            "warn"
+          ]
+        },
+        {
+          "kind": "callback",
+          "label": "B",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ]
+        }
+      ],
+      "expectedFindings": [
+        {
+          "type": "acme-alnum-token",
+          "detector": "acme-alnum-token",
+          "confidence": "medium",
+          "obfuscation": "none",
+          "start": 0,
+          "end": 28,
+          "expectedDecisions": [
+            {
+              "action": "warn",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "allow",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            }
+          ],
+          "expectedDiffers": true
+        },
+        {
+          "type": "github_token",
+          "detector": "github-token",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 37,
+          "end": 77,
+          "expectedDecisions": [
+            {
+              "action": "warn",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "allow",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            }
+          ],
+          "expectedDiffers": true
+        },
+        {
+          "type": "private_key",
+          "detector": "private-key",
+          "confidence": "high",
+          "obfuscation": "none",
+          "start": 78,
+          "end": 168,
+          "expectedDecisions": [
+            {
+              "action": "warn",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            },
+            {
+              "action": "allow",
+              "basis": "callback",
+              "ruleId": null,
+              "ruleIndex": null
+            }
+          ],
+          "expectedDiffers": true
+        }
+      ],
+      "expectedChangedCount": 3,
+      "expectedCallSequence": [
+        "A0",
+        "A1",
+        "A2",
+        "B0",
+        "B1",
+        "B2"
+      ],
+      "note": "Sides are evaluated one at a time in the order supplied, each over the findings in order, so each callback sees exactly the call sequence `scan` would give it."
+    }
+  ],
+  "errors": [
+    {
+      "id": "callback-failure-fails-the-whole-comparison",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "policy",
+          "policy": "four-actions"
+        },
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ],
+          "failAtFindingIndex": 1
+        }
+      ],
+      "expectedCode": "POLICY_FAILURE",
+      "expectedCallSequence": [
+        "A0",
+        "A1"
+      ],
+      "note": "No partial result. The failing callback is not called for any later finding, and no later side runs."
+    },
+    {
+      "id": "failure-in-the-first-side-skips-the-later-side",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ],
+          "failAtFindingIndex": 0
+        },
+        {
+          "kind": "callback",
+          "label": "B",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ]
+        }
+      ],
+      "expectedCode": "POLICY_FAILURE",
+      "expectedCallSequence": [
+        "A0"
+      ]
+    },
+    {
+      "id": "no-side",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [],
+      "expectedCode": "INVALID_OPTIONS",
+      "expectedCallSequence": []
+    },
+    {
+      "id": "five-sides",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        }
+      ],
+      "expectedCode": "INVALID_OPTIONS",
+      "expectedCallSequence": []
+    },
+    {
+      "id": "an-invalid-side-count-runs-no-detection-and-no-callback",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "sides": [
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ]
+        },
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        },
+        {
+          "kind": "default"
+        }
+      ],
+      "expectedCode": "INVALID_OPTIONS",
+      "expectedCallSequence": []
+    },
+    {
+      "id": "input-over-the-byte-bound",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "limits": {
+        "maxInputBytes": 10,
+        "maxFindings": 100
+      },
+      "sides": [
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ]
+        }
+      ],
+      "expectedCode": "INPUT_LIMIT_EXCEEDED",
+      "expectedCallSequence": []
+    },
+    {
+      "id": "findings-over-the-count-bound",
+      "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n\u002d----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRklYVFVSRQ==\n\u002d----END PRIVATE KEY-----\n",
+      "useRuleset": true,
+      "limits": {
+        "maxInputBytes": 1000000,
+        "maxFindings": 2
+      },
+      "sides": [
+        {
+          "kind": "callback",
+          "label": "A",
+          "returns": [
+            "allow",
+            "allow",
+            "allow"
+          ]
+        }
+      ],
+      "expectedCode": "FINDING_LIMIT_EXCEEDED",
+      "expectedCallSequence": [],
+      "note": "The finding bound fails the call before any policy runs, exactly as `scan` does."
+    }
+  ],
+  "hostObligations": [
+    {
+      "id": "preview-is-not-enforcement",
+      "statement": "A comparison never edits the input and returns no sanitized text and no placeholder. The same input scanned and redacted before and after a comparison yields byte-identical output."
+    },
+    {
+      "id": "detection-runs-once",
+      "statement": "Detection runs once per comparison regardless of the number of sides; a policy cannot change which findings exist."
+    },
+    {
+      "id": "finalized-findings-only",
+      "statement": "The result lists exactly the findings `scan` returns for the same input and detection configuration, in the same order and with the same ids, ranges and metadata."
+    },
+    {
+      "id": "no-plaintext",
+      "statement": "The result carries no input byte, matched value, snippet, hash of either, or score. A policy document's digest is the only digest."
+    },
+    {
+      "id": "detection-identified-separately",
+      "statement": "The result names the detection configuration (activation identity, profile, detector count) apart from every policy binding."
+    },
+    {
+      "id": "callback-bindings-have-no-identity",
+      "statement": "A callback side reports kind `callback` and no document digest."
+    },
+    {
+      "id": "incremental-comparison-is-unsupported",
+      "statement": "No incremental session, stream adapter or chunked comparison exists in v1; a surface exposes the whole-input primitive only."
+    },
+    {
+      "id": "digest-is-over-the-exact-document-bytes",
+      "statement": "A declarative policy's binding is the lowercase SHA-256 of the exact bytes the loader received. A host that serializes a native object digests those serialized bytes; `digests` asserts only raw document text."
+    }
+  ]
+}

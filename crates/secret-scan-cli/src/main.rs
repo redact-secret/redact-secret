@@ -27,6 +27,7 @@
 #![forbid(unsafe_code)]
 
 mod args;
+mod compare_report;
 mod failure;
 mod input;
 mod limits;
@@ -37,7 +38,7 @@ use std::env;
 use std::io::{self, BufWriter, Write};
 use std::process::ExitCode;
 
-use redact_secret::{RANGE_UNIT, VERSION};
+use redact_secret::{MAX_ACTION_POLICY_BYTES, RANGE_UNIT, VERSION};
 
 use args::{Command, Format};
 use failure::Failure;
@@ -45,8 +46,9 @@ use limits::{MAX_BUFFERED_BYTES, MAX_INPUT_BYTES, MAX_MULTILINE_BYTES, MAX_TOKEN
 
 /// The short usage block printed with a rejected command line.
 const USAGE: &str = "\
-usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
-       redact-secret --redact [--ruleset <path>] [--pii <selector>]... [--] [<path>]
+usage: redact-secret [--json] [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>...]
+       redact-secret --redact [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>]
+       redact-secret --compare-action-policy <path>... [--action-policy <path>] [--json] [--ruleset <path>] [--pii <selector>]... [--] <path>
        redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h";
@@ -127,6 +129,7 @@ where
             sources,
             format,
             ruleset,
+            action_policy,
             selectors,
         } => {
             let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
@@ -135,7 +138,17 @@ where
                 .as_deref()
                 .map(modes::load_ruleset_file)
                 .transpose()?;
-            let report = modes::check(&sources, stdin, ruleset.as_deref(), &selection);
+            let action_policy = action_policy
+                .as_deref()
+                .map(modes::load_action_policy_file)
+                .transpose()?;
+            let report = modes::check(
+                &sources,
+                stdin,
+                ruleset.as_deref(),
+                action_policy.as_ref(),
+                &selection,
+            );
             let written = match format {
                 Format::Text => report.write_text(stdout, stderr),
                 Format::Json => report.write_json(stdout),
@@ -155,9 +168,11 @@ where
                 Ok(Outcome::Clean)
             }
         }
+        Command::Compare(request) => run_compare(request, stdout, stderr),
         Command::Redact {
             source,
             ruleset,
+            action_policy,
             selectors,
         } => {
             let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
@@ -166,9 +181,73 @@ where
                 .as_deref()
                 .map(modes::load_ruleset_file)
                 .transpose()?;
-            modes::redact(&source, stdin, stdout, ruleset.as_deref(), &selection)?;
+            let action_policy = action_policy
+                .as_deref()
+                .map(modes::load_action_policy_file)
+                .transpose()?;
+            modes::redact(
+                &source,
+                stdin,
+                stdout,
+                ruleset.as_deref(),
+                action_policy.as_ref(),
+                &selection,
+            )?;
             Ok(Outcome::Clean)
         }
+    }
+}
+
+/// Runs one `--compare-action-policy` invocation: a preview, never enforcement.
+///
+/// Every policy file is loaded, and the whole run fails with nothing on standard
+/// output, before the input is read.
+fn run_compare(
+    request: args::CompareRequest,
+    stdout: &mut dyn Write,
+    stderr: &mut dyn Write,
+) -> Result<Outcome, Failure> {
+    let args::CompareRequest {
+        source,
+        format,
+        ruleset,
+        baseline,
+        candidates,
+        selectors,
+    } = request;
+    let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
+    let selection = redact_secret::PiiSelection::parse(&borrowed)?;
+    let ruleset = ruleset
+        .as_deref()
+        .map(modes::load_ruleset_file)
+        .transpose()?;
+    let baseline = baseline
+        .as_deref()
+        .map(modes::load_action_policy_file)
+        .transpose()?;
+    let candidates = candidates
+        .iter()
+        .map(|path| modes::load_action_policy_file(path))
+        .collect::<Result<Vec<_>, _>>()?;
+    let comparison = modes::compare(
+        &source,
+        ruleset.as_deref(),
+        baseline.as_ref(),
+        &candidates,
+        &selection,
+    )?;
+    let identity = args::Source::File(source).identity();
+    match format {
+        Format::Text => compare_report::write_text(&comparison, &identity, stdout, stderr)?,
+        Format::Json => compare_report::write_json(&comparison, &identity, stdout)?,
+    }
+    // A comparison is a preview: 0 means the policies agree on every finalized
+    // finding, 1 means at least one finding's action differs. Findings
+    // themselves are never a failure here.
+    if compare_report::has_differences(&comparison) {
+        Ok(Outcome::Findings)
+    } else {
+        Ok(Outcome::Clean)
     }
 }
 
@@ -181,12 +260,20 @@ fn write_line(out: &mut dyn Write, text: &str) -> Result<(), Failure> {
 /// Reporting a failure cannot itself fail the run any further: the exit code
 /// is already 2, and there is no other channel left to complain on.
 fn report_failure(stderr: &mut dyn Write, failure: Failure) {
-    let _ = writeln!(
-        stderr,
-        "redact-secret: {}: {}",
-        failure.code(),
-        failure.message()
-    );
+    let _ = match failure.detail() {
+        Some(detail) => writeln!(
+            stderr,
+            "redact-secret: {}: {} ({detail})",
+            failure.code(),
+            failure.message()
+        ),
+        None => writeln!(
+            stderr,
+            "redact-secret: {}: {}",
+            failure.code(),
+            failure.message()
+        ),
+    };
     if matches!(failure, Failure::Usage(_)) {
         let _ = writeln!(stderr, "{USAGE}");
     }
@@ -240,11 +327,44 @@ redact mode
   leaves the text written so far on standard output. That prefix is sanitized,
   but it is not the whole input: check the exit code before using the output.
 
+--action-policy <path>
+                  Available in both modes, with a path or standard input.
+                  Loads a declarative action policy (a JSON document,
+                  actionPolicyRevision 1, at most {MAX_ACTION_POLICY_BYTES} bytes) from <path> and
+                  applies it to every finding in place of the default policy:
+                  the first matching rule picks redact, block, warn or allow,
+                  and a finding no rule matches keeps the default action. A
+                  rejected policy fails the whole run with INVALID_ACTION_POLICY
+                  and its fixed class, and the zero-based rule index when the
+                  violation is inside a rule, before any source is scanned.
+                  Check mode still exits 1 when any finding exists, whatever
+                  its action; redact mode replaces only redact and block spans.
+
+--compare-action-policy <path>
+                  Preview, never enforcement. Repeatable, 1 to 3 times. Reads
+                  exactly one explicit file path, runs detection once, then
+                  evaluates the baseline and every candidate policy on the same
+                  finalized findings. The baseline is --action-policy <path>, or
+                  the default policy when it is absent; the candidates follow
+                  in the order given. For each finding the report names every
+                  policy's action and why: the matched rule id and index, a
+                  `default` rule, or no rule matched. Each policy document is
+                  bound to the SHA-256 of its exact bytes, and the detection
+                  configuration (profile, PII activation, detector count) is
+                  reported apart from every policy. Nothing is redacted and
+                  the input is never echoed. Only finalized findings are
+                  compared: an overlap loser or a suppressed PII alternative is
+                  never reported, and no claim of coverage is made. Standard
+                  input is not accepted (it is streamed under enforcement), and
+                  neither is --redact. Combine with --json for a machine report.
+
 exit codes
   0  check: every source was scanned and nothing was found
      redact: the whole sanitized stream was written
+     compare: the compared policies choose the same action for every finding
   1  check: every source was scanned and at least one finding exists
      redact: never returned
+     compare: at least one finding's action differs between the policies
   2  usage, decoding, or processing failure — including input that is not
      valid UTF-8, which fails closed rather than being scanned in part
 

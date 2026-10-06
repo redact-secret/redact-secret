@@ -92,6 +92,8 @@ export interface NativeIncrementalOptions {
   readonly limits: NativeIncrementalLimits;
   readonly policy?: NativeIncrementalPolicyCallback;
   readonly formatter?: NativeFormatterCallback;
+  /** The bytes of an action policy document; never together with `policy`. */
+  readonly actionPolicy?: Uint8Array;
 }
 
 export interface NativeIncrementalResult {
@@ -104,6 +106,76 @@ export interface NativeIncrementalSanitizer {
   append(chunk: string): NativeIncrementalResult;
   finalize(): NativeIncrementalResult;
   abort(): void;
+}
+
+/**
+ * One side of a comparison as the public wrapper hands it to a binding. A
+ * document is already the exact bytes the core will hash and parse; a
+ * callback is already adapted to safe metadata.
+ */
+export type NativeComparedSide =
+  | { readonly kind: "default" }
+  | { readonly kind: "action-policy"; readonly document: Uint8Array }
+  | { readonly kind: "callback"; readonly callback: NativePolicyCallback };
+
+/**
+ * What a binding returns for a comparison: the same field names on every
+ * runtime, ranges already UTF-16 code units. An absent value may be `null` or
+ * missing; the wrapper normalizes it to the one public shape.
+ */
+export interface NativeActionComparison {
+  readonly detection: {
+    readonly activationIdentity: string;
+    readonly profile?: string | null;
+    readonly detectorCount: number;
+  };
+  readonly sides: readonly {
+    readonly kind: string;
+    readonly documentSha256?: string | null;
+    readonly redact: number;
+    readonly block: number;
+    readonly warn: number;
+    readonly allow: number;
+  }[];
+  readonly changedCount: number;
+  readonly findings: readonly {
+    readonly id: string;
+    readonly type: string;
+    readonly detector: string;
+    readonly confidence: string;
+    readonly obfuscation: string;
+    readonly start: number;
+    readonly end: number;
+    readonly differs: boolean;
+    readonly decisions: readonly {
+      readonly action: string;
+      readonly basis: string;
+      readonly ruleId?: string | null;
+      readonly ruleIndex?: number | null;
+    }[];
+  }[];
+}
+
+/**
+ * Splits sides into the parallel arrays both bindings take: each side's
+ * `kind` in order, the documents in the order their sides appear, and the
+ * callbacks in the order theirs do. A binding rebuilds the sides from the
+ * three, so neither runtime needs a structured-clone of a callback.
+ */
+export function splitNativeSides(sides: readonly NativeComparedSide[]): {
+  readonly kinds: string[];
+  readonly documents: Uint8Array[];
+  readonly callbacks: NativePolicyCallback[];
+} {
+  const kinds: string[] = [];
+  const documents: Uint8Array[] = [];
+  const callbacks: NativePolicyCallback[] = [];
+  for (const side of sides) {
+    kinds.push(side.kind);
+    if (side.kind === "action-policy") documents.push(side.document);
+    else if (side.kind === "callback") callbacks.push(side.callback);
+  }
+  return { kinds, documents, callbacks };
 }
 
 export interface NativeBinding {
@@ -121,6 +193,7 @@ export interface NativeBinding {
     policy: NativePolicyCallback | undefined,
     limits: NativeWholeInputLimits | undefined,
     ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
   ): readonly NativeFinding[];
   redact(
     input: string,
@@ -134,8 +207,27 @@ export interface NativeBinding {
     formatter: NativeFormatterCallback | undefined,
     limits: NativeWholeInputLimits | undefined,
     ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
   ): NativeScanAndRedactResult;
   createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
+  /**
+   * The whole-input comparison primitive: one detection pass, then every
+   * side's action and reason per finding
+   * (`decision-explain-and-compare-action-policies-over-one-detection-pass`).
+   * There is deliberately no session or stream counterpart.
+   */
+  compareActionPolicies(
+    input: string,
+    sides: readonly NativeComparedSide[],
+    limits: NativeWholeInputLimits | undefined,
+    ruleset: Uint8Array | undefined,
+  ): NativeActionComparison;
+  /**
+   * The core's default evaluation of one finding's safe metadata, as an
+   * action name. The default table lives only in the core; nothing here
+   * copies it.
+   */
+  defaultPolicy(finding: NativeDetectedFinding): string;
 }
 
 /**

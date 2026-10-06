@@ -8,6 +8,7 @@
 | Replace supplied ranges | `redact` | `redact` | Text |
 | Both together | `scanAndRedact` | `scan_and_redact` | Text and findings |
 | Supported defaults, Rust only | none | `sanitize`, `sanitize_with_profile` | Text and findings, as `scan_and_redact` |
+| Compare action policies, preview only (whole input) | `compareActionPolicies` | `compare_action_policies` (Python and Rust); the CLI's `--compare-action-policy` | Per-finding actions and reasons for 1 to 4 policies over one detection pass, no text |
 
 Bindings adapt arguments and results; they do not copy detector logic. Rust
 additionally takes a registry, policy, and formatter; `sanitize(input)` and
@@ -183,7 +184,7 @@ hot loop read `.findings` once into a local variable.
 `RANGE_UNIT` names it.
 
 **Errors.** Every failure carries a fixed code and an input-free message. The
-22 core codes are identical in Rust, JavaScript and Python; JavaScript adds
+23 core codes (the latest is `INVALID_ACTION_POLICY`) are identical in Rust, JavaScript and Python; JavaScript adds
 five host codes (`NOT_INITIALIZED`, `INITIALIZATION_FAILED`, `INVALID_CHUNK`,
 `INVALID_UTF8`, `UNPAIRED_SURROGATE`). A lone surrogate cannot reach the core
 in either host: JavaScript rejects it with `UNPAIRED_SURROGATE`, Python with

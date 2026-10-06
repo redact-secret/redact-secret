@@ -86,8 +86,22 @@ export const redact = runtime.redact;
 /** Scans and redacts in one call, so text and findings cannot disagree. */
 export const scanAndRedact = runtime.scanAndRedact;
 
+/**
+ * Compares what one to four policies would choose for the findings `input`
+ * yields, over one detection pass, against the `common` detector set (see
+ * `@redact-secret/core`'s `compareActionPolicies`). Whole-input only.
+ */
+export const compareActionPolicies = runtime.compareActionPolicies;
+
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
+
+/**
+ * The core's default policy, as a policy object (see
+ * `@redact-secret/core`'s `defaultPolicy`). The default action does not
+ * depend on the detector profile.
+ */
+export const defaultPolicy = runtime.defaultPolicy;
 
 export * from "./entry-core.js";
 

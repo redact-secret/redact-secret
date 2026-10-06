@@ -7,6 +7,137 @@ evidence is linked from each published version.
 
 ### Added
 
+- Rust and CLI: explain and compare action policies over one detection pass
+  (#1220,
+  `decision-explain-and-compare-action-policies-over-one-detection-pass`).
+  `compare_action_policies` (and `_with_limits`, and the same methods on
+  `BuiltInRegistry`) runs detection once and evaluates 1 to 4 policies
+  (`ComparedPolicy::Default`, `ActionPolicy` or `Callback`) on the same finalized
+  findings, returning per finding and per policy the action and a
+  `DecisionBasis` (`Rule`, `RuleDefault`, `NoRuleMatched`, `DefaultPolicy`,
+  `Callback`) with the matched rule id and index, each document policy's
+  SHA-256 binding, per-action counts, and the detection configuration
+  (`DetectionIdentity`) apart from every policy. `ActionPolicy` gains
+  `document_sha256` and `document_sha256_hex`. It is a preview: it edits no
+  input, renders no placeholder and leaves `scan`, `redact` and sessions
+  unchanged; it covers finalized findings only and makes no coverage claim, and
+  incremental and stream comparison is unsupported in this version. A callback
+  side is called once per finding in order, sides one at a time, and a failure is
+  `POLICY_FAILURE` with no partial result. No new error code (the code count
+  stays 23); the root name count is 72, 12 more (the 9 types, the 2 functions and
+  `MAX_COMPARED_POLICIES`). The CLI gains `--compare-action-policy <path>`
+  (1 to 3 times, one file path, never standard input or `--redact`): exit 0 when
+  every policy agrees, 1 when a finding's action differs, 2 on any failure. The
+  shared fixture is `conformance/fixtures/action-policy-compare-v1.json`; the
+  bindings run it in their own entries. Existing results are unchanged.
+
+- Python: `compare_action_policies(text, policies, limits=None, ruleset=None)`
+  (#1220, `decision-explain-and-compare-action-policies-over-one-detection-pass`),
+  the whole-input explain-and-compare primitive. `policies` is a `list` or
+  `tuple` of 1 to 4 `ComparedPolicy` sides built with `ComparedPolicy.default()`,
+  `ComparedPolicy.action_policy(document)` (the `action_policy=` input forms,
+  loaded and validated when the side is built) or `ComparedPolicy.callback(policy)`.
+  It returns an immutable `ActionComparison` (`mode` `"preview"`, `enforced`
+  `False`, `detection`, `sides`, `findings`, `changed_count`) of
+  `ComparedFinding` (the safe finding metadata in code points, `differs` and one
+  `ActionDecision` per side with `action`, `basis`, `rule_id` and `rule_index`),
+  `ComparedSide` (`kind`, `document_sha256`, `counts`), `ActionCounts` and
+  `DetectionIdentity`; eight new names in all. Detection runs once
+  and no placeholder or text is produced. A callback side is called once per
+  finding in order, one side at a time, and its failure is the existing
+  `PolicyFailureError` (a bad return value `InvalidPolicyActionError`) for the
+  whole comparison with no partial result. Incremental and stream comparison is
+  unsupported. The package runs `action-policy-compare-v1.json`. Existing
+  results and exceptions are unchanged.
+
+- JavaScript (Node addon and WebAssembly): `compareActionPolicies(input,
+  { policies, limits?, ruleset? })`, in `@redact-secret/core` and
+  `@redact-secret/core/common` (#1220,
+  `decision-explain-and-compare-action-policies-over-one-detection-pass`). It is
+  the whole-input comparison of one to four policies over one detection pass:
+  each side is `{ kind: "default" }`, `{ kind: "action-policy", actionPolicy }`
+  (the same object, text or bytes forms as the `actionPolicy` option) or
+  `{ kind: "callback", policy }`. The result is frozen plain data in the CLI's
+  `--json` shape with camel-case names (`mode: "preview"`, `enforced: false`,
+  `detection`, `policies` with each document's `documentSha256`, `findings`
+  with `differs` and per-side `decisions` of `action`, `basis`, `ruleId` and
+  `ruleIndex`), carrying no input byte, matched value or hash of either. Results
+  are identical on the addon and on WebAssembly (the qualification runs the
+  shared `action-policy-compare-v1` fixture on both, with enforcement parity
+  against `scan` and the same result digest). It is whole-input only: a
+  non-string input is `INVALID_INPUT`, any option or side key that could suggest
+  an incremental or stream comparison is `INVALID_OPTIONS`, and no session or
+  stream adapter gains a method. A callback side is called once per finding in
+  order, sides one at a time; a throw is `POLICY_FAILURE` and a return outside
+  the four actions is `INVALID_POLICY_ACTION`, on both runtimes, failing the
+  whole comparison with no partial result. No new error code; the package
+  gains one runtime value and ten types (`CompareActionPoliciesOptions`,
+  `ComparedPolicy`, `ComparedPolicyKind`, `ActionComparison`,
+  `ComparisonDetection`, `ComparedPolicySummary`, `ActionCounts`,
+  `ComparedFinding`, `ActionDecision` and `DecisionBasis`). The WebAssembly
+  artifacts grow by the comparison and the core's SHA-256 (brotli, against the
+  head that already held the core's comparison unlinked: `full` +4,363 bytes
+  (2.54%), `common` +4,329, `full` with `pii` +4,256, `common` with `pii`
+  +4,612); the evidence is
+  `docs/audits/evidence/1220/README.md`. Existing results are unchanged.
+
+- Rust and CLI: a versioned declarative action policy (#1219,
+  `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+  `load_action_policy` parses a JSON document (`actionPolicyRevision: 1`, at most
+  64 KiB and 128 ordered rules) into an immutable, `Clone`, `Send + Sync`
+  `ActionPolicy` that is both a `Policy` and an `IncrementalPolicy`. The first
+  rule whose `type`, `detector`, `confidence` and `obfuscation` sets match picks
+  `redact`, `block`, `warn`, `allow` or `default`; an unmatched finding takes
+  the running artifact's own default action, computed at evaluation time and
+  never copied into the document. A rejected document is an
+  `ActionPolicyError` with the new code `INVALID_ACTION_POLICY` (the code count
+  is 23), one of 17 fixed `ActionPolicyErrorClass` values and the zero-based
+  rule index; no error carries a document byte. The CLI gains
+  `--action-policy <path>` in check and redact mode, with a path or standard
+  input; check mode still exits 1 on any finding. The root name count is 60.
+  The Node and WebAssembly artifacts, JavaScript and Python are separate entries
+  below. Existing no-policy results are unchanged.
+- `@redact-secret/core` (root and `./common`), the Node addon and the
+  WebAssembly artifacts: `actionPolicy` on `scan`, `scanAndRedact`,
+  `createIncrementalSanitizer` and the stream factories (#1219). It takes a
+  plain object (serialized once, when the call or session is created), UTF-8
+  JSON text or bytes; the Rust core parses and validates it on both runtimes,
+  so the same document gives the same action everywhere. A rejected document
+  throws the new `INVALID_ACTION_POLICY` (the code only in 0.1.x; the raw addon
+  and WebAssembly errors append the fixed class and rule index), a callback
+  `policy` together with `actionPolicy` throws `INVALID_OPTIONS`, and the
+  callback keeps replacing the default entirely. An incremental session binds
+  its policy at construction and no policy is held in a global, so live
+  policies of different content never affect each other. The new
+  `defaultPolicy` export evaluates the core's default through the loaded
+  binding (no copied type table) and is a valid `policy` for whole-input calls
+  and incremental sessions. New types: `ActionPolicyDocument`,
+  `ActionPolicyInput`, `ActionPolicyRule`, `ActionPolicyMatch`,
+  `ActionPolicyRuleAction`, `DefaultSecretPolicy`. The shared fixture
+  `conformance/fixtures/action-policy-v1.json` runs against the real addon and
+  the real WebAssembly artifact, through their raw exports and through the
+  published package.
+- Cost: linking the action policy parser into the WebAssembly artifacts grows
+  them, brotli quality 11, against `db0e5c8d`: `full` +5,653 bytes (164,789 to
+  170,442, 3.43%), `common` +5,888, `full` with `pii` +6,090 and `common` with
+  `pii` +5,251. The decision accepts that cost and records the figures
+  ([evidence](docs/audits/evidence/1219/README.md)).
+
+- Python: `action_policy`, a keyword-only argument of `scan`,
+  `scan_and_redact` and `IncrementalSanitizer` (#1219,
+  `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+  It takes a `dict` (serialized once with `json.dumps(value,
+  separators=(",", ":"))`) or the document as `bytes`, `bytearray` or `str`,
+  hands the bytes to the core's `load_action_policy`, and changes only what its
+  rules name. A whole-input call validates its document on every call; a session
+  validates once at construction and keeps the compiled policy, which is never
+  held in a process-wide cache. A rejected document raises the new
+  `InvalidActionPolicyError` (`code` `INVALID_ACTION_POLICY`, fixed message)
+  with `error_class` and `rule_index`; supplying a `policy` callback together
+  with `action_policy`, or a value of another type, raises
+  `InvalidOptionsError`. The legacy callback and every no-policy result are
+  unchanged. The package runs the shared `action-policy-v1.json` fixture.
+
 - `status()` in `@redact-secret/core` (root and `./common`) and
   `redact_secret.status()` in Python report whether the binding is initialized
   and its public activation, without loading, initializing or reconfiguring
@@ -85,6 +216,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- WebAssembly: a whole-input policy callback that returns a string other than
+  `redact`, `block`, `warn` or `allow` failed with `POLICY_FAILURE`, while the
+  Node addon and the incremental WebAssembly session reported
+  `INVALID_POLICY_ACTION`. The whole-input WebAssembly call now reports
+  `INVALID_POLICY_ACTION` too (#1219). A thrown exception and a non-string
+  return stay `POLICY_FAILURE` on every runtime.
 - `generic-token` no longer reports the instructional placeholder
   `YOUR_PASSWORD` (and `your-pwd-here`, `INSERT_PASSWORD`, `ENTER_YOUR_PASSPHRASE`,
   the `passwd` and `passphrase` forms) under a `password` name or any other
@@ -197,6 +334,20 @@ evidence is linked from each published version.
   24 base cases behind the 82 open root causes of #1203
   (`decision-settle-the-open-structured-file-url-carrier-and-control-roots-of-1203`),
   not a beta.13 regression.
+
+- Configuration ownership (#1222,
+  `decision-keep-the-configuration-bound-scanner-handle-out-of-0-1-x-for-node-webassembly-and-python`).
+  No configuration-bound scanner handle is added to Node, WebAssembly or Python
+  in 0.1.x; Rust already has `BuiltInRegistry`. Independent PII selections in
+  one Node thread, WebAssembly module instance or Python process stay
+  unsupported, and the `initialize` conflict contract is unchanged. The new
+  [configuration ownership guide](docs/guides/configuration-ownership.md) states
+  who owns detection configuration, action policy and host limits on each
+  surface, and gives recipes that were run: a shared `BuiltInRegistry`, one
+  Worker per tenant in Node, one module instance per tenant in WebAssembly, one
+  process per tenant in Python, and per-call `actionPolicy` with
+  `compareActionPolicies`. The decision lists the evidence that would reopen it.
+  No code, API, finding or artifact changes.
 
 ## 0.1.0-beta.13 — 2026-10-03
 
@@ -1078,7 +1229,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   whole line once per candidate for every context label it weighed. It now
   normalizes the vocabulary once per process, on first use, and groups
   candidates by line once per call. Under `pii:global`, a whole-input scan
-  of the 94,720-byte benchmarks `validator-heavy` workload goes from about
+  of the 94,612-byte benchmarks `validator-heavy` workload goes from about
   165 ms to about 7 ms (optimized, Apple M4), and 125 PII records on one
   line from about 21 s to about 1.4 ms. The `_pii` WebAssembly builds grow
   by about 5.8 KB (2.4 KB gzip), and building a registry, a session or

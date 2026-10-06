@@ -17,6 +17,8 @@ redact-secret --json config.txt       # JSON metadata report
 redact-secret --redact input.txt > sanitized.txt
 redact-secret -- --leading-dash.txt   # stop option parsing
 redact-secret --ruleset org.rules config.txt   # add a declarative ruleset
+redact-secret --action-policy policy.json config.txt   # change what a finding does
+redact-secret --compare-action-policy next.json config.txt   # preview a policy, nothing enforced
 ```
 
 `--ruleset <path>` works in check and redact mode. It loads a
@@ -25,6 +27,46 @@ addition to the built-in detectors. It requires an explicit path source,
 because standard input's streaming session accepts no custom detector, and a
 malformed ruleset fails the whole run with `INVALID_RULESET` before any source
 is scanned.
+
+`--action-policy <path>` works in check and redact mode, with a path or with
+standard input. It loads a [declarative action policy](action-policy.md) (a
+JSON document of ordered rules, at most 65,536 bytes) and applies it to every
+finding in place of the default policy: the first matching rule picks `redact`,
+`block`, `warn` or `allow`, and a finding no rule matches keeps the default
+action. The file is read once, with a bounded read, before any source is
+touched. A rejected policy fails the whole run with exit 2 and
+`INVALID_ACTION_POLICY`, followed by the fixed rejection class and, when the
+violation is inside a rule, its zero-based `rule_index`; the message never
+quotes the file.
+
+```text
+redact-secret: INVALID_ACTION_POLICY: a rule action is not supported. (class=INVALID_ACTION rule_index=0)
+```
+
+The exit codes do not change: check mode still exits 1 when any finding exists,
+whatever its action (an `allow` finding is still reported), and redact mode
+replaces only `redact` and `block` spans. `--action-policy` and `--ruleset` can
+be combined, which is how one rule makes a ruleset detection redact.
+
+## Compare action policies
+
+`--compare-action-policy <path>` previews policies instead of enforcing one. It
+is repeatable (1 to 3 times), needs exactly one explicit file path, and refuses
+`--redact` and standard input with a usage error (exit 2). Detection runs once;
+the baseline (`--action-policy <path>`, or the default policy) and every
+candidate then decide the same finalized findings. Each finding line lists
+`baseline=<action>(<basis>)` and `candidate-N=<action>(<basis>)`, where the basis
+is `rule:<id>#<index>`, `rule-default:<id>#<index>`, `no-rule-matched` or
+`default-policy`; `--json` adds `mode: "preview"`, `enforced: false`, the
+detection configuration, each policy's `documentSha256` and per-action counts,
+and per-finding `differs`. `--ruleset` and `--pii` apply to every side.
+
+Exit `0`: every policy chooses the same action for every finding. Exit `1`: at
+least one finding's action differs. Exit `2`: any failure, including a rejected
+policy file (`INVALID_ACTION_POLICY`), with nothing on standard output. A finding
+alone is not a failure here. The input is never written and never echoed. See the
+[action policy guide](action-policy.md#explain-and-compare) for what a comparison
+does and does not cover.
 
 PII defaults off. Repeat `--pii <selector>` to request a canonical selector
 set, or use `--print-pii-activation` to print its activation identity and exit

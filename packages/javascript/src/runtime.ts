@@ -8,12 +8,14 @@
  * inspects the host, imports a `node:` module, or touches a global.
  */
 
+import { toActionComparison } from "./compare.js";
 import { SecretScanError, type SecretScanErrorCode, toSecretScanError } from "./errors.js";
 import { defaultPlaceholderFormatter } from "./formatters.js";
 import {
   NATIVE_HANDLE,
   type NativeBinding,
   type NativeBindingLoader,
+  type NativeComparedSide,
   type NativeDetectedFinding,
   type NativeFinding,
   type NativeFormatterCallback,
@@ -24,8 +26,11 @@ import {
   type NativeWholeInputLimits,
 } from "./native.js";
 import type {
+  ActionComparison,
   ArtifactKind,
+  CompareActionPoliciesOptions,
   CoreStatus,
+  DefaultSecretPolicy,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
@@ -36,6 +41,7 @@ import type {
   ScanAndRedactOptions,
   ScanOptions,
   ScanResult,
+  SecretAction,
   SecretFinding,
 } from "./types.js";
 import { VERSION } from "./version.js";
@@ -193,6 +199,155 @@ function toNativeRuleset(ruleset: ScanOptions["ruleset"]): Uint8Array | undefine
 }
 
 /**
+ * Converts an optional public `actionPolicy` to the document bytes every
+ * binding accepts
+ * (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+ * This package serializes and forwards; the Rust core parses and validates the
+ * document, so no grammar rule is restated here.
+ *
+ * - Text becomes its UTF-8 bytes, and bytes pass through.
+ * - A plain object is serialized once, here, with `JSON.stringify` (the
+ *   standard compact encoder), so a later mutation of it changes nothing. A
+ *   serializer failure (a cycle, a `BigInt`) or a value with no JSON form is
+ *   `INVALID_ACTION_POLICY`, as a malformed document. Member order is the
+ *   object's insertion order, and the core requires `actionPolicyRevision`
+ *   first.
+ * - A value of any other kind is `INVALID_OPTIONS`.
+ *
+ * A callback `policy` and an action policy together are `INVALID_OPTIONS`,
+ * reported before the document is serialized or read.
+ */
+function toNativeActionPolicy(
+  actionPolicy: ScanOptions["actionPolicy"],
+  hasCallbackPolicy: boolean,
+): Uint8Array | undefined {
+  if (actionPolicy === undefined) return undefined;
+  if (hasCallbackPolicy) throw new SecretScanError("INVALID_OPTIONS");
+  if (typeof actionPolicy === "string") return new TextEncoder().encode(actionPolicy);
+  if (actionPolicy instanceof Uint8Array) return actionPolicy;
+  if (typeof actionPolicy === "object" && actionPolicy !== null) {
+    let serialized: unknown;
+    try {
+      serialized = JSON.stringify(actionPolicy);
+    } catch {
+      throw new SecretScanError("INVALID_ACTION_POLICY");
+    }
+    if (typeof serialized !== "string") throw new SecretScanError("INVALID_ACTION_POLICY");
+    return new TextEncoder().encode(serialized);
+  }
+  throw new SecretScanError("INVALID_OPTIONS");
+}
+
+/**
+ * Checks the shape of the finding metadata handed to `defaultPolicy.evaluate`
+ * before it crosses into a binding, so a malformed value is the same fixed
+ * `INVALID_FINDINGS` on every runtime rather than whatever a binding's own
+ * argument conversion would do. Identifier and vocabulary checks are the
+ * core's.
+ */
+function toNativeDefaultPolicyFinding(finding: unknown): NativeDetectedFinding {
+  if (typeof finding !== "object" || finding === null) {
+    throw new SecretScanError("INVALID_FINDINGS");
+  }
+  const record = finding as Readonly<Record<string, unknown>>;
+  const { id, type, detector, confidence, obfuscation, start, end } = record;
+  if (
+    typeof id !== "string" ||
+    typeof type !== "string" ||
+    typeof detector !== "string" ||
+    typeof confidence !== "string" ||
+    typeof obfuscation !== "string" ||
+    typeof start !== "number" ||
+    typeof end !== "number" ||
+    !Number.isInteger(start) ||
+    !Number.isInteger(end) ||
+    start < 0 ||
+    end < 0 ||
+    start > MAX_NATIVE_LIMIT ||
+    end > MAX_NATIVE_LIMIT
+  ) {
+    throw new SecretScanError("INVALID_FINDINGS");
+  }
+  return { id, type, detector, confidence, obfuscation, start, end };
+}
+
+/**
+ * Returns `value` as a plain record whose own enumerable keys are all in
+ * `allowed`, or throws `INVALID_OPTIONS`. The comparison primitive is strict
+ * about what it is given so that nothing is silently ignored: a key that could
+ * be mistaken for an incremental or stream option, or a field of the wrong
+ * side kind, is refused rather than dropped.
+ */
+function requireExactKeys(value: unknown, allowed: readonly string[]): Readonly<Record<string, unknown>> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new SecretScanError("INVALID_OPTIONS");
+  }
+  if (Object.keys(value).some((key) => !allowed.includes(key))) {
+    throw new SecretScanError("INVALID_OPTIONS");
+  }
+  return value as Readonly<Record<string, unknown>>;
+}
+
+/** The most sides one comparison takes: a baseline and three candidates. */
+const MAX_COMPARED_POLICIES = 4;
+
+/**
+ * Converts one public `ComparedPolicy` to the side a binding takes.
+ *
+ * The kind is closed, every kind carries exactly its own field, and a
+ * document is serialized to the exact bytes the core will hash and parse
+ * ({@link toNativeActionPolicy}), here, once, so a later mutation of an object
+ * policy changes nothing.
+ */
+function toNativeComparedSide(side: unknown): NativeComparedSide {
+  const kind = typeof side === "object" && side !== null ? (side as { kind?: unknown }).kind : undefined;
+  if (kind === "default") {
+    requireExactKeys(side, ["kind"]);
+    return { kind };
+  }
+  if (kind === "action-policy") {
+    const record = requireExactKeys(side, ["kind", "actionPolicy"]);
+    const document = toNativeActionPolicy(record.actionPolicy as ScanOptions["actionPolicy"], false);
+    if (document === undefined) throw new SecretScanError("INVALID_OPTIONS");
+    return { kind, document };
+  }
+  if (kind === "callback") {
+    const record = requireExactKeys(side, ["kind", "policy"]);
+    const callback = toPolicyCallback(record.policy as ScanOptions["policy"]);
+    if (callback === undefined) throw new SecretScanError("INVALID_OPTIONS");
+    return { kind, callback };
+  }
+  throw new SecretScanError("INVALID_OPTIONS");
+}
+
+/**
+ * Validates and converts the options of `compareActionPolicies`. The side
+ * count and every side's shape are checked before anything crosses into a
+ * binding, so a malformed call detects nothing and calls no callback.
+ */
+function toNativeComparison(options: CompareActionPoliciesOptions): {
+  readonly sides: readonly NativeComparedSide[];
+  readonly limits: NativeWholeInputLimits | undefined;
+  readonly ruleset: Uint8Array | undefined;
+} {
+  const record = requireExactKeys(options, ["policies", "limits", "ruleset"]);
+  const policies = record.policies;
+  if (!Array.isArray(policies) || policies.length < 1 || policies.length > MAX_COMPARED_POLICIES) {
+    throw new SecretScanError("INVALID_OPTIONS");
+  }
+  for (let index = 0; index < policies.length; index += 1) {
+    if (!Object.hasOwn(policies, index)) throw new SecretScanError("INVALID_OPTIONS");
+  }
+  const sides = (policies as readonly unknown[]).map(toNativeComparedSide);
+  if (record.limits !== undefined) requireExactKeys(record.limits, ["maxInputBytes", "maxFindings"]);
+  return {
+    sides,
+    limits: toNativeWholeInputLimits(record.limits as ScanOptions["limits"]),
+    ruleset: toNativeRuleset(record.ruleset as ScanOptions["ruleset"]),
+  };
+}
+
+/**
  * Resolves one incremental limit given under its byte name, its deprecated
  * `CodeUnits` name, or both. Both are validated like any limit
  * ({@link toNativeLimit}); a name that is absent or `undefined` is not
@@ -226,6 +381,7 @@ function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): Nativ
   }
   const policyCallback: NativeIncrementalPolicyCallback | undefined =
     policy === undefined ? undefined : (finding, context) => policy.evaluate(toDetectedSecretFinding(finding), context);
+  const actionPolicy = toNativeActionPolicy(options.actionPolicy, policy !== undefined);
   return {
     limits: {
       maxInputCodeUnits: resolveIncrementalLimit(limits, "maxInputBytes", "maxInputCodeUnits"),
@@ -235,6 +391,7 @@ function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): Nativ
     },
     ...(policyCallback === undefined ? {} : { policy: policyCallback }),
     ...(formatter === undefined ? {} : { formatter }),
+    ...(actionPolicy === undefined ? {} : { actionPolicy }),
   };
 }
 
@@ -246,7 +403,9 @@ export interface RedactSecretRuntime {
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
   redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string;
   scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult;
+  compareActionPolicies(input: string, options: CompareActionPoliciesOptions): ActionComparison;
   createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer;
+  readonly defaultPolicy: DefaultSecretPolicy;
 }
 
 /**
@@ -392,10 +551,11 @@ export function createRedactSecretRuntime(
     const native = active();
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
+    const actionPolicy = toNativeActionPolicy(options?.actionPolicy, policy !== undefined);
     const limits = toNativeWholeInputLimits(options?.limits);
     const ruleset = toNativeRuleset(options?.ruleset);
     try {
-      return toSecretFindings(native.scan(text, policy, limits, ruleset));
+      return toSecretFindings(native.scan(text, policy, limits, ruleset, actionPolicy));
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }
@@ -420,12 +580,13 @@ export function createRedactSecretRuntime(
     const native = active();
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
+    const actionPolicy = toNativeActionPolicy(options?.actionPolicy, policy !== undefined);
     const formatter = toFormatterCallback(options?.placeholderFormatter);
     const limits = toNativeWholeInputLimits(options?.limits);
     const ruleset = toNativeRuleset(options?.ruleset);
     let result;
     try {
-      result = native.scanAndRedact(text, policy, formatter, limits, ruleset);
+      result = native.scanAndRedact(text, policy, formatter, limits, ruleset, actionPolicy);
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }
@@ -433,6 +594,23 @@ export function createRedactSecretRuntime(
       text: result.text,
       findings: toSecretFindings(result.findings),
     });
+  }
+
+  /**
+   * The whole-input comparison primitive: one detection pass, then what each
+   * policy would choose for every finalized finding and why. A preview, never
+   * enforcement: it returns no text, and the sanitizer paths are not involved.
+   * It takes one string; there is no session or stream form.
+   */
+  function compareActionPolicies(input: string, options: CompareActionPoliciesOptions): ActionComparison {
+    const native = active();
+    const text = requireString(input);
+    const { sides, limits, ruleset } = toNativeComparison(options);
+    try {
+      return toActionComparison(native.compareActionPolicies(text, sides, limits, ruleset));
+    } catch (thrown) {
+      throw toSecretScanError(thrown, "DETECTOR_FAILURE");
+    }
   }
 
   function createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer {
@@ -506,6 +684,26 @@ export function createRedactSecretRuntime(
     });
   }
 
+  /**
+   * The core's default evaluation as a policy, for "mine, else the default"
+   * callbacks. The decision runs in the core through the loaded binding; this
+   * package holds no copy of the default table. It needs a successful
+   * `initialize()` like every other operation, and it is a policy for both
+   * whole-input calls and incremental sessions, since the default reads
+   * neither context.
+   */
+  const defaultPolicy: DefaultSecretPolicy = Object.freeze({
+    evaluate(finding: DetectedSecretFinding): SecretAction {
+      const native = active();
+      const metadata = toNativeDefaultPolicyFinding(finding);
+      try {
+        return native.defaultPolicy(metadata) as SecretAction;
+      } catch (thrown) {
+        throw toSecretScanError(thrown, "INVALID_FINDINGS");
+      }
+    },
+  });
+
   return {
     initialize,
     piiActivation,
@@ -514,6 +712,8 @@ export function createRedactSecretRuntime(
     scan,
     redact,
     scanAndRedact,
+    compareActionPolicies,
     createIncrementalSanitizer,
+    defaultPolicy,
   };
 }

@@ -35,6 +35,12 @@ idempotent; a later different selection fails with the fixed,
 input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
 the same contract while retaining `credentials=common` in its identity.
 
+One thread has one runtime per entry point, so a second wrapper or a second
+`initialize` selection does not create a second owner. Independent PII
+selections need a `worker_threads` Worker each; the
+[configuration ownership guide](configuration-ownership.md) has the recipe and
+the unsupported list.
+
 ## Status query
 
 `status()` reports whether this entry point is initialized, and its public
@@ -150,6 +156,26 @@ This policy replaces every detected finding; it cannot detect additional
 formats. To reject a request, choose `block` and check the returned actions
 before any downstream use. [Safe integration](safe-integration.md) explains
 that distinction and failure handling.
+
+To change only a few actions and keep the default for every other finding, pass
+a declarative `actionPolicy` instead of a callback. It takes a plain object,
+JSON text or bytes, on `scan`, `scanAndRedact`, `createIncrementalSanitizer` and
+the stream factories; the Rust core evaluates it on both runtimes, and a call or
+session takes a callback or an action policy, never both (`INVALID_OPTIONS`).
+A rejected document throws `INVALID_ACTION_POLICY`. For a callback that wants
+"mine, else the default", `defaultPolicy.evaluate(finding)` asks the core
+instead of copying the default table. See the
+[action policy guide](action-policy.md#javascript).
+
+To see why each finding got its action, or what changes when you swap one
+policy for another, `compareActionPolicies(input, { policies })` evaluates one to
+four policies (`{ kind: "default" }`, `{ kind: "action-policy", actionPolicy }`
+or `{ kind: "callback", policy }`) over one detection pass and returns each
+policy's action, the deciding rule and each document's SHA-256 as frozen data. It
+is a preview, never enforcement, it takes one string (there is no stream or
+incremental comparison), and a callback side that fails fails the whole
+comparison with no partial result. See
+[Compare in JavaScript](action-policy.md#compare-in-javascript).
 
 ## Request-wide placeholder numbering
 

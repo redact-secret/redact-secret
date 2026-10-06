@@ -8,7 +8,10 @@
 //! rather than the core, the same way the core documents that
 //! `INVALID_INPUT` and `INVALID_OPTIONS` are host-produced codes.
 
-use redact_secret::{RulesetError, RulesetErrorClass, SecretScanError, SecretScanErrorCode};
+use redact_secret::{
+    ActionPolicyError, ActionPolicyErrorClass, RulesetError, RulesetErrorClass, SecretScanError,
+    SecretScanErrorCode,
+};
 use wasm_bindgen::JsValue;
 
 /// Every error code this binding can report to JavaScript: every
@@ -29,6 +32,11 @@ pub(crate) enum WasmErrorCode {
     /// code is always the core's fixed `INVALID_RULESET`; the fixed class
     /// is folded into [`Self::message`].
     Ruleset(RulesetErrorClass),
+    /// An `actionPolicy` argument was rejected while loading (issue #1219).
+    /// The code is always the core's fixed `INVALID_ACTION_POLICY`; the fixed
+    /// class and, inside a rule, its zero-based index are folded into
+    /// [`Self::message`].
+    ActionPolicy(ActionPolicyErrorClass, Option<usize>),
 }
 
 impl WasmErrorCode {
@@ -40,6 +48,7 @@ impl WasmErrorCode {
             Self::InitializationFailed => "INITIALIZATION_FAILED",
             Self::Core(code) => code.as_str(),
             Self::Ruleset(_) => SecretScanErrorCode::InvalidRuleset.as_str(),
+            Self::ActionPolicy(..) => SecretScanErrorCode::InvalidActionPolicy.as_str(),
         }
     }
 
@@ -62,6 +71,20 @@ impl WasmErrorCode {
                 SecretScanErrorCode::InvalidRuleset.message(),
                 class.as_str()
             ),
+            // The same text `bindings/node` builds, so one rejected document
+            // reads identically on both runtimes: the fixed message, the
+            // fixed class, and the rule index when the violation is inside a
+            // rule. Never a byte of the rejected document.
+            Self::ActionPolicy(class, Some(index)) => format!(
+                "{} ({}, rule {index})",
+                SecretScanErrorCode::InvalidActionPolicy.message(),
+                class.as_str()
+            ),
+            Self::ActionPolicy(class, None) => format!(
+                "{} ({})",
+                SecretScanErrorCode::InvalidActionPolicy.message(),
+                class.as_str()
+            ),
         }
     }
 }
@@ -81,6 +104,12 @@ impl From<SecretScanError> for WasmErrorCode {
 impl From<RulesetError> for WasmErrorCode {
     fn from(error: RulesetError) -> Self {
         Self::Ruleset(error.class())
+    }
+}
+
+impl From<ActionPolicyError> for WasmErrorCode {
+    fn from(error: ActionPolicyError) -> Self {
+        Self::ActionPolicy(error.class(), error.rule_index())
     }
 }
 
@@ -124,6 +153,28 @@ mod tests {
         assert_eq!(
             WasmErrorCode::from(error).as_str(),
             SecretScanErrorCode::PolicyFailure.as_str()
+        );
+    }
+
+    #[test]
+    fn action_policy_errors_carry_the_fixed_code_class_and_rule_index() {
+        let document = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["jwt"]},"action":"mask"}]}"#;
+        let rejection = redact_secret::load_action_policy(document)
+            .expect_err("expected the unknown action to be rejected");
+        let wrapped = WasmErrorCode::from(rejection);
+        assert_eq!(wrapped.as_str(), "INVALID_ACTION_POLICY");
+        assert_eq!(
+            wrapped.message(),
+            "The supplied action policy is invalid. (INVALID_ACTION, rule 0)"
+        );
+
+        let rejection = redact_secret::load_action_policy(b"")
+            .expect_err("expected an empty document to be rejected");
+        let wrapped = WasmErrorCode::from(rejection);
+        assert_eq!(wrapped.as_str(), "INVALID_ACTION_POLICY");
+        assert_eq!(
+            wrapped.message(),
+            "The supplied action policy is invalid. (MALFORMED_DOCUMENT)"
         );
     }
 

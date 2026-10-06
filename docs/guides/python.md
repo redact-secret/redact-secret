@@ -41,6 +41,156 @@ The policy returns `redact`, `block`, `warn`, or `allow`. A `block` action must
 also be enforced by your application; the library replaces its range without
 throwing merely because it found a blocked credential.
 
+## Declarative action policy
+
+To change what a few rules name and keep the default action for every other
+finding, pass `action_policy` instead of writing a callback that must copy the
+default. The contract and the document format are in the
+[action policy guide](action-policy.md).
+
+```python
+import redact_secret
+
+result = redact_secret.scan_and_redact(
+    "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE",
+    formatter=redact_secret.typed_placeholder_formatter,
+    action_policy={
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [{"id": "warn-contextual", "match": {"type": ["contextual_secret"]}, "action": "warn"}],
+    },
+)
+assert result.text == "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE"
+assert [finding.action for finding in result.findings] == ["warn"]
+```
+
+`scan`, `scan_and_redact` and `IncrementalSanitizer` take `action_policy` as a
+keyword-only argument. It is a `dict`, or the document as `bytes`, `bytearray`
+or `str`; `None` means no overlay. A `dict` is serialized once, when the call or
+session is built, with `json.dumps(value, separators=(",", ":"))`, so the
+revision must be its first key and a later change to the `dict` affects
+nothing.
+
+- A call or session takes a `policy` callback or an `action_policy`, never
+  both. Supplying both raises `InvalidOptionsError` before anything is scanned,
+  as does a value of any other type. The callback is unchanged: it replaces the
+  default entirely, and `PolicyFailureError` and `InvalidPolicyActionError` keep
+  their meaning. A declarative policy never raises either.
+- The document is validated before any input is read: a whole-input call parses
+  it on every call, and an `IncrementalSanitizer` validates it once at
+  construction and keeps the compiled policy for its life. A rejected document
+  raises `InvalidActionPolicyError` and nothing falls back to the default.
+- `error.error_class` is the fixed rejection class (`"INVALID_ACTION"`,
+  `"UNKNOWN_FIELD"`, and the others in the
+  [error table](action-policy.md#errors)) and `error.rule_index` is the
+  zero-based index of the rule being read, or `None` for a document-level
+  violation. Neither repeats a byte of the document.
+- A policy sees finalized findings only, and the base for an unmatched finding
+  is the same evaluation `default_policy` gives, computed by the core. Public
+  findings gain no field.
+
+## Explain and compare action policies
+
+Before adopting a change, `compare_action_policies` shows what each of 1 to 4
+policies would choose for the same findings. Detection runs **once**; every
+policy then decides the same finalized findings, so the result lists exactly the
+findings `scan` returns for that input, in the same order with the same ids and
+ranges. The decision is
+[explain and compare action policies](../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md);
+the [action policy guide](action-policy.md#explain-and-compare) states what a
+comparison does and does not cover.
+
+```python
+import redact_secret
+from redact_secret import ComparedPolicy
+
+candidate = {
+    "actionPolicyRevision": 1,
+    "base": "default",
+    "rules": [{"id": "allow-github", "match": {"type": ["github_token"]}, "action": "allow"}],
+}
+comparison = redact_secret.compare_action_policies(
+    "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+    [ComparedPolicy.default(), ComparedPolicy.action_policy(candidate)],
+)
+assert comparison.mode == "preview" and comparison.enforced is False
+finding = comparison.findings[0]
+assert [decision.action for decision in finding.decisions] == ["redact", "allow"]
+assert finding.decisions[1].basis == "rule"
+assert (finding.decisions[1].rule_id, finding.decisions[1].rule_index) == ("allow-github", 0)
+assert finding.differs and comparison.changed_count == 1
+assert comparison.sides[1].document_sha256 is not None  # 64 lowercase hex characters
+```
+
+```python
+compare_action_policies(
+    text, policies, limits=None, ruleset=None
+) -> ActionComparison
+```
+
+`policies` is a `list` or `tuple` of 1 to 4 `ComparedPolicy` values, reported in
+the order given. Build each with a static constructor; there is no public
+constructor:
+
+| Constructor | Side |
+| --- | --- |
+| `ComparedPolicy.default()` | the default policy, with no document |
+| `ComparedPolicy.action_policy(document)` | a declarative policy, in the same input forms as `action_policy=` (`dict`, `bytes`, `bytearray` or `str`) |
+| `ComparedPolicy.callback(policy)` | a legacy `policy` callback |
+
+A document is loaded and validated when its side is built, so a rejected one
+raises `InvalidActionPolicyError` there, before any comparison. A side's `kind`
+is `"default"`, `"action-policy"` or `"callback"`, and an action-policy side
+exposes `document_sha256`. `limits` and `ruleset` are the arguments `scan` takes
+and apply to every side; PII activation is the process-wide selection.
+
+The result is immutable and every type is read-only with no public constructor.
+Its field names mirror the CLI's `--json` report in snake case:
+
+| Type | Fields |
+| --- | --- |
+| `ActionComparison` | `mode` (always `"preview"`), `enforced` (always `False`), `detection`, `sides`, `findings` (tuples), `changed_count` |
+| `DetectionIdentity` | `activation_identity`, `profile`, `detector_count` |
+| `ComparedSide` | `kind`, `document_sha256` (64 lowercase hex characters, or `None`), `counts` |
+| `ActionCounts` | `redact`, `block`, `warn`, `allow` |
+| `ComparedFinding` | `id`, `type`, `detector`, `confidence`, `obfuscation`, `start`, `end` (code points), `differs`, `decisions` (a tuple, one per side in order) |
+| `ActionDecision` | `action`, `basis`, `rule_id`, `rule_index` |
+
+`basis` is `"rule"`, `"rule-default"`, `"no-rule-matched"`, `"default-policy"` or
+`"callback"`; `rule_id` and `rule_index` are set for the first two and `None`
+otherwise. `differs` compares actions only, so a changed reason with the same
+action is not flagged. The detection configuration is reported in `detection`,
+apart from every `ComparedSide`: swapping a policy leaves it unchanged, and
+swapping the `ruleset` leaves every digest unchanged. It does not cover a custom
+ruleset, so key a ruleset to your own identity (for example a digest of its
+bytes) next to the comparison.
+
+- **Preview, not enforcement.** A comparison edits no input, returns no text and
+  no placeholder, and changes nothing `scan`, `redact`, `scan_and_redact` or an
+  `IncrementalSanitizer` does. To get the effect of a policy, call `scan` or
+  `scan_and_redact` with it; each declarative side's action equals what that call
+  chooses.
+- **Whole input only.** There is no incremental, session or stream comparison,
+  and a session is not accepted as a side.
+- **Callbacks.** A callback side is called once per finalized finding in finding
+  order with the same `DetectedFinding` and `PolicyContext` `scan` gives it, and
+  sides run one at a time in the order given: two callbacks run `A0 A1 A2 B0 B1
+  B2`. A callback that raises fails the whole comparison with
+  `PolicyFailureError`, and one that returns anything but an action raises
+  `InvalidPolicyActionError`; either way there is no partial result, the failing
+  callback is not called again and no later side runs. A callback with state or
+  side effects advances them during a comparison like any other call. A callback
+  may itself call `scan` or `compare_action_policies`.
+- **Bounds and errors.** The whole-input byte and finding limits apply as in
+  `scan`; the finding bound fails the call before any callback runs. Anything but
+  a `list` or `tuple` of 1 to 4 `ComparedPolicy` values raises
+  `InvalidOptionsError` before detection and before any callback. No new
+  exception exists.
+- **No content.** The result holds no input byte, matched value, snippet, hash of
+  either, retained input or score. A policy document's digest is the only digest.
+- **Threads.** Detection releases the GIL when no side is a callback. A callback
+  side holds it for the call, as `scan` does while it runs a callback.
+
 Catch `redact_secret.SecretScanError` for library failures and stop downstream
 processing. Do not fall back to the raw input. The binding maps callback
 failures to fixed exceptions instead of forwarding the callback's message.
@@ -120,7 +270,7 @@ not name as a failure, and never fall back to the raw input.
 | --- | --- | --- |
 | `SecretScanError` | none | Base class of every error below; catch it for any library failure. |
 | `InvalidInputError` | `INVALID_INPUT` | The text is not a `str`, or contains an unpaired surrogate. |
-| `InvalidOptionsError` | `INVALID_OPTIONS` | An option has the wrong type, such as a `ruleset` that is not `bytes`, `bytearray` or `str`. |
+| `InvalidOptionsError` | `INVALID_OPTIONS` | An option has the wrong type, such as a `ruleset` that is not `bytes`, `bytearray` or `str` or an `action_policy` that is not a `dict`, `bytes`, `bytearray` or `str`, or a call or session was given both a `policy` callback and an `action_policy`. |
 | `InvalidDetectorError` | `INVALID_DETECTOR` | The detector registry is malformed. Not reachable with the detectors this package ships. |
 | `DetectorFailureError` | `DETECTOR_FAILURE` | A detector failed while scanning. |
 | `InvalidCandidateError` | `INVALID_CANDIDATE` | A detector returned a candidate the core rejects. Not expected with the detectors this package ships. |
@@ -137,6 +287,7 @@ not name as a failure, and never fall back to the raw input.
 | `MultilineLimitExceededError` | `MULTILINE_LIMIT_EXCEEDED` | An open multiline construct exceeded `max_multiline_bytes`. |
 | `InvalidStateError` | `INVALID_STATE` | An incremental session received an operation after it left the `accepting` state. |
 | `InvalidRulesetError` | `INVALID_RULESET` | A `ruleset` was rejected while loading; the message ends with the fixed rejection class in parentheses. See [rulesets](rulesets.md). |
+| `InvalidActionPolicyError` | `INVALID_ACTION_POLICY` | An `action_policy` was rejected while loading. The message is fixed; `error_class` holds the fixed rejection class and `rule_index` the zero-based rule being read (`None` for a document-level violation). See [action policy](action-policy.md#errors). |
 | `PiiSelectorInvalidError` | `PII_SELECTOR_INVALID` | A PII selector given to `initialize` is not valid. |
 | `PiiSelectorUnsupportedError` | `PII_SELECTOR_UNSUPPORTED` | A PII jurisdiction or family is unsupported. |
 | `PiiSelectorUnavailableError` | `PII_SELECTOR_UNAVAILABLE` | The selection is unavailable in this artifact. |
@@ -203,6 +354,11 @@ To require a prebuilt wheel instead of a source build, use
 See the [binding README](../../bindings/python/README.md) for development details.
 
 ## PII activation
+
+The selection is process-wide: one process holds one, and a differing second
+selection is `PiiActivationConflictError` from any thread. For several
+selections use one process each; see
+[configuration ownership](configuration-ownership.md).
 
 Direct import and scanning remain credential-only. Call `initialize(pii=(...))`
 before constructing scans or incremental sessions to select PII explicitly,

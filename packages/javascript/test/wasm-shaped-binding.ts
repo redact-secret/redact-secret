@@ -13,7 +13,7 @@
  * normalization fails these tests instead of passing silently.
  */
 
-import type { NativeBinding, NativeBindingLoader } from "../src/native.js";
+import type { NativeActionComparison, NativeBinding, NativeBindingLoader } from "../src/native.js";
 import {
   createBindingFromWasmModule,
   type WasmDetectedFindingMetadata,
@@ -23,8 +23,45 @@ import {
   type WasmModule,
 } from "../src/runtime/browser.js";
 import { VERSION } from "../src/version.js";
+import { emptyNativeComparison } from "./fake-binding.js";
+
+/**
+ * The inverse of `decodeComparison`: lays a nested comparison out as the flat
+ * array `bindings/wasm/src/compare.rs` returns, so a test can run the decoder
+ * against the artifact's real shape.
+ */
+export function encodeComparison(comparison: NativeActionComparison): unknown[] {
+  const flat: unknown[] = [
+    comparison.detection.activationIdentity,
+    comparison.detection.profile ?? null,
+    comparison.detection.detectorCount,
+    comparison.sides.length,
+  ];
+  for (const side of comparison.sides) {
+    flat.push(side.kind, side.documentSha256 ?? null, side.redact, side.block, side.warn, side.allow);
+  }
+  flat.push(comparison.changedCount, comparison.findings.length);
+  for (const finding of comparison.findings) {
+    flat.push(
+      finding.id,
+      finding.type,
+      finding.detector,
+      finding.confidence,
+      finding.obfuscation,
+      finding.start,
+      finding.end,
+      finding.differs,
+    );
+    for (const decision of finding.decisions) {
+      flat.push(decision.action, decision.basis, decision.ruleId ?? null, decision.ruleIndex ?? null);
+    }
+  }
+  return flat;
+}
 
 export interface WasmShapedBindingOptions {
+  /** What `compareActionPolicies` returns; an empty one-side comparison when omitted. */
+  readonly comparison?: NativeActionComparison;
   readonly version?: string;
   readonly profile?: string;
   readonly findings?: readonly WasmFinding[];
@@ -47,6 +84,15 @@ export interface WasmShapedBinding {
   readonly calls: string[];
   /** The four positional limits the most recent `createIncrementalSanitizer` call received. */
   readonly lastIncrementalLimits: readonly number[] | undefined;
+  /** The `actionPolicy` bytes the most recent `scan`/`scanAndRedact`/session call received. */
+  readonly lastActionPolicy: Uint8Array | undefined;
+  /** The arguments the most recent `defaultPolicy` call received. */
+  readonly lastDefaultPolicyArguments: readonly unknown[] | undefined;
+  /**
+   * The arguments the most recent `compareActionPolicies` call received, with
+   * the callbacks reduced to their count.
+   */
+  readonly lastCompareArguments: readonly unknown[] | undefined;
   /** Mirrors `runtime/browser.ts`'s own `loadNativeBinding`, against this fake module instead of a real dynamic import. */
   readonly load: NativeBindingLoader;
 }
@@ -66,6 +112,9 @@ function toDetectedFindingMetadata(finding: WasmFinding): WasmDetectedFindingMet
 export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}): WasmShapedBinding {
   const calls: string[] = [];
   let lastIncrementalLimits: readonly number[] | undefined;
+  let lastActionPolicy: Uint8Array | undefined;
+  let lastDefaultPolicyArguments: readonly unknown[] | undefined;
+  let lastCompareArguments: readonly unknown[] | undefined;
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
   let activation = `credentials=${options.profile ?? "full"};selectors=off;families=;vocabulary=pii-context/v2`;
@@ -106,7 +155,8 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       ].join(",");
       activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v2`;
     },
-    scan: (input, policy) => {
+    scan: (input, policy, _maxInputBytes, _maxFindings, _ruleset, actionPolicy) => {
+      lastActionPolicy = actionPolicy;
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);
       if (options.throwOnScan !== undefined) throw options.throwOnScan;
       if (policy !== undefined) {
@@ -128,7 +178,8 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       }
       return redacted;
     },
-    scanAndRedact: (input, policy, formatter) => {
+    scanAndRedact: (input, policy, formatter, _maxInputBytes, _maxFindings, _ruleset, actionPolicy) => {
+      lastActionPolicy = actionPolicy;
       calls.push(
         `scanAndRedact:${input}:${policy === undefined ? "builtin" : "custom"}:${formatter === undefined ? "builtin" : "custom"}`,
       );
@@ -160,7 +211,9 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       maxMultilineCodeUnits,
       policy,
       formatter,
+      actionPolicy,
     ) => {
+      lastActionPolicy = actionPolicy;
       lastIncrementalLimits = [maxInputCodeUnits, maxBufferedCodeUnits, maxTokenCodeUnits, maxMultilineCodeUnits];
       calls.push(`createIncrementalSanitizer:${maxInputCodeUnits}`);
       const incrementalFindings = options.incrementalFindings ?? [];
@@ -206,12 +259,37 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       };
       return session;
     },
+    compareActionPolicies: (input, kinds, documents, callbacks, maxInputBytes, maxFindings, ruleset) => {
+      lastCompareArguments = [input, kinds, documents, callbacks.length, maxInputBytes, maxFindings, ruleset];
+      calls.push(`compareActionPolicies:${input}:${kinds.join(",")}`);
+      // Each callback runs once per finding with the nested-`range` metadata
+      // `bindings/wasm/src/compare.rs` adapts through `callbacks.rs`.
+      for (const callback of callbacks) {
+        findings.forEach((finding, index) => {
+          callback(toDetectedFindingMetadata(finding), { findingIndex: index, findingCount: findings.length });
+        });
+      }
+      return encodeComparison(options.comparison ?? emptyNativeComparison);
+    },
+    defaultPolicy: (...given) => {
+      lastDefaultPolicyArguments = given;
+      return "redact";
+    },
   };
 
   return {
     calls,
+    get lastCompareArguments() {
+      return lastCompareArguments;
+    },
     get lastIncrementalLimits() {
       return lastIncrementalLimits;
+    },
+    get lastActionPolicy() {
+      return lastActionPolicy;
+    },
+    get lastDefaultPolicyArguments() {
+      return lastDefaultPolicyArguments;
     },
     load: async (): Promise<NativeBinding> => {
       await module.default();

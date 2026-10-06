@@ -42,6 +42,9 @@ the generated [support matrix](support-matrix.md).
 | Which runtimes are supported, and which are not? | [Supported runtimes](getting-started.md#supported-runtimes) |
 | How do I turn on PII detection, and what does "available" mean? | [Opt-in PII availability is not support](reference/detection.md#opt-in-pii-availability-is-not-support) |
 | How do I detect an in-house credential format? | [Declarative rulesets](guides/rulesets.md) |
+| How do I change what one kind of finding does without copying the default? | [Declarative action policy](guides/action-policy.md) |
+| Which profile, PII selector, ruleset and isolation does each runtime support, and who owns the configuration? | [Detector capability and ownership matrix](reference/detector-capability-matrix.md) |
+| How do I keep several configurations (PII selections, policies) in one deployment, and who owns what on each surface? | [Configuration ownership](guides/configuration-ownership.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I report a false positive or missed detection safely? | [Reporting guide](guides/reporting-detection-issues.md) |
 | How do I contribute or run checks? | [Developer onboarding](onboarding.md) · [Contribution guide](../CONTRIBUTION.md) |

@@ -25,5 +25,11 @@ extension-module = ["pyo3/extension-module"]
 redact-secret.workspace = true
 pyo3 = { workspace = true, features = ["abi3-py310"] }
 
+[dev-dependencies]
+# Test-only: lets the unit tests read
+# `conformance/fixtures/action-policy-v1.json` directly instead of copying its
+# values into Rust (`decision-govern-cross-language-conformance`).
+serde_json = "1"
+
 [lints]
 workspace = true

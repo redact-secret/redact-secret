@@ -3,7 +3,7 @@
  *
  * Every code and message below is fixed and input-free: no error carries the
  * scanned input, a matched value, a placeholder, or a failing callback's own
- * message (`decision-define-runtime-bindings`). Twenty-two codes come from the
+ * message (`decision-define-runtime-bindings`). Twenty-three codes come from the
  * Rust core — including `FINDING_LIMIT_EXCEEDED` and the broadened
  * `INPUT_LIMIT_EXCEEDED`/`INVALID_LIMITS`, shared between incremental
  * sessions and whole-input `scan`/`redact`/`scanAndRedact`
@@ -45,6 +45,7 @@ export type SecretScanErrorCode =
   | "MULTILINE_LIMIT_EXCEEDED"
   | "INVALID_STATE"
   | "INVALID_RULESET"
+  | "INVALID_ACTION_POLICY"
   | "PII_SELECTOR_INVALID"
   | "PII_SELECTOR_UNSUPPORTED"
   | "PII_SELECTOR_UNAVAILABLE"
@@ -80,6 +81,10 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   // invariant every other code already has, rather than special-casing this
   // one code to carry variable content.
   INVALID_RULESET: "The supplied ruleset is invalid.",
+  // As `INVALID_RULESET`: the raw addon and WebAssembly errors append the
+  // fixed rejection class and the rule index in parentheses; this package
+  // carries only the code in 0.1.x, with one fixed message.
+  INVALID_ACTION_POLICY: "The supplied action policy is invalid.",
   PII_SELECTOR_INVALID: "PII selector is invalid.",
   PII_SELECTOR_UNSUPPORTED: "PII jurisdiction or family is unsupported.",
   PII_SELECTOR_UNAVAILABLE: "PII selection is unavailable in this artifact.",

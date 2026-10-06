@@ -4,7 +4,10 @@
 //! message. No failure carries argument text, input, a matched value, or an
 //! operating-system message that might quote either.
 
-use redact_secret::{RulesetErrorClass, SecretScanError, SecretScanErrorCode};
+use redact_secret::{
+    ActionPolicyError, ActionPolicyErrorClass, RulesetErrorClass, SecretScanError,
+    SecretScanErrorCode,
+};
 
 /// The command line named an option the binary does not accept.
 pub const UNKNOWN_OPTION: &str = "unrecognized option";
@@ -25,6 +28,24 @@ pub const RULESET_REPEATED: &str = "--ruleset may be given at most once";
 /// explicit file path.
 pub const RULESET_REQUIRES_FILE: &str =
     "--ruleset requires an explicit path; standard input does not accept a ruleset";
+/// `--action-policy` was the last argument, with no path following it.
+pub const ACTION_POLICY_MISSING_PATH: &str = "--action-policy requires a path argument";
+/// `--action-policy` appeared more than once.
+pub const ACTION_POLICY_REPEATED: &str = "--action-policy may be given at most once";
+/// `--compare-action-policy` was the last argument, with no path following it.
+pub const COMPARE_MISSING_PATH: &str = "--compare-action-policy requires a path argument";
+/// More candidate policies than one comparison accepts (the baseline is the
+/// fourth side).
+pub const COMPARE_TOO_MANY: &str = "--compare-action-policy may be given at most 3 times";
+/// A comparison observes one input, and standard input is streamed under
+/// enforcement, so it is not compared.
+pub const COMPARE_REQUIRES_FILE: &str =
+    "--compare-action-policy requires exactly one explicit path; standard input is not compared";
+/// A comparison reports on one input.
+pub const COMPARE_ONE_PATH: &str = "--compare-action-policy reads exactly one path";
+/// A comparison is an observation and `--redact` an enforcement.
+pub const COMPARE_WITH_REDACT: &str =
+    "--compare-action-policy is a preview and cannot be combined with --redact";
 /// `--pii` requires one selector value.
 pub const PII_MISSING_SELECTOR: &str = "--pii requires a selector argument";
 /// Activation printing performs no scan and accepts only selector flags.
@@ -52,6 +73,11 @@ pub enum Failure {
     /// core's fixed `INVALID_RULESET`; the fixed rejection class picks this
     /// failure's message, never a byte from the rejected file.
     Ruleset(RulesetErrorClass),
+    /// The file `--action-policy` named was rejected by the core. The code is
+    /// always the core's fixed `INVALID_ACTION_POLICY`; the fixed class and the
+    /// rule index pick this failure's text, never a byte from the rejected
+    /// file.
+    ActionPolicy(ActionPolicyError),
 }
 
 impl Failure {
@@ -64,6 +90,7 @@ impl Failure {
             Self::WriteFailed => "WRITE_FAILED",
             Self::Core(code) => code.as_str(),
             Self::Ruleset(_) => SecretScanErrorCode::InvalidRuleset.as_str(),
+            Self::ActionPolicy(error) => error.code().as_str(),
         }
     }
 
@@ -76,7 +103,59 @@ impl Failure {
             Self::WriteFailed => "Writing the output failed.",
             Self::Core(code) => code.message(),
             Self::Ruleset(class) => ruleset_class_message(class),
+            Self::ActionPolicy(error) => action_policy_class_message(error.class()),
         }
+    }
+
+    /// The fixed machine-readable detail that follows the message, if any: the
+    /// rejection class and, inside a rule, its zero-based index. Both are fixed
+    /// identifiers and integers, never a byte of the rejected file.
+    pub fn detail(self) -> Option<String> {
+        match self {
+            Self::ActionPolicy(error) => Some(match error.rule_index() {
+                Some(index) => format!("class={} rule_index={index}", error.class().as_str()),
+                None => format!("class={}", error.class().as_str()),
+            }),
+            _ => None,
+        }
+    }
+}
+
+/// A fixed, human-readable message per [`ActionPolicyErrorClass`], so a policy
+/// author can find and fix the rejected member without the CLI ever quoting the
+/// file's own bytes.
+const fn action_policy_class_message(class: ActionPolicyErrorClass) -> &'static str {
+    match class {
+        ActionPolicyErrorClass::ActionPolicyTooLarge => {
+            "the action policy file exceeds the maximum size."
+        }
+        ActionPolicyErrorClass::MalformedDocument => {
+            "the action policy is not a well-formed document of the supported JSON subset."
+        }
+        ActionPolicyErrorClass::UnknownRevision => {
+            "the actionPolicyRevision value is not supported."
+        }
+        ActionPolicyErrorClass::UnknownField => "the action policy declares an unknown member.",
+        ActionPolicyErrorClass::DuplicateField => "the action policy repeats a member.",
+        ActionPolicyErrorClass::MissingField => {
+            "the action policy is missing a required member, or the revision is not first."
+        }
+        ActionPolicyErrorClass::WrongType => "an action policy value has the wrong type.",
+        ActionPolicyErrorClass::UnknownBase => "the action policy base is not default.",
+        ActionPolicyErrorClass::InvalidAction => "a rule action is not supported.",
+        ActionPolicyErrorClass::InvalidIdentifier => {
+            "a rule id, type or detector is not a valid identifier."
+        }
+        ActionPolicyErrorClass::DuplicateRuleId => "two rules share an id.",
+        ActionPolicyErrorClass::EmptyMatch => "a rule has an empty match.",
+        ActionPolicyErrorClass::EmptySet => "a match set has no member.",
+        ActionPolicyErrorClass::DuplicateSetMember => "a match set repeats a member.",
+        ActionPolicyErrorClass::UnknownVocabularyEntry => {
+            "a confidence or obfuscation entry is not supported."
+        }
+        ActionPolicyErrorClass::TooManyRules => "the action policy declares too many rules.",
+        ActionPolicyErrorClass::SetTooLarge => "a match set declares too many members.",
+        _ => "the action policy was rejected.",
     }
 }
 
@@ -129,6 +208,12 @@ impl From<SecretScanError> for Failure {
 impl From<SecretScanErrorCode> for Failure {
     fn from(code: SecretScanErrorCode) -> Self {
         Self::Core(code)
+    }
+}
+
+impl From<ActionPolicyError> for Failure {
+    fn from(error: ActionPolicyError) -> Self {
+        Self::ActionPolicy(error)
     }
 }
 

@@ -32,8 +32,10 @@ unsupported runtime explains most setup failures.
 | `UNPAIRED_SURROGATE` | JavaScript text contains an invalid standalone UTF-16 surrogate; correct input handling before scanning |
 | `INVALID_FINDINGS` | Findings belong to the same original text, have valid native-unit bounds, and do not overlap |
 | `INVALID_PLACEHOLDER` | Formatter output is non-empty, no more than 256 UTF-8 bytes, and does not reproduce a replaced value |
-| `POLICY_FAILURE` / `PLACEHOLDER_FAILURE` | Trusted callback raised; use synthetic input to debug the callback |
+| `POLICY_FAILURE` / `PLACEHOLDER_FAILURE` | Trusted callback raised; use synthetic input to debug the callback. A callback side of `compareActionPolicies` that raises fails the whole comparison, which returns nothing |
+| `INVALID_OPTIONS` | A malformed options object, a callback `policy` together with `actionPolicy`, or a malformed comparison: zero or more than four sides, an unknown side `kind`, or a key `compareActionPolicies` does not take (it takes one string and no stream or incremental option) |
 | `INVALID_POLICY_ACTION` | Policy must return `redact`, `block`, `warn`, or `allow` |
+| `INVALID_ACTION_POLICY` | The action policy document was rejected whole. Rust and the CLI report the fixed class (for example `UNKNOWN_FIELD` or `DUPLICATE_RULE_ID`) and the zero-based rule index, and the public JavaScript error carries the code only, so validate a document with the CLI or Rust when the class matters; fix the first violation in document order. In JavaScript `actionPolicyRevision` must be the first member of an object. See the [action policy guide](guides/action-policy.md) |
 | `INVALID_LIMITS` | Positive explicit session limits and sufficient retained buffer for an incremental session; a positive `maxInputBytes`/`maxFindings` for whole-input `scan`/`redact`/`scanAndRedact` |
 | `INPUT_LIMIT_EXCEEDED` | An incremental session's total accepted input, or a whole-input `scan`/`redact`/`scanAndRedact` call's input, exceeded its byte limit (64 MiB by default for whole-input) |
 | `FINDING_LIMIT_EXCEEDED` | A whole-input `scan`/`redact`/`scanAndRedact` call's accepted finding count exceeded its limit (50,000 by default); raise it via the `limits` option or chunk the input through the incremental API |

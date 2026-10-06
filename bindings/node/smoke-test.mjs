@@ -7,7 +7,9 @@
 
 import assert from "node:assert/strict";
 import {
+  compareActionPolicies,
   createIncrementalSanitizer,
+  defaultPolicy,
   initialize,
   initializePii,
   piiActivation,
@@ -363,6 +365,127 @@ check("invalid limits are rejected with INVALID_LIMITS before a session is creat
       assert.equal(error.code, "INVALID_LIMITS");
       return true;
     },
+  );
+});
+
+const ACTION_POLICY_INPUT = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+const WARN_GITHUB = Buffer.from(
+  '{"actionPolicyRevision":1,"base":"default","rules":[{"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}',
+);
+
+check("an action policy changes one action and leaves the default for the rest", () => {
+  const [plain] = scan(ACTION_POLICY_INPUT);
+  assert.equal(plain.action, "redact");
+  const [overlaid] = scan(ACTION_POLICY_INPUT, undefined, undefined, undefined, WARN_GITHUB);
+  assert.equal(overlaid.action, "warn");
+  assert.equal(overlaid.start, plain.start);
+  const result = scanAndRedact(ACTION_POLICY_INPUT, undefined, undefined, undefined, undefined, WARN_GITHUB);
+  assert.equal(result.redacted, ACTION_POLICY_INPUT);
+});
+
+check("an incremental session binds the action policy it was created with", () => {
+  const session = createIncrementalSanitizer({ limits: INCREMENTAL_LIMITS, actionPolicy: WARN_GITHUB });
+  const released = [
+    ...session.append(ACTION_POLICY_INPUT.slice(0, 20)).findings,
+    ...session.append(ACTION_POLICY_INPUT.slice(20)).findings,
+    ...session.finalize().findings,
+  ];
+  assert.deepEqual(
+    released.map((finding) => finding.action),
+    ["warn"],
+  );
+});
+
+check("a rejected action policy is INVALID_ACTION_POLICY with the class and rule index", () => {
+  assert.throws(
+    () => scan("irrelevant", undefined, undefined, undefined, Buffer.from("{}")),
+    (error) => {
+      assert.equal(error.code, "INVALID_ACTION_POLICY");
+      assert.equal(error.message, "The supplied action policy is invalid. (MISSING_FIELD)");
+      return true;
+    },
+  );
+  assert.throws(
+    () => scan("irrelevant", () => "redact", undefined, undefined, WARN_GITHUB),
+    (error) => {
+      assert.equal(error.code, "INVALID_OPTIONS");
+      return true;
+    },
+  );
+});
+
+check("defaultPolicy evaluates the core default without a copied table", () => {
+  const finding = {
+    id: "finding-1",
+    type: "private_key",
+    detector: "private-key",
+    confidence: "low",
+    obfuscation: "none",
+    start: 0,
+    end: 1,
+  };
+  assert.equal(defaultPolicy(finding), "block");
+  assert.equal(defaultPolicy({ ...finding, type: "acme-unknown-type", confidence: "medium" }), "warn");
+});
+
+check("compareActionPolicies compares sides over one detection pass and enforces nothing", () => {
+  const calls = [];
+  const result = compareActionPolicies(
+    ACTION_POLICY_INPUT,
+    ["default", "action-policy", "callback"],
+    [WARN_GITHUB],
+    [
+      (finding, context) => {
+        calls.push(`${finding.id}:${context.findingIndex}/${context.findingCount}`);
+        return "allow";
+      },
+    ],
+  );
+  assert.deepEqual(calls, ["finding-1:0/1"]);
+  assert.equal(result.findings.length, 1);
+  const [finding] = result.findings;
+  assert.deepEqual(
+    finding.decisions.map((decision) => [decision.action, decision.basis]),
+    [
+      ["redact", "default-policy"],
+      ["warn", "rule"],
+      ["allow", "callback"],
+    ],
+  );
+  assert.equal(finding.decisions[1].ruleId, "warn-github");
+  assert.equal(finding.differs, true);
+  assert.equal(result.changedCount, 1);
+  assert.equal(result.sides[1].documentSha256.length, 64);
+  assert.equal(result.sides[2].documentSha256, undefined);
+  assert.equal(scanAndRedact(ACTION_POLICY_INPUT).redacted.includes("ghp_"), false);
+});
+
+check("compareActionPolicies fails closed on a bad side count, a bad return and a bad document", () => {
+  assert.throws(
+    () => compareActionPolicies(ACTION_POLICY_INPUT, [], [], []),
+    (error) => error.code === "INVALID_OPTIONS",
+  );
+  assert.throws(
+    () => compareActionPolicies(ACTION_POLICY_INPUT, ["callback"], [], [() => "mask"]),
+    (error) => error.code === "INVALID_POLICY_ACTION",
+  );
+  assert.throws(
+    () =>
+      compareActionPolicies(
+        ACTION_POLICY_INPUT,
+        ["callback"],
+        [],
+        [
+          () => {
+            throw new Error("synthetic");
+          },
+        ],
+      ),
+    (error) => error.code === "POLICY_FAILURE",
+  );
+  assert.throws(
+    () => compareActionPolicies("irrelevant", ["action-policy"], [Buffer.from("{}")], []),
+    (error) => error.code === "INVALID_ACTION_POLICY",
   );
 });
 

@@ -20,6 +20,21 @@
  *    pass through the addon's `ruleset` argument: accepted cases and their
  *    default action, and every rejection as `INVALID_RULESET` with the fixed
  *    class the raw addon appends to its message.
+ *    The shared action policy fixture
+ *    (`conformance/fixtures/action-policy-v1.json`, #1219) runs in its own
+ *    pass through the addon's raw exports (`scripts/lib/action-policy-reference.mjs`):
+ *    every rejection with the fixed class and rule index the raw error
+ *    appends to its message, the accepted and boundary documents, the
+ *    end-to-end cases (whole input and incremental sessions over several
+ *    partitions) and the host obligations. Pass 4 runs the same fixture
+ *    through the published package, which reports the code only.
+ *    The shared explain-and-compare fixture
+ *    (`conformance/fixtures/action-policy-compare-v1.json`, #1220) runs the
+ *    same two ways (`scripts/lib/action-policy-compare-reference.mjs`): its
+ *    cases, errors, digests and host obligations through the raw
+ *    `compareActionPolicies` exports, then through the package, whose
+ *    canonical result digest must equal the addon's. The WebAssembly
+ *    qualification prints the same digest for the same profile.
  * 4. **Integrate** — the published JavaScript package's public API driven
  *    against the same addon, resolved the way an installed consumer resolves
  *    it, so the package's own binding glue is covered end to end.
@@ -61,6 +76,21 @@ import { dirname, join, resolve } from "node:path";
 import { Readable, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  addonCompareSurface,
+  assertCompareResult,
+  loadCompareFixture,
+  publicPackageCompareSurface,
+  runCompareReference,
+} from "./lib/action-policy-compare-reference.mjs";
+import {
+  addonSurface,
+  assertActionPolicyResult,
+  loadActionPolicyFixture,
+  publicPackageSurface,
+  runActionPolicyReference,
+  runPublicInputForms,
+} from "./lib/action-policy-reference.mjs";
 import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
 import { loadRulesetReference, runRulesetReference } from "./lib/ruleset-reference.mjs";
 import {
@@ -418,6 +448,39 @@ function conformAddonRuleset(detectorProfile) {
 }
 
 /**
+ * Runs the shared action policy fixture
+ * (`conformance/fixtures/action-policy-v1.json`, #1219) through the addon's
+ * raw exports: every rejection with the fixed class and rule index the raw
+ * error appends to its message, the accepted and boundary documents, the
+ * end-to-end cases (whole input and incremental sessions over several
+ * partitions) and the host obligations.
+ */
+function conformAddonActionPolicy(detectorProfile) {
+  const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
+  const result = runActionPolicyReference(loadActionPolicyFixture(), addonSurface(addon, detectorProfile));
+  assertActionPolicyResult("addon", result, detectorProfile);
+  console.log(
+    `  ${result.checks} checks, ${result.skipped.length} skipped on this profile, ` +
+      `${result.unscannableEvaluations} evaluations no synthetic input reaches`,
+  );
+}
+
+/**
+ * Runs the shared explain-and-compare fixture
+ * (`conformance/fixtures/action-policy-compare-v1.json`, #1220) through the
+ * addon's raw exports: every case, error, digest and host obligation,
+ * enforcement parity against the addon's own `scan`, and the callback call
+ * sequences. Returns the result so the package run can be held to the same
+ * canonical result digest.
+ */
+function conformAddonCompare(detectorProfile) {
+  const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
+  const result = runCompareReference(loadCompareFixture(), addonCompareSurface(addon, detectorProfile));
+  assertCompareResult("addon comparison", result, detectorProfile);
+  return result;
+}
+
+/**
  * Resolves the addon under the specifier the package actually requires, by
  * linking it into the package's own `node_modules`.
  *
@@ -501,6 +564,21 @@ async function integrateWithPackage(detectorProfile, commonExpectations) {
     await api.initialize();
     await api.initialize();
     qualifyIncrementalInput(api.createIncrementalSanitizer, api.SecretScanError);
+    assertEqual(api.artifact(), "addon", "the artifact the package loaded");
+    const actionPolicyFixture = loadActionPolicyFixture();
+    assertActionPolicyResult(
+      "package",
+      runActionPolicyReference(actionPolicyFixture, publicPackageSurface(api, detectorProfile)),
+      detectorProfile,
+    );
+    assertActionPolicyResult("package input forms", runPublicInputForms(actionPolicyFixture, api), detectorProfile);
+    const publicCompare = runCompareReference(loadCompareFixture(), publicPackageCompareSurface(api, detectorProfile));
+    assertCompareResult("package comparison", publicCompare, detectorProfile);
+    assertEqual(
+      publicCompare.resultDigest,
+      conformAddonCompare(detectorProfile).resultDigest,
+      "the package's comparison results against the addon's",
+    );
     assertEqual(api.VERSION, expectedVersion, "the package's reported version");
     assertEqual(api.RANGE_UNIT, "utf16-code-units", "RANGE_UNIT");
     assertEqual(api.PROFILE, detectorProfile, "the package's reported PROFILE");
@@ -793,6 +871,16 @@ async function main() {
   report(`the addon matches the reference ruleset fixture (${detectorProfile})`, () =>
     conformAddonRuleset(detectorProfile),
   );
+  report(`the addon matches the shared action policy fixture (${detectorProfile})`, () =>
+    conformAddonActionPolicy(detectorProfile),
+  );
+  report(`the addon matches the explain-and-compare fixture (${detectorProfile})`, () => {
+    const result = conformAddonCompare(detectorProfile);
+    console.log(
+      `  ${result.checks} checks, ${result.skipped.length} fixture expectations skipped on this profile, ` +
+        `${result.notObservable.length} obligations not observable here, result digest ${result.resultDigest}`,
+    );
+  });
   report(`profile()/profileCommon() report the ${detectorProfile} contract`, () => {
     const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
     assertEqual(addon.profile(), "full", "addon.profile()");

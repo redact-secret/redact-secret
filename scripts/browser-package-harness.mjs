@@ -11,6 +11,7 @@
  */
 
 import {
+  compareActionPolicies,
   createIncrementalSanitizer,
   initialize,
   RANGE_UNIT,
@@ -29,6 +30,7 @@ export const qualify = (fixtures) =>
     RANGE_UNIT,
     SecretScanError,
     VERSION,
+    compareActionPolicies,
     createIncrementalSanitizer,
     initialize,
     redact,
