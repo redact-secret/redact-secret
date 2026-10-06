@@ -1270,6 +1270,19 @@ fn is_confluent_key_id_assignment(name: &str, value: &str) -> bool {
             .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit())
 }
 
+/// `true` for the public half of an Atlas programmatic API key assigned to
+/// its documented name (issue #1226): the Atlas CLI profile property
+/// `public_api_key` (`publicApiKey`, `PUBLIC_API_KEY`) or the variable
+/// `MONGODB_ATLAS_PUBLIC_API_KEY`, holding exactly 8 bytes, the length the
+/// Atlas API specification gives the public key (`minLength` and `maxLength`
+/// 8). The public key is the username-like half; the private half is a
+/// different name (`private_api_key`, `privateKey`) and is read as before. No
+/// alphabet is claimed. A value of any other length under the same name stays
+/// reported, so a longer secret filed under the public name is not hidden.
+fn is_atlas_public_api_key_assignment(name: &str, value: &str) -> bool {
+    matches!(name, "public_api_key" | "mongodb_atlas_public_api_key") && value.len() == 8
+}
+
 // --- colon-namespaced scope identifiers (issue #727, benchmark gap
 // `product-727`) ----------------------------------------------------------
 
@@ -2226,6 +2239,7 @@ fn assignment_confidence(
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
         || is_non_secret_reference(value, form)
         || is_confluent_key_id_assignment(name, value)
+        || is_atlas_public_api_key_assignment(name, value)
         || is_self_reference(name, value)
     {
         return None;

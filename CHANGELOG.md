@@ -222,6 +222,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports the public half of an Atlas programmatic API
+  key under its own name (#1226): `public_api_key = "abcd1234"`,
+  `MONGODB_ATLAS_PUBLIC_API_KEY=abcd1234` and `{"publicApiKey":"abcd1234"}` were a
+  medium `warn` `contextual_secret` while `publicKey` was silent. Exactly 8 bytes,
+  the documented public-key length, under those names is excluded; any other
+  length and the private half (`privateKey`, `private_api_key`,
+  `MONGODB_ATLAS_PRIVATE_API_KEY`, still a high `redact` over exactly the value,
+  now pinned by tests) keep their reading.
 - `generic-token` no longer reports the Batch 2 documentation placeholders that
   name a product, service or scope (#1234 follow-up): `{"password":"YOUR_DB_PASSWORD"}`,
   `YOUR_DATABASE_PASSWORD`, `YOUR_ATLAS_PASSWORD`, `YOUR_MONGODB_PASSWORD`,
