@@ -64,8 +64,19 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// `X-Airtable-Content-MAC` header carries). It is exactly this one name, not
 /// a `*_base64` rule: `thumbnailBase64`, `macSecretBase64Length`,
 /// `macSecretBase64Id` and a prefixed `oldMacSecretBase64` do not match.
+///
+/// Issue #1233 adds the `HubSpot` CLI's personal access key: the
+/// `personalAccessKey` field of an account entry (`authType:
+/// personalaccesskey` in `~/.hscli/config.yml`) and the
+/// `HUBSPOT_PERSONAL_ACCESS_KEY` variable. Exactly these two normalized names
+/// (`personal_access_key`, `hubspot_personal_access_key`), not a `*_key` rule:
+/// `personalAccessKeyId`, `personalAccessKeyExpiresAt`, a further-prefixed
+/// `my_personal_access_key` and `portalId` do not match. The field name rests
+/// on `HubSpot`'s own SDK source, not a documentation sentence.
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
     "mac_secret_base64",
+    "personal_access_key",
+    "hubspot_personal_access_key",
     "db_pass",
     "fal_key",
     "convex_deploy_key",
@@ -2467,6 +2478,13 @@ fn unquoted_assignment_value_with(
     start: usize,
     reach: Option<&mut ValueReach>,
 ) -> Option<(usize, usize)> {
+    // `refresh_token=&other=1`: the value is empty and the `&` is the form
+    // delimiter of the next parameter (issue #1232). Without this the walk
+    // below, which only stops at an `&name=` that is not its first byte,
+    // read the neighbouring public parameter as the credential.
+    if starts_query_parameter(input, start) {
+        return None;
+    }
     if let Some(span) = delimited_reference_value(input, start) {
         return Some(span);
     }

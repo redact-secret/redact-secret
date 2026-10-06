@@ -85,6 +85,34 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports the instructional placeholder
+  `YOUR_PASSWORD` (and `your-pwd-here`, `INSERT_PASSWORD`, `ENTER_YOUR_PASSPHRASE`,
+  the `passwd` and `passphrase` forms) under a `password` name or any other
+  contextual name (#1234). `{"password":"YOUR_PASSWORD"}` was a medium `warn`
+  while `"password":"<password>"`, `YOUR_ACCESS_TOKEN` and `YOUR_CLIENT_SECRET`
+  were silent. A placeholder glued to random material, a digit or a letter, a
+  placeholder with an unlisted word (`YOUR_DB_PASSWORD`), a real password and a
+  short password keep their previous result.
+- `generic-token` redacts the HubSpot CLI personal access key: the
+  `personalAccessKey` field of an account entry in `~/.hscli/config.yml` and the
+  `HUBSPOT_PERSONAL_ACCESS_KEY` environment variable (YAML, quoted, CRLF,
+  `export`, `.env`, docker-compose) as a generic `contextual_secret` over exactly
+  the value, redacted at high confidence and warned at medium (#1233). Before this
+  neither was read. Only these two whole names are added: `personalAccessKeyId`,
+  `personalAccessKeyExpiresAt`, `portalId`, `authType`, prefixed or suffixed
+  lookalikes, placeholders, references and masks are not matched, and no HubSpot
+  type is claimed. The field name rests on HubSpot's own SDK source; the legacy
+  `portals` layout is unresolved.
+- `generic-token` no longer takes the next form parameter as the value of an
+  empty one (#1232). `refresh_token=&other=1` and `client_secret=&grant_type=x`
+  produced a medium, `warn` `contextual_secret` whose span was `&other=1` or
+  `&grant_type=x`, so a policy that escalates `warn` to `redact` would have
+  masked a public parameter. An empty value is not a credential: no finding, and
+  a span never starts at the delimiter of the next `&name=` parameter. A real
+  value, an empty value at the end of the input, before a newline, `;`, `,` or a
+  space, an empty quoted value, and a credential in the parameter after an empty
+  one are unchanged. Cost: a password whose own first bytes read as `&name=` is
+  no longer reported as that one value.
 - `generic-token` redacts an `Authorization: ApiKey <value>` or
   `Proxy-Authorization: ApiKey <value>` credential in raw HTTP, quoted curl `-H`
   and JSON header maps, as a generic `authorization_credential` over the

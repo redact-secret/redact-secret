@@ -1,17 +1,16 @@
 # Evidence: #1226, Batch 2 Atlas password, API private key and service-account secret
 
-**Result:** the product contract for the three G6 rows is adopted as a
-conditional policy, with the Atlas database-user password stance the benchmarks
-readiness inventory was waiting on. The current policy is preserved where it is
-in contract: the `mongodb` and `mongodb+srv` URI userinfo password through the
-connection-string detector, and a documented password field through the
-contextual vocabulary. A user-chosen password that is short, low entropy or
-punctuation-bearing is a stated blind spot; no provider grammar is invented and
-no claim is made that all passwords are protected. The API private key is the
-client's Digest input, not a PEM and not in the Digest header; the service-account
-secret is opaque and `mdb_sa_sk_` is only a truncated example. No row is claimed
-covered, passing or ready, no benchmark result is stated, and no code, detector,
-registry entry or type changes.
+**Result:** the contract for the three G6 rows (adopted in PR #1231, with the Atlas
+password stance) was tested by the independent benchmarks#739 round 2 against the
+published `0.1.0-beta.13` and the candidate `a148dadf`. `mongodb-atlas:database-user-password`
+passed every positive and reproduced one false positive, the `YOUR_PASSWORD`
+placeholder under a password name (a medium `warn`), fixed by
+[#1234](../1234/README.md); its percent-escaped URI password stays an accepted
+policy limit, observed and not scored. `mongodb-atlas:service-account-secret` is
+existing coverage validated by the benchmark. `mongodb-atlas:programmatic-api-private-key`
+has no wire carrier (a client-side Digest input): only controls were observed, all
+clean, and the row is source-unresolved, not covered. The independent replay of
+the fixed candidate is open.
 
 Issue [#1226](https://github.com/redact-secret/redact-secret/issues/1226)
 (measurement child benchmarks
@@ -28,7 +27,7 @@ representation decision is
 | Role | Source |
 | --- | --- |
 | Provider facts (pending inputs) | The three proposed contracts of credential-evidence#235 and the [Batch 2 handoff](https://github.com/redact-secret/credential-evidence/blob/005a7331cf90403bd4ce4abcb93bd8b085d315a9/docs/handoffs/batch-2-bounded-carriers.md) (credential-evidence#248, project-authored, not independent). It records the password as a write-only, caller-chosen request property with no generated grammar and an unresolved percent-encoding question; the private key as a client-configured Digest input whose wire header holds a hash, returned unredacted once at creation; and the service-account secret as carried in an HTTP Basic header with `mdb_sa_sk_` plus an ellipsis only a truncated example and `mdb_sa_id_` a public id. It also holds three public-sibling records (the public key, the credential object id, the client id). |
-| Independent baseline | None. benchmarks#739 readiness (comment 6001345412): `mongodb-atlas:database-user-password` blocked (`representation-policy-undecided`), `mongodb-atlas:programmatic-api-private-key` carrier-unresolved, `mongodb-atlas:service-account-secret` blocked (awaiting evidence review). |
+| Independent baseline | benchmarks#739: [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/report.md), [round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/round2/report.md) and [ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/ledger.json) at merge `fe7a5d1a` of PR #761 (readiness at merge `6a1a7a64` of PR #755). Identities under "Independent measurement and dispositions". |
 | Product policy (this record) | The connection-string grammar (`connection_string_password`, valid percent escapes not decoded), the contextual vocabulary and its confidence gate (`decision-warn-unconditionally-on-high-signal-contextual-names`), the Basic envelope ([#1213](../1213/README.md)) and the representation decision above. |
 
 ## Adopted contracts
@@ -91,51 +90,118 @@ invented and not shown. Not benchmark results and not coverage claims.
 | JSON `{"clientSecret":"mdb_sa_sk_<24>"}` | `contextual_secret`, high, redact, over the value (17-51) |
 | `client_secret=mdb_sa_sk_...`; JSON `maskedSecretValue` with `mdb_sa_sk_...<4>`; a bare `mdb_sa_sk_<24>` in prose | no finding |
 
-## Per-row table
+## Independent measurement and dispositions
 
-Legend as in the [#1223 record](../1223/README.md#per-row-table): layout kind URI
-is the mongodb URI userinfo reading; P1 and P2 are the preconditions defined
-there. The evidence handoff marks all three rows `ready`; for the private key
-that mark rests on a Digest input with no wire carrier, so the product treats no
-layout as named and the row starts at P2.
+**Independent measurement.** benchmarks
+[#739](https://github.com/redact-secret/redact-secret-benchmarks/issues/739)
+measured all 58 rows in two rounds (PRs
+[#755](https://github.com/redact-secret/redact-secret-benchmarks/pull/755) and
+[#761](https://github.com/redact-secret/redact-secret-benchmarks/pull/761), both
+merged; permalinks at their merge commits `6a1a7a64` and `fe7a5d1a`): the
+[readiness inventory](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/readiness.md) (first version at merge `6a1a7a64` of PR #755), the [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/report.md), the [round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/round2/report.md) and the [ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/ledger.json) (58 rows, schema 4). Frozen round-2
+corpus sha256 `a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921`
+(1935 cases; first freeze `8e447629`, three documented errata before the
+re-measurement; round 1's corpus `74fed382`, 486 cases, 30 rows, is separate).
+Case ids are `<family>:r2:<layout>:<kind>` in `benchmarks/batch2/corpus-r2.mjs`
+(round 1: `<family>:<layout>:<kind>` in `corpus.mjs`) and are listed per row in the
+ledger. Expectations were authored from credential-evidence `65602481` and the
+adopted contract (PR #1231), frozen before any scan, and were not edited.
+
+**Identities.** Published: `@redact-secret/core`, `@redact-secret/wasm` and the
+darwin-arm64 addon `0.1.0-beta.13` from npm (core integrity
+`sha512-qZkqRN7CIJ+pc0IteRCXSucr1l9KtTc/nJaM5wPL0NvCiZ4AGWLCyrLy8KD95a2MBgxo8vuUJ/UaKhrny7gMJQ==`),
+PyPI `redact-secret` `0.1.0b13`, crates.io `redact-secret-cli` `0.1.0-beta.13`.
+Candidate: the unpublished commit `a148dadf4a43b5441ed88386d055428b2e278f25`
+(core main after PR #1231, no candidate package published). Surfaces: Node, WASM,
+Python and the CLI (the Rust surface; no separate Rust harness), whole and
+streamed at 7-byte and 1-byte chunks, darwin-arm64, Node v22.16.0; the four
+surfaces agreed on every case and stream equalled whole. Peers were not run. The
+fixed candidate is **not** an identity the benchmark has measured: this change
+was replayed locally on the CLI surface only (see the #1223 record).
+
+**Result (candidate `a148dadf`; published identical).** `mongodb-atlas:database-user-password`:
+19 positives pass, 1 control flagged (`password-member-placeholders`, #1234), the
+percent-escaped URI case is the recorded conflict observation (the contract keeps
+escapes inside the span, the evidence records the encoding as unresolved; not
+scored). `mongodb-atlas:service-account-secret`: 10 positives and 7 controls as
+expected. `mongodb-atlas:programmatic-api-private-key`: the evidence marks it
+`ready` but its input is a Digest computation with no wire carrier, so the
+benchmark has no positive; the Digest header, the public key and a redacted read
+were observed as controls only, clean (round 1).
+
+**Disposition legend.** *Existing coverage, validated by the benchmark: no
+code* means the row's in-contract positives and controls passed on the published
+baseline and on the candidate on every surface and stream, and the record
+changes nothing for it. *Reproduced gap, fixed by this PR* names the issue.
+*Batch 1 fix reused* means the row fails on the published baseline and passes on
+the candidate through an earlier core fix. *Accepted policy limit* and
+*source-unresolved / unmeasured* are never counted as a miss, a clean result or
+coverage. Variants the contract leaves unassertable (prefixed or upper-case
+names, single quotes, lower-case schemes, percent values, legacy layouts) are
+observed and not scored in every row. A row is not claimed covered beyond what the
+ledger measured.
+
+**Local replay of this change (CLI surface only).** The benchmark's own runner
+(`scripts/measure-batch1.mjs --corpus benchmarks/batch2/corpus-r2.mjs --cli
+<release build of this branch>`, 7-byte and 1-byte chunks) and scorer
+(`score-r2.mjs`) were run at the merge `fe7a5d1a` of benchmarks PR #761 over all
+1935 cases, whole and streamed. Result: 0 positives failing and 0 controls
+flagged on every row (the candidate `a148dadf` had 8 positive cases and 16 control
+cases failing). Against the
+candidate's CLI observations exactly 25 cases differ: the 15 empty-form-value
+controls of #1232 (now clean), the 8 HubSpot positives of #1233 (now exact), the
+mongodb-atlas placeholder control of #1234 (now clean), and the unscored
+`personalAccessKey-legacy-portals` observation (no finding before, a finding now:
+the name is read wherever it appears; the legacy layout stays unresolved and
+unasserted). Nothing else changed. This is a local diagnostic, not the
+benchmark's measurement: Node, WASM and Python were not replayed with the fixed
+candidate.
 
 ### G6: 3 families
 
-| Family | Layout kind (evidence-named, unreviewed) | Product disposition kind | Benchmarks inventory | Evidence handoff | Precondition |
-| --- | --- | --- | --- | --- | --- |
-| `mongodb-atlas:database-user-password` | F + URI | existing generic paths: documented password field and mongodb URI userinfo; user-chosen passwords are a stated blind spot | blocked (representation-policy-undecided) | ready | P1 |
-| `mongodb-atlas:programmatic-api-private-key` | C / X | plaintext slot conditional on a reviewed layout; the Digest header is out of contract | carrier-unresolved (carrier-source-missing) | ready | P2: the evidence contract names no plaintext slot (client-configured Digest input, no wire carrier); a reviewed create-response or config slot is needed before any layout is in contract |
-| `mongodb-atlas:service-account-secret` | BA | existing generic path: Basic envelope; a form field only where a reviewed layout names it | blocked (awaiting-evidence-review) | ready | P1 |
+| Family | Carrier layout (evidence-named, benchmark slots) | Cases r2: pos / ctl / unscored | Candidate `a148dadf` (published beta.13) | Disposition |
+| --- | --- | --- | --- | --- |
+| `mongodb-atlas:database-user-password` | JSON/YAML member `password`; URI userinfo | 19 / 11 / 6 (+ 15 round-1) | pos 0 fail, ctl 1 flagged (published: 0, 1) | Reproduced gap (placeholder control), fixed by this PR (#1234); other cases covered. The percent-escaped URI password is the accepted policy limit: observed, not scored. |
+| `mongodb-atlas:programmatic-api-private-key` | none (Digest input, no wire carrier) | 0 / 0 / 0 (+ 7 round-1) | controls only, clean | Source-unresolved / unmeasured: the evidence marks it ready but its input is a client-side Digest computation with no wire carrier, so there is no positive. Only the controls both sides agree on were observed (clean). Not claimed covered. |
+| `mongodb-atlas:service-account-secret` | Basic envelope | 10 / 7 / 4 (+ 14 round-1) | pos 0 fail, ctl 0 flagged (published: 0, 0) | Existing coverage, validated by the benchmark: no code. |
 
 ## Handoff
 
-The benchmarks side may treat as adopted: for the password row, the URI userinfo
-expectation (exact undecoded password, `connection_string_password`, redact) and,
-for a reviewed field layout, the field expectation including `warn` at medium,
-with user-chosen short, low-entropy and punctuation-bearing passwords recorded as
-blind spots and not scored as misses; for the service-account secret, once its
-layout is reviewed, the whole-envelope Basic expectation and the public client
-id, masked display and truncated example as controls; for the private key,
-nothing until a reviewed plaintext slot exists, with the Digest header and the
-public key as controls. What stays blocked: all three rows wait for a reviewed
-evidence contract and an independent baseline, and the private key additionally
-for a named plaintext slot. Percent-encoded password variants beyond the URI
-reading are unassertable under the decision. Exact candidate source and digests
-go to benchmarks only after a gap is demonstrated; none is. No pin, version or
-release changes.
+Final for the benchmarks side: the URI-userinfo and password-field expectations
+for `mongodb-atlas:database-user-password` (exact undecoded password,
+`connection_string_password` / `contextual_secret`), including that a documented
+placeholder (`YOUR_PASSWORD`, `<password>`) is silent after
+[#1234](../1234/README.md), with user-chosen short, low-entropy and
+punctuation-bearing passwords as blind spots and percent-escaped passwords
+unassertable; the whole-envelope Basic expectation for the service-account secret;
+and for the private key nothing beyond the controls, until the evidence names a
+plaintext slot (source-unresolved: not covered, not a miss).
+
+**What the benchmarks side replays (open).** Build the merge commit of this
+change (the maintainer names it; not chosen here) as the fixed candidate (`npm
+ci`, `npm run js:build`, the napi addon, `npm run wasm:build`, `npm pack` of core,
+addon and wasm, `maturin develop --release`, `cargo build --release --locked -p
+redact-secret-cli`), then run the round-2 corpus `a312308a...` (all 1935 cases) on
+Node, WASM, Python and the CLI, whole and at 7-byte and 1-byte chunks, with
+`scripts/measure-batch1.mjs` and `scripts/report-batch2-r2.mjs`, and the Batch 1
+and round-1 corpora for regression. Expected: 0 positives failing and 0 controls
+flagged on all 58 rows; observations identical to `a148dadf` except the 25 cases
+listed above; stream equal to whole; the four surfaces identical.
+
+No pin, version or release changes; this record chooses none.
 
 ## Gates of the issue
 
 | Gate | State |
 | --- | --- |
-| Freeze layout, admission, span, attribution, default action, exclusions per ready row | Met at class level (this record and the spec rows); per row conditional, no row is ready. |
-| Link baseline case ids and identities; disposition every row | Open, no baseline. |
-| Repair only demonstrated gaps | Open, none demonstrated. The password blind spots are accepted, recorded limits. |
-| Deterministic conformance for changed logic | Open, no logic changed. |
-| Shared parser fix once | Open, none needed so far. |
-| Node/WASM, Python, Rust and CLI whole and stream behavior | Open. Only the CLI was observed, at one commit. |
-| Candidate revision and digests to benchmarks; accept replay | Open, conditional on a demonstrated gap. |
-| Record no-code conclusions | Open, conditional on a baseline. |
+| Freeze each ready row's layout, admission, span, attribution, default action and exclusions in final product evidence and spec rows | Met. The class contract and spec rows are adopted (PR #1231) and the independent measurement tested them per row; the evidence contracts of credential-evidence remain proposed or draft, which is that repository's state, not a product gap. |
+| Link independent baseline case ids and identities; disposition every row | Met. Identities and permalinks are above and every row has its disposition in the per-row table, with case ids in the ledger and the corpus. |
+| Repair only demonstrated gaps | Met. One false positive was demonstrated (`YOUR_PASSWORD` under a password name) and repaired by [#1234](../1234/README.md); the password blind spots and the percent-escaped URI password are accepted, recorded limits. |
+| Deterministic conformance for changed logic | Met. `tests/batch2_gaps_1232_1234.rs` (`a_your_password_placeholder_under_a_password_name_is_silent` and the real-value, short-value and glued-placeholder controls). |
+| Shared parser fix once | Not applicable. #1234 is a placeholder-vocabulary fix, not a parser fix. |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | Partly. Baseline and candidate `a148dadf` were measured by the benchmark on all four surfaces, whole and 7-byte and 1-byte streamed, identical. For this change: the Rust core under whole input, every two-chunk UTF-8 byte partition and per-line sessions (`tests/batch2_gaps_1232_1234.rs`), and the CLI replay above. Open: Node, WASM and Python with the fixed candidate, which share the Rust core and are the benchmark replay. |
+| Exact candidate revision and digests to benchmarks; accept independent replay | Open. The fixed candidate does not exist as a measured identity until the change is merged and built; what to replay is stated above. Offered: the merge commit and the build recipe of the benchmark README, no pin, version or release change. |
+| Record no-code conclusions for existing coverage | Met for `mongodb-atlas:service-account-secret` and for the in-contract positives and controls of the password row, as the benchmark ledger measured them. `mongodb-atlas:programmatic-api-private-key` is source-unresolved and is not a no-code conclusion. |
 
 ## Tradeoffs
 
@@ -153,8 +219,10 @@ release changes.
 
 ## Tests
 
-None added: documentation and policy only. The URI grammar, the contextual
-vocabulary and the Basic envelope are pinned by their existing tests
-(`connection_string` and `generic_token` unit tests,
-`batch1_credential_slots_1209_1213.rs`). The observations above are pinned by
-this record only.
+`crates/secret-scan-core/tests/batch2_gaps_1232_1234.rs` pins #1234 (see
+[#1234](../1234/README.md#tests)); the URI grammar, the contextual vocabulary and
+the Basic envelope are pinned by their existing tests (`connection_string` and
+`generic_token` unit tests, `batch1_credential_slots_1209_1213.rs`). The
+observations above are pinned by this record only. The independent measurement is
+the benchmarks side's.
+
