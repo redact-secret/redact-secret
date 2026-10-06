@@ -1,4 +1,4 @@
-import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
+import { isMainThread, parentPort, Worker, workerData } from "node:worker_threads";
 
 const TEXT = "email: owner.synthetic@mail-synthetic.org\nclient_ip = 192.168.1.7\n";
 const TENANTS = {
@@ -22,6 +22,8 @@ if (isMainThread) {
   const { initialize, scan } = await import("@redact-secret/core");
   const pii = TENANTS[workerData.tenant];
   await initialize(pii === undefined ? {} : { pii });
-  const types = scan(TEXT).map((finding) => finding.type).sort();
+  const types = scan(TEXT)
+    .map((finding) => finding.type)
+    .sort();
   parentPort.postMessage({ tenant: workerData.tenant, types });
 }

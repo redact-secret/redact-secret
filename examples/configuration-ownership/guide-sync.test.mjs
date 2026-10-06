@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -9,7 +9,9 @@ import { fileURLToPath } from "node:url";
 // The Rust recipes are run by crates/secret-scan-core/tests/configuration_ownership_1222.rs.
 const here = new URL("./", import.meta.url);
 const guide = readFileSync(new URL("../../docs/guides/configuration-ownership.md", import.meta.url), "utf8");
-const files = readdirSync(fileURLToPath(here)).filter((name) => /\.(mjs|py)$/.test(name) && !name.endsWith(".test.mjs"));
+const files = readdirSync(fileURLToPath(here)).filter(
+  (name) => /\.(mjs|py)$/.test(name) && !name.endsWith(".test.mjs"),
+);
 
 test("the example set is the one the guide shows", () => {
   assert.deepEqual(files.sort(), [

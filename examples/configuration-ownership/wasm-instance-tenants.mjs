@@ -25,5 +25,13 @@ async function instanceFor(tenant, { stem, pii }) {
 const instances = {};
 for (const [tenant, config] of Object.entries(TENANTS)) instances[tenant] = await instanceFor(tenant, config);
 for (const [tenant, glue] of Object.entries(instances)) {
-  console.log(tenant, JSON.stringify(glue.scan(TEXT).map((finding) => finding.type).sort()));
+  console.log(
+    tenant,
+    JSON.stringify(
+      glue
+        .scan(TEXT)
+        .map((finding) => finding.type)
+        .sort(),
+    ),
+  );
 }

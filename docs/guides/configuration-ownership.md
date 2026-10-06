@@ -192,7 +192,7 @@ the package, so it is a separate owner; the main thread is one more. Call
 `initialize` once in each Worker, before its first scan.
 
 ```js
-import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
+import { isMainThread, parentPort, Worker, workerData } from "node:worker_threads";
 
 const TEXT = "email: owner.synthetic@mail-synthetic.org\nclient_ip = 192.168.1.7\n";
 const TENANTS = {
@@ -216,7 +216,9 @@ if (isMainThread) {
   const { initialize, scan } = await import("@redact-secret/core");
   const pii = TENANTS[workerData.tenant];
   await initialize(pii === undefined ? {} : { pii });
-  const types = scan(TEXT).map((finding) => finding.type).sort();
+  const types = scan(TEXT)
+    .map((finding) => finding.type)
+    .sort();
   parentPort.postMessage({ tenant: workerData.tenant, types });
 }
 ```
@@ -272,7 +274,15 @@ async function instanceFor(tenant, { stem, pii }) {
 const instances = {};
 for (const [tenant, config] of Object.entries(TENANTS)) instances[tenant] = await instanceFor(tenant, config);
 for (const [tenant, glue] of Object.entries(instances)) {
-  console.log(tenant, JSON.stringify(glue.scan(TEXT).map((finding) => finding.type).sort()));
+  console.log(
+    tenant,
+    JSON.stringify(
+      glue
+        .scan(TEXT)
+        .map((finding) => finding.type)
+        .sort(),
+    ),
+  );
 }
 ```
 

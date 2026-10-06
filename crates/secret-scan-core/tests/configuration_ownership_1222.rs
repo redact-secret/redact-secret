@@ -28,8 +28,9 @@ fn region(name: &str) -> String {
 
 fn guide_contains(name: &str) {
     let code = region(name);
+    // A Windows checkout may convert the guide to CRLF line endings.
     assert!(
-        GUIDE.contains(&code),
+        GUIDE.replace("\r\n", "\n").contains(&code),
         "docs/guides/configuration-ownership.md no longer contains the {name} example verbatim"
     );
 }

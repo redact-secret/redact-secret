@@ -679,7 +679,10 @@ fn nothing_in_the_result_carries_plaintext_or_a_score() {
 #[test]
 fn a_loser_and_a_suppressed_alternative_are_never_reported() {
     let registry = DetectorRegistry::with_built_in([]).unwrap();
-    let input = concat!("twilio Authorization: Bear", "er fedcba9876543210fedcba9876543210");
+    let input = concat!(
+        "twilio Authorization: Bear",
+        "er fedcba9876543210fedcba9876543210"
+    );
     let comparison = compare_action_policies(input, &registry, &[ComparedPolicy::Default]).unwrap();
     let enforced = scan(input, &registry, &DefaultPolicy).unwrap();
     assert_eq!(comparison.findings().len(), enforced.len());
