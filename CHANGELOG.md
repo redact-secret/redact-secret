@@ -222,6 +222,17 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `bearer-token` now reads the whole percent-escaped value of an
+  `Authorization:` or `Proxy-Authorization:` Bearer header (#1224). X's
+  application-only Bearer Token carries `%2B`, `%2F` and `%3D` inside it, and the
+  finding stopped at the first `%`, leaving the tail in the redacted output while
+  the same value under `access_token=` was redacted whole. A `%XX` triplet is now part of
+  the header value's token run (escapes are not decoded, and each counts three
+  bytes toward the 12-byte floor); a `%` without two hex digits ends the run, and
+  the bare `Bearer` form and every other grammar keep their alphabet, so a
+  percent-containing value there still leaves its tail. New decision record
+  `decision-admit-percent-escapes-in-the-authorization-bearer-header-value`
+  amends the 2026-10-05 stance for this one carrier.
 - `connection-string` now reads the password of a `mongodb` or `mongodb+srv` URI
   whose userinfo the strict grammar declined (#1226): `user:<v>%@host`,
   `user:ab%zz<v>@host`, `100%%` and a password with a raw `@`, `/`, `?` or `#` gave

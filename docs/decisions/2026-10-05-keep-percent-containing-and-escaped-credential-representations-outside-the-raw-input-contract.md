@@ -111,3 +111,4 @@ Bearer-grammar observation.
 ## Amendments
 
 - 2026-10-06: item 4 of the Decision (the Atlas URI password) is amended for the `mongodb` and `mongodb+srv` URI only by [`decision-read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed`](2026-10-06-read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed.md): a password with a malformed escape or raw punctuation is read at medium confidence.
+- 2026-10-06: item 1 and the rejected alternative "Widen the Bearer alphabet to include `%`" are amended for the `Authorization:`/`Proxy-Authorization:` Bearer header value only by [`decision-admit-percent-escapes-in-the-authorization-bearer-header-value`](2026-10-06-admit-percent-escapes-in-the-authorization-bearer-header-value.md): a `%XX` triplet is part of the token run there. Every other carrier, including the bare `Bearer` form, keeps its alphabet.
