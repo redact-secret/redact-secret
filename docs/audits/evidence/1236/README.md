@@ -8,7 +8,7 @@ placeholders glued to material and every other uppercase lead are unchanged.
 No vocabulary, detector, registry entry or type changes.
 
 Issue [#1236](https://github.com/redact-secret/redact-secret/issues/1236).
-Handoff: [`../1014/square.md`](../1014/square.md), "Benign" controls. Oracle:
+Handoff: [`../1014/square.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/square.md), "Benign" controls. Oracle:
 redact-secret-benchmarks `beta8-583a` (ledger record `product-1236`, benchmarks#770),
 cases `beta8-583a--square-token-your-access-token-placeholder`,
 `--square-token-angle-brackets-placeholder` and

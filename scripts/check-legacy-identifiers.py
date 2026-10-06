@@ -70,11 +70,6 @@ LEGACY_IDENTIFIER_ALLOWLIST: dict[str, str] = {
         "rationale cite the old identity as the decision's own record of "
         "what changed, not a missed rename"
     ),
-    "docs/audits/evidence/1012/cartesia.md": (
-        "a frozen #1012 research record whose permalink cites a third-party "
-        "repository file named `secret-scan.ts`; the text is another "
-        "project's path, not this project's former name"
-    ),
     "scripts/check-legacy-identifiers.py": (
         "this script's own docstring and token patterns must name the "
         "legacy identifier literally to detect and document it; not a "
