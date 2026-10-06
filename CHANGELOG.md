@@ -7,6 +7,15 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the Zendesk `{email}/token:{token}` credential string
+  by its `/token:` literal (#1230): the finding is the token only,
+  `contextual_secret`, high, `redact`, where the string was one whole-value
+  `warn` that left the token in the `--redact` output (a masked display
+  `.../token:********` was flagged the same way) and the `curl` argument form was
+  silent. The token wins the overlap against the whole-string reading; a mask,
+  reference, template or placeholder token and an email with `/token` alone are
+  silent. No `-u` flag reader (issue #1247); a plain `-u user:<password>` stays
+  unread.
 - `generic-token` now reads the `token=` parameter of an OAuth token revocation
   or introspection request (#1230): `token=<value>` in a form body or curl
   argument is a `contextual_secret`, high, `redact`, exactly the value, when the

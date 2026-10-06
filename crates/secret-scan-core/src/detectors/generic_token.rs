@@ -1699,6 +1699,7 @@ fn is_non_secret_reference_beyond_digits(value: &str, form: ValueForm) -> bool {
         || is_pem_framed_placeholder(value)
         || is_brace_placeholder_reference(value)
         || is_elided_middle_display(value)
+        || is_email_token_credential_with_placeholder(value)
 }
 
 /// The most letters in one word of a brace placeholder (`{your-app_id}`).
@@ -3471,6 +3472,149 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     candidates
 }
 
+// --- Zendesk `{email}/token:{api_token}` (issue #1230) ---------------------
+
+/// The literal between the email-address username and the API token of a
+/// Zendesk API-token credential string (`agent@example.test/token:<token>`),
+/// the form Zendesk documents for HTTP Basic authentication, a JSON
+/// configuration string and an environment value.
+const EMAIL_TOKEN_ANCHOR: &str = "/token:";
+
+/// The start of the email address that `prefix` ends with, or `None`: a local
+/// part of at least one `[A-Za-z0-9._%+-]` byte, `@`, and a domain of two or
+/// more dot-separated labels of `[A-Za-z0-9-]` (none empty, none starting or
+/// ending in `-`) whose last label is at least two ASCII letters.
+fn email_address_start(prefix: &str) -> Option<usize> {
+    let bytes = prefix.as_bytes();
+    let mut domain_start = bytes.len();
+    while domain_start > 0
+        && (bytes[domain_start - 1].is_ascii_alphanumeric()
+            || matches!(bytes[domain_start - 1], b'.' | b'-'))
+    {
+        domain_start -= 1;
+    }
+    if domain_start == 0 || bytes[domain_start - 1] != b'@' {
+        return None;
+    }
+    let domain = &prefix[domain_start..];
+    let last_label = domain.rsplit('.').next()?;
+    let labels_ok = domain.split('.').count() >= 2
+        && domain.split('.').all(|label| {
+            !label.is_empty()
+                && !label.starts_with('-')
+                && !label.ends_with('-')
+                && label
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-')
+        });
+    if !labels_ok || last_label.len() < 2 || !last_label.bytes().all(|b| b.is_ascii_alphabetic()) {
+        return None;
+    }
+    let at = domain_start - 1;
+    let mut local_start = at;
+    while local_start > 0
+        && (bytes[local_start - 1].is_ascii_alphanumeric()
+            || matches!(bytes[local_start - 1], b'.' | b'_' | b'%' | b'+' | b'-'))
+    {
+        local_start -= 1;
+    }
+    (local_start < at).then_some(local_start)
+}
+
+/// `true` for a whole value that is an email address, `/token:` and a token
+/// that is empty, a placeholder, a reference or a mask (`agent@example.test/token:********`,
+/// `.../token:${ZENDESK_API_TOKEN}`, `.../token:{api_token}`): the credential
+/// string with nothing secret in it (issue #1230). The email is an identifier;
+/// the generic reading flagged the whole string as a medium `warn`.
+fn is_email_token_credential_with_placeholder(value: &str) -> bool {
+    // The email and the separator without a token or a colon
+    // (`agent@example.test/token`): the documented username half alone.
+    if let Some(email) = value.strip_suffix("/token") {
+        return email_address_start(email) == Some(0);
+    }
+    let Some(at) = value.find(EMAIL_TOKEN_ANCHOR) else {
+        return false;
+    };
+    let token = &value[at + EMAIL_TOKEN_ANCHOR.len()..];
+    // A token holds no backslash: an escaped line break or quote ends it.
+    let token = token.find('\\').map_or(token, |end| &token[..end]);
+    email_address_start(&value[..at]) == Some(0)
+        && (token.is_empty()
+            || starts_with_reference_opener(token)
+            || is_non_secret_reference_beyond_digits(token, ValueForm::Unquoted))
+}
+
+/// `true` when a token starts with an opener that no issued credential starts
+/// with and that a reference, template or placeholder does (`{{ ... }}`, `{x}`,
+/// `[x]`, `<x y>`, `${X}`, a backtick): an unquoted value ends at the first
+/// space, so a template with spaces is cut after its opener.
+fn starts_with_reference_opener(token: &str) -> bool {
+    token.starts_with(['{', '[', '<', '$', '`'])
+}
+
+/// The token of every Zendesk credential string in `input` (issue #1230): the
+/// part after `/token:` when an email address stands directly before the
+/// literal. The span is the token only; the email, `/token` and any quote are
+/// outside it. The literal anchors the slot wherever it appears (a JSON member
+/// or an environment value, and, because the anchor does not look at flags, a
+/// Basic-credential argument too), so the token is read whatever its shape: it
+/// is `high` at 16 or more random-looking bytes and `medium` (`warn`) otherwise,
+/// a digits-only token included, never a placeholder, reference or mask. It wins
+/// the overlap against the whole-string reading of the same value (a medium
+/// `warn` under `credentials`), which would have left the token in the output.
+/// FP cost: a non-secret literal of 8 or more bytes after `<email>/token:`;
+/// FN cost: a token under 8 bytes and the same string in a base64 `Basic`
+/// envelope (a separate question).
+fn email_token_candidates(input: &str) -> Vec<Candidate> {
+    let mut candidates = Vec::new();
+    let mut from = 0usize;
+    while let Some(found) = input[from..].find(EMAIL_TOKEN_ANCHOR) {
+        let anchor = from + found;
+        from = anchor + 1;
+        if email_address_start(&input[..anchor]).is_none() {
+            continue;
+        }
+        let value_start = anchor + EMAIL_TOKEN_ANCHOR.len();
+        let Some((start, end)) = unquoted_assignment_value_with(input, value_start, None) else {
+            continue;
+        };
+        // A token holds no backslash, so the first one ends it: the backslash
+        // of an escaped closing quote (`...\"` in a JSON string inside a JSON
+        // string) or of an escaped line break (`...\n` in a fixture file).
+        let end = input[start..end].find('\\').map_or(end, |at| start + at);
+        let value = &input[start..end];
+        if value.len() < MIN_CONTEXT_VALUE_LENGTH
+            || value.len() > MAX_CONTEXT_VALUE_LENGTH
+            || starts_with_reference_opener(value)
+            || is_non_secret_assignment_reference(value, ValueForm::Unquoted)
+        {
+            continue;
+        }
+        let Some(range) = ByteRange::new(start, end) else {
+            continue;
+        };
+        let confidence = if value.len() >= MIN_HIGH_ENTROPY_LENGTH
+            && crate::shannon_entropy(value) >= HIGH_ENTROPY_THRESHOLD
+            && !is_all_digits(value)
+        {
+            Confidence::High
+        } else {
+            Confidence::Medium
+        };
+        let entropy_signal = if confidence == Confidence::High {
+            "bounded-entropy"
+        } else {
+            "context-only"
+        };
+        candidates.push(
+            Candidate::built_in("contextual_secret", confidence, range)
+                .with_specificity(Specificity::Contextual)
+                .with_signals(["high-signal-name", entropy_signal]),
+        );
+    }
+    candidates
+}
+
 /// `true` when the assignment starting at `name_start` sits inside a
 /// `{{ ... }}` template expression still open on its line and its value is
 /// a secret-manager path: a lookup-plugin term such as
@@ -4109,6 +4253,7 @@ impl Detector for GenericTokenDetector {
             candidates.extend(bare_vendor_prefix_candidates(input));
             candidates.extend(call_argument_candidates(input));
             candidates.extend(npmrc_credential_candidates(input));
+            candidates.extend(email_token_candidates(input));
         }
         Ok(candidates)
     }
