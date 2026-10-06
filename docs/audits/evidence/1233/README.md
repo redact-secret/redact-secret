@@ -125,3 +125,24 @@ Gate "independent replay of the fixed candidate": **met**, candidate
 `4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No
 package digest is claimed (no candidate package was published). Figures are read
 from the merged report and ledger; the harness was not re-run for this addendum.
+
+## Closure statement (2026-10-06)
+
+What this issue can honestly claim after the Groups C, D and E measurement rounds.
+
+No scored case of Groups C, D or E exercises this issue, so the group measurement adds no row claim to it. No Group C, D or E row is a `personalAccessKey` row. The claims of this issue stay the ones in the records above, which cite the Batch 2 evidence; do not cite the Groups C-E report for a row claim here.
+
+The closeout also added tracked policies that these records do not claim as covered:
+the `curl -u` password slot ([redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247)), the JFrog `AKCp` bare
+reader, deferred ([redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248)), the bare `token` member
+([redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256), rule [#1241](../1241/README.md)), the existing Case
+contradictions ([credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264)) and the percent-escaped X layout
+confirmation ([credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265)).
+
+Source: the [round-3 report of Groups C, D and E](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (section 7, [dispositions](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows)),
+its [scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json) and
+[identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json), at benchmarks commit
+`c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291`, measuring candidate
+`c6dd685974b8df6a84514e07e41e35afa711a2ac` (unpublished, 0.1.0-beta.14) on one
+host. Project-authored, maintainer-only evidence, not independent validation;
+the fixes target measured failures and no generalisation is claimed.

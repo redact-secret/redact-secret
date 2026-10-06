@@ -228,7 +228,7 @@ No pin, version or release change.
 ## Round-1 measurement addendum: final dispositions of the measured rows
 
 The independent baseline of Group C ([benchmarks#752](https://github.com/redact-secret/redact-secret-benchmarks/issues/752),
-measured at core `e1284537`, report `<round1 report permalink pending>`) is the
+measured at core `e1284537`, report [round 1](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md)) is the
 first measurement this record's "no gate that needs it is met" waited for. The
 dispositions below follow its gap groups and nothing else; "fixed" means the
 product behaviour changed with a deterministic test and an evidence addendum, and
@@ -276,5 +276,104 @@ measured 277 positives (197 exact, 65 misses) and 251 controls (36 flagged).
   token (the `curl-u-password-*` cases). The reader of that slot, with its policy
   for a literal user part, is issue #1247; until then the cases are stated false
   negatives of the product, not defects of the header repair.
+
+No pin, version or release change.
+
+## Final state (round 3, candidate c6dd6859), 2026-10-06
+
+This section supersedes the round-1 measurement addendum above wherever the two
+differ. Superseded statements are marked below; the round-1 text is kept as the
+record of that round. The placeholder that the round-1 addendum carried for its
+report is replaced there by the [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md).
+
+Measured at the final candidate redact-secret `c6dd685974b8df6a84514e07e41e35afa711a2ac`
+(core `e1284537` plus the nine round-1 fixes plus the two round-2 fixes
+`c8d661b3` and `c6dd6859`; declared 0.1.0-beta.14, not published). Frozen
+corpora digests: C (#752, errata-1, 646 cases)
+`16036d043fc0dad0e45ec42e2513d2ffec2020da3458a95ed57f09f44fb0e02d` (the original
+freeze digest was `f216ca0a72c52d2b268924662d7f4ab66372c9820d0cfe386e3eefa0110dc37d`;
+errata-1 made the nine `code=` controls observed-only), D (#753, 868 cases)
+`aa173111a8b7142dc4f378ebd29875605658112eae6553dcfce6287cbaf8e72e`, E (#754, 767
+cases) `6aa6221022b94418183f706f8034705d8c6050b5c657e309980832f6231691aa`. 2,281
+cases on four surfaces (Node, WASM, Python, CLI), each whole and in 7-byte and
+1-byte chunks. Against the baseline (beta.13), round 1 and round 2: 0
+regressions; 0 parity divergences; 0 open product gaps. Of the 119 scored
+failures across the three groups, all are recorded policy cases: 59 `curl -u`
+password slot (#1247), 15 Contentful lone `token` member (#1256, rule #1241), 2
+Reddit `token=` without revoke context (#1241), 1 Elastic `encoded` alone, 36
+Meta `APP_ID|SECRET` whole-pair redaction (recorded deviation a), 6 `x-api-key`
+Adobe client-id controls (recorded deviation b). Final dispositions of all 43
+rows: 16 fully covered (C 4, D 7, E 5), 5 covered with recorded deviation, 6
+policy-limited, 16 carrier unresolved (observed only), 0 open product gaps.
+
+Sources, all at benchmarks commit `c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291` (PR #799):
+[round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (per-row table: [section 6](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows); regressions: [section 2](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#2-regressions); residual groups: [section 4](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#4-round-2-residual-groups-and-what-still-fails)),
+[round-3 scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json),
+[round-3 identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json),
+[round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round2/report.md),
+[round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md) and
+[freeze record](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/benchmarks/FREEZE-groups-cde.md).
+
+Final disposition of the 11 rows of Group C (round-3 report, section 6; row names exact):
+
+| Row | Final disposition | Open cases and the policy that explains them |
+| --- | --- | --- |
+| `adobe:oauth-server-to-server-client-secret` | covered with recorded policy deviation | 2 controls: `x-api-key` header holding Adobe's public client ID is flagged (accepted false positive, deviation b) |
+| `adobe:enterprise-web-app-client-secret` | covered with recorded policy deviation | 2 controls, same as above (deviation b) |
+| `adobe:oauth-web-app-client-secret` | covered with recorded policy deviation | 2 controls, same as above (deviation b) |
+| `airtable:personal-access-token` | fully covered | 22/22 positives exact, 21 controls clean |
+| `contentful:cma-personal-access-token` | policy-limited | 15 open: a lone `token` member of the create response (beside only `name`) is not read; #1256 under the bare-`token` rule #1241 |
+| `dropbox:access-token` | fully covered | 36/36 positives exact, 22 controls clean |
+| `hubspot:private-app-access-token` | fully covered | 35/35 positives exact, 22 controls clean |
+| `jfrog:reference-token` | policy-limited | 15 open: the `curl -u user:<password>` password slot is not read; stated false negative, #1247 (deviation c) |
+| `meta:app-secret` | covered with recorded policy deviation | 15 positives are fully covered but not exact: the `APP_ID\|SECRET` pair is redacted whole, public app id included; no byte uncovered (deviation a) |
+| `salesforce:oauth-refresh-token` | fully covered | 35/35 positives exact, 21 controls clean |
+| `x:oauth1-consumer-secret` | carrier unresolved (observed only) | no scored positive; 12 controls, 0 flagged. Not covered |
+
+Group C totals at round 3: 277 positives (232 exact, 247 fully covered, 30
+misses) and 242 controls (6 flagged), against 197 exact, 65 misses and 27 flagged
+on baseline and round 1 (rescored on the errata-1 corpus). The 30 misses are the
+15 Contentful `token` member cases and the 15 JFrog `curl -u` cases; the 6
+flagged controls are the `x-api-key` client-id controls.
+
+Superseded by this section: the round-1 statement that three OAuth `code=`
+controls per Adobe row were flagged. Errata-1 of the corpus made the nine `code=`
+controls observed-only, so they are no longer scored. The round-1 figure "251
+controls (36 flagged)" is replaced by 242 controls with 6 flagged on round 3. The
+round-1 statement that the replay "has not run" is replaced by the round-3
+replay above; "fixed" for the brace, angle and mask placeholder controls, the
+HubSpot `tokenKey` member and the JFrog `X-JFrog-Art-Api` header cases is now
+confirmed on the measured cases only. The Meta pipe, Adobe `x-api-key` and
+`curl -u` items remain deliberate deviations, not defects, as the round-1
+addendum states.
+
+'Covered with recorded policy deviation' means the only open cases are the accepted deviations (a) and (b), not that the Case is met as written.
+
+Follow-ups that explain the policy-limited rows: curl `-u` password slot
+[redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247); JFrog `AKCp` bare reader, deferred
+[redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248); bare `token` member of the Contentful create
+response [redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256) under the bare-`token` rule
+[#1241](../1241/README.md); existing Case contradictions
+[credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264); percent-escaped X layout confirmation
+[credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265).
+
+Honest limits (round-3 report, section 8):
+
+* Project-authored, maintainer-only evidence, not independent validation. The
+  corpora derive from the maintainers' credential-evidence snapshot and were
+  frozen before any scan; agreement shows consistency with the maintainers' own
+  contract and nothing more. The policy dispositions are the maintainers' own
+  decisions, recorded and not validated by the measurement.
+* One host (darwin-arm64, Node v22.16.0), not a linux-x64 official run. Peers
+  were not run. The candidate is unpublished (a branch commit declaring
+  0.1.0-beta.14).
+* The fixes target the measured failures on these same corpora, so no
+  generalisation to unseen carriers is claimed. The false-positive cost on real
+  traffic of the 16+ digit rule and of the placeholder grammar (`{name}`,
+  `[name]`, `YOUR_<slot>`, pipe composites) is not measured by these corpora.
+* A "fully covered" row means every frozen scored case passes; it does not
+  promote support, change an official run, repin or release anything. A
+  carrier-unresolved row has no scored positive (its controls are clean and
+  nothing more) and a policy-limited row is not covered.
 
 No pin, version or release change.

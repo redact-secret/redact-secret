@@ -418,3 +418,32 @@ exactly the 15 empty-value controls.
 The replay figures above are read from the merged round-3 report and ledger. The
 harness and corpora were not re-run for this addendum; the report and the ledger
 are the benchmarks side's records.
+
+## Closure statement (2026-10-06)
+
+What this issue can honestly claim after the Groups C, D and E measurement rounds.
+
+This issue may cite only the aggregate of the measurement. On the three corpora
+(2,281 cases; four surfaces; whole, 7-byte and 1-byte) the final candidate has 0
+regressions against the beta.13 baseline, round 1 and round 2, 0 parity
+divergences and 0 open product gaps; positives 839 (726 exact, 762 fully covered,
+77 misses), controls 779 (6 flagged). The 113 positives that are not exact are 77
+policy-limited misses plus 36 fully covered over-wide Meta pipe findings. The 43
+rows end as 16 fully covered, 5 covered with a recorded deviation, 6
+policy-limited and 16 carrier unresolved (observed only). Carrier-unresolved and
+policy-limited rows are not covered, and no row is promoted by this statement.
+
+The closeout also added tracked policies that these records do not claim as covered:
+the `curl -u` password slot ([redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247)), the JFrog `AKCp` bare
+reader, deferred ([redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248)), the bare `token` member
+([redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256), rule [#1241](../1241/README.md)), the existing Case
+contradictions ([credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264)) and the percent-escaped X layout
+confirmation ([credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265)).
+
+Source: the [round-3 report of Groups C, D and E](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (section 7, [dispositions](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows)),
+its [scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json) and
+[identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json), at benchmarks commit
+`c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291`, measuring candidate
+`c6dd685974b8df6a84514e07e41e35afa711a2ac` (unpublished, 0.1.0-beta.14) on one
+host. Project-authored, maintainer-only evidence, not independent validation;
+the fixes target measured failures and no generalisation is claimed.
