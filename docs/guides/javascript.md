@@ -161,6 +161,16 @@ A rejected document throws `INVALID_ACTION_POLICY`. For a callback that wants
 instead of copying the default table. See the
 [action policy guide](action-policy.md#javascript).
 
+To see why each finding got its action, or what changes when you swap one
+policy for another, `compareActionPolicies(input, { policies })` evaluates one to
+four policies (`{ kind: "default" }`, `{ kind: "action-policy", actionPolicy }`
+or `{ kind: "callback", policy }`) over one detection pass and returns each
+policy's action, the deciding rule and each document's SHA-256 as frozen data. It
+is a preview, never enforcement, it takes one string (there is no stream or
+incremental comparison), and a callback side that fails fails the whole
+comparison with no partial result. See
+[Compare in JavaScript](action-policy.md#compare-in-javascript).
+
 ## Request-wide placeholder numbering
 
 Every call numbers its placeholders from 1, so scanning the string leaves of

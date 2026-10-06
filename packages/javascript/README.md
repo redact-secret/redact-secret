@@ -188,6 +188,63 @@ const policy: SecretPolicy = {
 The document format, evaluation order, limits and the rejection classes are in
 the [action policy guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/action-policy.md).
 
+## Explain and compare policies
+
+`compareActionPolicies` answers "why did this finding get this action" and
+"what changes if I swap policy A for policy B" without enforcing anything. It
+runs detection **once**, then evaluates one to four policies (a baseline and up
+to three candidates) on the same finalized findings:
+
+```ts
+import { compareActionPolicies, initialize } from "@redact-secret/core";
+
+await initialize();
+
+const comparison = compareActionPolicies("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", {
+  policies: [
+    { kind: "default" },
+    {
+      kind: "action-policy",
+      actionPolicy: {
+        actionPolicyRevision: 1,
+        base: "default",
+        rules: [{ id: "allow-github", match: { type: ["github_token"] }, action: "allow" }],
+      },
+    },
+  ],
+});
+
+for (const finding of comparison.findings) {
+  const [baseline, candidate] = finding.decisions;
+  // baseline: redact, default-policy; candidate: allow, rule "allow-github" at index 0
+  console.log(finding.type, baseline?.action, candidate?.action, candidate?.ruleId, finding.differs);
+}
+console.log(comparison.policies[1]?.documentSha256, comparison.changedCount);
+```
+
+A side is `{ kind: "default" }` (the default evaluation the loaded artifact
+computes), `{ kind: "action-policy", actionPolicy }` (the same forms as the
+`actionPolicy` option) or `{ kind: "callback", policy }` (a legacy
+`SecretPolicy`). Each finding carries one decision per side, in order, with its
+`action`, a `basis` (`rule`, `rule-default`, `no-rule-matched`,
+`default-policy` or `callback`) and, for a rule, its `ruleId` and zero-based
+`ruleIndex`. `differs` compares the actions only. `limits` and `ruleset` work as
+for `scan`; PII is selected by `initialize`. The result is frozen plain data in
+the CLI's `--json` shape, with `mode: "preview"` and `enforced: false`. It holds
+no input byte, matched value or hash of either; the only digest is each action
+policy side's `documentSha256`, the SHA-256 of the exact bytes the core parsed
+(for an object, its compact `JSON.stringify` bytes). The default side evolves
+with the artifact, so key evidence for it to `version` as well.
+
+It covers finalized findings only (not overlap losers or anything detection
+missed) and takes one string: there is no stream or incremental comparison, and
+any option or side that could suggest one is `INVALID_OPTIONS`. A callback side
+is called once per finding, in order, one side at a time, so a callback with
+state advances it; if one throws the whole comparison fails with
+`POLICY_FAILURE` (`INVALID_POLICY_ACTION` for a bad return) and returns nothing.
+The scope, the bases and the cost are in the
+[action policy guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/action-policy.md#explain-and-compare).
+
 ## Incremental and stream availability
 
 The Node artifact builds a real incremental session, wrapping the same core
@@ -322,7 +379,7 @@ mapped to the same fixed error vocabulary.
 ## Public API
 
 Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
-`piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
+`compareActionPolicies`, `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `defaultPolicy`, `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`,
 `VERSION`, `PROFILE`.
 
@@ -334,6 +391,9 @@ Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding
 `IncrementalLimits`, `IncrementalSecretPolicy`, `IncrementalPolicyContext`,
 `ActionPolicyDocument`, `ActionPolicyInput`, `ActionPolicyRule`,
 `ActionPolicyMatch`, `ActionPolicyRuleAction`, `DefaultSecretPolicy`,
+`CompareActionPoliciesOptions`, `ComparedPolicy`, `ComparedPolicyKind`,
+`ActionComparison`, `ComparedPolicySummary`, `ComparisonDetection`,
+`ComparedFinding`, `ActionDecision`, `ActionCounts`, `DecisionBasis`,
 `RangeUnit`, `SecretScanErrorCode`.
 
 PII activation is opt-in and off by default. Pass `pii` selectors to

@@ -81,6 +81,25 @@ export const redact = runtime.redact;
 /** Scans and redacts in one call, so text and findings cannot disagree. */
 export const scanAndRedact = runtime.scanAndRedact;
 
+/**
+ * Compares what one to four policies (the default, a declarative action
+ * policy, or a legacy callback policy) would choose for the findings `input`
+ * yields, over one detection pass, and says why: the deciding rule or the
+ * default. A preview, never enforcement: it returns no text and changes no
+ * state of `scan`, `redact` or an incremental session.
+ *
+ * Whole-input only. It takes one string, so a stream, a chunk or an
+ * incremental session cannot be compared, and a key that suggests one is
+ * `INVALID_OPTIONS`. A callback policy is called once per finding, in order,
+ * one side at a time, so a callback with state or side effects advances them.
+ * A failing callback fails the whole comparison with `POLICY_FAILURE` (or
+ * `INVALID_POLICY_ACTION` for a bad return) and no partial result.
+ *
+ * The result holds safe finding metadata and decisions, plus each action
+ * policy side's `documentSha256`; it holds no input byte or matched value.
+ */
+export const compareActionPolicies = runtime.compareActionPolicies;
+
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 

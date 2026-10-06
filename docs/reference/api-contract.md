@@ -8,6 +8,7 @@
 | Replace supplied ranges | `redact` | `redact` | Text |
 | Both together | `scanAndRedact` | `scan_and_redact` | Text and findings |
 | Supported defaults, Rust only | none | `sanitize`, `sanitize_with_profile` | Text and findings, as `scan_and_redact` |
+| Compare action policies, preview only (whole input) | `compareActionPolicies` | `compare_action_policies` (Python and Rust); the CLI's `--compare-action-policy` | Per-finding actions and reasons for 1 to 4 policies over one detection pass, no text |
 
 Bindings adapt arguments and results; they do not copy detector logic. Rust
 additionally takes a registry, policy, and formatter; `sanitize(input)` and

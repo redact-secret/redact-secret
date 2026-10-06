@@ -33,6 +33,7 @@
 //!   `wasm32-unknown-unknown` in any browser.
 
 mod callbacks;
+mod compare;
 mod error;
 mod finding;
 mod incremental;
@@ -295,6 +296,60 @@ pub fn scan(
         action_policy.as_deref(),
     )?;
     Ok(FindingJs::all(input, findings))
+}
+
+/// Compares what several policies choose for the findings `input` yields,
+/// over one detection pass and without enforcing any of them
+/// (`decision-explain-and-compare-action-policies-over-one-detection-pass`,
+/// issue #1220). The whole-input primitive only: there is no session or
+/// stream variant.
+///
+/// The sides arrive as parallel arguments: `kinds` names each side in order
+/// (`"default"`, `"action-policy"`, `"callback"`), `documents` holds the
+/// action policy documents in the order their sides appear, and `callbacks`
+/// the callbacks in the order theirs do. Callback sides run one at a time, in
+/// the order given, each once per finding in finding order. The result is a
+/// plain object of safe metadata and decisions (see `compare`); absent values
+/// are `null`.
+///
+/// # Errors
+///
+/// Returns a fixed `NOT_INITIALIZED` error before a successful
+/// [`initialize`]. `INVALID_OPTIONS` when there are zero or more than four
+/// sides or the arguments do not describe the same sides;
+/// `INVALID_ACTION_POLICY` for a document that does not parse and
+/// `INVALID_RULESET` for a ruleset that does not, both before any callback;
+/// `INVALID_LIMITS`, `INPUT_LIMIT_EXCEEDED` and `FINDING_LIMIT_EXCEEDED`
+/// exactly as [`scan`]; and `POLICY_FAILURE` or `INVALID_POLICY_ACTION` when a
+/// callback fails, which fails the whole comparison with no partial result.
+#[allow(clippy::needless_pass_by_value)]
+#[wasm_bindgen(js_name = "compareActionPolicies")]
+pub fn compare_action_policies(
+    input: &str,
+    kinds: Vec<String>,
+    documents: Vec<js_sys::Uint8Array>,
+    callbacks: Vec<Function>,
+    max_input_bytes: Option<u32>,
+    max_findings: Option<u32>,
+    ruleset: Option<Vec<u8>>,
+) -> Result<JsValue, JsValue> {
+    lifecycle::ensure_initialized().map_err(to_js_error)?;
+    let documents: Vec<Vec<u8>> = documents.iter().map(js_sys::Uint8Array::to_vec).collect();
+    let plans = compare::plan_sides(&kinds, &documents, callbacks.len()).map_err(to_js_error)?;
+    let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
+        .map_err(|error| to_js_error(error.into()))?;
+    let comparison = match ruleset.as_deref() {
+        None => lifecycle::with_registry(|registry| {
+            compare::run_compare(input, registry, &plans, &callbacks, &limits)
+        })
+        .map_err(to_js_error)?,
+        Some(bytes) => lifecycle::with_ruleset_registry(bytes, |registry| {
+            compare::run_compare(input, registry, &plans, &callbacks, &limits)
+        })
+        .map_err(to_js_error)?,
+    }
+    .map_err(|error| to_js_error(error.into()))?;
+    Ok(compare::comparison_to_array(input, &comparison).into())
 }
 
 /// Evaluates the core's default policy for one finding's safe metadata and

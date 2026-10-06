@@ -220,6 +220,138 @@ export interface ScanResult {
   readonly findings: readonly SecretFinding[];
 }
 
+/**
+ * One policy to compare
+ * (`decision-explain-and-compare-action-policies-over-one-detection-pass`):
+ * the default evaluation the running artifact computes, a declarative action
+ * policy, or a legacy callback policy. Every side names its `kind` and carries
+ * only the field of that kind; any other key is `INVALID_OPTIONS`, so nothing
+ * is silently ignored.
+ */
+export type ComparedPolicy =
+  | { readonly kind: "default" }
+  | {
+      readonly kind: "action-policy";
+      /** The same forms as {@link ScanOptions.actionPolicy}. */
+      readonly actionPolicy: ActionPolicyInput;
+    }
+  | {
+      readonly kind: "callback";
+      /**
+       * A whole-input policy, called exactly once per finalized finding, in
+       * finding order, with the same context `scan` gives it. Sides run one at
+       * a time in the order supplied, so two callbacks never interleave.
+       */
+      readonly policy: SecretPolicy;
+    };
+
+/**
+ * Options of `compareActionPolicies`. The comparison is whole-input only: it
+ * takes one string, never a stream, a chunk or an incremental session, and
+ * there is no incremental limit or option here. A key this interface does not
+ * name is `INVALID_OPTIONS`.
+ */
+export interface CompareActionPoliciesOptions {
+  /** One to four policies, compared in this order: the first is the baseline. */
+  readonly policies: readonly ComparedPolicy[];
+  /** Explicit whole-input bounds, exactly as for `scan`. Omit for the core's default. */
+  readonly limits?: WholeInputLimits;
+  /** A declarative detector ruleset, exactly as for `scan`; it applies to every side. */
+  readonly ruleset?: Uint8Array | string;
+}
+
+/** What kind of policy one compared side is. */
+export type ComparedPolicyKind = "default" | "action-policy" | "callback";
+
+/**
+ * Why a side chose its action: `rule` is a fixed-action rule, `rule-default`
+ * a rule whose action is `default` (the base action, and evaluation stopped at
+ * that rule), `no-rule-matched` the fall back to the base, `default-policy`
+ * the default side and `callback` a callback side.
+ */
+export type DecisionBasis = "rule" | "rule-default" | "no-rule-matched" | "default-policy" | "callback";
+
+/** One side's action for one finding and the reason for it. */
+export interface ActionDecision {
+  readonly action: SecretAction;
+  readonly basis: DecisionBasis;
+  /** The deciding rule's id for `rule` and `rule-default`; otherwise `null`. */
+  readonly ruleId: string | null;
+  /** The deciding rule's zero-based index for `rule` and `rule-default`; otherwise `null`. */
+  readonly ruleIndex: number | null;
+}
+
+/** How many findings a side redacts, blocks, warns on and allows. */
+export interface ActionCounts {
+  readonly redact: number;
+  readonly block: number;
+  readonly warn: number;
+  readonly allow: number;
+}
+
+/** One compared side: its position label, kind, document digest and counts. */
+export interface ComparedPolicySummary {
+  /** `"baseline"` for the first side, then `"candidate-1"`, `"candidate-2"`, `"candidate-3"`. */
+  readonly label: string;
+  readonly kind: ComparedPolicyKind;
+  /**
+   * The lowercase SHA-256 (64 hex characters) of an action policy document's
+   * exact bytes: the text or bytes given, or, for an object, the compact
+   * `JSON.stringify` bytes this package serialized. `null` for the default
+   * (which evolves with the artifact: key evidence to `version` as well) and
+   * for a callback (which has no identity). The only digest in a result.
+   */
+  readonly documentSha256: string | null;
+  readonly counts: ActionCounts;
+}
+
+/**
+ * What detection saw, apart from every policy. Swapping a policy leaves it
+ * unchanged, and swapping the ruleset or PII selection leaves every
+ * `documentSha256` unchanged. It does not identify a custom ruleset: key that
+ * to your own digest of its bytes.
+ */
+export interface ComparisonDetection {
+  /** The canonical credentials/PII activation identity (`piiActivation()`). */
+  readonly activationIdentity: string;
+  readonly profile: "full" | "common" | null;
+  /** How many detectors ran, ruleset detectors included. */
+  readonly detectorCount: number;
+}
+
+/** A finalized finding and every side's decision for it, in side order. */
+export interface ComparedFinding extends DetectedSecretFinding {
+  /** Whether the sides do not all choose the same action. The reason is not compared. */
+  readonly differs: boolean;
+  readonly decisions: readonly ActionDecision[];
+}
+
+/**
+ * The result of `compareActionPolicies`: a preview of what each policy would
+ * choose for the findings `scan` returns for the same input, never
+ * enforcement. It is frozen plain data with no input byte, matched value,
+ * snippet or hash of either.
+ *
+ * It covers finalized findings only: not overlap losers, not candidates that
+ * never survived, not suppressed PII alternatives, and it makes no claim about
+ * what detection missed. A rule with no match on this input is not proven dead.
+ */
+export interface ActionComparison {
+  /** The package version that produced the result; key `default`-side evidence to it. */
+  readonly version: string;
+  readonly rangeUnit: RangeUnit;
+  readonly mode: "preview";
+  readonly enforced: false;
+  readonly detection: ComparisonDetection;
+  /** One per side, in the order supplied. */
+  readonly policies: readonly ComparedPolicySummary[];
+  readonly findingCount: number;
+  /** How many findings have `differs` set. */
+  readonly changedCount: number;
+  /** In `scan`'s order, with the same ids, ranges and metadata. */
+  readonly findings: readonly ComparedFinding[];
+}
+
 /** The terminally distinct lifecycle states of an incremental session. */
 export type IncrementalSanitizerState = "accepting" | "finalized" | "aborted" | "failed";
 

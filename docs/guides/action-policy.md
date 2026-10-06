@@ -91,14 +91,14 @@ detection, and it changes no default.
 ## Explain and compare
 
 Before adopting a change, run it against a representative input and read why
-each finding got its action. The Rust core, the command line and Python compare
-1 to 4 policies (a baseline and up to three candidates) over **one** detection
-pass: detection runs once, then every policy decides the same finalized
-findings. Support today (`current`): Rust (`compare_action_policies`), the
-command line (`--compare-action-policy`) and Python
-(`redact_secret.compare_action_policies`, see the [Python guide](python.md#explain-and-compare-action-policies)).
-The Node addon, WebAssembly and the JavaScript package have not shipped it, so
-they expose no comparison and no digest.
+each finding got its action. The Rust core, the command line, Python and
+JavaScript compare 1 to 4 policies (a baseline and up to three candidates) over
+**one** detection pass: detection runs once, then every policy decides the same
+finalized findings. Support today (`current`): Rust (`compare_action_policies`),
+the command line (`--compare-action-policy`), Python
+(`redact_secret.compare_action_policies`, see the [Python guide](python.md#explain-and-compare-action-policies))
+and JavaScript (`compareActionPolicies` on the Node addon and WebAssembly alike,
+see [Compare in JavaScript](#compare-in-javascript)). Every surface now ships it.
 
 ```bash
 redact-secret --action-policy current.json --compare-action-policy next.json app.env
@@ -250,6 +250,76 @@ The WebAssembly artifacts carry the parser. Against the `db0e5c8d` build the
 brotli size grows by 5,653 bytes for `full` (164,789 to 170,442, 3.43%), 5,888
 for `common`, 6,090 for `full` with `pii` and 5,251 for `common` with `pii`; see
 the [evidence](../audits/evidence/1219/README.md).
+
+### Compare in JavaScript
+
+`compareActionPolicies(input, { policies, limits?, ruleset? })` is the
+whole-input comparison, in the root package and in `@redact-secret/core/common`,
+with identical results on the Node addon and on WebAssembly (the qualification
+runs one fixture on both and requires the same result digest). `policies` holds
+one to four sides, each with a `kind`:
+
+- `{ kind: "default" }`, the default evaluation the loaded artifact computes;
+- `{ kind: "action-policy", actionPolicy }`, the same object, text or bytes forms
+  as the `actionPolicy` option, serialized once at the call;
+- `{ kind: "callback", policy }`, a legacy `SecretPolicy`.
+
+```ts
+import { compareActionPolicies, initialize } from "@redact-secret/core";
+
+await initialize();
+const result = compareActionPolicies("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", {
+  policies: [
+    { kind: "default" },
+    {
+      kind: "action-policy",
+      actionPolicy: {
+        actionPolicyRevision: 1,
+        base: "default",
+        rules: [{ id: "allow-github", match: { type: ["github_token"] }, action: "allow" }],
+      },
+    },
+  ],
+});
+// result.findings[0].decisions[1] is { action: "allow", basis: "rule", ruleId: "allow-github", ruleIndex: 0 }
+// result.policies[1].documentSha256 is 64 lowercase hex characters
+```
+
+The result is frozen plain data in the CLI's `--json` shape with camel-case
+names: `version`, `rangeUnit`, `mode: "preview"`, `enforced: false`, `detection`
+(`activationIdentity`, `profile`, `detectorCount`), `policies` (`label` of
+`baseline`, `candidate-1`, `candidate-2` and `candidate-3`, `kind`,
+`documentSha256` or `null`, and per-action `counts`), `findingCount`,
+`changedCount` and `findings` (the six finding fields, UTF-16 `start` and `end`,
+`differs` and one `decisions` entry per side). An absent value is `null`, never
+missing. `documentSha256` is the SHA-256 of the exact bytes the core parsed: the
+text or bytes you gave, or, for an object, its compact `JSON.stringify` bytes.
+The package keeps no policy handle, so the digest is read from the result.
+
+Misuse is refused rather than ignored, each as `INVALID_OPTIONS` before detection
+and before any callback: no side or more than four, an unknown `kind`, a field
+that belongs to another kind, and any other option key, including keys that
+could suggest an incremental or stream comparison (`incremental`, `stream`,
+`chunks`, incremental limits). A non-string input is `INVALID_INPUT`. There is no
+incremental or stream comparison in this version: the function takes one string,
+and no session or stream adapter gains a method for it. A rejected document is
+`INVALID_ACTION_POLICY` before any callback runs; `limits` and `ruleset` fail as
+for `scan`.
+
+A callback side is called once per finding in finding order with the same
+`{ findingIndex, findingCount }` context `scan` gives it, sides one at a time in
+the order supplied. If a callback throws the whole comparison fails with
+`POLICY_FAILURE`, and if it returns something other than the four actions with
+`INVALID_POLICY_ACTION`, on both runtimes, with no partial result and no later
+call. Comparing a callback with state or side effects advances them like any
+other call.
+
+The WebAssembly artifacts also carry the comparison and the SHA-256. Against the
+branch head that already held the core's comparison, the brotli size grows by
+4,363 bytes for `full` (171,919 to 176,282, 2.54%), 4,329 for `common`, 4,256 for
+`full` with `pii` and 4,612 for `common` with `pii`; against the `db0e5c8d` build
+the parser, the digest and the comparison together add 11,493 bytes to `full`
+(7.0%). See the [evidence](../audits/evidence/1220/README.md).
 
 ## Command line
 

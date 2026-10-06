@@ -50,6 +50,37 @@ evidence is linked from each published version.
   unsupported. The package runs `action-policy-compare-v1.json`. Existing
   results and exceptions are unchanged.
 
+- JavaScript (Node addon and WebAssembly): `compareActionPolicies(input,
+  { policies, limits?, ruleset? })`, in `@redact-secret/core` and
+  `@redact-secret/core/common` (#1220,
+  `decision-explain-and-compare-action-policies-over-one-detection-pass`). It is
+  the whole-input comparison of one to four policies over one detection pass:
+  each side is `{ kind: "default" }`, `{ kind: "action-policy", actionPolicy }`
+  (the same object, text or bytes forms as the `actionPolicy` option) or
+  `{ kind: "callback", policy }`. The result is frozen plain data in the CLI's
+  `--json` shape with camel-case names (`mode: "preview"`, `enforced: false`,
+  `detection`, `policies` with each document's `documentSha256`, `findings`
+  with `differs` and per-side `decisions` of `action`, `basis`, `ruleId` and
+  `ruleIndex`), carrying no input byte, matched value or hash of either. Results
+  are identical on the addon and on WebAssembly (the qualification runs the
+  shared `action-policy-compare-v1` fixture on both, with enforcement parity
+  against `scan` and the same result digest). It is whole-input only: a
+  non-string input is `INVALID_INPUT`, any option or side key that could suggest
+  an incremental or stream comparison is `INVALID_OPTIONS`, and no session or
+  stream adapter gains a method. A callback side is called once per finding in
+  order, sides one at a time; a throw is `POLICY_FAILURE` and a return outside
+  the four actions is `INVALID_POLICY_ACTION`, on both runtimes, failing the
+  whole comparison with no partial result. No new error code; the package
+  gains one runtime value and ten types (`CompareActionPoliciesOptions`,
+  `ComparedPolicy`, `ComparedPolicyKind`, `ActionComparison`,
+  `ComparisonDetection`, `ComparedPolicySummary`, `ActionCounts`,
+  `ComparedFinding`, `ActionDecision` and `DecisionBasis`). The WebAssembly
+  artifacts grow by the comparison and the core's SHA-256 (brotli, against the
+  head that already held the core's comparison unlinked: `full` +4,363 bytes
+  (2.54%), `common` +4,329, `full` with `pii` +4,256, `common` with `pii`
+  +4,612); the evidence is
+  `docs/audits/evidence/1220/README.md`. Existing results are unchanged.
+
 - Rust and CLI: a versioned declarative action policy (#1219,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
   `load_action_policy` parses a JSON document (`actionPolicyRevision: 1`, at most
@@ -1184,7 +1215,7 @@ The previous pinned matrix is not comparable, so no stable delta is stated: it m
   whole line once per candidate for every context label it weighed. It now
   normalizes the vocabulary once per process, on first use, and groups
   candidates by line once per call. Under `pii:global`, a whole-input scan
-  of the 94,720-byte benchmarks `validator-heavy` workload goes from about
+  of the 94,612-byte benchmarks `validator-heavy` workload goes from about
   165 ms to about 7 ms (optimized, Apple M4), and 125 PII records on one
   line from about 21 s to about 1.4 ms. The `_pii` WebAssembly builds grow
   by about 5.8 KB (2.4 KB gzip), and building a registry, a session or

@@ -12,17 +12,18 @@ mod error;
 mod incremental;
 mod offsets;
 
-use std::cell::{OnceCell, RefCell};
+use std::cell::{Cell, OnceCell, RefCell};
 use std::rc::Rc;
 
 use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
-    Action, ActionPolicy, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
-    Finding, FormatterFailure, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter,
-    Policy, PolicyContext, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
-    default_placeholder_formatter, load_action_policy, load_ruleset,
-    redact_with_limits as core_redact_with_limits, run_detector_pipeline,
+    Action, ActionComparison, ActionPolicy, ByteRange, ComparedPolicy, Confidence, DefaultPolicy,
+    DetectedFinding, DetectorRegistry, Finding, FormatterFailure, MAX_COMPARED_POLICIES,
+    Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
+    PolicyFailure, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
+    compare_action_policies_with_limits, default_placeholder_formatter, load_action_policy,
+    load_ruleset, redact_with_limits as core_redact_with_limits, run_detector_pipeline,
 };
 
 use crate::error::{to_js_action_policy_error, to_js_error, to_js_ruleset_error};
@@ -983,6 +984,391 @@ pub fn scan_and_redact_common(
     )
 }
 
+// ---------------------------------------------------------------------
+// Explain and compare action policies (issue #1220)
+// ---------------------------------------------------------------------
+
+/// What detection saw, apart from every policy: the registry's activation
+/// identity, its profile when it has one, and its detector count
+/// (`decision-explain-and-compare-action-policies-over-one-detection-pass`).
+#[napi(object)]
+pub struct JsComparisonDetection {
+    /// The canonical credentials/PII activation identity.
+    pub activation_identity: String,
+    /// `"full"` or `"common"`, or absent for a registry with no profile.
+    pub profile: Option<String>,
+    /// How many detectors the registry holds.
+    pub detector_count: u32,
+}
+
+/// One compared policy's binding and per-action counts.
+#[napi(object)]
+pub struct JsComparedSide {
+    /// `"default"`, `"action-policy"` or `"callback"`.
+    pub kind: String,
+    /// Lowercase SHA-256 of an action policy document's exact bytes; absent
+    /// for the default and for a callback.
+    pub document_sha256: Option<String>,
+    /// Findings this side redacts.
+    pub redact: u32,
+    /// Findings this side blocks.
+    pub block: u32,
+    /// Findings this side warns on.
+    pub warn: u32,
+    /// Findings this side allows.
+    pub allow: u32,
+}
+
+/// One side's action for one finding and the reason for it.
+#[napi(object)]
+pub struct JsActionDecision {
+    /// `"redact"`, `"block"`, `"warn"` or `"allow"`.
+    pub action: String,
+    /// `"rule"`, `"rule-default"`, `"no-rule-matched"`, `"default-policy"` or
+    /// `"callback"`.
+    pub basis: String,
+    /// The deciding rule's id, for `rule` and `rule-default`.
+    pub rule_id: Option<String>,
+    /// The deciding rule's zero-based index, for `rule` and `rule-default`.
+    pub rule_index: Option<u32>,
+}
+
+/// One finalized finding and every side's decision for it. Ranges are UTF-16
+/// code-unit offsets.
+#[napi(object)]
+pub struct JsComparedFinding {
+    /// Deterministic finding id (`finding-1`, `finding-2`, ...).
+    pub id: String,
+    /// Finding type.
+    pub r#type: String,
+    /// Id of the detector that produced this finding.
+    pub detector: String,
+    /// `"high"`, `"medium"`, or `"low"`.
+    pub confidence: String,
+    /// `"none"` or `"invisible-characters"`.
+    pub obfuscation: String,
+    /// Start offset in UTF-16 code units.
+    pub start: u32,
+    /// End offset in UTF-16 code units (exclusive).
+    pub end: u32,
+    /// Whether the sides do not all choose the same action.
+    pub differs: bool,
+    /// One decision per side, in the order the sides were supplied.
+    pub decisions: Vec<JsActionDecision>,
+}
+
+/// The result of [`compare_action_policies`]: a preview, never enforcement.
+#[napi(object)]
+pub struct JsActionComparison {
+    /// The detection configuration, apart from every policy.
+    pub detection: JsComparisonDetection,
+    /// One entry per side, in the order supplied.
+    pub sides: Vec<JsComparedSide>,
+    /// How many findings differ between the sides.
+    pub changed_count: u32,
+    /// Every finalized finding, in `scan`'s order.
+    pub findings: Vec<JsComparedFinding>,
+}
+
+/// How one comparison side is evaluated, once every document is loaded.
+enum ComparedSidePlan {
+    Default,
+    ActionPolicy(ActionPolicy),
+    /// The position among the call's callbacks.
+    Callback(usize),
+}
+
+/// Resolves the parallel `kinds`/`documents`/`callbacks` arguments to one plan
+/// per side. The count check comes first, so a call with no or too many sides
+/// loads no document and runs no callback; a rejected document is
+/// `INVALID_ACTION_POLICY` before detection starts. The parallel arrays are
+/// built by this package's own wrapper, so a mismatch here is a malformed
+/// call and `INVALID_OPTIONS`.
+fn plan_compared_sides(
+    kinds: &[String],
+    documents: &[Buffer],
+    callback_count: usize,
+) -> napi::Result<Vec<ComparedSidePlan>, String> {
+    let invalid = || to_js_error(SecretScanErrorCode::InvalidOptions.into());
+    if kinds.is_empty() || kinds.len() > MAX_COMPARED_POLICIES {
+        return Err(invalid());
+    }
+    let mut documents = documents.iter();
+    let mut next_callback = 0;
+    let mut plans = Vec::with_capacity(kinds.len());
+    for kind in kinds {
+        plans.push(match kind.as_str() {
+            "default" => ComparedSidePlan::Default,
+            "action-policy" => {
+                let bytes = documents.next().ok_or_else(invalid)?;
+                ComparedSidePlan::ActionPolicy(
+                    load_action_policy(bytes).map_err(to_js_action_policy_error)?,
+                )
+            }
+            "callback" => {
+                if next_callback >= callback_count {
+                    return Err(invalid());
+                }
+                next_callback += 1;
+                ComparedSidePlan::Callback(next_callback - 1)
+            }
+            _ => return Err(invalid()),
+        });
+    }
+    if documents.next().is_some() || next_callback != callback_count {
+        return Err(invalid());
+    }
+    Ok(plans)
+}
+
+/// Adapts a JavaScript policy callback to [`Policy`] for one comparison side,
+/// with the same callback arguments, UTF-16 conversion and failure codes as
+/// [`run_scan`]: a throw is `POLICY_FAILURE` and a return outside the four
+/// action names is `INVALID_POLICY_ACTION`. The core's [`PolicyFailure`]
+/// carries no detail, so the precise code is recorded here for
+/// [`Self::refine`].
+struct JsCompareCallback<'a, 'input, 'env> {
+    callback: &'a PolicyCallback<'env>,
+    offsets: &'a RefCell<Utf16Offsets<'input>>,
+    failure: Cell<Option<SecretScanErrorCode>>,
+}
+
+impl JsCompareCallback<'_, '_, '_> {
+    /// The more precise code of the failure the core reported, if this
+    /// callback recorded one.
+    fn refine(&self, error: SecretScanError) -> SecretScanError {
+        match (error.code(), self.failure.take()) {
+            (SecretScanErrorCode::PolicyFailure, Some(code)) => code.into(),
+            _ => error,
+        }
+    }
+}
+
+impl Policy for JsCompareCallback<'_, '_, '_> {
+    fn evaluate(
+        &self,
+        finding: &DetectedFinding,
+        context: &PolicyContext,
+    ) -> Result<Action, PolicyFailure> {
+        let js_finding = to_js_detected_finding(&mut self.offsets.borrow_mut(), finding);
+        let js_context = JsPolicyContext {
+            finding_index: u32::try_from(context.finding_index()).unwrap_or(u32::MAX),
+            finding_count: u32::try_from(context.finding_count()).unwrap_or(u32::MAX),
+        };
+        let action_name: String = self
+            .callback
+            .call(FnArgs::from((js_finding, js_context)))
+            .map_err(|_| PolicyFailure)?;
+        Action::from_name(&action_name).ok_or_else(|| {
+            self.failure
+                .set(Some(SecretScanErrorCode::InvalidPolicyAction));
+            PolicyFailure
+        })
+    }
+}
+
+/// Converts the core comparison to its N-API shape, every range through
+/// `offsets`.
+fn to_js_comparison(
+    offsets: &mut Utf16Offsets<'_>,
+    comparison: &ActionComparison,
+) -> JsActionComparison {
+    let count = |value: usize| u32::try_from(value).unwrap_or(u32::MAX);
+    let detection = comparison.detection();
+    JsActionComparison {
+        detection: JsComparisonDetection {
+            activation_identity: detection.activation_identity().to_owned(),
+            profile: detection
+                .profile()
+                .map(|profile| profile.as_str().to_owned()),
+            detector_count: count(detection.detector_count()),
+        },
+        sides: comparison
+            .sides()
+            .iter()
+            .map(|side| {
+                let counts = side.counts();
+                JsComparedSide {
+                    kind: side.binding().kind().to_owned(),
+                    document_sha256: side.binding().document_sha256_hex(),
+                    redact: count(counts.redact()),
+                    block: count(counts.block()),
+                    warn: count(counts.warn()),
+                    allow: count(counts.allow()),
+                }
+            })
+            .collect(),
+        changed_count: count(comparison.changed_count()),
+        findings: comparison
+            .findings()
+            .iter()
+            .map(|compared| {
+                let finding = compared.finding();
+                JsComparedFinding {
+                    id: finding.id().to_owned(),
+                    r#type: finding.type_name().to_owned(),
+                    detector: finding.detector().to_owned(),
+                    confidence: finding.confidence().as_str().to_owned(),
+                    obfuscation: finding.obfuscation().as_str().to_owned(),
+                    start: offsets.utf16_at(finding.range().start()),
+                    end: offsets.utf16_at(finding.range().end()),
+                    differs: compared.differs(),
+                    decisions: compared
+                        .decisions()
+                        .iter()
+                        .map(|decision| JsActionDecision {
+                            action: decision.action().as_str().to_owned(),
+                            basis: decision.basis().as_str().to_owned(),
+                            rule_id: decision.basis().rule_id().map(str::to_owned),
+                            rule_index: decision.basis().rule_index().map(count),
+                        })
+                        .collect(),
+                }
+            })
+            .collect(),
+    }
+}
+
+/// Runs one comparison over `registry`: the whole-input primitive, with the
+/// callback sides adapted and the failure of one refined to its precise code.
+fn run_compare(
+    input: &str,
+    registry: &DetectorRegistry,
+    plans: &[ComparedSidePlan],
+    callbacks: &[PolicyCallback<'_>],
+    limits: &WholeInputLimits,
+) -> Result<JsActionComparison, SecretScanError> {
+    // One converter for the whole call, so every callback and the result
+    // convert through the same walk over `input`.
+    let offsets = RefCell::new(Utf16Offsets::new(input));
+    let adapters: Vec<JsCompareCallback<'_, '_, '_>> = callbacks
+        .iter()
+        .map(|callback| JsCompareCallback {
+            callback,
+            offsets: &offsets,
+            failure: Cell::new(None),
+        })
+        .collect();
+    let policies: Vec<ComparedPolicy<'_>> = plans
+        .iter()
+        .map(|plan| match plan {
+            ComparedSidePlan::Default => ComparedPolicy::Default,
+            ComparedSidePlan::ActionPolicy(document) => ComparedPolicy::ActionPolicy(document),
+            ComparedSidePlan::Callback(index) => ComparedPolicy::Callback(&adapters[*index]),
+        })
+        .collect();
+    let comparison = compare_action_policies_with_limits(input, registry, &policies, limits)
+        .map_err(|error| {
+            // At most one callback failed: the comparison stops at the first.
+            adapters
+                .iter()
+                .fold(error, |error, adapter| adapter.refine(error))
+        })?;
+    Ok(to_js_comparison(&mut offsets.borrow_mut(), &comparison))
+}
+
+/// [`run_compare`] against `profile`'s shared registry, or the registry over
+/// `ruleset` when one is given (cached for repeats, as for [`scan`]).
+fn compare_for_profile(
+    profile: Profile,
+    input: &str,
+    kinds: &[String],
+    documents: &[Buffer],
+    callbacks: &[PolicyCallback<'_>],
+    limits: Option<&JsWholeInputLimits>,
+    ruleset: Option<&[u8]>,
+) -> napi::Result<JsActionComparison, String> {
+    let plans = plan_compared_sides(kinds, documents, callbacks.len())?;
+    let limits = resolve_whole_input_limits(limits).map_err(to_js_error)?;
+    match ruleset {
+        None => with_profile_registry(profile, |registry| {
+            run_compare(input, registry, &plans, callbacks, &limits)
+        })
+        .map_err(to_js_error),
+        Some(bytes) => with_ruleset_registry(profile, bytes, |registry| {
+            run_compare(input, registry, &plans, callbacks, &limits)
+        }),
+    }
+}
+
+/// Compares what `kinds.len()` policies choose for the findings `input`
+/// yields, over one detection pass and without enforcing any of them
+/// (`decision-explain-and-compare-action-policies-over-one-detection-pass`,
+/// issue #1220). The whole-input primitive only: there is no session or
+/// stream variant.
+///
+/// The sides arrive as parallel arguments: `kinds` names each side in order
+/// (`"default"`, `"action-policy"`, `"callback"`), `documents` holds the
+/// action policy documents in the order their sides appear, and `callbacks`
+/// the callbacks in the order theirs do. Callback sides run one at a time, in
+/// the order given, each once per finding in finding order.
+///
+/// # Errors
+///
+/// - `INVALID_OPTIONS` when there are zero or more than four sides, or the
+///   arguments do not describe the same sides.
+/// - `INVALID_LIMITS`, `INPUT_LIMIT_EXCEEDED` and `FINDING_LIMIT_EXCEEDED`
+///   exactly as [`scan`]; the finding bound fails before any callback runs.
+/// - `INVALID_ACTION_POLICY` when a document does not parse, and
+///   `INVALID_RULESET` when `ruleset` does not parse, before any callback.
+/// - `POLICY_FAILURE` when a callback throws, and `INVALID_POLICY_ACTION` when
+///   one returns something other than the four action names. Either fails
+///   the whole comparison, with no partial result.
+/// - `DETECTOR_FAILURE` / `INVALID_CANDIDATE` from the detector pipeline.
+///
+/// No error carries `input`, a document, or a matched value.
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "compareActionPolicies")]
+pub fn compare_action_policies(
+    input: String,
+    kinds: Vec<String>,
+    #[napi(ts_arg_type = "Uint8Array[]")] documents: Vec<Buffer>,
+    #[napi(ts_arg_type = "((finding: JsDetectedFinding, context: JsPolicyContext) => string)[]")]
+    callbacks: Vec<PolicyCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
+    ruleset: Option<Buffer>,
+) -> napi::Result<JsActionComparison, String> {
+    compare_for_profile(
+        Profile::Full,
+        &input,
+        &kinds,
+        &documents,
+        &callbacks,
+        limits.as_ref(),
+        ruleset.as_deref(),
+    )
+}
+
+/// The `common`-profile analogue of [`compare_action_policies`]: the same
+/// behavior against the `common` registry.
+///
+/// # Errors
+///
+/// The same as [`compare_action_policies`].
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "compareActionPoliciesCommon")]
+pub fn compare_action_policies_common(
+    input: String,
+    kinds: Vec<String>,
+    #[napi(ts_arg_type = "Uint8Array[]")] documents: Vec<Buffer>,
+    #[napi(ts_arg_type = "((finding: JsDetectedFinding, context: JsPolicyContext) => string)[]")]
+    callbacks: Vec<PolicyCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
+    ruleset: Option<Buffer>,
+) -> napi::Result<JsActionComparison, String> {
+    compare_for_profile(
+        Profile::Common,
+        &input,
+        &kinds,
+        &documents,
+        &callbacks,
+        limits.as_ref(),
+        ruleset.as_deref(),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1022,6 +1408,150 @@ mod tests {
             )
         })
         .unwrap()
+    }
+
+    const COMPARE_INPUT: &str = "\u{1F511} API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+
+    fn compare_document(action: &str) -> Buffer {
+        Buffer::from(
+            format!(
+                r#"{{"actionPolicyRevision":1,"base":"default","rules":[{{"id":"rule-a","match":{{"type":["github_token"]}},"action":"{action}"}}]}}"#
+            )
+            .into_bytes(),
+        )
+    }
+
+    fn side_kinds(names: &[&str]) -> Vec<String> {
+        names.iter().map(|name| (*name).to_owned()).collect()
+    }
+
+    fn compare_default_and_documents(
+        kind_names: &[&str],
+        documents: &[Buffer],
+        limits: &WholeInputLimits,
+    ) -> Result<JsActionComparison, SecretScanError> {
+        let plans = plan_compared_sides(&side_kinds(kind_names), documents, 0).unwrap();
+        with_profile_registry(Profile::Full, |registry| {
+            run_compare(COMPARE_INPUT, registry, &plans, &[], limits)
+        })
+    }
+
+    #[test]
+    fn plan_compared_sides_bounds_the_side_count_before_loading_anything() {
+        // A document that would be rejected is never read: the count fails first.
+        let broken: Vec<Buffer> = (0..5).map(|_| Buffer::from(b"{}".to_vec())).collect();
+
+        for (names, documents) in [
+            (side_kinds(&[]), vec![]),
+            (side_kinds(&["action-policy"; 5]), broken),
+        ] {
+            let error = plan_compared_sides(&names, &documents, 0).err().unwrap();
+            assert_eq!(error.status, "INVALID_OPTIONS");
+        }
+        assert_eq!(
+            plan_compared_sides(&side_kinds(&["default"; 4]), &[], 0)
+                .unwrap()
+                .len(),
+            4
+        );
+    }
+
+    #[test]
+    fn plan_compared_sides_refuses_arguments_that_do_not_describe_the_same_sides() {
+        for (names, documents, callbacks) in [
+            (side_kinds(&["session"]), vec![], 0),
+            (side_kinds(&["default"]), vec![compare_document("warn")], 0),
+            (side_kinds(&["action-policy"]), vec![], 0),
+            (side_kinds(&["default"]), vec![], 1),
+            (side_kinds(&["callback"]), vec![], 0),
+        ] {
+            let error = plan_compared_sides(&names, &documents, callbacks)
+                .err()
+                .unwrap();
+            assert_eq!(error.status, "INVALID_OPTIONS", "{names:?}");
+        }
+    }
+
+    #[test]
+    fn plan_compared_sides_reports_a_rejected_document_with_its_class() {
+        let error = plan_compared_sides(
+            &side_kinds(&["default", "action-policy"]),
+            &[Buffer::from(b"{}".to_vec())],
+            0,
+        )
+        .err()
+        .unwrap();
+
+        assert_eq!(error.status, "INVALID_ACTION_POLICY");
+        assert_eq!(
+            error.reason,
+            "The supplied action policy is invalid. (MISSING_FIELD)"
+        );
+    }
+
+    #[test]
+    fn a_comparison_explains_each_side_and_matches_scan_in_utf16() {
+        let result = compare_default_and_documents(
+            &["default", "action-policy", "action-policy"],
+            &[compare_document("allow"), compare_document("default")],
+            &WholeInputLimits::default(),
+        )
+        .unwrap();
+        let scanned = scan_default(COMPARE_INPUT);
+        let js_scanned = to_js_finding(&mut Utf16Offsets::new(COMPARE_INPUT), &scanned[0]);
+
+        assert_eq!(result.findings.len(), scanned.len());
+        let compared = &result.findings[0];
+        assert_eq!(compared.id, scanned[0].id());
+        // The key emoji is two UTF-16 code units but four UTF-8 bytes.
+        assert_eq!(
+            (compared.start, compared.end),
+            (js_scanned.start, js_scanned.end)
+        );
+        assert_ne!(compared.start as usize, scanned[0].range().start());
+        assert_eq!(compared.decisions.len(), 3);
+        assert_eq!(compared.decisions[0].action, js_scanned.action);
+        assert_eq!(compared.decisions[0].basis, "default-policy");
+        assert_eq!(compared.decisions[1].action, "allow");
+        assert_eq!(compared.decisions[1].basis, "rule");
+        assert_eq!(compared.decisions[1].rule_id.as_deref(), Some("rule-a"));
+        assert_eq!(compared.decisions[1].rule_index, Some(0));
+        assert_eq!(compared.decisions[2].basis, "rule-default");
+        assert_eq!(compared.decisions[2].action, js_scanned.action);
+        assert!(compared.differs);
+        assert_eq!(result.changed_count, 1);
+        let registry_len =
+            with_profile_registry(Profile::Full, |registry| Ok(registry.len())).unwrap();
+        assert_eq!(result.detection.detector_count as usize, registry_len);
+        assert_eq!(result.detection.profile.as_deref(), Some("full"));
+        assert_eq!(result.sides[0].kind, "default");
+        assert_eq!(result.sides[0].document_sha256, None);
+        assert_eq!(result.sides[1].kind, "action-policy");
+        assert_eq!(
+            result.sides[1].document_sha256.as_ref().map(String::len),
+            Some(64)
+        );
+        assert_eq!((result.sides[1].allow, result.sides[1].redact), (1, 0));
+    }
+
+    #[test]
+    fn a_comparison_applies_the_whole_input_limits_as_scan_does() {
+        let bytes = WholeInputLimits::new(5, 50).unwrap();
+        let findings = WholeInputLimits::new(1_000, 1).unwrap();
+        let two = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000\nTOKEN=ghp_SYNTHETICREVOKED00000000000000000001";
+
+        let error = compare_default_and_documents(&["default"], &[], &bytes)
+            .err()
+            .unwrap();
+        assert_eq!(error.code(), SecretScanErrorCode::InputLimitExceeded);
+
+        let plans = plan_compared_sides(&side_kinds(&["default"]), &[], 0).unwrap();
+        let error = with_profile_registry(Profile::Full, |registry| {
+            run_compare(two, registry, &plans, &[], &findings)
+        })
+        .err()
+        .unwrap();
+        assert_eq!(error.code(), SecretScanErrorCode::FindingLimitExceeded);
     }
 
     #[test]

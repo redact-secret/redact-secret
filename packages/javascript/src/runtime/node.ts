@@ -18,17 +18,19 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
 import { SecretScanError } from "../errors.js";
-import type {
-  NativeBinding,
-  NativeBindingLoader,
-  NativeDetectedFinding,
-  NativeFinding,
-  NativeFormatterCallback,
-  NativeIncrementalOptions,
-  NativeIncrementalSanitizer,
-  NativePolicyCallback,
-  NativeScanAndRedactResult,
-  NativeWholeInputLimits,
+import {
+  type NativeActionComparison,
+  type NativeBinding,
+  type NativeBindingLoader,
+  type NativeDetectedFinding,
+  type NativeFinding,
+  type NativeFormatterCallback,
+  type NativeIncrementalOptions,
+  type NativeIncrementalSanitizer,
+  type NativePolicyCallback,
+  type NativeScanAndRedactResult,
+  type NativeWholeInputLimits,
+  splitNativeSides,
 } from "../native.js";
 import { assertWasmModuleShape, createBindingFromWasmModule, type WasmModule } from "./wasm-binding.js";
 
@@ -70,8 +72,23 @@ interface NodeAddon {
     actionPolicy?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
+  compareActionPolicies: AddonCompare;
   defaultPolicy(finding: NativeDetectedFinding): string;
 }
+
+/**
+ * The addon's whole-input comparison export, which takes the sides as the
+ * parallel `kinds`/`documents`/`callbacks` arrays {@link splitNativeSides}
+ * builds (`bindings/node/src/lib.rs`'s `compare_action_policies`).
+ */
+type AddonCompare = (
+  input: string,
+  kinds: string[],
+  documents: Uint8Array[],
+  callbacks: NativePolicyCallback[],
+  limits?: NativeWholeInputLimits,
+  ruleset?: Uint8Array,
+) => NativeActionComparison;
 
 /**
  * The addon's `common`-profile export surface: the same operations as
@@ -108,6 +125,7 @@ interface CommonNodeAddon {
     actionPolicy?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizerCommon(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
+  compareActionPoliciesCommon: AddonCompare;
   defaultPolicy(finding: NativeDetectedFinding): string;
   profileCommon(): string;
 }
@@ -238,6 +256,7 @@ function loadAddon(): NodeAddon {
     "scan",
     "redact",
     "scanAndRedact",
+    "compareActionPolicies",
     "createIncrementalSanitizer",
     "defaultPolicy",
   ]);
@@ -257,6 +276,7 @@ export function loadCommonAddon(): CommonNodeAddon {
     "scanCommon",
     "redact",
     "scanAndRedactCommon",
+    "compareActionPoliciesCommon",
     "createIncrementalSanitizerCommon",
     "profileCommon",
     "defaultPolicy",
@@ -288,6 +308,7 @@ interface ProfiledAddonMethods {
     actionPolicy?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
+  compareActionPolicies: AddonCompare;
 }
 
 /**
@@ -315,6 +336,10 @@ function buildBinding(
       return { text: result.redacted, findings: result.findings };
     },
     createIncrementalSanitizer: (options) => methods.createIncrementalSanitizer(options),
+    compareActionPolicies: (input, sides, limits, ruleset) => {
+      const { kinds, documents, callbacks } = splitNativeSides(sides);
+      return methods.compareActionPolicies(input, kinds, documents, callbacks, limits, ruleset);
+    },
     defaultPolicy: (finding) => addon.defaultPolicy(finding),
   };
 }
@@ -339,6 +364,8 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) =>
       addon.scanAndRedact(input, policy, formatter, limits, ruleset, actionPolicy),
     createIncrementalSanitizer: (options) => addon.createIncrementalSanitizer(options),
+    compareActionPolicies: (input, kinds, documents, callbacks, limits, ruleset) =>
+      addon.compareActionPolicies(input, kinds, documents, callbacks, limits, ruleset),
   });
 }
 
@@ -365,6 +392,8 @@ export function createBindingFromCommonAddon(addon: CommonNodeAddon): NativeBind
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) =>
       addon.scanAndRedactCommon(input, policy, formatter, limits, ruleset, actionPolicy),
     createIncrementalSanitizer: (options) => addon.createIncrementalSanitizerCommon(options),
+    compareActionPolicies: (input, kinds, documents, callbacks, limits, ruleset) =>
+      addon.compareActionPoliciesCommon(input, kinds, documents, callbacks, limits, ruleset),
   });
 }
 

@@ -332,13 +332,49 @@ $ echo $?
 ## Consequences
 
 The Rust core and the CLI ship the primitive with this change (#1220). The
-Node, WebAssembly, JavaScript and Python bindings follow in their own tracks
-against the fixture; until they ship it, a surface that has not shipped it
-exposes no comparison and no digest. The 0.1.x additive contract covers every
-new name. The five-surface WebAssembly increase for the SHA-256 and the
-comparison is expected to be small and is measured by the binding track, not
-asserted here. ADR-1217 gains one sentence pointing at this record. No detector,
-default action, finding field, error code or version changes.
+Node, WebAssembly and JavaScript bindings ship it in the same change and the
+Python binding in its own track, each against the fixture; a surface that has not
+shipped it exposes no comparison and no digest. The 0.1.x additive contract
+covers every new name. ADR-1217 gains one sentence pointing at
+this record. No detector, default action, finding field, error code or version
+changes.
+
+**JavaScript surface (#1220).** `compareActionPolicies(input, { policies, limits?,
+ruleset? })` is one function in `@redact-secret/core` and
+`@redact-secret/core/common`, and the result is the CLI's `--json` object with
+camel-case names. A side is `{ kind: "default" }`, `{ kind: "action-policy",
+actionPolicy }` (the forms of the `actionPolicy` option, serialized once) or
+`{ kind: "callback", policy }`; the `kind` strings are the ones the result
+reports (`default`, `action-policy`, `callback`). Section 3 is enforced in the
+shape: the function takes one string, a non-string is `INVALID_INPUT`, and an
+option or side key that could suggest an incremental or stream comparison (or
+belongs to another kind) is `INVALID_OPTIONS` instead of being ignored. The
+JavaScript package keeps no policy handle, so the digest section 7 puts on the
+policy handle is read from the result's `policies[].documentSha256`; for an object
+policy it is the digest of the compact `JSON.stringify` bytes the package
+serialized, the case the fixture's last host obligation names. Callback sides use
+the existing adapters: `POLICY_FAILURE` for a throw or a non-string return and
+`INVALID_POLICY_ACTION` for a string outside the four names, identically on the
+Node addon and on WebAssembly. The addon and the WebAssembly artifact return the
+same fields, the package builds the one public object from them, and the
+qualification requires the same result digest from both runtimes on the same
+profile.
+
+**WebAssembly cost, measured.** The five-surface increase was left to the
+binding track. Release `wasm-bindgen` builds, brotli quality 11, against the
+branch head that already held the core's comparison and SHA-256 but linked
+neither into a binding export (so the `full` baseline is 1,477 bytes above
+#1219's 170,442: the core change since then, which includes the SHA-256 computed
+at every policy load, is already in it): `full` 171,919 to 176,282 (+4,363, 2.54%), `common`
+123,785 to 128,114 (+4,329), `full` with `pii` 270,450 to 274,706 (+4,256) and
+`common` with `pii` 220,910 to 225,522 (+4,612). Against `db0e5c8d`, the parser,
+the digest and the comparison together add 11,493 bytes to `full` (7.0%). About
+2,600 of the 4,363 are the core comparison and its call, about 900 the argument
+glue and about 900 the flat result; a nested object result cost 881 bytes more
+than the flat array the package now rebuilds. The cost is
+accepted and recorded in
+[the evidence](../audits/evidence/1220/README.md); later growth of the
+comparison re-measures against it.
 
 ### Reopening bar
 

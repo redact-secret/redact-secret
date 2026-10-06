@@ -194,7 +194,18 @@ depend on `src/`.
   from its own default evaluation, so the file copies no part of the default
   table. The Rust core runs it
   (`crates/secret-scan-core/tests/action_policy_compare.rs`) and the CLI runs the
-  plumbing; each binding that ships the primitive runs it.
+  plumbing; each binding that ships the primitive runs it. The Node addon and the
+  WebAssembly artifact (through its Node glue) run it, through their raw exports
+  and through the published package on top of each, in the artifact-qualification
+  workflow through `scripts/lib/action-policy-compare-reference.mjs` (issue
+  #1220): every case, error and digest, the host obligations a JavaScript surface
+  can observe (`detection-runs-once` cannot be, and is counted as such),
+  enforcement parity against the surface's own `scan`, that a comparison leaves
+  enforcement output and callback logs unchanged, and a canonical result digest
+  that the addon and WebAssembly runs of one profile must share. On `common`,
+  where the fixture's findings are not all detected, the fixture's own
+  expectations are skipped and counted while every check that does not depend on
+  them still runs. The Python binding runs the fixture in its own tests.
 - [`fixtures/action-policy-v1.json`](./fixtures/action-policy-v1.json) —
   the revision 1 declarative action policy truth table (issue #1217,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).

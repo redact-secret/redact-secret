@@ -7,6 +7,7 @@
 
 import assert from "node:assert/strict";
 import {
+  compareActionPolicies,
   createIncrementalSanitizer,
   defaultPolicy,
   initialize,
@@ -425,6 +426,67 @@ check("defaultPolicy evaluates the core default without a copied table", () => {
   };
   assert.equal(defaultPolicy(finding), "block");
   assert.equal(defaultPolicy({ ...finding, type: "acme-unknown-type", confidence: "medium" }), "warn");
+});
+
+check("compareActionPolicies compares sides over one detection pass and enforces nothing", () => {
+  const calls = [];
+  const result = compareActionPolicies(
+    ACTION_POLICY_INPUT,
+    ["default", "action-policy", "callback"],
+    [WARN_GITHUB],
+    [
+      (finding, context) => {
+        calls.push(`${finding.id}:${context.findingIndex}/${context.findingCount}`);
+        return "allow";
+      },
+    ],
+  );
+  assert.deepEqual(calls, ["finding-1:0/1"]);
+  assert.equal(result.findings.length, 1);
+  const [finding] = result.findings;
+  assert.deepEqual(
+    finding.decisions.map((decision) => [decision.action, decision.basis]),
+    [
+      ["redact", "default-policy"],
+      ["warn", "rule"],
+      ["allow", "callback"],
+    ],
+  );
+  assert.equal(finding.decisions[1].ruleId, "warn-github");
+  assert.equal(finding.differs, true);
+  assert.equal(result.changedCount, 1);
+  assert.equal(result.sides[1].documentSha256.length, 64);
+  assert.equal(result.sides[2].documentSha256, undefined);
+  assert.equal(scanAndRedact(ACTION_POLICY_INPUT).redacted.includes("ghp_"), false);
+});
+
+check("compareActionPolicies fails closed on a bad side count, a bad return and a bad document", () => {
+  assert.throws(
+    () => compareActionPolicies(ACTION_POLICY_INPUT, [], [], []),
+    (error) => error.code === "INVALID_OPTIONS",
+  );
+  assert.throws(
+    () => compareActionPolicies(ACTION_POLICY_INPUT, ["callback"], [], [() => "mask"]),
+    (error) => error.code === "INVALID_POLICY_ACTION",
+  );
+  assert.throws(
+    () =>
+      compareActionPolicies(
+        ACTION_POLICY_INPUT,
+        ["callback"],
+        [],
+        [
+          () => {
+            throw new Error("synthetic");
+          },
+        ],
+      ),
+    (error) => error.code === "POLICY_FAILURE",
+  );
+  assert.throws(
+    () => compareActionPolicies("irrelevant", ["action-policy"], [Buffer.from("{}")], []),
+    (error) => error.code === "INVALID_ACTION_POLICY",
+  );
 });
 
 if (process.exitCode) {

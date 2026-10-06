@@ -14,6 +14,11 @@ import type { NativeFinding, NativeFormatterCallback } from "../src/native.js";
 import { createBindingFromAddon, createBindingFromCommonAddon } from "../src/runtime/node.js";
 import { sampleFinding } from "./fake-binding.js";
 
+/** The comparison export is not under test here; a call would be a bug. */
+const unusedComparison = (): never => {
+  throw new Error("unexpected compareActionPolicies call");
+};
+
 const LIMITS = {
   maxInputCodeUnits: 1_024,
   maxBufferedCodeUnits: 384,
@@ -26,6 +31,7 @@ describe("Node addon binding: artifact", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPolicies: unusedComparison,
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -49,6 +55,7 @@ describe("Node addon binding: PII initialization", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPolicies: unusedComparison,
       profile: () => "full",
       initialize: () => calls.push("legacy"),
       initializePii: (pii) => {
@@ -74,6 +81,7 @@ describe("Node addon binding: PII initialization", () => {
     const binding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPoliciesCommon: unusedComparison,
       profileCommon: () => "common",
       initializeCommon: () => calls.push("legacy"),
       initializeCommonPii: (pii) => {
@@ -101,6 +109,7 @@ describe("Node addon binding: createIncrementalSanitizer", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPolicies: unusedComparison,
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -129,6 +138,7 @@ describe("Node addon binding: scanAndRedact result shape", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPolicies: unusedComparison,
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -155,6 +165,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     const binding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPoliciesCommon: unusedComparison,
       profileCommon: () => "common",
       initializeCommon: () => {
         calls.push("initializeCommon");
@@ -206,6 +217,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     const binding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPoliciesCommon: unusedComparison,
       profileCommon: () => "common",
       initializeCommon: () => {},
       scanCommon: () => [],
@@ -238,6 +250,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     const fullBinding = createBindingFromAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPolicies: unusedComparison,
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -253,6 +266,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     const commonBinding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
       defaultPolicy: () => "redact",
+      compareActionPoliciesCommon: unusedComparison,
       profileCommon: () => "common",
       initializeCommon: () => {},
       scanCommon: () => [],
