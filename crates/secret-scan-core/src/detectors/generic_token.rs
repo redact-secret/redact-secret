@@ -1963,10 +1963,52 @@ const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 /// (`sk-ant-admin01-<your-key>`) get the same treatment as the 12-byte
 /// `sk-ant-api01`/`sk-ant-api03` siblings. Listing the exact prefix keeps the
 /// general 12-byte cap for every other lowercase lead (`longvendorname_`).
-const LONG_VENDOR_PLACEHOLDER_PREFIXES: &[&str] = &["sk-ant-admin01"];
+///
+/// Issue #1236: `sandbox-sq0csb` is the Square sandbox application-secret
+/// prefix (14 bytes), so `sandbox-sq0csb-<your-sandbox-application-secret>`
+/// is read like its 12-byte sibling `sq0csp-<...>`.
+const LONG_VENDOR_PLACEHOLDER_PREFIXES: &[&str] = &["sk-ant-admin01", "sandbox-sq0csb"];
 
 /// The longest entry of [`LONG_VENDOR_PLACEHOLDER_PREFIXES`].
 const MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 14;
+
+/// Uppercase dedicated-detector prefixes that qualify in front of a
+/// placeholder although the general vendor rule requires a lowercase lead
+/// (issue #1236): `EAAA` is the Square access-token prefix. Each is listed
+/// exactly, so any other uppercase lead (`KEY_YOUR_API_KEY`, #756) stays
+/// reported.
+const UPPERCASE_PLACEHOLDER_PREFIXES: &[&str] = &["EAAA"];
+
+/// `true` for a documentation placeholder behind one of
+/// [`UPPERCASE_PLACEHOLDER_PREFIXES`] (issue #1236): the prefix, then either
+/// a `-`/`_` separator and an instructional placeholder, lead-word phrase,
+/// repeated filler or `<...>` reference (`EAAA-your-access-token`), or,
+/// with no separator, one whole `<...>` reference (`EAAA<your-access-token>`).
+/// A glued word (`EAAAyourtoken`) or random material keeps the value detected.
+fn is_uppercase_prefixed_placeholder(value: &str) -> bool {
+    UPPERCASE_PLACEHOLDER_PREFIXES.iter().any(|prefix| {
+        let Some(rest) = value.strip_prefix(prefix) else {
+            return false;
+        };
+        if let Some(body) = rest.strip_prefix(['-', '_']) {
+            return !body.is_empty()
+                && (is_instructional_token_placeholder(body)
+                    || is_lead_word_phrase_placeholder(body)
+                    || is_repeated_character_filler(body)
+                    || is_whole_angle_reference(body));
+        }
+        is_whole_angle_reference(rest)
+    })
+}
+
+/// `true` for exactly one `<...>` reference around a non-empty run without
+/// `<` or `>`.
+fn is_whole_angle_reference(value: &str) -> bool {
+    value
+        .strip_prefix('<')
+        .and_then(|rest| rest.strip_suffix('>'))
+        .is_some_and(|inner| !inner.is_empty() && !inner.contains(['<', '>']))
+}
 
 /// `true` for a documentation placeholder behind a short vendor prefix:
 /// `pplx-your-api-key-here`, `lsv2_pt_your_key_here`, `pcsk_***`,
@@ -1985,43 +2027,44 @@ const MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 14;
 /// material, which fails all three checks, so the prefix alone never
 /// excludes a value.
 pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
-    value
-        .char_indices()
-        .take_while(|&(index, _)| index <= MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN)
-        .filter(|&(index, ch)| {
-            index > 0
-                && matches!(ch, '_' | '-')
-                && (index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN
-                    || LONG_VENDOR_PLACEHOLDER_PREFIXES.contains(&&value[..index]))
-        })
-        .any(|(index, _)| {
-            let rest = &value[index + 1..];
-            let prefix = &value[..index];
-            // An uppercase vendor prefix (`PMAK-<your-api-key>`) qualifies
-            // only in front of a whole `<...>` placeholder (issue #993).
-            let upper_prefix_ok = prefix
-                .bytes()
-                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
-                && rest.len() > 2
-                && rest.starts_with('<')
-                && rest.ends_with('>')
-                && !rest[1..rest.len() - 1].contains(['<', '>']);
-            !rest.is_empty()
-                && (upper_prefix_ok
-                    || prefix.bytes().all(|byte| {
-                        byte.is_ascii_lowercase()
-                            || byte.is_ascii_digit()
-                            || matches!(byte, b'_' | b'-')
-                    }))
-                && (is_instructional_token_placeholder(rest)
-                    || is_glued_instructional_placeholder(rest)
-                    || is_lead_word_phrase_placeholder(rest)
-                    || is_ascending_digit_run(rest)
-                    || is_counting_run_body(rest)
-                    || starts_with_angle_bracket_reference(rest)
-                    || is_repeated_character_filler(rest)
-                    || is_generic_placeholder_word(rest))
-        })
+    is_uppercase_prefixed_placeholder(value)
+        || value
+            .char_indices()
+            .take_while(|&(index, _)| index <= MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN)
+            .filter(|&(index, ch)| {
+                index > 0
+                    && matches!(ch, '_' | '-')
+                    && (index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN
+                        || LONG_VENDOR_PLACEHOLDER_PREFIXES.contains(&&value[..index]))
+            })
+            .any(|(index, _)| {
+                let rest = &value[index + 1..];
+                let prefix = &value[..index];
+                // An uppercase vendor prefix (`PMAK-<your-api-key>`) qualifies
+                // only in front of a whole `<...>` placeholder (issue #993).
+                let upper_prefix_ok = prefix
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+                    && rest.len() > 2
+                    && rest.starts_with('<')
+                    && rest.ends_with('>')
+                    && !rest[1..rest.len() - 1].contains(['<', '>']);
+                !rest.is_empty()
+                    && (upper_prefix_ok
+                        || prefix.bytes().all(|byte| {
+                            byte.is_ascii_lowercase()
+                                || byte.is_ascii_digit()
+                                || matches!(byte, b'_' | b'-')
+                        }))
+                    && (is_instructional_token_placeholder(rest)
+                        || is_glued_instructional_placeholder(rest)
+                        || is_lead_word_phrase_placeholder(rest)
+                        || is_ascending_digit_run(rest)
+                        || is_counting_run_body(rest)
+                        || starts_with_angle_bracket_reference(rest)
+                        || is_repeated_character_filler(rest)
+                        || is_generic_placeholder_word(rest))
+            })
 }
 
 /// Shortest digit run [`is_ascending_digit_run`] accepts.

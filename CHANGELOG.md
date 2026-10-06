@@ -228,6 +228,14 @@ evidence is linked from each published version.
   `INVALID_POLICY_ACTION`. The whole-input WebAssembly call now reports
   `INVALID_POLICY_ACTION` too (#1219). A thrown exception and a non-string
   return stay `POLICY_FAILURE` on every runtime.
+- `generic-token` no longer reports Square documentation placeholders (#1236):
+  `SQUARE_ACCESS_TOKEN=EAAA-your-access-token`,
+  `SQUARE_ACCESS_TOKEN="EAAA<your-production-access-token>"` and
+  `client_secret: sandbox-sq0csb-<your-sandbox-application-secret>` were each a
+  high, `redact` `contextual_secret` over the whole value. A real `EAAA`,
+  `sq0csp-` or `sandbox-sq0csb-` value is still a Square finding, and a
+  placeholder glued to random material, an off-width random body and any other
+  uppercase lead keep their previous result.
 - `generic-token` no longer reports the instructional placeholder
   `YOUR_PASSWORD` (and `your-pwd-here`, `INSERT_PASSWORD`, `ENTER_YOUR_PASSPHRASE`,
   the `passwd` and `passphrase` forms) under a `password` name or any other
