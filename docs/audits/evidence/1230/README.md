@@ -228,3 +228,130 @@ password is one `authorization_credential` span in raw HTTP and a quoted curl
 input equals every two-chunk UTF-8 byte partition equals a per-line session.
 
 No pin, version or release change.
+
+## Round-1 measurement addendum: final dispositions of the measured rows
+
+The independent baseline of Group E ([benchmarks#754](https://github.com/redact-secret/redact-secret-benchmarks/issues/754),
+measured at core `e1284537`, report [round 1](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md)) is the
+measurement this record's "baseline open" gate waited for, and it confirms the
+`hapikey` gap this record named as pre-decided. The dispositions follow its gap
+groups and nothing else; "fixed" means the product behaviour changed with a
+deterministic test and an evidence addendum, confirmed only by a replay at a
+commit carrying the fix, which has not run. No row is claimed covered, passing or
+ready by this addendum. Group E measured 343 positives (182 exact, 151 misses) and
+186 controls (2 flagged).
+
+| Row | Measured | Disposition |
+| --- | --- | --- |
+| `adobe:service-account-jwt-private-key` | no positive; 1 control flagged (`<contents of private.key>`) | fixed (spaced angle placeholder, [#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `airtable:legacy-api-key` | 27 of 28 exact; 1 miss (`query-shape-digits24`); 1 control flagged (brace placeholder) | digits-only: fixed ([addendum](addendum-digits-only-values.md)); brace placeholder: fixed |
+| `dropbox:legacy-long-lived-access-token` | 24 of 25 exact; 1 miss (`member-shape-digits24`) | fixed ([digits-only addendum](addendum-digits-only-values.md)) |
+| `hubspot:legacy-api-key` | 0 of 32; 32 misses (`hapikey`) | fixed, the whole-name entry this record pre-decided ([addendum](addendum-hapikey.md)); the digits-only case follows the digits-only addendum |
+| `jfrog:api-key` | 0 of 40; 40 misses | the `X-JFrog-Art-Api` header cases: fixed ([addendum](../1228/addendum-jfrog-art-api-header.md)), `header-shape-digits24` through the digits-only addendum; the `curl -u user:<secret>` cases (`basic-*`): **deferred to issue #1247**, a stated false negative |
+| `reddit:oauth-access-token` | 59 of 86 exact; 27 misses: 24 revoke `token=`, 3 digits-only | `token=`: **partly fixed, partly policy-limited**: read where the request names a revoke or introspect endpoint or carries `token_type_hint=` ([addendum](addendum-revoke-token-parameter.md)), the context-free layouts are recorded false negatives; the digits-only member and fragment cases are fixed ([digits-only addendum](addendum-digits-only-values.md)) |
+| `reddit:oauth-refresh-token` | 46 of 48 exact; 2 misses (digits-only) | fixed ([digits-only addendum](addendum-digits-only-values.md)) |
+| `reddit:app-client-secret` | 0 of 26; 26 misses | **deferred to issue #1247**: every case is the `curl -u` or `--user` password slot, not read; a stated false negative |
+| `zendesk:api-token` | 26 of 58 exact; 22 misses and 10 over-wide (a whole-string `warn` that left the token in the output), 1 masked display flagged | fixed, a reader anchored on `/token:` with a token-only `redact` span ([addendum](addendum-zendesk-email-token-credential.md)); the `curl -u` argument cases are read by the literal as a consequence |
+
+### Deferred, not fixed
+
+* **The `curl -u` / `--user` password slot** (JFrog API key and reference token,
+  Reddit client secret): issue #1247, with the policy for a literal user part. About
+  80 of the measured positives are in this slot.
+* **A bare `token=`** with no revoke context, and the corpus layouts of the Reddit
+  group that hold none: a recorded policy limit under the accepted rule for the
+  bare `token` name ([#1241](../1241/README.md)).
+
+No pin, version or release change.
+
+## Final state (round 3, candidate c6dd6859), 2026-10-06
+
+This section supersedes the round-1 measurement addendum above wherever the two
+differ. Superseded statements are marked below; the round-1 text is kept as the
+record of that round. The placeholder that the round-1 addendum carried for its
+report is replaced there by the [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md).
+
+Measured at the final candidate redact-secret `c6dd685974b8df6a84514e07e41e35afa711a2ac`
+(core `e1284537` plus the nine round-1 fixes plus the two round-2 fixes
+`c8d661b3` and `c6dd6859`; declared 0.1.0-beta.14, not published). Frozen
+corpora digests: C (#752, errata-1, 646 cases)
+`16036d043fc0dad0e45ec42e2513d2ffec2020da3458a95ed57f09f44fb0e02d` (the original
+freeze digest was `f216ca0a72c52d2b268924662d7f4ab66372c9820d0cfe386e3eefa0110dc37d`;
+errata-1 made the nine `code=` controls observed-only), D (#753, 868 cases)
+`aa173111a8b7142dc4f378ebd29875605658112eae6553dcfce6287cbaf8e72e`, E (#754, 767
+cases) `6aa6221022b94418183f706f8034705d8c6050b5c657e309980832f6231691aa`. 2,281
+cases on four surfaces (Node, WASM, Python, CLI), each whole and in 7-byte and
+1-byte chunks. Against the baseline (beta.13), round 1 and round 2: 0
+regressions; 0 parity divergences; 0 open product gaps. Of the 119 scored
+failures across the three groups, all are recorded policy cases: 59 `curl -u`
+password slot (#1247), 15 Contentful lone `token` member (#1256, rule #1241), 2
+Reddit `token=` without revoke context (#1241), 1 Elastic `encoded` alone, 36
+Meta `APP_ID|SECRET` whole-pair redaction (recorded deviation a), 6 `x-api-key`
+Adobe client-id controls (recorded deviation b). Final dispositions of all 43
+rows: 16 fully covered (C 4, D 7, E 5), 5 covered with recorded deviation, 6
+policy-limited, 16 carrier unresolved (observed only), 0 open product gaps.
+
+Sources, all at benchmarks commit `c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291` (PR #799):
+[round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (per-row table: [section 6](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows); regressions: [section 2](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#2-regressions); residual groups: [section 4](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#4-round-2-residual-groups-and-what-still-fails)),
+[round-3 scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json),
+[round-3 identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json),
+[round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round2/report.md),
+[round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md) and
+[freeze record](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/benchmarks/FREEZE-groups-cde.md).
+
+Final disposition of the 9 rows of Group E (round-3 report, section 6; row names exact):
+
+| Row | Final disposition | Open cases and the policy that explains them |
+| --- | --- | --- |
+| `adobe:service-account-jwt-private-key` | carrier unresolved (observed only) | no scored positive; 17 controls, 0 flagged. Not covered |
+| `airtable:legacy-api-key` | fully covered | 28/28 positives exact, 18 controls clean |
+| `dropbox:legacy-long-lived-access-token` | fully covered | 25/25 positives exact, 16 controls clean |
+| `hubspot:legacy-api-key` | fully covered | 32/32 positives exact, 19 controls clean (the `YOUR_HAPIKEY` control flagged on round 2 is clean) |
+| `jfrog:api-key` | policy-limited | 18 open: the `curl -u user:<password>` password slot is not read; stated false negative, #1247 (deviation c) |
+| `reddit:oauth-access-token` | policy-limited | 2 open (`form-utf8-before-after`, `form-repeat`): `token=` with no revoke or introspect endpoint and no `token_type_hint` is not read; bare-`token` rule #1241 |
+| `reddit:oauth-refresh-token` | fully covered | 48/48 positives exact, 20 controls clean |
+| `reddit:app-client-secret` | policy-limited | 26 open: every case is the `curl -u` / `--user` password slot, not read; #1247 (deviation c) |
+| `zendesk:api-token` | fully covered | 58/58 positives exact, 21 controls clean |
+
+Group E totals at round 3: 343 positives (297 exact, 297 fully covered, 46
+misses) and 186 controls (0 flagged), against 182 exact and 151 misses on the
+baseline. The 46 misses are 18 JFrog and 26 Reddit-secret `curl -u` cases plus the
+2 Reddit `token=` cases.
+
+Superseded by this section: the round-1 statement that the `X-JFrog-Art-Api`,
+`hapikey`, digits-only, Zendesk and revoke `token=` fixes were unconfirmed is
+replaced by the round-3 replay: none of the 46 open cases belongs to those fixes
+(they are the `curl -u` slot and the context-free `token=`). The round-1
+statement that "about 80" measured positives sit in the `curl -u` slot is not
+reconfirmed by the final report; the final count of open `curl -u` cases across
+Groups C and E is 59 (15 JFrog reference token in C, 18 JFrog API key and 26
+Reddit client secret in E).
+
+Follow-ups that explain the policy-limited rows: curl `-u` password slot
+[redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247); JFrog `AKCp` bare reader, deferred
+[redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248); bare `token` member of the Contentful create
+response [redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256) under the bare-`token` rule
+[#1241](../1241/README.md); existing Case contradictions
+[credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264); percent-escaped X layout confirmation
+[credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265).
+
+Honest limits (round-3 report, section 8):
+
+* Project-authored, maintainer-only evidence, not independent validation. The
+  corpora derive from the maintainers' credential-evidence snapshot and were
+  frozen before any scan; agreement shows consistency with the maintainers' own
+  contract and nothing more. The policy dispositions are the maintainers' own
+  decisions, recorded and not validated by the measurement.
+* One host (darwin-arm64, Node v22.16.0), not a linux-x64 official run. Peers
+  were not run. The candidate is unpublished (a branch commit declaring
+  0.1.0-beta.14).
+* The fixes target the measured failures on these same corpora, so no
+  generalisation to unseen carriers is claimed. The false-positive cost on real
+  traffic of the 16+ digit rule and of the placeholder grammar (`{name}`,
+  `[name]`, `YOUR_<slot>`, pipe composites) is not measured by these corpora.
+* A "fully covered" row means every frozen scored case passes; it does not
+  promote support, change an official run, repin or release anything. A
+  carrier-unresolved row has no scored positive (its controls are clean and
+  nothing more) and a policy-limited row is not covered.
+
+No pin, version or release change.

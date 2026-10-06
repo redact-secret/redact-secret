@@ -2143,6 +2143,8 @@
         "connection-positive-unclosed-command-substitution-still-detected",
         "connection-regression-http-proxy-userinfo-password",
         "connection-regression-https-userinfo-percent-encoded-password",
+        "connection-regression-mongodb-malformed-percent-password",
+        "connection-regression-mongodb-srv-malformed-percent-password",
         "connection-regression-placeholder-embedded-in-password"
       ],
       "policyClass": "always-redact",
@@ -2182,7 +2184,8 @@
         {
           "evidenceFixtureIds": [
             "connection-positive-mongodb-srv",
-            "connection-positive-mongodb-srv-reserved-example-host"
+            "connection-positive-mongodb-srv-reserved-example-host",
+            "connection-regression-mongodb-srv-malformed-percent-password"
           ],
           "scheme": "mongodb+srv",
           "state": "supported"
@@ -2191,7 +2194,9 @@
           "evidenceFixtureIds": [
             "connection-positive-mongodb-seed-list",
             "connection-positive-mongodb-srv",
-            "connection-positive-mongodb-srv-reserved-example-host"
+            "connection-positive-mongodb-srv-reserved-example-host",
+            "connection-regression-mongodb-malformed-percent-password",
+            "connection-regression-mongodb-srv-malformed-percent-password"
           ],
           "scheme": "mongodb",
           "state": "supported"

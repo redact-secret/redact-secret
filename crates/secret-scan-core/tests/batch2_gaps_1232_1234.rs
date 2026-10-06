@@ -259,13 +259,11 @@ fn hubspot_public_config_placeholders_references_masks_and_lookalikes_stay_clean
         "HUBSPOT_PERSONAL_ACCESS_KEY=${HUBSPOT_PERSONAL_ACCESS_KEY}\n".to_string(),
         "HUBSPOT_PERSONAL_ACCESS_KEY=\n".to_string(),
         "personalAccessKey: \"\"\n".to_string(),
-        // neighbouring names and a further-prefixed lookalike
+        // neighbouring names (the prefixed forms are read since #1225, see tests/hubspot_prefixed_personal_access_key_1225.rs)
         format!("personalAccessKeyId: {HUBSPOT_KEY}\n"),
         format!("personalAccessKeyExpiresAt: {HUBSPOT_KEY}\n"),
         format!("personalAccessKeyHint: {HUBSPOT_KEY}\n"),
         format!("personalAccessKeyLength: {HUBSPOT_KEY}\n"),
-        format!("my_personal_access_key: {HUBSPOT_KEY}\n"),
-        format!("oldPersonalAccessKey: {HUBSPOT_KEY}\n"),
         format!("HUBSPOT_PERSONAL_ACCESS_KEY_ID={HUBSPOT_KEY}\n"),
         format!("HUBSPOT_PERSONAL_ACCESS_KEY_EXPIRES_AT={HUBSPOT_KEY}\n"),
         format!("portalId: {HUBSPOT_KEY}\n"),

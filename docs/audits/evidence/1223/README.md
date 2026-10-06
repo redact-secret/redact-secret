@@ -312,3 +312,138 @@ grammar pinned by the `generic_token` and `bearer_token` unit tests and
 by this record only. The independent measurement is the benchmarks side's, with
 its own corpus and scorer.
 
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written when the contract was adopted and
+measured; the statements listed here no longer hold, and this section is the
+current state. The other Batch 2 records ([#1224](../1224/README.md),
+[#1225](../1225/README.md), [#1226](../1226/README.md),
+[#1232](../1232/README.md), [#1233](../1233/README.md),
+[#1234](../1234/README.md)) carry the same replay facts for their rows, and
+[#1241](../1241/README.md) records the `oauth_token` decision.
+
+### The accepted replay
+
+benchmarks [#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merged 2026-10-06, merge commit
+`74c88531f7f185e687eabe6477fff5b06f54e2e9`, the round-3 step of
+[benchmarks#739](https://github.com/redact-secret/redact-secret-benchmarks/issues/739))
+replayed the exact candidate **`4e0041081aad22d0101bd52db52017b67b5bd3db`**
+(core main after PR #1235, which carries #1232, #1233 and #1234; declared
+`0.1.0-beta.13`, not released) on Node, WASM, Python and the CLI, whole and
+streamed at 7-byte and 1-byte chunks (darwin-arm64, Node v22.16.0; peers not
+run). The corpora were frozen and not edited: round 2
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921`
+(1935 cases), round 1
+`sha256:74fed38245503b63d55247f0da2da8e27a271de5467b3b06146ebef0c4f7a4f1`
+(486 cases) and Batch 1
+`sha256:ddd709174816443e2234594f040d0dae27e3b78b5dce68f2396296bffde8708c`
+(82 cases). Sources, at the merge commit:
+[round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md)
+and [ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)
+(schema 5, 58 rows, `candidateRound3` identity `4e004108`).
+
+| Corpus / run | Positives passing | Controls clean | Whole equals stream | Four surfaces identical |
+| --- | ---: | ---: | ---: | ---: |
+| round 2, `4e004108`, 7-byte chunks | 1010 / 1010 | 555 / 555 | 7740 / 7740 | 1935 / 1935 |
+| round 2, `4e004108`, 1-byte chunks | 1010 / 1010 | 555 / 555 | 7740 / 7740 | 1935 / 1935 |
+| round 2, previous candidate `a148dadf` (round 2) | 1002 / 1010 | 539 / 555 | 7740 / 7740 | 1935 / 1935 |
+| round 1, `4e004108`, 7-byte and 1-byte chunks | 200 / 200 | 203 / 203 | 1944 / 1944 | 486 / 486 |
+
+Batch 1 controls (82 cases, 656 entries): 0 differences against the accepted
+`af1e71e0` observations at both chunk sizes. Against `a148dadf` exactly 25 cases
+differ (15 empty-form-value controls, 8 HubSpot positives, 1 Atlas placeholder
+control, 1 unscored HubSpot legacy-layout observation); there are 0 regressions
+and 0 cases still failing or flagged. This is a local replay on one host and does
+not replace a linux-x64 official run; nothing in it repins, promotes support or
+releases.
+
+### Statements superseded by the accepted replay
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "The independent replay of the fixed candidate is open" (Result, Handoff "What the benchmarks side replays (open)") | Done and accepted: benchmarks #771, candidate `4e004108`, four surfaces, whole and 1-byte and 7-byte streams. The expected result stated in the Handoff (0 failing, 0 flagged, 25 differing cases, stream equals whole, surfaces identical) is the result the replay reports. |
+| "The fixed candidate is **not** an identity the benchmark has measured" (Identities) | It is: `4e0041081aad22d0101bd52db52017b67b5bd3db` is the measured candidate identity of round 3. |
+| "Node, WASM and Python were not replayed with the fixed candidate" (Local replay) | They were, by the benchmark. The local CLI-only replay above is superseded by the benchmark's own. |
+| Gates "Node/WASM, Python, Rust and CLI whole and stream behavior: Partly" and "Exact candidate revision and digests to benchmarks; accept independent replay: Open" | Met, see the gate table below. |
+| "the declarative overlay work of #1216 to #1222 when it lands" (Rules for all classes) | Shipped. A user action policy is a versioned declarative document loaded with the CLI `--action-policy` and compared with `--compare-action-policy`; the rows are in [`docs/specs/engine.md`](../../../specs/engine.md) and the decisions [`decision-define-the-versioned-declarative-action-policy-and-default-overlay`](../../../decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md) and [`decision-explain-and-compare-action-policies-over-one-detection-pass`](../../../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md). The contract above still states defaults only. |
+
+### Dispositions of the 48 rows, as the ledger now records them
+
+Ledger counts for all 58 Batch 2 rows (the package records split them): 38
+`already-covered / no-code`, 17 `fixed by candidate 4e004108, replay verified on
+Node, WASM, Python and CLI (whole, 7-byte and 1-byte streams)`, 2 `fixed in
+candidate by an existing core fix (no new gap)` (the two Elastic rows of
+[#1224](../1224/README.md)) and 1 `contract-evidence conflict` (the Atlas API
+private key of [#1226](../1226/README.md)). The ledger's own label for the last
+one is a conflict between the evidence's `ready` mark and the contract, not a
+carrier gap.
+
+For this record's 48 rows (G1 23, G2 13, G3 12): 34 stay `already-covered /
+no-code` (G1 22, G2 7, G3 5), and the 14 rows that reproduced one gap each are
+now `fixed by candidate 4e004108, replay verified`, with 0 failing and 0 flagged
+cases on every surface and stream. The gap in each is the control
+`<family>:r2:<name>-form-empty-null:control`, fixed by [#1232](../1232/README.md):
+
+| Group | Rows (14) |
+| --- | --- |
+| G1 | `meta:user-access-token` |
+| G2 | `airtable:oauth-refresh-token`, `asana:oauth-refresh-token`, `box:oauth-refresh-token`, `dropbox:refresh-token`, `hubspot:oauth-refresh-token`, `x:oauth2-refresh-token` |
+| G3 | `asana:oauth-client-secret`, `box:oauth-client-secret`, `dropbox:app-secret`, `hubspot:app-client-secret`, `salesforce:external-client-app-consumer-secret`, `zendesk:oauth-client-secret`, `zoom:oauth-app-client-secret` |
+
+The 15th case of #1232, `x:oauth1-access-token-secret`, is a G5 row counted in
+[#1225](../1225/README.md). The per-row tables above stay as the record of the
+measurement on `a148dadf`; the case ids are in the ledger. The accepted
+trade-off of #1232 was checked by the replay: the frozen corpora contain no
+positive whose expected value starts with `&` (round 2 0, round 1 0, Batch 1 0),
+and the 15 round-2 cases with an assignment followed directly by `&name=` are
+exactly the 15 empty-value controls.
+
+### Gates of the issue at `4e004108`
+
+| Gate | State |
+| --- | --- |
+| Freeze each ready row's layout, admission, span, attribution, default action and exclusions in final product evidence and spec rows | Met (unchanged). |
+| Link independent baseline case ids and identities; disposition every row | Met, now with the replay identity and the final dispositions above. |
+| Repair only demonstrated in-contract leaks, spans, actions or false positives | Met (unchanged): one defect class, repaired once by #1232 and verified fixed by the replay. |
+| Deterministic conformance for changed logic | Met (unchanged). |
+| Shared parser fix once | Met (unchanged). |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | **Met.** The benchmark replayed `4e004108` on Node, WASM, Python and the CLI (the Rust surface; no separate Rust harness), whole and 7-byte and 1-byte streamed; stream equals whole on every entry and the four surfaces are identical on every case. |
+| Exact candidate revision and digests to benchmarks; accept independent replay | **Met.** Candidate `4e0041081aad22d0101bd52db52017b67b5bd3db`, corpus digests above, accepted as benchmarks #771 (merge `74c88531`). No package digest is claimed: no candidate package was published for the replay. |
+| Record no-code conclusions for existing coverage | Met (unchanged): 34 rows. |
+
+### Not verified here
+
+The replay figures above are read from the merged round-3 report and ledger. The
+harness and corpora were not re-run for this addendum; the report and the ledger
+are the benchmarks side's records.
+
+## Closure statement (2026-10-06)
+
+What this issue can honestly claim after the Groups C, D and E measurement rounds.
+
+This issue may cite only the aggregate of the measurement. On the three corpora
+(2,281 cases; four surfaces; whole, 7-byte and 1-byte) the final candidate has 0
+regressions against the beta.13 baseline, round 1 and round 2, 0 parity
+divergences and 0 open product gaps; positives 839 (726 exact, 762 fully covered,
+77 misses), controls 779 (6 flagged). The 113 positives that are not exact are 77
+policy-limited misses plus 36 fully covered over-wide Meta pipe findings. The 43
+rows end as 16 fully covered, 5 covered with a recorded deviation, 6
+policy-limited and 16 carrier unresolved (observed only). Carrier-unresolved and
+policy-limited rows are not covered, and no row is promoted by this statement.
+
+The closeout also added tracked policies that these records do not claim as covered:
+the `curl -u` password slot ([redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247)), the JFrog `AKCp` bare
+reader, deferred ([redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248)), the bare `token` member
+([redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256), rule [#1241](../1241/README.md)), the existing Case
+contradictions ([credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264)) and the percent-escaped X layout
+confirmation ([credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265)).
+
+Source: the [round-3 report of Groups C, D and E](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (section 7, [dispositions](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows)),
+its [scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json) and
+[identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json), at benchmarks commit
+`c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291`, measuring candidate
+`c6dd685974b8df6a84514e07e41e35afa711a2ac` (unpublished, 0.1.0-beta.14) on one
+host. Project-authored, maintainer-only evidence, not independent validation;
+the fixes target measured failures and no generalisation is claimed.

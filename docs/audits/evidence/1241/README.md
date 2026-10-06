@@ -124,3 +124,16 @@ whole-input equals every two-chunk UTF-8 byte partition equals a per-line sessio
 | No benchmark expectation rewritten to fit current output | Met: none was edited. |
 
 No release, tag, pin or version change.
+
+## Status at the accepted replay (2026-10-06)
+
+Addendum. The decision above is unchanged. The benchmarks round-3 report of the
+accepted replay (benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771), merge
+`74c88531f7f185e687eabe6477fff5b06f54e2e9`, candidate `4e004108`) still lists
+`x:oauth1-access-token-secret` under "Unchanged, recorded and not resolved
+here": the candidate observation of `oauth_token` is unchanged and "owners
+decide" ([report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md)).
+So the gate "Benchmarks can freeze the expectation ... and remove the conflict
+from the ledger" stays open on the benchmarks side; the secret-half row itself is
+`fixed by candidate 4e004108, replay verified` (see the [#1225 record](../1225/README.md)).

@@ -226,3 +226,141 @@ the Basic envelope are pinned by their existing tests (`connection_string` and
 observations above are pinned by this record only. The independent measurement is
 the benchmarks side's.
 
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+(candidate, corpus digests, results, the 25 differing cases) are in the
+[#1223 record](../1223/README.md).
+
+### The accepted replay and the three G6 rows
+
+The accepted replay is benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`) of the exact candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db` on the frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), with round 1 `74fed382...` and Batch 1 as regression, on Node, WASM,
+Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Row | Ledger disposition at `74c88531` | Positives failing / controls flagged | Whole equals stream (7-byte, 1-byte), four surfaces identical |
+| --- | --- | --- | --- |
+| `mongodb-atlas:database-user-password` | fixed by candidate `4e004108`, replay verified ([#1234](../1234/README.md)); the `password-member-placeholders` control is clean. Percent-escaped URI password: observed, not scored (6 round-2 variants and 2 round-1 variants unscored) | 0 / 0 | 148/148, 148/148; 37/37 cases |
+| `mongodb-atlas:programmatic-api-private-key` | `contract-evidence conflict`: no positive exists, only the agreed controls, all clean | 0 / 0 | 0/0 entries (no scored case) |
+| `mongodb-atlas:service-account-secret` | already-covered / no-code | 0 / 0 | 84/84, 84/84; 21/21 cases |
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "The independent replay of the fixed candidate is open" (Result, Handoff "What the benchmarks side replays (open)") | Done and accepted: benchmarks #771. |
+| "The fixed candidate is **not** an identity the benchmark has measured" (Identities) and "Node, WASM and Python were not replayed" (Local replay) | Measured: `4e0041081aad22d0101bd52db52017b67b5bd3db`, all four surfaces. |
+| Gates "Node/WASM, Python, Rust and CLI ...: Partly" and "Exact candidate revision ...; accept independent replay: Open" | Met, see the gate table below. |
+| "has no wire carrier ... source-unresolved" and "No layout is asserted until the evidence names a plaintext slot" for the API private key | Superseded as to the evidence: credential-evidence [#256](https://github.com/redact-secret/credential-evidence/issues/256) is closed by PR #258 (merged 2026-10-06T11:06:11Z, merge `d53e7e3a7ad1860b7735625aa6c0a7faa866fbdf`), which names two plaintext slots (below). "No wire carrier" was true of the request wire only. The benchmarks round 3 merged earlier (10:34:34Z) and so still records the row as a conflict with no positive. |
+
+### The Atlas API private key: two named slots
+
+The evidence note
+[`atlas-private-key-slots.md`](https://github.com/redact-secret/credential-evidence/blob/d53e7e3a7ad1860b7735625aa6c0a7faa866fbdf/docs/handoffs/atlas-private-key-slots.md)
+and the updated
+[Batch 2 handoff](https://github.com/redact-secret/credential-evidence/blob/d53e7e3a7ad1860b7735625aa6c0a7faa866fbdf/docs/handoffs/batch-2-bounded-carriers.md)
+(project-authored, not independent; the contract stays draft) establish:
+
+| Slot | Exact spelling |
+| --- | --- |
+| Creation response member | `privateKey` of the answer to `createOrgApiKey` and `createGroupApiKey`, unredacted when first created and redacted afterwards |
+| Atlas CLI profile property | `private_api_key`, next to `public_api_key`, set with `atlas config set` |
+
+Not established, and therefore not in contract: an environment variable, a
+command-line flag, a Terraform argument, the curl `--user` layout, and any byte
+grammar, prefix, length or alphabet. The evidence authors no Case for these slots:
+a must-flag expectation is a project-policy decision it has not taken.
+
+**Product contract for the two slots.** Both are in-contract carriers read by the
+existing field grammar, with no new vocabulary entry, detector or type: a
+`contextual_secret` over exactly the value, redacted at high confidence and warned
+at medium (default `redact` for a random value of 16 bytes or more), with no
+width, alphabet or prefix claim and no Atlas attribution. The 8-character public
+key, the credential object id, a masked later response and the Digest header
+fields stay silent. This applies the "a reviewed plaintext slot then falls under
+the existing field grammar" rule of the adopted contract; it changes no behaviour.
+
+**Observed at core `efe71496`** (CLI `0.1.0-beta.14`, release build, check mode;
+the only detector change since `4e004108` is the Square placeholder prefixes of
+#1236, which do not touch these inputs). Synthetic inputs built at run time, the
+36-byte values UUID-shaped and invented (the shape is not claimed as Atlas's),
+the public key 8 random characters, values not shown:
+
+| Input (synthetic) | Observed finding |
+| --- | --- |
+| JSON creation response `{"id":..,"publicKey":"<8>","privateKey":"<36>","roles":[]}` | one `contextual_secret`, `generic-token`, high, redact, over exactly the 36-byte `privateKey` value; `publicKey` and `id` silent |
+| TOML profile `[default]` with `org_id`, `public_api_key = "<8>"`, `private_api_key = "<36>"` | one `contextual_secret`, high, redact, over exactly the 36-byte value; the others silent |
+| YAML `public_api_key: <8>` and `private_api_key: <36>` | one `contextual_secret`, high, redact, over exactly the value |
+| `"privateKey":"********-****-****-************"` with a public key | no finding |
+| `private_api_key = "<6 bytes>"` | no finding (under the 8-byte floor) |
+| `atlas config set private_api_key <36>` (command-line layout) | no finding: a command-line flag or argument is not read and is not named by the evidence |
+| `MONGODB_ATLAS_PRIVATE_API_KEY=<36>` | one `contextual_secret`, high, redact, by name. Observation only: the evidence does not name this variable, so it is not in contract and not claimed |
+
+These observations are pinned by this record only; no test in `crates/` names
+either slot yet. The benchmarks row stays a `contract-evidence conflict` until a
+positive expectation is frozen there: this is not coverage, and the row is not
+claimed covered.
+
+### Percent-escaped URI password: what is decided and what is not
+
+The product behaviour is decided and was not "unresolved": in a `mongodb://` or
+`mongodb+srv://` URI userinfo a password containing valid `%XX` escapes is
+`connection_string_password`, high, redact, over exactly the password with its
+escapes kept as written and never decoded; host, path and query stay outside. The
+unit test `a_percent_encoded_reserved_delimiter_in_the_password_is_kept_undecoded`
+(`crates/secret-scan-core/src/detectors/connection_string.rs`, a `postgres`
+scheme) pins the grammar, and the CLI at `efe71496` gave the same result on
+synthetic `mongodb+srv` and `mongodb` URIs with two escapes (`%40`, `%3A`) and
+with one escape (`%40`, `%2F`): one finding over the whole escaped password, the
+span ending at the `@`. A `%` that is not followed by two hex digits invalidates
+the userinfo (the unit test `malformed_percent_escape_invalidates_the_authority`)
+and the same `mongodb+srv` input gave no finding: a stated blind spot, not
+decided as protection. What stays unresolved is the provider fact, whether Atlas
+requires the encoding in a connection string: the evidence handoff at
+`d53e7e3a` still records it as unresolved, and the round-3 report keeps the
+case observed and not scored. Both statements of the sections above that call it
+"unresolved" refer to that provider question only.
+
+### Gates of the issue at `4e004108`
+
+| Gate | State |
+| --- | --- |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | **Met.** Replayed by the benchmark on all four surfaces, whole and 7-byte and 1-byte streamed, identical (the CLI is the Rust surface). |
+| Exact candidate revision and digests to benchmarks; accept independent replay | **Met.** Candidate `4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No candidate package was published, so no package digest is claimed. |
+| Record no-code conclusions for existing coverage | Met (unchanged) for `service-account-secret` and the in-contract positives and controls of the password row. The API private key is **not** a no-code conclusion: it has named slots and a product contract but no benchmark positive, so it is not claimed covered. |
+| All other gates | Met, unchanged. |
+
+### Not verified here
+
+The replay figures are read from the merged report and ledger; the harness was
+not re-run. The slot spellings are as the credential-evidence note states them;
+the provider sources behind them were not re-read. The probes above ran on one
+host with a build of `efe71496`, not on `4e004108` itself.
+
+## Closure statement (2026-10-06)
+
+What this issue can honestly claim after the Groups C, D and E measurement rounds.
+
+No scored case of Groups C, D or E exercises this issue, so the group measurement adds no row claim to it. No Group C, D or E row is an Atlas row. The claims of this issue stay the ones in the records above, which cite the Batch 2 evidence; do not cite the Groups C-E report for a row claim here. The Atlas API private key
+remains not claimed as covered, as the record above says.
+
+The closeout also added tracked policies that these records do not claim as covered:
+the `curl -u` password slot ([redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247)), the JFrog `AKCp` bare
+reader, deferred ([redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248)), the bare `token` member
+([redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256), rule [#1241](../1241/README.md)), the existing Case
+contradictions ([credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264)) and the percent-escaped X layout
+confirmation ([credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265)).
+
+Source: the [round-3 report of Groups C, D and E](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (section 7, [dispositions](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows)),
+its [scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json) and
+[identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json), at benchmarks commit
+`c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291`, measuring candidate
+`c6dd685974b8df6a84514e07e41e35afa711a2ac` (unpublished, 0.1.0-beta.14) on one
+host. Project-authored, maintainer-only evidence, not independent validation;
+the fixes target measured failures and no generalisation is claimed.

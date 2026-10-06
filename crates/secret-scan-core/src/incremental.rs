@@ -71,13 +71,14 @@ use crate::detectors::{
     continues_previous_line, has_open_aws_secret_candidate_line_in, has_open_bearer_authorization,
     has_open_confluent_properties_in, has_open_contextual_assignment, has_open_deepgram_request_in,
     has_open_heroku_legacy_context_in, has_open_list_item_pair_in, has_open_provider_sibling_in,
-    has_open_twilio_cli_table_in, is_open_tail_neutral, lookback_tail_lines,
+    has_open_scoped_context_in, has_open_twilio_cli_table_in, is_open_tail_neutral,
+    lookback_tail_lines,
 };
 #[cfg(test)]
 use crate::detectors::{
     has_open_aws_secret_candidate_line, has_open_confluent_properties, has_open_deepgram_request,
     has_open_heroku_legacy_context, has_open_list_item_pair, has_open_provider_sibling,
-    has_open_twilio_cli_table,
+    has_open_scoped_context, has_open_twilio_cli_table,
 };
 use crate::error::{PolicyFailure, SecretScanError, SecretScanErrorCode};
 use crate::evidence::shadow::ShadowComparison;
@@ -451,6 +452,7 @@ struct LookbackHints {
     list_item_pair: bool,
     provider_sibling: bool,
     deepgram_request: bool,
+    scoped_context: bool,
     aws_secret_access_key: bool,
 }
 
@@ -463,6 +465,7 @@ impl LookbackHints {
             || self.list_item_pair
             || self.provider_sibling
             || self.deepgram_request
+            || self.scoped_context
     }
 
     fn of(registry: &DetectorRegistry) -> Self {
@@ -473,6 +476,7 @@ impl LookbackHints {
             list_item_pair: reads_list_item_pairs(registry),
             provider_sibling: reads_provider_siblings(registry),
             deepgram_request: registry.contains(DEEPGRAM_DETECTOR_ID),
+            scoped_context: registry.contains(GENERIC_TOKEN_DETECTOR_ID),
             aws_secret_access_key: registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID),
         }
     }
@@ -505,6 +509,10 @@ fn reads_provider_siblings(registry: &DetectorRegistry) -> bool {
 /// `deepgram-api-key` also reads the request line or `Host:` header above
 /// a token header (issue #1017).
 const DEEPGRAM_DETECTOR_ID: &str = "deepgram-api-key";
+
+/// `generic-token` also reads a scoped name beside a sibling member within a
+/// few lines (`has_open_scoped_context_in`, issues #1228 to #1230).
+const GENERIC_TOKEN_DETECTOR_ID: &str = "generic-token";
 
 /// A bounded, side-effect-free incremental sanitizer session over built-in
 /// detectors. Custom detectors are not accepted: each has no retention
@@ -877,7 +885,8 @@ impl IncrementalSanitizer {
                 || (lookbacks.confluent_legacy && has_open_confluent_properties_in(tail))
                 || (lookbacks.list_item_pair && has_open_list_item_pair_in(tail))
                 || (lookbacks.provider_sibling && has_open_provider_sibling_in(tail))
-                || (lookbacks.deepgram_request && has_open_deepgram_request_in(tail)),
+                || (lookbacks.deepgram_request && has_open_deepgram_request_in(tail))
+                || (lookbacks.scoped_context && has_open_scoped_context_in(tail)),
             aws_secret_candidate: lookbacks.aws_secret_access_key
                 && has_open_aws_secret_candidate_line_in(tail, || {
                     self.line_above_unit_carries_aws_id()
@@ -948,7 +957,9 @@ impl IncrementalSanitizer {
             || (reads_list_item_pairs(&self.registry) && has_open_list_item_pair(&rescanned))
             || (reads_provider_siblings(&self.registry) && has_open_provider_sibling(&rescanned))
             || (self.registry.contains(DEEPGRAM_DETECTOR_ID)
-                && has_open_deepgram_request(&rescanned));
+                && has_open_deepgram_request(&rescanned))
+            || (self.registry.contains(GENERIC_TOKEN_DETECTOR_ID)
+                && has_open_scoped_context(&rescanned));
         assert_eq!(open.other, reference, "open single-line construct");
         let aws_reference = self.registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID)
             && has_open_aws_secret_candidate_line(&rescanned, || {

@@ -6,6 +6,7 @@
 //! no candidates. Values above 4 KiB are left to more specific detectors.
 
 use super::pattern::{self, PrefixShape};
+use super::scoped_context;
 use super::text::{
     OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, contains_ci, ends_with_ci, find_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
@@ -73,7 +74,29 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// `personalAccessKeyId`, `personalAccessKeyExpiresAt`, a further-prefixed
 /// `my_personal_access_key` and `portalId` do not match. The field name rests
 /// on `HubSpot`'s own SDK source, not a documentation sentence.
+///
+/// Issue #1228 (Group C, `JFrog` reference token) and #1230 (Group E, `JFrog` API
+/// key) add the one header both families share: `X-JFrog-Art-Api` in any
+/// letter case (`X-JFrog-Art-API`, `x-jfrog-art-api`), which normalizes to
+/// `x_jfrog_art_api`. `JFrog` documents it as the header that carries an API key
+/// or a reference token; the credential-evidence Cases flag the value by its
+/// position, not its shape. Exactly this name: `jfrog_art_api`,
+/// `x_jfrog_art_api_id` and a further-prefixed `my_x_jfrog_art_api` do not
+/// match. `curl -u user:<secret>` is not read (issue #1247).
+///
+/// Issue #1230 (Group E, `HubSpot` legacy API key) adds `hapikey`, the query
+/// parameter that carries both the retired account API key and the current
+/// developer API key (`?hapikey=<value>`; `HAPIKEY=<value>` normalizes to the
+/// same name). credential-evidence Case
+/// `hubspot-legacy-api-key-hapikey-query-parameter-value` flags the value by
+/// its position, not its shape, and no era or key type is inferred. Both
+/// conditions of the #1225 admission rule are met (the evidence names the exact
+/// field; the round-1 baseline reproduced the miss). `hapikeyId`, `hapikeys`
+/// and `hapikey_id` do not match; a user prefix does (see
+/// [`PREFIXED_EXACT_HIGH_SIGNAL_NAMES`]).
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "hapikey",
+    "x_jfrog_art_api",
     "mac_secret_base64",
     "personal_access_key",
     "hubspot_personal_access_key",
@@ -82,6 +105,21 @@ const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
     "convex_deploy_key",
     "convex_self_hosted_admin_key",
 ];
+
+/// Whole names that are also a high-signal name behind a generic prefix
+/// (issue #1225 follow-up): `my_hubspot_personal_access_key`,
+/// `MY_PERSONAL_ACCESS_KEY` and `old_personal_access_key` are the same field
+/// under a user's own prefix, as `MYAPP_API_KEY` is `api_key`. The exact
+/// names stay in [`EXACT_HIGH_SIGNAL_NAMES`]; the prefixed form goes through
+/// [`has_prefixed_credential_name`], so a prefix that says the value is not the
+/// secret (`masked_`, `redacted_`, `publishable_`) still excludes it. Only the
+/// whole name is the suffix: `personal_access_key_id`, `_expires_at`, `_hint`
+/// and `_length` do not end in it and stay unmatched.
+///
+/// Issue #1230 adds `hapikey` here too: `HUBSPOT_HAPIKEY`, `MY_HAPIKEY` and
+/// `hubspot.hapikey` are the same field under a user's own prefix, the way
+/// environment variables and configuration keys are written.
+const PREFIXED_EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["personal_access_key", "hapikey"];
 
 const AMBIGUOUS_NAMES: &[&str] = &["auth", "credential", "credentials", "signing_key"];
 
@@ -358,6 +396,7 @@ pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
     HIGH_SIGNAL_NAMES.contains(&normalized)
         || EXACT_HIGH_SIGNAL_NAMES.contains(&normalized)
         || has_prefixed_credential_name(normalized, HIGH_SIGNAL_NAMES)
+        || has_prefixed_credential_name(normalized, PREFIXED_EXACT_HIGH_SIGNAL_NAMES)
         || (!AMBIGUOUS_NAMES.contains(&normalized)
             && has_prefixed_credential_name(normalized, &["token"])
             && !NON_CREDENTIAL_TOKEN_NAMES.contains(&normalized)
@@ -1270,6 +1309,19 @@ fn is_confluent_key_id_assignment(name: &str, value: &str) -> bool {
             .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit())
 }
 
+/// `true` for the public half of an Atlas programmatic API key assigned to
+/// its documented name (issue #1226): the Atlas CLI profile property
+/// `public_api_key` (`publicApiKey`, `PUBLIC_API_KEY`) or the variable
+/// `MONGODB_ATLAS_PUBLIC_API_KEY`, holding exactly 8 bytes, the length the
+/// Atlas API specification gives the public key (`minLength` and `maxLength`
+/// 8). The public key is the username-like half; the private half is a
+/// different name (`private_api_key`, `privateKey`) and is read as before. No
+/// alphabet is claimed. A value of any other length under the same name stays
+/// reported, so a longer secret filed under the public name is not hidden.
+fn is_atlas_public_api_key_assignment(name: &str, value: &str) -> bool {
+    matches!(name, "public_api_key" | "mongodb_atlas_public_api_key") && value.len() == 8
+}
+
 // --- colon-namespaced scope identifiers (issue #727, benchmark gap
 // `product-727`) ----------------------------------------------------------
 
@@ -1583,10 +1635,40 @@ fn is_source_code_expression(value: &str, form: ValueForm) -> bool {
 /// immaterial: the only check that reads it, [`is_truncated_call_expression`],
 /// needs a bracket the character class already forbids.
 fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
+    is_boolean_null_or_digits(value) || is_non_secret_reference_beyond_digits(value, form)
+}
+
+/// The fewest decimal digits a value under a credential name needs to be read
+/// as a numeric secret (issue #1230). Below it a digit run is a count, a port,
+/// an id or a PIN-sized number; from it a run carries at least 53 bits if
+/// random, which no counter or small id reaches.
+const MIN_NUMERIC_SECRET_DIGITS: usize = 16;
+
+/// `true` for a non-empty run of ASCII digits.
+fn is_all_digits(value: &str) -> bool {
+    !value.is_empty() && value.bytes().all(|byte| byte.is_ascii_digit())
+}
+
+/// [`is_non_secret_reference`] for a contextual assignment (issue #1230): a
+/// digits-only value of at least [`MIN_NUMERIC_SECRET_DIGITS`] digits under a
+/// credential name is read as a value by position, not shape, unless it is a
+/// counting run (`1234567890123456`) or one repeated digit. `true`, `false`,
+/// `null` and `undefined` and every other reference stay non-secret. The
+/// authorization-header carrier keeps [`is_non_secret_reference`].
+fn is_non_secret_assignment_reference(value: &str, form: ValueForm) -> bool {
+    let is_literal_word = ["true", "false", "null", "undefined"]
+        .iter()
+        .any(|word| value.eq_ignore_ascii_case(word));
+    let is_small_number = is_all_digits(value)
+        && (value.len() < MIN_NUMERIC_SECRET_DIGITS || is_ascending_digit_run(value));
+    is_literal_word || is_small_number || is_non_secret_reference_beyond_digits(value, form)
+}
+
+/// Every check of [`is_non_secret_reference`] except the digits-only one.
+fn is_non_secret_reference_beyond_digits(value: &str, form: ValueForm) -> bool {
     is_generic_placeholder_word(value)
         || is_instructional_token_placeholder(value)
         || is_glued_my_placeholder(value)
-        || is_boolean_null_or_digits(value)
         || starts_with_env_reference(value)
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
@@ -1615,6 +1697,167 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_composite_with_placeholder_secret_part(value)
         || is_terraform_sensitive_marker(value)
         || is_pem_framed_placeholder(value)
+        || is_brace_placeholder_reference(value)
+        || is_elided_middle_display(value)
+        || is_email_token_credential_with_placeholder(value)
+}
+
+/// The most letters in one word of a brace placeholder (`{your-app_id}`).
+const MAX_BRACE_PLACEHOLDER_WORD_LEN: usize = 24;
+/// The most bytes between the braces of one placeholder.
+const MAX_BRACE_PLACEHOLDER_NAME_LEN: usize = 48;
+
+/// The length of the placeholder group at the start of `bytes`:
+/// `{` (or `[`) + one or more words of ASCII letters (1 to
+/// [`MAX_BRACE_PLACEHOLDER_WORD_LEN`] each) joined by `_`, `-`, `.` or one
+/// space, in at most [`MAX_BRACE_PLACEHOLDER_NAME_LEN`] bytes, + the matching
+/// `}` (or `]`). The square form is the one `HubSpot` writes
+/// (`Bearer [YOUR_TOKEN]`, issue #1228).
+fn brace_group_len(bytes: &[u8]) -> Option<usize> {
+    let close = match bytes.first() {
+        Some(b'{') => b'}',
+        Some(b'[') => b']',
+        _ => return None,
+    };
+    let mut word = 0usize;
+    let mut index = 1usize;
+    while let Some(&byte) = bytes.get(index) {
+        match byte {
+            byte if byte == close && word > 0 => return Some(index + 1),
+            b'_' | b'-' | b'.' | b' ' if word > 0 => word = 0,
+            letter if letter.is_ascii_alphabetic() => {
+                word += 1;
+                if word > MAX_BRACE_PLACEHOLDER_WORD_LEN {
+                    return None;
+                }
+            }
+            _ => return None,
+        }
+        index += 1;
+        if index > MAX_BRACE_PLACEHOLDER_NAME_LEN + 1 {
+            return None;
+        }
+    }
+    None
+}
+
+/// The length of the second half of a pipe composite when it is a placeholder,
+/// a mask, empty or a reference (issue #1234, round-2 residual): a brace group,
+/// an `<...>` placeholder (no nested bracket, at most
+/// [`MAX_BRACE_PLACEHOLDER_NAME_LEN`] bytes), a run of three or more `*` or
+/// bullets, a `${NAME}` or `$NAME` reference, or nothing (the composite ends
+/// or a value boundary follows). Any other second half is a real-shaped value
+/// and makes the composite a value.
+fn placeholder_half_len(bytes: &[u8]) -> Option<usize> {
+    if let Some(len) = brace_group_len(bytes) {
+        return Some(len);
+    }
+    let boundary = |at: usize| bytes.get(at).is_none_or(|b| !b.is_ascii_alphanumeric());
+    match bytes.first() {
+        None => Some(0),
+        Some(b'<') => {
+            let limit = bytes.len().min(MAX_BRACE_PLACEHOLDER_NAME_LEN + 2);
+            let close = bytes[1..limit]
+                .iter()
+                .position(|&b| matches!(b, b'>' | b'<'))?;
+            (bytes[1 + close] == b'>' && close > 0).then_some(close + 2)
+        }
+        Some(b'*') => {
+            let run = bytes.iter().take_while(|&&b| b == b'*').count();
+            (run >= 3 && boundary(run)).then_some(run)
+        }
+        Some(0xE2) => {
+            let bullet = "\u{2022}".as_bytes();
+            let mut run = 0usize;
+            while bytes.get(run * 3..run * 3 + 3) == Some(bullet) {
+                run += 1;
+            }
+            (run >= 3 && boundary(run * 3)).then_some(run * 3)
+        }
+        Some(b'$') => {
+            let (start, close) = if bytes.get(1) == Some(&b'{') {
+                (2, true)
+            } else {
+                (1, false)
+            };
+            let name = bytes[start..]
+                .iter()
+                .take_while(|b| b.is_ascii_alphanumeric() || **b == b'_')
+                .count();
+            let end = start + name;
+            if name == 0 || (close && bytes.get(end) != Some(&b'}')) {
+                return None;
+            }
+            Some(end + usize::from(close))
+        }
+        Some(&byte) if is_query_value_stop(byte) => Some(0),
+        Some(_) => None,
+    }
+}
+
+/// The length of the brace placeholder at the start of `bytes`: one
+/// [`brace_group_len`] group, or two joined by `|` or `:` (the documented
+/// app-id and app-secret template `{your-app_id}|{your-app_secret}`), or a
+/// group joined to any other placeholder half ([`placeholder_half_len`]):
+/// `{your-app_id}|<APP_SECRET>`, `{your-app_id}|********`, `{your-app_id}|`.
+fn brace_placeholder_len(bytes: &[u8]) -> Option<usize> {
+    let first = brace_group_len(bytes)?;
+    if matches!(bytes.get(first), Some(b'|' | b':'))
+        && let Some(second) = placeholder_half_len(&bytes[first + 1..])
+    {
+        return Some(first + 1 + second);
+    }
+    Some(first)
+}
+
+/// `true` when the whole `value` is a brace template placeholder: the RFC 6570
+/// style `{name}` documentation writes where a caller supplies a value
+/// (`{CLIENT_SECRET}`, `{your-app_id}`, `{user-access-token}`,
+/// `{YOUR_DEVELOPER_API_KEY}`), alone or as an `{id}|{secret}` pair (issue
+/// #1234). Closed grammar: ASCII letters in words joined by `_`, `-`, `.` or a
+/// space, so a digit, any other byte, an empty group or a word over 24 letters
+/// keeps the value reported (a brace-wrapped GUID or random alphanumeric
+/// secret is not a placeholder). FN cost: a real secret that is letters only
+/// in short words inside one pair of braces.
+fn is_brace_placeholder_reference(value: &str) -> bool {
+    brace_placeholder_len(value.as_bytes()) == Some(value.len())
+}
+
+/// The span of the brace placeholder that opens the query, fragment or form
+/// parameter value at `start`, when a value boundary follows it. The plain
+/// scan ends at the first `}` and read `{your-app_id` as the value (issue
+/// #1234).
+fn query_brace_placeholder(input: &str, start: usize) -> Option<(usize, usize)> {
+    let bytes = input.as_bytes();
+    let len = brace_placeholder_len(bytes.get(start..)?)?;
+    let end = start + len;
+    bytes
+        .get(end)
+        .is_none_or(|&byte| is_query_value_stop(byte))
+        .then_some((start, end))
+}
+
+/// `true` for a documentation display that shows the first and last few
+/// characters of a key around one elision (issue #1234):
+/// `CFPAT-123...789`. A visible head of 1 to [`MAX_MASK_VISIBLE_SIDE`]
+/// `[A-Za-z0-9_-]` characters, exactly three `.` or one `…`, and a visible
+/// tail of 1 to [`MAX_MASK_VISIBLE_SIDE`] `[A-Za-z0-9_-]` characters. The
+/// elided value is not in the text, the middle-elision twin of
+/// [`is_ellipsis_truncated_display`]; no documented credential grammar contains
+/// `...` between alphanumerics.
+fn is_elided_middle_display(value: &str) -> bool {
+    let visible = |side: &str| {
+        (1..=MAX_MASK_VISIBLE_SIDE).contains(&side.len())
+            && side
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+    };
+    if let Some((head, tail)) = value.split_once('\u{2026}') {
+        return visible(head) && visible(tail);
+    }
+    value
+        .split_once("...")
+        .is_some_and(|(head, tail)| visible(head) && visible(tail))
 }
 
 /// The value Terraform prints in a plan or apply for an attribute it
@@ -1716,6 +1959,33 @@ fn is_credential_variable_name_value(value: &str) -> bool {
             .is_some_and(|tail| CREDENTIAL_NAME_TAIL_WORDS.contains(&tail))
 }
 
+/// `true` for a quoted `UPPER_SNAKE` credential variable name
+/// ([`is_credential_variable_name_value`]) whose last segment is the last
+/// segment of the slot it sits in (issue #1234): `"x-api-key": "ZOOM_API_KEY"`,
+/// `"password": "ADMIN_PASSWORD"`, `"client_secret": "APP_SECRET"`. The
+/// unquoted form was already a reference; a quoted literal needs the slot to
+/// agree, so a quoted `"api_key": "OTHER_TOKEN"` and any random value stay
+/// reported. `name` is the normalized slot name; `password`, `passwd` and
+/// `passphrase` count as one word. FN cost: a real secret that is an all-caps
+/// word chain of at least two segments whose last segment is the slot's own
+/// last word.
+fn is_quoted_variable_name_for_slot(name: &str, value: &str) -> bool {
+    fn family(word: &str) -> &str {
+        match word {
+            "passwd" | "passphrase" => "password",
+            other => other,
+        }
+    }
+    let Some(value_tail) = value.rsplit('_').next() else {
+        return false;
+    };
+    let value_tail = value_tail.to_ascii_lowercase();
+    let slot_tail = name.rsplit('_').next().unwrap_or(name);
+    !value.ends_with(')')
+        && is_credential_variable_name_value(value)
+        && family(&value_tail) == family(slot_tail)
+}
+
 /// Credential nouns that end a lowercase placeholder phrase.
 const CREDENTIAL_PHRASE_TAIL_WORDS: &[&str] = &[
     "key",
@@ -1744,6 +2014,89 @@ fn is_credential_noun_phrase(value: &str) -> bool {
     // `all` stops at the first bad word, so `tail` is read only when every
     // word passed and it is therefore the last one (#1121).
     all_words && count >= 2 && CREDENTIAL_PHRASE_TAIL_WORDS.contains(&tail)
+}
+
+/// The lead words of an instructional placeholder (`YOUR_`, `INSERT_`, ...),
+/// the set `is_instructional_token_placeholder` reads. `MY_` is not one: `my`
+/// plus `password` is a common weak real password.
+const OWN_NAME_PLACEHOLDER_LEADS: &[&str] = &["your", "insert", "enter", "paste", "replace"];
+
+/// `true` when `value` is a lead word followed by the slot's own name words
+/// (issue #1230 round 2): `?hapikey=YOUR_HAPIKEY`, `"encoded": "YOUR_ENCODED"`,
+/// `HUBSPOT_HAPIKEY=YOUR_HAPIKEY`, `X-JFrog-Art-Api: YOUR_ART_API`. After the
+/// lead word and any `_`, `-`, `.` or space, the rest, with separators removed
+/// and in any case, must equal the concatenation of one or more trailing words
+/// of the normalized slot name, so a vocabulary name admitted later is covered
+/// without a list. A lead glued to random material, a word off the name and a
+/// real-shaped value stay reported. `raw_name` is the name as written (before
+/// any alias). FN cost: a real value spelled exactly as a lead word and the
+/// slot's own name, which no issuer generates.
+fn is_own_name_placeholder(raw_name: &str, value: &str) -> bool {
+    let Some(lead) = OWN_NAME_PLACEHOLDER_LEADS
+        .iter()
+        .find(|lead| starts_with_ci(value, 0, lead))
+    else {
+        return false;
+    };
+    let rest = &value[lead.len()..];
+    if rest.is_empty()
+        || !rest
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-' | b'.' | b' '))
+    {
+        return false;
+    }
+    let glued: String = rest
+        .bytes()
+        .filter(u8::is_ascii_alphanumeric)
+        .map(|b| char::from(b.to_ascii_lowercase()))
+        .collect();
+    // Further lead words (`ENTER_YOUR_HAPIKEY`) are lead words too.
+    let mut glued = glued.as_str();
+    while let Some(next) = OWN_NAME_PLACEHOLDER_LEADS
+        .iter()
+        .find_map(|lead| glued.strip_prefix(lead).filter(|rest| !rest.is_empty()))
+    {
+        glued = next;
+    }
+    if glued.is_empty() {
+        return false;
+    }
+    let name = normalize_name(raw_name);
+    let words: Vec<&str> = name.split('_').collect();
+    (0..words.len()).any(|from| words[from..].concat() == glued)
+}
+
+/// `true` for a value that is itself the name of a credential rather than a
+/// credential (issue #1228): a lowercase credential-noun phrase
+/// ([`is_credential_noun_phrase`], `access_token`, `auth-token-storage-key`) or
+/// a camelCase credential name that ends in a credential noun
+/// (`refreshToken`, `authorizationTokenStorageKey`). Applied only to a scoped
+/// name that also names the storage key a token is saved under
+/// ([`scoped_context::ScopedRead`]). FN cost: a real value spelled as a
+/// lowercase word chain or a camelCase identifier ending in a credential noun.
+fn is_credential_name_phrase(value: &str) -> bool {
+    if is_credential_noun_phrase(value) {
+        return true;
+    }
+    let bytes = value.as_bytes();
+    let Some(last_capital) = bytes.iter().rposition(u8::is_ascii_uppercase) else {
+        return false;
+    };
+    bytes.first().is_some_and(u8::is_ascii_lowercase)
+        && bytes.iter().all(u8::is_ascii_alphabetic)
+        && last_capital > 0
+        && matches!(
+            &value[last_capital..],
+            "Key"
+                | "Secret"
+                | "Token"
+                | "Password"
+                | "Passwd"
+                | "Passphrase"
+                | "Credential"
+                | "Credentials"
+        )
 }
 
 /// `true` for a composite value, runs joined by `|` or `:` such as a Convex
@@ -1977,7 +2330,12 @@ const MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 14;
 /// (issue #1236): `EAAA` is the Square access-token prefix. Each is listed
 /// exactly, so any other uppercase lead (`KEY_YOUR_API_KEY`, #756) stays
 /// reported.
-const UPPERCASE_PLACEHOLDER_PREFIXES: &[&str] = &["EAAA"];
+///
+/// Issue #1234 adds `CFPAT`, the Contentful CMA personal access token prefix
+/// that Contentful's own repositories write in front of their placeholders
+/// (`CFPAT-xxx`, `CFPAT-<your-token>`, `CFPAT-your-token`); credential-evidence
+/// Case `contentful-cma-personal-access-token-documented-placeholders-and-masks`.
+const UPPERCASE_PLACEHOLDER_PREFIXES: &[&str] = &["EAAA", "CFPAT"];
 
 /// `true` for a documentation placeholder behind one of
 /// [`UPPERCASE_PLACEHOLDER_PREFIXES`] (issue #1236): the prefix, then either
@@ -2224,9 +2582,11 @@ fn assignment_confidence(
     }
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
-        || is_non_secret_reference(value, form)
+        || is_non_secret_assignment_reference(value, form)
         || is_confluent_key_id_assignment(name, value)
+        || is_atlas_public_api_key_assignment(name, value)
         || is_self_reference(name, value)
+        || (form == ValueForm::Quoted && is_quoted_variable_name_for_slot(name, value))
     {
         return None;
     }
@@ -2234,8 +2594,14 @@ fn assignment_confidence(
     let entropy = crate::shannon_entropy(value);
 
     if high_signal {
+        // A digits-only value is read by its position alone and stays medium
+        // (`warn`, text unchanged): a decimal run has no shape that separates
+        // a secret from a long id (issue #1230).
         return Some(
-            if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
+            if value.len() >= MIN_HIGH_ENTROPY_LENGTH
+                && entropy >= HIGH_ENTROPY_THRESHOLD
+                && !is_all_digits(value)
+            {
                 Confidence::High
             } else {
                 Confidence::Medium
@@ -2386,6 +2752,13 @@ const DELIMITED_REFERENCE_OPENERS: &[DelimitedOpener] = &[
         open: "{file:",
         nest_open: '{',
         close: '}',
+    },
+    // An angle placeholder may hold spaces (`<contents of private.key>`,
+    // issue #1234); the unquoted scan ended it at the first one.
+    DelimitedOpener {
+        open: "<",
+        nest_open: '<',
+        close: '>',
     },
 ];
 
@@ -2849,6 +3222,9 @@ fn query_parameter_value(
     // The value ends at the first byte below, wherever the scan began, so a
     // stop further than the length bound is a failure and a nearer one is the
     // end of the value (issue #1055).
+    if let Some(span) = query_brace_placeholder(input, start) {
+        return Some(span);
+    }
     let stop = reach.first_stop(input, start, is_query_value_stop)?;
     (stop > start).then_some((start, stop))
 }
@@ -2862,6 +3238,11 @@ fn is_query_value_stop(byte: u8) -> bool {
 /// tests compare it against.
 #[cfg(test)]
 fn query_parameter_value_walk(input: &str, start: usize) -> Option<(usize, usize)> {
+    // The brace placeholder of issue #1234 is the one span the walk does not
+    // produce; it is the same function the production path calls.
+    if let Some(span) = query_brace_placeholder(input, start) {
+        return Some(span);
+    }
     let mut cursor = start;
     while let Some(ch) = char_at(input, cursor) {
         if is_unquoted_value_boundary(Some(ch)) || matches!(ch, '&' | '#' | ')' | '<' | '>') {
@@ -3120,6 +3501,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
         {
             let value = &input[value_start..value_end];
             normalize_name_into(&input[name_start..name_end], &mut normalized);
+            let mut name_phrase_is_reference = false;
             if matches!(names, NameSource::BuiltIn)
                 && is_jwk_secret_member(input, name_start, name_end, &jwk_lines)
             {
@@ -3127,6 +3509,16 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 // `private_key` name's high-signal bucket (issue #821).
                 normalized.clear();
                 normalized.push_str("private_key");
+            } else if matches!(names, NameSource::BuiltIn)
+                && let Some(scoped) =
+                    scoped_context::scoped_alias(input, name_start, name_end, &normalized)
+            {
+                // A scoped name whose carrier or context the evidence Case
+                // names is judged under an existing high-signal name (issues
+                // #1228 to #1230); see `scoped_context`.
+                normalized.clear();
+                normalized.push_str(scoped.alias);
+                name_phrase_is_reference = scoped.name_phrase_is_reference;
             } else if matches!(names, NameSource::BuiltIn)
                 && is_unmasked_under_masking_lead(&normalized, value)
                 && let Some((_, rest)) = value_checked_lead_rest(&normalized)
@@ -3148,6 +3540,8 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             // otherwise be reported (issue #989).
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
                 && !is_parameter_expansion_message(input, name_start, name_end, value_start)
+                && (!name_phrase_is_reference || !is_credential_name_phrase(value))
+                && !is_own_name_placeholder(&input[name_start..name_end], value)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
                 && !is_templated_lookup_path(&mut templates, input, name_start, value)
@@ -3183,6 +3577,149 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             .map_or(prefix_end, |ch| prefix_end - ch.len_utf8());
     }
 
+    candidates
+}
+
+// --- Zendesk `{email}/token:{api_token}` (issue #1230) ---------------------
+
+/// The literal between the email-address username and the API token of a
+/// Zendesk API-token credential string (`agent@example.test/token:<token>`),
+/// the form Zendesk documents for HTTP Basic authentication, a JSON
+/// configuration string and an environment value.
+const EMAIL_TOKEN_ANCHOR: &str = "/token:";
+
+/// The start of the email address that `prefix` ends with, or `None`: a local
+/// part of at least one `[A-Za-z0-9._%+-]` byte, `@`, and a domain of two or
+/// more dot-separated labels of `[A-Za-z0-9-]` (none empty, none starting or
+/// ending in `-`) whose last label is at least two ASCII letters.
+fn email_address_start(prefix: &str) -> Option<usize> {
+    let bytes = prefix.as_bytes();
+    let mut domain_start = bytes.len();
+    while domain_start > 0
+        && (bytes[domain_start - 1].is_ascii_alphanumeric()
+            || matches!(bytes[domain_start - 1], b'.' | b'-'))
+    {
+        domain_start -= 1;
+    }
+    if domain_start == 0 || bytes[domain_start - 1] != b'@' {
+        return None;
+    }
+    let domain = &prefix[domain_start..];
+    let last_label = domain.rsplit('.').next()?;
+    let labels_ok = domain.split('.').count() >= 2
+        && domain.split('.').all(|label| {
+            !label.is_empty()
+                && !label.starts_with('-')
+                && !label.ends_with('-')
+                && label
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-')
+        });
+    if !labels_ok || last_label.len() < 2 || !last_label.bytes().all(|b| b.is_ascii_alphabetic()) {
+        return None;
+    }
+    let at = domain_start - 1;
+    let mut local_start = at;
+    while local_start > 0
+        && (bytes[local_start - 1].is_ascii_alphanumeric()
+            || matches!(bytes[local_start - 1], b'.' | b'_' | b'%' | b'+' | b'-'))
+    {
+        local_start -= 1;
+    }
+    (local_start < at).then_some(local_start)
+}
+
+/// `true` for a whole value that is an email address, `/token:` and a token
+/// that is empty, a placeholder, a reference or a mask (`agent@example.test/token:********`,
+/// `.../token:${ZENDESK_API_TOKEN}`, `.../token:{api_token}`): the credential
+/// string with nothing secret in it (issue #1230). The email is an identifier;
+/// the generic reading flagged the whole string as a medium `warn`.
+fn is_email_token_credential_with_placeholder(value: &str) -> bool {
+    // The email and the separator without a token or a colon
+    // (`agent@example.test/token`): the documented username half alone.
+    if let Some(email) = value.strip_suffix("/token") {
+        return email_address_start(email) == Some(0);
+    }
+    let Some(at) = value.find(EMAIL_TOKEN_ANCHOR) else {
+        return false;
+    };
+    let token = &value[at + EMAIL_TOKEN_ANCHOR.len()..];
+    // A token holds no backslash: an escaped line break or quote ends it.
+    let token = token.find('\\').map_or(token, |end| &token[..end]);
+    email_address_start(&value[..at]) == Some(0)
+        && (token.is_empty()
+            || starts_with_reference_opener(token)
+            || is_non_secret_reference_beyond_digits(token, ValueForm::Unquoted))
+}
+
+/// `true` when a token starts with an opener that no issued credential starts
+/// with and that a reference, template or placeholder does (`{{ ... }}`, `{x}`,
+/// `[x]`, `<x y>`, `${X}`, a backtick): an unquoted value ends at the first
+/// space, so a template with spaces is cut after its opener.
+fn starts_with_reference_opener(token: &str) -> bool {
+    token.starts_with(['{', '[', '<', '$', '`'])
+}
+
+/// The token of every Zendesk credential string in `input` (issue #1230): the
+/// part after `/token:` when an email address stands directly before the
+/// literal. The span is the token only; the email, `/token` and any quote are
+/// outside it. The literal anchors the slot wherever it appears (a JSON member
+/// or an environment value, and, because the anchor does not look at flags, a
+/// Basic-credential argument too), so the token is read whatever its shape: it
+/// is `high` at 16 or more random-looking bytes and `medium` (`warn`) otherwise,
+/// a digits-only token included, never a placeholder, reference or mask. It wins
+/// the overlap against the whole-string reading of the same value (a medium
+/// `warn` under `credentials`), which would have left the token in the output.
+/// FP cost: a non-secret literal of 8 or more bytes after `<email>/token:`;
+/// FN cost: a token under 8 bytes and the same string in a base64 `Basic`
+/// envelope (a separate question).
+fn email_token_candidates(input: &str) -> Vec<Candidate> {
+    let mut candidates = Vec::new();
+    let mut from = 0usize;
+    while let Some(found) = input[from..].find(EMAIL_TOKEN_ANCHOR) {
+        let anchor = from + found;
+        from = anchor + 1;
+        if email_address_start(&input[..anchor]).is_none() {
+            continue;
+        }
+        let value_start = anchor + EMAIL_TOKEN_ANCHOR.len();
+        let Some((start, end)) = unquoted_assignment_value_with(input, value_start, None) else {
+            continue;
+        };
+        // A token holds no backslash, so the first one ends it: the backslash
+        // of an escaped closing quote (`...\"` in a JSON string inside a JSON
+        // string) or of an escaped line break (`...\n` in a fixture file).
+        let end = input[start..end].find('\\').map_or(end, |at| start + at);
+        let value = &input[start..end];
+        if value.len() < MIN_CONTEXT_VALUE_LENGTH
+            || value.len() > MAX_CONTEXT_VALUE_LENGTH
+            || starts_with_reference_opener(value)
+            || is_non_secret_assignment_reference(value, ValueForm::Unquoted)
+        {
+            continue;
+        }
+        let Some(range) = ByteRange::new(start, end) else {
+            continue;
+        };
+        let confidence = if value.len() >= MIN_HIGH_ENTROPY_LENGTH
+            && crate::shannon_entropy(value) >= HIGH_ENTROPY_THRESHOLD
+            && !is_all_digits(value)
+        {
+            Confidence::High
+        } else {
+            Confidence::Medium
+        };
+        let entropy_signal = if confidence == Confidence::High {
+            "bounded-entropy"
+        } else {
+            "context-only"
+        };
+        candidates.push(
+            Candidate::built_in("contextual_secret", confidence, range)
+                .with_specificity(Specificity::Contextual)
+                .with_signals(["high-signal-name", entropy_signal]),
+        );
+    }
     candidates
 }
 
@@ -3824,6 +4361,7 @@ impl Detector for GenericTokenDetector {
             candidates.extend(bare_vendor_prefix_candidates(input));
             candidates.extend(call_argument_candidates(input));
             candidates.extend(npmrc_credential_candidates(input));
+            candidates.extend(email_token_candidates(input));
         }
         Ok(candidates)
     }

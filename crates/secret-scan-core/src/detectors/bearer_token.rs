@@ -85,6 +85,31 @@ fn is_token_char(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b'~' | b'+' | b'/' | b'-')
 }
 
+/// The length of the token run at `start`: [`is_token_char`] bytes and, when
+/// `percent` is set, `%XX` triplets (a `%` and two hex digits), each of which
+/// counts as three bytes. `percent` is set only after an explicit
+/// `Authorization:`/`Proxy-Authorization:` header name (issue #1224): X's own
+/// documentation shows an application-only Bearer Token with `%2F` and `%3D`
+/// inside it, and a run that stopped at the first `%` left the tail readable.
+/// A `%` that does not start a valid triplet ends the run.
+fn token_run_len(bytes: &[u8], start: usize, percent: bool) -> usize {
+    let mut at = start;
+    while let Some(&byte) = bytes.get(at) {
+        if is_token_char(byte) {
+            at += 1;
+        } else if percent
+            && byte == b'%'
+            && bytes.get(at + 1).is_some_and(u8::is_ascii_hexdigit)
+            && bytes.get(at + 2).is_some_and(u8::is_ascii_hexdigit)
+        {
+            at += 3;
+        } else {
+            break;
+        }
+    }
+    at - start
+}
+
 /// `true` for `[A-Za-z0-9_-]`, the boundary charset that keeps a match from
 /// starting inside a wider identifier.
 fn is_boundary_identifier_char(byte: u8) -> bool {
@@ -191,12 +216,13 @@ fn joined_value_end(
     bytes: &[u8],
     value_start: usize,
     first_run_end: usize,
+    percent: bool,
 ) -> (usize, Vec<(usize, usize)>) {
     let mut runs = vec![(value_start, first_run_end)];
     let mut end = first_run_end + trailing_equals_at(bytes, first_run_end);
     while bytes.get(end).copied().is_some_and(is_value_join) {
         let run_start = end + 1;
-        let run_len = ascii_run_len(bytes, run_start, is_token_char);
+        let run_len = token_run_len(bytes, run_start, percent);
         // `scheme://` is a URL, not a joined credential: `Bearer https://…`
         // in prose keeps today's (floor-rejected) reading.
         if run_len == 0 || bytes[run_start..].starts_with(b"//") {
@@ -493,12 +519,13 @@ fn bearer_scheme_candidates(
         }
         let value_start = scheme_end + ws_len;
 
-        let token_len = ascii_run_len(bytes, value_start, is_token_char);
+        let token_len = token_run_len(bytes, value_start, header);
         if token_len == 0 {
             cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
             continue;
         }
-        let (value_end, runs) = joined_value_end(bytes, value_start, value_start + token_len);
+        let (value_end, runs) =
+            joined_value_end(bytes, value_start, value_start + token_len, header);
         // The floor is judged on the whole joined value, padding and the
         // final run's `=` excluded: a short id before a long secret is
         // still one credential (issue #918).

@@ -5,6 +5,117 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Fixed
+
+- `generic-token` no longer reports a pipe composite whose halves are all
+  placeholders (#1234): `access_token={your-app_id}|<APP_SECRET>`, `|********`,
+  `|${META_APP_SECRET}` or an empty second half was the 12-byte `{your-app_id`
+  `warn`. Each half is evaluated; a real-shaped half keeps the finding.
+- `generic-token` no longer reports `YOUR_<the slot's own name>` placeholders
+  (#1230): `?hapikey=YOUR_HAPIKEY` was a `warn` once `hapikey` became a readable
+  name. A lead word followed by the slot's own name words is silent under every
+  contextual name (`YOUR_ART_API`, `YOUR_ENCODED`, `YOUR_PUBLIC_API_KEY`, ...);
+  real-shaped values and material glued to a placeholder stay detected.
+- `generic-token` now reads the Zendesk `{email}/token:{token}` credential string
+  by its `/token:` literal (#1230): the finding is the token only,
+  `contextual_secret`, high, `redact`, where the string was one whole-value
+  `warn` that left the token in the `--redact` output (a masked display
+  `.../token:********` was flagged the same way) and the `curl` argument form was
+  silent. The token wins the overlap against the whole-string reading; a mask,
+  reference, template or placeholder token and an email with `/token` alone are
+  silent. No `-u` flag reader (issue #1247); a plain `-u user:<password>` stays
+  unread.
+- `generic-token` now reads the `token=` parameter of an OAuth token revocation
+  or introspection request (#1230): `token=<value>` in a form body or curl
+  argument is a `contextual_secret`, high, `redact`, exactly the value, when the
+  request names a `/revoke`, `/revoke_token` or `/introspect` endpoint within
+  nine lines or carries `token_type_hint=` (RFC 7009 and RFC 7662; Reddit's
+  revoke request), where it was silent. A scoped reader with an incremental
+  retention hint; a bare `token=` is unchanged and a context-free layout is a
+  recorded policy limit. 0 false positives across 9,168 tracked files.
+- `generic-token` now reads the Contentful create-token response `token` member
+  beside its documented siblings (#1228): a quoted `token` member with a `sys` or
+  `scopes` member within five lines is a `contextual_secret`, high, `redact`,
+  exactly the value. The bare `token` rule is unchanged: a lone `{"token": ...}`
+  or `name` plus `token` is not read, a recorded policy limit with its choices in
+  the evidence addendum. 0 false positives across 9,166 tracked files.
+- `generic-token` now reads the Elastic cross-cluster `encoded` member (#1229):
+  in a create-cross-cluster-API-key response the `encoded` value (the base64 of
+  `id:api_key`, a complete credential) is a `contextual_secret`, high, `redact`,
+  exactly the value, whenever a quoted `api_key` member sits within five lines,
+  where only `api_key` was redacted and `encoded` stayed in the output. A scoped
+  reader with a bounded sibling window and an incremental retention hint, never
+  an `encoded` vocabulary name; the member alone stays unread (a recorded policy
+  limit). 0 false positives across 9,164 tracked files.
+- `generic-token` now reads the HubSpot `tokenKey` member (#1228): the value of
+  a quoted `"tokenKey"` JSON member (the access-token-info request body) is a
+  `contextual_secret`, high, `redact`, exactly the value, where it was silent. A
+  scoped reader (a new `scoped_context` module): only the quoted member name,
+  never `tokenKey=`, `TOKEN_KEY` or a variable; a credential-name value
+  (`accessToken`) is a reference; the bare `token` rule is unchanged. The
+  `[YOUR_TOKEN]` square placeholder is silent. 0 false positives across 9,161
+  tracked files of the maintainers' repositories.
+- `generic-token` now reads a digits-only value of 16 or more digits in a
+  credential-named slot (#1230): `api_key=<24 digits>`, a JSON `access_token`
+  member, a `hapikey` or `X-JFrog-Art-Api` value of digits was silent while the
+  same slot with letters was a finding. The finding is `medium` (`warn`, text
+  unchanged), never `high`; fewer than 16 digits, a counting run, the ambiguous
+  names (`auth`, `credential`) and the bare `token` stay silent. 0 new findings
+  across 9,159 tracked files of the maintainers' repositories.
+- `generic-token` now reads the HubSpot `hapikey` parameter (#1230): the value
+  of `?hapikey=`, `&hapikey=`, `HAPIKEY=`, `HUBSPOT_HAPIKEY=` or a `"hapikey"`
+  member (the retired account key and the current developer key alike) is a
+  `contextual_secret`, high, `redact`, exactly the value, where it was silent and
+  the key stayed in the output. Whole name (and a user prefix) only: `hapikeyId`,
+  `appId`, `portalId`, placeholders and masks stay silent.
+- `generic-token` no longer reports brace, angle, documented-mask and
+  upper-case placeholders under credential names (#1234): `{CLIENT_SECRET}`,
+  `{your-app_id}|{your-app_secret}` and `{short-lived-access-token}` in a query,
+  form or quoted value; `<contents of private.key>`; `CFPAT-xxx` and
+  `CFPAT-123...789`; and a quoted `"x-api-key": "ZOOM_API_KEY"`. Brace groups
+  with digits, glued material or a real-shaped value stay detected.
+- `generic-token` now reads the `X-JFrog-Art-Api` header (#1228, #1230): the
+  value of `X-JFrog-Art-Api` or `X-JFrog-Art-API` (any letter case) is a
+  `contextual_secret`, high, `redact`, exactly the value, in raw HTTP, a curl
+  `-H` argument and a JSON header map, where it was silent and the credential
+  stayed in the output. Whole name only; placeholders, masks and neighbouring
+  names stay silent. The `curl -u user:<secret>` password is still not read
+  (#1247).
+- `generic-token` no longer reports documentation placeholders that name a
+  service (#1234): a `YOUR_` lead plus listed service words and a credential
+  noun (`YOUR_DB_PASSWORD`, `YOUR_ZOOM_CLIENT_SECRET`,
+  `YOUR_HUBSPOT_PERSONAL_ACCESS_KEY`, `YOUR_PRIVATE_KEY`, and similar) is
+  silent. The word list is closed and read only by the bare-value rule; a real
+  value that merely contains these words inside random material is still
+  detected.
+- MongoDB Atlas (#1226): the public half of an API key pair is no longer
+  warned when it is exactly 8 bytes under `public_api_key` or
+  `mongodb_atlas_public_api_key`; the programmatic API private key slots
+  `privateKey` and `private_api_key` are pinned by tests (they were already
+  detected). A `mongodb` / `mongodb+srv` URI whose userinfo password has a
+  malformed percent escape or a raw `@`, `/`, `?`, `#` is now read at medium
+  confidence and redacted, where it previously produced no finding and the
+  password stayed in the output (ADR
+  `read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed`). Two
+  conformance cases that were negatives are now regression positives.
+- `Authorization: Bearer` values that contain percent escapes (`%2B`, `%3D`)
+  are redacted whole after an explicit `Authorization:` or
+  `Proxy-Authorization:` header name, where the run previously ended at the
+  first `%` and left the tail in the output (#1224, ADR
+  `admit-percent-escapes-in-the-authorization-bearer-header-value`). The bare
+  `Bearer` form is unchanged.
+- HubSpot (#1225): `personal_access_key` is also read behind a generic prefix
+  (`MY_HUBSPOT_PERSONAL_ACCESS_KEY`); `masked_`, `redacted_` and `publishable_`
+  prefixes and the neighbouring `…Id`, `…ExpiresAt`, `…Hint` and `…Length`
+  names stay silent. This relaxes the whole-name rule recorded for #1233.
+
+### Documentation
+
+- The Batch 2 evidence records (#1223 to #1226, #1232 to #1234) carry the
+  accepted replay of candidate `4e004108` (benchmarks #771), and the stale
+  statements about the programmatic API private key, percent encoding and the
+  declarative overlay are superseded.
+
 ## 0.1.0-beta.14 — 2026-10-06
 
 ### Support status
@@ -222,6 +333,53 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the HubSpot personal access key under a prefix
+  (#1225): `MY_HUBSPOT_PERSONAL_ACCESS_KEY`, `my_personal_access_key` and
+  `oldPersonalAccessKey` were silent while `HUBSPOT_PERSONAL_ACCESS_KEY` was a
+  high `redact`, so a real key in a prefixed variable stayed in the output. The
+  name `personal_access_key` now qualifies behind a generic prefix, like
+  `api_key`; `personalAccessKeyId`, `_ExpiresAt`, `_Hint`, `_Length`, a
+  `masked_`/`redacted_`/`publishable_` prefix, placeholders and masks stay silent.
+  This amends the whole-name-only clause of #1233 for this one name.
+- `bearer-token` now reads the whole percent-escaped value of an
+  `Authorization:` or `Proxy-Authorization:` Bearer header (#1224). X's
+  application-only Bearer Token carries `%2B`, `%2F` and `%3D` inside it, and the
+  finding stopped at the first `%`, leaving the tail in the redacted output while
+  the same value under `access_token=` was redacted whole. A `%XX` triplet is now part of
+  the header value's token run (escapes are not decoded, and each counts three
+  bytes toward the 12-byte floor); a `%` without two hex digits ends the run, and
+  the bare `Bearer` form and every other grammar keep their alphabet, so a
+  percent-containing value there still leaves its tail. New decision record
+  `decision-admit-percent-escapes-in-the-authorization-bearer-header-value`
+  amends the 2026-10-05 stance for this one carrier.
+- `connection-string` now reads the password of a `mongodb` or `mongodb+srv` URI
+  whose userinfo the strict grammar declined (#1226): `user:<v>%@host`,
+  `user:ab%zz<v>@host`, `100%%` and a password with a raw `@`, `/`, `?` or `#` gave
+  no finding, so a real password ending in `%` stayed in the output. The password
+  slot is now a `connection_string_password` at medium confidence (`redact`, like
+  every `connection_string_password`), the userinfo ending at the last `@` before
+  the first `/`, `?` or `#`. Well-formed URIs, host-only URIs
+  (`mongodb://host:27017/db?x=a:b@c.example`), placeholders and other schemes keep
+  their previous result; a digit-only password before a raw `/` stays unread.
+- `generic-token` no longer reports the public half of an Atlas programmatic API
+  key under its own name (#1226): `public_api_key = "abcd1234"`,
+  `MONGODB_ATLAS_PUBLIC_API_KEY=abcd1234` and `{"publicApiKey":"abcd1234"}` were a
+  medium `warn` `contextual_secret` while `publicKey` was silent. Exactly 8 bytes,
+  the documented public-key length, under those names is excluded; any other
+  length and the private half (`privateKey`, `private_api_key`,
+  `MONGODB_ATLAS_PRIVATE_API_KEY`, still a high `redact` over exactly the value,
+  now pinned by tests) keep their reading.
+- `generic-token` no longer reports the Batch 2 documentation placeholders that
+  name a product, service or scope (#1234 follow-up): `{"password":"YOUR_DB_PASSWORD"}`,
+  `YOUR_DATABASE_PASSWORD`, `YOUR_ATLAS_PASSWORD`, `YOUR_MONGODB_PASSWORD`,
+  `{"client_secret":"YOUR_ZOOM_CLIENT_SECRET"}`, `YOUR_SPOTIFY_ACCESS_TOKEN`,
+  `YOUR_HUBSPOT_PERSONAL_ACCESS_KEY`, `YOUR_PRIVATE_KEY` and `YOUR_PRIVATE_API_KEY`
+  were each a high, `redact` `contextual_secret` over the whole value, while
+  `YOUR_USER_PASSWORD` and `YOUR_APP_SECRET` were silent. A closed list of 21
+  service and scope words now joins the bare-value placeholder rule (a lead
+  word, whole listed words, a credential noun). A word off the list, a
+  placeholder glued to random material and a random value that
+  contains one of the words keep their previous result.
 - WebAssembly: a whole-input policy callback that returns a string other than
   `redact`, `block`, `warn` or `allow` failed with `POLICY_FAILURE`, while the
   Node addon and the incremental WebAssembly session reported

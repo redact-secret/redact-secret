@@ -14594,17 +14594,26 @@
       "note": "A host-only mongodb+srv URL has no credential."
     },
     {
-      "id": "connection-negative-mongodb-srv-malformed-percent",
+      "id": "connection-regression-mongodb-srv-malformed-percent-password",
       "detector": "connection-string",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "malformed",
+      "tier": "regression",
       "contexts": [
         "plain-text"
       ],
       "input": "mongodb+srv://fixture:SYNTHETIC%GGREVOKED@cluster0.example.mongodb.net/db",
-      "expected": [],
-      "note": "A malformed percent escape invalidates a mongodb+srv userinfo authority."
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "medium",
+          "specificity": "structural",
+          "start": 22,
+          "end": 41
+        }
+      ],
+      "note": "Issue #1226: a malformed percent escape in a mongodb+srv userinfo password is read over the password slot at medium confidence (redact), not dropped; the strict grammar stays for other schemes."
     },
     {
       "id": "connection-negative-mongodb-host-only",
@@ -14620,17 +14629,26 @@
       "note": "A host-only mongodb URL has no credential."
     },
     {
-      "id": "connection-negative-mongodb-malformed-percent",
+      "id": "connection-regression-mongodb-malformed-percent-password",
       "detector": "connection-string",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "malformed",
+      "tier": "regression",
       "contexts": [
         "plain-text"
       ],
       "input": "mongodb://fixture:SYNTHETIC%GGREVOKED@db0.example.test:27017/db",
-      "expected": [],
-      "note": "A malformed percent escape invalidates a mongodb userinfo authority."
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "medium",
+          "specificity": "structural",
+          "start": 18,
+          "end": 37
+        }
+      ],
+      "note": "Issue #1226: a malformed percent escape in a mongodb userinfo password is read over the password slot at medium confidence (redact), not dropped; the strict grammar stays for other schemes."
     },
     {
       "id": "connection-boundary-mongodb-unicode-host",

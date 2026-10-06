@@ -59,7 +59,7 @@ pub(super) fn is_line_start(input: &str, pos: usize) -> bool {
 /// same lines whether it scans one unit or the whole input (issue #990).
 /// A `\r` that ends the input stays in its line, as it did before, so on
 /// input with only LF or CRLF line endings the lines are unchanged.
-fn line_end_from(bytes: &[u8], start: usize) -> (usize, usize) {
+pub(super) fn line_end_from(bytes: &[u8], start: usize) -> (usize, usize) {
     let mut at = start;
     while at < bytes.len() {
         match bytes[at] {
@@ -507,6 +507,47 @@ const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
 /// these nouns (`your_password`), which no issuer generates.
 const PLACEHOLDER_PASSWORD_WORDS: &[&str] = &["password", "passwd", "pwd", "passphrase"];
 
+/// Product, service and credential-scope words a bare-value instructional
+/// placeholder may carry between its lead word and its credential nouns
+/// (`YOUR_ZOOM_CLIENT_SECRET`, `YOUR_DATABASE_PASSWORD`,
+/// `YOUR_PRIVATE_API_KEY`). Issue #1234 follow-up: the Batch 2 provider
+/// documentation spells its placeholders with these words, and the shorter
+/// forms `YOUR_USER_PASSWORD` and `YOUR_APP_SECRET` were already silent while
+/// `YOUR_DB_PASSWORD` was a high `redact` finding.
+///
+/// A closed list, never an open wildcard: a later word off every list still
+/// keeps the value detected. Kept apart from
+/// [`PLACEHOLDER_PROVIDER_WORDS`] on purpose, like
+/// [`PLACEHOLDER_PASSWORD_WORDS`]: only the bare-value rule
+/// [`is_instructional_token_placeholder`], which needs a lead word, a
+/// separator between every word and a credential noun, reads this list, so
+/// the glued rule (`yourdbkey` behind a vendor prefix) and the `my` rules keep
+/// their behavior. FN cost: a real value spelled exactly as a lead word plus
+/// these words and a noun, which no issuer generates.
+const PLACEHOLDER_SERVICE_WORDS: &[&str] = &[
+    "adobe",
+    "airtable",
+    "asana",
+    "atlas",
+    "box",
+    "canva",
+    "contentful",
+    "database",
+    "db",
+    "dropbox",
+    "elastic",
+    "hubspot",
+    "instagram",
+    "jfrog",
+    "meta",
+    "mongodb",
+    "private",
+    "salesforce",
+    "spotify",
+    "zendesk",
+    "zoom",
+];
+
 /// `true` for a [`PLACEHOLDER_CREDENTIAL_WORDS`] entry, case-insensitively.
 pub(super) fn is_placeholder_credential_word(word: &str) -> bool {
     PLACEHOLDER_CREDENTIAL_WORDS
@@ -749,6 +790,7 @@ pub(super) fn is_instructional_token_placeholder(value: &str) -> bool {
     for word in words {
         if !is_listed(word, PLACEHOLDER_CREDENTIAL_WORDS)
             && !is_listed(word, PLACEHOLDER_PASSWORD_WORDS)
+            && !is_listed(word, PLACEHOLDER_SERVICE_WORDS)
             && !is_listed(word, PLACEHOLDER_LEAD_WORDS)
             && !is_placeholder_provider_word(word)
         {
@@ -1355,7 +1397,7 @@ pub(super) fn for_each_long_run_line(input: &str, mut visit: impl FnMut(usize, u
 }
 
 /// The line ([`lines`]) after the one ending at `line_end`.
-fn next_line(input: &str, line_end: usize) -> Option<(usize, usize)> {
+pub(super) fn next_line(input: &str, line_end: usize) -> Option<(usize, usize)> {
     let bytes = input.as_bytes();
     let start = match bytes.get(line_end) {
         Some(b'\n') => line_end + 1,

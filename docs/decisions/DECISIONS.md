@@ -17,6 +17,7 @@ Current rules: `docs/specs/detector-families.md`.
 - [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md)
 - [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](2026-09-24-redact-google-api-keys-inside-firebase-web-config.md)
 - [Keep a credential's lifecycle era out of detection and preserve backward redaction](2026-10-06-keep-credential-lifecycle-era-out-of-detection-and-preserve-backward-redaction.md)
+- [Read the MongoDB URI password slot when the userinfo is malformed](2026-10-06-read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed.md)
 
 ## Contextual detection
 
@@ -56,6 +57,7 @@ Current rules: `docs/specs/engine.md`.
 - [Keep percent-containing and escaped credential representations outside the raw-input contract](2026-10-05-keep-percent-containing-and-escaped-credential-representations-outside-the-raw-input-contract.md)
 - [Keep request-wide placeholder numbering a documented recipe, not a helper](2026-10-05-keep-request-wide-placeholder-numbering-a-documented-recipe.md)
 - [Settle the root causes that credential-evidence snapshot-2026.10.04.4 added](2026-10-05-settle-the-snapshot-2026-10-04-4-added-case-roots.md)
+- [Admit percent escapes in the Authorization Bearer header value](2026-10-06-admit-percent-escapes-in-the-authorization-bearer-header-value.md)
 - [Define the versioned declarative action policy and its default overlay](2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md)
 - [Explain and compare action policies over one detection pass](2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md)
 - [Keep the configuration-bound scanner handle out of 0.1.x for Node, WebAssembly and Python](2026-10-06-keep-the-configuration-bound-scanner-handle-out-of-0-1-x-for-node-webassembly-and-python.md)

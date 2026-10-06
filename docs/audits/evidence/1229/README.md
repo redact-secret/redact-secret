@@ -256,3 +256,155 @@ redacts; a signature header and a keyed proof are silent while `plainToken` and
 two-chunk UTF-8 byte partition equals a per-line session.
 
 No pin, version or release change.
+
+## Correction (2026-10-06): the declarative overlay is shipped and the role question is answered
+
+Addendum. The text above is kept as written; two statements are superseded.
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "the user lowers the action with the action configuration (policy callback today, declarative overlay when #1216 to #1222 land)" (option table, class decision 2) | The declarative overlay is shipped. A user action policy is a versioned JSON document (`actionPolicyRevision: 1`, `base: "default"`) loaded with the CLI `--action-policy` and previewed with `--compare-action-policy`, and the callback remains. See [`docs/specs/engine.md`](../../../specs/engine.md) and the decisions [`decision-define-the-versioned-declarative-action-policy-and-default-overlay`](../../../decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md) and [`decision-explain-and-compare-action-policies-over-one-detection-pass`](../../../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md). |
+| "One open question is handed to the configuration design (#1217 and #1218) ...: findings carry no role, so a user cannot select 'search-only keys' in a policy, only a type, a detector, a confidence or a range." | Answered by the policy decision above: revision 1 selects by `type`, `detector`, `confidence` and `obfuscation` only. A role, range or specificity matcher is not part of revision 1 (an unknown field rejects the document, `UNKNOWN_FIELD`) and is barred until a reviewed role grammar reopens [`decision-keep-credential-role-facts-out-of-detection-attribution-and-default-action`](../../../decisions/2026-10-06-keep-credential-role-facts-out-of-detection-attribution-and-default-action.md). A rule on `contextual_secret` lowers every finding of that type, because findings carry no role. The "range" in the earlier wording is also not a matcher. |
+
+Nothing else in this record changes: the role-neutral detection, the type-based
+default and the per-row tables stand, and the rows remain conditional. The
+independent baseline for Group D (benchmarks
+[#753](https://github.com/redact-secret/redact-secret-benchmarks/issues/753)) was
+not checked again for this correction.
+
+## Round-1 measurement addendum: final dispositions of the measured rows
+
+The independent baseline of Group D ([benchmarks#753](https://github.com/redact-secret/redact-secret-benchmarks/issues/753),
+measured at core `e1284537`, report [round 1](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md)) is the
+measurement this record's "baseline open" gate waited for. The dispositions follow
+its gap groups and nothing else; "fixed" means the product behaviour changed with
+a deterministic test and an evidence addendum, confirmed only by a replay at a
+commit carrying the fix, which has not run. No row is claimed covered, passing or
+ready by this addendum. Group D measured 219 positives (181 exact, 17 misses) and
+351 controls (23 flagged); the Elastic Serverless improvement of 22 cases over
+the published baseline is the Authorization `ApiKey` fix (core #1212), not this
+work.
+
+| Row | Measured | Disposition |
+| --- | --- | --- |
+| `algolia:admin-api-key`, `dropbox:app-auth-token`, `figma:plan-access-token`, `hubspot:static-auth-access-token`, `zoom:webhook-secret-token` | all positives exact or no positive; no control flagged | none |
+| `contentful:delivery-api-access-token` | no positive; 1 control flagged (`preview-url-no-token-query`) | a brace-placeholder control: the URL-template forms of the Case are silent after the [#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md), but the case text was not read, so the replay decides |
+| `elastic:cross-cluster-api-key` | 1 of 18 exact; 17 misses (the `encoded` member beside an exact `api_key`) | 16 fixed, a bounded sibling reader ([addendum](addendum-elastic-encoded-member.md)); `encoded-member-only` (1 case) **policy-limited**: reading a lone `encoded` needs a bare name or a decoding, which the product does not do |
+| `elastic:serverless-project-api-key` | 22 of 22 exact | fixed earlier by #1212; none here |
+| `meta:app-access-token` | 21 positives fully covered, none exact (the whole pipe pair); 12 controls flagged (brace placeholders) | over-wide pair: **deliberate policy deviation**, below; brace placeholders: fixed ([#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `meta:instagram-app-secret` | 21 exact; 9 controls flagged (`access_token={short-lived-access-token}` placeholders beside the secret slot) | fixed ([#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `zoom:build-platform-api-key` | 27 exact; 1 control flagged (`ZOOM_API_KEY` as a quoted value) | fixed (a quoted variable name in its own slot, same addendum) |
+| the 14 rows with no positive | observed only | no scored claim; no change |
+
+### Deliberate policy deviation from the Case (not a product defect)
+
+* **The Meta `APP_ID|SECRET` composite is redacted whole** (decision 4 of this
+  record). The Case `meta-app-secret-in-app-id-pipe-access-token` expects the part
+  after the pipe only; the product reports one finding over the whole pair, the
+  public app id included, in a query, a form, a JSON member and a Bearer header.
+  Basis: no source states a composite grammar, and the whole span cannot leave the
+  secret half readable; none of the 21 measured pipe cases has an uncovered byte.
+  Product: unchanged. Benchmarks: score on full coverage, or freeze the whole pair
+  as the expected span; not a false negative. credential-evidence: restate the
+  extent, or record the narrower span as a role expectation the product does not
+  follow.
+
+No pin, version or release change.
+
+## Final state (round 3, candidate c6dd6859), 2026-10-06
+
+This section supersedes the round-1 measurement addendum above wherever the two
+differ. Superseded statements are marked below; the round-1 text is kept as the
+record of that round. The placeholder that the round-1 addendum carried for its
+report is replaced there by the [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md).
+
+Measured at the final candidate redact-secret `c6dd685974b8df6a84514e07e41e35afa711a2ac`
+(core `e1284537` plus the nine round-1 fixes plus the two round-2 fixes
+`c8d661b3` and `c6dd6859`; declared 0.1.0-beta.14, not published). Frozen
+corpora digests: C (#752, errata-1, 646 cases)
+`16036d043fc0dad0e45ec42e2513d2ffec2020da3458a95ed57f09f44fb0e02d` (the original
+freeze digest was `f216ca0a72c52d2b268924662d7f4ab66372c9820d0cfe386e3eefa0110dc37d`;
+errata-1 made the nine `code=` controls observed-only), D (#753, 868 cases)
+`aa173111a8b7142dc4f378ebd29875605658112eae6553dcfce6287cbaf8e72e`, E (#754, 767
+cases) `6aa6221022b94418183f706f8034705d8c6050b5c657e309980832f6231691aa`. 2,281
+cases on four surfaces (Node, WASM, Python, CLI), each whole and in 7-byte and
+1-byte chunks. Against the baseline (beta.13), round 1 and round 2: 0
+regressions; 0 parity divergences; 0 open product gaps. Of the 119 scored
+failures across the three groups, all are recorded policy cases: 59 `curl -u`
+password slot (#1247), 15 Contentful lone `token` member (#1256, rule #1241), 2
+Reddit `token=` without revoke context (#1241), 1 Elastic `encoded` alone, 36
+Meta `APP_ID|SECRET` whole-pair redaction (recorded deviation a), 6 `x-api-key`
+Adobe client-id controls (recorded deviation b). Final dispositions of all 43
+rows: 16 fully covered (C 4, D 7, E 5), 5 covered with recorded deviation, 6
+policy-limited, 16 carrier unresolved (observed only), 0 open product gaps.
+
+Sources, all at benchmarks commit `c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291` (PR #799):
+[round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (per-row table: [section 6](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows); regressions: [section 2](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#2-regressions); residual groups: [section 4](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#4-round-2-residual-groups-and-what-still-fails)),
+[round-3 scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json),
+[round-3 identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json),
+[round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round2/report.md),
+[round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round1/report.md) and
+[freeze record](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/benchmarks/FREEZE-groups-cde.md).
+
+Final disposition of the 23 rows of Group D (round-3 report, section 6; row names exact):
+
+| Row | Final disposition | Open cases and the policy that explains them |
+| --- | --- | --- |
+| `algolia:admin-api-key` | fully covered | 27/27 positives exact, 33 controls clean |
+| `contentful:delivery-api-access-token` | carrier unresolved (observed only) | no scored positive; 63 controls, 0 flagged. Not covered |
+| `dropbox:app-auth-token` | fully covered | 27/27 positives exact, 37 controls clean |
+| `elastic:cross-cluster-api-key` | policy-limited | 1 open: `encoded-member-only`, an `encoded` member with no `api_key` sibling is not read (bounded sibling reader) |
+| `elastic:serverless-project-api-key` | fully covered | 22/22 positives exact, 30 controls clean |
+| `figma:plan-access-token` | fully covered | 29/29 positives exact, 32 controls clean |
+| `hubspot:static-auth-access-token` | fully covered | 27/27 positives exact, 38 controls clean |
+| `meta:app-access-token` | covered with recorded policy deviation | 21 positives fully covered but not exact: the `APP_ID\|SECRET` pair is redacted whole, public app id included; no byte uncovered (deviation a) |
+| `meta:instagram-app-secret` | fully covered | 21/21 positives exact, 31 controls clean |
+| `x:oauth1-access-token` | carrier unresolved (observed only) | no scored case; 12 observed-only. Not covered |
+| `zoom:build-platform-api-key` | fully covered | 27/27 positives exact, 33 controls clean |
+| `zoom:webhook-secret-token` | carrier unresolved (observed only) | no scored positive; 5 controls, 0 flagged. Not covered |
+| `algolia:search-only-api-key`, `algolia:secured-api-key`, `algolia:write-api-key`, `algolia:analytics-api-key`, `algolia:monitoring-api-key`, `algolia:usage-api-key` | carrier unresolved (observed only) | no scored case (11, 9, 10, 8, 8 and 8 observed-only cases). Not covered |
+| `contentful:preview-api-access-token`, `asana:service-account-token`, `figma:cli-plan-access-token`, `jfrog:pairing-token`, `canva:authorization-code` | carrier unresolved (observed only) | no scored case (12, 10, 8, 8 and 12 observed-only cases). Not covered |
+
+Group D totals at round 3: 219 positives (197 exact, 218 fully covered, 1 miss)
+and 351 controls (0 flagged), against 159 exact on the baseline, 181 on round 1
+and 197 on round 2 (controls flagged 25, 23, 8, 0). The one miss is
+`encoded-member-only`; the 21 non-exact positives of `meta:app-access-token` are
+over-wide, fully covered pairs.
+
+Superseded by this section: the round-1 statements that the placeholder controls
+of `contentful:delivery-api-access-token`, `meta:instagram-app-secret`,
+`meta:app-access-token` and `zoom:build-platform-api-key` were fixed but that
+"the replay decides" are replaced by the round-3 result: all four rows have 0
+controls flagged (the 12 `meta:app-access-token` pipe composites were still open
+on round 2 and closed by `c6dd6859`). The Elastic `encoded` fix is confirmed
+(17 of 18 exact, 1 open). The 14 rows with no positive remain observed only; the
+measurement does not cover them.
+
+Follow-ups that explain the policy-limited rows: curl `-u` password slot
+[redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247); JFrog `AKCp` bare reader, deferred
+[redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248); bare `token` member of the Contentful create
+response [redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256) under the bare-`token` rule
+[#1241](../1241/README.md); existing Case contradictions
+[credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264); percent-escaped X layout confirmation
+[credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265).
+
+Honest limits (round-3 report, section 8):
+
+* Project-authored, maintainer-only evidence, not independent validation. The
+  corpora derive from the maintainers' credential-evidence snapshot and were
+  frozen before any scan; agreement shows consistency with the maintainers' own
+  contract and nothing more. The policy dispositions are the maintainers' own
+  decisions, recorded and not validated by the measurement.
+* One host (darwin-arm64, Node v22.16.0), not a linux-x64 official run. Peers
+  were not run. The candidate is unpublished (a branch commit declaring
+  0.1.0-beta.14).
+* The fixes target the measured failures on these same corpora, so no
+  generalisation to unseen carriers is claimed. The false-positive cost on real
+  traffic of the 16+ digit rule and of the placeholder grammar (`{name}`,
+  `[name]`, `YOUR_<slot>`, pipe composites) is not measured by these corpora.
+* A "fully covered" row means every frozen scored case passes; it does not
+  promote support, change an official run, repin or release anything. A
+  carrier-unresolved row has no scored positive (its controls are clean and
+  nothing more) and a policy-limited row is not covered.
+
+No pin, version or release change.

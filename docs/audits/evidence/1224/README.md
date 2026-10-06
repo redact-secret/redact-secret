@@ -180,3 +180,76 @@ tests and the `bearer-token` and `jwt` tests; the independent measurement is the
 benchmarks side's, with its own corpus and scorer. The product observations above
 are pinned by this record only.
 
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+(candidate, corpus digests, results, the 25 differing cases) are in the
+[#1223 record](../1223/README.md).
+
+The accepted replay is benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`) of the exact candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db` on the frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), with round 1 `74fed382...` and Batch 1 as regression, on Node, WASM,
+Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "The independent replay of a fixed candidate does not apply to this package ... but it is covered by the whole-corpus regression replay stated under Handoff" (Result) | The regression replay ran and is accepted. None of the 25 cases that differ from `a148dadf` belongs to a G4 row, and the ledger records no change versus the previous candidate for any of the four. |
+| "What the benchmarks side replays (open)" (Handoff) | Done: benchmarks #771. |
+| Gates "Node/WASM, Python, Rust and CLI ...: Partly" and "Exact candidate revision ...; accept independent replay: Open" | Met, see below. |
+| Elastic rows "reused" (Disposition legend) | Unchanged in substance. The ledger label is `fixed in candidate by an existing core fix (no new gap)`. |
+
+### Dispositions at `4e004108`
+
+| Row | Ledger disposition | Positives failing / controls flagged | Whole equals stream (7-byte, 1-byte), four surfaces identical |
+| --- | --- | --- | --- |
+| `elastic:cloud-api-key` | fixed in candidate by an existing core fix (no new gap): the Batch 1 [#1212](../1212/README.md) fix | 0 / 0 | 76/76, 76/76; 19/19 cases |
+| `elastic:ece-api-key` | fixed in candidate by an existing core fix (no new gap) | 0 / 0 | 76/76, 76/76; 19/19 cases |
+| `jfrog:access-token` | already-covered / no-code | 0 / 0 | 220/220, 220/220; 55/55 cases |
+| `x:app-only-bearer-token` | already-covered / no-code | 0 / 0 | 120/120, 120/120; 30/30 cases |
+
+The round-3 report keeps the percent-containing forms of `x:app-only-bearer-token`
+as observed and not scored: they still redact only the prefix before the first
+`%`, as the representation decision states. This package changed no code.
+
+### Gates of the issue at `4e004108`
+
+| Gate | State |
+| --- | --- |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | **Met.** Replayed by the benchmark on all four surfaces, whole and 7-byte and 1-byte streamed, identical (the CLI is the Rust surface). |
+| Exact candidate revision and digests to benchmarks; accept independent replay | **Met.** Candidate `4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No candidate package was published, so no package digest is claimed. |
+| All other gates | Met, unchanged. |
+
+The figures are read from the merged report and ledger; the harness was not
+re-run for this addendum.
+
+## Closure statement (2026-10-06)
+
+What this issue can honestly claim after the Groups C, D and E measurement rounds.
+
+No scored case of Groups C, D or E exercises this issue, so the group measurement adds no row claim to it. Round 1 attributed to the closeout fixes two observed-only changes (the
+percent-containing Bearer value of `dropbox:app-auth-token` and
+`hubspot:static-auth-access-token`, now covered whole instead of up to the first
+escape); nothing is scored. The claims of this issue stay the ones in the records above, which cite the Batch 2 evidence; do not cite the Groups C-E report for a row claim here. The percent-escaped X layout itself awaits
+confirmation in [credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265).
+
+The closeout also added tracked policies that these records do not claim as covered:
+the `curl -u` password slot ([redact-secret#1247](https://github.com/redact-secret/redact-secret/issues/1247)), the JFrog `AKCp` bare
+reader, deferred ([redact-secret#1248](https://github.com/redact-secret/redact-secret/issues/1248)), the bare `token` member
+([redact-secret#1256](https://github.com/redact-secret/redact-secret/issues/1256), rule [#1241](../1241/README.md)), the existing Case
+contradictions ([credential-evidence#264](https://github.com/redact-secret/credential-evidence/issues/264)) and the percent-escaped X layout
+confirmation ([credential-evidence#265](https://github.com/redact-secret/credential-evidence/issues/265)).
+
+Source: the [round-3 report of Groups C, D and E](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md) (section 7, [dispositions](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/report.md#6-final-disposition-of-all-43-rows)),
+its [scores](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/scores.json) and
+[identity](https://github.com/redact-secret/redact-secret-benchmarks/blob/c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291/evidence/groups-cde/round3/identity.json), at benchmarks commit
+`c1837c240a9eb4ec43bfa6abc6e2e3d7f34c7291`, measuring candidate
+`c6dd685974b8df6a84514e07e41e35afa711a2ac` (unpublished, 0.1.0-beta.14) on one
+host. Project-authored, maintainer-only evidence, not independent validation;
+the fixes target measured failures and no generalisation is claimed.
