@@ -224,3 +224,57 @@ per-line session. The product observations above are pinned by this record only,
 and the independent measurement is the benchmarks side's.
 
 No pin, version or release change.
+
+## Round-1 measurement addendum: final dispositions of the measured rows
+
+The independent baseline of Group C ([benchmarks#752](https://github.com/redact-secret/redact-secret-benchmarks/issues/752),
+measured at core `e1284537`, report `<round1 report permalink pending>`) is the
+first measurement this record's "no gate that needs it is met" waited for. The
+dispositions below follow its gap groups and nothing else; "fixed" means the
+product behaviour changed with a deterministic test and an evidence addendum, and
+that the replay at a commit carrying the fix is what confirms it, which has not
+run. No row is claimed covered, passing or ready by this addendum. Group C
+measured 277 positives (197 exact, 65 misses) and 251 controls (36 flagged).
+
+| Row | Measured | Disposition |
+| --- | --- | --- |
+| `adobe:oauth-server-to-server-client-secret`, `adobe:enterprise-web-app-client-secret` | 24 and 21 positives exact; 8 controls flagged each: 3 brace placeholders, 2 `x-api-key` public client ids, 3 OAuth `code=` | brace placeholders: fixed ([#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)); `x-api-key` public client id: **deliberate policy deviation**, below; `code=`: a corpus erratum candidate of the measurement (the generic `code` rule reads an authorization code as a `warn`), no product change |
+| `adobe:oauth-web-app-client-secret` | 16 positives exact; 5 controls flagged: 2 `x-api-key`, 3 `code=` | the same two dispositions |
+| `airtable:personal-access-token`, `dropbox:access-token`, `salesforce:oauth-refresh-token` | all positives exact; no control flagged | none |
+| `contentful:cma-personal-access-token` | 18 of 33 exact; 15 misses (the `token` member of the create response); 5 controls flagged (documented masks) | `token` member: **policy-limited**, a sibling reader for the documented `sys` and `scopes` members is implemented and the measured layouts (the member alone, or beside `name`) are not read, with the choices and their cost recorded ([addendum](addendum-contentful-create-response-token.md)); masks `CFPAT-xxx` and `CFPAT-123...789`: fixed ([#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `hubspot:private-app-access-token` | 18 of 35 exact; 17 misses (the `tokenKey` member) | fixed, a scoped reader (quoted member only; [addendum](addendum-token-key-member.md)); the Bearer path was already read |
+| `jfrog:reference-token` | 0 of 33; 33 misses | the `X-JFrog-Art-Api` header cases: fixed ([addendum](addendum-jfrog-art-api-header.md)); the `curl -u user:<secret>` password cases: **deferred to issue #1247**, a stated false negative |
+| `meta:app-secret` | 7 exact and 22 fully covered (15 over-wide pipe cases, no byte uncovered); 10 controls flagged (brace placeholders) | over-wide pipe: **deliberate policy deviation**, below; brace placeholders: fixed |
+| `x:oauth1-consumer-secret` | no positive; no control flagged | none |
+
+### Deliberate policy deviations from the Cases (not product defects)
+
+* **The Meta `APP_ID|SECRET` composite is redacted whole.** The Case expects the
+  span after the pipe only (`meta-app-secret-in-app-id-pipe-access-token`); the
+  product reports one `contextual_secret` or `bearer_token` over the whole pair,
+  the public app id included (decision 4 of the [Group D record](../1229/README.md)).
+  Basis: a secret-only span needs a composite grammar no source states, and the
+  whole span cannot leave the secret half readable (no byte of the secret is
+  uncovered in any of the 36 measured pipe cases). Product: unchanged, the app id
+  half is over-redacted. Benchmarks: score these cases on full coverage
+  (`fullyCovered`), or freeze the whole pair as the expected span; they are not
+  false negatives. credential-evidence: the Case's extent sentence is the
+  disagreement; restating it as the whole composite, or recording the narrower span
+  as a role expectation the product does not follow, resolves it.
+* **An `x-api-key` header whose value is Adobe's public client id keeps being
+  flagged.** The Case lists the client id as a public identifier
+  (`adobe-client-secret-placeholders-references-and-public-identifiers`); a generic
+  scanner cannot know that a value in `x-api-key` is Adobe's, and the slot is a
+  credential slot for every other provider. Basis: the security-first default and
+  the decision to keep role facts out of detection
+  (`keep-credential-role-facts-out-of-detection-attribution-and-default-action`).
+  Product: unchanged (`contextual_secret`, high, `redact`). Benchmarks: record the
+  six measured controls as an accepted false positive or move them to observed
+  only. credential-evidence: keep the identifier role as a fact; the expectation
+  that the value is not flagged is not the product's behaviour.
+* **The `curl -u user:<secret>` password slot is not read** for the JFrog reference
+  token (the `curl-u-password-*` cases). The reader of that slot, with its policy
+  for a literal user part, is issue #1247; until then the cases are stated false
+  negatives of the product, not defects of the header repair.
+
+No pin, version or release change.
