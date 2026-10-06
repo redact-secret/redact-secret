@@ -32,6 +32,10 @@ const BRACE_PLACEHOLDERS: &[&str] = &[
     "{your api key}",
     "{your-app_id}|{your-app_secret}",
     "{app-id}:{app-secret}",
+    // The square form HubSpot writes (issue #1228).
+    "[YOUR_TOKEN]",
+    "[your-api-key]",
+    "[app-id]|[app-secret]",
 ];
 
 #[test]

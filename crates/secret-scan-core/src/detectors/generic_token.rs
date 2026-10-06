@@ -6,6 +6,7 @@
 //! no candidates. Values above 4 KiB are left to more specific detectors.
 
 use super::pattern::{self, PrefixShape};
+use super::scoped_context;
 use super::text::{
     OPENCODE_REFERENCE_OPENERS, ascii_run_len, char_at, contains_ci, ends_with_ci, find_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
@@ -1706,18 +1707,22 @@ const MAX_BRACE_PLACEHOLDER_WORD_LEN: usize = 24;
 const MAX_BRACE_PLACEHOLDER_NAME_LEN: usize = 48;
 
 /// The length of the placeholder group at the start of `bytes`:
-/// `{` + one or more words of ASCII letters (1 to
+/// `{` (or `[`) + one or more words of ASCII letters (1 to
 /// [`MAX_BRACE_PLACEHOLDER_WORD_LEN`] each) joined by `_`, `-`, `.` or one
-/// space, in at most [`MAX_BRACE_PLACEHOLDER_NAME_LEN`] bytes, + `}`.
+/// space, in at most [`MAX_BRACE_PLACEHOLDER_NAME_LEN`] bytes, + the matching
+/// `}` (or `]`). The square form is the one `HubSpot` writes
+/// (`Bearer [YOUR_TOKEN]`, issue #1228).
 fn brace_group_len(bytes: &[u8]) -> Option<usize> {
-    if bytes.first() != Some(&b'{') {
-        return None;
-    }
+    let close = match bytes.first() {
+        Some(b'{') => b'}',
+        Some(b'[') => b']',
+        _ => return None,
+    };
     let mut word = 0usize;
     let mut index = 1usize;
     while let Some(&byte) = bytes.get(index) {
         match byte {
-            b'}' if word > 0 => return Some(index + 1),
+            byte if byte == close && word > 0 => return Some(index + 1),
             b'_' | b'-' | b'.' | b' ' if word > 0 => word = 0,
             letter if letter.is_ascii_alphabetic() => {
                 word += 1;
@@ -1952,6 +1957,38 @@ fn is_credential_noun_phrase(value: &str) -> bool {
     // `all` stops at the first bad word, so `tail` is read only when every
     // word passed and it is therefore the last one (#1121).
     all_words && count >= 2 && CREDENTIAL_PHRASE_TAIL_WORDS.contains(&tail)
+}
+
+/// `true` for a value that is itself the name of a credential rather than a
+/// credential (issue #1228): a lowercase credential-noun phrase
+/// ([`is_credential_noun_phrase`], `access_token`, `auth-token-storage-key`) or
+/// a camelCase credential name that ends in a credential noun
+/// (`refreshToken`, `authorizationTokenStorageKey`). Applied only to a scoped
+/// name that also names the storage key a token is saved under
+/// ([`scoped_context::ScopedRead`]). FN cost: a real value spelled as a
+/// lowercase word chain or a camelCase identifier ending in a credential noun.
+fn is_credential_name_phrase(value: &str) -> bool {
+    if is_credential_noun_phrase(value) {
+        return true;
+    }
+    let bytes = value.as_bytes();
+    let Some(last_capital) = bytes.iter().rposition(u8::is_ascii_uppercase) else {
+        return false;
+    };
+    bytes.first().is_some_and(u8::is_ascii_lowercase)
+        && bytes.iter().all(u8::is_ascii_alphabetic)
+        && last_capital > 0
+        && matches!(
+            &value[last_capital..],
+            "Key"
+                | "Secret"
+                | "Token"
+                | "Password"
+                | "Passwd"
+                | "Passphrase"
+                | "Credential"
+                | "Credentials"
+        )
 }
 
 /// `true` for a composite value, runs joined by `|` or `:` such as a Convex
@@ -3356,6 +3393,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
         {
             let value = &input[value_start..value_end];
             normalize_name_into(&input[name_start..name_end], &mut normalized);
+            let mut name_phrase_is_reference = false;
             if matches!(names, NameSource::BuiltIn)
                 && is_jwk_secret_member(input, name_start, name_end, &jwk_lines)
             {
@@ -3363,6 +3401,16 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 // `private_key` name's high-signal bucket (issue #821).
                 normalized.clear();
                 normalized.push_str("private_key");
+            } else if matches!(names, NameSource::BuiltIn)
+                && let Some(scoped) =
+                    scoped_context::scoped_alias(input, name_start, name_end, &normalized)
+            {
+                // A scoped name whose carrier or context the evidence Case
+                // names is judged under an existing high-signal name (issues
+                // #1228 to #1230); see `scoped_context`.
+                normalized.clear();
+                normalized.push_str(scoped.alias);
+                name_phrase_is_reference = scoped.name_phrase_is_reference;
             } else if matches!(names, NameSource::BuiltIn)
                 && is_unmasked_under_masking_lead(&normalized, value)
                 && let Some((_, rest)) = value_checked_lead_rest(&normalized)
@@ -3384,6 +3432,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             // otherwise be reported (issue #989).
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
                 && !is_parameter_expansion_message(input, name_start, name_end, value_start)
+                && (!name_phrase_is_reference || !is_credential_name_phrase(value))
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
                 && !is_templated_lookup_path(&mut templates, input, name_start, value)

@@ -7,6 +7,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the HubSpot `tokenKey` member (#1228): the value of
+  a quoted `"tokenKey"` JSON member (the access-token-info request body) is a
+  `contextual_secret`, high, `redact`, exactly the value, where it was silent. A
+  scoped reader (a new `scoped_context` module): only the quoted member name,
+  never `tokenKey=`, `TOKEN_KEY` or a variable; a credential-name value
+  (`accessToken`) is a reference; the bare `token` rule is unchanged. The
+  `[YOUR_TOKEN]` square placeholder is silent. 0 false positives across 9,161
+  tracked files of the maintainers' repositories.
 - `generic-token` now reads a digits-only value of 16 or more digits in a
   credential-named slot (#1230): `api_key=<24 digits>`, a JSON `access_token`
   member, a `hapikey` or `X-JFrog-Art-Api` value of digits was silent while the

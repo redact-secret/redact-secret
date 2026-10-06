@@ -81,6 +81,7 @@ mod resend;
 mod rubygems;
 mod ruleset_adapter;
 mod runpod;
+mod scoped_context;
 mod sendgrid;
 mod sentry;
 mod shopify;
