@@ -1,15 +1,17 @@
 # Evidence: #1224, Batch 2 ApiKey, JWT and X encoded carriers
 
-**Result:** the product contract for the four G4 rows is adopted as a
-conditional policy, with the representation decision the benchmarks readiness
-inventory was waiting on for `x:app-only-bearer-token`. In short: the Cloud
-`ApiKey` layout reuses the Batch 1 implementation unchanged; ECE is not read as
-Cloud by its name; a JFrog value that is a JWT is one `jwt` finding with the
-exact JWT redacted and no JFrog attribution; and a percent-containing or escaped
-X representation is unsupported and unassertable, with no alphabet broadened and
-a redacted prefix never reported as full coverage. No row is claimed covered,
-passing or ready, no benchmark result is stated, and no code, detector, registry
-entry or type changes.
+**Result:** the contract for the four G4 rows (adopted in PR #1231, with the
+representation decision) was tested by the independent benchmarks#739 round 2
+against the published `0.1.0-beta.13` and the candidate `a148dadf`. No gap was
+reproduced and no code changes for this package. `elastic:cloud-api-key` and
+`elastic:ece-api-key` fail on the published baseline and pass on the candidate
+through the Batch 1 `Authorization: ApiKey` fix ([#1212](../1212/README.md)),
+reused. `jfrog:access-token` and `x:app-only-bearer-token` are existing coverage
+validated by the benchmark; the X percent-containing and escaped forms stay an
+accepted policy limit, observed and not scored, with a redacted prefix never
+reported as full coverage. The independent replay of a fixed candidate does not
+apply to this package (nothing was fixed for it), but it is covered by the
+whole-corpus regression replay stated under "Handoff".
 
 Issue [#1224](https://github.com/redact-secret/redact-secret/issues/1224)
 (measurement child benchmarks
@@ -26,7 +28,7 @@ decision is
 | Role | Source |
 | --- | --- |
 | Provider facts (pending inputs) | The four proposed contracts of credential-evidence#235 and the [Batch 2 handoff](https://github.com/redact-secret/credential-evidence/blob/005a7331cf90403bd4ce4abcb93bd8b085d315a9/docs/handoffs/batch-2-bounded-carriers.md) (credential-evidence#248, project-authored, not independent). For X it records the Bearer role, an unspecified byte format, and percent-containing shapes only as a scanner-corroborated lead (`artifacts-bearer-leading-run-and-percent`), not a provider-proven encoding. |
-| Independent baseline | None. benchmarks#739 readiness (comment 6001345412): `elastic:cloud-api-key` blocked (awaiting evidence review), `x:app-only-bearer-token` blocked (`representation-policy-undecided`), `elastic:ece-api-key` and `jfrog:access-token` carrier-unresolved. |
+| Independent baseline | benchmarks#739: [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/report.md), [round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/round2/report.md) and [ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/ledger.json) at merge `fe7a5d1a` of PR #761 (readiness at merge `6a1a7a64` of PR #755). Identities under "Independent measurement and dispositions". |
 | Product policy (this record) | `Authorization: ApiKey` grammar ([#1212](../1212/README.md)), the `bearer-token` grammar, the `jwt` detector, `decision-defer-encoded-input-decoding` and the representation decision above. |
 
 ## Adopted contracts
@@ -58,50 +60,105 @@ invented and not shown. Not benchmark results and not coverage claims.
 | `Authorization: Bearer <7>%2B<...>` | no finding (leading run under the 12-byte floor), so the whole value stays |
 | `Authorization: Bearer <42>+<12>` (literal backslash-u escape) | `bearer_token` over the 42 bytes before the backslash (22-64); the escape and tail stay |
 
-## Per-row table
+## Independent measurement and dispositions
 
-Legend as in the [#1223 record](../1223/README.md#per-row-table): layout kind AK
-is the ApiKey scheme; `B / X` is a raw Bearer layout in contract with the
-percent-containing and escaped forms outside it; P1 and P2 are the
-preconditions defined there.
+**Independent measurement.** benchmarks
+[#739](https://github.com/redact-secret/redact-secret-benchmarks/issues/739)
+measured all 58 rows in two rounds (PRs
+[#755](https://github.com/redact-secret/redact-secret-benchmarks/pull/755) and
+[#761](https://github.com/redact-secret/redact-secret-benchmarks/pull/761), both
+merged; permalinks at their merge commits `6a1a7a64` and `fe7a5d1a`): the
+[readiness inventory](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/readiness.md) (first version at merge `6a1a7a64` of PR #755), the [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/report.md), the [round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/round2/report.md) and the [ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/ledger.json) (58 rows, schema 4). Frozen round-2
+corpus sha256 `a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921`
+(1935 cases; first freeze `8e447629`, three documented errata before the
+re-measurement; round 1's corpus `74fed382`, 486 cases, 30 rows, is separate).
+Case ids are `<family>:r2:<layout>:<kind>` in `benchmarks/batch2/corpus-r2.mjs`
+(round 1: `<family>:<layout>:<kind>` in `corpus.mjs`) and are listed per row in the
+ledger. Expectations were authored from credential-evidence `65602481` and the
+adopted contract (PR #1231), frozen before any scan, and were not edited.
+
+**Identities.** Published: `@redact-secret/core`, `@redact-secret/wasm` and the
+darwin-arm64 addon `0.1.0-beta.13` from npm (core integrity
+`sha512-qZkqRN7CIJ+pc0IteRCXSucr1l9KtTc/nJaM5wPL0NvCiZ4AGWLCyrLy8KD95a2MBgxo8vuUJ/UaKhrny7gMJQ==`),
+PyPI `redact-secret` `0.1.0b13`, crates.io `redact-secret-cli` `0.1.0-beta.13`.
+Candidate: the unpublished commit `a148dadf4a43b5441ed88386d055428b2e278f25`
+(core main after PR #1231, no candidate package published). Surfaces: Node, WASM,
+Python and the CLI (the Rust surface; no separate Rust harness), whole and
+streamed at 7-byte and 1-byte chunks, darwin-arm64, Node v22.16.0; the four
+surfaces agreed on every case and stream equalled whole. Peers were not run. The
+fixed candidate is **not** an identity the benchmark has measured: this change
+was replayed locally on the CLI surface only (see the #1223 record).
+
+**Result (candidate `a148dadf`).** 4 rows, 0 positives failing and 0 controls
+flagged on the candidate; on the published baseline 22 positive cases fail, all on the
+two Elastic rows and all the ApiKey envelope fixed by #1212 / PR #1215 (11 cases
+each); the other two rows are clean on both. The evidence now names a carrier for
+each row: Elastic ECE `authorization-apikey-carrier` (the same `ApiKey` scheme as
+Cloud, so the contract's "same path, no ECE attribution" branch applies and ECE is
+still not read as Cloud by name), JFrog `authorization-bearer-header` (Bearer,
+with a JWT value read as one `jwt` finding), X an explicit Bearer carrier with
+percent-containing shapes only as an unscored variant. The local CLI replay of
+this change (see the [#1223 record](../1223/README.md#independent-measurement-and-dispositions))
+left every G4 observation unchanged.
+
+**Disposition legend.** *Existing coverage, validated by the benchmark: no
+code* means the row's in-contract positives and controls passed on the published
+baseline and on the candidate on every surface and stream, and the record
+changes nothing for it. *Reproduced gap, fixed by this PR* names the issue.
+*Batch 1 fix reused* means the row fails on the published baseline and passes on
+the candidate through an earlier core fix. *Accepted policy limit* and
+*source-unresolved / unmeasured* are never counted as a miss, a clean result or
+coverage. Variants the contract leaves unassertable (prefixed or upper-case
+names, single quotes, lower-case schemes, percent values, legacy layouts) are
+observed and not scored in every row. A row is not claimed covered beyond what the
+ledger measured.
 
 ### G4: 4 families
 
-| Family | Layout kind (evidence-named, unreviewed) | Product disposition kind | Benchmarks inventory | Evidence handoff | Precondition |
-| --- | --- | --- | --- | --- | --- |
-| `elastic:cloud-api-key` | AK | existing generic path: ApiKey scheme (Batch 1, #1212) | blocked (awaiting-evidence-review) | ready | P1 |
-| `elastic:ece-api-key` | C | conditional on a reviewed layout; not read as Cloud ApiKey by name | carrier-unresolved (carrier-source-missing) | carrier-unresolved | P2: Elastic Cloud Enterprise API reference: authentication header for the API key |
-| `jfrog:access-token` | C | conditional on a reviewed layout; a JWT value is read by the existing `jwt` detector | carrier-unresolved (carrier-source-missing) | carrier-unresolved | P2: JFrog access token docs: header and `access_token` form; representation of a reference token |
-| `x:app-only-bearer-token` | B / X | raw Bearer: existing generic path; percent-containing and escaped forms: out of contract | blocked (representation-policy-undecided) | ready | P1 for the raw Bearer layout only; percent-containing and escaped forms are not startable until a separate representation decision (ADR, #491 criteria) |
+| Family | Carrier layout (evidence-named, benchmark slots) | Cases r2: pos / ctl / unscored | Candidate `a148dadf` (published beta.13) | Disposition |
+| --- | --- | --- | --- | --- |
+| `elastic:cloud-api-key` | ApiKey header | 11 / 6 / 2 (+ 12 round-1) | pos 0 fail, ctl 0 flagged (published: 11, 0) | Batch 1 fix reused (#1212 ApiKey envelope, PR #1215): fails on the published baseline, passes on the candidate; no new gap. |
+| `elastic:ece-api-key` | ApiKey header | 11 / 6 / 2 | pos 0 fail, ctl 0 flagged (published: 11, 0) | Batch 1 fix reused (#1212 ApiKey envelope, PR #1215): fails on the published baseline, passes on the candidate; no new gap. |
+| `jfrog:access-token` | explicit Bearer header; Bearer JWT | 29 / 14 / 12 | pos 0 fail, ctl 0 flagged (published: 0, 0) | Existing coverage, validated by the benchmark: no code. |
+| `x:app-only-bearer-token` | explicit Bearer header | 15 / 7 / 8 (+ 20 round-1) | pos 0 fail, ctl 0 flagged (published: 0, 0) | Existing coverage, validated by the benchmark: no code. Percent-containing and escaped forms: accepted policy limit, observed and not scored. |
 
 ## Handoff
 
-The benchmarks side may treat as adopted: for `elastic:cloud-api-key`, once its
-layout is reviewed, the ApiKey expectation above; for `x:app-only-bearer-token`,
-the raw Bearer expectation once reviewed, and the percent-containing and escaped
-forms as unsupported (`unassertable`, never FN, TN or pass); for
-`jfrog:access-token` with a JWT value, the single `jwt` finding with exact
-redaction and no JFrog attribution, as a conditional expectation pending its
-carrier; and for the whole row set, no ECE-as-Cloud reading. What stays
-blocked: `elastic:ece-api-key` and `jfrog:access-token` wait for the provider
-sources the handoff names, `elastic:cloud-api-key` and the raw X layout wait for
-a reviewed contract, and every row waits for an independent baseline. A change
-to the representation stance is a new decision under the reopening bar, not an
-expectation edit. No candidate source or digest is offered: no gap is
-demonstrated. No pin, version or release changes.
+Final for the benchmarks side: the ApiKey expectation for `elastic:cloud-api-key`
+and `elastic:ece-api-key` (`authorization_credential`, undecoded run, redact, no
+Elastic attribution), the single `jwt` finding with no JFrog attribution for a
+JFrog JWT, and the raw Bearer expectation for `x:app-only-bearer-token`, all
+validated by the measurement; the X percent-containing and escaped forms as
+unsupported and unassertable (never an FN, TN or pass). The Elastic rows depend on
+the Batch 1 fix that is already merged and published only in the candidate line:
+the published `0.1.0-beta.13` fails them, so a user on the published package has
+the ApiKey gap until the next release.
+
+**What the benchmarks side replays (open).** Build the merge commit of this
+change (the maintainer names it; not chosen here) as the fixed candidate (`npm
+ci`, `npm run js:build`, the napi addon, `npm run wasm:build`, `npm pack` of core,
+addon and wasm, `maturin develop --release`, `cargo build --release --locked -p
+redact-secret-cli`), then run the round-2 corpus `a312308a...` (all 1935 cases) on
+Node, WASM, Python and the CLI, whole and at 7-byte and 1-byte chunks, with
+`scripts/measure-batch1.mjs` and `scripts/report-batch2-r2.mjs`, and the Batch 1
+and round-1 corpora for regression. Expected: 0 positives failing and 0 controls
+flagged on all 58 rows; observations identical to `a148dadf` except the 25 cases
+listed above; stream equal to whole; the four surfaces identical.
+
+No pin, version or release changes; this record chooses none.
 
 ## Gates of the issue
 
 | Gate | State |
 | --- | --- |
-| Freeze layout, admission, span, attribution, default action, exclusions per ready row | Met at class level (this record and the spec rows); per row conditional, no row is ready. |
-| Link baseline case ids and identities; disposition every row | Open, no baseline. |
-| Repair only demonstrated gaps | Open, none demonstrated. The `%` prefix behaviour is an accepted, recorded limit. |
-| Deterministic conformance for changed logic | Open, no logic changed. |
-| Shared parser fix once | Open, none needed so far. |
-| Node/WASM, Python, Rust and CLI whole and stream behavior | Open. Only the CLI was observed, at one commit. |
-| Candidate revision and digests to benchmarks; accept replay | Open, conditional on a demonstrated gap. |
-| Record no-code conclusions | Open, conditional on a baseline. |
+| Freeze each ready row's layout, admission, span, attribution, default action and exclusions in final product evidence and spec rows | Met. The class contract and spec rows are adopted (PR #1231) and the independent measurement tested them per row; the evidence contracts of credential-evidence remain proposed or draft, which is that repository's state, not a product gap. |
+| Link independent baseline case ids and identities; disposition every row | Met. Identities and permalinks are above and every row has its disposition in the per-row table, with case ids in the ledger and the corpus. |
+| Repair only demonstrated gaps | Met. No G4 gap was demonstrated on the candidate; the two Elastic failures on the published baseline are the already-merged #1212 fix, reused. The `%` prefix behaviour is an accepted, recorded limit. |
+| Deterministic conformance for changed logic | Met, nothing changed for this package; the ApiKey grammar is pinned by the Batch 1 `apikey_*` tests and the Bearer and `jwt` behaviour by their unit tests. |
+| Shared parser fix once | Not applicable. No shared parser fix was needed for G4 (the one shared fix of this batch, #1232, does not touch these rows). |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | Partly. Baseline and candidate `a148dadf` were measured by the benchmark on all four surfaces, whole and 7-byte and 1-byte streamed, identical. For this change: the Rust core under whole input, every two-chunk UTF-8 byte partition and per-line sessions (`tests/batch2_gaps_1232_1234.rs`), and the CLI replay above. Open: Node, WASM and Python with the fixed candidate, which share the Rust core and are the benchmark replay. |
+| Exact candidate revision and digests to benchmarks; accept independent replay | Open. The fixed candidate does not exist as a measured identity until the change is merged and built; what to replay is stated above. Offered: the merge commit and the build recipe of the benchmark README, no pin, version or release change. |
+| Record no-code conclusions for existing coverage | Met for `jfrog:access-token` and `x:app-only-bearer-token` (existing coverage, no code) and for the two Elastic rows (the Batch 1 fix reused, no new code), as the benchmark ledger measured them. |
 
 ## Tradeoffs
 
@@ -118,6 +175,8 @@ demonstrated. No pin, version or release changes.
 
 ## Tests
 
-None added: documentation and policy only. The grammar is pinned by the Batch 1
-`apikey_*` tests and the `bearer-token` and `jwt` tests. The observations above
+None added for this package. The grammar is pinned by the Batch 1 `apikey_*`
+tests and the `bearer-token` and `jwt` tests; the independent measurement is the
+benchmarks side's, with its own corpus and scorer. The product observations above
 are pinned by this record only.
+
