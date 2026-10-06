@@ -2467,6 +2467,13 @@ fn unquoted_assignment_value_with(
     start: usize,
     reach: Option<&mut ValueReach>,
 ) -> Option<(usize, usize)> {
+    // `refresh_token=&other=1`: the value is empty and the `&` is the form
+    // delimiter of the next parameter (issue #1232). Without this the walk
+    // below, which only stops at an `&name=` that is not its first byte,
+    // read the neighbouring public parameter as the credential.
+    if starts_query_parameter(input, start) {
+        return None;
+    }
     if let Some(span) = delimited_reference_value(input, start) {
         return Some(span);
     }

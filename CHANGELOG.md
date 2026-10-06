@@ -85,6 +85,16 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer takes the next form parameter as the value of an
+  empty one (#1232). `refresh_token=&other=1` and `client_secret=&grant_type=x`
+  produced a medium, `warn` `contextual_secret` whose span was `&other=1` or
+  `&grant_type=x`, so a policy that escalates `warn` to `redact` would have
+  masked a public parameter. An empty value is not a credential: no finding, and
+  a span never starts at the delimiter of the next `&name=` parameter. A real
+  value, an empty value at the end of the input, before a newline, `;`, `,` or a
+  space, an empty quoted value, and a credential in the parameter after an empty
+  one are unchanged. Cost: a password whose own first bytes read as `&name=` is
+  no longer reported as that one value.
 - `generic-token` redacts an `Authorization: ApiKey <value>` or
   `Proxy-Authorization: ApiKey <value>` credential in raw HTTP, quoted curl `-H`
   and JSON header maps, as a generic `authorization_credential` over the
