@@ -107,3 +107,7 @@ public interface changes; no version change and no release. The Batch 2 evidence
 records `docs/audits/evidence/1223` to `1226` apply it to their rows, and
 [the #1223 record](../audits/evidence/1223/README.md) holds the shared
 Bearer-grammar observation.
+
+## Amendments
+
+- 2026-10-06: item 4 of the Decision (the Atlas URI password) is amended for the `mongodb` and `mongodb+srv` URI only by [`decision-read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed`](2026-10-06-read-the-mongodb-uri-password-slot-when-the-userinfo-is-malformed.md): a password with a malformed escape or raw punctuation is read at medium confidence.

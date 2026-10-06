@@ -758,6 +758,149 @@ fn azure_candidates(input: &str, candidates: &mut Vec<Candidate>) {
     }
 }
 
+/// `true` for a `mongodb` or `mongodb+srv` scheme.
+fn is_mongodb_scheme(scheme: &str) -> bool {
+    matches!(scheme, "mongodb" | "mongodb+srv")
+}
+
+/// The end of the whitespace-free run a MongoDB URI userinfo may sit in:
+/// like [`authority_end`] but `/`, `?` and `#` do not end it, because a
+/// password that carries one of them raw (the MongoDB URI specification
+/// requires them escaped; users write them anyway) would otherwise end the
+/// authority before its `@`. Bounded by [`MAX_AUTHORITY_LENGTH`].
+fn mongodb_run_end(input: &str, start: usize, opened_by_single_quote: bool) -> Option<usize> {
+    let bytes = input.as_bytes();
+    let mut end = start;
+    while end < bytes.len() {
+        let byte = bytes[end];
+        let literal_quote = byte == b'\'' && !opened_by_single_quote;
+        let terminator =
+            !matches!(byte, b'/' | b'?' | b'#') && is_authority_terminator(byte) && !literal_quote;
+        if terminator {
+            break;
+        }
+        if end - start >= MAX_AUTHORITY_LENGTH {
+            return None;
+        }
+        end += 1;
+    }
+    Some(end)
+}
+
+/// The password slot of a MongoDB URI userinfo the strict grammar declines
+/// (issue #1226): a malformed percent escape (`user:ab%zz@host`, a password
+/// ending in `%`), a raw `@`, or a raw `/`, `?` or `#`. Returns the byte
+/// range of the password inside `input`.
+///
+/// The userinfo ends at the LAST `@` before the first `/`, `?` or `#`, as the
+/// Go driver reads it (the Node driver stops at the first `@`, `pymongo`
+/// rejects the URI: neither accepts the raw form, so the product follows the
+/// reading that keeps the most of the secret inside the span); an `@` in a
+/// later path or query is never the userinfo's. When a raw `/`, `?` or `#`
+/// ended the authority before any `@`, the first `@` followed by a valid host
+/// list ends it. The text after that `@`, up to the next `/`, `?` or `#`, must
+/// be a valid host list for the scheme. The user is the non-empty run before the first `:` of the
+/// userinfo and holds none of `/ ? # @`; the password is everything after
+/// that `:`, non-empty and not a placeholder. A run whose text before its
+/// first `/`, `?` or `#` is already a valid host list with no `@`
+/// (`mongodb://host:27017/db?x=a:b@c.example`) is a host-only URI, not a
+/// userinfo. A password made of digits right before a raw `/`
+/// (`user:123/x@host`) reads as `host:port` and stays unread.
+fn mongodb_relaxed_password(
+    input: &str,
+    user_info_start: usize,
+    scheme: &str,
+    opened_by_single_quote: bool,
+) -> Option<(usize, usize)> {
+    let run_end = mongodb_run_end(input, user_info_start, opened_by_single_quote)?;
+    let run = &input[user_info_start..run_end];
+    let first_stop = run.find(['/', '?', '#']).unwrap_or(run.len());
+    let authority0 = &run[..first_stop];
+    let host_is_valid = |at: usize| {
+        let host_region = &run[at + 1..];
+        let host_end = host_region
+            .find(['/', '?', '#'])
+            .unwrap_or(host_region.len());
+        host_end > 0 && has_valid_host_for_scheme(scheme, &host_region[..host_end])
+    };
+    let at = if let Some(last) = authority0.rfind('@') {
+        // The userinfo ends at the last `@` before the first `/`, `?` or `#`
+        // (a raw `@` in the password). An `@` in a later query or path is
+        // never the userinfo's.
+        host_is_valid(last).then_some(last)?
+    } else {
+        // A raw `/`, `?` or `#` ended the authority before any `@`. A run
+        // that is already a valid host list is a host-only URI.
+        if has_valid_mongo_host_list(authority0) {
+            return None;
+        }
+        run.match_indices('@')
+            .map(|(at, _)| at)
+            .find(|&at| host_is_valid(at))?
+    };
+    let user_info = &run[..at];
+    let separator = user_info.find(':')?;
+    let user = &user_info[..separator];
+    let password = &user_info[separator + 1..];
+    if user.is_empty()
+        || !user
+            .bytes()
+            .all(|byte| is_userinfo_char(byte) || byte == b'%')
+        || password.is_empty()
+        || password.len() > MAX_PASSWORD_LENGTH
+        || is_placeholder(password)
+    {
+        return None;
+    }
+    let start = user_info_start + separator + 1;
+    Some((start, start + password.len()))
+}
+
+/// Appends the password slot of every MongoDB URI userinfo the strict
+/// grammar declined ([`mongodb_relaxed_password`], issue #1226) and no
+/// candidate of this call already covers, at medium confidence: the slot is
+/// read from a malformed or ambiguous userinfo, so it never claims the
+/// strict form's high confidence. `connection_string_password` redacts at
+/// any confidence.
+fn mongodb_relaxed_candidates(input: &str, candidates: &mut Vec<Candidate>) {
+    let mut position = 0;
+    while let Some(scheme_match) = find_next_scheme(input, position) {
+        position = scheme_match.end;
+        if !is_mongodb_scheme(scheme_match.scheme)
+            || (scheme_match.start > 0 && is_scheme_char(input.as_bytes()[scheme_match.start - 1]))
+        {
+            continue;
+        }
+        let opened_by_single_quote =
+            scheme_match.start > 0 && input.as_bytes()[scheme_match.start - 1] == b'\'';
+        let Some((start, end)) = mongodb_relaxed_password(
+            input,
+            scheme_match.end,
+            scheme_match.scheme,
+            opened_by_single_quote,
+        ) else {
+            continue;
+        };
+        if candidates
+            .iter()
+            .any(|candidate| candidate.range().start() < end && start < candidate.range().end())
+        {
+            continue;
+        }
+        if let Some(range) = ByteRange::new(start, end) {
+            candidates.push(
+                Candidate::built_in("connection_string_password", Confidence::Medium, range)
+                    .with_specificity(Specificity::Structural)
+                    .with_signals(vec![
+                        "credential-bearing-authority",
+                        "supported-scheme",
+                        "mongodb-relaxed-userinfo",
+                    ]),
+            );
+        }
+    }
+}
+
 /// Recognizes the password of a credential-bearing connection authority for
 /// a bounded set of schemes.
 pub struct ConnectionStringDetector;
@@ -844,6 +987,8 @@ impl Detector for ConnectionStringDetector {
                 );
             }
         }
+
+        mongodb_relaxed_candidates(input, &mut candidates);
 
         azure_candidates(input, &mut candidates);
 

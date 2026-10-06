@@ -222,6 +222,15 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `connection-string` now reads the password of a `mongodb` or `mongodb+srv` URI
+  whose userinfo the strict grammar declined (#1226): `user:<v>%@host`,
+  `user:ab%zz<v>@host`, `100%%` and a password with a raw `@`, `/`, `?` or `#` gave
+  no finding, so a real password ending in `%` stayed in the output. The password
+  slot is now a `connection_string_password` at medium confidence (`redact`, like
+  every `connection_string_password`), the userinfo ending at the last `@` before
+  the first `/`, `?` or `#`. Well-formed URIs, host-only URIs
+  (`mongodb://host:27017/db?x=a:b@c.example`), placeholders and other schemes keep
+  their previous result; a digit-only password before a raw `/` stays unread.
 - `generic-token` no longer reports the public half of an Atlas programmatic API
   key under its own name (#1226): `public_api_key = "abcd1234"`,
   `MONGODB_ATLAS_PUBLIC_API_KEY=abcd1234` and `{"publicApiKey":"abcd1234"}` were a
