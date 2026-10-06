@@ -121,6 +121,7 @@ pub(crate) use heroku::has_open_heroku_legacy_context_in;
 pub(crate) use keyword_gated_keys::{has_open_deepgram_request_in, has_open_provider_sibling_in};
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
+pub(crate) use scoped_context::has_open_scoped_context_in;
 pub(crate) use text::has_open_list_item_pair_in;
 pub(crate) use twilio::has_open_twilio_cli_table_in;
 #[cfg(test)]
@@ -129,6 +130,7 @@ pub(crate) use {
     confluent::has_open_confluent_properties,
     heroku::has_open_heroku_legacy_context,
     keyword_gated_keys::{has_open_deepgram_request, has_open_provider_sibling},
+    scoped_context::has_open_scoped_context,
     text::has_open_list_item_pair,
     twilio::has_open_twilio_cli_table,
 };
@@ -143,6 +145,7 @@ pub(crate) const MAX_LOOKBACK_LINES: usize = {
         confluent::PROPERTIES_LOOKBACK_LINES,
         keyword_gated_keys::MAX_HTTP_BLOCK_LINES,
         keyword_gated_keys::MAX_SIBLING_LINES,
+        scoped_context::SCOPED_LOOKBACK_LINES,
         // `has_open_list_item_pair_in` and `has_open_aws_secret_candidate_line_in`.
         1,
         2,

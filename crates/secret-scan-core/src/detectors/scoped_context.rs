@@ -15,6 +15,34 @@
 //! | Name | Carrier | Required context | Alias |
 //! | --- | --- | --- | --- |
 //! | `token_key` | quoted JSON member | none (the quoted member is the carrier) | `access_token` |
+//! | `encoded` | quoted JSON member | an `api_key` member within the sibling window | `api_key` |
+//!
+//! # The window
+//!
+//! A sibling line counts when it lies within [`JSON_WINDOW_LINES`] lines of the
+//! name's line (the same line always counts) and the text from the first of the
+//! two lines through the last is at most [`MAX_WINDOW_BYTES`] bytes. The rule
+//! reads only text, so a whole-input scan and an incremental session agree once
+//! the session holds the lines of a possible window: [`has_open_scoped_context_in`]
+//! is the retention hint that does it, true while a line that can open a window
+//! sits among the last lines. A sibling is any quoted member of the named
+//! partners, in the same object or a neighbouring one: the window is positional,
+//! not a parse, which keeps whole-input and incremental scans equal.
+
+use super::text;
+
+/// The most lines apart (the name's line included) a JSON sibling member may be:
+/// a partner on any of the next `JSON_WINDOW_LINES - 1` lines or the previous
+/// `JSON_WINDOW_LINES - 1` counts.
+pub(crate) const JSON_WINDOW_LINES: usize = 6;
+/// The most complete lines the retention hint reads back.
+pub(crate) const SCOPED_LOOKBACK_LINES: usize = JSON_WINDOW_LINES;
+/// The most bytes from the first line of a window through its last. A longer
+/// stretch is not a window, which also bounds what the session holds.
+pub(crate) const MAX_WINDOW_BYTES: usize = 2_048;
+
+/// JSON member names that can open or complete a sibling window.
+const JSON_TRIGGER_MEMBERS: &[&str] = &["api_key", "encoded"];
 
 /// What a scoped name is judged as, and the extra guard it carries.
 pub(super) struct ScopedRead {
@@ -24,6 +52,15 @@ pub(super) struct ScopedRead {
     /// `auth_token_key`) is a reference, not a value: the scoped name also
     /// names the storage key an application saves a token under.
     pub(super) name_phrase_is_reference: bool,
+}
+
+impl ScopedRead {
+    const fn alias(alias: &'static str) -> Self {
+        Self {
+            alias,
+            name_phrase_is_reference: false,
+        }
+    }
 }
 
 /// `true` when the name at `name_start..name_end` is a quoted JSON member name
@@ -47,6 +84,142 @@ pub(super) fn scoped_alias(
             alias: "access_token",
             name_phrase_is_reference: true,
         }),
+        "encoded"
+            if is_quoted_member(input, name_start, name_end)
+                && json_partner(input, name_start, &["api_key"]) =>
+        {
+            Some(ScopedRead::alias("api_key"))
+        }
         _ => None,
     }
+}
+
+// --- lines ---------------------------------------------------------------
+
+/// The line (`start`, `end`) holding byte `position`.
+fn line_around(input: &str, position: usize) -> (usize, usize) {
+    let start = text::line_start_before(input, position);
+    let end = text::line_end_from(input.as_bytes(), start)
+        .0
+        .min(input.len());
+    (start, end)
+}
+
+/// Calls `visit` with every line within `window - 1` lines of the line
+/// (`line_start`, `line_end`), above it first and then below it, nearest first
+/// on each side, whose span with that line is at most [`MAX_WINDOW_BYTES`];
+/// stops at the first line for which `visit` returns `true`.
+fn any_line_in_window(
+    input: &str,
+    (line_start, line_end): (usize, usize),
+    window: usize,
+    mut visit: impl FnMut(&str) -> bool,
+) -> bool {
+    let mut start = line_start;
+    for _ in 1..window {
+        let Some((above_start, above_end)) = text::previous_line(input, start) else {
+            break;
+        };
+        start = above_start;
+        if line_end - start > MAX_WINDOW_BYTES {
+            break;
+        }
+        if visit(&input[above_start..above_end]) {
+            return true;
+        }
+    }
+    let mut end = line_end;
+    for _ in 1..window {
+        let Some((below_start, below_end)) = text::next_line(input, end) else {
+            break;
+        };
+        end = below_end;
+        if end - line_start > MAX_WINDOW_BYTES {
+            break;
+        }
+        if visit(&input[below_start..below_end]) {
+            return true;
+        }
+    }
+    false
+}
+
+// --- JSON siblings ---------------------------------------------------------
+
+/// `true` when `line` holds a quoted JSON member named one of `names`
+/// (`"api_key":`, or the escaped `\"api_key\":`), with an `:` after it. Each
+/// name is searched for itself rather than by pairing quotes, so an enclosing
+/// quoted string (`"text": "{\"api_key\":...}"`) cannot shift the pairing.
+fn line_has_member(line: &str, names: &[&str]) -> bool {
+    let bytes = line.as_bytes();
+    names.iter().any(|name| {
+        line.match_indices(name).any(|(start, _)| {
+            let end = start + name.len();
+            if start == 0 || bytes[start - 1] != b'"' {
+                return false;
+            }
+            // The closing quote, plain or escaped.
+            let mut after = match (bytes.get(end), bytes.get(end + 1)) {
+                (Some(b'"'), _) => end + 1,
+                (Some(b'\\'), Some(b'"')) => end + 2,
+                _ => return false,
+            };
+            while bytes
+                .get(after)
+                .is_some_and(|&byte| matches!(byte, b' ' | b'\t'))
+            {
+                after += 1;
+            }
+            bytes.get(after) == Some(&b':')
+        })
+    })
+}
+
+/// `true` when a member named one of `partners` sits on the name's line or
+/// within the sibling window around it.
+fn json_partner(input: &str, name_start: usize, partners: &[&str]) -> bool {
+    let line = line_around(input, name_start);
+    line_has_member(&input[line.0..line.1], partners)
+        || any_line_in_window(input, line, JSON_WINDOW_LINES, |other| {
+            line_has_member(other, partners)
+        })
+}
+
+// --- the incremental retention hint --------------------------------------
+
+/// `true` when `line` can open a window: a trigger member, on a line short
+/// enough to be inside one.
+fn line_opens_window(line: &str) -> bool {
+    line.len() <= MAX_WINDOW_BYTES && line_has_member(line, JSON_TRIGGER_MEMBERS)
+}
+
+/// Internal retention hint (issues #1228 to #1230): `true` while the last
+/// complete lines of the unit hold a line that can open a [`scoped_alias`]
+/// window and fewer lines than the window have followed it, so a sibling member
+/// on a later line can still be read with it: some line among the last
+/// `JSON_WINDOW_LINES - 1` opens one and the text from it through the last line
+/// is within [`MAX_WINDOW_BYTES`]. The byte total counts line lengths only, which
+/// is at most the exact span, so the hint never releases a window the reader
+/// would still use. Holding a line that never pairs only delays its output by up
+/// to [`JSON_WINDOW_LINES`] lines.
+pub(crate) fn has_open_scoped_context_in(tail: &[&str]) -> bool {
+    let recent = text::tail_lines(tail, JSON_WINDOW_LINES - 1);
+    let mut total = 0usize;
+    // Newest first: the total grows towards the oldest candidate opener.
+    for line in recent.iter().rev() {
+        total += line.len();
+        if total > MAX_WINDOW_BYTES {
+            return false;
+        }
+        if line_opens_window(line) {
+            return true;
+        }
+    }
+    false
+}
+
+/// [`has_open_scoped_context_in`] over a [`super::lookback_tail`].
+#[cfg(test)]
+pub(crate) fn has_open_scoped_context(input: &str) -> bool {
+    has_open_scoped_context_in(&super::lookback_tail(input))
 }

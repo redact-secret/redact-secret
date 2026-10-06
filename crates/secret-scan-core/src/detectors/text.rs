@@ -59,7 +59,7 @@ pub(super) fn is_line_start(input: &str, pos: usize) -> bool {
 /// same lines whether it scans one unit or the whole input (issue #990).
 /// A `\r` that ends the input stays in its line, as it did before, so on
 /// input with only LF or CRLF line endings the lines are unchanged.
-fn line_end_from(bytes: &[u8], start: usize) -> (usize, usize) {
+pub(super) fn line_end_from(bytes: &[u8], start: usize) -> (usize, usize) {
     let mut at = start;
     while at < bytes.len() {
         match bytes[at] {
@@ -1397,7 +1397,7 @@ pub(super) fn for_each_long_run_line(input: &str, mut visit: impl FnMut(usize, u
 }
 
 /// The line ([`lines`]) after the one ending at `line_end`.
-fn next_line(input: &str, line_end: usize) -> Option<(usize, usize)> {
+pub(super) fn next_line(input: &str, line_end: usize) -> Option<(usize, usize)> {
     let bytes = input.as_bytes();
     let start = match bytes.get(line_end) {
         Some(b'\n') => line_end + 1,

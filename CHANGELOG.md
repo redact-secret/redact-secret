@@ -7,6 +7,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the Elastic cross-cluster `encoded` member (#1229):
+  in a create-cross-cluster-API-key response the `encoded` value (the base64 of
+  `id:api_key`, a complete credential) is a `contextual_secret`, high, `redact`,
+  exactly the value, whenever a quoted `api_key` member sits within five lines,
+  where only `api_key` was redacted and `encoded` stayed in the output. A scoped
+  reader with a bounded sibling window and an incremental retention hint, never
+  an `encoded` vocabulary name; the member alone stays unread (a recorded policy
+  limit). 0 false positives across 9,164 tracked files.
 - `generic-token` now reads the HubSpot `tokenKey` member (#1228): the value of
   a quoted `"tokenKey"` JSON member (the access-token-info request body) is a
   `contextual_secret`, high, `redact`, exactly the value, where it was silent. A
