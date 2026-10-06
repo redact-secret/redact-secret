@@ -24,7 +24,7 @@ always gives the same result.
 
 ## Quick start
 
-Every release so far is a beta. The newest published version is `0.1.0-beta.13`;
+Every release so far is a beta. The newest published version is `0.1.0-beta.14`;
 the stable `0.1.0` is not published yet. Pick your runtime, install, and redact
 one synthetic value in about five minutes:
 
@@ -33,7 +33,7 @@ one synthetic value in about five minutes:
 | JavaScript: Node.js 20, 22, 24, and browsers | `npm install @redact-secret/core@beta` | [Node.js](docs/quickstart.md#nodejs), [browser](docs/quickstart.md#browser-with-a-bundler) |
 | Python 3.10 or newer | `pip install --only-binary=:all: redact-secret` | [Python](docs/quickstart.md#python) |
 | Rust 1.88 or newer | `cargo add redact-secret` | [Rust](docs/quickstart.md#rust) |
-| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.13` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
+| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.14` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
 
 These install the newest beta. The [quickstart](docs/quickstart.md#which-version-you-get)
 pins an exact version, says what a bare install resolves today, and says what

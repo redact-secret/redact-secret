@@ -5,6 +5,12 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.14 — 2026-10-06
+
+### Support status
+
+92 providers, 173 credential families: stable 144, provisional 7, pending 5, unsupported 17. This is the matrix measured on the `0.1.0-beta.13` build; it is not refreshed for this version, so the eight detectors added below carry no status until their benchmarks arrival evidence lands. See the [support matrix](/docs/support-matrix.md).
+
 ### Added
 
 - Rust and CLI: explain and compare action policies over one detection pass
@@ -222,6 +228,14 @@ evidence is linked from each published version.
   `INVALID_POLICY_ACTION`. The whole-input WebAssembly call now reports
   `INVALID_POLICY_ACTION` too (#1219). A thrown exception and a non-string
   return stay `POLICY_FAILURE` on every runtime.
+- `generic-token` no longer reports Square documentation placeholders (#1236):
+  `SQUARE_ACCESS_TOKEN=EAAA-your-access-token`,
+  `SQUARE_ACCESS_TOKEN="EAAA<your-production-access-token>"` and
+  `client_secret: sandbox-sq0csb-<your-sandbox-application-secret>` were each a
+  high, `redact` `contextual_secret` over the whole value. A real `EAAA`,
+  `sq0csp-` or `sandbox-sq0csb-` value is still a Square finding, and a
+  placeholder glued to random material, an off-width random body and any other
+  uppercase lead keep their previous result.
 - `generic-token` no longer reports the instructional placeholder
   `YOUR_PASSWORD` (and `your-pwd-here`, `INSERT_PASSWORD`, `ENTER_YOUR_PASSPHRASE`,
   the `passwd` and `passphrase` forms) under a `password` name or any other
@@ -348,6 +362,36 @@ evidence is linked from each published version.
   process per tenant in Python, and per-call `actionPolicy` with
   `compareActionPolicies`. The decision lists the evidence that would reopen it.
   No code, API, finding or artifact changes.
+
+- Batch 2 product contracts (#1223, #1224, #1225, #1226, PR #1231,
+  `decision-keep-percent-containing-and-escaped-credential-representations-outside-the-raw-input-contract`).
+  Documentation and policy only. A percent-encoded or escaped credential form is
+  not decoded and the Bearer alphabet is not broadened; an Atlas
+  `database-user-password` keeps the current policy with its blind spots stated.
+  The class-level contracts and per-row dispositions are in
+  `docs/audits/evidence/{1223,1224,1225,1226}/README.md`.
+
+- Group C, D and E product contracts (#1228, #1229, #1230, PR #1243,
+  `decision-keep-credential-role-facts-out-of-detection-attribution-and-default-action`,
+  `decision-keep-credential-lifecycle-era-out-of-detection-and-preserve-backward-redaction`).
+  Documentation and policy only. A credential's role or confidentiality fact does
+  not select detection, attribution or the default action, and a retired
+  credential is detected like a current one. No detector, registry or type
+  changes.
+
+- The default reading of the OAuth 1.0 `oauth_token` is kept (#1241, PR #1242):
+  a random value stays a `contextual_secret`, redacted at high confidence over
+  exactly the value, like `access_token`; a low-entropy value is `medium` and
+  `warn`; a placeholder, reference, mask or empty value is silent. It is
+  recorded as an intentional policy deviation from the credential-evidence role,
+  which lists `oauth_token` as a public lookalike. Tests only, no behavior change.
+
+### Internal, tooling, and qualification
+
+- Dependencies: open Dependabot alerts and Scorecard pinning findings are fixed
+  (PR #1198), and four minor or patch updates are merged (PR #1243): `napi`
+  3.13.0 to 3.14.0 and `pyo3` 0.29.2 to 0.29.3 in the native bindings, plus
+  `@napi-rs/cli`, the npm tooling group and two GitHub Actions pins.
 
 ## 0.1.0-beta.13 — 2026-10-03
 

@@ -9,16 +9,16 @@ the supported runtimes, and how to build this checkout.
 ## Install a published release
 
 Every published release so far is a beta; the stable `0.1.0` is not published
-yet. The commands below install the newest published beta, `0.1.0-beta.13`.
+yet. The commands below install the newest published beta, `0.1.0-beta.14`.
 [Release status](releases/status.md) lists what the registries currently
 carry. Select the version explicitly and keep it in your application's
 dependency lockfile.
 
 ```bash
-npm install @redact-secret/core@0.1.0-beta.13
-python -m pip install redact-secret==0.1.0b13
-cargo add redact-secret@0.1.0-beta.13
-cargo install redact-secret-cli --version 0.1.0-beta.13 --locked
+npm install @redact-secret/core@0.1.0-beta.14
+python -m pip install redact-secret==0.1.0b14
+cargo add redact-secret@0.1.0-beta.14
+cargo install redact-secret-cli --version 0.1.0-beta.14 --locked
 ```
 
 Run only the command for your runtime. What an unpinned install gives you
