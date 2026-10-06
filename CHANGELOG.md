@@ -222,6 +222,17 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports the Batch 2 documentation placeholders that
+  name a product, service or scope (#1234 follow-up): `{"password":"YOUR_DB_PASSWORD"}`,
+  `YOUR_DATABASE_PASSWORD`, `YOUR_ATLAS_PASSWORD`, `YOUR_MONGODB_PASSWORD`,
+  `{"client_secret":"YOUR_ZOOM_CLIENT_SECRET"}`, `YOUR_SPOTIFY_ACCESS_TOKEN`,
+  `YOUR_HUBSPOT_PERSONAL_ACCESS_KEY`, `YOUR_PRIVATE_KEY` and `YOUR_PRIVATE_API_KEY`
+  were each a high, `redact` `contextual_secret` over the whole value, while
+  `YOUR_USER_PASSWORD` and `YOUR_APP_SECRET` were silent. A closed list of 21
+  service and scope words now joins the bare-value placeholder rule (a lead
+  word, whole listed words, a credential noun). A word off the list, a
+  placeholder glued to random material and a random value that
+  contains one of the words keep their previous result.
 - WebAssembly: a whole-input policy callback that returns a string other than
   `redact`, `block`, `warn` or `allow` failed with `POLICY_FAILURE`, while the
   Node addon and the incremental WebAssembly session reported
