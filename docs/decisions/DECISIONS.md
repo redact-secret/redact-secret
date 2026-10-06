@@ -16,6 +16,7 @@ Current rules: `docs/specs/detector-families.md`.
 - [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](2026-09-21-govern-bare-vendor-prefixed-policy-layer.md)
 - [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md)
 - [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](2026-09-24-redact-google-api-keys-inside-firebase-web-config.md)
+- [Keep a credential's lifecycle era out of detection and preserve backward redaction](2026-10-06-keep-credential-lifecycle-era-out-of-detection-and-preserve-backward-redaction.md)
 
 ## Contextual detection
 

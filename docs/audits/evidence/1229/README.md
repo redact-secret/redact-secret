@@ -28,7 +28,7 @@ evidence epic [credential-evidence#237](https://github.com/redact-secret/credent
 closed). Shared rules for the three groups (evidence classes, one origin per
 copied rule, the five kinds, preconditions) are in
 [#1228](../1228/README.md#disposition-kinds-and-the-rules-that-bind-every-row);
-siblings #1230 and Batch 2 [#1223](../1223/README.md).
+siblings [#1230](../1230/README.md) and Batch 2 [#1223](../1223/README.md).
 
 ## Sources
 
