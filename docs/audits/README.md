@@ -22,29 +22,20 @@ epic), and **evidence** (a single issue's record, `evidence/<issue>/`).
 ## Releases
 
 Start with the [beta.14 candidate public-contract review](beta14-candidate-public-contract-review.md).
-The [beta.12 candidate public-contract review](beta12-candidate-public-contract-review.md), the [beta.11](beta11-candidate-public-contract-review.md),
-[beta.10](beta10-candidate-public-contract-review.md) and
-[beta.9](beta9-candidate-public-contract-review.md) candidate public-contract reviews,
-the [beta.6 candidate public-contract review](beta6-candidate-public-contract-review.md),
-the [beta.5 release readiness review](beta5-release-readiness-review.md), the
-[beta.5](beta5-candidate-public-contract-review.md) and
-[beta.4](beta4-candidate-public-contract-review.md) candidate public-contract reviews, and the
-[beta.2 final code review](beta2-final-code-review.md) remain historical evidence.
+The [beta.12 candidate public-contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta12-candidate-public-contract-review.md), the [beta.11](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta11-candidate-public-contract-review.md),
+[beta.10](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta10-candidate-public-contract-review.md) and
+[beta.9](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta9-candidate-public-contract-review.md) candidate public-contract reviews,
+the [beta.6 candidate public-contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-candidate-public-contract-review.md),
+the [beta.5 release readiness review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-readiness-review.md), the
+[beta.5](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-candidate-public-contract-review.md) and
+[beta.4](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta4-candidate-public-contract-review.md) candidate public-contract reviews, and the
+[beta.2 final code review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta2-final-code-review.md) remain historical evidence.
 The earlier [local pre-release review](pre-release-code-and-docs-review.md)
 and [qualification follow-up](release-qualification-follow-up.md) describe beta.1.
 
 | Topic | Evidence |
 | --- | --- |
 | Beta.14 candidate identity and public contract | [Retained candidate review](beta14-candidate-public-contract-review.md) (the artifact inventory selects it by `candidate_version`) |
-| Beta.12 candidate identity and public contract | [Historical candidate review](beta12-candidate-public-contract-review.md) |
-| Beta.11 candidate identity and public contract | [Historical candidate review](beta11-candidate-public-contract-review.md) |
-| Beta.10 candidate identity and public contract | [Historical candidate review](beta10-candidate-public-contract-review.md) |
-| Beta.9 candidate identity and public contract | [Historical candidate review](beta9-candidate-public-contract-review.md) |
-| Beta.6 candidate identity and public contract | [Historical candidate review](beta6-candidate-public-contract-review.md) |
-| Beta.5 release readiness | [Pre-candidate review and fixes](beta5-release-readiness-review.md) |
-| Historical candidate identity and public contract | [Beta.5](beta5-candidate-public-contract-review.md), [beta.4](beta4-candidate-public-contract-review.md), [beta.1](candidate-public-contract-review.md) |
-| Beta.4 release readiness (#362) | [Release readiness review](beta4-release-readiness-review.md) |
-| Beta.2 final code review | [Historical evidence](beta2-final-code-review.md) |
 | Beta.1 local pre-release review | [Local review](pre-release-code-and-docs-review.md) |
 | Beta.1 qualification follow-up | [Follow-up](release-qualification-follow-up.md) |
 | Beta.2 final review reproduction probes | [Offline synthetic-input probes for issues #234–#238](evidence/beta2-final-review/README.md) |
@@ -55,8 +46,8 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Earlier release readiness | [Readiness audit](release-readiness-audit.md) |
 | Independent repeat audit (#145, top-level review) | [Revision-bound verdict and residual findings](repeated-release-readiness-audit.md) |
 | Release rehearsal coverage and the Reconcile Release exercise (#530) | [What the no-publication rehearsal covers, what it cannot, and the pending live Reconcile Release commands](release-rehearsal-coverage.md) |
-| Beta.5 release retrospective and v0.1.0 readiness criteria (#531) | [What failed, how each problem was resolved, what remains open](beta5-release-retrospective.md); checklist at [v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md) |
-| Beta.6 release retrospective (#615) | [What went well, what went wrong, what #614 fixed, what remains open](beta6-release-retrospective.md); release record at [0.1.0-beta.6](../releases/0.1.0-beta.6/README.md) |
+| Beta.5 release retrospective and v0.1.0 readiness criteria (#531) | [What failed, how each problem was resolved, what remains open](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-retrospective.md); checklist at [v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md) |
+| Beta.6 release retrospective (#615) | [What went well, what went wrong, what #614 fixed, what remains open](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-release-retrospective.md); release record at [0.1.0-beta.6](../releases/0.1.0-beta.6/README.md) |
 
 ## Epic close-outs
 

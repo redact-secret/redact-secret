@@ -14,7 +14,7 @@ explicit act under `AGENTS.md`'s "Release authority" section.
 ## Beta.5's three failure modes
 
 Recorded by [#526](https://github.com/redact-secret/redact-secret/issues/526)
-and the [beta.5 release readiness review](beta5-release-readiness-review.md):
+and the [beta.5 release readiness review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-readiness-review.md):
 
 1. **npm registry propagation delay reported as a publish failure.** Fixed by
    [#529](https://github.com/redact-secret/redact-secret/issues/529): every
@@ -61,7 +61,7 @@ that is possible without a real publish.
 ## Rehearsing at a throwaway unpublished version
 
 Added for issue [#632](https://github.com/redact-secret/redact-secret/issues/632),
-from item 1 of the [beta.6 release retrospective](beta6-release-retrospective.md).
+from item 1 of the [beta.6 release retrospective](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-release-retrospective.md).
 Until then the rehearsal qualified whatever version its branch carried, and on
 `main` that version is always already on every registry. Two beta.6 defects
 therefore surfaced only on the freshly bumped RC and cost two extra

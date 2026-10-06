@@ -1,7 +1,7 @@
 # Issue #144 — candidate identity and public-contract verification
 
 [Audit archive](../../README.md) · [Issue #144](https://github.com/redact-secret/redact-secret/issues/144) ·
-[Candidate public-contract review (beta.1)](../../candidate-public-contract-review.md)
+[Candidate public-contract review (beta.1)](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/candidate-public-contract-review.md)
 
 Recorded 2026-09-11 at commit `c34f4a8ad2634bc9c77cf64a9514a8ccc629d229`,
 `0.1.0-beta.1` development (`0.1.0b1` on PyPI). This is the raw

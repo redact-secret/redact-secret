@@ -1,6 +1,6 @@
 # Beta.2 final review — reproduction probes
 
-[Audit archive](../../README.md) · [Beta.2 final code review](../../beta2-final-code-review.md)
+[Audit archive](../../README.md) · [Beta.2 final code review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta2-final-code-review.md)
 
 Two offline, synthetic-input probes behind the parent review's confirmed
 findings for issues #234–#238. They report defects; they are not a CI pass
@@ -47,4 +47,4 @@ Requires PyYAML. Build the reviewed code first (`npm run js:build` and
 `cargo build -p redact-secret-node -p redact-secret-python --locked`); an
 old local binary with a matching version number is not evidence for the
 current source. Full invocation:
-`docs/audits/beta2-final-code-review.md`'s [Reproduction evidence](../../beta2-final-code-review.md#reproduction-evidence).
+`docs/audits/beta2-final-code-review.md`'s [Reproduction evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta2-final-code-review.md#reproduction-evidence).
