@@ -271,3 +271,42 @@ default and the per-row tables stand, and the rows remain conditional. The
 independent baseline for Group D (benchmarks
 [#753](https://github.com/redact-secret/redact-secret-benchmarks/issues/753)) was
 not checked again for this correction.
+
+## Round-1 measurement addendum: final dispositions of the measured rows
+
+The independent baseline of Group D ([benchmarks#753](https://github.com/redact-secret/redact-secret-benchmarks/issues/753),
+measured at core `e1284537`, report `<round1 report permalink pending>`) is the
+measurement this record's "baseline open" gate waited for. The dispositions follow
+its gap groups and nothing else; "fixed" means the product behaviour changed with
+a deterministic test and an evidence addendum, confirmed only by a replay at a
+commit carrying the fix, which has not run. No row is claimed covered, passing or
+ready by this addendum. Group D measured 219 positives (181 exact, 17 misses) and
+351 controls (23 flagged); the Elastic Serverless improvement of 22 cases over
+the published baseline is the Authorization `ApiKey` fix (core #1212), not this
+work.
+
+| Row | Measured | Disposition |
+| --- | --- | --- |
+| `algolia:admin-api-key`, `dropbox:app-auth-token`, `figma:plan-access-token`, `hubspot:static-auth-access-token`, `zoom:webhook-secret-token` | all positives exact or no positive; no control flagged | none |
+| `contentful:delivery-api-access-token` | no positive; 1 control flagged (`preview-url-no-token-query`) | a brace-placeholder control: the URL-template forms of the Case are silent after the [#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md), but the case text was not read, so the replay decides |
+| `elastic:cross-cluster-api-key` | 1 of 18 exact; 17 misses (the `encoded` member beside an exact `api_key`) | 16 fixed, a bounded sibling reader ([addendum](addendum-elastic-encoded-member.md)); `encoded-member-only` (1 case) **policy-limited**: reading a lone `encoded` needs a bare name or a decoding, which the product does not do |
+| `elastic:serverless-project-api-key` | 22 of 22 exact | fixed earlier by #1212; none here |
+| `meta:app-access-token` | 21 positives fully covered, none exact (the whole pipe pair); 12 controls flagged (brace placeholders) | over-wide pair: **deliberate policy deviation**, below; brace placeholders: fixed ([#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `meta:instagram-app-secret` | 21 exact; 9 controls flagged (`access_token={short-lived-access-token}` placeholders beside the secret slot) | fixed ([#1234 addendum](../1234/addendum-brace-angle-mask-placeholders.md)) |
+| `zoom:build-platform-api-key` | 27 exact; 1 control flagged (`ZOOM_API_KEY` as a quoted value) | fixed (a quoted variable name in its own slot, same addendum) |
+| the 14 rows with no positive | observed only | no scored claim; no change |
+
+### Deliberate policy deviation from the Case (not a product defect)
+
+* **The Meta `APP_ID|SECRET` composite is redacted whole** (decision 4 of this
+  record). The Case `meta-app-secret-in-app-id-pipe-access-token` expects the part
+  after the pipe only; the product reports one finding over the whole pair, the
+  public app id included, in a query, a form, a JSON member and a Bearer header.
+  Basis: no source states a composite grammar, and the whole span cannot leave the
+  secret half readable; none of the 21 measured pipe cases has an uncovered byte.
+  Product: unchanged. Benchmarks: score on full coverage, or freeze the whole pair
+  as the expected span; not a false negative. credential-evidence: restate the
+  extent, or record the narrower span as a role expectation the product does not
+  follow.
+
+No pin, version or release change.
