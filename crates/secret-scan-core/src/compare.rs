@@ -402,8 +402,9 @@ impl ActionComparison {
 /// Runs detection once over `input` and evaluates every policy in `policies`
 /// on the same finalized findings, under the default [`WholeInputLimits`].
 ///
-/// See the [module documentation](self) for what a comparison covers and what
-/// it does not.
+/// A comparison covers the finalized findings only: it never reruns detection,
+/// never reports an overlap loser or a suppressed alternative, and never edits
+/// the input.
 ///
 /// # Examples
 ///
