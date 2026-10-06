@@ -106,6 +106,36 @@ cancelled and have no deadline; the limits above are the only bounds. See
 [Completeness of `Ok`](../reference/api-contract.md#completeness-of-ok) and
 [Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
 
+## Action policy
+
+`load_action_policy` parses a declarative action policy document
+(`actionPolicyRevision: 1`, see the [action policy guide](action-policy.md))
+into an `ActionPolicy`. The value is immutable, `Clone`, `Send` and `Sync`, and
+is both a `Policy` and an `IncrementalPolicy`, so it goes anywhere a callback
+does without restating the default table:
+
+```rust
+use redact_secret::{Action, DetectorRegistry, load_action_policy, scan};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let policy = load_action_policy(
+        br#"{"actionPolicyRevision":1,"base":"default","rules":[
+            {"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#,
+    )?;
+    let registry = DetectorRegistry::with_built_in([])?;
+    let findings = scan("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", &registry, &policy)?;
+    assert_eq!(findings[0].action(), Action::Warn);
+    Ok(())
+}
+```
+
+A rejected document is an `ActionPolicyError`: its `code()` is always
+`SecretScanErrorCode::InvalidActionPolicy`, `class()` is one of 17 fixed
+`ActionPolicyErrorClass` values, and `rule_index()` is the zero-based index of
+the rule being read (`None` for a document-level violation). No error carries a
+byte of the document. Loading never partially succeeds, and evaluation never
+fails, so an `ActionPolicy` never reports `POLICY_FAILURE`.
+
 ## Request-wide placeholder numbering
 
 Every call numbers its placeholders from 1, so scanning the string leaves of

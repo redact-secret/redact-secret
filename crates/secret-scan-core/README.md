@@ -110,6 +110,7 @@ documentation, inside a function that returns `Result`.)
 | Profiles | `Profile` |
 | PII selection | `PiiSelection` |
 | Declarative rulesets | `load_ruleset`, `RulesetError`, `RulesetErrorClass` |
+| Declarative action policy | `load_action_policy`, `ActionPolicy`, `ActionPolicyError`, `ActionPolicyErrorClass`, `MAX_ACTION_POLICY_BYTES` |
 | Identifiers and units | `is_identifier`, `MAX_IDENTIFIER_LENGTH`, `RANGE_UNIT`, `VERSION` |
 | Detector building blocks | `shannon_entropy` |
 

@@ -7,6 +7,23 @@ evidence is linked from each published version.
 
 ### Added
 
+- Rust and CLI: a versioned declarative action policy (#1219,
+  `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+  `load_action_policy` parses a JSON document (`actionPolicyRevision: 1`, at most
+  64 KiB and 128 ordered rules) into an immutable, `Clone`, `Send + Sync`
+  `ActionPolicy` that is both a `Policy` and an `IncrementalPolicy`. The first
+  rule whose `type`, `detector`, `confidence` and `obfuscation` sets match picks
+  `redact`, `block`, `warn`, `allow` or `default`; an unmatched finding takes
+  the running artifact's own default action, computed at evaluation time and
+  never copied into the document. A rejected document is an
+  `ActionPolicyError` with the new code `INVALID_ACTION_POLICY` (the code count
+  is 23), one of 17 fixed `ActionPolicyErrorClass` values and the zero-based
+  rule index; no error carries a document byte. The CLI gains
+  `--action-policy <path>` in check and redact mode, with a path or standard
+  input; check mode still exits 1 on any finding. The root name count is 60.
+  Node, WebAssembly, Python and JavaScript surfaces follow in the same issue.
+  Existing no-policy results are unchanged.
+
 - `status()` in `@redact-secret/core` (root and `./common`) and
   `redact_secret.status()` in Python report whether the binding is initialized
   and its public activation, without loading, initializing or reconfiguring

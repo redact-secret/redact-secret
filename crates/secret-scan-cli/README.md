@@ -20,8 +20,8 @@ which does not carry the opt-in PII families (see the
 [detection reference](https://github.com/redact-secret/redact-secret/blob/main/docs/reference/detection.md#opt-in-pii-availability-is-not-support)).
 
 ```text
-usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
-       redact-secret --redact [--ruleset <path>] [--pii <selector>]... [--] [<path>]
+usage: redact-secret [--json] [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>...]
+       redact-secret --redact [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>]
        redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h
@@ -31,8 +31,13 @@ usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<pa
 explicit path source; standard input accepts none.
 A ruleset detection has medium confidence, so the default policy only warns
 about it: check mode reports it, and `--redact --ruleset` runs but leaves
-ruleset matches in the output unchanged. The CLI has no policy hook to change
-that; see the [rulesets guide](../../docs/guides/rulesets.md#default-action).
+ruleset matches in the output unchanged. `--action-policy <path>` changes that:
+it loads a declarative action policy (a JSON document of ordered rules) in
+either mode, with a path or standard input, and the first matching rule picks
+`redact`, `block`, `warn` or `allow` while an unmatched finding keeps its default
+action. A rejected policy fails the run with exit 2 and `INVALID_ACTION_POLICY`
+before any source is scanned. Check mode still exits 1 on any finding; see the
+[rulesets guide](../../docs/guides/rulesets.md#default-action).
 
 PII selectors are opt-in and repeatable. The activation-print form exits
 without opening input. `pii` closes over the context-required

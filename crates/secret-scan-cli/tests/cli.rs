@@ -1149,3 +1149,488 @@ fn a_closed_downstream_pipe_fails_the_run_instead_of_hanging() {
     assert!(run.stderr.contains("WRITE_FAILED"));
     run.leaks_nothing();
 }
+
+// --- action policy -------------------------------------------------------
+
+/// An action policy that allows one built-in type and leaves everything else
+/// to the default (issue #1219,
+/// `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+const ALLOW_GITHUB_POLICY: &str = r#"{"actionPolicyRevision":1,"base":"default","rules":[
+  {"id":"allow-github","match":{"type":["github_token"]},"action":"allow"}]}"#;
+
+#[test]
+fn an_action_policy_changes_the_action_of_the_findings_it_matches_and_check_still_exits_one() {
+    let scratch = Scratch::new();
+    let policy = scratch.write("policy.json", ALLOW_GITHUB_POLICY);
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+
+    let default = run(&[&source], b"");
+    assert_eq!(default.code, 1);
+    assert!(default.stdout.contains("action=redact"));
+
+    let overlaid = run(&[Path::new("--action-policy"), &policy, &source], b"");
+    // The finding still exists, so check mode keeps its rule: any finding is
+    // exit 1, whatever its action.
+    assert_eq!(overlaid.code, 1);
+    assert!(overlaid.stdout.contains("github_token"));
+    assert!(overlaid.stdout.contains("action=allow"));
+    overlaid.leaks_nothing();
+    assert!(overlaid.stderr.contains("1 finding(s)"));
+}
+
+#[test]
+fn an_action_policy_leaves_unmatched_findings_at_the_default() {
+    let scratch = Scratch::new();
+    let policy = scratch.write("policy.json", ALLOW_GITHUB_POLICY);
+    let source = scratch.write("secret.env", &format!("AWS_KEY={SYNTHETIC_AWS_KEY}\n"));
+
+    let default = run(&[&source], b"");
+    let overlaid = run(&[Path::new("--action-policy"), &policy, &source], b"");
+    assert_eq!(overlaid.code, default.code);
+    assert_eq!(overlaid.stdout, default.stdout);
+}
+
+#[test]
+fn an_action_policy_in_redact_mode_replaces_only_redact_and_block_spans() {
+    let scratch = Scratch::new();
+    let input = format!("API_KEY={SYNTHETIC_TOKEN}\nAWS_KEY={SYNTHETIC_AWS_KEY}\n");
+    let source = scratch.write("secret.env", &input);
+    let allow = scratch.write("allow.json", ALLOW_GITHUB_POLICY);
+    let warn = scratch.write(
+        "warn.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[
+          {"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#,
+    );
+    let block = scratch.write(
+        "block.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[
+          {"id":"block-github","match":{"type":["github_token"]},"action":"block"}]}"#,
+    );
+
+    for (name, policy, github_replaced) in [
+        ("allow", &allow, false),
+        ("warn", &warn, false),
+        ("block", &block, true),
+    ] {
+        let run = run(
+            &[
+                Path::new("--redact"),
+                Path::new("--action-policy"),
+                policy,
+                &source,
+            ],
+            b"",
+        );
+        assert_eq!(run.code, 0, "{name}: redaction exits 0");
+        assert_eq!(
+            run.stdout.contains(SYNTHETIC_TOKEN),
+            !github_replaced,
+            "{name}"
+        );
+        assert!(
+            !run.stdout.contains(SYNTHETIC_AWS_KEY),
+            "{name}: the AWS key keeps its default"
+        );
+        assert!(run.stdout.contains("<SECRET_"), "{name}");
+        assert_eq!(
+            fs::read_to_string(&source).unwrap(),
+            input,
+            "{name}: input untouched"
+        );
+    }
+}
+
+#[test]
+fn an_action_policy_applies_to_a_streamed_standard_input_in_both_modes() {
+    let scratch = Scratch::new();
+    let policy = scratch.write("policy.json", ALLOW_GITHUB_POLICY);
+    let input = format!("API_KEY={SYNTHETIC_TOKEN}\nAWS_KEY={SYNTHETIC_AWS_KEY}\n");
+
+    let checked = run(
+        &[Path::new("--json"), Path::new("--action-policy"), &policy],
+        input.as_bytes(),
+    );
+    assert_eq!(checked.code, 1);
+    assert!(checked.stdout.contains("\"action\": \"allow\""));
+    assert!(checked.stdout.contains("\"action\": \"redact\""));
+
+    let redacted = run(
+        &[Path::new("--redact"), Path::new("--action-policy"), &policy],
+        input.as_bytes(),
+    );
+    assert_eq!(redacted.code, 0);
+    assert!(
+        redacted.stdout.contains(SYNTHETIC_TOKEN),
+        "allowed text stays"
+    );
+    assert!(!redacted.stdout.contains(SYNTHETIC_AWS_KEY));
+    assert!(redacted.stdout.contains("AWS_KEY=<SECRET_1>"));
+}
+
+#[test]
+fn an_action_policy_raises_a_ruleset_detection_with_one_rule() {
+    // A ruleset detection warns by default (medium confidence); one rule makes
+    // it redact, without restating any default.
+    let scratch = Scratch::new();
+    let ruleset = scratch.write("rules.txt", RULESET_FIXTURE);
+    let policy = scratch.write(
+        "policy.json",
+        r#"{"actionPolicyRevision":1,"base":"default","rules":[
+          {"id":"redact-acme","match":{"type":["acme-internal-token"]},"action":"redact"}]}"#,
+    );
+    let input = format!("TOKEN=ACME_{}\n", "a".repeat(20));
+    let source = scratch.write("secret.env", &input);
+
+    let run = run(
+        &[
+            Path::new("--redact"),
+            Path::new("--ruleset"),
+            &ruleset,
+            Path::new("--action-policy"),
+            &policy,
+            &source,
+        ],
+        b"",
+    );
+    assert_eq!(run.code, 0);
+    assert_eq!(run.stdout, "TOKEN=<SECRET_1>\n");
+}
+
+#[test]
+fn a_rejected_action_policy_fails_the_whole_run_before_any_source_is_scanned() {
+    let scratch = Scratch::new();
+    let canary = "s3cr3t-policy-canary-marker";
+    let policy = scratch.write(
+        "policy.json",
+        &format!(
+            r#"{{"actionPolicyRevision":1,"base":"default","rules":[
+              {{"id":"ok","match":{{"type":["jwt"]}},"action":"warn"}},
+              {{"id":"bad","match":{{"{canary}":["jwt"]}},"action":"warn"}}]}}"#
+        ),
+    );
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+
+    for args in [
+        vec![Path::new("--action-policy"), &policy, &source],
+        vec![
+            Path::new("--redact"),
+            Path::new("--action-policy"),
+            &policy,
+            &source,
+        ],
+    ] {
+        let run = run(&args, b"");
+        assert_eq!(run.code, 2);
+        assert_eq!(
+            run.stdout, "",
+            "a source is never scanned once the policy is rejected"
+        );
+        assert!(run.stderr.contains("INVALID_ACTION_POLICY"));
+        assert!(run.stderr.contains("class=UNKNOWN_FIELD"));
+        assert!(run.stderr.contains("rule_index=1"));
+        assert!(!run.stderr.contains(canary));
+        run.leaks_nothing();
+    }
+
+    // A rejected policy also fails a run whose source would be standard input.
+    let run = run(
+        &[Path::new("--action-policy"), &policy],
+        format!("API_KEY={SYNTHETIC_TOKEN}\n").as_bytes(),
+    );
+    assert_eq!(run.code, 2);
+    assert_eq!(run.stdout, "");
+    assert!(run.stderr.contains("INVALID_ACTION_POLICY"));
+}
+
+#[test]
+fn a_document_level_rejection_reports_its_class_and_no_rule_index() {
+    let scratch = Scratch::new();
+    let source = scratch.write("secret.env", "clean\n");
+    for (name, contents, class) in [
+        (
+            "revision",
+            r#"{"actionPolicyRevision":2,"base":"default","rules":[]}"#,
+            "UNKNOWN_REVISION",
+        ),
+        (
+            "syntax",
+            r#"{"actionPolicyRevision":1,"base":"default","rules":[],}"#,
+            "MALFORMED_DOCUMENT",
+        ),
+        (
+            "base",
+            r#"{"actionPolicyRevision":1,"base":"allow","rules":[]}"#,
+            "UNKNOWN_BASE",
+        ),
+        ("empty", "", "MALFORMED_DOCUMENT"),
+    ] {
+        let policy = scratch.write(&format!("{name}.json"), contents);
+        let run = run(&[Path::new("--action-policy"), &policy, &source], b"");
+        assert_eq!(run.code, 2, "{name}");
+        assert!(run.stderr.contains("INVALID_ACTION_POLICY"), "{name}");
+        assert!(
+            run.stderr.contains(&format!("class={class}")),
+            "{name}: {}",
+            run.stderr
+        );
+        assert!(!run.stderr.contains("rule_index"), "{name}");
+        assert_eq!(run.stdout, "", "{name}");
+    }
+}
+
+#[test]
+fn an_invalid_utf8_policy_file_is_malformed_without_quoting_it() {
+    let scratch = Scratch::new();
+    let policy = scratch.write_bytes("policy.json", &[0xff, 0xfe, b'{', b'}']);
+    let source = scratch.write("secret.env", "clean\n");
+    let run = run(&[Path::new("--action-policy"), &policy, &source], b"");
+    assert_eq!(run.code, 2);
+    assert!(run.stderr.contains("class=MALFORMED_DOCUMENT"));
+}
+
+#[test]
+fn an_oversized_policy_file_is_rejected_by_the_core_after_a_bounded_read() {
+    let scratch = Scratch::new();
+    let source = scratch.write("secret.env", "clean\n");
+    // One byte over the bound, and a file hundreds of times the bound: both are
+    // the core's `ACTION_POLICY_TOO_LARGE`, and the CLI never reads past the
+    // bound plus one byte.
+    for size in [65_537_usize, 40 * 1024 * 1024] {
+        let mut contents = br#"{"actionPolicyRevision":1,"base":"default","rules":[]}"#.to_vec();
+        contents.resize(size, b' ');
+        let policy = scratch.write_bytes("big.json", &contents);
+        let run = run(&[Path::new("--action-policy"), &policy, &source], b"");
+        assert_eq!(run.code, 2, "{size}");
+        assert!(
+            run.stderr.contains("class=ACTION_POLICY_TOO_LARGE"),
+            "{size}: {}",
+            run.stderr
+        );
+    }
+    // Exactly at the bound loads.
+    let mut contents = br#"{"actionPolicyRevision":1,"base":"default","rules":[]}"#.to_vec();
+    contents.resize(65_536, b' ');
+    let policy = scratch.write_bytes("edge.json", &contents);
+    let run = run(&[Path::new("--action-policy"), &policy, &source], b"");
+    assert_eq!(run.code, 0);
+}
+
+#[test]
+fn a_missing_or_unreadable_policy_file_fails_closed_with_a_fixed_code() {
+    let scratch = Scratch::new();
+    let source = scratch.write("secret.env", "clean\n");
+    let missing = scratch.root.join("does-not-exist.json");
+    let run_missing = run(&[Path::new("--action-policy"), &missing, &source], b"");
+    assert_eq!(run_missing.code, 2);
+    assert!(run_missing.stderr.contains("READ_FAILED"));
+    assert!(!run_missing.stderr.contains("does-not-exist"));
+
+    // A directory opens but cannot be read as a file.
+    let directory = scratch.root.clone();
+    let run_directory = run(&[Path::new("--action-policy"), &directory, &source], b"");
+    assert_eq!(run_directory.code, 2);
+    assert!(run_directory.stderr.contains("READ_FAILED"));
+}
+
+#[test]
+fn action_policy_usage_failures_are_fixed_and_name_no_argument() {
+    let missing = run_args(&["--action-policy"], b"");
+    assert_eq!(missing.code, 2);
+    assert!(
+        missing
+            .stderr
+            .contains("--action-policy requires a path argument")
+    );
+
+    let repeated = run_args(
+        &["--action-policy", "a.json", "--action-policy", "b.json"],
+        b"",
+    );
+    assert_eq!(repeated.code, 2);
+    assert!(
+        repeated
+            .stderr
+            .contains("--action-policy may be given at most once")
+    );
+    assert!(!repeated.stderr.contains("a.json"));
+
+    let standalone = run_args(
+        &["--print-pii-activation", "--action-policy", "a.json"],
+        b"",
+    );
+    assert_eq!(standalone.code, 2);
+    assert!(standalone.stderr.contains("USAGE"));
+}
+
+#[test]
+fn help_documents_the_action_policy_option() {
+    let help = run_args(&["--help"], b"");
+    assert!(help.stdout.contains("--action-policy <path>"));
+    assert!(help.stdout.contains("INVALID_ACTION_POLICY"));
+    assert!(help.stdout.contains("65536"));
+}
+
+// --- action policy: the shared conformance fixture, end to end -----------
+
+const ACTION_POLICY_FIXTURE: &str =
+    include_str!("../../../conformance/fixtures/action-policy-v1.json");
+
+/// One finding of a `--json` report: `(type, detector, confidence,
+/// obfuscation, start, end, action)`.
+type ReportedFinding = (String, String, String, String, u64, u64, String);
+
+/// The findings the JSON report lists for its one source, in report order.
+fn json_findings(stdout: &str) -> Vec<ReportedFinding> {
+    let report: serde_json::Value = serde_json::from_str(stdout).expect("the report is JSON");
+    report["sources"][0]["findings"]
+        .as_array()
+        .expect("the report lists findings")
+        .iter()
+        .map(|finding| {
+            let text = |key: &str| finding[key].as_str().expect(key).to_owned();
+            (
+                text("type"),
+                text("detector"),
+                text("confidence"),
+                text("obfuscation"),
+                finding["start"].as_u64().expect("start"),
+                finding["end"].as_u64().expect("end"),
+                text("action"),
+            )
+        })
+        .collect()
+}
+
+/// The sanitized text for `input` given its findings as `(start, end, action)`
+/// in input order: redact and block spans become numbered placeholders; warn
+/// and allow spans stay and take no number.
+fn sanitized_text(input: &str, spans: &[(usize, usize, String)]) -> String {
+    let mut text = String::new();
+    let mut cursor = 0;
+    let mut number = 0_usize;
+    for (start, end, action) in spans {
+        if action == "redact" || action == "block" {
+            number += 1;
+            text.push_str(&input[cursor..*start]);
+            text.push_str("<SECRET_");
+            text.push_str(&number.to_string());
+            text.push('>');
+            cursor = *end;
+        }
+    }
+    text.push_str(&input[cursor..]);
+    text
+}
+
+#[test]
+fn the_cli_runs_every_end_to_end_case_of_the_shared_fixture() {
+    let fixture: serde_json::Value = serde_json::from_str(ACTION_POLICY_FIXTURE).unwrap();
+    let end_to_end = &fixture["endToEnd"];
+    let cases = end_to_end["cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 5);
+    let scratch = Scratch::new();
+    let ruleset = scratch.write("ruleset.txt", end_to_end["ruleset"].as_str().unwrap());
+
+    for case in cases {
+        let id = case["id"].as_str().unwrap();
+        let document = match &case["policy"] {
+            serde_json::Value::String(name) => fixture["policies"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|policy| policy["id"].as_str() == Some(name))
+                .map(|policy| policy["document"].clone())
+                .unwrap(),
+            inline => inline.clone(),
+        };
+        let policy = scratch.write(
+            &format!("{id}.json"),
+            &serde_json::to_string(&document).unwrap(),
+        );
+        let input = case["input"].as_str().unwrap();
+        let source = scratch.write(&format!("{id}.txt"), input);
+        let uses_ruleset = case["useRuleset"].as_bool() == Some(true);
+
+        let mut with_policy: Vec<&Path> = vec![Path::new("--json")];
+        let mut without_policy: Vec<&Path> = vec![Path::new("--json")];
+        if uses_ruleset {
+            with_policy.extend([Path::new("--ruleset"), ruleset.as_path()]);
+            without_policy.extend([Path::new("--ruleset"), ruleset.as_path()]);
+        }
+        with_policy.extend([Path::new("--action-policy"), policy.as_path()]);
+        with_policy.push(source.as_path());
+        without_policy.push(source.as_path());
+
+        // `base` resolves to what the same input yields with no policy at all.
+        let baseline = json_findings(&run(&without_policy, b"").stdout);
+        let actual = run(&with_policy, b"");
+        assert_eq!(actual.code, 1, "{id}: any finding exits 1");
+        let findings = json_findings(&actual.stdout);
+        let expected = case["expectedFindings"].as_array().unwrap();
+        assert_eq!(findings.len(), expected.len(), "{id}");
+
+        let mut spans = Vec::new();
+        for (index, want) in expected.iter().enumerate() {
+            let got = &findings[index];
+            let text = |key: &str| want[key].as_str().unwrap().to_owned();
+            assert_eq!(got.0, text("type"), "{id}");
+            assert_eq!(got.1, text("detector"), "{id}");
+            assert_eq!(got.2, text("confidence"), "{id}");
+            assert_eq!(got.3, text("obfuscation"), "{id}");
+            assert_eq!(got.4, want["start"].as_u64().unwrap(), "{id}");
+            assert_eq!(got.5, want["end"].as_u64().unwrap(), "{id}");
+            let want_action = match want["expectedAction"].as_str().unwrap() {
+                "base" => baseline[index].6.clone(),
+                other => other.to_owned(),
+            };
+            assert_eq!(got.6, want_action, "{id}");
+            spans.push((
+                usize::try_from(got.4).unwrap(),
+                usize::try_from(got.5).unwrap(),
+                got.6.clone(),
+            ));
+        }
+
+        let expected_text = sanitized_text(input, &spans);
+
+        let mut redact_args: Vec<&Path> = vec![Path::new("--redact")];
+        if uses_ruleset {
+            redact_args.extend([Path::new("--ruleset"), ruleset.as_path()]);
+        }
+        redact_args.extend([
+            Path::new("--action-policy"),
+            policy.as_path(),
+            source.as_path(),
+        ]);
+        let redacted = run(&redact_args, b"");
+        assert_eq!(redacted.code, 0, "{id}");
+        assert_eq!(redacted.stdout, expected_text, "{id}: file redaction");
+
+        if case["alsoIncremental"].as_bool() == Some(true) {
+            let streamed = run(
+                &[
+                    Path::new("--redact"),
+                    Path::new("--action-policy"),
+                    policy.as_path(),
+                ],
+                input.as_bytes(),
+            );
+            assert_eq!(streamed.code, 0, "{id}");
+            assert_eq!(streamed.stdout, expected_text, "{id}: streamed redaction");
+
+            let streamed_check = run(
+                &[
+                    Path::new("--json"),
+                    Path::new("--action-policy"),
+                    policy.as_path(),
+                ],
+                input.as_bytes(),
+            );
+            let streamed_findings = json_findings(&streamed_check.stdout);
+            assert_eq!(streamed_findings.len(), expected.len(), "{id}");
+            for (streamed, file) in streamed_findings.iter().zip(&findings) {
+                assert_eq!(streamed, file, "{id}: stdin and file agree");
+            }
+        }
+    }
+}

@@ -62,6 +62,7 @@
 //! | Custom detectors | [`Detector`], [`Candidate`], [`DetectorContext`], [`DetectorRegistry`], [`RegisteredDetector`] |
 //! | Thread-shareable built-in registry | [`BuiltInRegistry`] |
 //! | Declarative rulesets | [`load_ruleset`], [`RulesetError`], [`RulesetErrorClass`] |
+//! | Declarative action policy | [`load_action_policy`], [`ActionPolicy`], [`ActionPolicyError`], [`ActionPolicyErrorClass`], [`MAX_ACTION_POLICY_BYTES`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
@@ -130,6 +131,7 @@
 #![deny(missing_docs)]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 
+mod action_policy;
 mod detectors;
 mod entropy;
 mod error;
@@ -154,6 +156,10 @@ mod ruleset;
 mod structured_validators;
 mod types;
 
+pub use action_policy::{
+    ActionPolicy, ActionPolicyError, ActionPolicyErrorClass, MAX_ACTION_POLICY_BYTES,
+    load_action_policy,
+};
 pub use entropy::shannon_entropy;
 pub use error::{
     DetectorFailure, FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode,

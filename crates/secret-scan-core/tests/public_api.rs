@@ -23,17 +23,17 @@
 mod support;
 
 use redact_secret::{
-    Action, BuiltInRegistry, ByteRange, Candidate, Confidence, DEFAULT_MAX_FINDINGS,
-    DEFAULT_MAX_INPUT_BYTES, DefaultPolicy, DetectedFinding, Detector, DetectorContext,
-    DetectorFailure, DetectorRegistry, Finding, FormatterFailure, IncrementalLimits,
-    IncrementalPolicy, IncrementalPolicyContext, IncrementalResult, IncrementalSanitizer,
-    MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH, Obfuscation, PiiSelection, PlaceholderContext,
-    PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile, RANGE_UNIT,
-    RegisteredDetector, RulesetError, RulesetErrorClass, ScanResult, SecretScanError,
-    SecretScanErrorCode, SessionState, Specificity, VERSION, WholeInputLimits,
-    default_placeholder_formatter, is_identifier, load_ruleset, redact, redact_with_limits,
-    run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
-    shannon_entropy, typed_placeholder_formatter,
+    Action, ActionPolicy, ActionPolicyError, ActionPolicyErrorClass, BuiltInRegistry, ByteRange,
+    Candidate, Confidence, DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, DefaultPolicy,
+    DetectedFinding, Detector, DetectorContext, DetectorFailure, DetectorRegistry, Finding,
+    FormatterFailure, IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext,
+    IncrementalResult, IncrementalSanitizer, MAX_ACTION_POLICY_BYTES, MAX_IDENTIFIER_LENGTH,
+    MAX_PLACEHOLDER_LENGTH, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter,
+    Policy, PolicyContext, PolicyFailure, Profile, RANGE_UNIT, RegisteredDetector, RulesetError,
+    RulesetErrorClass, ScanResult, SecretScanError, SecretScanErrorCode, SessionState, Specificity,
+    VERSION, WholeInputLimits, default_placeholder_formatter, is_identifier, load_action_policy,
+    load_ruleset, redact, redact_with_limits, run_detector_pipeline, scan, scan_and_redact,
+    scan_and_redact_with_limits, scan_with_limits, shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -498,6 +498,72 @@ fn a_ruleset_detector_cannot_claim_a_specificity_reserved_to_built_ins() {
 // ---------------------------------------------------------------------------
 // incremental session
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// declarative action policy (issue #1219,
+// decision-define-the-versioned-declarative-action-policy-and-default-overlay)
+// ---------------------------------------------------------------------------
+
+const ACTION_POLICY: &[u8] = br#"{"actionPolicyRevision":1,"base":"default","rules":[
+    {"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#;
+
+#[test]
+fn an_action_policy_is_a_policy_and_an_incremental_policy_and_is_shareable() {
+    fn shareable<T: Clone + Send + Sync + 'static>(_: &T) {}
+
+    let policy: ActionPolicy = load_action_policy(ACTION_POLICY).unwrap();
+    shareable(&policy);
+
+    // Whole input: one rule changes one type; the default decides the rest.
+    let findings = scan(FIXTURE, &registry(), &policy).unwrap();
+    assert_eq!(findings[0].action(), Action::Warn);
+    let unchanged = scan(FIXTURE, &registry(), &DefaultPolicy).unwrap();
+    assert_eq!(unchanged[0].action(), Action::Redact);
+
+    // Incremental: the same value is also an `IncrementalPolicy`, and a
+    // clone is an independent handle on the same rules.
+    let limits = IncrementalLimits::new(
+        1 << 20,
+        IncrementalLimits::minimum_buffered_bytes(1 << 16, 1 << 16),
+        1 << 16,
+        1 << 16,
+    )
+    .unwrap();
+    let boxed: Box<dyn IncrementalPolicy> = Box::new(policy.clone());
+    let mut session = IncrementalSanitizer::with_policy_and_formatter(
+        limits,
+        boxed,
+        Box::new(default_placeholder_formatter),
+    )
+    .unwrap();
+    let mut text = session.append(FIXTURE).unwrap().text().to_owned();
+    text.push_str(session.finalize().unwrap().text());
+    assert_eq!(text, FIXTURE, "a warned finding leaves the text unchanged");
+}
+
+#[test]
+fn load_action_policy_rejects_with_the_fixed_code_class_and_rule_index() {
+    let result: Result<ActionPolicy, ActionPolicyError> = load_action_policy(
+        br#"{"actionPolicyRevision":1,"base":"default","rules":[
+            {"id":"r","match":{"type":["jwt"]},"action":"warn"},
+            {"id":"r","match":{"type":["jwt"]},"action":"warn"}]}"#,
+    );
+    let Err(error) = result else {
+        panic!("expected the repeated rule id to be rejected");
+    };
+    assert_eq!(error.code(), SecretScanErrorCode::InvalidActionPolicy);
+    assert_eq!(error.class(), ActionPolicyErrorClass::DuplicateRuleId);
+    assert_eq!(error.rule_index(), Some(1));
+    assert_eq!(error.message(), "The supplied action policy is invalid.");
+    assert_eq!(error.to_string(), error.message());
+    assert_eq!(ActionPolicyErrorClass::ALL.len(), 17);
+    assert_eq!(MAX_ACTION_POLICY_BYTES, 65_536);
+    let oversized = vec![b' '; MAX_ACTION_POLICY_BYTES + 1];
+    assert_eq!(
+        load_action_policy(&oversized).unwrap_err().class(),
+        ActionPolicyErrorClass::ActionPolicyTooLarge
+    );
+}
 
 #[test]
 fn an_incremental_session_reproduces_the_whole_input_reference() {

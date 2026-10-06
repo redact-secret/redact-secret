@@ -37,7 +37,7 @@ use std::env;
 use std::io::{self, BufWriter, Write};
 use std::process::ExitCode;
 
-use redact_secret::{RANGE_UNIT, VERSION};
+use redact_secret::{MAX_ACTION_POLICY_BYTES, RANGE_UNIT, VERSION};
 
 use args::{Command, Format};
 use failure::Failure;
@@ -45,8 +45,8 @@ use limits::{MAX_BUFFERED_BYTES, MAX_INPUT_BYTES, MAX_MULTILINE_BYTES, MAX_TOKEN
 
 /// The short usage block printed with a rejected command line.
 const USAGE: &str = "\
-usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
-       redact-secret --redact [--ruleset <path>] [--pii <selector>]... [--] [<path>]
+usage: redact-secret [--json] [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>...]
+       redact-secret --redact [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>]
        redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h";
@@ -127,6 +127,7 @@ where
             sources,
             format,
             ruleset,
+            action_policy,
             selectors,
         } => {
             let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
@@ -135,7 +136,17 @@ where
                 .as_deref()
                 .map(modes::load_ruleset_file)
                 .transpose()?;
-            let report = modes::check(&sources, stdin, ruleset.as_deref(), &selection);
+            let action_policy = action_policy
+                .as_deref()
+                .map(modes::load_action_policy_file)
+                .transpose()?;
+            let report = modes::check(
+                &sources,
+                stdin,
+                ruleset.as_deref(),
+                action_policy.as_ref(),
+                &selection,
+            );
             let written = match format {
                 Format::Text => report.write_text(stdout, stderr),
                 Format::Json => report.write_json(stdout),
@@ -158,6 +169,7 @@ where
         Command::Redact {
             source,
             ruleset,
+            action_policy,
             selectors,
         } => {
             let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
@@ -166,7 +178,18 @@ where
                 .as_deref()
                 .map(modes::load_ruleset_file)
                 .transpose()?;
-            modes::redact(&source, stdin, stdout, ruleset.as_deref(), &selection)?;
+            let action_policy = action_policy
+                .as_deref()
+                .map(modes::load_action_policy_file)
+                .transpose()?;
+            modes::redact(
+                &source,
+                stdin,
+                stdout,
+                ruleset.as_deref(),
+                action_policy.as_ref(),
+                &selection,
+            )?;
             Ok(Outcome::Clean)
         }
     }
@@ -181,12 +204,20 @@ fn write_line(out: &mut dyn Write, text: &str) -> Result<(), Failure> {
 /// Reporting a failure cannot itself fail the run any further: the exit code
 /// is already 2, and there is no other channel left to complain on.
 fn report_failure(stderr: &mut dyn Write, failure: Failure) {
-    let _ = writeln!(
-        stderr,
-        "redact-secret: {}: {}",
-        failure.code(),
-        failure.message()
-    );
+    let _ = match failure.detail() {
+        Some(detail) => writeln!(
+            stderr,
+            "redact-secret: {}: {} ({detail})",
+            failure.code(),
+            failure.message()
+        ),
+        None => writeln!(
+            stderr,
+            "redact-secret: {}: {}",
+            failure.code(),
+            failure.message()
+        ),
+    };
     if matches!(failure, Failure::Usage(_)) {
         let _ = writeln!(stderr, "{USAGE}");
     }
@@ -239,6 +270,19 @@ redact mode
   Standard input is sanitized as it streams, so a failure part way through
   leaves the text written so far on standard output. That prefix is sanitized,
   but it is not the whole input: check the exit code before using the output.
+
+--action-policy <path>
+                  Available in both modes, with a path or standard input.
+                  Loads a declarative action policy (a JSON document,
+                  actionPolicyRevision 1, at most {MAX_ACTION_POLICY_BYTES} bytes) from <path> and
+                  applies it to every finding in place of the default policy:
+                  the first matching rule picks redact, block, warn or allow,
+                  and a finding no rule matches keeps the default action. A
+                  rejected policy fails the whole run with INVALID_ACTION_POLICY
+                  and its fixed class, and the zero-based rule index when the
+                  violation is inside a rule, before any source is scanned.
+                  Check mode still exits 1 when any finding exists, whatever
+                  its action; redact mode replaces only redact and block spans.
 
 exit codes
   0  check: every source was scanned and nothing was found

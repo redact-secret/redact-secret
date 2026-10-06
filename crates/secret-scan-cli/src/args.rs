@@ -8,8 +8,9 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 use crate::failure::{
-    Failure, JSON_WITH_REDACT, PII_MISSING_SELECTOR, PRINT_PII_STANDALONE, REDACT_ONE_PATH,
-    RULESET_MISSING_PATH, RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
+    ACTION_POLICY_MISSING_PATH, ACTION_POLICY_REPEATED, Failure, JSON_WITH_REDACT,
+    PII_MISSING_SELECTOR, PRINT_PII_STANDALONE, REDACT_ONE_PATH, RULESET_MISSING_PATH,
+    RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
 };
 
 /// The identity standard input reports as in a check report.
@@ -64,6 +65,8 @@ pub enum Command {
         format: Format,
         /// The path `--ruleset` named, if any.
         ruleset: Option<PathBuf>,
+        /// The path `--action-policy` named, if any.
+        action_policy: Option<PathBuf>,
         /// Repeatable PII selectors.
         selectors: Vec<String>,
     },
@@ -73,6 +76,8 @@ pub enum Command {
         source: Source,
         /// The path `--ruleset` named, if any.
         ruleset: Option<PathBuf>,
+        /// The path `--action-policy` named, if any.
+        action_policy: Option<PathBuf>,
         /// Repeatable PII selectors.
         selectors: Vec<String>,
     },
@@ -85,8 +90,9 @@ pub enum Command {
 /// Returns [`Failure::Usage`] for an unrecognized option, for `--help` or
 /// `--version` alongside another argument, for `--json` with `--redact`, for
 /// `--redact` with more than one path, for `--ruleset` given more than once
-/// or with no path following it, and for `--ruleset` with no explicit file
-/// path (standard input's incremental session accepts no custom detector).
+/// or with no path following it, for `--ruleset` with no explicit file
+/// path (standard input's incremental session accepts no custom detector), and
+/// for `--action-policy` given more than once or with no path following it.
 pub fn parse<I>(args: I) -> Result<Command, Failure>
 where
     I: IntoIterator<Item = OsString>,
@@ -104,6 +110,7 @@ where
     let mut json = false;
     let mut paths_only = false;
     let mut ruleset: Option<PathBuf> = None;
+    let mut action_policy: Option<PathBuf> = None;
     let mut selectors = Vec::new();
     let mut print_pii_activation = false;
     let mut paths: Vec<PathBuf> = Vec::new();
@@ -131,6 +138,14 @@ where
                     return Err(Failure::Usage(RULESET_REPEATED));
                 }
             }
+            Some("--action-policy") => {
+                let path = args
+                    .next()
+                    .ok_or(Failure::Usage(ACTION_POLICY_MISSING_PATH))?;
+                if action_policy.replace(PathBuf::from(path)).is_some() {
+                    return Err(Failure::Usage(ACTION_POLICY_REPEATED));
+                }
+            }
             Some("--help" | "-h" | "--version" | "-V") => {
                 return Err(Failure::Usage(SOLE_OPTION));
             }
@@ -139,7 +154,7 @@ where
     }
 
     if print_pii_activation {
-        if redact || json || ruleset.is_some() || !paths.is_empty() {
+        if redact || json || ruleset.is_some() || action_policy.is_some() || !paths.is_empty() {
             return Err(Failure::Usage(PRINT_PII_STANDALONE));
         }
         return Ok(Command::PiiActivation { selectors });
@@ -159,6 +174,7 @@ where
         return Ok(Command::Redact {
             source,
             ruleset,
+            action_policy,
             selectors,
         });
     }
@@ -176,6 +192,7 @@ where
         sources,
         format,
         ruleset,
+        action_policy,
         selectors,
     })
 }
@@ -200,6 +217,7 @@ mod tests {
                 sources: vec![Source::Stdin],
                 format: Format::Text,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -213,6 +231,7 @@ mod tests {
                 sources: vec![file("b.txt"), file("a.txt")],
                 format: Format::Text,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -226,6 +245,7 @@ mod tests {
                 sources: vec![file("a.txt")],
                 format: Format::Json,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -238,6 +258,7 @@ mod tests {
             Command::Redact {
                 source: Source::Stdin,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -246,6 +267,7 @@ mod tests {
             Command::Redact {
                 source: file("a.txt"),
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -259,6 +281,7 @@ mod tests {
                 sources: vec![file("--json")],
                 format: Format::Text,
                 ruleset: None,
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -272,6 +295,7 @@ mod tests {
                 sources: vec![file("a.txt")],
                 format: Format::Text,
                 ruleset: Some(PathBuf::from("rules.txt")),
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -280,6 +304,7 @@ mod tests {
             Command::Redact {
                 source: file("a.txt"),
                 ruleset: Some(PathBuf::from("rules.txt")),
+                action_policy: None,
                 selectors: Vec::new(),
             }
         );
@@ -306,6 +331,72 @@ mod tests {
         assert_eq!(
             parse_args(&["--ruleset", "a.txt", "--ruleset", "b.txt", "c.txt"]),
             Err(Failure::Usage(RULESET_REPEATED))
+        );
+    }
+
+    #[test]
+    fn action_policy_names_a_path_alongside_any_source_in_either_mode() {
+        assert_eq!(
+            parse_args(&["--action-policy", "p.json", "a.txt"]).unwrap(),
+            Command::Check {
+                sources: vec![file("a.txt")],
+                format: Format::Text,
+                ruleset: None,
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+        assert_eq!(
+            parse_args(&["--action-policy", "p.json"]).unwrap(),
+            Command::Check {
+                sources: vec![Source::Stdin],
+                format: Format::Text,
+                ruleset: None,
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+        assert_eq!(
+            parse_args(&["--redact", "--action-policy", "p.json"]).unwrap(),
+            Command::Redact {
+                source: Source::Stdin,
+                ruleset: None,
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+        assert_eq!(
+            parse_args(&[
+                "--redact",
+                "--ruleset",
+                "r.txt",
+                "--action-policy",
+                "p.json",
+                "a.txt"
+            ])
+            .unwrap(),
+            Command::Redact {
+                source: file("a.txt"),
+                ruleset: Some(PathBuf::from("r.txt")),
+                action_policy: Some(PathBuf::from("p.json")),
+                selectors: Vec::new(),
+            }
+        );
+    }
+
+    #[test]
+    fn action_policy_rejects_a_missing_value_and_a_repeated_flag() {
+        assert_eq!(
+            parse_args(&["--action-policy"]),
+            Err(Failure::Usage(ACTION_POLICY_MISSING_PATH))
+        );
+        assert_eq!(
+            parse_args(&["--action-policy", "a.json", "--action-policy", "b.json"]),
+            Err(Failure::Usage(ACTION_POLICY_REPEATED))
+        );
+        assert_eq!(
+            parse_args(&["--print-pii-activation", "--action-policy", "a.json"]),
+            Err(Failure::Usage(PRINT_PII_STANDALONE))
         );
     }
 
