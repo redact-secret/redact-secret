@@ -49,15 +49,17 @@ a false-positive and false-negative statement, and neighbouring-name controls
 never derived from a credential's label ("personal access key", "API token").
 [#1233](../1233/README.md) applies the rule to the HubSpot CLI field once the evidence named it (the evidence caveat: the field name rests on HubSpot's own SDK source, and the legacy `portals` layout is unresolved).
 
-**`oauth_token` is not adopted as an exclusion.** The evidence handoff lists
-`oauth_token` among the public lookalikes of the secret half. The product's
-accepted default reads a prefixed `_token` name as a credential (the #702 rule,
-`oauth_token` named in the `auth_token` row of the contextual spec), so a random
-value under `oauth_token` is `contextual_secret`, redacted, and a low-entropy one
-is `warn`. This contract does not change that and asserts nothing for
-`oauth_token` as part of the secret-half row; an evidence control that expects
-`oauth_token` to stay clean contradicts the accepted default and needs its own
-product decision, proposed as an expectation correction, not assumed.
+**`oauth_token` is read by the accepted default (decided in
+[#1241](../1241/README.md)).** The evidence handoff lists `oauth_token` among the
+public lookalikes of the secret half. The product's accepted default reads a
+prefixed `_token` name as a credential (the #702 rule, `oauth_token` named in the
+`auth_token` row of the contextual spec), so a random value under `oauth_token` is
+`contextual_secret`, redacted, and a low-entropy one is `warn`. [#1241](../1241/README.md)
+keeps this as an intentional policy deviation from the evidence role (option A):
+the evidence role is a factual claim, the redaction is a product policy, a pairing
+rule would add false negatives, and the default is security first. This contract
+asserts nothing for `oauth_token` as part of the secret-half row, and the expectation
+for the benchmarks side is `policy: redacted`, not an expected-clean value.
 
 ## Product observations
 
@@ -166,10 +168,10 @@ confidence and warn at medium, no HubSpot attribution; `portalId`, `authType`,
 `personalAccessKeyId`, `...ExpiresAt`, placeholders, references and masks silent),
 with the SDK-source caveat and the unresolved legacy `portals` layout observed and
 not scored; and the MyJFrog Bearer expectation, validated. `oauth_token` is
-outside the secret-half row: it is not an expected clean value, and the evidence
-control that lists it as a public lookalike is an expectation correction for the
-benchmarks side, as the Result states, not a product change (recorded as already
-noted in #1225's comment, behaviour unchanged).
+outside the secret-half row: it is not an expected clean value. [#1241](../1241/README.md)
+decided that the product keeps redacting it (`policy: redacted`), so the evidence
+control that lists it as a public lookalike is a recorded policy deviation, not a
+product change and not a false positive; the expectation to freeze is stated there.
 
 **What the benchmarks side replays (open).** Build the merge commit of this
 change (the maintainer names it; not chosen here) as the fixed candidate (`npm
@@ -206,7 +208,7 @@ No pin, version or release changes; this record chooses none.
   blind spot, instead of broadening to `*key` and redacting benign configuration.
 * Reading `oauth_token` as a credential redacts a value the provider may treat
   as public. That is the security-first default of the prefixed `_token` rule and
-  is kept.
+  is kept by decision ([#1241](../1241/README.md)).
 * The secret half is read by name only; the same bytes in another field, an SDK
   positional argument or a split literal are not read.
 
