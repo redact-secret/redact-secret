@@ -1580,6 +1580,36 @@ step. The per-row dispositions are in each evidence record.
 | `mongodb-atlas:programmatic-api-private-key` (G6) | The private key is the client's Digest input, not a PEM and not in the Digest `Authorization` header, which carries a hash that stays silent with `username`, `realm`, `nonce` and `cnonce`. No layout is asserted until the evidence names a plaintext slot; a reviewed slot then falls under the existing field grammar (`private_key` is already a high-signal name), `contextual_secret`, exactly the value, with no width, alphabet or prefix claim. The 8-character public key, the credential object id and a masked later response are controls. A curl `--user <public>:<private> --digest` layout is not read and is a disclosed blind spot. | [#1226](../audits/evidence/1226/README.md) |
 | `mongodb-atlas:service-account-secret` (G6) | The secret is opaque. In its reviewed `Authorization: Basic` layout it is `authorization_credential` over the whole encoded envelope, never decoded and covering the public client id half, always redacted; a `client_secret`-style field, where a reviewed layout names one, is `contextual_secret` over the value. `mdb_sa_sk_` is only a truncated example, so no prefix detector is added and a bare value outside a slot is not read; the public `mdb_sa_id_` client id, a masked or truncated display and the secret's object id are controls. | [#1226](../audits/evidence/1226/README.md) |
 
+## Groups C, D and E conditional contracts (#1228 to #1230)
+
+Three conditional product contracts for the 43 rows that remained after Batch 1
+and Batch 2 in the credential-evidence adoption inventory
+([#231](https://github.com/redact-secret/credential-evidence/issues/231); Group
+C 11 rows, Group D 23, Group E 9). Each row states, per class of rows, what the
+product does once a row's reviewed carrier layout and an independent baseline
+exist, and what stays outside the contract. The evidence side is done (epics
+[#236](https://github.com/redact-secret/credential-evidence/issues/236),
+[#237](https://github.com/redact-secret/credential-evidence/issues/237) and
+[#238](https://github.com/redact-secret/credential-evidence/issues/238), handoffs
+read at `522e0795`), but every contract it describes is a draft and the independent
+baselines (benchmarks
+[#752](https://github.com/redact-secret/redact-secret-benchmarks/issues/752),
+[#753](https://github.com/redact-secret/redact-secret-benchmarks/issues/753) and
+[#754](https://github.com/redact-secret/redact-secret-benchmarks/issues/754)) do
+not exist, so no row is claimed covered, passing or ready, and no expectation is
+taken from current output or scanner majority. Every row applies existing
+policy: none adds a provider detector, a registry entry, a bare-prefix grammar,
+decoding, a width or alphabet claim, a vocabulary name or a provider subtype
+from a shared carrier. Unresolved properties stay unresolved and an unresolved
+row is not support.
+
+| Class | Applied rule | Evidence |
+| --- | --- | --- |
+| Group C evidence classes (11 rows) | A fact is frozen under the class the handoff gave it: provider-documented, SDK source, scanner-derived (consistency only) or project policy. A distinctive prefix alone does not prove every following body; tools that copied one rule are one origin; provider statements of opacity and variable length (Airtable, Dropbox) constrain and are never overridden by a scanner width. No new bare detector is adopted, so a bare provider-shaped value of an unproven grammar is silent, a stated and unassertable limit and not a miss. A row's carrier and its bare value carry separate dispositions. | [#1228](../audits/evidence/1228/README.md) |
+| Adobe client secrets (3 rows) | The S2S and Enterprise `client_secret` form or query parameter is `contextual_secret` over exactly the value, ending at its delimiter, with the client id, scope and `org_id` outside; the Web App `Authorization: Basic` envelope is `authorization_credential` over the whole undecoded value, public client id included. All three redact by default (`warn` at medium for the field), with no Adobe type: `p8e-` rests on two rule artifacts of unstated basis that name no credential type, and subtype attribution is a Group D question. | [#1228](../audits/evidence/1228/README.md) |
+| Airtable PAT, Dropbox access token, HubSpot private-app token (3 rows) | The documented slots (Bearer header; `access_token` response member) are read generically at any length, so the provider's opaque and variable-length statements are never narrowed by a tool width. The `pat` ID and 64-hex layout, the `sl.` ranges and `pat-na1-` are context hints only; a bare value is silent. HubSpot private-app and static-auth are not merged and carry no HubSpot attribution (the Group D mapping); a `tokenKey` field is a candidate whole-name entry only if a baseline separates it from other uses. | [#1228](../audits/evidence/1228/README.md) |
+| Contentful CMA token, JFrog reference token, Meta app secret, Salesforce refresh token, X consumer secret (5 rows) | Lexical conflicts are recorded per page or artifact, never as a compromise union: JFrog 64 versus 128, Salesforce 80 versus 40, X 50 versus 35 to 44, Contentful 43 versus at least 40 versus 64 hex, Meta a 32-character value that collides with digests. Only documented slots are read generically (Contentful Bearer; Meta `client_secret`; Salesforce `refresh_token`, a token-endpoint field and not a resource Bearer credential); the JFrog header and X consumer secret have no read layout yet and nothing is asserted for them. | [#1228](../audits/evidence/1228/README.md) |
+
 ## Rules
 
 | Rule | Governing ADR |
