@@ -497,6 +497,16 @@ const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
     "xai",
 ];
 
+/// The password-family nouns an instructional placeholder may name
+/// (`YOUR_PASSWORD`, `enter-your-passphrase`). Issue #1234. Kept apart from
+/// [`PLACEHOLDER_CREDENTIAL_WORDS`] on purpose: only the bare-value rule
+/// [`is_instructional_token_placeholder`], which needs a lead word, reads
+/// this list, so `placeholder-password` or `my` + `password` (a common weak
+/// real password) and the glued and vendor-prefixed rules keep their
+/// behavior. FN cost: a real password spelled exactly as a lead word plus
+/// these nouns (`your_password`), which no issuer generates.
+const PLACEHOLDER_PASSWORD_WORDS: &[&str] = &["password", "passwd", "pwd", "passphrase"];
+
 /// `true` for a [`PLACEHOLDER_CREDENTIAL_WORDS`] entry, case-insensitively.
 pub(super) fn is_placeholder_credential_word(word: &str) -> bool {
     PLACEHOLDER_CREDENTIAL_WORDS
@@ -738,12 +748,14 @@ pub(super) fn is_instructional_token_placeholder(value: &str) -> bool {
     let mut count = 0usize;
     for word in words {
         if !is_listed(word, PLACEHOLDER_CREDENTIAL_WORDS)
+            && !is_listed(word, PLACEHOLDER_PASSWORD_WORDS)
             && !is_listed(word, PLACEHOLDER_LEAD_WORDS)
             && !is_placeholder_provider_word(word)
         {
             return false;
         }
-        saw_noun |= is_listed(word, PLACEHOLDER_CREDENTIAL_NOUNS);
+        saw_noun |= is_listed(word, PLACEHOLDER_CREDENTIAL_NOUNS)
+            || is_listed(word, PLACEHOLDER_PASSWORD_WORDS);
         count += 1;
     }
     count > 0 && saw_noun

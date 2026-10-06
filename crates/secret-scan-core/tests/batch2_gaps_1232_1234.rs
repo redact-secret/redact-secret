@@ -278,3 +278,88 @@ fn hubspot_public_config_placeholders_references_masks_and_lookalikes_stay_clean
         assert_clean(&input);
     }
 }
+// ------------------------------------ #1234 YOUR_PASSWORD under a password
+
+#[test]
+fn a_your_password_placeholder_under_a_password_name_is_silent() {
+    for name in [
+        "password",
+        "passwd",
+        "pwd",
+        "passphrase",
+        "db_password",
+        "DB_PASSWORD",
+    ] {
+        for placeholder in [
+            "YOUR_PASSWORD",
+            "your_password",
+            "YOUR-PASSWORD",
+            "your-pwd-here",
+            "YOUR_PASSWD",
+            "YOUR_PASSPHRASE",
+            "INSERT_PASSWORD",
+            "ENTER_YOUR_PASSWORD",
+            "PASTE_YOUR_PASSWORD_HERE",
+            "REPLACE_WITH_YOUR_PASSWORD",
+            "your_database_password",
+            "YOUR_API_KEY",
+            "YOUR_ACCESS_TOKEN",
+            "YOUR_CLIENT_SECRET",
+        ] {
+            for input in [
+                format!("{{\"{name}\":\"{placeholder}\"}}"),
+                format!("{name}={placeholder}"),
+                format!("{name}: {placeholder}\n"),
+                format!("{name} = \"{placeholder}\"\r\n"),
+            ] {
+                // `your_database_password` carries the unlisted word
+                // `database`, so it is the documented one-word-off case.
+                if placeholder == "your_database_password" {
+                    continue;
+                }
+                assert_clean(&input);
+            }
+        }
+    }
+}
+
+#[test]
+fn the_benchmark_password_member_document_reports_nothing() {
+    // `mongodb-atlas:database-user-password:r2:password-member-placeholders`.
+    assert_clean("{\"password\":\"YOUR_PASSWORD\",\"username\":\"dbUser\"}");
+    assert_clean("{\"password\":\"<password>\"}");
+    assert_clean("{\"password\":\"YOUR_PASSWORD\",\"other\":\"<password>\"}\n");
+}
+
+#[test]
+fn password_real_values_short_values_and_glued_placeholders_keep_their_policy() {
+    // A real value is still reported.
+    let findings = findings_with_parity(&format!("password={SHORT_PASSWORD}"));
+    assert_eq!(findings.len(), 1, "{findings:?}");
+    assert_eq!(findings[0].action(), Action::Warn);
+    assert_value(&format!("password={VALUE}"), VALUE);
+    // A short password stays below the 8-byte floor, as before (#817).
+    assert_clean("password=hunter2");
+    // A placeholder glued to random material, a digit, or one extra letter
+    // is not the placeholder and stays reported.
+    for input in [
+        "password=YOUR_PASSWORD9f2cK7mQx",
+        "password=YOUR_PASSWORD9",
+        "password=YOUR_PASSWORDx",
+        "password=YOUR_PASSWORD_9f2cK7mQx",
+        "password=your_password_for_staging",
+        "password=YOUR_PASS",
+    ] {
+        let findings = findings_with_parity(input);
+        assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+        assert_eq!(
+            (findings[0].range().start(), findings[0].range().end()),
+            (9, input.len()),
+            "{input:?}"
+        );
+    }
+    // A bare weak password that merely looks like a lead word plus a noun
+    // without a separator stays reported, as before.
+    let findings = findings_with_parity("password=mypassword");
+    assert_eq!(findings.len(), 1, "{findings:?}");
+}

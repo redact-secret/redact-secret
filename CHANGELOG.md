@@ -85,6 +85,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports the instructional placeholder
+  `YOUR_PASSWORD` (and `your-pwd-here`, `INSERT_PASSWORD`, `ENTER_YOUR_PASSPHRASE`,
+  the `passwd` and `passphrase` forms) under a `password` name or any other
+  contextual name (#1234). `{"password":"YOUR_PASSWORD"}` was a medium `warn`
+  while `"password":"<password>"`, `YOUR_ACCESS_TOKEN` and `YOUR_CLIENT_SECRET`
+  were silent. A placeholder glued to random material, a digit or a letter, a
+  placeholder with an unlisted word (`YOUR_DB_PASSWORD`), a real password and a
+  short password keep their previous result.
 - `generic-token` redacts the HubSpot CLI personal access key: the
   `personalAccessKey` field of an account entry in `~/.hscli/config.yml` and the
   `HUBSPOT_PERSONAL_ACCESS_KEY` environment variable (YAML, quoted, CRLF,
