@@ -1741,13 +1741,69 @@ fn brace_group_len(bytes: &[u8]) -> Option<usize> {
     None
 }
 
+/// The length of the second half of a pipe composite when it is a placeholder,
+/// a mask, empty or a reference (issue #1234, round-2 residual): a brace group,
+/// an `<...>` placeholder (no nested bracket, at most
+/// [`MAX_BRACE_PLACEHOLDER_NAME_LEN`] bytes), a run of three or more `*` or
+/// bullets, a `${NAME}` or `$NAME` reference, or nothing (the composite ends
+/// or a value boundary follows). Any other second half is a real-shaped value
+/// and makes the composite a value.
+fn placeholder_half_len(bytes: &[u8]) -> Option<usize> {
+    if let Some(len) = brace_group_len(bytes) {
+        return Some(len);
+    }
+    let boundary = |at: usize| bytes.get(at).is_none_or(|b| !b.is_ascii_alphanumeric());
+    match bytes.first() {
+        None => Some(0),
+        Some(b'<') => {
+            let limit = bytes.len().min(MAX_BRACE_PLACEHOLDER_NAME_LEN + 2);
+            let close = bytes[1..limit]
+                .iter()
+                .position(|&b| matches!(b, b'>' | b'<'))?;
+            (bytes[1 + close] == b'>' && close > 0).then_some(close + 2)
+        }
+        Some(b'*') => {
+            let run = bytes.iter().take_while(|&&b| b == b'*').count();
+            (run >= 3 && boundary(run)).then_some(run)
+        }
+        Some(0xE2) => {
+            let bullet = "\u{2022}".as_bytes();
+            let mut run = 0usize;
+            while bytes.get(run * 3..run * 3 + 3) == Some(bullet) {
+                run += 1;
+            }
+            (run >= 3 && boundary(run * 3)).then_some(run * 3)
+        }
+        Some(b'$') => {
+            let (start, close) = if bytes.get(1) == Some(&b'{') {
+                (2, true)
+            } else {
+                (1, false)
+            };
+            let name = bytes[start..]
+                .iter()
+                .take_while(|b| b.is_ascii_alphanumeric() || **b == b'_')
+                .count();
+            let end = start + name;
+            if name == 0 || (close && bytes.get(end) != Some(&b'}')) {
+                return None;
+            }
+            Some(end + usize::from(close))
+        }
+        Some(&byte) if is_query_value_stop(byte) => Some(0),
+        Some(_) => None,
+    }
+}
+
 /// The length of the brace placeholder at the start of `bytes`: one
 /// [`brace_group_len`] group, or two joined by `|` or `:` (the documented
-/// app-id and app-secret template `{your-app_id}|{your-app_secret}`).
+/// app-id and app-secret template `{your-app_id}|{your-app_secret}`), or a
+/// group joined to any other placeholder half ([`placeholder_half_len`]):
+/// `{your-app_id}|<APP_SECRET>`, `{your-app_id}|********`, `{your-app_id}|`.
 fn brace_placeholder_len(bytes: &[u8]) -> Option<usize> {
     let first = brace_group_len(bytes)?;
     if matches!(bytes.get(first), Some(b'|' | b':'))
-        && let Some(second) = brace_group_len(&bytes[first + 1..])
+        && let Some(second) = placeholder_half_len(&bytes[first + 1..])
     {
         return Some(first + 1 + second);
     }

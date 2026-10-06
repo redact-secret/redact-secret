@@ -102,3 +102,27 @@ silent and the random `CFPAT-` body, a long-head ellipsis and a glued
 placeholder reported; quoted variable names silent only in their own slot. Every
 input runs whole, in 7-byte chunks and in 1-byte chunks with equal text and
 findings.
+
+## Round-2 residual: a pipe composite with a non-brace half
+
+The round-2 replay found 12 controls (`meta:app-secret` 4, `meta:app-access-token`
+8) still reported as the 12-byte `{your-app_id` (`warn`): the brace rule above
+accepted a pair only when both halves were brace groups, so
+`{your-app_id}|<APP_SECRET>`, `{your-app_id}|********` and a brace app id with
+an empty or reference second half fell back to the plain scan, which ends at the
+first `}`.
+
+Each half of the composite is now evaluated (`placeholder_half_len`): after a
+brace group and `|` or `:`, the second half may be a brace group, an `<...>`
+placeholder (at most 48 bytes, no nested bracket), a run of three or more `*` or
+bullets, a `${NAME}` or `$NAME` reference, or empty. When every half is one of
+these the whole composite is silent; any other second half (random material, a
+glued suffix after a placeholder, a mask under three characters) is a real-shaped
+value and the existing finding stays, with the span rules unchanged (the
+whole-composite decision of the Group D record is kept). A real app id before a
+placeholder secret is not a brace composite and stays reported.
+
+Tradeoff: false positive removed, the placeholder composite; false negative added,
+a real secret that is exactly a `<...>` group, a mask or a reference after a
+brace-wrapped letters-only app id, which no issuer generates. Tests:
+`tests/placeholder_pipe_composite_1234.rs` (2 tests, whole, 7-byte and 1-byte).

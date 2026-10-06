@@ -7,6 +7,10 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports a pipe composite whose halves are all
+  placeholders (#1234): `access_token={your-app_id}|<APP_SECRET>`, `|********`,
+  `|${META_APP_SECRET}` or an empty second half was the 12-byte `{your-app_id`
+  `warn`. Each half is evaluated; a real-shaped half keeps the finding.
 - `generic-token` no longer reports `YOUR_<the slot's own name>` placeholders
   (#1230): `?hapikey=YOUR_HAPIKEY` was a `warn` once `hapikey` became a readable
   name. A lead word followed by the slot's own name words is silent under every
