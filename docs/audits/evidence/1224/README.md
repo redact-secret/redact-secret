@@ -5,7 +5,7 @@ representation decision) was tested by the independent benchmarks#739 round 2
 against the published `0.1.0-beta.13` and the candidate `a148dadf`. No gap was
 reproduced and no code changes for this package. `elastic:cloud-api-key` and
 `elastic:ece-api-key` fail on the published baseline and pass on the candidate
-through the Batch 1 `Authorization: ApiKey` fix ([#1212](../1212/README.md)),
+through the Batch 1 `Authorization: ApiKey` fix ([#1212](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1212/README.md)),
 reused. `jfrog:access-token` and `x:app-only-bearer-token` are existing coverage
 validated by the benchmark; the X percent-containing and escaped forms stay an
 accepted policy limit, observed and not scored, with a redacted prefix never
@@ -29,7 +29,7 @@ decision is
 | --- | --- |
 | Provider facts (pending inputs) | The four proposed contracts of credential-evidence#235 and the [Batch 2 handoff](https://github.com/redact-secret/credential-evidence/blob/005a7331cf90403bd4ce4abcb93bd8b085d315a9/docs/handoffs/batch-2-bounded-carriers.md) (credential-evidence#248, project-authored, not independent). For X it records the Bearer role, an unspecified byte format, and percent-containing shapes only as a scanner-corroborated lead (`artifacts-bearer-leading-run-and-percent`), not a provider-proven encoding. |
 | Independent baseline | benchmarks#739: [round-1 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/report.md), [round-2 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/round2/report.md) and [ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/ledger.json) at merge `fe7a5d1a` of PR #761 (readiness at merge `6a1a7a64` of PR #755). Identities under "Independent measurement and dispositions". |
-| Product policy (this record) | `Authorization: ApiKey` grammar ([#1212](../1212/README.md)), the `bearer-token` grammar, the `jwt` detector, `decision-defer-encoded-input-decoding` and the representation decision above. |
+| Product policy (this record) | `Authorization: ApiKey` grammar ([#1212](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1212/README.md)), the `bearer-token` grammar, the `jwt` detector, `decision-defer-encoded-input-decoding` and the representation decision above. |
 
 ## Adopted contracts
 
@@ -209,7 +209,7 @@ Python and the CLI, whole and at 7-byte and 1-byte chunks
 
 | Row | Ledger disposition | Positives failing / controls flagged | Whole equals stream (7-byte, 1-byte), four surfaces identical |
 | --- | --- | --- | --- |
-| `elastic:cloud-api-key` | fixed in candidate by an existing core fix (no new gap): the Batch 1 [#1212](../1212/README.md) fix | 0 / 0 | 76/76, 76/76; 19/19 cases |
+| `elastic:cloud-api-key` | fixed in candidate by an existing core fix (no new gap): the Batch 1 [#1212](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1212/README.md) fix | 0 / 0 | 76/76, 76/76; 19/19 cases |
 | `elastic:ece-api-key` | fixed in candidate by an existing core fix (no new gap) | 0 / 0 | 76/76, 76/76; 19/19 cases |
 | `jfrog:access-token` | already-covered / no-code | 0 / 0 | 220/220, 220/220; 55/55 cases |
 | `x:app-only-bearer-token` | already-covered / no-code | 0 / 0 | 120/120, 120/120; 30/30 cases |

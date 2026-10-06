@@ -539,13 +539,6 @@
       "rationale": "The maintainer-local scan_cost bench parses its own flags (--runs, --filter, --json, --no-detectors, --top, --list) from its arguments to choose which synthetic workloads to time and how to print them. They are never interpreted as a command, passed to a shell, or used to launch another process, and the bench is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "10cf4cbdd41836e5": {
-      "classification": "false_positive",
-      "line": 104,
-      "path": "docs/audits/evidence/1221/probe-python.py",
-      "rationale": "Evidence probe, not shipped code (docs/audits/evidence/1221): `subprocess.run` is given an argument list (no shell), the interpreter path `sys.executable`, a constant child program, and `json.dumps` of a value chosen from a three-entry literal dict; no external input is interpolated into the command.",
-      "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
-    },
     "15b279e8f4876c40": {
       "classification": "false_positive",
       "line": 194,
@@ -566,20 +559,6 @@
       "path": "crates/secret-scan-cli/src/main.rs",
       "rationale": "The flagged call is `env::args_os().skip(1)`: argv[0] is explicitly discarded before the remaining arguments are used as scan-target paths, so the exact property this audit rule warns about (relying on argv[0] for a security decision) does not apply.",
       "rule_id": "sast.rules.rust.lang.security.args-os"
-    },
-    "86a38e8aafd74a36": {
-      "classification": "false_positive",
-      "line": 70,
-      "path": "docs/audits/evidence/1221/probe-node.mjs",
-      "rationale": "Evidence probe, not shipped code (docs/audits/evidence/1221): the dynamic method name `call` is looked up on the locally loaded native addon from a hard-coded list of export names inside the same script; it never comes from external input, so the rule's prototype-pollution/arbitrary-method concern does not apply.",
-      "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method"
-    },
-    "ec49063ff9be431f": {
-      "classification": "false_positive",
-      "line": 80,
-      "path": "docs/audits/evidence/1221/probe-node.mjs",
-      "rationale": "Evidence probe, not shipped code (docs/audits/evidence/1221): `handlers[op]` dispatches a message sent by the probe's own parent thread with an op name from a fixed local object literal; the worker accepts no external messages, so no attacker-controlled method name reaches the lookup.",
-      "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method"
     },
     "fde6ed285a470997": {
       "classification": "false_positive",

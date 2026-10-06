@@ -23,7 +23,7 @@ core remains the only authoritative implementation
   [`corpus audit`](../coverage/precision-corpus-audit.json). The review
   narrative, source ledger, and beta.4 measurement provenance this contract
   was reviewed against remain in
-  [`docs/audits/evidence/367/`](../audits/evidence/367/README.md) while the
+  [`docs/audits/evidence/367/`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/367/README.md) while the
   audit archive is retired. Moved here from the evidence archive by
   [#596](https://github.com/redact-secret/redact-secret/issues/596) (DS4).
 - [`precision/beta4-twin-baseline.json`](precision/beta4-twin-baseline.json)
