@@ -7,6 +7,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the `token=` parameter of an OAuth token revocation
+  or introspection request (#1230): `token=<value>` in a form body or curl
+  argument is a `contextual_secret`, high, `redact`, exactly the value, when the
+  request names a `/revoke`, `/revoke_token` or `/introspect` endpoint within
+  nine lines or carries `token_type_hint=` (RFC 7009 and RFC 7662; Reddit's
+  revoke request), where it was silent. A scoped reader with an incremental
+  retention hint; a bare `token=` is unchanged and a context-free layout is a
+  recorded policy limit. 0 false positives across 9,168 tracked files.
 - `generic-token` now reads the Contentful create-token response `token` member
   beside its documented siblings (#1228): a quoted `token` member with a `sys` or
   `scopes` member within five lines is a `contextual_secret`, high, `redact`,
