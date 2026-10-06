@@ -83,6 +83,17 @@ const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
     "convex_self_hosted_admin_key",
 ];
 
+/// Whole names that are also a high-signal name behind a generic prefix
+/// (issue #1225 follow-up): `my_hubspot_personal_access_key`,
+/// `MY_PERSONAL_ACCESS_KEY` and `old_personal_access_key` are the same field
+/// under a user's own prefix, as `MYAPP_API_KEY` is `api_key`. The exact
+/// names stay in [`EXACT_HIGH_SIGNAL_NAMES`]; the prefixed form goes through
+/// [`has_prefixed_credential_name`], so a prefix that says the value is not the
+/// secret (`masked_`, `redacted_`, `publishable_`) still excludes it. Only the
+/// whole name is the suffix: `personal_access_key_id`, `_expires_at`, `_hint`
+/// and `_length` do not end in it and stay unmatched.
+const PREFIXED_EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["personal_access_key"];
+
 const AMBIGUOUS_NAMES: &[&str] = &["auth", "credential", "credentials", "signing_key"];
 
 /// Names that are credential-bearing only as a URL query, fragment or form
@@ -358,6 +369,7 @@ pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
     HIGH_SIGNAL_NAMES.contains(&normalized)
         || EXACT_HIGH_SIGNAL_NAMES.contains(&normalized)
         || has_prefixed_credential_name(normalized, HIGH_SIGNAL_NAMES)
+        || has_prefixed_credential_name(normalized, PREFIXED_EXACT_HIGH_SIGNAL_NAMES)
         || (!AMBIGUOUS_NAMES.contains(&normalized)
             && has_prefixed_credential_name(normalized, &["token"])
             && !NON_CREDENTIAL_TOKEN_NAMES.contains(&normalized)

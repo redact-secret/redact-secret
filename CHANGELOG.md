@@ -222,6 +222,14 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the HubSpot personal access key under a prefix
+  (#1225): `MY_HUBSPOT_PERSONAL_ACCESS_KEY`, `my_personal_access_key` and
+  `oldPersonalAccessKey` were silent while `HUBSPOT_PERSONAL_ACCESS_KEY` was a
+  high `redact`, so a real key in a prefixed variable stayed in the output. The
+  name `personal_access_key` now qualifies behind a generic prefix, like
+  `api_key`; `personalAccessKeyId`, `_ExpiresAt`, `_Hint`, `_Length`, a
+  `masked_`/`redacted_`/`publishable_` prefix, placeholders and masks stay silent.
+  This amends the whole-name-only clause of #1233 for this one name.
 - `bearer-token` now reads the whole percent-escaped value of an
   `Authorization:` or `Proxy-Authorization:` Bearer header (#1224). X's
   application-only Bearer Token carries `%2B`, `%2F` and `%3D` inside it, and the
