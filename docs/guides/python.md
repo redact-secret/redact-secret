@@ -355,6 +355,11 @@ See the [binding README](../../bindings/python/README.md) for development detail
 
 ## PII activation
 
+The selection is process-wide: one process holds one, and a differing second
+selection is `PiiActivationConflictError` from any thread. For several
+selections use one process each; see
+[configuration ownership](configuration-ownership.md).
+
 Direct import and scanning remain credential-only. Call `initialize(pii=(...))`
 before constructing scans or incremental sessions to select PII explicitly,
 and use `pii_activation()` to record the canonical activation identity.

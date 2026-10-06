@@ -56,7 +56,9 @@ with `scan`, `scan_with_limits`, `scan_and_redact` and `scan_and_redact_with_lim
 methods that return exactly what the `DetectorRegistry` functions return
 (`BuiltInRegistry::with_built_in()`, `with_common_built_in()`,
 `with_built_in_and_pii(&selection)`, `with_common_built_in_and_pii(&selection)`).
-Wrap it in an `Arc` to hand it to workers. `IncrementalSanitizer` still builds its
+Wrap it in an `Arc` to hand it to workers; registries with different PII
+selections coexist with no shared state (see [configuration ownership](configuration-ownership.md)).
+`IncrementalSanitizer` still builds its
 own registry per session. `scan` returns policy-evaluated findings;
 `redact` takes the original input, findings, and a formatter. `scan_and_redact`
 combines those operations. Ranges are half-open UTF-8 byte offsets on character

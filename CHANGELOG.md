@@ -335,6 +335,20 @@ evidence is linked from each published version.
   (`decision-settle-the-open-structured-file-url-carrier-and-control-roots-of-1203`),
   not a beta.13 regression.
 
+- Configuration ownership (#1222,
+  `decision-keep-the-configuration-bound-scanner-handle-out-of-0-1-x-for-node-webassembly-and-python`).
+  No configuration-bound scanner handle is added to Node, WebAssembly or Python
+  in 0.1.x; Rust already has `BuiltInRegistry`. Independent PII selections in
+  one Node thread, WebAssembly module instance or Python process stay
+  unsupported, and the `initialize` conflict contract is unchanged. The new
+  [configuration ownership guide](docs/guides/configuration-ownership.md) states
+  who owns detection configuration, action policy and host limits on each
+  surface, and gives recipes that were run: a shared `BuiltInRegistry`, one
+  Worker per tenant in Node, one module instance per tenant in WebAssembly, one
+  process per tenant in Python, and per-call `actionPolicy` with
+  `compareActionPolicies`. The decision lists the evidence that would reopen it.
+  No code, API, finding or artifact changes.
+
 ## 0.1.0-beta.13 — 2026-10-03
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.13/README.md).

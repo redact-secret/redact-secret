@@ -8,6 +8,9 @@ one small change should not have to reproduce it. An action policy is data that
 changes only what a few rules name and leaves every other finding at the default
 action the running artifact computes. The contract is
 [`decision-define-the-versioned-declarative-action-policy-and-default-overlay`](../decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md).
+A policy is an argument of each call and owns no detection configuration; see
+[configuration ownership](configuration-ownership.md) for what each surface owns
+and how to keep several policies, or several PII selections, in one deployment.
 
 Support today (`current`): the Rust core (`load_action_policy`), the command
 line (`--action-policy <path>`), Python (`action_policy=`) and the JavaScript package

@@ -103,7 +103,12 @@ facade guards this by requiring `initialize()` first; the raw addon does not.
 ## 4. Configuration ownership and per-instance PII isolation
 
 Who owns the PII selection, the registry and the ruleset cache decides whether
-two tenants can have different selections in one process.
+two tenants can have different selections in one process. The
+[configuration ownership guide](../guides/configuration-ownership.md) turns this
+table into recipes that were run, and
+[`decision-keep-the-configuration-bound-scanner-handle-out-of-0-1-x-for-node-webassembly-and-python`](../decisions/2026-10-06-keep-the-configuration-bound-scanner-handle-out-of-0-1-x-for-node-webassembly-and-python.md)
+records that no configuration-bound handle is added to Node, WebAssembly or
+Python in 0.1.x.
 
 | Surface | PII selection owner | Registry owner | Ruleset cache | Independent configurations in one process |
 | --- | --- | --- | --- | --- |

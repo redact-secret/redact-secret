@@ -35,6 +35,12 @@ idempotent; a later different selection fails with the fixed,
 input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
 the same contract while retaining `credentials=common` in its identity.
 
+One thread has one runtime per entry point, so a second wrapper or a second
+`initialize` selection does not create a second owner. Independent PII
+selections need a `worker_threads` Worker each; the
+[configuration ownership guide](configuration-ownership.md) has the recipe and
+the unsupported list.
+
 ## Status query
 
 `status()` reports whether this entry point is initialized, and its public
