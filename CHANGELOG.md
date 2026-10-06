@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Documentation
+
+- Documentation lifecycle (#1265, epic #1259,
+  `decision-retire-historical-audit-bodies-before-release-qualification`):
+  historical audit bodies, rejected research artifacts and the archive index
+  are retired from the tree. History is preserved by 40-hex permalinks, and
+  `docs/audits/` keeps only the retained reviews, each with an owner and a
+  retirement trigger. No detection, redaction or public API behavior changes.
+
 ## 0.1.0-beta.14 — 2026-10-06
 
 ### Support status

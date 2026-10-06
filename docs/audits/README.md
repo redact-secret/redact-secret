@@ -1,76 +1,74 @@
-# Review and audit archive
+# Temporary review index
 
 [Documentation home](../README.md)
 
-Audit verdicts apply to the revision and date recorded in each document. They
-are not live status dashboards, and a later code fix does not rewrite what an
-earlier reviewer observed. Under
+This folder holds only temporary reviews: a review or evidence unit written
+while work is in progress, with an owner and a retirement trigger. Everything
+that was finished has left the tree. The retired bodies stay in git history, and
+a 40-hex permalink cites them; nothing here is a status dashboard or an
+archive.
+
+## Lifecycle
+
 [`decision-retire-historical-audit-bodies-before-release-qualification`](../decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)
-every document here is a temporary review: it may be committed during
-development and its body leaves this tree, with a verified 40-hex permalink,
-before release qualification. Existing units are retired by the epic
-[#1259](https://github.com/redact-secret/redact-secret/issues/1259); until
-then an entry's presence here is not a retention decision.
+fixes the rules. In short:
 
-Organized by kind, per
-[DS0](../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md):
-**releases** (candidate and readiness reviews, one section per version),
-**epic close-outs** (a multi-issue body of work's completion record),
-**subsystem reviews** (a cross-cutting review not tied to one release or
-epic), and **evidence** (a single issue's record, `evidence/<issue>/`).
+- The entry file of every unit (`<name>.md` or `evidence/<unit>/README.md`)
+  starts with a front matter block: `owner`, `reviewed_source` (a 40-hex
+  commit), `status` (`in-progress`, `final`, `deferred` or `retained`) and
+  `retire_on` (`before-qualification`, `after-issue:#N` or
+  `after-release:<version>`). A `final` unit also carries `record`.
+- A `final` unit is retired before release qualification. Its conclusions move
+  to the authoritative spec, contract, decision or release record, and its body
+  is deleted without a stub or a replacement index row.
+- Anything a script or CI reads is a live input and does not belong here.
+- Benchmark and scanner results belong in
+  [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks).
+  An exploratory log stays in an issue comment.
+- Cleanup is a reviewed pull request merged before the source SHA is recorded
+  for qualification. Publication changes no file.
 
-## Releases
+The index lists only what is in the tree. It grows when a unit is added and
+shrinks when a unit is retired; it keeps no row for a retired unit.
 
-Start with the [beta.14 candidate public-contract review](beta14-candidate-public-contract-review.md).
-The [beta.12 candidate public-contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta12-candidate-public-contract-review.md), the [beta.11](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta11-candidate-public-contract-review.md),
-[beta.10](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta10-candidate-public-contract-review.md) and
-[beta.9](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta9-candidate-public-contract-review.md) candidate public-contract reviews,
-the [beta.6 candidate public-contract review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-candidate-public-contract-review.md),
-the [beta.5 release readiness review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-readiness-review.md), the
-[beta.5](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-candidate-public-contract-review.md) and
-[beta.4](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta4-candidate-public-contract-review.md) candidate public-contract reviews, and the
-[beta.2 final code review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta2-final-code-review.md) remain historical evidence.
-The earlier [local pre-release review](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/pre-release-code-and-docs-review.md)
-and [qualification follow-up](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-qualification-follow-up.md) describe beta.1.
+## Units in the tree
 
-| Topic | Evidence |
-| --- | --- |
-| Beta.14 candidate identity and public contract | [Retained candidate review](beta14-candidate-public-contract-review.md) (the artifact inventory selects it by `candidate_version`) |
-| Remediation classification | [Release gaps](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/release-gap-disposition.md), [deferred quality](deferred-quality-backlog.md) |
-| Beta.5 release retrospective and v0.1.0 readiness criteria (#531) | [What failed, how each problem was resolved, what remains open](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta5-release-retrospective.md); checklist at [v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md) |
-| Beta.6 release retrospective (#615) | [What went well, what went wrong, what #614 fixed, what remains open](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/beta6-release-retrospective.md); release record at [0.1.0-beta.6](../releases/0.1.0-beta.6/README.md) |
-
-## Epic close-outs
-
-| Topic | Evidence |
-| --- | --- |
-
-## Subsystem reviews
-
-| Topic | Evidence |
-| --- | --- |
-
-## Evidence
-
-One record per issue, under `evidence/<issue>/`. Per
-[DS0](../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md),
-each folder's kind is what reads or produces it: **product judgement** (an
-ADR or release relies on it — frozen here) or **benchmark measurement** (a
-`redact-secret-benchmarks` run produced it — belongs there, a stub here).
-Two folders sit outside both rows by an explicit constraint recorded when
-this table was last swept (2026-09-22, per
-[#604](https://github.com/redact-secret/redact-secret/issues/604)): #367 is a
-live CI contract embedded in the archive, deferred to
-[#596](https://github.com/redact-secret/redact-secret/issues/596) (DS4); #200
-is test-bound until [#594](https://github.com/redact-secret/redact-secret/issues/594)
-(DS2). Every folder below was reviewed for that sweep; "kept in place" states
-why.
-
-| Issue | Evidence | Kind | Disposition |
+| Unit | Owner | Status | Retires |
 | --- | --- | --- | --- |
-| Bare vendor-prefixed OpenAI value redacted under a generic policy layer (#552) | [`decision-govern-bare-vendor-prefixed-policy-layer`](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md): a marker-less `sk-`-family value at the provider-documented 48-byte body width now redacts as `vendor_prefixed_credential`, below every provider contract's specificity | decision record | n/a — not an `evidence/` folder |
-| PII us-ssn identity-only mismatch, public investigation (#1003) | [4,655 synthetic cases against the identity seam and the #910 oracle: no public defect, 110 boundary-adjacency mismatches by contract](evidence/1003/README.md) | product judgement | kept in place — final record; the protected case was not opened |
-| Plaintext memory lifetime inventory (#1079) | [Every owned buffer that can hold input-derived text in the core, with owner, lifetime and release point on success, error, abort, finalize and drop; bindings and CLI at summary level; terminal-transition tests; ten findings, no erasure anywhere](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1079/README.md) | product judgement | kept in place — final record; the contract it supports is [plaintext lifetime](../reference/plaintext-lifetime.md) |
-| Optional zeroization design for core-owned plaintext buffers (#1080) | [What `zeroize` 1.9.0 guarantees from its source, the proposed buffers, transitions and feature, a measured prototype (no added transitive dependency, `forbid(unsafe_code)` kept, about 5% incremental-path cost, 0.21% WebAssembly size), the no-dependency alternative, and the no-core-features rule it conflicts with](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1080/README.md) | product judgement | kept in place — final record; a proposal, no build zeroizes anything; the contract it would extend is [plaintext lifetime](../reference/plaintext-lifetime.md) |
-| Action policy parser size in the WebAssembly artifacts and JavaScript conformance coverage (#1219) | [Brotli sizes of the four WebAssembly artifacts against `db0e5c8d` (`full` +5,653, 3.43%), where the bytes are, and what the shared action policy fixture does and does not reach through the Node addon and the WebAssembly artifact](evidence/1219/README.md) | measurement | kept in place — final record; later parser growth re-measures against it |
-| Comparison cost in the WebAssembly artifacts and the JavaScript comparison conformance run (#1220) | [Brotli sizes of the four WebAssembly artifacts before and after exposing `compareActionPolicies` (`full` +4,363, 2.54%), where the bytes are, the one reduction taken (a flat result array, -881) and the ones rejected, and what the shared explain-and-compare fixture reaches through the Node addon, the WebAssembly artifact and the package](evidence/1220/README.md) | measurement | kept in place — final record; later growth of the comparison re-measures against it |
+| [Beta.14 candidate public-contract review](beta14-candidate-public-contract-review.md) | [#1263](https://github.com/redact-secret/redact-secret/issues/1263) | `retained` (the artifact inventory selects it by `candidate_version`) | after release `0.1.0-beta.14`; a reviewed closeout pull request then moves its conclusions into `docs/releases/0.1.0-beta.14/` |
+| [Deferred quality backlog](deferred-quality-backlog.md) | [#80](https://github.com/redact-secret/redact-secret/issues/80) (closed) | `deferred`: 25 non-blocking findings, cited by `conformance/fixtures/synchronous-corpus.json` and a coverage-declaration comment | after epic [#1259](https://github.com/redact-secret/redact-secret/issues/1259), which decides where those citations point |
+| [#1003 us-ssn identity-only mismatch, public investigation](evidence/1003/README.md) | [#1003](https://github.com/redact-secret/redact-secret/issues/1003) | `deferred`: the protected half of the issue is open | after #1003 |
+| [#1219 WebAssembly size of the action policy parser](evidence/1219/README.md) | [#1219](https://github.com/redact-secret/redact-secret/issues/1219) | `deferred`: measurement record for an open issue | after #1219 |
+| [#1220 WebAssembly size of the action policy comparison](evidence/1220/README.md) | [#1220](https://github.com/redact-secret/redact-secret/issues/1220) | `deferred`: measurement record for an open issue | after #1220 |
+
+## History
+
+Every earlier review, evidence unit and close-out is in the commit history. The
+pin below contains each of them byte-identical to the tree that was removed:
+
+- Pin: `2816897f96c405c3eb8c87a0c70eba5df273c121`
+- Link form: `https://github.com/redact-secret/redact-secret/blob/` + the pin + `/docs/audits/` + the path
+  (use `tree` instead of `blob` for a folder)
+
+The pin has one exception: `evidence/367/README.md` and `evidence/475/README.md`
+were edited by #1262 when the files they described moved, so the pin holds
+their complete text and the later commit holds only the edited pointer. The
+live files moved to
+[`docs/contracts/precision/`](../contracts/precision/) and
+[`docs/coverage/`](../coverage/).
+
+`python3 -B scripts/check-historical-permalinks.py` verifies every such
+permalink against the local history, and `--retirement-pin <sha> --retire
+<paths>` proves a pin before a deletion. The closed issue a retired unit
+belonged to carries its permalink as a comment
+([#1264](https://github.com/redact-secret/redact-secret/issues/1264)), and
+`git log --diff-filter=D --name-only -- docs/audits/` lists what was removed.
+
+## Adding a unit
+
+1. Write `docs/audits/<name>.md` or `docs/audits/evidence/<unit>/README.md` with
+   the front matter block above.
+2. Add one row to the table here, linking the entry file. The
+   `audits-index:check` gate fails on a unit that has no link.
+3. When the unit is final, record its permalink, move the conclusions to the
+   authoritative document, delete the body and the row.

@@ -1,3 +1,10 @@
+---
+owner: #80
+reviewed_source: fdfd05af10fdc53713a6b94a8ae66bca4457e23a
+status: deferred
+retire_on: after-issue:#1259
+---
+
 # Deferred quality backlog
 
 The 25 non-blocking findings the Rust-core migration retrospective produced,

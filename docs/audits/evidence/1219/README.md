@@ -1,3 +1,10 @@
+---
+owner: #1219
+reviewed_source: db0e5c8ddf706988967e971593f509daf460c222
+status: deferred
+retire_on: after-issue:#1219
+---
+
 # Evidence: #1219, WebAssembly size of the action policy parser, and JavaScript conformance coverage
 
 Measurement record for

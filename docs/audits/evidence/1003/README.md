@@ -1,3 +1,10 @@
+---
+owner: #1003
+reviewed_source: 40822967a1249b39c9c1f01f70b4020d05dbf0d1
+status: deferred
+retire_on: after-issue:#1003
+---
+
 # #1003 — us-ssn identity-only mismatch: public investigation
 
 Product judgement. Final record for the public-evidence half of #1003. The
