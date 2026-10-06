@@ -5,9 +5,17 @@ scope: workspace
 title: Decide the artifact taxonomy, spec routing, and evidence placement
 decided_at: 2026-09-22
 spec: evidence-and-gates
+superseded_by: decision-retire-historical-audit-bodies-before-release-qualification
 ---
 
 # Decide the artifact taxonomy, spec routing, and evidence placement
+
+> **Partly superseded (2026-10-06).** Only the table row "Final evidence,
+> product judgement" and its "frozen" retention are superseded by
+> [`decision-retire-historical-audit-bodies-before-release-qualification`](2026-10-06-retire-historical-audit-bodies-before-release-qualification.md):
+> such a record is a temporary review that leaves the current tree before
+> release qualification and is preserved by history and a verified permalink.
+> The rest of this record stands. The text below is left as decided.
 
 ## Decision
 

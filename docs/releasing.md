@@ -28,15 +28,15 @@ so they queue and run one at a time; they never race each other.
 | --- | --- | --- | --- |
 | What it does | Packs and checks npm runtime dependency packages only | Publishes to crates.io, npm, and PyPI for real, then tags | Repairs a **partially** failed `Release`: fills in only what's missing |
 | Publishes anything? | No — nothing is ever published | Yes, everything | Only what the failed run didn't already publish |
-| When to run it | Optional, while preparing the release commit | Once, after final approval | Only after a `Release` run fails partway, with separate recovery authorization |
+| When to run it | On the exact final SHA, before `Release` | Once, after final approval | Only after a `Release` run fails partway, with separate recovery authorization |
 | Has a dry-run? | It *is* the dry-run | No — there is no rehearsal mode for `Release` itself | Yes: `dry_run=true` prints the plan before anything is touched |
 
 Normal path:
 
 ```
-merge the prepared version to main
+merge the prepared version to main, with historical audit bodies already retired
   → Performance evaluation (benchmarks)    -- paired same-job run of the frozen main SHA; must judge accepted
-  → (optional) Package Release Rehearsal   -- npm dependency check only, publishes nothing
+  → Package Release Rehearsal on the exact final SHA -- npm dependency check only, publishes nothing; run before Release
   → Artifact qualification + SAST + approval
   → Release                                -- the actual publish, run once
        success      → close out
@@ -152,7 +152,19 @@ and must use the qualified binaries and recorded digests.
    [`docs/getting-started.md`](getting-started.md#install-a-published-release).
    Change them in the same commit, and at `0.1.0` drop the `@beta` and
    `--version` qualifiers the quickstart explains.
-4. Run the local checks below before merging. After merge, record the exact
+4. Retire historical review bodies before qualification, in the same reviewed
+   pull request or an earlier one. Every `docs/audits/` unit whose front
+   matter says `status: final` (or whose `retire_on` has come due) leaves the
+   tree once its full 40-hex permalink to an existing reachable `main` commit
+   holding the complete record is verified, its current conclusions are in the
+   authoritative spec, contract or release record, and nothing live reads it
+   (rule: [`decision-retire-historical-audit-bodies-before-release-qualification`](decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)).
+   Leave no per-issue stub. Only the one `retained` current candidate review
+   may stay. The tree changes here or not at all: any later change, including
+   cleanup, is a new candidate SHA and needs fresh qualification, and
+   `Release` itself edits and deletes nothing. Existing tags and history are
+   never touched.
+5. Run the local checks below before merging. After merge, record the exact
    `main` commit to qualify. Selecting any later source commit requires fresh
    qualification.
 
@@ -224,7 +236,10 @@ throwaway `<X.Y.Z>-beta.<run id>` version that no registry carries, moved onto
 its own uncommitted checkout, so unpublished-version defects surface before an
 RC exists (what that covers:
 [release rehearsal coverage](audits/release-rehearsal-coverage.md#rehearsing-at-a-throwaway-unpublished-version)). `Release` has no
-`publish=false` or `dry_run` input; never dispatch it as a rehearsal.
+`publish=false` or `dry_run` input; never dispatch it as a rehearsal. Run
+`Package Release Rehearsal` on the exact final SHA, after cleanup has merged
+and before dispatching `Release`; a rehearsal on any earlier commit does not
+cover the cleaned tree.
 
 Also require passing SAST evidence for the frozen revision. An acknowledged
 baseline is not zero findings or complete parser coverage. Assessment results
@@ -427,7 +442,9 @@ attestation. Dry runs publish nothing and sign nothing.
 
 ## Close out
 
-Preserve evidence under `docs/releases/<version>/`, following the
+After publication, move the retained candidate review's conclusions into the
+release record and retire its body through a reviewed pull request; that is a
+post-release change, never a step of `Release`. Preserve evidence under `docs/releases/<version>/`, following the
 [beta.1 record](releases/0.1.0-beta.1/README.md): approved source, artifact and
 corpus identity, registry file checksums, qualification/publication/recovery run
 IDs, clean-install results, and annotated tag target. Label reconstructed

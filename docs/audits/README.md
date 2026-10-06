@@ -3,15 +3,21 @@
 [Documentation home](../README.md)
 
 Audit verdicts apply to the revision and date recorded in each document. They
-are historical evidence, not live status dashboards. A later code fix does not
-rewrite what an earlier reviewer observed.
+are not live status dashboards, and a later code fix does not rewrite what an
+earlier reviewer observed. Under
+[`decision-retire-historical-audit-bodies-before-release-qualification`](../decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)
+every document here is a temporary review: it may be committed during
+development and its body leaves this tree, with a verified 40-hex permalink,
+before release qualification. Existing units are retired by the epic
+[#1259](https://github.com/redact-secret/redact-secret/issues/1259); until
+then an entry's presence here is not a retention decision.
 
 Organized by kind, per
 [DS0](../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md):
 **releases** (candidate and readiness reviews, one section per version),
 **epic close-outs** (a multi-issue body of work's completion record),
 **subsystem reviews** (a cross-cutting review not tied to one release or
-epic), and **evidence** (a single issue's frozen record, `evidence/<issue>/`).
+epic), and **evidence** (a single issue's record, `evidence/<issue>/`).
 
 ## Releases
 

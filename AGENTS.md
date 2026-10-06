@@ -11,11 +11,19 @@ also create `_notes/decisions`. Validate them with `npm run decisions:validate`.
 
 New evidence goes where
 [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](docs/decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
-places its kind: final evidence for a product judgement lands frozen under
-`docs/audits/evidence/<issue>/`; final evidence from a benchmark or scanner
-run belongs in `redact-secret-benchmarks`, never copied here; and an
-iterative or exploratory log stays in an issue comment, linked by permalink
-from whichever final record cites it, not duplicated into a repository file.
+places its kind, with the retention of product-judgement records set by
+[`decision-retire-historical-audit-bodies-before-release-qualification`](docs/decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md):
+a review or evidence unit for a product judgement may be committed under
+`docs/audits/` while work is in progress, with a front matter block (`owner`,
+`reviewed_source`, `status`, `retire_on`); it is a temporary review, not a
+permanent record. Before release qualification its body is retired from the
+tree after a full 40-hex permalink to a reachable `main` commit that holds
+the complete record is verified, with current conclusions kept in the
+authoritative spec, contract or release record and no per-issue stub. Final
+evidence from a benchmark or scanner run belongs in
+`redact-secret-benchmarks`, never copied here; and an iterative or
+exploratory log stays in an issue comment, linked by permalink from whichever
+final record cites it, not duplicated into a repository file.
 
 Cross-repository `github.com/redact-secret/<repo>/blob/<ref>/<path>` links follow one rule: a past state uses a 40-hex permalink, living documentation uses `main`, never a branch. `npm run cross-repo-links:check` enforces resolvability; see [`docs/specs/evidence-and-gates.md`](docs/specs/evidence-and-gates.md).
 

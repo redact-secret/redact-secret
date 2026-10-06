@@ -93,3 +93,4 @@ Current rules: `docs/specs/evidence-and-gates.md`.
 - [Decide the artifact taxonomy, spec routing, and evidence placement](2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
 - [Move performance results, criteria, and judgement to redact-secret-benchmarks](2026-09-22-move-performance-results-criteria-and-judgement-to-benchmarks.md)
 - [Define pii-v1 qualification and national-ID arrival gates](2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md)
+- [Retire historical audit bodies before release qualification instead of retaining them permanently](2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)

@@ -3,8 +3,9 @@
 Every file in this directory is a **live contract**: a script or CI reads it
 at run time, so per
 [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
-it lives outside `docs/audits/evidence/`, where only frozen, non-live records
-belong. Nothing here changes what a detector does at scan time — the Rust
+it lives outside `docs/audits/`, where only temporary, non-live reviews
+belong (see
+[`decision-retire-historical-audit-bodies-before-release-qualification`](../decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)). Nothing here changes what a detector does at scan time — the Rust
 core remains the only authoritative implementation
 (`ARCHITECTURE.md`, deliberate exclusions).
 

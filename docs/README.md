@@ -71,12 +71,12 @@ list is not proof that input contains no secrets.
 - [Rust workspace](rust-workspace.md), [Python packaging](python-packaging.md),
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
-- [Live contracts](contracts/README.md): CI-read inputs, kept outside the frozen evidence archive
+- [Live contracts](contracts/README.md): CI-read inputs, kept outside the temporary review archive
 - [Support matrix](support-matrix.md): per-family status (`stable` /
   `provisional` / `pending` / `unsupported`), generated from evaluation
   evidence in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
 - [Detection reliability evidence](reference/detection-reliability.md)
-- [Review archive](audits/README.md) and [beta.2 final code review](audits/beta2-final-code-review.md)
+- [Temporary review archive](audits/README.md), retired before release qualification, and [beta.2 final code review](audits/beta2-final-code-review.md)
 - [Release records](releases/status.md): every published version and its durable record,
   stored per version under [`docs/releases/`](releases/)
 - [Support-matrix drift gate](support-matrix-drift.md): the pre-release regression
@@ -96,13 +96,18 @@ list is not proof that input contains no secrets.
 [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
 gives every committed document or generated file under `docs/`, `assessment/`,
 and `benchmarks/` exactly one kind, found by what reads or produces it, not by
-its current path:
+its current path.
+[`decision-retire-historical-audit-bodies-before-release-qualification`](decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)
+supersedes only that ADR's permanent retention of product-judgement evidence
+and separates six kinds: current contract, live input, generated-and-checked
+artifact, temporary review, historical judgement, and release record.
 
 | Kind | Test | Location |
 | --- | --- | --- |
 | Live contract / input | CI, a script, or code reads it | a non-archive path (for example `docs/contracts/`) |
 | Generated | a script produces it | committed only with a regeneration-equality test; otherwise gitignored |
-| Final evidence, product judgement | an ADR or release relies on it | `docs/audits/evidence/<issue>/`, frozen |
+| Temporary review (product judgement) | written during development; owner, reviewed source, status and retirement trigger in a front matter block | `docs/audits/` until retired, never past release qualification |
+| Historical judgement | a temporary review that reached `final` | repository history, cited by a verified 40-hex main-commit permalink; current conclusions live in the spec, contract or release record, with no per-issue stub |
 | Final evidence, benchmark measurement | a benchmark or scanner run produced it | `redact-secret-benchmarks`, per [`decision-govern-benchmark-regression-promotion`](decisions/2026-09-18-govern-benchmark-regression-promotion.md) |
 | Iterative / exploratory log | only people read it, not a final record | an issue comment; final records keep a permalink to it, not a copy |
 | Detail of a settled record | nothing reads the full text any more | a commit-pinned permalink plus a summary |
