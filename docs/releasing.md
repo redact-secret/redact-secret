@@ -163,7 +163,16 @@ and must use the qualified binaries and recorded digests.
    may stay. The tree changes here or not at all: any later change, including
    cleanup, is a new candidate SHA and needs fresh qualification, and
    `Release` itself edits and deletes nothing. Existing tags and history are
-   never touched.
+   never touched. `npm run lifecycle:release` runs the offline check that
+   enforces this on the checked-out tree (it fails on every `final`,
+   `in-progress`, `before-qualification` or unclassified unit and names each
+   path); development (`npm run lifecycle:check`, part of `npm run ci`) accepts
+   a declared temporary unit. For a `deferred` unit, confirm `after-issue:#N`
+   is still open, optionally with `--closed-issues FILE` from
+   `gh issue list --state closed --limit 1000 --json number --jq '.[].number'`;
+   the check never calls the API. `Artifact qualification` (dispatch and `rc/*`
+   pushes), `Release` and `Reconcile Release` run it in release mode before
+   anything is built or published, and it approves and publishes nothing.
 5. Run the local checks below before merging. After merge, record the exact
    `main` commit to qualify. Selecting any later source commit requires fresh
    qualification.
@@ -483,6 +492,13 @@ source/run identity. When the manifest upload failed, provide both
 run and qualified inventory. The selected source must remain in the current
 `main` history, including its tip. A source outside that history cannot be
 recovered through this path.
+
+`Reconcile Release` checks the audit lifecycle of the recorded source
+revision, in release mode, with the check that revision carries, before it
+repairs anything. A source revision that predates the check was qualified before
+the policy existed and is repaired without it; any other source must pass, which
+the original `Release` run already required. It is not an input and cannot be
+skipped.
 
 Review the exact skip/publish/block plan and evidence before authorizing
 `dry_run=false`. Existing artifacts must match the qualified content; missing

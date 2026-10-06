@@ -38,6 +38,14 @@ with a front matter block naming `owner`, `reviewed_source` (a 40-hex commit),
 `final` unit also carries `record`, the 40-hex main-commit permalink to its
 complete text. It is a temporary review, not a permanent record.
 
+`npm run lifecycle:check` (in `npm run ci`) accepts a declared unit, warns on
+a historical body listed in `scripts/audit-lifecycle-legacy-units.txt`, and
+fails on a new unit without a block, a stale `after-release` or `after-issue`
+exception, or a `record` that is not a verified 40-hex permalink.
+`npm run lifecycle:release` is the qualification form: it also fails on every
+`final`, `in-progress` or `before-qualification` unit. Scripts must not write
+under `docs/audits/`.
+
 Before release qualification, retire every `final` unit: verify the permalink,
 keep current conclusions in the authoritative spec, contract or release record,
 and delete the body without leaving a per-issue stub. Anything a script or CI

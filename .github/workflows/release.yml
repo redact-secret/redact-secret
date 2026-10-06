@@ -65,11 +65,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Issue #1266: a release is never qualified from a tree that still carries a
+  # historical review body. `ci` and `artifact-qualification` wait on this job,
+  # and every publish job waits on both, so no build and no publication is
+  # reachable when it fails. Release mode rejects `final`, `in-progress`,
+  # `before-qualification` and unclassified units; the exact merged commit is
+  # the qualification identity, so the cleanup is merged first and is never
+  # performed here. The check only reads.
+  lifecycle:
+    name: Audit lifecycle
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: |
+          echo "Releases must run from main." >&2
+          exit 1
+
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Check the audit lifecycle in release mode
+        run: python3 -B scripts/check-audit-lifecycle.py --release
+
   # Reuse qualification so every publisher gates on this exact `github.sha`,
   # rather than a separate, potentially stale run on the same ref.
   # The caller and reusable workflows share the same immutable commit.
   ci:
     name: CI
+    needs: lifecycle
     uses: ./.github/workflows/ci.yml
     with:
       benchmark_branch: main
@@ -82,6 +111,7 @@ jobs:
   # per release run.
   artifact-qualification:
     name: Artifact qualification
+    needs: lifecycle
     uses: ./.github/workflows/artifact-qualification.yml
     permissions:
       contents: read

@@ -33,7 +33,6 @@ export const PATH_RULES = [
   { suffix: ".md", scopes: ["docs"] },
   { prefix: "docs/coverage/", scopes: ["docs", "detector"] },
   { prefix: "docs/contracts/", scopes: ["docs", "detector"] },
-  { prefix: "docs/audits/evidence/", scopes: ["docs", "detector"] },
   { prefix: "docs/releases/", scopes: ["docs", "release"] },
   { prefix: "docs/", scopes: ["docs"] },
   { prefix: "conventions/", scopes: ["docs"] },

@@ -60,5 +60,42 @@ class ReachabilityTests(unittest.TestCase):
         self.assertEqual(len(CHECK.validate(self.root, {})), 1)
 
 
+class TemporaryAuditUnitTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+
+    def write(self, name: str, text: str) -> None:
+        path = self.root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def unit(self, name: str, status: str, retire: str) -> None:
+        self.write(
+            name,
+            "---\nowner: #1266\nreviewed_source: "
+            + "a" * 40
+            + "\nstatus: {status}\nretire_on: {retire}\n---\n\n# Review\n".format(status=status, retire=retire),
+        )
+
+    def test_a_temporary_unit_page_needs_no_navigation_link(self) -> None:
+        self.write("docs/README.md", "index\n")
+        self.unit("docs/audits/wip.md", "in-progress", "before-qualification")
+        self.unit("docs/audits/evidence/3/README.md", "final", "before-qualification")
+        self.write("docs/audits/evidence/3/notes.md", "extra page\n")
+        self.assertEqual(CHECK.validate(self.root, {}), [])
+
+    def test_a_retained_unit_page_must_be_reachable(self) -> None:
+        self.write("docs/README.md", "index\n")
+        self.unit("docs/audits/candidate.md", "retained", "after-release:0.1.0-beta.14")
+        self.assertEqual(len(CHECK.validate(self.root, {})), 1)
+
+    def test_a_page_outside_the_audit_tree_is_unaffected(self) -> None:
+        self.write("docs/README.md", "index\n")
+        self.write("docs/specs/engine.md", "orphan\n")
+        self.assertEqual(len(CHECK.validate(self.root, {})), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

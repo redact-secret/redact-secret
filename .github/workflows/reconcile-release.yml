@@ -178,6 +178,31 @@ jobs:
           fi
           echo "source_revision=$(jq -r '.source_revision' <<<"$decision")" >> "$GITHUB_OUTPUT"
 
+      # Issue #1266. Reconcile qualifies nothing new: it republishes artifacts
+      # an original `release.yml` run built from `SOURCE_REVISION`, and the
+      # step below proves that run's own gate would pass on that exact commit.
+      # The check that runs is the one the source revision carries, against
+      # that revision's tree, in release mode. A source revision that predates
+      # the check was qualified before the policy existed and may only have
+      # its registry state repaired, so it is not blocked by a policy it could
+      # not have met; every revision a Release run can start from today
+      # carries the check, so a new release cannot use this path to skip it.
+      - name: Verify the source revision's audit lifecycle
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          SOURCE_REVISION: ${{ steps.guard.outputs.source_revision }}
+        run: |
+          set -euo pipefail
+          source_tree="$RUNNER_TEMP/lifecycle-source"
+          git worktree add --detach "$source_tree" "$SOURCE_REVISION"
+          trap 'git worktree remove --force "$source_tree"' EXIT
+          if [[ -f "$source_tree/scripts/check-audit-lifecycle.py" ]]; then
+            python3 -B "$source_tree/scripts/check-audit-lifecycle.py" --release --root "$source_tree" --version "$VERSION"
+          else
+            echo "::notice::$SOURCE_REVISION predates the audit lifecycle check; repairing registry state only."
+          fi
+
       - name: Verify original run and artifact inventory
         shell: bash
         env:
