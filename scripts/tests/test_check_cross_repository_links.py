@@ -115,7 +115,9 @@ class UnavailableSourceTests(unittest.TestCase):
     def test_offline_resolver_uses_local_git_and_never_calls_gh(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            run = lambda *a: subprocess.run(["git", "-C", temp, *a], check=True, capture_output=True, text=True).stdout.strip()  # noqa: E731
+            run = lambda *a: subprocess.run(
+                ["git", "-C", temp, *a], check=True, capture_output=True, text=True
+            ).stdout.strip()  # noqa: E731
             run("init", "-q", "-b", "main")
             run("config", "user.email", "t@example.invalid")
             run("config", "user.name", "T")

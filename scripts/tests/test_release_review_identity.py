@@ -88,12 +88,16 @@ class SelectCandidateReviewTests(unittest.TestCase):
 
     def test_the_file_name_never_selects_a_review_only_the_bound_version_does(self) -> None:
         tree = Tree(self)
-        tree.review("beta12-review.md", review_text(candidate_version="0.1.0-beta.12", retire_on="after-release:0.1.0-beta.12"))
+        tree.review(
+            "beta12-review.md", review_text(candidate_version="0.1.0-beta.12", retire_on="after-release:0.1.0-beta.12")
+        )
         tree.review("anything-else.md", review_text())
         self.assertEqual(tree.select()["path"], "docs/audits/anything-else.md")
 
     def test_no_review_at_all_fails_and_names_what_was_expected(self) -> None:
-        with self.assertRaisesRegex(identity.ReviewIdentityError, "no candidate public-contract review for 0.1.0-beta.14"):
+        with self.assertRaisesRegex(
+            identity.ReviewIdentityError, "no candidate public-contract review for 0.1.0-beta.14"
+        ):
             Tree(self).select()
 
     def test_a_historical_review_alone_cannot_satisfy_the_current_candidate(self) -> None:
@@ -160,7 +164,11 @@ class SelectCandidateReviewTests(unittest.TestCase):
         self.assertEqual(history["record"], link)
         self.assertIs(history["verifiedLocally"], False)  # the commit is not in this temp root
         for label, overrides, expected in (
-            ("branch link", {"previous_review_record": link.replace("c" * 40, "main"), "previous_review_sha256": "d" * 64}, "40-hex permalink"),
+            (
+                "branch link",
+                {"previous_review_record": link.replace("c" * 40, "main"), "previous_review_sha256": "d" * 64},
+                "40-hex permalink",
+            ),
             ("bad digest", {"previous_review_record": link, "previous_review_sha256": "xyz"}, "64-hex"),
             ("record alone", {"previous_review_record": link}, "must be given together"),
         ):
@@ -219,7 +227,9 @@ class GitRelationTests(unittest.TestCase):
         tree = Tree(self)
 
         def run(*args: str) -> str:
-            return subprocess.run(["git", *args], cwd=tree.root, check=True, capture_output=True, text=True).stdout.strip()
+            return subprocess.run(
+                ["git", *args], cwd=tree.root, check=True, capture_output=True, text=True
+            ).stdout.strip()
 
         run("init", "-q")
         run("config", "user.email", "t@example.invalid")
@@ -243,7 +253,10 @@ LEGACY = {
         "issue": 1112,
         "publicApiAndChangelogReview": {
             "status": "required-before-release-approval",
-            "currentPublicApiReview": {"path": "docs/audits/beta12-candidate-public-contract-review.md", "sha256": "1" * 64},
+            "currentPublicApiReview": {
+                "path": "docs/audits/beta12-candidate-public-contract-review.md",
+                "sha256": "1" * 64,
+            },
             "publicApiReview": {
                 "path": "docs/audits/candidate-public-contract-review.md",
                 "sha256": "2" * 64,
@@ -267,7 +280,9 @@ class RecordedIdentityTests(unittest.TestCase):
             current["permalink"],
             f"https://github.com/redact-secret/redact-secret/blob/{'9' * 40}/docs/audits/beta12-candidate-public-contract-review.md",
         )
-        self.assertEqual((historical["role"], historical["scope"]), ("historical", "historical-beta.1-candidate-review"))
+        self.assertEqual(
+            (historical["role"], historical["scope"]), ("historical", "historical-beta.1-candidate-review")
+        )
 
     def test_an_inventory_with_no_readiness_is_not_an_error(self) -> None:
         self.assertIsNone(identity.read_recorded_identity({"sourceCommit": "9" * 40}))

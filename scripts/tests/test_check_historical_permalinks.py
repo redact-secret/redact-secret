@@ -19,7 +19,7 @@ sys.modules[SPEC.name] = CHECK
 SPEC.loader.exec_module(CHECK)
 
 BASE = "https://github.com/redact-secret/redact-secret"
-REVIEW = "# Review\n\n## Findings\n\nText.\n\n## Findings\n\nAgain.\n\n<a id=\"custom-anchor\"></a>\n"
+REVIEW = '# Review\n\n## Findings\n\nText.\n\n## Findings\n\nAgain.\n\n<a id="custom-anchor"></a>\n'
 
 
 def sha256(text: str) -> str:
@@ -37,7 +37,9 @@ class Repo:
         self.git("config", "commit.gpgsign", "false")
 
     def git(self, *args: str) -> str:
-        return subprocess.run(["git", "-C", str(self.root), *args], check=True, capture_output=True, text=True).stdout.strip()
+        return subprocess.run(
+            ["git", "-C", str(self.root), *args], check=True, capture_output=True, text=True
+        ).stdout.strip()
 
     def write(self, relative: str, text: str) -> None:
         path = self.root / relative

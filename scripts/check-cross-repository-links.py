@@ -56,6 +56,7 @@ RELEASE_TAG = re.compile(r"v\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?")
 PLACEHOLDER = re.compile(r"[{}<>*$]")
 SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".wasm", ".node", ".woff", ".woff2", ".zip", ".gz"}
 
+
 class Unverifiable(Exception):
     """A link's remote source cannot be reached here; it is neither valid nor broken."""
 

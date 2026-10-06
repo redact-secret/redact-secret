@@ -274,7 +274,12 @@ def validate(repo: Repo, files: list[str] | None = None) -> tuple[list[str], dic
     links = collect(repo, names)
     errors: list[str] = []
     missing_commits: list[str] = []
-    stats = {"links": len(links), "commits": len({sha for _, sha, _, _ in links}), "digest_unresolved": 0, "missing_commits": 0}
+    stats = {
+        "links": len(links),
+        "commits": len({sha for _, sha, _, _ in links}),
+        "digest_unresolved": 0,
+        "missing_commits": 0,
+    }
 
     def report(link: Link, message: str) -> None:
         for citing in sorted(set(links[link])):
@@ -318,7 +323,9 @@ def validate(repo: Repo, files: list[str] | None = None) -> tuple[list[str], dic
             continue
         observed = [hashlib.sha256(repo.blob(sha, path) or b"").hexdigest() for sha in shas]
         if digest not in observed:
-            errors.append(f"{citing}: invalid digest for {path}: record {digest[:12]} matches none of {', '.join(s[:12] for s in shas)}")
+            errors.append(
+                f"{citing}: invalid digest for {path}: record {digest[:12]} matches none of {', '.join(s[:12] for s in shas)}"
+            )
 
     stats["missing_commits"] = len(set(missing_commits))
     return sorted(set(errors)), stats
@@ -363,10 +370,14 @@ def _worktree_blob_id(repo: Repo, name: str) -> str | None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("root", nargs="?", default=Path.cwd(), type=Path)
-    parser.add_argument("--main-ref", help="ref that must contain every permalink commit (default: origin/main, then main)")
+    parser.add_argument(
+        "--main-ref", help="ref that must contain every permalink commit (default: origin/main, then main)"
+    )
     parser.add_argument("--no-ancestry", action="store_true", help="skip the ancestry check (reported in the summary)")
     parser.add_argument("--retirement-pin", metavar="SHA", help="verify this commit as the pin for a retirement")
-    parser.add_argument("--retire", action="append", default=[], metavar="PREFIX", help="tracked path prefix being retired")
+    parser.add_argument(
+        "--retire", action="append", default=[], metavar="PREFIX", help="tracked path prefix being retired"
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -390,7 +401,11 @@ def main(argv: list[str] | None = None) -> int:
     for error in errors:
         print(f"ERROR {error}")
     ancestry = f"ancestry of {repo.main_ref}" if repo.check_ancestry else "ancestry NOT checked (--no-ancestry)"
-    note = f"; {stats['digest_unresolved']} digest record(s) name a path with no permalink to verify" if stats["digest_unresolved"] else ""
+    note = (
+        f"; {stats['digest_unresolved']} digest record(s) name a path with no permalink to verify"
+        if stats["digest_unresolved"]
+        else ""
+    )
     print(
         f"Historical permalink check complete: {stats['links']} distinct permalink(s) at {stats['commits']} commit(s), "
         f"{ancestry}, {len(errors)} error(s){note}"

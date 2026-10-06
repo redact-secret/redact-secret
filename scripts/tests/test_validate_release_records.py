@@ -157,7 +157,9 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
         inventory["releaseReadiness"] = readiness
         (record / "artifact-inventory.json").write_text(json.dumps(inventory))
         manifest = json.loads((record / "manifest.json").read_text())
-        manifest["artifact_inventory_sha256"] = hashlib.sha256((record / "artifact-inventory.json").read_bytes()).hexdigest()
+        manifest["artifact_inventory_sha256"] = hashlib.sha256(
+            (record / "artifact-inventory.json").read_bytes()
+        ).hexdigest()
         (record / "manifest.json").write_text(json.dumps(manifest))
         return root
 

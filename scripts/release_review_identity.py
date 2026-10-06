@@ -214,7 +214,11 @@ def select_candidate_review(
                 "reason": "throwaway rehearsal inventory; not release evidence",
                 "reviewAuthorizesRelease": False,
             }
-        found = f" (found reviews bound to: {', '.join(other)}; a review of another version is history, not this candidate's review)" if other else ""
+        found = (
+            f" (found reviews bound to: {', '.join(other)}; a review of another version is history, not this candidate's review)"
+            if other
+            else ""
+        )
         raise ReviewIdentityError(
             [
                 f"no candidate public-contract review for {version}: expected one {AUDITS_DIR.as_posix()}/*.md "
@@ -243,7 +247,9 @@ def select_candidate_review(
         if state == "not-ancestor":
             bad(f"reviewed_source {reviewed[:12]} is not an ancestor of the qualified source {source[:12]}")
         elif state != "ancestor":
-            bad(f"cannot resolve reviewed_source {reviewed[:12]} against {source[:12]} (shallow clone or missing commit)")
+            bad(
+                f"cannot resolve reviewed_source {reviewed[:12]} against {source[:12]} (shallow clone or missing commit)"
+            )
     if fields.get("status") and fields["status"] != LIFECYCLE_STATUS:
         bad(f"status is {fields['status']!r}; the current candidate review must be {LIFECYCLE_STATUS!r}")
     if fields.get("retire_on") and fields["retire_on"] != f"after-release:{version}":
@@ -252,7 +258,9 @@ def select_candidate_review(
         bad(f"review_scope is {fields['review_scope']!r}; the obligation requires {REQUIRED_SCOPE!r}")
     disposition = fields.get("disposition")
     if disposition and disposition not in ACCEPTED_DISPOSITIONS:
-        bad(f"disposition {disposition!r} does not accept the candidate (expected one of {', '.join(ACCEPTED_DISPOSITIONS)})")
+        bad(
+            f"disposition {disposition!r} does not accept the candidate (expected one of {', '.join(ACCEPTED_DISPOSITIONS)})"
+        )
     if disposition == "accepted-with-limitations" and not fields.get("limitations"):
         bad("disposition accepted-with-limitations requires a limitations field")
     history = _cited_history(fields, root, errors)
@@ -329,9 +337,10 @@ def read_recorded_identity(inventory: dict) -> dict | None:
         raise ReviewIdentityError(["schema 2 inventory has no recognized candidateReview"])
     reviews = []
     if candidate["status"] == STATUS_BOUND:
-        if SHA64.fullmatch(str(candidate.get("sha256", ""))) is None or SHA40.fullmatch(
-            str(candidate.get("reviewedSource", ""))
-        ) is None:
+        if (
+            SHA64.fullmatch(str(candidate.get("sha256", ""))) is None
+            or SHA40.fullmatch(str(candidate.get("reviewedSource", ""))) is None
+        ):
             raise ReviewIdentityError(["candidateReview lacks a SHA-256 or a 40-hex reviewedSource"])
         if candidate.get("reviewAuthorizesRelease") is not False:
             raise ReviewIdentityError(["candidateReview must state reviewAuthorizesRelease: false"])
