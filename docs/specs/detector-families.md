@@ -1553,10 +1553,19 @@ provider subtype from a shared carrier. The findings are the generic
 `contextual_secret`, `bearer_token`, `authorization_credential` (and the existing
 `jwt` and `connection_string_password` readings), with the default action of the
 accepted policy; a user action policy replaces that default exactly as before.
-Provider carrier facts are owned by credential-evidence and stay pending until a
-reviewed contract names them. No family is claimed covered, passing or ready, and
-no measured result is stated; the per-family tables and the product observations
-are in each evidence record.
+Provider carrier facts are owned by credential-evidence. The independent
+[benchmarks#739](https://github.com/redact-secret/redact-secret-benchmarks/issues/739)
+round 2 (frozen corpus sha256 `a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921`,
+[report](https://github.com/redact-secret/redact-secret-benchmarks/blob/fe7a5d1acd8ba56e4f1c537117f78a944369a9c6/evidence/739/round2/report.md))
+measured all 58 rows against the published `0.1.0-beta.13` and the candidate
+`a148dadf`: 38 are existing coverage validated with no code, 2 are the Batch 1
+`ApiKey` fix reused, 17 reproduced a gap (15 the empty form value of
+[#1232](../audits/evidence/1232/README.md), 1 the HubSpot field of
+[#1233](../audits/evidence/1233/README.md), 1 the `YOUR_PASSWORD` placeholder of
+[#1234](../audits/evidence/1234/README.md)) fixed in this repository, and 1 has no
+wire carrier and is source-unresolved. No row is claimed covered beyond what that
+ledger measured, and the replay of the fixed candidate is the benchmarks side's open
+step. The per-row dispositions are in each evidence record.
 
 | Class | Applied rule | Evidence |
 | --- | --- | --- |
