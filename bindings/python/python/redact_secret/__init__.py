@@ -64,6 +64,23 @@ A rejected document raises :class:`InvalidActionPolicyError`, whose
 ``error_class`` and ``rule_index`` attributes name the fixed rejection class and
 the rule being read.
 
+To see what a change would do before adopting it, :func:`compare_action_policies`
+detects once and reports what 1 to 4 policies (the default, a declarative
+document, or a legacy ``policy`` callback) would choose for the same finalized
+findings. It is a preview, never enforcement (``mode == "preview"``,
+``enforced is False``), it covers whole input only (there is no incremental
+comparison), and it carries no input byte or matched value::
+
+    comparison = redact_secret.compare_action_policies(
+        text,
+        [
+            redact_secret.ComparedPolicy.default(),
+            redact_secret.ComparedPolicy.action_policy(candidate_document),
+        ],
+    )
+    for finding in comparison.findings:
+        print(finding.type, [d.action for d in finding.decisions], finding.differs)
+
 ``policy`` and ``formatter`` callbacks only ever receive the safe metadata
 types below, never the input or a matched value. A callback that raises, or
 that returns something other than the documented protocol, never
@@ -87,9 +104,16 @@ try:
     from redact_secret._native import (
         RANGE_UNIT,
         VERSION,
+        ActionComparison,
+        ActionCounts,
+        ActionDecision,
         BufferLimitExceededError,
+        ComparedFinding,
+        ComparedPolicy,
+        ComparedSide,
         CoreStatus,
         DetectedFinding,
+        DetectionIdentity,
         DetectorFailureError,
         Finding,
         FindingLimitExceededError,
@@ -122,6 +146,7 @@ try:
         SecretScanError,
         TokenLimitExceededError,
         WholeInputLimits,
+        compare_action_policies,
         default_incremental_policy,
         default_placeholder_formatter,
         default_policy,
@@ -141,9 +166,16 @@ __version__ = VERSION
 __all__ = [
     "RANGE_UNIT",
     "VERSION",
+    "ActionComparison",
+    "ActionCounts",
+    "ActionDecision",
     "BufferLimitExceededError",
+    "ComparedFinding",
+    "ComparedPolicy",
+    "ComparedSide",
     "CoreStatus",
     "DetectedFinding",
+    "DetectionIdentity",
     "DetectorFailureError",
     "Finding",
     "FindingLimitExceededError",
@@ -176,6 +208,7 @@ __all__ = [
     "SecretScanError",
     "TokenLimitExceededError",
     "WholeInputLimits",
+    "compare_action_policies",
     "default_incremental_policy",
     "default_placeholder_formatter",
     "default_policy",

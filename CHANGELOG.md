@@ -31,6 +31,25 @@ evidence is linked from each published version.
   shared fixture is `conformance/fixtures/action-policy-compare-v1.json`; the
   bindings run it in their own entries. Existing results are unchanged.
 
+- Python: `compare_action_policies(text, policies, limits=None, ruleset=None)`
+  (#1220, `decision-explain-and-compare-action-policies-over-one-detection-pass`),
+  the whole-input explain-and-compare primitive. `policies` is a `list` or
+  `tuple` of 1 to 4 `ComparedPolicy` sides built with `ComparedPolicy.default()`,
+  `ComparedPolicy.action_policy(document)` (the `action_policy=` input forms,
+  loaded and validated when the side is built) or `ComparedPolicy.callback(policy)`.
+  It returns an immutable `ActionComparison` (`mode` `"preview"`, `enforced`
+  `False`, `detection`, `sides`, `findings`, `changed_count`) of
+  `ComparedFinding` (the safe finding metadata in code points, `differs` and one
+  `ActionDecision` per side with `action`, `basis`, `rule_id` and `rule_index`),
+  `ComparedSide` (`kind`, `document_sha256`, `counts`), `ActionCounts` and
+  `DetectionIdentity`; eight new names in all. Detection runs once
+  and no placeholder or text is produced. A callback side is called once per
+  finding in order, one side at a time, and its failure is the existing
+  `PolicyFailureError` (a bad return value `InvalidPolicyActionError`) for the
+  whole comparison with no partial result. Incremental and stream comparison is
+  unsupported. The package runs `action-policy-compare-v1.json`. Existing
+  results and exceptions are unchanged.
+
 - Rust and CLI: a versioned declarative action policy (#1219,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
   `load_action_policy` parses a JSON document (`actionPolicyRevision: 1`, at most

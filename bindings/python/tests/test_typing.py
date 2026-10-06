@@ -54,6 +54,7 @@ def test_functions_carry_introspectable_signatures() -> None:
         "scan": {"text", "policy", "limits", "ruleset", "action_policy"},
         "redact": {"text", "findings", "formatter", "limits"},
         "scan_and_redact": {"text", "policy", "formatter", "limits", "ruleset", "action_policy"},
+        "compare_action_policies": {"text", "policies", "limits", "ruleset"},
         "default_policy": {"finding", "context"},
         "default_placeholder_formatter": {"finding", "context"},
         "typed_placeholder_formatter": {"finding", "context"},

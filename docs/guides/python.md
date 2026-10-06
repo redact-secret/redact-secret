@@ -89,6 +89,108 @@ nothing.
   is the same evaluation `default_policy` gives, computed by the core. Public
   findings gain no field.
 
+## Explain and compare action policies
+
+Before adopting a change, `compare_action_policies` shows what each of 1 to 4
+policies would choose for the same findings. Detection runs **once**; every
+policy then decides the same finalized findings, so the result lists exactly the
+findings `scan` returns for that input, in the same order with the same ids and
+ranges. The decision is
+[explain and compare action policies](../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md);
+the [action policy guide](action-policy.md#explain-and-compare) states what a
+comparison does and does not cover.
+
+```python
+import redact_secret
+from redact_secret import ComparedPolicy
+
+candidate = {
+    "actionPolicyRevision": 1,
+    "base": "default",
+    "rules": [{"id": "allow-github", "match": {"type": ["github_token"]}, "action": "allow"}],
+}
+comparison = redact_secret.compare_action_policies(
+    "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+    [ComparedPolicy.default(), ComparedPolicy.action_policy(candidate)],
+)
+assert comparison.mode == "preview" and comparison.enforced is False
+finding = comparison.findings[0]
+assert [decision.action for decision in finding.decisions] == ["redact", "allow"]
+assert finding.decisions[1].basis == "rule"
+assert (finding.decisions[1].rule_id, finding.decisions[1].rule_index) == ("allow-github", 0)
+assert finding.differs and comparison.changed_count == 1
+assert comparison.sides[1].document_sha256 is not None  # 64 lowercase hex characters
+```
+
+```python
+compare_action_policies(
+    text, policies, limits=None, ruleset=None
+) -> ActionComparison
+```
+
+`policies` is a `list` or `tuple` of 1 to 4 `ComparedPolicy` values, reported in
+the order given. Build each with a static constructor; there is no public
+constructor:
+
+| Constructor | Side |
+| --- | --- |
+| `ComparedPolicy.default()` | the default policy, with no document |
+| `ComparedPolicy.action_policy(document)` | a declarative policy, in the same input forms as `action_policy=` (`dict`, `bytes`, `bytearray` or `str`) |
+| `ComparedPolicy.callback(policy)` | a legacy `policy` callback |
+
+A document is loaded and validated when its side is built, so a rejected one
+raises `InvalidActionPolicyError` there, before any comparison. A side's `kind`
+is `"default"`, `"action-policy"` or `"callback"`, and an action-policy side
+exposes `document_sha256`. `limits` and `ruleset` are the arguments `scan` takes
+and apply to every side; PII activation is the process-wide selection.
+
+The result is immutable and every type is read-only with no public constructor.
+Its field names mirror the CLI's `--json` report in snake case:
+
+| Type | Fields |
+| --- | --- |
+| `ActionComparison` | `mode` (always `"preview"`), `enforced` (always `False`), `detection`, `sides`, `findings` (tuples), `changed_count` |
+| `DetectionIdentity` | `activation_identity`, `profile`, `detector_count` |
+| `ComparedSide` | `kind`, `document_sha256` (64 lowercase hex characters, or `None`), `counts` |
+| `ActionCounts` | `redact`, `block`, `warn`, `allow` |
+| `ComparedFinding` | `id`, `type`, `detector`, `confidence`, `obfuscation`, `start`, `end` (code points), `differs`, `decisions` (a tuple, one per side in order) |
+| `ActionDecision` | `action`, `basis`, `rule_id`, `rule_index` |
+
+`basis` is `"rule"`, `"rule-default"`, `"no-rule-matched"`, `"default-policy"` or
+`"callback"`; `rule_id` and `rule_index` are set for the first two and `None`
+otherwise. `differs` compares actions only, so a changed reason with the same
+action is not flagged. The detection configuration is reported in `detection`,
+apart from every `ComparedSide`: swapping a policy leaves it unchanged, and
+swapping the `ruleset` leaves every digest unchanged. It does not cover a custom
+ruleset, so key a ruleset to your own identity (for example a digest of its
+bytes) next to the comparison.
+
+- **Preview, not enforcement.** A comparison edits no input, returns no text and
+  no placeholder, and changes nothing `scan`, `redact`, `scan_and_redact` or an
+  `IncrementalSanitizer` does. To get the effect of a policy, call `scan` or
+  `scan_and_redact` with it; each declarative side's action equals what that call
+  chooses.
+- **Whole input only.** There is no incremental, session or stream comparison,
+  and a session is not accepted as a side.
+- **Callbacks.** A callback side is called once per finalized finding in finding
+  order with the same `DetectedFinding` and `PolicyContext` `scan` gives it, and
+  sides run one at a time in the order given: two callbacks run `A0 A1 A2 B0 B1
+  B2`. A callback that raises fails the whole comparison with
+  `PolicyFailureError`, and one that returns anything but an action raises
+  `InvalidPolicyActionError`; either way there is no partial result, the failing
+  callback is not called again and no later side runs. A callback with state or
+  side effects advances them during a comparison like any other call. A callback
+  may itself call `scan` or `compare_action_policies`.
+- **Bounds and errors.** The whole-input byte and finding limits apply as in
+  `scan`; the finding bound fails the call before any callback runs. Anything but
+  a `list` or `tuple` of 1 to 4 `ComparedPolicy` values raises
+  `InvalidOptionsError` before detection and before any callback. No new
+  exception exists.
+- **No content.** The result holds no input byte, matched value, snippet, hash of
+  either, retained input or score. A policy document's digest is the only digest.
+- **Threads.** Detection releases the GIL when no side is a callback. A callback
+  side holds it for the call, as `scan` does while it runs a callback.
+
 Catch `redact_secret.SecretScanError` for library failures and stop downstream
 processing. Do not fall back to the raw input. The binding maps callback
 failures to fixed exceptions instead of forwarding the callback's message.

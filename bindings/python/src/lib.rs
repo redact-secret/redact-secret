@@ -17,6 +17,7 @@
 //! UTF-8 byte offsets happens in this crate without changing the selected
 //! span (`decision-govern-cross-language-conformance`).
 
+mod compare;
 mod incremental;
 
 use std::cell::RefCell;
@@ -1028,6 +1029,50 @@ fn with_registry<T>(
     })
 }
 
+/// Like [`with_registry`], but runs `f` with the registry moved out of this
+/// thread's cache, then puts it back.
+///
+/// [`with_registry`] holds the cache borrowed while `f` runs, which is right
+/// when `f` is native detection but would panic if `f` ran a Python callback
+/// that itself scans or compares. Here the borrow ends before `f` starts, so
+/// a nested call builds (or reuses) its own registry; on return this one is
+/// restored unless a nested call already filled the slot, and a stale epoch
+/// is rebuilt by the next call as usual.
+fn with_registry_released<T>(
+    ruleset: Option<&[u8]>,
+    f: impl FnOnce(&DetectorRegistry) -> T,
+) -> Result<T, RegistryError> {
+    // Build (or reuse) the registry for this ruleset and PII epoch.
+    with_registry(ruleset, |_| ())?;
+    let (epoch, bytes, registry) = REGISTRY_CACHE
+        .with(|cache| {
+            let mut cache = cache.borrow_mut();
+            match ruleset {
+                None => cache
+                    .built_in
+                    .take()
+                    .map(|(epoch, registry)| (epoch, None, registry)),
+                Some(_) => cache
+                    .with_ruleset
+                    .take()
+                    .map(|(epoch, bytes, registry)| (epoch, Some(bytes), registry)),
+            }
+        })
+        .ok_or_else(unreachable_cache_miss)?;
+    let output = f(&registry);
+    REGISTRY_CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        match bytes {
+            None if cache.built_in.is_none() => cache.built_in = Some((epoch, registry)),
+            Some(bytes) if cache.with_ruleset.is_none() => {
+                cache.with_ruleset = Some((epoch, bytes, registry));
+            }
+            _ => {}
+        }
+    });
+    Ok(output)
+}
+
 /// Extracts ruleset bytes from a `bytes`/`bytearray` or `str` argument
 /// (`decision-define-declarative-detector-ruleset-contract`'s "Surface
 /// exposure": "a `bytes`/`str` argument in the same position").
@@ -1628,6 +1673,7 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyWholeInputLimits>()?;
     module.add_class::<PyCoreStatus>()?;
 
+    compare::register(module)?;
     incremental::register(module)?;
     register_exceptions(module)?;
 
@@ -1641,7 +1687,7 @@ mod tests {
     use super::{
         ByteRange, CharOffsets, PII_EPOCH, REGISTRY_BUILDS, RegistryError,
         byte_offset_to_char_offset, char_offset, char_range, declarative_action,
-        run_detector_pipeline, with_registry,
+        run_detector_pipeline, with_registry, with_registry_released,
     };
 
     /// A minimal, valid declarative ruleset.
@@ -1662,6 +1708,39 @@ validator: none\n";
             run_detector_pipeline(text, registry).unwrap().len()
         })
         .unwrap()
+    }
+
+    /// Issue #1220: a callback running inside a comparison may itself use the
+    /// registry cache (a nested `scan`), which `with_registry` would panic on;
+    /// the released registry is restored, so the pair costs one build.
+    #[test]
+    fn a_released_registry_allows_a_nested_lookup_and_is_restored() {
+        std::thread::spawn(|| {
+            let start = builds();
+            let outer = with_registry_released(None, |registry| {
+                // The nested lookup finds the slot empty and builds its own.
+                let nested = detect_count(None, "nothing here");
+                (registry.len(), nested)
+            })
+            .unwrap();
+            assert_eq!(outer.1, 0);
+            assert!(outer.0 > 0);
+            // One build for the released registry, one for the nested lookup.
+            assert_eq!(builds() - start, 2);
+            // The nested lookup refilled the slot, so the released registry was
+            // dropped rather than overwriting it, and nothing rebuilds now.
+            assert_eq!(detect_count(None, "nothing here"), 0);
+            assert_eq!(builds() - start, 2);
+
+            // Without a nested lookup the released registry itself is restored.
+            let before = builds();
+            with_registry_released(Some(RULESET), |_| ()).unwrap();
+            assert_eq!(builds() - before, 1);
+            assert_eq!(detect_count(Some(RULESET), "x"), 0);
+            assert_eq!(builds() - before, 1);
+        })
+        .join()
+        .unwrap();
     }
 
     /// Issue #1059: repeated calls reuse one registry per thread, a changed

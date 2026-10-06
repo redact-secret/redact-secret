@@ -91,9 +91,14 @@ detection, and it changes no default.
 ## Explain and compare
 
 Before adopting a change, run it against a representative input and read why
-each finding got its action. The Rust core and the command line compare 1 to 4
-policies (a baseline and up to three candidates) over **one** detection pass:
-detection runs once, then every policy decides the same finalized findings.
+each finding got its action. The Rust core, the command line and Python compare
+1 to 4 policies (a baseline and up to three candidates) over **one** detection
+pass: detection runs once, then every policy decides the same finalized
+findings. Support today (`current`): Rust (`compare_action_policies`), the
+command line (`--compare-action-policy`) and Python
+(`redact_secret.compare_action_policies`, see the [Python guide](python.md#explain-and-compare-action-policies)).
+The Node addon, WebAssembly and the JavaScript package have not shipped it, so
+they expose no comparison and no digest.
 
 ```bash
 redact-secret --action-policy current.json --compare-action-policy next.json app.env
@@ -111,7 +116,7 @@ For every finding the report gives each policy's action and its reason:
 | `callback` | the side is a legacy callback; only its action is known |
 
 Each document-based policy is bound to the SHA-256 of its exact bytes
-(`documentSha256`), so the same file gives the same binding on every surface and
+(`documentSha256`, `document_sha256` in Python), so the same file gives the same binding on every surface and
 any changed byte, including whitespace, changes it. The detection configuration
 (activation identity, profile, detector count) is reported separately; a custom
 ruleset's identity is yours to record, for example a digest of its bytes.
