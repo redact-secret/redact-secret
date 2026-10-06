@@ -73,7 +73,17 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// `personalAccessKeyId`, `personalAccessKeyExpiresAt`, a further-prefixed
 /// `my_personal_access_key` and `portalId` do not match. The field name rests
 /// on `HubSpot`'s own SDK source, not a documentation sentence.
+///
+/// Issue #1228 (Group C, `JFrog` reference token) and #1230 (Group E, `JFrog` API
+/// key) add the one header both families share: `X-JFrog-Art-Api` in any
+/// letter case (`X-JFrog-Art-API`, `x-jfrog-art-api`), which normalizes to
+/// `x_jfrog_art_api`. `JFrog` documents it as the header that carries an API key
+/// or a reference token; the credential-evidence Cases flag the value by its
+/// position, not its shape. Exactly this name: `jfrog_art_api`,
+/// `x_jfrog_art_api_id` and a further-prefixed `my_x_jfrog_art_api` do not
+/// match. `curl -u user:<secret>` is not read (issue #1247).
 const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &[
+    "x_jfrog_art_api",
     "mac_secret_base64",
     "personal_access_key",
     "hubspot_personal_access_key",

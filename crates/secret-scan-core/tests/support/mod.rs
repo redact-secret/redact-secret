@@ -454,3 +454,75 @@ pub fn single_byte_partition(input: &str) -> Vec<String> {
 pub fn as_chunks(pieces: &[String]) -> Vec<&str> {
     pieces.iter().map(String::as_str).collect()
 }
+
+// ---------------------------------------------------------------------------
+// whole-input / 7-byte / 1-byte parity helpers (Groups C, D and E fixes)
+// ---------------------------------------------------------------------------
+
+/// The whole-input findings of `input`, asserting that a session fed 1-byte
+/// and 7-byte chunks releases the same text and the same findings.
+pub fn findings_with_parity(input: &str) -> Vec<Finding> {
+    let (expected_text, expected) = whole_input(input);
+    let one = single_byte_partition(input);
+    let session = run(&as_chunks(&one));
+    assert_eq!(session.text(), expected_text, "{input:?}: 1-byte text");
+    assert_eq!(session.findings(), expected, "{input:?}: 1-byte findings");
+    let sevens: Vec<&[u8]> = input.as_bytes().chunks(7).collect();
+    let seven = decode_byte_chunks(&sevens);
+    let session = run(&as_chunks(&seven));
+    assert_eq!(session.text(), expected_text, "{input:?}: 7-byte text");
+    assert_eq!(session.findings(), expected, "{input:?}: 7-byte findings");
+    expected
+}
+
+/// No finding in the whole input, in 7-byte chunks or in 1-byte chunks.
+pub fn assert_clean(input: &str) {
+    let findings = findings_with_parity(input);
+    assert!(findings.is_empty(), "{input:?}: {findings:?}");
+}
+
+/// Exactly the findings that cover the `values`, in order: each one a
+/// `contextual_secret` at `confidence` with `action`, over exactly the value;
+/// for `Action::Redact` the redacted text carries none of the values.
+pub fn assert_values_with(
+    input: &str,
+    values: &[&str],
+    confidence: Confidence,
+    action: redact_secret::Action,
+) {
+    let findings = findings_with_parity(input);
+    assert_eq!(findings.len(), values.len(), "{input:?}: {findings:?}");
+    let mut from = 0usize;
+    for (finding, value) in findings.iter().zip(values) {
+        let start = from
+            + input[from..]
+                .find(value)
+                .expect("the value is in the input");
+        let range = finding.range();
+        assert_eq!(
+            (range.start(), range.end()),
+            (start, start + value.len()),
+            "{input:?}: {findings:?}"
+        );
+        assert_eq!(finding.type_name(), "contextual_secret", "{input:?}");
+        assert_eq!(finding.confidence(), confidence, "{input:?}");
+        assert_eq!(finding.action(), action, "{input:?}");
+        from = start + value.len();
+    }
+    if action == redact_secret::Action::Redact {
+        let (text, _) = whole_input(input);
+        for value in values {
+            assert!(!text.contains(value), "{input:?}: {text:?}");
+        }
+    }
+}
+
+/// One `contextual_secret`, high confidence, `redact`, exactly `value`.
+pub fn assert_value(input: &str, value: &str) {
+    assert_values_with(
+        input,
+        &[value],
+        Confidence::High,
+        redact_secret::Action::Redact,
+    );
+}

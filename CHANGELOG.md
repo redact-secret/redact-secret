@@ -7,6 +7,13 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` now reads the `X-JFrog-Art-Api` header (#1228, #1230): the
+  value of `X-JFrog-Art-Api` or `X-JFrog-Art-API` (any letter case) is a
+  `contextual_secret`, high, `redact`, exactly the value, in raw HTTP, a curl
+  `-H` argument and a JSON header map, where it was silent and the credential
+  stayed in the output. Whole name only; placeholders, masks and neighbouring
+  names stay silent. The `curl -u user:<secret>` password is still not read
+  (#1247).
 - `generic-token` no longer reports documentation placeholders that name a
   service (#1234): a `YOUR_` lead plus listed service words and a credential
   noun (`YOUR_DB_PASSWORD`, `YOUR_ZOOM_CLIENT_SECRET`,
