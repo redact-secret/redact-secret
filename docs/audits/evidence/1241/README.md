@@ -50,7 +50,7 @@ Product observations, not coverage claims and not a benchmark result.
 
 1. **It is the accepted rule, not a new one.** `oauth_token` is read by the
    prefixed `_token` name default that also reads `access_token` and
-   `refresh_token`, and a bare `token` name stays silent ([#1203](../1203/README.md)).
+   `refresh_token`, and a bare `token` name stays silent ([#1203](../../../decisions/2026-10-04-settle-the-open-structured-file-url-carrier-and-control-roots-of-1203.md)).
    Carving out one prefixed name adds a vocabulary exception that no other
    OAuth field has.
 2. **The alternative needs a context rule that costs more than it saves.**
