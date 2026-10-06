@@ -1650,6 +1650,106 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_composite_with_placeholder_secret_part(value)
         || is_terraform_sensitive_marker(value)
         || is_pem_framed_placeholder(value)
+        || is_brace_placeholder_reference(value)
+        || is_elided_middle_display(value)
+}
+
+/// The most letters in one word of a brace placeholder (`{your-app_id}`).
+const MAX_BRACE_PLACEHOLDER_WORD_LEN: usize = 24;
+/// The most bytes between the braces of one placeholder.
+const MAX_BRACE_PLACEHOLDER_NAME_LEN: usize = 48;
+
+/// The length of the placeholder group at the start of `bytes`:
+/// `{` + one or more words of ASCII letters (1 to
+/// [`MAX_BRACE_PLACEHOLDER_WORD_LEN`] each) joined by `_`, `-`, `.` or one
+/// space, in at most [`MAX_BRACE_PLACEHOLDER_NAME_LEN`] bytes, + `}`.
+fn brace_group_len(bytes: &[u8]) -> Option<usize> {
+    if bytes.first() != Some(&b'{') {
+        return None;
+    }
+    let mut word = 0usize;
+    let mut index = 1usize;
+    while let Some(&byte) = bytes.get(index) {
+        match byte {
+            b'}' if word > 0 => return Some(index + 1),
+            b'_' | b'-' | b'.' | b' ' if word > 0 => word = 0,
+            letter if letter.is_ascii_alphabetic() => {
+                word += 1;
+                if word > MAX_BRACE_PLACEHOLDER_WORD_LEN {
+                    return None;
+                }
+            }
+            _ => return None,
+        }
+        index += 1;
+        if index > MAX_BRACE_PLACEHOLDER_NAME_LEN + 1 {
+            return None;
+        }
+    }
+    None
+}
+
+/// The length of the brace placeholder at the start of `bytes`: one
+/// [`brace_group_len`] group, or two joined by `|` or `:` (the documented
+/// app-id and app-secret template `{your-app_id}|{your-app_secret}`).
+fn brace_placeholder_len(bytes: &[u8]) -> Option<usize> {
+    let first = brace_group_len(bytes)?;
+    if matches!(bytes.get(first), Some(b'|' | b':'))
+        && let Some(second) = brace_group_len(&bytes[first + 1..])
+    {
+        return Some(first + 1 + second);
+    }
+    Some(first)
+}
+
+/// `true` when the whole `value` is a brace template placeholder: the RFC 6570
+/// style `{name}` documentation writes where a caller supplies a value
+/// (`{CLIENT_SECRET}`, `{your-app_id}`, `{user-access-token}`,
+/// `{YOUR_DEVELOPER_API_KEY}`), alone or as an `{id}|{secret}` pair (issue
+/// #1234). Closed grammar: ASCII letters in words joined by `_`, `-`, `.` or a
+/// space, so a digit, any other byte, an empty group or a word over 24 letters
+/// keeps the value reported (a brace-wrapped GUID or random alphanumeric
+/// secret is not a placeholder). FN cost: a real secret that is letters only
+/// in short words inside one pair of braces.
+fn is_brace_placeholder_reference(value: &str) -> bool {
+    brace_placeholder_len(value.as_bytes()) == Some(value.len())
+}
+
+/// The span of the brace placeholder that opens the query, fragment or form
+/// parameter value at `start`, when a value boundary follows it. The plain
+/// scan ends at the first `}` and read `{your-app_id` as the value (issue
+/// #1234).
+fn query_brace_placeholder(input: &str, start: usize) -> Option<(usize, usize)> {
+    let bytes = input.as_bytes();
+    let len = brace_placeholder_len(bytes.get(start..)?)?;
+    let end = start + len;
+    bytes
+        .get(end)
+        .is_none_or(|&byte| is_query_value_stop(byte))
+        .then_some((start, end))
+}
+
+/// `true` for a documentation display that shows the first and last few
+/// characters of a key around one elision (issue #1234):
+/// `CFPAT-123...789`. A visible head of 1 to [`MAX_MASK_VISIBLE_SIDE`]
+/// `[A-Za-z0-9_-]` characters, exactly three `.` or one `…`, and a visible
+/// tail of 1 to [`MAX_MASK_VISIBLE_SIDE`] `[A-Za-z0-9_-]` characters. The
+/// elided value is not in the text, the middle-elision twin of
+/// [`is_ellipsis_truncated_display`]; no documented credential grammar contains
+/// `...` between alphanumerics.
+fn is_elided_middle_display(value: &str) -> bool {
+    let visible = |side: &str| {
+        (1..=MAX_MASK_VISIBLE_SIDE).contains(&side.len())
+            && side
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+    };
+    if let Some((head, tail)) = value.split_once('\u{2026}') {
+        return visible(head) && visible(tail);
+    }
+    value
+        .split_once("...")
+        .is_some_and(|(head, tail)| visible(head) && visible(tail))
 }
 
 /// The value Terraform prints in a plan or apply for an attribute it
@@ -1749,6 +1849,33 @@ fn is_credential_variable_name_value(value: &str) -> bool {
             .rsplit('_')
             .next()
             .is_some_and(|tail| CREDENTIAL_NAME_TAIL_WORDS.contains(&tail))
+}
+
+/// `true` for a quoted `UPPER_SNAKE` credential variable name
+/// ([`is_credential_variable_name_value`]) whose last segment is the last
+/// segment of the slot it sits in (issue #1234): `"x-api-key": "ZOOM_API_KEY"`,
+/// `"password": "ADMIN_PASSWORD"`, `"client_secret": "APP_SECRET"`. The
+/// unquoted form was already a reference; a quoted literal needs the slot to
+/// agree, so a quoted `"api_key": "OTHER_TOKEN"` and any random value stay
+/// reported. `name` is the normalized slot name; `password`, `passwd` and
+/// `passphrase` count as one word. FN cost: a real secret that is an all-caps
+/// word chain of at least two segments whose last segment is the slot's own
+/// last word.
+fn is_quoted_variable_name_for_slot(name: &str, value: &str) -> bool {
+    fn family(word: &str) -> &str {
+        match word {
+            "passwd" | "passphrase" => "password",
+            other => other,
+        }
+    }
+    let Some(value_tail) = value.rsplit('_').next() else {
+        return false;
+    };
+    let value_tail = value_tail.to_ascii_lowercase();
+    let slot_tail = name.rsplit('_').next().unwrap_or(name);
+    !value.ends_with(')')
+        && is_credential_variable_name_value(value)
+        && family(&value_tail) == family(slot_tail)
 }
 
 /// Credential nouns that end a lowercase placeholder phrase.
@@ -2012,7 +2139,12 @@ const MAX_LONG_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 14;
 /// (issue #1236): `EAAA` is the Square access-token prefix. Each is listed
 /// exactly, so any other uppercase lead (`KEY_YOUR_API_KEY`, #756) stays
 /// reported.
-const UPPERCASE_PLACEHOLDER_PREFIXES: &[&str] = &["EAAA"];
+///
+/// Issue #1234 adds `CFPAT`, the Contentful CMA personal access token prefix
+/// that Contentful's own repositories write in front of their placeholders
+/// (`CFPAT-xxx`, `CFPAT-<your-token>`, `CFPAT-your-token`); credential-evidence
+/// Case `contentful-cma-personal-access-token-documented-placeholders-and-masks`.
+const UPPERCASE_PLACEHOLDER_PREFIXES: &[&str] = &["EAAA", "CFPAT"];
 
 /// `true` for a documentation placeholder behind one of
 /// [`UPPERCASE_PLACEHOLDER_PREFIXES`] (issue #1236): the prefix, then either
@@ -2263,6 +2395,7 @@ fn assignment_confidence(
         || is_confluent_key_id_assignment(name, value)
         || is_atlas_public_api_key_assignment(name, value)
         || is_self_reference(name, value)
+        || (form == ValueForm::Quoted && is_quoted_variable_name_for_slot(name, value))
     {
         return None;
     }
@@ -2422,6 +2555,13 @@ const DELIMITED_REFERENCE_OPENERS: &[DelimitedOpener] = &[
         open: "{file:",
         nest_open: '{',
         close: '}',
+    },
+    // An angle placeholder may hold spaces (`<contents of private.key>`,
+    // issue #1234); the unquoted scan ended it at the first one.
+    DelimitedOpener {
+        open: "<",
+        nest_open: '<',
+        close: '>',
     },
 ];
 
@@ -2885,6 +3025,9 @@ fn query_parameter_value(
     // The value ends at the first byte below, wherever the scan began, so a
     // stop further than the length bound is a failure and a nearer one is the
     // end of the value (issue #1055).
+    if let Some(span) = query_brace_placeholder(input, start) {
+        return Some(span);
+    }
     let stop = reach.first_stop(input, start, is_query_value_stop)?;
     (stop > start).then_some((start, stop))
 }
@@ -2898,6 +3041,11 @@ fn is_query_value_stop(byte: u8) -> bool {
 /// tests compare it against.
 #[cfg(test)]
 fn query_parameter_value_walk(input: &str, start: usize) -> Option<(usize, usize)> {
+    // The brace placeholder of issue #1234 is the one span the walk does not
+    // produce; it is the same function the production path calls.
+    if let Some(span) = query_brace_placeholder(input, start) {
+        return Some(span);
+    }
     let mut cursor = start;
     while let Some(ch) = char_at(input, cursor) {
         if is_unquoted_value_boundary(Some(ch)) || matches!(ch, '&' | '#' | ')' | '<' | '>') {

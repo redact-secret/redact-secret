@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- `generic-token` no longer reports brace, angle, documented-mask and
+  upper-case placeholders under credential names (#1234): `{CLIENT_SECRET}`,
+  `{your-app_id}|{your-app_secret}` and `{short-lived-access-token}` in a query,
+  form or quoted value; `<contents of private.key>`; `CFPAT-xxx` and
+  `CFPAT-123...789`; and a quoted `"x-api-key": "ZOOM_API_KEY"`. Brace groups
+  with digits, glued material or a real-shaped value stay detected.
 - `generic-token` now reads the `X-JFrog-Art-Api` header (#1228, #1230): the
   value of `X-JFrog-Art-Api` or `X-JFrog-Art-API` (any letter case) is a
   `contextual_secret`, high, `redact`, exactly the value, in raw HTTP, a curl
