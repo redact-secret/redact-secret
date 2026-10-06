@@ -330,7 +330,7 @@ jobs:
           cache: npm
 
       - name: Set up stable Rust with the addon target
-        uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # v1
+        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
@@ -512,7 +512,7 @@ jobs:
           cache: npm
 
       - name: Set up stable Rust with the wasm32 target
-        uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # v1
+        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
         with:
           toolchain: stable
           targets: wasm32-unknown-unknown
@@ -612,7 +612,7 @@ jobs:
           node-version: 20
 
       - name: Set up stable Rust with the CLI target
-        uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # v1
+        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
@@ -661,7 +661,7 @@ jobs:
           cache: npm
 
       - name: Set up stable Rust with the macOS ARM target
-        uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # v1
+        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
         with:
           toolchain: stable
           targets: aarch64-apple-darwin
@@ -1201,7 +1201,7 @@ jobs:
 
       - name: Set up stable Rust
         if: needs.plan.outputs.full == 'true'
-        uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # v1
+        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
         with:
           toolchain: stable
 
