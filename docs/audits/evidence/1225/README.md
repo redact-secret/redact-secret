@@ -220,3 +220,58 @@ grammar is also pinned by the `generic_token` unit tests and
 `batch1_credential_slots_1209_1213.rs`. The observations above are pinned by this
 record only. The independent measurement is the benchmarks side's.
 
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+(candidate, corpus digests, results, the 25 differing cases) are in the
+[#1223 record](../1223/README.md).
+
+The accepted replay is benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`) of the exact candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db` on the frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), with round 1 `74fed382...` and Batch 1 as regression, on Node, WASM,
+Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "The independent replay of the fixed candidate is open" (Result, Handoff) | Done and accepted: benchmarks #771. |
+| "The fixed candidate does not exist as a measured identity" (Identities, Gates) | It does: `4e0041081aad22d0101bd52db52017b67b5bd3db`. |
+| Gates "Node/WASM, Python, Rust and CLI ...: Partly" and "Exact candidate revision ...; accept independent replay: Open" | Met, see below. |
+| "Open: Node, WASM and Python with the fixed candidate" | Replayed by the benchmark, identical to the CLI. |
+
+### Dispositions at `4e004108`
+
+| Row | Ledger disposition | Positives failing / controls flagged | Whole equals stream (7-byte, 1-byte), four surfaces identical |
+| --- | --- | --- | --- |
+| `hubspot:personal-access-key` | fixed by candidate `4e004108`, replay verified ([#1233](../1233/README.md)); the 8 positives now pass | 0 / 0 | 60/60, 60/60; 15/15 cases |
+| `x:oauth1-access-token-secret` | fixed by candidate `4e004108`, replay verified ([#1232](../1232/README.md)); the `oauth_token_secret-form-empty-null` control is clean | 0 / 0 | 220/220, 220/220; 55/55 cases |
+| `jfrog:myjfrog-api-token` | already-covered / no-code | 0 / 0 | 108/108, 108/108; 27/27 cases |
+
+The unscored HubSpot `personalAccessKey-legacy-portals` observation changed from
+no finding to a `contextual_secret` / `redact` finding at 55-91 (the name is read
+wherever it appears); the legacy layout stays unresolved and is not scored.
+
+`oauth_token` is unchanged: the round-3 report still lists
+`x:oauth1-access-token-secret` as a contract-evidence conflict between the
+evidence's public-lookalike role and the product default, with the candidate
+observation unchanged and "owners decide". The product decision is
+[#1241](../1241/README.md) (default kept, a deliberate deviation from the
+evidence role). Whether the benchmarks ledger records it as a resolved policy
+deviation is the benchmarks side's step and is not shown by the round-3 report.
+
+### Gates of the issue at `4e004108`
+
+| Gate | State |
+| --- | --- |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | **Met.** Replayed by the benchmark on all four surfaces, whole and 7-byte and 1-byte streamed, identical (the CLI is the Rust surface). |
+| Exact candidate revision and digests to benchmarks; accept independent replay | **Met.** Candidate `4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No candidate package was published, so no package digest is claimed. |
+| All other gates | Met, unchanged. |
+
+The figures are read from the merged report and ledger; the harness was not
+re-run for this addendum.

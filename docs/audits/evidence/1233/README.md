@@ -90,3 +90,38 @@ The 8 gates are stated per package in the [#1225 record](../1225/README.md#gates
 This record closes the repair of the demonstrated gap, the evidenced vocabulary
 addition and the deterministic conformance for it; the independent replay of the
 fixed candidate on Node, WASM, Python and the CLI stays open.
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+are in the [#1223 record](../1223/README.md).
+
+The fix is in candidate `4e0041081aad22d0101bd52db52017b67b5bd3db` (PR #1235) and
+was replayed by the benchmark: benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`), frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), Node, WASM, Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "the independent replay of the fixed candidate on Node, WASM, Python and the CLI stays open" (Gates) | Done and accepted: benchmarks #771. |
+| "none of the 8 positives ... produced a finding, on every surface" (Result) | Still the record of the baseline. On `4e004108` all 8 positives pass on every surface and stream (the 8 `personalAccessKey-*` and `HUBSPOT_PERSONAL_ACCESS_KEY-*` cases), with the 4 row controls clean. |
+
+Disposition at `74c88531` for `hubspot:personal-access-key`: `fixed by candidate
+4e004108, replay verified on Node, WASM, Python and CLI (whole, 7-byte and 1-byte
+streams)`; 0 positives failing, 0 controls flagged; whole equals stream on 60/60
+entries at both chunk sizes and the four surfaces are identical on 15/15 cases.
+The only other HubSpot difference from `a148dadf` is the unscored
+`personalAccessKey-legacy-portals` observation, which changed from no finding to a
+`contextual_secret` / `redact` finding at 55-91: the name is read wherever it
+appears, the legacy `portals` layout stays unresolved and is not scored, and no
+other row moved because of this change.
+
+Gate "independent replay of the fixed candidate": **met**, candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No
+package digest is claimed (no candidate package was published). Figures are read
+from the merged report and ledger; the harness was not re-run for this addendum.

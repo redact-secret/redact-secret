@@ -180,3 +180,51 @@ tests and the `bearer-token` and `jwt` tests; the independent measurement is the
 benchmarks side's, with its own corpus and scorer. The product observations above
 are pinned by this record only.
 
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+(candidate, corpus digests, results, the 25 differing cases) are in the
+[#1223 record](../1223/README.md).
+
+The accepted replay is benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`) of the exact candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db` on the frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), with round 1 `74fed382...` and Batch 1 as regression, on Node, WASM,
+Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "The independent replay of a fixed candidate does not apply to this package ... but it is covered by the whole-corpus regression replay stated under Handoff" (Result) | The regression replay ran and is accepted. None of the 25 cases that differ from `a148dadf` belongs to a G4 row, and the ledger records no change versus the previous candidate for any of the four. |
+| "What the benchmarks side replays (open)" (Handoff) | Done: benchmarks #771. |
+| Gates "Node/WASM, Python, Rust and CLI ...: Partly" and "Exact candidate revision ...; accept independent replay: Open" | Met, see below. |
+| Elastic rows "reused" (Disposition legend) | Unchanged in substance. The ledger label is `fixed in candidate by an existing core fix (no new gap)`. |
+
+### Dispositions at `4e004108`
+
+| Row | Ledger disposition | Positives failing / controls flagged | Whole equals stream (7-byte, 1-byte), four surfaces identical |
+| --- | --- | --- | --- |
+| `elastic:cloud-api-key` | fixed in candidate by an existing core fix (no new gap): the Batch 1 [#1212](../1212/README.md) fix | 0 / 0 | 76/76, 76/76; 19/19 cases |
+| `elastic:ece-api-key` | fixed in candidate by an existing core fix (no new gap) | 0 / 0 | 76/76, 76/76; 19/19 cases |
+| `jfrog:access-token` | already-covered / no-code | 0 / 0 | 220/220, 220/220; 55/55 cases |
+| `x:app-only-bearer-token` | already-covered / no-code | 0 / 0 | 120/120, 120/120; 30/30 cases |
+
+The round-3 report keeps the percent-containing forms of `x:app-only-bearer-token`
+as observed and not scored: they still redact only the prefix before the first
+`%`, as the representation decision states. This package changed no code.
+
+### Gates of the issue at `4e004108`
+
+| Gate | State |
+| --- | --- |
+| Node/WASM, Python, Rust and CLI whole and stream behavior | **Met.** Replayed by the benchmark on all four surfaces, whole and 7-byte and 1-byte streamed, identical (the CLI is the Rust surface). |
+| Exact candidate revision and digests to benchmarks; accept independent replay | **Met.** Candidate `4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No candidate package was published, so no package digest is claimed. |
+| All other gates | Met, unchanged. |
+
+The figures are read from the merged report and ledger; the harness was not
+re-run for this addendum.

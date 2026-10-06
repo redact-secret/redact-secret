@@ -256,3 +256,18 @@ redacts; a signature header and a keyed proof are silent while `plainToken` and
 two-chunk UTF-8 byte partition equals a per-line session.
 
 No pin, version or release change.
+
+## Correction (2026-10-06): the declarative overlay is shipped and the role question is answered
+
+Addendum. The text above is kept as written; two statements are superseded.
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "the user lowers the action with the action configuration (policy callback today, declarative overlay when #1216 to #1222 land)" (option table, class decision 2) | The declarative overlay is shipped. A user action policy is a versioned JSON document (`actionPolicyRevision: 1`, `base: "default"`) loaded with the CLI `--action-policy` and previewed with `--compare-action-policy`, and the callback remains. See [`docs/specs/engine.md`](../../../specs/engine.md) and the decisions [`decision-define-the-versioned-declarative-action-policy-and-default-overlay`](../../../decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md) and [`decision-explain-and-compare-action-policies-over-one-detection-pass`](../../../decisions/2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md). |
+| "One open question is handed to the configuration design (#1217 and #1218) ...: findings carry no role, so a user cannot select 'search-only keys' in a policy, only a type, a detector, a confidence or a range." | Answered by the policy decision above: revision 1 selects by `type`, `detector`, `confidence` and `obfuscation` only. A role, range or specificity matcher is not part of revision 1 (an unknown field rejects the document, `UNKNOWN_FIELD`) and is barred until a reviewed role grammar reopens [`decision-keep-credential-role-facts-out-of-detection-attribution-and-default-action`](../../../decisions/2026-10-06-keep-credential-role-facts-out-of-detection-attribution-and-default-action.md). A rule on `contextual_secret` lowers every finding of that type, because findings carry no role. The "range" in the earlier wording is also not a matcher. |
+
+Nothing else in this record changes: the role-neutral detection, the type-based
+default and the per-row tables stand, and the rows remain conditional. The
+independent baseline for Group D (benchmarks
+[#753](https://github.com/redact-secret/redact-secret-benchmarks/issues/753)) was
+not checked again for this correction.

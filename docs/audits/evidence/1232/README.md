@@ -101,3 +101,38 @@ UTF-8 byte partition and per-line incremental parity.
 The 8 gates are stated per package in the [#1223 record](../1223/README.md#gates-of-the-issue).
 This record closes the shared-parser-fix and deterministic-conformance gates for
 the empty value; the independent replay of the fixed candidate stays open.
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+are in the [#1223 record](../1223/README.md).
+
+The fix is in candidate `4e0041081aad22d0101bd52db52017b67b5bd3db` (PR #1235) and
+was replayed by the benchmark: benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`), frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), Node, WASM, Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "the replay of the fixed candidate on them is the benchmarks side's step and stays open" (Before and after) and "the independent replay of the fixed candidate stays open" (Gates) | Done and accepted: benchmarks #771. |
+| "On the CLI surface the replay ... left 0 controls flagged" (local, CLI only) | Confirmed by the benchmark on all four surfaces: all 15 cases are `clean`. Of the 25 cases that differ from `a148dadf`, 15 are these controls (`airtable`, `asana` x2, `box` x2, `dropbox` x2, `hubspot` x2, `meta`, `salesforce`, `x` x2, `zendesk`, `zoom`, one `...-form-empty-null:control` each); the replay lists them case by case. |
+
+Dispositions at `74c88531`: the 15 rows of this issue, 14 in G1 to G3 of
+[#1223](../1223/README.md) and `x:oauth1-access-token-secret` of
+[#1225](../1225/README.md), are `fixed by candidate 4e004108, replay verified on
+Node, WASM, Python and CLI (whole, 7-byte and 1-byte streams)`, with 0 positives
+failing and 0 controls flagged and no regression. The accepted trade-off was
+checked: the frozen corpora contain no positive whose expected value starts with
+`&` (round 2 0, round 1 0, Batch 1 0). A one-off synthetic probe with the
+candidate build, not a corpus case and not scored, confirms `password=&name=<run>`
+yields no finding.
+
+Gate "independent replay of the fixed candidate": **met**, candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No
+package digest is claimed (no candidate package was published). Figures are read
+from the merged report and ledger; the harness was not re-run for this addendum.

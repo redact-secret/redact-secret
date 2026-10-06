@@ -97,3 +97,38 @@ The 8 gates are stated per package in the [#1226 record](../1226/README.md#gates
 This record closes the repair of the demonstrated false positive and its
 deterministic conformance; the independent replay of the fixed candidate on
 Node, WASM, Python and the CLI stays open.
+
+## Final state at 4e004108 / replay accepted (2026-10-06)
+
+Addendum. The text above is kept as written; the statements below are superseded
+and this section is the current state. Replay facts shared by all Batch 2 records
+are in the [#1223 record](../1223/README.md).
+
+The fix is in candidate `4e0041081aad22d0101bd52db52017b67b5bd3db` (PR #1235) and
+was replayed by the benchmark: benchmarks
+[#771](https://github.com/redact-secret/redact-secret-benchmarks/pull/771)
+(merge `74c88531f7f185e687eabe6477fff5b06f54e2e9`), frozen round-2 corpus
+`sha256:a312308a141e3157c859f62e53c5e0762ca91c2e0083d0e02497848ebee8b921` (1935
+cases), Node, WASM, Python and the CLI, whole and at 7-byte and 1-byte chunks
+([round-3 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/round3/report.md),
+[ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/74c88531f7f185e687eabe6477fff5b06f54e2e9/evidence/739/ledger.json)).
+
+| Earlier statement (in this record) | State now |
+| --- | --- |
+| "the replay of the fixed candidate on Node, WASM and Python is the benchmarks side's step and stays open" (Before and after) and "the independent replay ... stays open" (Gates) | Done and accepted: benchmarks #771. |
+| `password-member-placeholders:control` "flagged ... After: clean" (CLI replay) | Confirmed by the benchmark on all four surfaces: clean. |
+
+Disposition at `74c88531` for `mongodb-atlas:database-user-password`: `fixed by
+candidate 4e004108, replay verified on Node, WASM, Python and CLI (whole, 7-byte
+and 1-byte streams)`; 0 positives failing, 0 controls flagged; whole equals stream
+on 148/148 entries at both chunk sizes and the four surfaces are identical on
+37/37 cases. The round-3 report states the side effect precisely: the new
+password-word list changed one control (the Atlas `YOUR_PASSWORD` placeholder);
+the password-field and URI-userinfo positives, the low-entropy warn cases and all
+other password-named cases are unchanged. The percent-escaped URI password stays
+observed and not scored (see the [#1226 record](../1226/README.md)).
+
+Gate "independent replay of the fixed candidate": **met**, candidate
+`4e0041081aad22d0101bd52db52017b67b5bd3db`, accepted as benchmarks #771. No
+package digest is claimed (no candidate package was published). Figures are read
+from the merged report and ledger; the harness was not re-run for this addendum.
