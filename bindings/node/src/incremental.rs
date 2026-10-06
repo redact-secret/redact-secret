@@ -29,17 +29,17 @@ use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 use std::rc::Rc;
 
-use napi::bindgen_prelude::{Env, FnArgs, Function, FunctionRef};
+use napi::bindgen_prelude::{Buffer, Env, FnArgs, Function, FunctionRef};
 use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, DefaultPolicy, DetectedFinding, Finding, FormatterFailure,
     IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext, IncrementalResult,
     IncrementalSanitizer, PlaceholderContext, PlaceholderFormatter, PolicyFailure, Profile,
     SecretScanError as CoreError, SecretScanErrorCode, SessionState,
-    default_placeholder_formatter as core_default_formatter,
+    default_placeholder_formatter as core_default_formatter, load_action_policy,
 };
 
-use crate::error::to_js_error;
+use crate::error::{to_js_action_policy_error, to_js_error};
 use crate::{FormatterCallback, JsDetectedFinding, JsFinding, JsPlaceholderContext};
 
 // ---------------------------------------------------------------------
@@ -527,6 +527,12 @@ pub struct JsIncrementalOptions<'env> {
     /// `<SECRET_N>` formatter.
     #[napi(ts_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     pub formatter: Option<FormatterCallback<'env>>,
+    /// The bytes of a revision 1 declarative action policy document
+    /// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+    /// issue #1219). Parsed once here, at construction; the compiled policy
+    /// is owned by the session. Giving it together with `policy` is
+    /// `INVALID_OPTIONS`; a rejected document is `INVALID_ACTION_POLICY`.
+    pub action_policy: Option<Buffer>,
 }
 
 fn to_core_limits(limits: &JsIncrementalLimits) -> Result<IncrementalLimits, CoreError> {
@@ -746,9 +752,22 @@ fn build(
     let policy_failure = Rc::new(Cell::new(None));
     let current_env: Rc<Cell<Option<Env>>> = Rc::new(Cell::new(None));
 
-    let policy: Box<dyn IncrementalPolicy> = match options.policy {
-        None => Box::new(DefaultPolicy),
-        Some(callback) => {
+    // A callback and an action policy together are host misuse, rejected
+    // before the document is read. The document is then loaded once, here:
+    // the session owns the compiled policy for its whole life, so no other
+    // session or call can change what it evaluates.
+    if options.policy.is_some() && options.action_policy.is_some() {
+        return Err(to_js_error(SecretScanErrorCode::InvalidOptions.into()));
+    }
+    let action_policy = match options.action_policy.as_deref() {
+        None => None,
+        Some(bytes) => Some(load_action_policy(bytes).map_err(to_js_action_policy_error)?),
+    };
+
+    let policy: Box<dyn IncrementalPolicy> = match (options.policy, action_policy) {
+        (None, Some(overlay)) => Box::new(overlay),
+        (None, None) => Box::new(DefaultPolicy),
+        (Some(callback), _) => {
             // Unreachable in practice: `callback` is already a validated JS
             // function value by the time N-API decoded `options`, so only an
             // internal engine failure could prevent taking a reference to
@@ -1155,6 +1174,7 @@ mod tests {
             limits: generous_js_limits(),
             policy: None,
             formatter: None,
+            action_policy: None,
         };
         let mut sanitizer = create_incremental_sanitizer_common(options).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
@@ -1164,5 +1184,67 @@ mod tests {
         let (_, released) = sanitizer.session.finalize().unwrap().into_parts();
         findings.extend(released);
         assert!(findings.is_empty());
+    }
+
+    fn action_policy_options(document: &[u8]) -> JsIncrementalOptions<'static> {
+        JsIncrementalOptions {
+            limits: generous_js_limits(),
+            policy: None,
+            formatter: None,
+            action_policy: Some(Buffer::from(document)),
+        }
+    }
+
+    /// Every action the session assigns across `chunks`, in order.
+    fn session_actions(sanitizer: &mut JsIncrementalSanitizer, chunks: &[&str]) -> Vec<Action> {
+        let mut actions = Vec::new();
+        for chunk in chunks {
+            let (_, released) = sanitizer.session.append(chunk).unwrap().into_parts();
+            actions.extend(released.iter().map(Finding::action));
+        }
+        let (_, released) = sanitizer.session.finalize().unwrap().into_parts();
+        actions.extend(released.iter().map(Finding::action));
+        actions
+    }
+
+    /// An incremental session evaluates the action policy it was built with,
+    /// at every partition of the input, and two live sessions of different
+    /// policies do not affect each other, in either construction order
+    /// (issue #1219: no process-global policy slot).
+    #[test]
+    fn a_session_binds_the_action_policy_it_was_constructed_with() {
+        const WARN: &[u8] = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#;
+        const ALLOW: &[u8] = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"allow-github","match":{"type":["github_token"]},"action":"allow"}]}"#;
+        let input = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+        for split in 1..input.len() {
+            let (head, tail) = input.split_at(split);
+            let mut warn = create_incremental_sanitizer(action_policy_options(WARN)).unwrap();
+            let mut allow = create_incremental_sanitizer(action_policy_options(ALLOW)).unwrap();
+            let mut default = create_incremental_sanitizer(JsIncrementalOptions {
+                limits: generous_js_limits(),
+                policy: None,
+                formatter: None,
+                action_policy: None,
+            })
+            .unwrap();
+            assert_eq!(session_actions(&mut warn, &[head, tail]), [Action::Warn]);
+            assert_eq!(session_actions(&mut allow, &[head, tail]), [Action::Allow]);
+            assert_eq!(
+                session_actions(&mut default, &[head, tail]),
+                [Action::Redact]
+            );
+        }
+    }
+
+    #[test]
+    fn a_rejected_action_policy_fails_session_construction() {
+        let error = create_incremental_sanitizer(action_policy_options(b"{}"))
+            .err()
+            .expect("expected an error");
+        assert_eq!(error.status, "INVALID_ACTION_POLICY");
+        assert_eq!(
+            error.reason,
+            "The supplied action policy is invalid. (MISSING_FIELD)"
+        );
     }
 }

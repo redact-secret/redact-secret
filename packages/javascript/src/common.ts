@@ -89,6 +89,13 @@ export const scanAndRedact = runtime.scanAndRedact;
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 
+/**
+ * The core's default policy, as a policy object (see
+ * `@redact-secret/core`'s `defaultPolicy`). The default action does not
+ * depend on the detector profile.
+ */
+export const defaultPolicy = runtime.defaultPolicy;
+
 export * from "./entry-core.js";
 
 /**

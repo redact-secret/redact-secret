@@ -165,5 +165,6 @@ export function createSanitizingBinding(): NativeBinding {
     redact: (input: string) => input,
     scanAndRedact: (input: string) => ({ text: input, findings: [] }),
     createIncrementalSanitizer: session,
+    defaultPolicy: () => "redact",
   };
 }

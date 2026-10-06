@@ -6,7 +6,7 @@
 //! error carries input or a matched value.
 
 use napi::Error as NapiError;
-use redact_secret::{RulesetError, SecretScanError};
+use redact_secret::{ActionPolicyError, RulesetError, SecretScanError};
 
 /// The JavaScript error type this crate throws: `status` (surfaced to
 /// JavaScript as `code`) carries the fixed [`redact_secret::SecretScanErrorCode`]
@@ -33,6 +33,37 @@ pub fn to_js_ruleset_error(error: RulesetError) -> JsError {
     )
 }
 
+/// The message of a rejected action policy: the one fixed
+/// `INVALID_ACTION_POLICY` message, then the fixed rejection class, then the
+/// zero-based rule index when the violation is inside a rule. Only fixed
+/// identifiers and an integer; never a byte of the rejected document.
+#[must_use]
+pub fn action_policy_message(error: ActionPolicyError) -> String {
+    match error.rule_index() {
+        Some(index) => format!(
+            "{} ({}, rule {index})",
+            error.message(),
+            error.class().as_str()
+        ),
+        None => format!("{} ({})", error.message(), error.class().as_str()),
+    }
+}
+
+/// Converts a rejected action policy load into the JavaScript error contract
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// issue #1219). `status` is always the one public `INVALID_ACTION_POLICY`
+/// code. [`JsError`] carries no third field, so the fixed rejection class and
+/// the rule index are appended to the message as [`action_policy_message`]
+/// formats them (the class alone for a document-level violation), the same
+/// way [`to_js_ruleset_error`] carries a ruleset's class.
+#[must_use]
+pub fn to_js_action_policy_error(error: ActionPolicyError) -> JsError {
+    NapiError::new(
+        error.code().as_str().to_owned(),
+        action_policy_message(error),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use redact_secret::SecretScanErrorCode;
@@ -44,6 +75,28 @@ mod tests {
         let error = to_js_error(SecretScanErrorCode::InvalidFindings.into());
         assert_eq!(error.status, "INVALID_FINDINGS");
         assert_eq!(error.reason, "Redaction findings are invalid.");
+    }
+
+    #[test]
+    fn action_policy_errors_carry_the_fixed_code_class_and_rule_index() {
+        let document = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["jwt"]},"action":"mask"}]}"#;
+        let rejection = redact_secret::load_action_policy(document)
+            .expect_err("expected the unknown action to be rejected");
+        let error = to_js_action_policy_error(rejection);
+        assert_eq!(error.status, "INVALID_ACTION_POLICY");
+        assert_eq!(
+            error.reason,
+            "The supplied action policy is invalid. (INVALID_ACTION, rule 0)"
+        );
+
+        let rejection = redact_secret::load_action_policy(b"")
+            .expect_err("expected an empty document to be rejected");
+        let error = to_js_action_policy_error(rejection);
+        assert_eq!(error.status, "INVALID_ACTION_POLICY");
+        assert_eq!(
+            error.reason,
+            "The supplied action policy is invalid. (MALFORMED_DOCUMENT)"
+        );
     }
 
     #[test]

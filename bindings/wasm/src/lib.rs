@@ -44,8 +44,9 @@ mod util;
 
 use js_sys::Function;
 use redact_secret::{
-    DefaultPolicy, DetectorRegistry, Finding, SecretScanError, WholeInputLimits,
-    default_placeholder_formatter,
+    ActionPolicy, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
+    Obfuscation, Policy, PolicyContext, SecretScanError, SecretScanErrorCode, WholeInputLimits,
+    default_placeholder_formatter, load_action_policy,
 };
 use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -123,21 +124,62 @@ fn resolve_whole_input_limits(
     }
 }
 
+#[cfg(test)]
 fn run_scan(
     input: &str,
     registry: &DetectorRegistry,
     policy: Option<&Function>,
     limits: &WholeInputLimits,
 ) -> Result<Vec<Finding>, SecretScanError> {
-    match policy {
-        Some(function) => redact_secret::scan_with_limits(
-            input,
-            registry,
-            &callbacks::JsPolicy::new(input, function),
-            limits,
-        ),
-        None => redact_secret::scan_with_limits(input, registry, &DefaultPolicy, limits),
+    run_scan_with(input, registry, policy, None, limits)
+}
+
+/// [`run_scan`] with an optional declarative [`ActionPolicy`]. The caller
+/// guarantees at most one of `policy` and `action_policy` is present
+/// ([`load_call_action_policy`]).
+fn run_scan_with(
+    input: &str,
+    registry: &DetectorRegistry,
+    policy: Option<&Function>,
+    action_policy: Option<&ActionPolicy>,
+    limits: &WholeInputLimits,
+) -> Result<Vec<Finding>, SecretScanError> {
+    match (policy, action_policy) {
+        (Some(function), _) => {
+            let policy = callbacks::JsPolicy::new(input, function);
+            redact_secret::scan_with_limits(input, registry, &policy, limits)
+                .map_err(|error| policy.refine(error))
+        }
+        (None, Some(overlay)) => redact_secret::scan_with_limits(input, registry, overlay, limits),
+        (None, None) => redact_secret::scan_with_limits(input, registry, &DefaultPolicy, limits),
     }
+}
+
+/// Loads the optional declarative action policy a whole-input call carries
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// issue #1219). The compiled [`ActionPolicy`] is owned by the one call that
+/// loaded it: no thread-local, process-global or one-slot cache holds it (the
+/// single ruleset slot in `lifecycle` is not a precedent), so another call can
+/// neither evict nor overwrite it.
+///
+/// A callback `policy` and an action policy together are `INVALID_OPTIONS`,
+/// reported before the document is read; a rejected document is
+/// `INVALID_ACTION_POLICY` with its fixed class and rule index in the
+/// message. The core, not this function, performs every check of the
+/// document.
+fn load_call_action_policy(
+    has_callback: bool,
+    document: Option<&[u8]>,
+) -> Result<Option<ActionPolicy>, JsValue> {
+    let Some(bytes) = document else {
+        return Ok(None);
+    };
+    if has_callback {
+        return Err(to_js_error(SecretScanErrorCode::InvalidOptions.into()));
+    }
+    load_action_policy(bytes)
+        .map(Some)
+        .map_err(|error| to_js_error(error.into()))
 }
 
 fn run_redact(
@@ -177,19 +219,23 @@ fn scan_after_initialize(
     policy: Option<&Function>,
     limits: &WholeInputLimits,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&[u8]>,
 ) -> Result<Vec<Finding>, JsValue> {
+    // The initialization gate comes first, so a call made before
+    // `initialize()` reports `NOT_INITIALIZED` whatever else it carries.
+    lifecycle::ensure_initialized().map_err(to_js_error)?;
+    let action_policy = load_call_action_policy(policy.is_some(), action_policy)?;
     match ruleset {
-        None => lifecycle::with_registry(|registry| run_scan(input, registry, policy, limits))
-            .map_err(to_js_error)?
-            .map_err(|error| to_js_error(error.into())),
-        Some(bytes) => {
-            lifecycle::ensure_initialized().map_err(to_js_error)?;
-            lifecycle::with_ruleset_registry(bytes, |registry| {
-                run_scan(input, registry, policy, limits)
-            })
-            .map_err(to_js_error)?
-            .map_err(|error| to_js_error(error.into()))
-        }
+        None => lifecycle::with_registry(|registry| {
+            run_scan_with(input, registry, policy, action_policy.as_ref(), limits)
+        })
+        .map_err(to_js_error)?
+        .map_err(|error| to_js_error(error.into())),
+        Some(bytes) => lifecycle::with_ruleset_registry(bytes, |registry| {
+            run_scan_with(input, registry, policy, action_policy.as_ref(), limits)
+        })
+        .map_err(to_js_error)?
+        .map_err(|error| to_js_error(error.into())),
     }
 }
 
@@ -215,6 +261,16 @@ fn scan_after_initialize(
 /// (`decision-define-declarative-detector-ruleset-contract`); its declared
 /// detectors register after every built-in, so a ruleset detector can add
 /// detections but never outrank a built-in's resolved finding.
+///
+/// `action_policy`, when given, is the bytes of a revision 1 declarative
+/// action policy document
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`):
+/// it replaces the default per-finding evaluation with the first matching
+/// rule's action, or the default action when none matches. The compiled
+/// policy lives only for this call. A rejected document is
+/// `INVALID_ACTION_POLICY` (the fixed class and rule index are appended to
+/// the message); supplying both `policy` and `action_policy` is
+/// `INVALID_OPTIONS`.
 // `policy` cannot be `Option<&Function>`: wasm-bindgen only implements
 // `FromWasmAbi` for owned imported types across an exported function
 // boundary, so this crate takes ownership at every such boundary and
@@ -227,11 +283,55 @@ pub fn scan(
     max_input_bytes: Option<u32>,
     max_findings: Option<u32>,
     ruleset: Option<Vec<u8>>,
+    action_policy: Option<Vec<u8>>,
 ) -> Result<Vec<FindingJs>, JsValue> {
     let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
         .map_err(|error| to_js_error(error.into()))?;
-    let findings = scan_after_initialize(input, policy.as_ref(), &limits, ruleset.as_deref())?;
+    let findings = scan_after_initialize(
+        input,
+        policy.as_ref(),
+        &limits,
+        ruleset.as_deref(),
+        action_policy.as_deref(),
+    )?;
     Ok(FindingJs::all(input, findings))
+}
+
+/// Evaluates the core's default policy for one finding's safe metadata and
+/// returns its action name, so a JavaScript policy that wants "mine, else the
+/// default" never copies the default table
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// issue #1219). Only `type_name` and `confidence` decide the result; the
+/// range is validated and otherwise ignored.
+///
+/// # Errors
+///
+/// Returns a fixed `NOT_INITIALIZED` error before a successful
+/// [`initialize`], and `INVALID_FINDINGS` when the metadata is not a
+/// well-formed finding: a non-identifier `id`, `type_name` or `detector`, an
+/// unknown `confidence` or `obfuscation`, or an empty or reversed range.
+#[wasm_bindgen(js_name = "defaultPolicy")]
+pub fn default_policy(
+    id: &str,
+    type_name: &str,
+    detector: &str,
+    confidence: &str,
+    obfuscation: &str,
+    start: u32,
+    end: u32,
+) -> Result<String, JsValue> {
+    lifecycle::ensure_initialized().map_err(to_js_error)?;
+    let invalid = || to_js_error(SecretScanErrorCode::InvalidFindings.into());
+    let range = ByteRange::new(start as usize, end as usize).ok_or_else(invalid)?;
+    let confidence = Confidence::from_name(confidence).ok_or_else(invalid)?;
+    let obfuscation = Obfuscation::from_name(obfuscation).ok_or_else(invalid)?;
+    let finding = DetectedFinding::new(id, type_name, detector, confidence, range)
+        .map_err(|_| invalid())?
+        .with_obfuscation(obfuscation);
+    DefaultPolicy
+        .evaluate(&finding, &PolicyContext::new(0, 1))
+        .map(|action| action.as_str().to_owned())
+        .map_err(|_| to_js_error(SecretScanErrorCode::PolicyFailure.into()))
 }
 
 /// Redacts `input` using `findings` (as returned by [`scan`] for the same
@@ -284,10 +384,17 @@ pub fn scan_and_redact(
     max_input_bytes: Option<u32>,
     max_findings: Option<u32>,
     ruleset: Option<Vec<u8>>,
+    action_policy: Option<Vec<u8>>,
 ) -> Result<ScanAndRedactResultJs, JsValue> {
     let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
         .map_err(|error| to_js_error(error.into()))?;
-    let findings = scan_after_initialize(input, policy.as_ref(), &limits, ruleset.as_deref())?;
+    let findings = scan_after_initialize(
+        input,
+        policy.as_ref(),
+        &limits,
+        ruleset.as_deref(),
+        action_policy.as_deref(),
+    )?;
     let text = run_redact(input, &findings, formatter.as_ref(), &limits)
         .map_err(|error| to_js_error(error.into()))?;
     Ok(ScanAndRedactResultJs::new(
@@ -466,7 +573,7 @@ mod tests {
         initialize(Vec::new()).unwrap();
         let input = synthetic_input();
 
-        let findings = scan(&input, None, None, None, None).unwrap();
+        let findings = scan(&input, None, None, None, None, None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].type_name(), synthetic::secret().type_name);
         assert_eq!(findings[0].action(), "redact");
@@ -474,7 +581,7 @@ mod tests {
         let output = redact(&input, findings, None, None, None).unwrap();
         assert_eq!(output, redacted_input("<SECRET_1>"));
 
-        let combined = scan_and_redact(&input, None, None, None, None, None).unwrap();
+        let combined = scan_and_redact(&input, None, None, None, None, None, None).unwrap();
         assert_eq!(combined.text(), output);
         assert_eq!(combined.findings().len(), 1);
         assert_eq!(
@@ -492,7 +599,7 @@ mod tests {
     fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
         initialize(Vec::new()).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
-        let findings = scan(&input, None, None, None, None).unwrap();
+        let findings = scan(&input, None, None, None, None, None).unwrap();
         if cfg!(feature = "full") {
             assert_eq!(findings.len(), 1);
             assert_eq!(findings[0].detector(), "aws-access-key");
@@ -526,13 +633,21 @@ validator: none\n";
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
-        let without_ruleset = scan(&input, None, None, None, None).unwrap();
+        let without_ruleset = scan(&input, None, None, None, None, None).unwrap();
         assert!(
             without_ruleset.is_empty(),
             "no built-in detector claims ACME_"
         );
 
-        let with_ruleset = scan(&input, None, None, None, Some(RULESET_FIXTURE.to_vec())).unwrap();
+        let with_ruleset = scan(
+            &input,
+            None,
+            None,
+            None,
+            Some(RULESET_FIXTURE.to_vec()),
+            None,
+        )
+        .unwrap();
         assert_eq!(with_ruleset.len(), 1);
         assert_eq!(with_ruleset[0].detector(), "acme-internal-token");
         assert_eq!(with_ruleset[0].confidence(), "medium");
@@ -551,6 +666,7 @@ validator: none\n";
             None,
             None,
             Some(RULESET_FIXTURE.to_vec()),
+            None,
         )
         .unwrap();
         assert_eq!(combined.findings().len(), 1);
@@ -558,6 +674,196 @@ validator: none\n";
         // `Confidence::Medium` warns rather than redacts under the default
         // policy, so the text passes through unchanged.
         assert!(combined.text().contains(&value));
+    }
+
+    /// A revision 1 action policy (issue #1219) with one rule that names the
+    /// compiled profile's one synthetic finding type, so the tests below hold
+    /// for `full` and `common`.
+    fn policy_for_compiled_secret(action: &str) -> Vec<u8> {
+        format!(
+            r#"{{"actionPolicyRevision":1,"base":"default","rules":[{{"id":"r","match":{{"type":["{}"]}},"action":"{action}"}}]}}"#,
+            synthetic::secret().type_name
+        )
+        .into_bytes()
+    }
+
+    #[test]
+    fn scan_applies_an_action_policy_and_the_default_stays_the_base() {
+        initialize(Vec::new()).unwrap();
+        let input = synthetic_input();
+
+        let default = scan(&input, None, None, None, None, None).unwrap();
+        assert_eq!(default[0].action(), "redact");
+
+        let warned = scan(
+            &input,
+            None,
+            None,
+            None,
+            None,
+            Some(policy_for_compiled_secret("warn")),
+        )
+        .unwrap();
+        assert_eq!(warned.len(), 1);
+        assert_eq!(warned[0].action(), "warn");
+
+        let identity = scan(
+            &input,
+            None,
+            None,
+            None,
+            None,
+            Some(br#"{"actionPolicyRevision":1,"base":"default","rules":[]}"#.to_vec()),
+        )
+        .unwrap();
+        assert_eq!(identity[0].action(), "redact");
+
+        // A rule for a type the finding does not carry leaves the base.
+        let unrelated = scan(
+            &input,
+            None,
+            None,
+            None,
+            None,
+            Some(br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["acme-not-emitted"]},"action":"allow"}]}"#.to_vec()),
+        )
+        .unwrap();
+        assert_eq!(unrelated[0].action(), "redact");
+
+        let combined = scan_and_redact(
+            &input,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(policy_for_compiled_secret("warn")),
+        )
+        .unwrap();
+        assert_eq!(combined.findings()[0].action(), "warn");
+        assert_eq!(combined.text(), input);
+    }
+
+    /// Two live policies of different content evaluate independently, in
+    /// either construction order: nothing is held between calls.
+    #[test]
+    fn no_process_global_action_policy_slot_exists() {
+        initialize(Vec::new()).unwrap();
+        let input = synthetic_input();
+        let run = |document: &[u8]| {
+            scan(&input, None, None, None, None, Some(document.to_vec())).unwrap()[0].action()
+        };
+        let warn = policy_for_compiled_secret("warn");
+        let allow = policy_for_compiled_secret("allow");
+        assert_eq!(run(&warn), "warn");
+        assert_eq!(run(&allow), "allow");
+        assert_eq!(run(&warn), "warn");
+        assert_eq!(run(&allow), "allow");
+    }
+
+    /// The `code` and `message` JavaScript sees on a failed call. These
+    /// build real JavaScript errors, so they only run under `wasm32`.
+    fn js_error_parts(error: JsValue) -> (String, String) {
+        let error: js_sys::Error = error.into();
+        let code = js_sys::Reflect::get(&error, &JsValue::from_str("code"))
+            .unwrap()
+            .as_string()
+            .unwrap();
+        (code, String::from(error.message()))
+    }
+
+    #[wasm_bindgen_test::wasm_bindgen_test]
+    fn a_rejected_action_policy_reaches_javascript_with_its_code_class_and_rule_index() {
+        initialize(Vec::new()).unwrap();
+        let rejected = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["jwt"]},"action":"mask"}]}"#;
+        let error = scan(
+            "irrelevant",
+            None,
+            None,
+            None,
+            None,
+            Some(rejected.to_vec()),
+        )
+        .unwrap_err();
+        assert_eq!(
+            js_error_parts(error),
+            (
+                "INVALID_ACTION_POLICY".to_owned(),
+                "The supplied action policy is invalid. (INVALID_ACTION, rule 0)".to_owned()
+            )
+        );
+        let error = scan("irrelevant", None, None, None, None, Some(b"{}".to_vec())).unwrap_err();
+        assert_eq!(
+            js_error_parts(error).1,
+            "The supplied action policy is invalid. (MISSING_FIELD)"
+        );
+    }
+
+    #[wasm_bindgen_test::wasm_bindgen_test]
+    fn a_callback_and_an_action_policy_together_are_invalid_options_before_the_document_is_read() {
+        initialize(Vec::new()).unwrap();
+        let callback = Function::new_no_args("return 'redact';");
+        // A document that would be rejected still reports the misuse code.
+        let error = scan(
+            "irrelevant",
+            Some(callback),
+            None,
+            None,
+            None,
+            Some(b"not json".to_vec()),
+        )
+        .unwrap_err();
+        assert_eq!(js_error_parts(error).0, "INVALID_OPTIONS");
+    }
+
+    #[wasm_bindgen_test::wasm_bindgen_test]
+    fn a_callback_returning_an_unknown_action_name_is_invalid_policy_action() {
+        initialize(Vec::new()).unwrap();
+        let input = synthetic_input();
+        let callback = Function::new_no_args("return 'mask';");
+        let error = scan(&input, Some(callback), None, None, None, None).unwrap_err();
+        assert_eq!(js_error_parts(error).0, "INVALID_POLICY_ACTION");
+        // A thrown exception and a non-string return stay the generic failure.
+        let throwing =
+            Function::new_no_args("throw new Error('SYNTHETIC_REVOKED_CALLBACK_FAILURE');");
+        let error = scan(&input, Some(throwing), None, None, None, None).unwrap_err();
+        assert_eq!(js_error_parts(error).0, "POLICY_FAILURE");
+        let non_string = Function::new_no_args("return 7;");
+        let error = scan(&input, Some(non_string), None, None, None, None).unwrap_err();
+        assert_eq!(js_error_parts(error).0, "POLICY_FAILURE");
+    }
+
+    #[wasm_bindgen_test::wasm_bindgen_test]
+    fn default_policy_rejects_malformed_metadata_as_invalid_findings() {
+        initialize(Vec::new()).unwrap();
+        let error = default_policy("finding-1", "Not An Identifier", "d", "high", "none", 0, 1)
+            .unwrap_err();
+        assert_eq!(js_error_parts(error).0, "INVALID_FINDINGS");
+        let error = default_policy("finding-1", "jwt", "d", "certain", "none", 0, 1).unwrap_err();
+        assert_eq!(js_error_parts(error).0, "INVALID_FINDINGS");
+        let error = default_policy("finding-1", "jwt", "d", "high", "none", 1, 1).unwrap_err();
+        assert_eq!(js_error_parts(error).0, "INVALID_FINDINGS");
+    }
+
+    #[test]
+    fn default_policy_delegates_to_the_core_default_evaluation() {
+        initialize(Vec::new()).unwrap();
+        let evaluate = |type_name: &str, confidence: &str| {
+            default_policy(
+                "finding-1",
+                type_name,
+                "synthetic-detector",
+                confidence,
+                "none",
+                0,
+                1,
+            )
+            .unwrap()
+        };
+        assert_eq!(evaluate("private_key", "low"), "block");
+        assert_eq!(evaluate("github_token", "low"), "redact");
+        assert_eq!(evaluate("acme-unknown-type", "high"), "redact");
+        assert_eq!(evaluate("acme-unknown-type", "medium"), "warn");
     }
 
     /// [`lifecycle::registry_with_ruleset`] itself, exercised natively:
@@ -588,7 +894,7 @@ validator: none\n";
     fn finding_range_uses_utf16_offsets_end_to_end() {
         initialize(Vec::new()).unwrap();
         let input = synthetic_input();
-        let findings = scan(&input, None, None, None, None).unwrap();
+        let findings = scan(&input, None, None, None, None, None).unwrap();
         let range = findings[0].range();
 
         let utf16: Vec<u16> = input.encode_utf16().collect();
@@ -724,7 +1030,7 @@ validator: none\n";
         let input = synthetic_input();
 
         let policy = Function::new_with_args("finding, context", "return 'block';");
-        let findings = scan(&input, Some(policy), None, None, None).unwrap();
+        let findings = scan(&input, Some(policy), None, None, None, None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].action(), "block");
 

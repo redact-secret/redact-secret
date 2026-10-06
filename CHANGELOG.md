@@ -21,8 +21,33 @@ evidence is linked from each published version.
   rule index; no error carries a document byte. The CLI gains
   `--action-policy <path>` in check and redact mode, with a path or standard
   input; check mode still exits 1 on any finding. The root name count is 60.
-  Node, WebAssembly, Python and JavaScript surfaces follow in the same issue.
-  Existing no-policy results are unchanged.
+  The Node and WebAssembly artifacts, JavaScript and Python are separate entries
+  below. Existing no-policy results are unchanged.
+- `@redact-secret/core` (root and `./common`), the Node addon and the
+  WebAssembly artifacts: `actionPolicy` on `scan`, `scanAndRedact`,
+  `createIncrementalSanitizer` and the stream factories (#1219). It takes a
+  plain object (serialized once, when the call or session is created), UTF-8
+  JSON text or bytes; the Rust core parses and validates it on both runtimes,
+  so the same document gives the same action everywhere. A rejected document
+  throws the new `INVALID_ACTION_POLICY` (the code only in 0.1.x; the raw addon
+  and WebAssembly errors append the fixed class and rule index), a callback
+  `policy` together with `actionPolicy` throws `INVALID_OPTIONS`, and the
+  callback keeps replacing the default entirely. An incremental session binds
+  its policy at construction and no policy is held in a global, so live
+  policies of different content never affect each other. The new
+  `defaultPolicy` export evaluates the core's default through the loaded
+  binding (no copied type table) and is a valid `policy` for whole-input calls
+  and incremental sessions. New types: `ActionPolicyDocument`,
+  `ActionPolicyInput`, `ActionPolicyRule`, `ActionPolicyMatch`,
+  `ActionPolicyRuleAction`, `DefaultSecretPolicy`. The shared fixture
+  `conformance/fixtures/action-policy-v1.json` runs against the real addon and
+  the real WebAssembly artifact, through their raw exports and through the
+  published package.
+- Cost: linking the action policy parser into the WebAssembly artifacts grows
+  them, brotli quality 11, against `db0e5c8d`: `full` +5,653 bytes (164,789 to
+  170,442, 3.43%), `common` +5,888, `full` with `pii` +6,090 and `common` with
+  `pii` +5,251. The decision accepts that cost and records the figures
+  ([evidence](docs/audits/evidence/1219/README.md)).
 
 - Python: `action_policy`, a keyword-only argument of `scan`,
   `scan_and_redact` and `IncrementalSanitizer` (#1219,
@@ -117,6 +142,12 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- WebAssembly: a whole-input policy callback that returns a string other than
+  `redact`, `block`, `warn` or `allow` failed with `POLICY_FAILURE`, while the
+  Node addon and the incremental WebAssembly session reported
+  `INVALID_POLICY_ACTION`. The whole-input WebAssembly call now reports
+  `INVALID_POLICY_ACTION` too (#1219). A thrown exception and a non-string
+  return stay `POLICY_FAILURE` on every runtime.
 - `generic-token` no longer reports the instructional placeholder
   `YOUR_PASSWORD` (and `your-pwd-here`, `INSERT_PASSWORD`, `ENTER_YOUR_PASSPHRASE`,
   the `passwd` and `passphrase` forms) under a `password` name or any other

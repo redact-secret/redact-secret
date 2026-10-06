@@ -92,6 +92,8 @@ export interface NativeIncrementalOptions {
   readonly limits: NativeIncrementalLimits;
   readonly policy?: NativeIncrementalPolicyCallback;
   readonly formatter?: NativeFormatterCallback;
+  /** The bytes of an action policy document; never together with `policy`. */
+  readonly actionPolicy?: Uint8Array;
 }
 
 export interface NativeIncrementalResult {
@@ -121,6 +123,7 @@ export interface NativeBinding {
     policy: NativePolicyCallback | undefined,
     limits: NativeWholeInputLimits | undefined,
     ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
   ): readonly NativeFinding[];
   redact(
     input: string,
@@ -134,8 +137,15 @@ export interface NativeBinding {
     formatter: NativeFormatterCallback | undefined,
     limits: NativeWholeInputLimits | undefined,
     ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
   ): NativeScanAndRedactResult;
   createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
+  /**
+   * The core's default evaluation of one finding's safe metadata, as an
+   * action name. The default table lives only in the core; nothing here
+   * copies it.
+   */
+  defaultPolicy(finding: NativeDetectedFinding): string;
 }
 
 /**

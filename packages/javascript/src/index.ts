@@ -84,6 +84,16 @@ export const scanAndRedact = runtime.scanAndRedact;
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 
+/**
+ * The core's default policy, as a policy object: `evaluate` returns the
+ * action the default evaluation gives that finding, so a callback that wants
+ * "mine, else the default" never copies the default table. It works as a
+ * whole-input `policy` and as an incremental session `policy`, and it needs a
+ * successful `initialize()` like every other operation. A declarative
+ * `actionPolicy` with an empty `rules` array is the same behavior as data.
+ */
+export const defaultPolicy = runtime.defaultPolicy;
+
 export * from "./entry-core.js";
 
 /**

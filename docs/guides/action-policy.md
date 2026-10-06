@@ -10,9 +10,9 @@ action the running artifact computes. The contract is
 [`decision-define-the-versioned-declarative-action-policy-and-default-overlay`](../decisions/2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md).
 
 Support today (`current`): the Rust core (`load_action_policy`), the command
-line (`--action-policy <path>`) and Python (`action_policy=`). The Node,
-WebAssembly and JavaScript surfaces are `planned` in the same issue (#1219);
-until they ship, those surfaces accept no document.
+line (`--action-policy <path>`), Python (`action_policy=`) and the JavaScript package
+`@redact-secret/core` (`actionPolicy`) on both runtimes, the Node addon and the
+WebAssembly artifact.
 
 ## Write a policy
 
@@ -128,6 +128,66 @@ A rejected document raises `InvalidActionPolicyError` with `code`
 `rule_index`. The message stays the fixed text and repeats no byte of the
 document. See the [Python guide](python.md#declarative-action-policy).
 
+## JavaScript
+
+`actionPolicy` is an option of `scan`, `scanAndRedact`,
+`createIncrementalSanitizer` and the stream factories, in the root package and
+in `@redact-secret/core/common`, on the Node addon and on the WebAssembly
+artifact. It takes the document as a plain object, as UTF-8 JSON text, or as
+bytes. An object is serialized once with `JSON.stringify`, at the call or when
+the session is created, so changing it afterwards changes nothing; the member
+order is the object's own, and `actionPolicyRevision` must be written first. A
+value that cannot be serialized (a cycle, a `BigInt`) is `INVALID_ACTION_POLICY`,
+and a value that is not an object, text or bytes is `INVALID_OPTIONS`.
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+const { text } = scanAndRedact("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", {
+  actionPolicy: {
+    actionPolicyRevision: 1,
+    base: "default",
+    rules: [{ id: "keep-github", match: { type: ["github_token"] }, action: "warn" }],
+  },
+});
+```
+
+The Rust core parses and validates the document on both runtimes and the
+package never reads it, so the same bytes load or fail identically on the addon
+and in WebAssembly. The compiled policy belongs to the call or the session that
+built it: nothing is cached in the module, so two live policies of different
+content never affect each other, in either order, and a session keeps the policy
+it was created with. Supplying a callback `policy` together with `actionPolicy`
+is `INVALID_OPTIONS`, reported before the document is read, and a callback still
+replaces the default entirely.
+
+`defaultPolicy` is the core's default evaluation as a policy object. Its
+`evaluate(finding)` asks the loaded binding, so a callback that wants "mine,
+else the default" does not copy the default table, and an empty `rules` array
+is the same behavior as data:
+
+```ts
+import { defaultPolicy } from "@redact-secret/core";
+import type { SecretPolicy } from "@redact-secret/core";
+
+const policy: SecretPolicy = {
+  evaluate: (finding, context) =>
+    finding.type === "acme-alnum-token" ? "redact" : defaultPolicy.evaluate(finding, context),
+};
+```
+
+A rejected document throws the package's `SecretScanError` with the code
+`INVALID_ACTION_POLICY` and the one fixed message; the public package carries
+the code only in 0.1.x. The raw addon and WebAssembly errors (not part of the
+public API) append the fixed class and the rule index to the message, for
+example `The supplied action policy is invalid. (INVALID_ACTION, rule 0)`.
+
+The WebAssembly artifacts carry the parser. Against the `db0e5c8d` build the
+brotli size grows by 5,653 bytes for `full` (164,789 to 170,442, 3.43%), 5,888
+for `common`, 6,090 for `full` with `pii` and 5,251 for `common` with `pii`; see
+the [evidence](../audits/evidence/1219/README.md).
+
 ## Command line
 
 ```bash
@@ -146,7 +206,9 @@ A rejected document fails whole, with the fixed code `INVALID_ACTION_POLICY`
 and the message "The supplied action policy is invalid." There is no partial
 load and no fallback to the default. Rust and the CLI also report the fixed
 class and `rule_index`, the zero-based index of the rule being read (none for a
-document-level violation); Python exposes them as `error_class` and `rule_index`. No error repeats a byte of the document. The first
+document-level violation); Python exposes them as `error_class` and `rule_index`, the raw Node addon
+and WebAssembly errors append both to the message, and the public JavaScript package reports the code
+only. No error repeats a byte of the document. The first
 violation in document order is reported, after two fixed precedences: the size
 bound before any parsing, and the revision, which must be the first member.
 

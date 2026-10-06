@@ -151,6 +151,16 @@ formats. To reject a request, choose `block` and check the returned actions
 before any downstream use. [Safe integration](safe-integration.md) explains
 that distinction and failure handling.
 
+To change only a few actions and keep the default for every other finding, pass
+a declarative `actionPolicy` instead of a callback. It takes a plain object,
+JSON text or bytes, on `scan`, `scanAndRedact`, `createIncrementalSanitizer` and
+the stream factories; the Rust core evaluates it on both runtimes, and a call or
+session takes a callback or an action policy, never both (`INVALID_OPTIONS`).
+A rejected document throws `INVALID_ACTION_POLICY`. For a callback that wants
+"mine, else the default", `defaultPolicy.evaluate(finding)` asks the core
+instead of copying the default table. See the
+[action policy guide](action-policy.md#javascript).
+
 ## Request-wide placeholder numbering
 
 Every call numbers its placeholders from 1, so scanning the string leaves of

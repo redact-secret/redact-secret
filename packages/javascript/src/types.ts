@@ -128,8 +128,73 @@ export interface WholeInputLimits {
   readonly maxFindings: number;
 }
 
+/** What a rule of an {@link ActionPolicyDocument} may do: an action, or `"default"` for the base. */
+export type ActionPolicyRuleAction = SecretAction | "default";
+
+/**
+ * The conditions of one rule. Every key a rule has must hold (AND), and a key
+ * holds when the finding's value is a member of its non-empty set (OR). A rule
+ * has one to four keys; no key is a wildcard, a pattern, a negation or a
+ * number.
+ */
+export interface ActionPolicyMatch {
+  /** Finding types (lowercase identifiers). A type no detector emits is accepted and matches nothing. */
+  readonly type?: readonly string[];
+  /** Detector ids (lowercase identifiers). */
+  readonly detector?: readonly string[];
+  readonly confidence?: readonly SecretConfidence[];
+  readonly obfuscation?: readonly SecretObfuscation[];
+}
+
+/** One rule of an {@link ActionPolicyDocument}. */
+export interface ActionPolicyRule {
+  /** A lowercase identifier of at most 64 bytes, unique in the document. */
+  readonly id: string;
+  readonly match: ActionPolicyMatch;
+  readonly action: ActionPolicyRuleAction;
+}
+
+/**
+ * A revision 1 declarative action policy
+ * (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`):
+ * the first rule that matches a finalized finding decides its action, and a
+ * finding no rule matches keeps the default action the running artifact
+ * computes. The document is parsed and validated by the Rust core, never by
+ * this package.
+ */
+export interface ActionPolicyDocument {
+  readonly actionPolicyRevision: 1;
+  readonly base: "default";
+  /** 0 to 128 rules, evaluated in order. */
+  readonly rules: readonly ActionPolicyRule[];
+}
+
+/**
+ * The accepted forms of the `actionPolicy` option: a plain object (serialized
+ * once, with `JSON.stringify`, at the call or at session construction), or
+ * the document as UTF-8 JSON text or bytes. The document is at most 65,536
+ * bytes. A rejected document throws `INVALID_ACTION_POLICY`; supplying it
+ * together with a callback `policy` throws `INVALID_OPTIONS`.
+ */
+export type ActionPolicyInput = ActionPolicyDocument | string | Uint8Array;
+
+/**
+ * The `defaultPolicy` export: the core's default evaluation as a policy. It is
+ * a valid `policy` for a whole-input call and for an incremental session, and
+ * its `context` is optional because the default reads neither.
+ */
+export interface DefaultSecretPolicy extends SecretPolicy, IncrementalSecretPolicy {
+  evaluate(finding: DetectedSecretFinding, context?: PolicyContext | IncrementalPolicyContext): SecretAction;
+}
+
 export interface ScanOptions {
   readonly policy?: SecretPolicy;
+  /**
+   * A declarative action policy that replaces the default evaluation: the
+   * first matching rule's action, or the default action for an unmatched
+   * finding. Mutually exclusive with `policy`. See {@link ActionPolicyInput}.
+   */
+  readonly actionPolicy?: ActionPolicyInput;
   readonly limits?: WholeInputLimits;
   /**
    * A caller-supplied declarative ruleset
@@ -269,6 +334,12 @@ export interface IncrementalSanitizerOptions {
   readonly limits: IncrementalLimits;
   readonly placeholderFormatter?: PlaceholderFormatter;
   readonly policy?: IncrementalSecretPolicy;
+  /**
+   * A declarative action policy, parsed once when the session is created and
+   * bound to it for its whole life. Mutually exclusive with `policy`. See
+   * {@link ActionPolicyInput}.
+   */
+  readonly actionPolicy?: ActionPolicyInput;
 }
 
 /** Safe output and final findings produced by one session operation. */

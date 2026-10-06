@@ -14,12 +14,18 @@ import { createWebStreamSanitizer, WebStreamSanitizer } from "../src/adapters/we
 import { createWebStreamSanitizer as createCommonWebStreamSanitizer } from "../src/adapters/web-stream-common.js";
 import type * as publicApi from "../src/index.js";
 import type {
+  ActionPolicyDocument,
+  ActionPolicyInput,
+  ActionPolicyMatch,
+  ActionPolicyRuleAction,
   ArtifactKind,
   CoreStatus,
+  DefaultSecretPolicy,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
   IncrementalSanitizerResult,
+  IncrementalSecretPolicy,
   PlaceholderContext,
   PlaceholderFormatter,
   PolicyContext,
@@ -39,6 +45,7 @@ import {
   artifact,
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
+  defaultPolicy,
   initialize,
   type PROFILE,
   RANGE_UNIT,
@@ -160,6 +167,43 @@ async function documentedUsage(input: string): Promise<void> {
 }
 
 void documentedUsage;
+
+/**
+ * The declarative action policy (#1219): a typed object, text or bytes, never
+ * together with a callback `policy`, and `defaultPolicy` as a policy object
+ * for both whole-input calls and incremental sessions.
+ */
+const actionPolicyDocument: ActionPolicyDocument = {
+  actionPolicyRevision: 1,
+  base: "default",
+  rules: [
+    { id: "redact-acme-tokens", match: { type: ["acme-alnum-token"] }, action: "redact" },
+    { id: "keep-default-jwt", match: { type: ["jwt"], confidence: ["medium"] }, action: "default" },
+  ],
+};
+const actionPolicyInputs: readonly ActionPolicyInput[] = [
+  actionPolicyDocument,
+  '{"actionPolicyRevision":1,"base":"default","rules":[]}',
+  new Uint8Array(0),
+];
+const withActionPolicy: ScanOptions = { actionPolicy: actionPolicyDocument };
+const textActionPolicy: ActionPolicyInput = '{"actionPolicyRevision":1,"base":"default","rules":[]}';
+const sessionWithActionPolicy: IncrementalSanitizerOptions = {
+  limits: incrementalBytesOptions.limits,
+  actionPolicy: textActionPolicy,
+};
+const mineElseDefault: SecretPolicy = {
+  evaluate: (finding, context) =>
+    finding.type === "acme-alnum-token" ? "redact" : defaultPolicy.evaluate(finding, context),
+};
+const defaultIsBoth: SecretPolicy & IncrementalSecretPolicy = defaultPolicy;
+const defaultAsNamedType: DefaultSecretPolicy = defaultPolicy;
+const directAction: SecretAction = defaultPolicy.evaluate({} as DetectedSecretFinding);
+type DefaultPolicyReturnsAnAction = Expect<Equal<ReturnType<typeof defaultPolicy.evaluate>, SecretAction>>;
+type RuleActionAddsDefault = Expect<Equal<ActionPolicyRuleAction, SecretAction | "default">>;
+type ActionPolicyHasNoThreshold = Expect<"threshold" extends keyof ActionPolicyMatch ? false : true>;
+type InvalidActionPolicyIsACode = Expect<"INVALID_ACTION_POLICY" extends SecretScanErrorCode ? true : false>;
+void [withActionPolicy, sessionWithActionPolicy, mineElseDefault, defaultIsBoth, defaultAsNamedType, directAction];
 
 /**
  * The stream adapters. Neither is reachable from the root export: they are

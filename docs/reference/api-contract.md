@@ -183,7 +183,7 @@ hot loop read `.findings` once into a local variable.
 `RANGE_UNIT` names it.
 
 **Errors.** Every failure carries a fixed code and an input-free message. The
-22 core codes are identical in Rust, JavaScript and Python; JavaScript adds
+23 core codes (the latest is `INVALID_ACTION_POLICY`) are identical in Rust, JavaScript and Python; JavaScript adds
 five host codes (`NOT_INITIALIZED`, `INITIALIZATION_FAILED`, `INVALID_CHUNK`,
 `INVALID_UTF8`, `UNPAIRED_SURROGATE`). A lone surrogate cannot reach the core
 in either host: JavaScript rejects it with `UNPAIRED_SURROGATE`, Python with

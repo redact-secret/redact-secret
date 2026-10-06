@@ -8,6 +8,7 @@
 import assert from "node:assert/strict";
 import {
   createIncrementalSanitizer,
+  defaultPolicy,
   initialize,
   initializePii,
   piiActivation,
@@ -364,6 +365,66 @@ check("invalid limits are rejected with INVALID_LIMITS before a session is creat
       return true;
     },
   );
+});
+
+const ACTION_POLICY_INPUT = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+const WARN_GITHUB = Buffer.from(
+  '{"actionPolicyRevision":1,"base":"default","rules":[{"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}',
+);
+
+check("an action policy changes one action and leaves the default for the rest", () => {
+  const [plain] = scan(ACTION_POLICY_INPUT);
+  assert.equal(plain.action, "redact");
+  const [overlaid] = scan(ACTION_POLICY_INPUT, undefined, undefined, undefined, WARN_GITHUB);
+  assert.equal(overlaid.action, "warn");
+  assert.equal(overlaid.start, plain.start);
+  const result = scanAndRedact(ACTION_POLICY_INPUT, undefined, undefined, undefined, undefined, WARN_GITHUB);
+  assert.equal(result.redacted, ACTION_POLICY_INPUT);
+});
+
+check("an incremental session binds the action policy it was created with", () => {
+  const session = createIncrementalSanitizer({ limits: INCREMENTAL_LIMITS, actionPolicy: WARN_GITHUB });
+  const released = [
+    ...session.append(ACTION_POLICY_INPUT.slice(0, 20)).findings,
+    ...session.append(ACTION_POLICY_INPUT.slice(20)).findings,
+    ...session.finalize().findings,
+  ];
+  assert.deepEqual(
+    released.map((finding) => finding.action),
+    ["warn"],
+  );
+});
+
+check("a rejected action policy is INVALID_ACTION_POLICY with the class and rule index", () => {
+  assert.throws(
+    () => scan("irrelevant", undefined, undefined, undefined, Buffer.from("{}")),
+    (error) => {
+      assert.equal(error.code, "INVALID_ACTION_POLICY");
+      assert.equal(error.message, "The supplied action policy is invalid. (MISSING_FIELD)");
+      return true;
+    },
+  );
+  assert.throws(
+    () => scan("irrelevant", () => "redact", undefined, undefined, WARN_GITHUB),
+    (error) => {
+      assert.equal(error.code, "INVALID_OPTIONS");
+      return true;
+    },
+  );
+});
+
+check("defaultPolicy evaluates the core default without a copied table", () => {
+  const finding = {
+    id: "finding-1",
+    type: "private_key",
+    detector: "private-key",
+    confidence: "low",
+    obfuscation: "none",
+    start: 0,
+    end: 1,
+  };
+  assert.equal(defaultPolicy(finding), "block");
+  assert.equal(defaultPolicy({ ...finding, type: "acme-unknown-type", confidence: "medium" }), "warn");
 });
 
 if (process.exitCode) {

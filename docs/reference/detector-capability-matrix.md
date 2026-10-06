@@ -73,7 +73,7 @@ dial, and none can recover what an earlier layer removed.
 | --- | --- | --- | --- |
 | Identity and sensitivity gate (PII families) | whether a candidate is established as the identity and as sensitive in context; `not-established` and `non-sensitive` produce no finding | the PII selector chooses which families run; the gate itself is internal, per family (`contextRequirement`) and is a non-public evaluation seam (#910) | be tuned, thresholded or exposed; a gated-out value is a non-finding, not a low-confidence finding |
 | Emitted confidence | categorical `high`, `medium`, `low` on an emitted finding | read-only metadata on findings | be a calibrated probability or a percentage; a shadow evidence score is a separate frozen artifact, not confidence |
-| Action policy | `allow`, `warn`, `redact`, `block` for an emitted, overlap-resolved finding | a callback per call or session; the default policy; a declarative policy document is designed in [#1217](https://github.com/redact-secret/redact-secret/issues/1217) | resurrect a candidate that detection, the gate or overlap dropped |
+| Action policy | `allow`, `warn`, `redact`, `block` for an emitted, overlap-resolved finding | a callback per call or session; the default policy; a declarative policy document ([#1217](https://github.com/redact-secret/redact-secret/issues/1217), implemented in Rust, the CLI and JavaScript by [#1219](https://github.com/redact-secret/redact-secret/issues/1219)) | resurrect a candidate that detection, the gate or overlap dropped |
 
 Consequence: a request for "more sensitive" or "less sensitive" is one of
 three different things (select more detectors or families, change a gate, change

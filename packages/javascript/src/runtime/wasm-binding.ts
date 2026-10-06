@@ -133,6 +133,7 @@ export interface WasmModule {
     maxInputBytes?: number,
     maxFindings?: number,
     ruleset?: Uint8Array,
+    actionPolicy?: Uint8Array,
   ): readonly WasmFinding[];
   redact(
     input: string,
@@ -148,6 +149,7 @@ export interface WasmModule {
     maxInputBytes?: number,
     maxFindings?: number,
     ruleset?: Uint8Array,
+    actionPolicy?: Uint8Array,
   ): WasmScanAndRedactResult;
   createIncrementalSanitizer(
     maxInputCodeUnits: number,
@@ -156,7 +158,17 @@ export interface WasmModule {
     maxMultilineCodeUnits: number,
     policy?: WasmIncrementalPolicyCallback,
     formatter?: WasmFormatterCallback,
+    actionPolicy?: Uint8Array,
   ): WasmIncrementalSanitizer;
+  defaultPolicy(
+    id: string,
+    type: string,
+    detector: string,
+    confidence: string,
+    obfuscation: string,
+    start: number,
+    end: number,
+  ): string;
 }
 
 /**
@@ -174,6 +186,7 @@ const REQUIRED_WASM_EXPORTS = [
   "redact",
   "scanAndRedact",
   "createIncrementalSanitizer",
+  "defaultPolicy",
 ] as const;
 
 /** Throws `INITIALIZATION_FAILED` unless every required export is present. */
@@ -290,9 +303,9 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
       wasm.initialize(pii);
     },
     piiActivation: () => wasm.piiActivation(),
-    scan: (input, policy, limits, ruleset) =>
+    scan: (input, policy, limits, ruleset, actionPolicy) =>
       wasm
-        .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset)
+        .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset, actionPolicy)
         .map(toNativeFinding),
     redact: (input, findings, formatter, limits) =>
       wasm.redact(
@@ -302,7 +315,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         limits?.maxInputBytes,
         limits?.maxFindings,
       ),
-    scanAndRedact: (input, policy, formatter, limits, ruleset) => {
+    scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) => {
       const result = wasm.scanAndRedact(
         input,
         toWasmPolicyCallback(policy),
@@ -310,6 +323,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         limits?.maxInputBytes,
         limits?.maxFindings,
         ruleset,
+        actionPolicy,
       );
       try {
         return {
@@ -328,6 +342,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         options.limits.maxMultilineCodeUnits,
         toWasmIncrementalPolicyCallback(options.policy),
         toWasmFormatterCallback(options.formatter),
+        options.actionPolicy,
       );
       return {
         get state() {
@@ -340,5 +355,15 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         },
       };
     },
+    defaultPolicy: (finding) =>
+      wasm.defaultPolicy(
+        finding.id,
+        finding.type,
+        finding.detector,
+        finding.confidence,
+        finding.obfuscation,
+        finding.start,
+        finding.end,
+      ),
   };
 }

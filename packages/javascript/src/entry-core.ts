@@ -21,8 +21,14 @@ export { VERSION } from "./version.js";
 export const RANGE_UNIT: RangeUnit = "utf16-code-units";
 
 export type {
+  ActionPolicyDocument,
+  ActionPolicyInput,
+  ActionPolicyMatch,
+  ActionPolicyRule,
+  ActionPolicyRuleAction,
   ArtifactKind,
   CoreStatus,
+  DefaultSecretPolicy,
   DetectedSecretFinding,
   IncrementalLimits,
   IncrementalPolicyContext,

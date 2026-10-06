@@ -185,8 +185,16 @@ depend on `src/`.
 - [`fixtures/action-policy-v1.json`](./fixtures/action-policy-v1.json) —
   the revision 1 declarative action policy truth table (issue #1217,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
-  It is data only and has no consumer yet; #1219 adds the Rust, Node,
-  WebAssembly, Python and CLI runners. It holds named synthetic finding
+  It is data only. The Rust core runs it for semantics
+  (`crates/secret-scan-core/tests/action_policy_conformance.rs`); the Node addon
+  and the WebAssembly artifact (through its Node glue) run it, through their raw
+  exports and through the published package on top of each, in the
+  artifact-qualification workflow through `scripts/lib/action-policy-reference.mjs`
+  (issue #1219). A JavaScript surface cannot construct a finding without
+  scanning, so it runs the evaluations a synthetic input can produce and
+  reports the rest as not reachable; the raw exports also compare the fixed
+  class and rule index, which the public package hides by design. The Python
+  binding and the CLI have their own runners. It holds named synthetic finding
   metadata, the policy documents, 37 evaluations (matched rule, unmatched
   fallback, unknown type, all four actions, the `default` rule action, AND,
   set membership and an ordering conflict in both orders), one rejection per

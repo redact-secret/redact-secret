@@ -145,6 +145,49 @@ Omit `policy` to use the built-in policy, which runs in Rust. Pass
 (`<SECRET_1>`, `<SECRET_2>`, ...) explicitly; `typedPlaceholderFormatter`
 names the finding type instead (`<JWT_1>`).
 
+## Change one action without copying the default
+
+A callback replaces the default action for every finding, so keeping the
+default for the rest means reproducing it. `actionPolicy` is data instead: the
+first rule that matches a finalized finding decides its action, and every
+other finding keeps the default action the loaded artifact computes.
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+
+const { text, findings } = scanAndRedact("ACME_AN_aB1cD2eF3gH4iJ5kL6mN", {
+  ruleset: 'ruleset-revision: 1\ndetector: acme-alnum-token\nspecificity: contextual\nprefix: "ACME_AN_"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n',
+  actionPolicy: {
+    actionPolicyRevision: 1, // must be the first member
+    base: "default",
+    rules: [{ id: "redact-acme-tokens", match: { type: ["acme-alnum-token"] }, action: "redact" }],
+  },
+});
+```
+
+`actionPolicy` is accepted by `scan`, `scanAndRedact`, `createIncrementalSanitizer`
+and the stream factories, as a plain object (serialized once, when the call or
+session is created), as UTF-8 JSON text, or as bytes. The Rust core parses and
+validates it; a rejected document throws `INVALID_ACTION_POLICY` (the code only
+in 0.1.x) and a callback `policy` together with `actionPolicy` throws
+`INVALID_OPTIONS`. An incremental session binds its policy when it is created.
+`defaultPolicy` is the core's default evaluation as a policy object, for a
+callback that wants "mine, else the default" without copying a table:
+
+```ts
+import { defaultPolicy } from "@redact-secret/core";
+import type { SecretPolicy } from "@redact-secret/core";
+
+const policy: SecretPolicy = {
+  evaluate: (finding, context) => (finding.type === "acme-alnum-token" ? "redact" : defaultPolicy.evaluate(finding, context)),
+};
+```
+
+The document format, evaluation order, limits and the rejection classes are in
+the [action policy guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/action-policy.md).
+
 ## Incremental and stream availability
 
 The Node artifact builds a real incremental session, wrapping the same core
@@ -280,8 +323,8 @@ mapped to the same fixed error vocabulary.
 
 Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
 `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
-`typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`, `VERSION`,
-`PROFILE`.
+`defaultPolicy`, `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`,
+`VERSION`, `PROFILE`.
 
 Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 `SecretConfidence`, `SecretObfuscation`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
@@ -289,6 +332,8 @@ Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding
 `ScanResult`, `WholeInputLimits`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,
 `IncrementalSanitizerResult`, `IncrementalSanitizerState`,
 `IncrementalLimits`, `IncrementalSecretPolicy`, `IncrementalPolicyContext`,
+`ActionPolicyDocument`, `ActionPolicyInput`, `ActionPolicyRule`,
+`ActionPolicyMatch`, `ActionPolicyRuleAction`, `DefaultSecretPolicy`,
 `RangeUnit`, `SecretScanErrorCode`.
 
 PII activation is opt-in and off by default. Pass `pii` selectors to

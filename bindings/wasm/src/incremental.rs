@@ -663,10 +663,20 @@ fn to_core_limits(
 /// only safe metadata, never the input or a matched value, and both are
 /// numbered across the whole session rather than per call.
 ///
+/// `action_policy`, when given, is the bytes of a revision 1 declarative
+/// action policy document
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// issue #1219). It is parsed once, here, and the compiled policy is owned by
+/// the session for its whole life: no other session or call can change what
+/// it evaluates. Giving it together with `policy` is `INVALID_OPTIONS`.
+///
 /// # Errors
 ///
 /// Returns `INVALID_LIMITS` when the four limits are non-positive or do not
-/// satisfy the documented relationship between them.
+/// satisfy the documented relationship between them, `INVALID_OPTIONS` when
+/// both `policy` and `action_policy` are given, and `INVALID_ACTION_POLICY`
+/// (the fixed class and rule index appended to the message) when
+/// `action_policy` does not parse.
 // `policy`/`formatter` cannot be `Option<&Function>` (see `lib.rs`'s `scan`);
 // this crate takes ownership at every such boundary and borrows internally.
 #[allow(clippy::needless_pass_by_value)]
@@ -678,6 +688,7 @@ pub fn create_incremental_sanitizer(
     max_multiline_code_units: u32,
     policy: Option<Function>,
     formatter: Option<Function>,
+    action_policy: Option<Vec<u8>>,
 ) -> Result<IncrementalSanitizerJs, JsValue> {
     let limits = to_core_limits(
         max_input_code_units,
@@ -686,12 +697,24 @@ pub fn create_incremental_sanitizer(
         max_multiline_code_units,
     )
     .map_err(|error| to_js_error(error.into()))?;
+    // A callback and an action policy together are host misuse, rejected
+    // before the document is read.
+    if policy.is_some() && action_policy.is_some() {
+        return Err(to_js_error(SecretScanErrorCode::InvalidOptions.into()));
+    }
+    let action_policy = match action_policy.as_deref() {
+        None => None,
+        Some(bytes) => Some(
+            redact_secret::load_action_policy(bytes).map_err(|error| to_js_error(error.into()))?,
+        ),
+    };
     let index = Rc::new(RefCell::new(Utf16Index::new(limits.max_buffered_bytes())));
     let policy_failure = Rc::new(Cell::new(None));
 
-    let policy: Box<dyn IncrementalPolicy> = match policy {
-        None => Box::new(DefaultPolicy),
-        Some(callback) => Box::new(JsIncrementalPolicyAdapter {
+    let policy: Box<dyn IncrementalPolicy> = match (policy, action_policy) {
+        (None, Some(overlay)) => Box::new(overlay),
+        (None, None) => Box::new(DefaultPolicy),
+        (Some(callback), _) => Box::new(JsIncrementalPolicyAdapter {
             callback,
             index: Rc::clone(&index),
             policy_failure: Rc::clone(&policy_failure),
@@ -1033,7 +1056,70 @@ mod tests {
         formatter: Option<Function>,
     ) -> IncrementalSanitizerJs {
         crate::initialize(Vec::new()).unwrap();
-        create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, policy, formatter).unwrap()
+        create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, policy, formatter, None)
+            .unwrap()
+    }
+
+    /// An incremental session evaluates the action policy it was constructed
+    /// with, at every partition of the input, and live sessions of different
+    /// policies do not affect each other, in either construction order
+    /// (issue #1219: no process-global policy slot). No JavaScript function
+    /// is involved, so this runs natively.
+    #[test]
+    fn a_session_binds_the_action_policy_it_was_constructed_with() {
+        crate::initialize(Vec::new()).unwrap();
+        let secret = crate::synthetic::secret();
+        let document = |action: &str| {
+            format!(
+                r#"{{"actionPolicyRevision":1,"base":"default","rules":[{{"id":"r","match":{{"type":["{}"]}},"action":"{action}"}}]}}"#,
+                secret.type_name
+            )
+            .into_bytes()
+        };
+        let open = |document: Option<Vec<u8>>| {
+            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None, document)
+                .unwrap()
+        };
+        let actions = |session: &mut IncrementalSanitizerJs, chunks: &[&str]| {
+            let mut actions = Vec::new();
+            for chunk in chunks {
+                actions.extend(
+                    session
+                        .append(chunk)
+                        .unwrap()
+                        .findings()
+                        .iter()
+                        .map(FindingJs::action),
+                );
+            }
+            actions.extend(
+                session
+                    .finalize()
+                    .unwrap()
+                    .findings()
+                    .iter()
+                    .map(FindingJs::action),
+            );
+            actions
+        };
+        let input = format!("prefix {} suffix", secret.text);
+        for split in 1..input.len() {
+            let (head, tail) = input.split_at(split);
+            let mut warn = open(Some(document("warn")));
+            let mut allow = open(Some(document("allow")));
+            let mut default = open(None);
+            assert_eq!(actions(&mut warn, &[head, tail]), ["warn"], "split {split}");
+            assert_eq!(
+                actions(&mut allow, &[head, tail]),
+                ["allow"],
+                "split {split}"
+            );
+            assert_eq!(
+                actions(&mut default, &[head, tail]),
+                ["redact"],
+                "split {split}"
+            );
+        }
     }
 
     #[wasm_bindgen_test::wasm_bindgen_test]
@@ -1206,6 +1292,7 @@ mod tests {
             u32::try_from(buffered).unwrap(),
             u32::try_from(token).unwrap(),
             u32::try_from(multiline).unwrap(),
+            None,
             None,
             None,
         )

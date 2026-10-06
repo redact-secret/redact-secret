@@ -18,14 +18,14 @@ use std::rc::Rc;
 use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
-    Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
-    FormatterFailure, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy,
-    PolicyContext, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
-    default_placeholder_formatter, load_ruleset, redact_with_limits as core_redact_with_limits,
-    run_detector_pipeline,
+    Action, ActionPolicy, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
+    Finding, FormatterFailure, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter,
+    Policy, PolicyContext, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
+    default_placeholder_formatter, load_action_policy, load_ruleset,
+    redact_with_limits as core_redact_with_limits, run_detector_pipeline,
 };
 
-use crate::error::{to_js_error, to_js_ruleset_error};
+use crate::error::{to_js_action_policy_error, to_js_error, to_js_ruleset_error};
 use crate::offsets::{Utf16Offsets, utf16_offsets_to_bytes};
 // Re-exported so the incremental N-API surface (a public export like `scan`
 // or `redact`, just organized in its own module) is part of this crate's
@@ -439,6 +439,50 @@ fn from_js_findings(input: &str, findings: &[JsFinding]) -> Result<Vec<Finding>,
         .collect()
 }
 
+/// Evaluates the core's [`DefaultPolicy`] for one finding's safe metadata and
+/// returns its action name, so a JavaScript policy that wants "mine, else the
+/// default" never copies the default table
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// issue #1219). Only `type` and `confidence` decide the result; the range
+/// is validated and otherwise ignored.
+///
+/// # Errors
+///
+/// `INVALID_FINDINGS` when `finding` is not a well-formed finding: a
+/// non-identifier `id`, `type` or `detector`, an unknown `confidence` or
+/// `obfuscation`, or an empty or reversed range.
+#[napi(js_name = "defaultPolicy")]
+#[allow(clippy::needless_pass_by_value, reason = "N-API owns object arguments")]
+pub fn default_policy(finding: JsDetectedFinding) -> napi::Result<String, String> {
+    let core_finding = from_js_detected_finding(&finding)
+        .map_err(|_| to_js_error(SecretScanErrorCode::InvalidFindings.into()))?;
+    DefaultPolicy
+        .evaluate(&core_finding, &PolicyContext::new(0, 1))
+        .map(|action| action.as_str().to_owned())
+        .map_err(|_| to_js_error(SecretScanErrorCode::PolicyFailure.into()))
+}
+
+/// Reconstructs a native [`DetectedFinding`] from its JavaScript metadata,
+/// using the UTF-16 offsets as the range: the default policy never reads it.
+fn from_js_detected_finding(
+    finding: &JsDetectedFinding,
+) -> Result<DetectedFinding, SecretScanError> {
+    let range = ByteRange::new(finding.start as usize, finding.end as usize)
+        .ok_or(SecretScanErrorCode::InvalidFindings)?;
+    let confidence =
+        Confidence::from_name(&finding.confidence).ok_or(SecretScanErrorCode::InvalidFindings)?;
+    let obfuscation =
+        Obfuscation::from_name(&finding.obfuscation).ok_or(SecretScanErrorCode::InvalidFindings)?;
+    Ok(DetectedFinding::new(
+        &finding.id,
+        &finding.r#type,
+        &finding.detector,
+        confidence,
+        range,
+    )?
+    .with_obfuscation(obfuscation))
+}
+
 /// Reconstructs a native [`Finding`] from a JavaScript-supplied [`JsFinding`]
 /// whose UTF-16 range bounds were already resolved to UTF-8 bytes.
 ///
@@ -472,8 +516,37 @@ fn from_js_finding(
     .with_action(action))
 }
 
-/// Runs the detector pipeline over `input` and evaluates `policy` (or the
-/// core's [`DefaultPolicy`] when absent) once per finding.
+/// Loads the optional declarative action policy a whole-input call carries
+/// (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`,
+/// issue #1219). The compiled [`ActionPolicy`] is owned by the one call that
+/// loaded it: no thread-local, process-global or one-slot cache holds it, so
+/// another call can neither evict nor overwrite it.
+///
+/// A callback `policy` and an action policy together are rejected with
+/// `INVALID_OPTIONS` before the document is read; a rejected document is
+/// `INVALID_ACTION_POLICY` with its fixed class and rule index in the
+/// message. The core, not this function, performs every check of the
+/// document.
+fn load_call_action_policy(
+    has_callback: bool,
+    document: Option<&[u8]>,
+) -> napi::Result<Option<ActionPolicy>, String> {
+    let Some(bytes) = document else {
+        return Ok(None);
+    };
+    if has_callback {
+        return Err(to_js_error(SecretScanErrorCode::InvalidOptions.into()));
+    }
+    load_action_policy(bytes)
+        .map(Some)
+        .map_err(to_js_action_policy_error)
+}
+
+/// Runs the detector pipeline over `input` and evaluates `policy` (a
+/// JavaScript callback), `action_policy` (a declarative overlay) or, when
+/// both are absent, the core's [`DefaultPolicy`] once per finding. The caller
+/// guarantees at most one of `policy` and `action_policy` is present
+/// ([`load_call_action_policy`]).
 ///
 /// Checks `limits` explicitly: unlike [`run_redact`], this function calls
 /// `run_detector_pipeline` directly rather than a core function that already
@@ -485,6 +558,7 @@ fn run_scan(
     input: &str,
     registry: &DetectorRegistry,
     policy: Option<&PolicyCallback<'_>>,
+    action_policy: Option<&ActionPolicy>,
     limits: &WholeInputLimits,
     offsets: &RefCell<Utf16Offsets<'_>>,
 ) -> Result<Vec<Finding>, SecretScanError> {
@@ -509,6 +583,9 @@ fn run_scan(
                         .map_err(|_| SecretScanErrorCode::PolicyFailure)?;
                     Action::from_name(&action_name)
                         .ok_or(SecretScanErrorCode::InvalidPolicyAction)?
+                } else if let Some(overlay) = action_policy {
+                    Policy::evaluate(overlay, &finding, &context)
+                        .map_err(|_| SecretScanErrorCode::PolicyFailure)?
                 } else {
                     DefaultPolicy
                         .evaluate(&finding, &context)
@@ -635,17 +712,18 @@ fn run_scan_for_profile(
     profile: Profile,
     input: &str,
     policy: Option<&PolicyCallback<'_>>,
+    action_policy: Option<&ActionPolicy>,
     limits: &WholeInputLimits,
     ruleset: Option<&[u8]>,
     offsets: &RefCell<Utf16Offsets<'_>>,
 ) -> napi::Result<Vec<Finding>, String> {
     match ruleset {
         None => with_profile_registry(profile, |registry| {
-            run_scan(input, registry, policy, limits, offsets)
+            run_scan(input, registry, policy, action_policy, limits, offsets)
         })
         .map_err(to_js_error),
         Some(bytes) => with_ruleset_registry(profile, bytes, |registry| {
-            run_scan(input, registry, policy, limits, offsets)
+            run_scan(input, registry, policy, action_policy, limits, offsets)
         }),
     }
 }
@@ -658,10 +736,20 @@ fn scan_for_profile(
     policy: Option<&PolicyCallback<'_>>,
     limits: Option<&JsWholeInputLimits>,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&[u8]>,
 ) -> napi::Result<Vec<JsFinding>, String> {
     let limits = resolve_whole_input_limits(limits).map_err(to_js_error)?;
+    let action_policy = load_call_action_policy(policy.is_some(), action_policy)?;
     let offsets = RefCell::new(Utf16Offsets::new(input));
-    let findings = run_scan_for_profile(profile, input, policy, &limits, ruleset, &offsets)?;
+    let findings = run_scan_for_profile(
+        profile,
+        input,
+        policy,
+        action_policy.as_ref(),
+        &limits,
+        ruleset,
+        &offsets,
+    )?;
     Ok(to_js_findings(&mut offsets.borrow_mut(), &findings))
 }
 
@@ -683,12 +771,23 @@ fn scan_for_profile(
 ///   `"redact"`, `"block"`, `"warn"`, or `"allow"`.
 /// - `INVALID_RULESET` when `ruleset` is given and does not parse; the fixed
 ///   rejection class is appended to the thrown error's message.
+/// - `INVALID_ACTION_POLICY` when `action_policy` is given and does not
+///   parse; the fixed rejection class and, inside a rule, its zero-based
+///   index are appended to the thrown error's message.
+/// - `INVALID_OPTIONS` when both `policy` and `action_policy` are given.
 ///
-/// No error carries `input`, `ruleset`'s bytes, or a matched value.
+/// No error carries `input`, `ruleset`'s or `action_policy`'s bytes, or a
+/// matched value.
 ///
 /// When `ruleset` is given, its declared detectors register after every
 /// built-in, exactly as a native custom detector would
 /// (`decision-define-declarative-detector-ruleset-contract`).
+///
+/// When `action_policy` is given (the bytes of a revision 1 declarative
+/// action policy document), it replaces the default per-finding evaluation:
+/// the first matching rule's action, or the default action when none
+/// matches (`decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
+/// The compiled policy lives only for this call.
 // N-API's generated argument conversion produces owned `String`/`Function`
 // values; there is no borrowed form to take instead.
 #[allow(clippy::needless_pass_by_value)]
@@ -699,6 +798,7 @@ pub fn scan(
     policy: Option<PolicyCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
     ruleset: Option<Buffer>,
+    action_policy: Option<Buffer>,
 ) -> napi::Result<Vec<JsFinding>, String> {
     scan_for_profile(
         Profile::Full,
@@ -706,6 +806,7 @@ pub fn scan(
         policy.as_ref(),
         limits.as_ref(),
         ruleset.as_deref(),
+        action_policy.as_deref(),
     )
 }
 
@@ -728,6 +829,7 @@ pub fn scan_common(
     policy: Option<PolicyCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
     ruleset: Option<Buffer>,
+    action_policy: Option<Buffer>,
 ) -> napi::Result<Vec<JsFinding>, String> {
     scan_for_profile(
         Profile::Common,
@@ -735,6 +837,7 @@ pub fn scan_common(
         policy.as_ref(),
         limits.as_ref(),
         ruleset.as_deref(),
+        action_policy.as_deref(),
     )
 }
 
@@ -792,11 +895,21 @@ fn run_scan_and_redact_for_profile(
     formatter: Option<&FormatterCallback<'_>>,
     limits: &WholeInputLimits,
     ruleset: Option<&[u8]>,
+    action_policy: Option<&[u8]>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
+    let action_policy = load_call_action_policy(policy.is_some(), action_policy)?;
     // One converter for the whole call: the policy callback, the formatter
     // callback, and the returned findings all convert through it.
     let offsets = RefCell::new(Utf16Offsets::new(input));
-    let findings = run_scan_for_profile(profile, input, policy, limits, ruleset, &offsets)?;
+    let findings = run_scan_for_profile(
+        profile,
+        input,
+        policy,
+        action_policy.as_ref(),
+        limits,
+        ruleset,
+        &offsets,
+    )?;
     let redacted =
         run_redact(input, &findings, formatter, limits, &offsets).map_err(to_js_error)?;
     let js_findings = to_js_findings(&mut offsets.borrow_mut(), &findings);
@@ -824,6 +937,7 @@ pub fn scan_and_redact(
     formatter: Option<FormatterCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
     ruleset: Option<Buffer>,
+    action_policy: Option<Buffer>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
     run_scan_and_redact_for_profile(
@@ -833,6 +947,7 @@ pub fn scan_and_redact(
         formatter.as_ref(),
         &limits,
         ruleset.as_deref(),
+        action_policy.as_deref(),
     )
 }
 
@@ -854,6 +969,7 @@ pub fn scan_and_redact_common(
     formatter: Option<FormatterCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
     ruleset: Option<Buffer>,
+    action_policy: Option<Buffer>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
     run_scan_and_redact_for_profile(
@@ -863,6 +979,7 @@ pub fn scan_and_redact_common(
         formatter.as_ref(),
         &limits,
         ruleset.as_deref(),
+        action_policy.as_deref(),
     )
 }
 
@@ -898,6 +1015,7 @@ mod tests {
             run_scan(
                 input,
                 registry,
+                None,
                 None,
                 &WholeInputLimits::default(),
                 &offsets_for(input),
@@ -1030,7 +1148,7 @@ mod tests {
             .collect();
         assert_eq!(js_findings.len(), 1);
 
-        let combined = scan_and_redact(input.to_owned(), None, None, None, None).unwrap();
+        let combined = scan_and_redact(input.to_owned(), None, None, None, None, None).unwrap();
         assert_eq!(
             combined
                 .findings
@@ -1047,6 +1165,7 @@ mod tests {
             run_scan(
                 input,
                 registry,
+                None,
                 None,
                 &WholeInputLimits::default(),
                 &offsets_for(input),
@@ -1112,7 +1231,8 @@ mod tests {
             .map(|f| to_js_finding(&mut Utf16Offsets::new(input), f))
             .collect();
 
-        let combined = scan_and_redact_common(input.to_owned(), None, None, None, None).unwrap();
+        let combined =
+            scan_and_redact_common(input.to_owned(), None, None, None, None, None).unwrap();
         assert_eq!(
             combined
                 .findings
@@ -1143,7 +1263,7 @@ mod tests {
     #[test]
     fn scan_rejects_input_over_an_explicit_byte_limit() {
         let input = "abcdef".to_owned();
-        let result = scan(input, None, Some(tight_limits()), None);
+        let result = scan(input, None, Some(tight_limits()), None, None);
         assert_err_status(result, "INPUT_LIMIT_EXCEEDED");
     }
 
@@ -1165,6 +1285,7 @@ mod tests {
                 max_findings: 1,
             }),
             None,
+            None,
         );
         assert_err_status(result, "FINDING_LIMIT_EXCEEDED");
     }
@@ -1178,6 +1299,7 @@ mod tests {
                 max_input_bytes: 0,
                 max_findings: 50,
             }),
+            None,
             None,
         );
         assert_err_status(result, "INVALID_LIMITS");
@@ -1244,13 +1366,14 @@ validator: none\n";
     fn scan_accepts_a_ruleset_buffer_and_registers_it_after_the_built_ins() {
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
-        let without_ruleset = scan(input.clone(), None, None, None).unwrap();
+        let without_ruleset = scan(input.clone(), None, None, None, None).unwrap();
         assert!(
             without_ruleset.is_empty(),
             "no built-in detector claims ACME_"
         );
 
-        let with_ruleset = scan(input, None, None, Some(Buffer::from(RULESET_FIXTURE))).unwrap();
+        let with_ruleset =
+            scan(input, None, None, Some(Buffer::from(RULESET_FIXTURE)), None).unwrap();
         assert_eq!(with_ruleset.len(), 1);
         assert_eq!(with_ruleset[0].detector, "acme-internal-token");
         assert_eq!(with_ruleset[0].confidence, "medium");
@@ -1260,7 +1383,8 @@ validator: none\n";
     fn scan_common_also_accepts_a_ruleset_and_keeps_its_own_built_in_set() {
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
-        let findings = scan_common(input, None, None, Some(Buffer::from(RULESET_FIXTURE))).unwrap();
+        let findings =
+            scan_common(input, None, None, Some(Buffer::from(RULESET_FIXTURE)), None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].detector, "acme-internal-token");
     }
@@ -1269,8 +1393,15 @@ validator: none\n";
     fn scan_and_redact_thread_the_ruleset_through_to_the_scan_step() {
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
-        let result =
-            scan_and_redact(input, None, None, None, Some(Buffer::from(RULESET_FIXTURE))).unwrap();
+        let result = scan_and_redact(
+            input,
+            None,
+            None,
+            None,
+            Some(Buffer::from(RULESET_FIXTURE)),
+            None,
+        )
+        .unwrap();
         assert_eq!(result.findings.len(), 1);
         assert_eq!(result.findings[0].detector, "acme-internal-token");
         // `Confidence::Medium` warns rather than redacts under the default
@@ -1289,10 +1420,169 @@ validator: none\n";
             None,
             None,
             Some(Buffer::from(malformed.into_bytes())),
+            None,
         );
         let error = result.err().expect("expected an error");
         assert_eq!(error.status, "INVALID_RULESET");
         assert!(error.reason.contains("UNKNOWN_REVISION"));
+    }
+
+    /// A minimal, valid revision 1 action policy (issue #1219).
+    const ACTION_POLICY_FIXTURE: &[u8] = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"warn-github","match":{"type":["github_token"]},"action":"warn"}]}"#;
+
+    const ACTION_POLICY_INPUT: &str = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+
+    #[test]
+    fn scan_applies_an_action_policy_and_the_default_stays_the_base() {
+        let default = scan(ACTION_POLICY_INPUT.to_owned(), None, None, None, None).unwrap();
+        assert_eq!(default.len(), 1);
+        assert_eq!(default[0].action, "redact");
+
+        let overlaid = scan(
+            ACTION_POLICY_INPUT.to_owned(),
+            None,
+            None,
+            None,
+            Some(Buffer::from(ACTION_POLICY_FIXTURE)),
+        )
+        .unwrap();
+        assert_eq!(overlaid.len(), 1);
+        assert_eq!(overlaid[0].action, "warn");
+        assert_eq!(
+            (overlaid[0].start, overlaid[0].end),
+            (default[0].start, default[0].end)
+        );
+
+        let empty = br#"{"actionPolicyRevision":1,"base":"default","rules":[]}"#;
+        let identity = scan(
+            ACTION_POLICY_INPUT.to_owned(),
+            None,
+            None,
+            None,
+            Some(Buffer::from(&empty[..])),
+        )
+        .unwrap();
+        assert_eq!(identity[0].action, default[0].action);
+    }
+
+    #[test]
+    fn the_common_exports_and_scan_and_redact_apply_an_action_policy() {
+        let common = scan_common(
+            "postgres://user:SYNTHETIC_REVOKED_PASSWORD@example.test:5432/db".to_owned(),
+            None,
+            None,
+            None,
+            Some(Buffer::from(
+                &br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"allow-all","match":{"confidence":["high","medium","low"]},"action":"allow"}]}"#[..],
+            )),
+        )
+        .unwrap();
+        assert!(common.iter().all(|finding| finding.action == "allow"));
+
+        let combined = scan_and_redact(
+            ACTION_POLICY_INPUT.to_owned(),
+            None,
+            None,
+            None,
+            None,
+            Some(Buffer::from(ACTION_POLICY_FIXTURE)),
+        )
+        .unwrap();
+        assert_eq!(combined.findings[0].action, "warn");
+        // `warn` leaves the text unchanged.
+        assert_eq!(combined.redacted, ACTION_POLICY_INPUT);
+    }
+
+    #[test]
+    fn a_rejected_action_policy_carries_the_fixed_code_class_and_rule_index() {
+        let rejected = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["jwt"]},"action":"mask"}]}"#;
+        let error = scan(
+            "irrelevant".to_owned(),
+            None,
+            None,
+            None,
+            Some(Buffer::from(&rejected[..])),
+        )
+        .err()
+        .expect("expected an error");
+        assert_eq!(error.status, "INVALID_ACTION_POLICY");
+        assert_eq!(
+            error.reason,
+            "The supplied action policy is invalid. (INVALID_ACTION, rule 0)"
+        );
+    }
+
+    #[test]
+    fn a_callback_and_an_action_policy_together_are_invalid_options_before_parsing() {
+        // `true` stands for a supplied callback; the document is never read,
+        // so even a document that would be rejected reports the misuse code.
+        let error =
+            load_call_action_policy(true, Some(b"not json")).expect_err("expected an error");
+        assert_eq!(error.status, "INVALID_OPTIONS");
+        assert!(load_call_action_policy(true, None).unwrap().is_none());
+        assert!(load_call_action_policy(false, None).unwrap().is_none());
+    }
+
+    /// Two live policies of different content evaluate independently, in
+    /// either construction order: nothing is held between calls.
+    #[test]
+    fn no_process_global_action_policy_slot_exists() {
+        let warn = ACTION_POLICY_FIXTURE;
+        let allow = &br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"allow-github","match":{"type":["github_token"]},"action":"allow"}]}"#[..];
+        let run = |document: &[u8]| {
+            scan(
+                ACTION_POLICY_INPUT.to_owned(),
+                None,
+                None,
+                None,
+                Some(Buffer::from(document)),
+            )
+            .unwrap()[0]
+                .action
+                .clone()
+        };
+        assert_eq!(run(warn), "warn");
+        assert_eq!(run(allow), "allow");
+        assert_eq!(run(warn), "warn");
+        assert_eq!(run(allow), "allow");
+    }
+
+    #[test]
+    fn default_policy_delegates_to_the_core_default_evaluation() {
+        let finding = |type_name: &str, confidence: &str| JsDetectedFinding {
+            id: "finding-1".to_owned(),
+            r#type: type_name.to_owned(),
+            detector: "synthetic-detector".to_owned(),
+            confidence: confidence.to_owned(),
+            obfuscation: "none".to_owned(),
+            start: 0,
+            end: 1,
+        };
+        assert_eq!(
+            default_policy(finding("private_key", "low")).unwrap(),
+            "block"
+        );
+        assert_eq!(
+            default_policy(finding("github_token", "low")).unwrap(),
+            "redact"
+        );
+        assert_eq!(
+            default_policy(finding("acme-unknown-type", "high")).unwrap(),
+            "redact"
+        );
+        assert_eq!(
+            default_policy(finding("acme-unknown-type", "medium")).unwrap(),
+            "warn"
+        );
+        for malformed in [
+            finding("Not An Identifier", "high"),
+            finding("jwt", "certain"),
+        ] {
+            assert_err_status(default_policy(malformed), "INVALID_FINDINGS");
+        }
+        let mut empty_range = finding("jwt", "high");
+        empty_range.end = 0;
+        assert_err_status(default_policy(empty_range), "INVALID_FINDINGS");
     }
 
     #[test]
@@ -1304,7 +1594,7 @@ validator: none\n";
             "INPUT_LIMIT_EXCEEDED",
         );
         assert_err_status(
-            scan_and_redact(input, None, None, Some(tight_limits()), None),
+            scan_and_redact(input, None, None, Some(tight_limits()), None, None),
             "INPUT_LIMIT_EXCEEDED",
         );
     }
@@ -1316,7 +1606,7 @@ validator: none\n";
             pii_activation().unwrap(),
             "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2"
         );
-        let findings = scan("🔒 client_ip=10.0.0.8".to_owned(), None, None, None).unwrap();
+        let findings = scan("🔒 client_ip=10.0.0.8".to_owned(), None, None, None, None).unwrap();
         let finding = findings
             .iter()
             .find(|finding| finding.r#type == "pii_global_network_address")
@@ -1344,6 +1634,7 @@ validator: none\n";
                 let findings = run_scan(
                     input,
                     &registry,
+                    None,
                     None,
                     &WholeInputLimits::default(),
                     &offsets_for(input),
@@ -1398,6 +1689,7 @@ validator: none\n";
             let findings = run_scan(
                 input,
                 &registry,
+                None,
                 None,
                 &WholeInputLimits::default(),
                 &offsets_for(input),

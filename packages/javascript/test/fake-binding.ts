@@ -12,6 +12,7 @@ import type {
   NativeBinding,
   NativeFinding,
   NativeIncrementalLimits,
+  NativeIncrementalOptions,
   NativeIncrementalSanitizer,
   NativeWholeInputLimits,
 } from "../src/native.js";
@@ -51,6 +52,13 @@ export interface FakeBinding extends NativeBinding {
    * {@link lastLimits}.
    */
   readonly lastRuleset: Uint8Array | undefined;
+  /**
+   * The `actionPolicy` document bytes the most recent `scan`/`scanAndRedact`
+   * call received, with the same "check `calls` first" caveat.
+   */
+  readonly lastActionPolicy: Uint8Array | undefined;
+  /** The options the most recent `createIncrementalSanitizer` call received. */
+  readonly lastIncrementalOptions: NativeIncrementalOptions | undefined;
 }
 
 export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding {
@@ -60,6 +68,8 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
   let lastLimits: NativeWholeInputLimits | undefined;
   let lastIncrementalLimits: NativeIncrementalLimits | undefined;
   let lastRuleset: Uint8Array | undefined;
+  let lastActionPolicy: Uint8Array | undefined;
+  let lastIncrementalOptions: NativeIncrementalOptions | undefined;
   let activation = "credentials=full;selectors=off;families=;vocabulary=pii-context/v2";
 
   function session(): NativeIncrementalSanitizer {
@@ -136,9 +146,10 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
       activation = next;
     },
     piiActivation: () => activation,
-    scan: (input, policy, limits, ruleset) => {
+    scan: (input, policy, limits, ruleset, actionPolicy) => {
       lastLimits = limits;
       lastRuleset = ruleset;
+      lastActionPolicy = actionPolicy;
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);
       if (options.throwOnScan !== undefined) throw options.throwOnScan;
       return findings;
@@ -148,9 +159,10 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
       calls.push(`redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`);
       return redacted;
     },
-    scanAndRedact: (input, policy, formatter, limits, ruleset) => {
+    scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) => {
       lastLimits = limits;
       lastRuleset = ruleset;
+      lastActionPolicy = actionPolicy;
       calls.push(
         `scanAndRedact:${input}:${policy === undefined ? "builtin" : "custom"}:${formatter === undefined ? "builtin" : "custom"}`,
       );
@@ -158,6 +170,7 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
     },
     createIncrementalSanitizer: (incrementalOptions) => {
       lastIncrementalLimits = incrementalOptions.limits;
+      lastIncrementalOptions = incrementalOptions;
       calls.push(`createIncrementalSanitizer:${incrementalOptions.limits.maxInputCodeUnits}`);
       return session();
     },
@@ -170,6 +183,13 @@ export function createFakeBinding(options: FakeBindingOptions = {}): FakeBinding
     get lastRuleset() {
       return lastRuleset;
     },
+    get lastActionPolicy() {
+      return lastActionPolicy;
+    },
+    get lastIncrementalOptions() {
+      return lastIncrementalOptions;
+    },
+    defaultPolicy: () => "redact",
   };
 }
 

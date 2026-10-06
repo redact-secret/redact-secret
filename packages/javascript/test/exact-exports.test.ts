@@ -17,6 +17,7 @@ const PUBLIC_RUNTIME_EXPORTS = [
   "artifact",
   "createIncrementalSanitizer",
   "defaultPlaceholderFormatter",
+  "defaultPolicy",
   "initialize",
   "piiActivation",
   "redact",

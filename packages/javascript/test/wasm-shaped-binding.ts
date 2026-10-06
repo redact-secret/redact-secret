@@ -47,6 +47,10 @@ export interface WasmShapedBinding {
   readonly calls: string[];
   /** The four positional limits the most recent `createIncrementalSanitizer` call received. */
   readonly lastIncrementalLimits: readonly number[] | undefined;
+  /** The `actionPolicy` bytes the most recent `scan`/`scanAndRedact`/session call received. */
+  readonly lastActionPolicy: Uint8Array | undefined;
+  /** The arguments the most recent `defaultPolicy` call received. */
+  readonly lastDefaultPolicyArguments: readonly unknown[] | undefined;
   /** Mirrors `runtime/browser.ts`'s own `loadNativeBinding`, against this fake module instead of a real dynamic import. */
   readonly load: NativeBindingLoader;
 }
@@ -66,6 +70,8 @@ function toDetectedFindingMetadata(finding: WasmFinding): WasmDetectedFindingMet
 export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}): WasmShapedBinding {
   const calls: string[] = [];
   let lastIncrementalLimits: readonly number[] | undefined;
+  let lastActionPolicy: Uint8Array | undefined;
+  let lastDefaultPolicyArguments: readonly unknown[] | undefined;
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
   let activation = `credentials=${options.profile ?? "full"};selectors=off;families=;vocabulary=pii-context/v2`;
@@ -106,7 +112,8 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       ].join(",");
       activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v2`;
     },
-    scan: (input, policy) => {
+    scan: (input, policy, _maxInputBytes, _maxFindings, _ruleset, actionPolicy) => {
+      lastActionPolicy = actionPolicy;
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);
       if (options.throwOnScan !== undefined) throw options.throwOnScan;
       if (policy !== undefined) {
@@ -128,7 +135,8 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       }
       return redacted;
     },
-    scanAndRedact: (input, policy, formatter) => {
+    scanAndRedact: (input, policy, formatter, _maxInputBytes, _maxFindings, _ruleset, actionPolicy) => {
+      lastActionPolicy = actionPolicy;
       calls.push(
         `scanAndRedact:${input}:${policy === undefined ? "builtin" : "custom"}:${formatter === undefined ? "builtin" : "custom"}`,
       );
@@ -160,7 +168,9 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       maxMultilineCodeUnits,
       policy,
       formatter,
+      actionPolicy,
     ) => {
+      lastActionPolicy = actionPolicy;
       lastIncrementalLimits = [maxInputCodeUnits, maxBufferedCodeUnits, maxTokenCodeUnits, maxMultilineCodeUnits];
       calls.push(`createIncrementalSanitizer:${maxInputCodeUnits}`);
       const incrementalFindings = options.incrementalFindings ?? [];
@@ -206,12 +216,22 @@ export function createWasmShapedBinding(options: WasmShapedBindingOptions = {}):
       };
       return session;
     },
+    defaultPolicy: (...given) => {
+      lastDefaultPolicyArguments = given;
+      return "redact";
+    },
   };
 
   return {
     calls,
     get lastIncrementalLimits() {
       return lastIncrementalLimits;
+    },
+    get lastActionPolicy() {
+      return lastActionPolicy;
+    },
+    get lastDefaultPolicyArguments() {
+      return lastDefaultPolicyArguments;
     },
     load: async (): Promise<NativeBinding> => {
       await module.default();

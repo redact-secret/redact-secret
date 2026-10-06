@@ -26,6 +26,12 @@
  * fixed class the glue appends to its error message. The public package hides
  * the class by design, so the class comparison needs the glue itself.
  *
+ * It runs the shared action policy fixture
+ * (`conformance/fixtures/action-policy-v1.json`, #1219) the same two ways: through
+ * the artifact's own glue (the fixed class and rule index the raw error appends
+ * to its message) and through the published package on the fallback, which
+ * reports the code only (`scripts/lib/action-policy-reference.mjs`).
+ *
  * This does not exhaustively fuzz every byte boundary the way
  * `qualify-node-addon.mjs`'s own stream pass does: the stream adapter and
  * incremental session are unmodified, already-qualified code shared with the
@@ -53,6 +59,14 @@ import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { pathToFileURL } from "node:url";
 
+import {
+  assertActionPolicyResult,
+  loadActionPolicyFixture,
+  publicPackageSurface,
+  runActionPolicyReference,
+  runPublicInputForms,
+  wasmGlueSurface,
+} from "./lib/action-policy-reference.mjs";
 import { loadRulesetReference, runRulesetReference } from "./lib/ruleset-reference.mjs";
 import {
   assertMatchesFixture,
@@ -247,6 +261,26 @@ async function conformRuleset(detectorProfile) {
   return checks;
 }
 
+/**
+ * The shared action policy fixture (`conformance/fixtures/action-policy-v1.json`,
+ * #1219) through the artifact's generated glue, loaded the way the fallback
+ * loads it: every rejection with the fixed class and rule index the glue
+ * appends to its error message, the accepted and boundary documents, the
+ * end-to-end cases (whole input and incremental sessions over several
+ * partitions) and the host obligations.
+ */
+async function conformActionPolicy(detectorProfile) {
+  const name = detectorProfile === "common" ? "redact_secret_wasm_common" : "redact_secret_wasm";
+  const glue = await import(`${pathToFileURL(join(WASM_PACKAGE_ROOT, `${name}.js`)).href}?action-policy`);
+  await glue.default({ module_or_path: readFileSync(join(WASM_PACKAGE_ROOT, `${name}_bg.wasm`)) });
+  assertEqual(glue.profile(), detectorProfile, "the glue's reported profile");
+  glue.initialize([]);
+
+  const result = runActionPolicyReference(loadActionPolicyFixture(), wasmGlueSurface(glue, detectorProfile));
+  assertActionPolicyResult("wasm glue", result, detectorProfile);
+  return result;
+}
+
 async function main() {
   const { wasmDir, detectorProfile, phoneSelector } = parseArguments(process.argv.slice(2));
   const packageEntry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
@@ -278,8 +312,23 @@ async function main() {
     const rulesetChecks = await conformRuleset(detectorProfile);
     console.log(`the WebAssembly artifact matches the reference ruleset fixture (${rulesetChecks} checks)`);
 
+    const actionPolicy = await conformActionPolicy(detectorProfile);
+    console.log(
+      `the WebAssembly artifact matches the shared action policy fixture ` +
+        `(${actionPolicy.checks} checks, ${actionPolicy.skipped.length} skipped on this profile, ` +
+        `${actionPolicy.unscannableEvaluations} evaluations no synthetic input reaches)`,
+    );
+
     await api.initialize();
     assertEqual(api.artifact(), "wasm", "the fallback's reported artifact");
+    const actionPolicyFixture = loadActionPolicyFixture();
+    assertActionPolicyResult(
+      "package",
+      runActionPolicyReference(actionPolicyFixture, publicPackageSurface(api, detectorProfile)),
+      detectorProfile,
+    );
+    assertActionPolicyResult("package input forms", runPublicInputForms(actionPolicyFixture, api), detectorProfile);
+    console.log("the package's public API matches the shared action policy fixture on the WebAssembly fallback");
     assertEqual(api.VERSION, expectedVersion, "the package's reported version");
     assertEqual(api.PROFILE, detectorProfile, "the package's reported PROFILE");
 

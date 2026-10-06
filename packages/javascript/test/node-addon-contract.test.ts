@@ -25,6 +25,7 @@ describe("Node addon binding: artifact", () => {
   it("reports its artifact kind as addon, never wasm", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -47,6 +48,7 @@ describe("Node addon binding: PII initialization", () => {
     const calls: string[] = [];
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profile: () => "full",
       initialize: () => calls.push("legacy"),
       initializePii: (pii) => {
@@ -71,6 +73,7 @@ describe("Node addon binding: PII initialization", () => {
     const calls: string[] = [];
     const binding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profileCommon: () => "common",
       initializeCommon: () => calls.push("legacy"),
       initializeCommonPii: (pii) => {
@@ -97,6 +100,7 @@ describe("Node addon binding: createIncrementalSanitizer", () => {
     const calls: string[] = [];
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -124,6 +128,7 @@ describe("Node addon binding: scanAndRedact result shape", () => {
   it("renames the addon's redacted field to the contract's text", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -137,7 +142,7 @@ describe("Node addon binding: scanAndRedact result shape", () => {
       }),
     });
 
-    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined)).toEqual({
+    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined, undefined)).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
@@ -149,6 +154,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     const calls: string[] = [];
     const binding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profileCommon: () => "common",
       initializeCommon: () => {
         calls.push("initializeCommon");
@@ -179,9 +185,9 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     expect(binding.version()).toBe("0.0.0-test");
     expect(binding.profile()).toBe("common");
     binding.initialize();
-    expect(binding.scan("input", undefined, undefined, undefined)).toEqual([]);
+    expect(binding.scan("input", undefined, undefined, undefined, undefined)).toEqual([]);
     expect(binding.redact("input", [], undefined, undefined)).toBe("input");
-    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined)).toEqual({
+    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined, undefined)).toEqual({
       text: "input",
       findings: [sampleFinding],
     });
@@ -199,6 +205,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
   it("renames the addon's redacted field to the contract's text", () => {
     const binding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profileCommon: () => "common",
       initializeCommon: () => {},
       scanCommon: () => [],
@@ -215,7 +222,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
       }),
     });
 
-    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined)).toEqual({
+    expect(binding.scanAndRedact("input", undefined, undefined, undefined, undefined, undefined)).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
@@ -230,6 +237,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
 
     const fullBinding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profile: () => "full",
       initialize: () => {},
       scan: () => [],
@@ -244,6 +252,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     });
     const commonBinding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
+      defaultPolicy: () => "redact",
       profileCommon: () => "common",
       initializeCommon: () => {},
       scanCommon: () => [],
