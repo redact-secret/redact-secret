@@ -19,8 +19,10 @@ body:
         [reporting guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md)
         is optional help; you do not need to read it first.
 
-        Filing this does not by itself change any fixture or confirm a defect.
-        Maintainers route accepted cases internally. For a suspected
+        Filing this opens an intake issue. A maintainer decides whether it is
+        research-needed or implementation-ready; filing it does not by itself
+        change any fixture, confirm a defect, or make anything supported.
+        For a suspected
         security vulnerability use
         [private reporting](https://github.com/redact-secret/redact-secret/security/advisories/new).
 

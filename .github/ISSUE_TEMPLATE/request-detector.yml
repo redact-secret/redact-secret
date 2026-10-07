@@ -16,9 +16,10 @@ body:
         tool exports. Describe the format in words or link to public
         documentation instead.
 
-        A request does not promise support, and you do not need to know how
-        detectors are researched or classified. Maintainers route accepted
-        requests internally. For a suspected security vulnerability use
+        This opens an intake issue. A request does not promise support, and you
+        do not need to know how detectors are researched or classified. A
+        maintainer decides whether it is research-needed or implementation-ready
+        and routes it internally. For a suspected security vulnerability use
         [private reporting](https://github.com/redact-secret/redact-secret/security/advisories/new),
         not this form.
 

@@ -8,6 +8,10 @@ the form that best matches your feedback. English or Korean is welcome.
 leave it blank. For a suspected security vulnerability, use the private process
 in [SECURITY.md](../../SECURITY.md) — never a public issue.
 
+Want to do more than report, such as research a provider or implement an
+`implementation-ready` issue? See
+[Which contribution path should I use?](../../CONTRIBUTION.md#which-contribution-path-should-i-use)
+
 | What you noticed | Form |
 | --- | --- |
 | A harmless value was flagged or redacted | [False positive report](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml) |
@@ -131,10 +135,22 @@ prefill.
 
 ## What happens after you file
 
+Every report starts as `intake`. A maintainer then decides whether it needs
+`research-needed` (provider facts are not yet recorded), is
+`implementation-ready` (research is complete and the behavior is frozen), is
+`verification-needed` (a candidate exists and independent evaluation has not
+measured it), or is `complete` (that measurement was recorded). The
+[contribution guide](../../CONTRIBUTION.md#what-happens-to-what-you-submit)
+explains the five states, and the
+[handoff contract](../contracts/contribution/implementation-ready-handoff.md#vocabulary)
+defines them. You never move an issue between states or file a second issue in
+another repository.
+
 Filing a false positive or missed detection report does **not** by itself
 change any conformance fixture or expected result, and does not by itself open
 a confirmed product defect. A detector request also does not imply that a
-family will be implemented or qualified.
+family will be implemented or qualified, and no state makes a family supported
+or stable.
 Benchmark-originated and reporter-originated findings share one governed
 lifecycle, owned by
 [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)

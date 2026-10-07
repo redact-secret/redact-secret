@@ -5,24 +5,137 @@ Rust core shared by JavaScript, Python, Rust, and CLI consumers. Beta releases
 are prereleases; describe current support and limitations without claiming v1
 stability.
 
+**One rule applies to every path: synthetic data only.** Never put a live,
+revoked-but-real, or real-derived credential, or real personal data, in an
+issue, pull request, fixture, log, screenshot, or comment. Not even a truncated
+or partly masked fragment. Build an independently made synthetic value with the
+same shape instead (the
+[reporting guide](docs/guides/reporting-detection-issues.md#never-submit-a-real-credential)
+shows how). Report a suspected vulnerability privately as described in
+[SECURITY.md](SECURITY.md), never in a public issue.
+
+## Which contribution path should I use?
+
+Find your situation, read only the linked page, and stop there. Nothing below
+the table is required reading for a reporter.
+
+| I want to... | Your role | Start here | Minimum reading |
+| --- | --- | --- | --- |
+| Tell you a harmless value was flagged | Reporter | [False positive form](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml) | the form itself |
+| Tell you a credential or PII value was missed | Reporter | [Missed detection form](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml) | the form itself |
+| Ask for a provider credential or PII type to be supported | Reporter | [Request support form](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml) | the form itself; a name is enough |
+| Report a crash, thrown error, or binding mismatch | Reporter | [Bug report form](https://github.com/redact-secret/redact-secret/issues/new?template=bug-report.yml) | the form itself |
+| Report confusing docs or an installation problem | Reporter | [Integration or docs form](https://github.com/redact-secret/redact-secret/issues/new?template=integration-docs.yml) | the form itself |
+| Report a broken link or wrong content on the website | Reporter | [Website feedback form](https://github.com/redact-secret/redact-secret/issues/new?template=website-feedback.yml) | the form itself |
+| Share a safe made-up input that might be worth testing | Fixture contributor | [Synthetic edge case form](https://github.com/redact-secret/redact-secret/issues/new?template=synthetic-edge-case.yml), or a pull request using the [fixture row](#before-opening-a-change) | [synthetic regression convention](conventions/synthetic-secret-regressions.md) |
+| Document how a provider's credentials look, from public sources | Researcher | [Propose a provider for credential research](https://github.com/redact-secret/redact-secret-benchmarks/issues/new?template=suggest-research.yml) | the form; no core change needed |
+| Implement an issue marked `implementation-ready` | Implementer | [Implementer path](#implementer-pick-up-an-implementation-ready-issue) | the issue body, then that section |
+| Fix a documentation, wrapper, engine, or CI problem | Implementer | [Before opening a change](#before-opening-a-change) | the row for your change |
+| Decide taxonomy, evidence tier, contract, or promotion | Maintainer | [Advanced: maintainer evidence and promotion](#advanced-maintainer-evidence-and-promotion) | everything under that heading |
+| Ask a question or float an early idea | anyone | [Discussions](https://github.com/redact-secret/redact-secret/discussions) (**Q&A**, **Ideas**, **Show and tell**) | nothing |
+
+Not sure which row fits? Use the
+[Synthetic edge case form](https://github.com/redact-secret/redact-secret/issues/new?template=synthetic-edge-case.yml)
+or a Discussion. A maintainer re-routes it. Support in issues and Discussions
+is best-effort, with no response-time or long-term-support commitment.
+`redact-secret-www` is private, so website problems are filed here through the
+website feedback form.
+
+## What happens to what you submit
+
+Every contribution moves through the same five work-item states. They label an
+issue's progress and never a family's support status. You do not manage the
+states or coordinate repositories; a maintainer moves an item and says so in a
+comment. The words are defined once in the
+[handoff contract](docs/contracts/contribution/implementation-ready-handoff.md#vocabulary).
+
+| State | Meaning for you |
+| --- | --- |
+| `intake` | Your report was received. This is where every form starts. |
+| `research-needed` | A maintainer triaged it; provider facts or sources still need research. |
+| `implementation-ready` | Research is complete and the behavior is frozen, so the task can be implemented and tested as written. |
+| `verification-needed` | A candidate is implemented here; independent evaluation has not yet measured that exact candidate. |
+| `complete` | The independent measurement of that exact candidate was recorded. |
+
+Behind those states work flows through four repositories in order, and each
+owns one step:
+
+1. [`credential-evidence`](https://github.com/redact-secret/credential-evidence)
+   researches provider facts (shapes, sources, issuance).
+2. This repository adopts the researched contract and implements it with
+   conformance fixtures.
+3. [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
+   evaluates the exact candidate independently.
+4. The same benchmarks repository reports results and decides support status.
+
+Filing an issue or opening a pull request never makes a family supported,
+`provisional`, or `stable`. Support status comes only from the benchmark
+evaluation, which reaches this repository as the pinned
+[support matrix](docs/support-matrix.md#what-each-status-means). `complete`
+means the measurement was recorded, not that the candidate passed.
+
+## Paths by role
+
+### Reporter
+
+1. Open the matching form from the table above. A short description is enough
+   to start, in English or Korean.
+2. Write an independently made synthetic example. The
+   [reporting guide](docs/guides/reporting-detection-issues.md) is optional
+   help, including a local reproduction that prints only classifications and
+   ranges.
+3. Your issue starts as `intake`. Filing it does not by itself change any
+   fixture or confirm a defect, and you are never asked to file a second issue
+   in another repository.
+
+### Researcher
+
+Research needs public provider documentation and no code. Use the
+[research proposal form](https://github.com/redact-secret/redact-secret-benchmarks/issues/new?template=suggest-research.yml)
+if you already know a provider's credential format, or
+[`credential-evidence`](https://github.com/redact-secret/credential-evidence)
+for the research itself. A reviewed research handoff is what lets a maintainer
+mark an implementation issue `implementation-ready`. If you only want something
+detected, use the Request support form instead.
+
+### Fixture contributor
+
+Contribute the smallest synthetic input that measures one contract behavior,
+either through the Synthetic edge case form or as a pull request. A confirmed
+false positive or false negative becomes a permanent synthetic regression
+fixture ([convention](conventions/synthetic-secret-regressions.md)). Fixture
+rules and the shared corpus are in the [conformance corpus](conformance/README.md).
+Use the conformance row of the table in
+[Before opening a change](#before-opening-a-change) to check it.
+
+### Implementer: pick up an `implementation-ready` issue
+
+1. Read only the issue's first screen: Task, Expected positives, Expected
+   negatives and twins, Files likely to change, Commands to run. The collapsed
+   "Maintainer evidence and research" section is for maintainers.
+2. Create a branch from `main`. For a new detector, scaffold it instead of
+   copying the layout by hand (see [Before opening a change](#before-opening-a-change));
+   for any other route, edit the files the issue lists:
+   `npm run contrib:new-detector -- <detector-id> --dry-run`, then without
+   `--dry-run`. Replace every `TODO(scaffold)` marker.
+3. Run the issue's commands, then `python3 -B scripts/contribution-readiness.py`
+   to see what is still missing in the same words CI uses.
+4. Open the pull request, linking the issue. If the issue asks for a detector,
+   also follow the [boundary change](#boundary-changes) reading and the
+   [new detector family checklist](#new-detector-family-checklist). The
+   pull request does not set support status.
+
+### Maintainer
+
+You own taxonomy, evidence tier, dossier normalization, contract freeze,
+adoption, and promotion. Those details are kept in full under
+[Advanced: maintainer evidence and promotion](#advanced-maintainer-evidence-and-promotion)
+and in [GOVERNANCE.md](GOVERNANCE.md).
+
 ## Before opening a change
 
-- Use GitHub Issues for reproducible bugs, compatibility evidence, and focused
-  proposals. Public support is best-effort; the project makes no response-time or
-  long-term-support commitment. For a false positive or missed detection, use
-  the [reporting guide](docs/guides/reporting-detection-issues.md) and its
-  issue forms instead of a freeform issue. `redact-secret-www` is private, so
-  website problems (broken links, wrong content, translation, playground) are
-  also filed here, via the website feedback form.
-- Use [Discussions](https://github.com/redact-secret/redact-secret/discussions)
-  for open-ended questions, early ideas, and usage reports instead of an
-  issue — **Q&A**, **Ideas**, and **Show and tell**. Support there is also
-  best-effort, with no response-time or long-term-support commitment.
-- Report suspected vulnerabilities privately as described in
-  [SECURITY.md](SECURITY.md), not in a public issue.
-
-What to read and run depends on the change. A small change needs only its
-row below; `npm run check:changed` prints the scoped commands for your branch.
+What to read and run depends on the change. A small change needs only its row
+below; `npm run check:changed` prints the scoped commands for your branch.
 
 | Change | Read first | Run locally |
 | --- | --- | --- |
@@ -31,7 +144,7 @@ row below; `npm run check:changed` prints the scoped commands for your branch.
 | JavaScript wrapper or examples | [ARCHITECTURE.md](ARCHITECTURE.md) | `npm run check:js` |
 | Rust engine, CLI, or binding | [ARCHITECTURE.md](ARCHITECTURE.md), [workspace policy](docs/rust-workspace.md) | `npm run check:rust` |
 | Release, CI, packaging, or `scripts/` | [release runbook](docs/releasing.md) | `npm run check:release` |
-| Boundary change (below) | everything in the next list | the full suite: `npm run ci` and `npm run check:rust` |
+| Boundary change ([below](#boundary-changes)) | everything in that section | the full suite: `npm run ci` and `npm run check:rust` |
 
 CI runs the full suite on every pull request whatever the scope, so you do
 not need to reproduce the platform matrix, the wheel build, or the artifact
@@ -61,31 +174,6 @@ promotion. It then prints the regeneration and scoped-check commands to run
 after you replace the markers (`git grep -n --untracked 'TODO(scaffold)' -- . ':!scripts/' ':!CONTRIBUTION.md'`). The
 [handoff contract](docs/contracts/contribution/implementation-ready-handoff.md)
 defines the optional input file.
-
-A boundary change -- a new or changed detector, PII context rule, policy,
-public API, evidence rule, or release gate -- also needs this reading, because
-the ADR and spec-file rules bind it:
-
-- Read [ARCHITECTURE.md](ARCHITECTURE.md), [CONVENTIONS.md](CONVENTIONS.md), and the
-  [decision router](docs/decisions/DECISIONS.md). A material boundary change needs
-  an ADR rather than an undocumented convention.
-- New evidence goes where
-  [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](docs/decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
-  places its kind, not wherever is convenient: a product-judgement review
-  under `docs/audits/` as a temporary review with its lifecycle block, retired
-  before release qualification under
-  [`decision-retire-historical-audit-bodies-before-release-qualification`](docs/decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md);
-  a benchmark or scanner measurement in `redact-secret-benchmarks`, never
-  copied into this repository; and an iterative or exploratory log as an
-  issue comment, cited by permalink from whichever final record needs it, not
-  restated there.
-- Current rules are stated in the five spec files under `docs/specs/`
-  (`detector-families.md`, `contextual-detection.md`, `engine.md`,
-  `distribution.md`, `evidence-and-gates.md`); each links the ADR that
-  decided it. A decision that applies an existing policy to one more
-  provider family or one more instance is a spec-file row plus its
-  supporting evidence, not a new ADR — a new ADR is warranted only for new
-  policy, a new trade-off, or a precedent that spans families.
 
 Keep fixtures to the smallest synthetic input that measures one contract behavior.
 Never include active credentials or matched plaintext in diagnostics. Keep the
@@ -176,6 +264,49 @@ a type or its default action changed. When the change alters no observable
 behavior -- a refactor, a test, a comment -- apply the `no-changelog` label to
 the pull request instead, so the waiver is visible to the reviewer. By contributing, you agree that your contribution is licensed
 under the repository's [MIT License](LICENSE).
+
+During beta, repository Markdown is the documentation source. Include updates
+to the relevant user guides, examples, support statements, and limitations in
+each feature change. Use the [documentation readiness checklist](docs/documentation-readiness.md)
+to identify affected topics and record verification evidence. Before stable
+release, reconcile all required topics with the final public contracts and
+complete the delivery checks after a platform has been chosen.
+
+## Advanced: maintainer evidence and promotion
+
+Contributors do not need this section to report, research, contribute a
+fixture, or implement an `implementation-ready` issue. Maintainers own it, and
+a pull request that adds or changes a detector is reviewed against it. Nothing
+here is optional for maintainers, and none of it weakens a gate. The state
+vocabulary and ownership table are in the
+[handoff contract](docs/contracts/contribution/implementation-ready-handoff.md).
+
+### Boundary changes
+
+A boundary change -- a new or changed detector, PII context rule, policy,
+public API, evidence rule, or release gate -- also needs this reading, because
+the ADR and spec-file rules bind it:
+
+- Read [ARCHITECTURE.md](ARCHITECTURE.md), [CONVENTIONS.md](CONVENTIONS.md), and the
+  [decision router](docs/decisions/DECISIONS.md). A material boundary change needs
+  an ADR rather than an undocumented convention.
+- New evidence goes where
+  [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](docs/decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
+  places its kind, not wherever is convenient: a product-judgement review
+  under `docs/audits/` as a temporary review with its lifecycle block, retired
+  before release qualification under
+  [`decision-retire-historical-audit-bodies-before-release-qualification`](docs/decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md);
+  a benchmark or scanner measurement in `redact-secret-benchmarks`, never
+  copied into this repository; and an iterative or exploratory log as an
+  issue comment, cited by permalink from whichever final record needs it, not
+  restated there.
+- Current rules are stated in the five spec files under `docs/specs/`
+  (`detector-families.md`, `contextual-detection.md`, `engine.md`,
+  `distribution.md`, `evidence-and-gates.md`); each links the ADR that
+  decided it. A decision that applies an existing policy to one more
+  provider family or one more instance is a spec-file row plus its
+  supporting evidence, not a new ADR — a new ADR is warranted only for new
+  policy, a new trade-off, or a precedent that spans families.
 
 ### New detector family checklist
 
@@ -307,13 +438,6 @@ Follow
 for fixture placement, detector-unit-test criteria, ownership, and historical
 reconciliation. A code fix or a closed implementation issue alone does not
 satisfy both gates.
-
-During beta, repository Markdown is the documentation source. Include updates
-to the relevant user guides, examples, support statements, and limitations in
-each feature change. Use the [documentation readiness checklist](docs/documentation-readiness.md)
-to identify affected topics and record verification evidence. Before stable
-release, reconcile all required topics with the final public contracts and
-complete the delivery checks after a platform has been chosen.
 
 ## Branching strategy
 
