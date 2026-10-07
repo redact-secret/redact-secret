@@ -35,13 +35,28 @@ function deepFreeze<T>(value: T): T {
   return value;
 }
 
+const COMPOSITION_ID = /^custom:[0-9a-f]{64}$/;
+
+/**
+ * A custom artifact names its composition (`custom` kind and a
+ * `custom:<sha256>` identity); a standard one has none. A manifest whose
+ * composition does not match its variant is another artifact's document.
+ */
+function isCompositionOf(composition: unknown, expectedProfile: "full" | "common" | "custom"): boolean {
+  if (!isRecord(composition) || composition.profile !== expectedProfile) return false;
+  if (expectedProfile === "custom") {
+    return composition.kind === "custom" && typeof composition.id === "string" && COMPOSITION_ID.test(composition.id);
+  }
+  return composition.kind === "standard" && composition.id === null;
+}
+
 /**
  * Parses the JSON text a binding reports and checks it describes this entry
  * point: the `artifact-manifest/v1` schema, this package's version, the
  * expected profile as its variant, and a well-formed digest. The result is
  * deeply frozen.
  */
-export function parseArtifactManifest(text: unknown, expectedProfile: "full" | "common"): ArtifactManifest {
+export function parseArtifactManifest(text: unknown, expectedProfile: "full" | "common" | "custom"): ArtifactManifest {
   if (typeof text !== "string") return fail();
   let value: unknown;
   try {
@@ -52,6 +67,7 @@ export function parseArtifactManifest(text: unknown, expectedProfile: "full" | "
   if (!isRecord(value) || value.schema !== SCHEMA || value.version !== VERSION) return fail();
   const { artifact, digest, detectors } = value;
   if (!isRecord(artifact) || artifact.variant !== expectedProfile) return fail();
+  if (!isCompositionOf(value.composition, expectedProfile)) return fail();
   if (typeof digest !== "string" || !DIGEST.test(digest)) return fail();
   if (!Array.isArray(detectors)) return fail();
   return deepFreeze(value as unknown as ArtifactManifest);

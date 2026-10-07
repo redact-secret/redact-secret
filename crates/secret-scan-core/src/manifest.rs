@@ -54,6 +54,7 @@ use std::fmt::{self, Write as _};
 
 use crate::VERSION;
 use crate::action_policy::MAX_ACTION_POLICY_BYTES;
+use crate::composition::Composition;
 use crate::detectors::{
     BUILT_IN_PACKS, Pack, built_in_detectors, common_built_in_detectors, declared_common_types,
     declared_types,
@@ -190,6 +191,7 @@ pub struct ArtifactManifest {
     ids: Vec<&'static str>,
     declared: Vec<(&'static str, &'static [&'static str])>,
     not_included: Vec<&'static str>,
+    composition_id: Option<String>,
     digest: String,
     json: String,
 }
@@ -226,7 +228,7 @@ impl ArtifactManifest {
             pack: pack_name(row.id),
             types: declared_types(row.id).unwrap_or_default(),
         });
-        Self::assemble(Profile::Full, kind, pii, source_revision, entries)
+        Self::assemble(Profile::Full, kind, pii, source_revision, None, entries)
     }
 
     /// The manifest of an artifact that links only the `common` profile.
@@ -250,7 +252,40 @@ impl ArtifactManifest {
             pack: pack_name(row.id),
             types: declared_common_types(row.id).unwrap_or_default(),
         });
-        Self::assemble(Profile::Common, kind, pii, source_revision, entries)
+        Self::assemble(Profile::Common, kind, pii, source_revision, None, entries)
+    }
+
+    /// The manifest of an artifact built from a static custom composition
+    /// (issue #1253): `artifact.variant` and `composition.profile` are
+    /// `custom`, `composition.kind` is `custom` and `composition.id` is the
+    /// composition identity. The PII flag is the composition's.
+    ///
+    /// Names only the selected detectors' rows and their own catalog types, so
+    /// calling it from a composed artifact links no other detector. The other
+    /// `full` built-in ids are listed as ids only, in `notIncluded`.
+    ///
+    /// # Errors
+    ///
+    /// [`ArtifactManifestError::InvalidSourceRevision`] when `source_revision`
+    /// is not 40 lowercase hexadecimal characters.
+    pub fn custom(
+        kind: ArtifactKind,
+        composition: &Composition,
+        source_revision: Option<&str>,
+    ) -> Result<Self, ArtifactManifestError> {
+        let entries = composition.selected().iter().map(|selected| Entry {
+            id: selected.id,
+            pack: pack_name(selected.id),
+            types: selected.types,
+        });
+        Self::assemble(
+            Profile::Custom,
+            kind,
+            composition.pii(),
+            source_revision,
+            Some(composition.id()),
+            entries,
+        )
     }
 
     fn assemble(
@@ -258,6 +293,7 @@ impl ArtifactManifest {
         kind: ArtifactKind,
         pii: bool,
         source_revision: Option<&str>,
+        composition_id: Option<&str>,
         entries: impl Iterator<Item = Entry>,
     ) -> Result<Self, ArtifactManifestError> {
         if source_revision.is_some_and(|revision| !is_revision(revision)) {
@@ -282,6 +318,7 @@ impl ArtifactManifest {
             pii,
             selection,
             source_revision,
+            composition_id,
             &entries,
             &not_included,
         );
@@ -297,6 +334,7 @@ impl ArtifactManifest {
             ids,
             declared,
             not_included,
+            composition_id: composition_id.map(str::to_owned),
             digest,
             json,
         })
@@ -306,6 +344,13 @@ impl ArtifactManifest {
     #[must_use]
     pub const fn profile(&self) -> Profile {
         self.profile
+    }
+
+    /// The composition identity of a custom artifact (`custom:` and 64
+    /// lowercase hexadecimal characters); `None` for `full` and `common`.
+    #[must_use]
+    pub fn composition_id(&self) -> Option<&str> {
+        self.composition_id.as_deref()
     }
 
     /// The kind of artifact the manifest describes.
@@ -415,12 +460,14 @@ struct Members {
 }
 
 impl Members {
+    #[allow(clippy::too_many_arguments)] // one value per manifest member group
     fn new(
         profile: Profile,
         kind: ArtifactKind,
         pii: bool,
         selection: bool,
         source_revision: Option<&str>,
+        composition_id: Option<&str>,
         entries: &[Entry],
         not_included: &[&'static str],
     ) -> Self {
@@ -431,7 +478,21 @@ impl Members {
         push_string(&mut artifact, profile_name);
         artifact.push('}');
 
-        let mut composition = String::from("{\"id\":null,\"kind\":\"standard\",\"profile\":");
+        let mut composition = String::from("{\"id\":");
+        match composition_id {
+            Some(id) => push_string(&mut composition, id),
+            None => composition.push_str("null"),
+        }
+        composition.push_str(",\"kind\":");
+        push_string(
+            &mut composition,
+            if composition_id.is_some() {
+                "custom"
+            } else {
+                "standard"
+            },
+        );
+        composition.push_str(",\"profile\":");
         push_string(&mut composition, profile_name);
         composition.push('}');
 
@@ -604,6 +665,20 @@ mod tests {
 
     fn common() -> ArtifactManifest {
         ArtifactManifest::common(ArtifactKind::RustRegistry, true, None).expect("manifest")
+    }
+
+    fn custom() -> ArtifactManifest {
+        let composition = Composition::new(
+            "edge-checks",
+            false,
+            [
+                crate::composition::github_token(),
+                crate::composition::jwt(),
+                crate::composition::generic_token(),
+            ],
+        )
+        .expect("composition");
+        ArtifactManifest::custom(ArtifactKind::Wasm, &composition, None).expect("manifest")
     }
 
     #[test]
@@ -785,7 +860,7 @@ mod tests {
 
     #[test]
     fn digest_is_the_sha256_of_the_canonical_document_without_digest() {
-        for manifest in [full(), common()] {
+        for manifest in [full(), common(), custom()] {
             let mut value: serde_json::Value =
                 serde_json::from_str(manifest.as_json()).expect("valid JSON");
             let object = value.as_object_mut().expect("object");
@@ -810,6 +885,44 @@ mod tests {
             );
             assert_eq!(without_schema, manifest.as_json());
         }
+    }
+
+    #[test]
+    fn a_custom_manifest_lists_the_composition_and_its_complement() {
+        let manifest = custom();
+        assert_eq!(manifest.profile(), Profile::Custom);
+        let listed: Vec<&str> = manifest.detector_ids().collect();
+        assert_eq!(listed, ["github-token", "jwt", "generic-token"]);
+        assert_eq!(
+            manifest.not_included_ids().count(),
+            BUILT_IN_PACKS.len() - 3
+        );
+        let value: serde_json::Value = serde_json::from_str(manifest.as_json()).expect("JSON");
+        assert_eq!(value["artifact"]["variant"], "custom");
+        assert_eq!(value["composition"]["kind"], "custom");
+        assert_eq!(value["composition"]["profile"], "custom");
+        let id = manifest.composition_id().expect("custom id");
+        assert_eq!(value["composition"]["id"], id);
+        assert!(id.starts_with("custom:") && id.len() == "custom:".len() + 64);
+        assert_eq!(full().composition_id(), None);
+        assert_ne!(custom().digest(), full().digest());
+        // The same selection under another name is another artifact.
+        let renamed = Composition::new(
+            "other-name",
+            false,
+            [
+                crate::composition::github_token(),
+                crate::composition::jwt(),
+                crate::composition::generic_token(),
+            ],
+        )
+        .expect("composition");
+        assert_ne!(
+            ArtifactManifest::custom(ArtifactKind::Wasm, &renamed, None)
+                .expect("manifest")
+                .digest(),
+            custom().digest()
+        );
     }
 
     #[test]

@@ -919,6 +919,7 @@ impl SnapshotFacts<'_> {
         let kind = manifest.kind().as_str();
         let manifest_digest = manifest.digest();
         let profile = manifest.profile().as_str();
+        let composition_id = OptStr(manifest.composition_id());
         let version = crate::VERSION;
         let custom = effective.custom_detectors;
         let enabled_count = effective.enabled.len();
@@ -940,7 +941,7 @@ impl SnapshotFacts<'_> {
         format!(
             "{{{head}\"actionPolicy\":{{\"digest\":{policy_digest},\"explainable\":{explainable},\
              \"revision\":{policy_revision},\"ruleCount\":{policy_rules},\"source\":\"{policy_source}\"}},\
-             \"artifact\":{{\"compositionId\":null,\"kind\":\"{kind}\",\"manifestDigest\":\"{manifest_digest}\",\
+             \"artifact\":{{\"compositionId\":{composition_id},\"kind\":\"{kind}\",\"manifestDigest\":\"{manifest_digest}\",\
              \"profile\":\"{profile}\",\"version\":\"{version}\"}},\
              \"detection\":{{\"compiledCount\":{compiled},\"customDetectors\":{custom},\"disabled\":{disabled},\
              \"enabled\":{enabled},\"enabledCount\":{enabled_count},\"mode\":\"{mode}\",\"unavailable\":{unavailable}}},\

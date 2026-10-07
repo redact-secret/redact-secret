@@ -201,3 +201,45 @@ describe("artifactManifest()", () => {
     expect(runtime.artifactManifest()).toBe(first);
   });
 });
+
+describe("a custom composition manifest (issue #1253)", () => {
+  const CUSTOM_ID = `custom:${"a".repeat(64)}`;
+  const custom = (composition: unknown = { id: CUSTOM_ID, kind: "custom", profile: "custom" }): string =>
+    manifestText({ variant: "custom", extra: { composition } });
+
+  it("is accepted by the custom wrapper only, with its composition identity", async () => {
+    const runtime = createRedactSecretRuntime(async () => bindingReporting(custom(), "custom" as "full"), "custom");
+    await runtime.initialize();
+    expect(runtime.artifactManifest().artifact.variant).toBe("custom");
+    expect(runtime.artifactManifest().composition).toEqual({ id: CUSTOM_ID, kind: "custom", profile: "custom" });
+    expect(runtime.status().profile).toBe("custom");
+  });
+
+  it("is refused by the standard entry points, and a standard manifest by the custom wrapper", async () => {
+    for (const profile of ["full", "common"] as const) {
+      const runtime = createRedactSecretRuntime(async () => bindingReporting(custom(), profile), profile);
+      await expect(runtime.initialize()).rejects.toMatchObject({ code: "INITIALIZATION_FAILED" });
+    }
+    const standard = createRedactSecretRuntime(
+      async () => bindingReporting(manifestText(), "custom" as "full"),
+      "custom",
+    );
+    await expect(standard.initialize()).rejects.toMatchObject({ code: "INITIALIZATION_FAILED" });
+  });
+
+  it("refuses a custom document without a well-formed composition identity or with the wrong kind", async () => {
+    for (const composition of [
+      { id: null, kind: "custom", profile: "custom" },
+      { id: "custom:short", kind: "custom", profile: "custom" },
+      { id: CUSTOM_ID, kind: "standard", profile: "custom" },
+      { id: CUSTOM_ID, kind: "custom", profile: "full" },
+      "custom",
+    ]) {
+      const runtime = createRedactSecretRuntime(
+        async () => bindingReporting(custom(composition), "custom" as "full"),
+        "custom",
+      );
+      await expect(runtime.initialize()).rejects.toMatchObject({ code: "INITIALIZATION_FAILED" });
+    }
+  });
+});

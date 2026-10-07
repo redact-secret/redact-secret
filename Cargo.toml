@@ -114,6 +114,7 @@ core-public-api = [
   "ComparedFinding",
   "ComparedPolicy",
   "ComparedSide",
+  "composition",
   "ConfigDiagnostic",
   "ConfigRequest",
   "ConfigResolution",

@@ -7,6 +7,7 @@
 use std::borrow::Cow;
 use std::sync::{Arc, OnceLock};
 
+use crate::composition::Composition;
 use crate::detectors::{
     BuiltIn, BuiltInDetector, LiteralMatcher, RequiredLiterals, built_in_entries, built_in_ids,
     common_built_in_entries,
@@ -37,19 +38,27 @@ pub enum Profile {
     /// published structure or a credential-bearing context rather than one
     /// issuer's token format.
     Common,
+    /// A static custom composition of built-in detectors
+    /// ([`Composition`](crate::composition::Composition), issue #1253). It is
+    /// not a profile a caller selects: it is what a registry built from a
+    /// composition reports, and it has no wire name to parse.
+    Custom,
 }
 
 impl Profile {
-    /// The wire name (`"full"`, `"common"`).
+    /// The wire name (`"full"`, `"common"`, `"custom"`).
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Full => "full",
             Self::Common => "common",
+            Self::Custom => "custom",
         }
     }
 
-    /// Parses a wire name.
+    /// Parses the wire name of a selectable profile: `"full"` or `"common"`.
+    /// `"custom"` is not selectable by name; a composition is built with
+    /// [`Composition`](crate::composition::Composition).
     #[must_use]
     pub fn from_name(name: &str) -> Option<Self> {
         match name {
@@ -80,7 +89,7 @@ impl Prefilter {
 /// Compiles the matcher over `declared`, one call shape for every registry so
 /// the generic `LiteralMatcher::compile` is instantiated once rather than per
 /// registry type (it is the same code in every WebAssembly artifact).
-fn compile_matcher(declared: Vec<Option<&RequiredLiterals>>) -> Option<LiteralMatcher> {
+pub(crate) fn compile_matcher(declared: Vec<Option<&RequiredLiterals>>) -> Option<LiteralMatcher> {
     LiteralMatcher::compile(declared)
 }
 
@@ -331,6 +340,66 @@ impl DetectorRegistry {
         registry.profile = Some(Profile::Common);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Common);
         Ok(registry)
+    }
+
+    /// Creates a registry holding exactly the detectors of `composition`, in
+    /// its canonical order, followed by `custom` in the given order (issue
+    /// #1253). It reports [`Profile::Custom`].
+    ///
+    /// Only the selected constructors are referenced, so a build that calls
+    /// nothing else links no other built-in detector. Like
+    /// [`Self::with_common_built_in`], a custom detector may not reuse any
+    /// `full` built-in id, including one the composition does not select. This
+    /// constructor never names the PII adapter, so an artifact built without
+    /// the PII runtime links none; use [`Self::with_composition_and_pii`] for
+    /// one that has it.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] when a custom
+    /// detector has a malformed id, repeats an id already registered, or
+    /// reuses any `full` built-in id.
+    pub fn with_composition<I>(
+        composition: &Composition,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        let mut registry = Self::new();
+        for selected in composition.selected() {
+            registry.push_validated_built_in(selected.id, selected.detector, selected.required)?;
+        }
+        registry.prefilter = composition.prefilter().map(Prefilter::Owned);
+        for detector in custom {
+            registry.push_validated_custom(detector, true)?;
+        }
+        registry.profile = Some(Profile::Custom);
+        registry.activation_identity = PiiSelection::default().activation_identity(Profile::Custom);
+        Ok(registry)
+    }
+
+    /// [`Self::with_composition`] plus the selected PII-domain adapter in its
+    /// fixed slot after the credentials, preserving the custom profile
+    /// identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] for a malformed,
+    /// duplicate, built-in, adapter, or internal family id.
+    pub fn with_composition_and_pii<I>(
+        composition: &Composition,
+        selection: &PiiSelection,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        Self::with_composition(composition, [])?.with_pii_and_custom(
+            Profile::Custom,
+            selection,
+            custom,
+        )
     }
 
     /// Creates the `full` credential profile plus the selected PII-domain

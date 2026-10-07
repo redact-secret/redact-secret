@@ -349,8 +349,12 @@ export interface ConfigResolution {
 export interface CoreStatus {
   /** `true` once an `initialize()` call has succeeded and operations are usable. */
   readonly initialized: boolean;
-  /** The detector profile of this entry point. */
-  readonly profile: "full" | "common";
+  /**
+   * The detector profile of this entry point: `"full"` or `"common"` for the
+   * published entry points, `"custom"` for the generated wrapper of a static
+   * custom composition (`scripts/build-custom-artifact.mjs`).
+   */
+  readonly profile: "full" | "common" | "custom";
   /**
    * The canonical credentials/PII activation identity (the `piiActivation()`
    * string) once initialized; `null` before.

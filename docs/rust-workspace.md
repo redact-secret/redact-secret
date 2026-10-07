@@ -220,6 +220,16 @@ side-effect free, on top of the dependency boundary above:
   modules supply only the incremental session's retention predicates, never a
   registered detector (#1127).
 
+  A third, mutually exclusive shape, the off-by-default `custom` feature
+  (#1253), replaces `full` and `common` for a static custom composition: the
+  crate then names no built-in constructor, and a generated leaf crate
+  (`scripts/build-custom-artifact.mjs`, in an isolated build workspace, never
+  in this tree) names only the per-detector constructors of
+  `redact_secret::composition` its composition selects. The core stays
+  Cargo-feature-free. CI runs this crate's tests and Clippy under
+  `--no-default-features --features custom` (and `custom,pii`), where a
+  stand-in composition of the six `common` detectors is installed.
+
   A second, off-by-default feature, `pii`, links the PII domain runtime
   (#937). Each build script run emits both builds of its profile side by
   side: the default one and `<outName>_pii`. Without `pii`, the crate calls

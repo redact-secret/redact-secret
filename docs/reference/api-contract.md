@@ -145,6 +145,39 @@ WebAssembly artifacts and `false` for the Python wheel and the CLI, so a
 manifest digest differs by artifact kind
 ([`decision-define-the-artifact-manifest-and-configuration-data-contracts`](../decisions/2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md)).
 
+## Static custom composition
+
+A **custom composition** links only the built-in detectors a build selects. It
+is not a profile (`Profile::Custom` is what a composed registry reports; it has
+no wire name to parse, and `sanitize_with_profile` refuses it with
+`INVALID_OPTIONS`). The core stays free of Cargo features: the mechanism is one
+public constructor per built-in detector plus the types that consume them.
+
+| Surface | Name |
+| --- | --- |
+| Rust | the root module `composition`: `Composition::new(name, pii, selected)`, `SelectedDetector`, and one constructor per built-in detector named after its id with `-` written `_` (`github_token()`, `jwt()`, `generic_token()`); `DetectorRegistry::with_composition`, `::with_composition_and_pii`; `IncrementalSanitizer::with_composition_detection_policy_and_formatter`, `::with_composition_and_pii_detection_policy_and_formatter`; `ArtifactManifest::custom`, `ArtifactManifest::composition_id` |
+| WebAssembly | a generated wrapper from `scripts/build-custom-artifact.mjs` (`npm run wasm:build:custom`) with the function set of `./common` and `PROFILE` `"custom"`; the binding's `custom` Cargo feature |
+| Node addon, Python, CLI | unsupported |
+
+The constructor names are the accepted public naming of the `core-public-api`
+review: `composition` is the one name added to the crate root (73 names), and
+adding a built-in detector adds one constructor, pinned by tests against the
+registration row, the catalog and the prefilter declaration. `Composition::new`
+validates the canonical registration order (a composition never reorders it),
+repeats, the name and a non-empty set, all as `InvalidDetector`, and derives the
+identity `custom:<sha256>` of the canonical `composition/v1` document, shared
+with the JavaScript tooling through `conformance/fixtures/composition-v1.json`.
+A custom detector cannot reuse any built-in id, selected or not. A manifest of
+a custom artifact has `artifact.variant` and `composition.profile` `custom`,
+`composition.kind` `custom` and `composition.id` set; the snapshot's
+`artifact.compositionId` carries the same value. The JavaScript `status()`
+`profile` type widens to include `"custom"` for the generated wrapper only (the
+manifest types already allowed it); the published entry points still report
+`"full"` and `"common"`. The [custom composition guide](../guides/custom-composition.md)
+states what a build removes, what stays, and that no size or speed is
+guaranteed
+([`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](../decisions/2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md)).
+
 ## Detector selection and effective configuration
 
 A **detector-id selection** chooses which of an artifact's included built-in
@@ -265,7 +298,7 @@ custom detector callbacks are a direct Rust surface only.
 
 | Surface | Covered | Not covered |
 | --- | --- | --- |
-| Rust | The 72 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
+| Rust | The 73 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
 | JavaScript | `@redact-secret/core` and its subpaths `./common`, `./node-stream`, `./web-stream`, `./common/node-stream`, `./common/web-stream`: exported functions, constants, classes and types | `@redact-secret/wasm`, `@redact-secret/node` and the platform packages: installed as dependencies, not for direct use, versioned only in lockstep |
 | Python | Names in `redact_secret.__all__` and the shipped `.pyi` stubs | `redact_secret._native` and anything not re-exported |
 | CLI | Arguments, exit codes `0`/`1`/`2`, the `--json` report fields, standard-stream behavior | The line-per-finding text format (it is for people; parse `--json`), and diagnostic wording beyond the fixed code |
@@ -433,7 +466,7 @@ current contract, stated here so that no consumer has to infer it.
 
 | Fact | Evidence |
 | --- | --- |
-| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 72 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
+| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 73 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
 | Policy and formatter callbacks cannot act as a deadline. The policy runs only after detection has finished and the formatter only after the policy, so neither can cut detection short. A Rust custom `Detector` may return `DetectorFailure`, but that is the detector's own choice; the core never preempts it. | `scan_with_limits`, `scan_and_redact_with_limits` (`src/pipeline.rs`). |
 | `abort()` on an incremental session, and `cancel()` or `abort()` on a stream adapter, discard retained plaintext between calls. They cannot interrupt an `append` or `finalize` that is already running. | `IncrementalSanitizer::abort` (`src/incremental.rs`); `WebStreamSanitizer` (`packages/javascript/src/adapters/web-stream-core.ts`). Tests: `abort_rejects_every_later_call` (`tests/incremental.rs`), `packages/javascript/test/adapters/`. |
 | The only bounds are `max_input_bytes`, 64 MiB (67,108,864 bytes), and `max_findings`, 50,000. Both fail closed, as described in the previous section. They bound input size and finding count, not running time: the time a call takes depends on the host, the build, the profile, the PII selection, the ruleset and the content of the input. A CLI file source uses the same 64 MiB bound, and CLI standard input runs under the explicit incremental limits that `--help` lists. | `DEFAULT_MAX_INPUT_BYTES`, `DEFAULT_MAX_FINDINGS` (`src/limits.rs`); `crates/secret-scan-cli/src/limits.rs`. Tests: `default_matches_declared_constants` (`src/limits.rs`), the 50,001-finding and 64 MiB + 1 cases in `tests/sanitize_golden_path_1078.rs`. No test asserts the literal values 67,108,864 and 50,000. |

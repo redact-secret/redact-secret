@@ -66,6 +66,7 @@
 //! | Explain and compare action policies | [`compare_action_policies`], [`compare_action_policies_with_limits`], [`ComparedPolicy`], [`ActionComparison`], [`ComparedFinding`], [`ActionDecision`], [`DecisionBasis`], [`ComparedSide`], [`PolicyBinding`], [`ActionCounts`], [`DetectionIdentity`], [`MAX_COMPARED_POLICIES`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Artifact manifest | [`ArtifactManifest`], [`ArtifactKind`], [`ArtifactManifestError`] |
+//! | Static custom composition | [`composition`] |
 //! | Detector selection | [`DetectionSelection`], [`DetectionConfigError`] |
 //! | Effective configuration | [`resolve_config`], [`describe_config`], [`ConfigRequest`], [`ConfigResolution`], [`ConfigSnapshot`], [`ConfigDiagnostic`], [`ConfigSeverity`], [`SampleRuleHits`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
@@ -166,6 +167,8 @@ mod selection;
 mod sha256;
 mod structured_validators;
 mod types;
+
+pub mod composition;
 
 pub use action_policy::{
     ActionPolicy, ActionPolicyError, ActionPolicyErrorClass, MAX_ACTION_POLICY_BYTES,

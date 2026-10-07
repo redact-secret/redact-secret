@@ -542,6 +542,16 @@ accepted in
   profile ships a default build without it and a `pii` build with it, and
   `@redact-secret/core` loads the `pii` build only when `initialize()` is
   given a PII selection.
+- **Static custom composition (#1253).** A third WebAssembly build shape, not
+  a profile: `redact_secret::composition` has one public constructor per
+  built-in detector (the id with `-` written `_`), and a generated leaf crate
+  in an isolated build workspace calls exactly the selected ones, so
+  link-time reachability removes every other detector's code. The binding's
+  `custom` Cargo feature replaces `full` and `common` and references no
+  built-in constructor. `scripts/build-custom-artifact.mjs` resolves a
+  `composition/v1` input against the catalog, builds, and emits the artifact,
+  its manifest and reports only after the build verified itself. See the
+  [custom composition guide](docs/guides/custom-composition.md).
 - **Node addon (`bindings/node`).** One compiled addon serves both
   profiles: it exports `profile()` plus a `common` counterpart to every
   registry-backed export (`initializeCommon`/`scanCommon`/

@@ -459,7 +459,7 @@ export interface RedactSecretRuntime {
  */
 export function createRedactSecretRuntime(
   loadNativeBinding: NativeBindingLoader,
-  expectedProfile: "full" | "common",
+  expectedProfile: "full" | "common" | "custom",
 ): RedactSecretRuntime {
   let binding: NativeBinding | undefined;
   let manifest: ArtifactManifest | undefined;

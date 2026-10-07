@@ -110,6 +110,7 @@ documentation, inside a function that returns `Result`.)
 | Profiles | `Profile` |
 | PII selection | `PiiSelection` |
 | Artifact manifest | `ArtifactManifest`, `ArtifactKind`, `ArtifactManifestError` |
+| Static custom composition | `composition` |
 | Detector selection | `DetectionSelection`, `DetectionConfigError` |
 | Effective configuration | `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`, `SampleRuleHits` |
 | Declarative rulesets | `load_ruleset`, `RulesetError`, `RulesetErrorClass` |

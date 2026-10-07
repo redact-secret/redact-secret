@@ -34,6 +34,8 @@
 
 mod callbacks;
 mod compare;
+#[cfg(feature = "custom")]
+pub mod custom;
 mod error;
 mod finding;
 mod incremental;
@@ -538,7 +540,7 @@ pub(crate) mod synthetic {
     }
 
     /// `full`: a bare AWS-shaped access key id, a `provider` detector.
-    #[cfg(feature = "full")]
+    #[cfg(all(feature = "full", not(feature = "custom")))]
     pub(crate) fn secret() -> Secret {
         let key = format!("AKIA{}", "SYNTHETICEXAMPLE");
         Secret {
@@ -549,7 +551,7 @@ pub(crate) mod synthetic {
     }
 
     /// `common`: a connection-URI password, a `common` detector.
-    #[cfg(not(feature = "full"))]
+    #[cfg(not(all(feature = "full", not(feature = "custom"))))]
     pub(crate) fn secret() -> Secret {
         let password = format!("SYNTHETIC_REVOKED_{}", "PASSWORD");
         Secret {
@@ -644,7 +646,7 @@ mod tests {
     /// there is no finding count to bound.
     #[test]
     fn run_scan_rejects_a_finding_count_over_an_explicit_bound() {
-        if !cfg!(feature = "full") {
+        if !cfg!(all(feature = "full", not(feature = "custom"))) {
             return;
         }
         initialize(Vec::new(), None).unwrap();
@@ -721,7 +723,7 @@ mod tests {
         initialize(Vec::new(), None).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
         let findings = scan(&input, None, None, None, None, None).unwrap();
-        if cfg!(feature = "full") {
+        if cfg!(all(feature = "full", not(feature = "custom"))) {
             assert_eq!(findings.len(), 1);
             assert_eq!(findings[0].detector(), "aws-access-key");
         } else {
@@ -731,7 +733,9 @@ mod tests {
 
     #[test]
     fn profile_reports_the_compiled_profile() {
-        let expected = if cfg!(feature = "full") {
+        let expected = if cfg!(feature = "custom") {
+            "custom"
+        } else if cfg!(feature = "full") {
             "full"
         } else {
             "common"
@@ -746,7 +750,9 @@ mod tests {
         let manifest = lifecycle::artifact_manifest().expect("manifest");
         assert!(manifest.starts_with("{\"schema\":\"artifact-manifest/v1\","));
         assert!(manifest.contains("\"kind\":\"wasm\""));
-        let variant = if cfg!(feature = "full") {
+        let variant = if cfg!(feature = "custom") {
+            "custom"
+        } else if cfg!(feature = "full") {
             "full"
         } else {
             "common"
@@ -756,7 +762,7 @@ mod tests {
         // A common artifact names no provider detector as included.
         assert_eq!(
             manifest.contains("\"id\":\"github-token\""),
-            cfg!(feature = "full")
+            cfg!(all(feature = "full", not(feature = "custom")))
         );
         assert_eq!(manifest, lifecycle::artifact_manifest().expect("manifest"));
     }

@@ -81,10 +81,12 @@ what the loaded artifact reports: the `artifact-manifest/v1` schema, the lockste
 version, the variant of the entry point and the document's own digest (the SHA-256
 of its canonical form); any mismatch fails with `INITIALIZATION_FAILED`, as a profile
 mismatch does, and echoes nothing of the document. `ArtifactManifest::verify_packaged`
-exists for comparing a packaged document with the generated one and is not used by any
-surface yet. **Follow-up, not built:** a packaged file per variant compared with
-the self-reported manifest at `initialize()`; #1253 (custom artifacts) and #1255
-(qualification) may pick it up. A standard artifact's `detectors` and `composition` never
+compares a packaged document with the generated one. **Packaged-manifest status (#1253):**
+a custom WebAssembly artifact ships `artifact-manifest.custom.json` and `initialize()`
+compares it with its own generated manifest (`ARTIFACT_MANIFEST_MISSING`,
+`_SCHEMA_MISMATCH` or `_DIGEST_MISMATCH`, echoing nothing); the standard `full` and `common`
+artifacts still ship no packaged file, and a packaged file for them stays a follow-up
+(#1255 may pick it up). A standard artifact's `detectors` and `composition` never
 change between builds of one version. There is no `target` field: the build target
 class is `artifact.kind`.
 

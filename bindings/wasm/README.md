@@ -34,6 +34,17 @@
   (`bindings/wasm/npm/package.json`). Measurements are in
   [`docs/audits/evidence/381/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/381/README.md); qualification and the package export
   are in [`docs/audits/evidence/382/README.md`](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/382/README.md).
+- A third build shape, the off-by-default `custom` feature (#1253), replaces
+  `full` and `common` for a static custom composition. This crate then
+  references no built-in registry constructor: a generated leaf crate names the
+  selected per-detector constructors of `redact_secret::composition` and
+  installs them through `custom::install` from its module start function, with
+  the exact bytes of the packaged `artifact-manifest.custom.json`, which
+  `initialize()` compares with the manifest the artifact generates
+  (`ARTIFACT_MANIFEST_MISSING`, `..._SCHEMA_MISMATCH` or `..._DIGEST_MISMATCH`,
+  echoing nothing). `profile()` returns `"custom"`. Build one with
+  `npm run wasm:build:custom -- --config <composition.json>`; see the
+  [custom composition guide](../../docs/guides/custom-composition.md).
 - A second, off-by-default Cargo feature, `pii` (#937), links the PII domain
   runtime: the `pii-domain` adapter, its families, and the Unicode
   normalization tables they use. Without it the artifact links none of that,

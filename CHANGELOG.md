@@ -108,6 +108,26 @@ evidence is linked from each published version.
   `runtime-config/v1` has no such member). The `ConfigDiagnostic` id may now be
   a rule id as well as a catalog detector id.
 
+- Static custom composition (#1253, epic #1246,
+  `decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`):
+  `npm run wasm:build:custom -- --config <composition.json>`
+  (`scripts/build-custom-artifact.mjs`, usable from a webpack or Vite build hook)
+  resolves a declarative `composition/v1` input against the detector catalog and
+  builds, in an isolated workspace, a WebAssembly artifact that links only the
+  selected built-in detectors. It emits the wrapper (the function set of
+  `./common`, `PROFILE` `"custom"`), the glue and `.wasm`, the packaged
+  `artifact-manifest.custom.json` (compared with the generated manifest at
+  `initialize()`), a capability report, the verified default configuration and a
+  build report with the engine revision, toolchain and identities; an
+  unsupported id, combination or target fails before anything is emitted. New
+  Rust names: the root module `composition` (one constructor per built-in
+  detector, `Composition::new`, `SelectedDetector`),
+  `DetectorRegistry::with_composition`, `::with_composition_and_pii`,
+  `IncrementalSanitizer::with_composition_*`, `ArtifactManifest::custom`,
+  `Profile::Custom`. The standard `full` and `common` artifacts are unchanged.
+  Removal is of detector code only; no size or speed is guaranteed. A custom
+  Node addon, Python wheel or CLI is unsupported.
+
 ### Fixed
 
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a

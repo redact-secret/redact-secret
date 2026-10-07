@@ -183,3 +183,15 @@ forwards `actionPolicy` and needs nothing here;
 [adapters#213](https://github.com/redact-secret/redact-secret-adapters/issues/213)
 uses the custom WebAssembly wrapper and `initialize({ detection })`, and is not
 evidence for a handle.
+
+## Implementation status
+
+- **#1253.** Static custom composition is implemented for WebAssembly and, natively, Rust.
+  The reviewed seam is the root module `composition` of `core-public-api`: one public
+  constructor per built-in detector (the id with `-` written `_`), `Composition::new`,
+  `DetectorRegistry::with_composition`, the matching `IncrementalSanitizer` constructors,
+  `ArtifactManifest::custom` and `Profile::Custom` (not selectable by name). A generated leaf
+  crate in an isolated build workspace (`scripts/build-custom-artifact.mjs`) calls the selected
+  constructors only, and the binding's third Cargo feature `custom` installs it. The generated
+  wrapper has the function set of `./common`. See the
+  [guide](../guides/custom-composition.md) and the engine spec row.

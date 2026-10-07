@@ -313,6 +313,52 @@ pub(crate) fn declared_common_types(id: &str) -> Option<&'static [&'static str]>
         .map(|(_, types)| *types)
 }
 
+/// Byte-wise equality of two strings in a `const` context.
+pub(crate) const fn const_str_eq(left: &str, right: &str) -> bool {
+    let (left, right) = (left.as_bytes(), right.as_bytes());
+    if left.len() != right.len() {
+        return false;
+    }
+    let mut index = 0;
+    while index < left.len() {
+        if left[index] != right[index] {
+            return false;
+        }
+        index += 1;
+    }
+    true
+}
+
+/// The declared emitted types of the built-in detector `id`, resolved when
+/// the crate is compiled (issue #1253).
+///
+/// Evaluated in a `const` item, only the one slice it returns is linked: a
+/// composed artifact carries the types of its selected detectors and no other
+/// provider type name. An id with no entry fails the build of this crate, so
+/// a constructor cannot be added without its catalog row.
+pub(crate) const fn types_const(id: &str) -> &'static [&'static str] {
+    let mut index = 0;
+    while index < COMMON_TYPES.len() {
+        if const_str_eq(COMMON_TYPES[index].0, id) {
+            return COMMON_TYPES[index].1;
+        }
+        index += 1;
+    }
+    index = 0;
+    while index < PROVIDER_TYPES.len() {
+        if const_str_eq(PROVIDER_TYPES[index].0, id) {
+            return PROVIDER_TYPES[index].1;
+        }
+        index += 1;
+    }
+    // Reached only when a `const` item evaluates an id that has no row:
+    // that is a compile error, never a run-time path.
+    #[allow(clippy::panic)]
+    {
+        panic!("a built-in detector has no declared types")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::{BUILT_IN_PACKS, Pack, built_in_detectors, common_built_in_detectors};

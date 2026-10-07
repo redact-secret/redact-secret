@@ -1009,6 +1009,45 @@ fn artifact_manifest_is_public_side_effect_free_and_bounded() {
 }
 
 #[test]
+fn static_custom_composition_is_public_and_is_not_a_selectable_profile() {
+    use redact_secret::composition::{self, Composition, SelectedDetector};
+
+    let selected: Vec<SelectedDetector> = vec![composition::github_token(), composition::jwt()];
+    assert_eq!(selected[0].id(), "github-token");
+    let composition: Composition = Composition::new("public-api", false, selected).unwrap();
+    assert_eq!(composition.name(), "public-api");
+    assert_eq!(
+        composition.ids().collect::<Vec<_>>(),
+        ["github-token", "jwt"]
+    );
+    assert!(composition.id().starts_with("custom:"));
+
+    let registry = DetectorRegistry::with_composition(&composition, []).unwrap();
+    assert_eq!(registry.profile(), Some(Profile::Custom));
+    assert_eq!(Profile::Custom.as_str(), "custom");
+    assert_eq!(
+        Profile::from_name("custom"),
+        None,
+        "a composition is not selectable by name"
+    );
+    assert_eq!(
+        redact_secret::sanitize_with_profile(FIXTURE, Profile::Custom)
+            .unwrap_err()
+            .code(),
+        SecretScanErrorCode::InvalidOptions
+    );
+    assert_eq!(scan(FIXTURE, &registry, &DefaultPolicy).unwrap().len(), 1);
+
+    let manifest = redact_secret::ArtifactManifest::custom(
+        redact_secret::ArtifactKind::Wasm,
+        &composition,
+        None,
+    )
+    .unwrap();
+    assert_eq!(manifest.composition_id(), Some(composition.id()));
+}
+
+#[test]
 fn detector_selection_and_configuration_resolution_are_public() {
     use redact_secret::{
         ArtifactKind, ArtifactManifest, ConfigDiagnostic, ConfigRequest, ConfigResolution,

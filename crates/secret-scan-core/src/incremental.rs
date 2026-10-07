@@ -66,6 +66,7 @@
 
 use std::borrow::Cow;
 
+use crate::composition::Composition;
 use crate::detectors::{
     LookbackTail, MAX_LOOKBACK_LINES, PrivateKeyRetentionTracker, carries_aws_access_key_id,
     continues_previous_line, has_open_aws_secret_candidate_line_in, has_open_bearer_authorization,
@@ -805,6 +806,45 @@ impl IncrementalSanitizer {
     ) -> Result<Self, SecretScanError> {
         let registry =
             DetectorRegistry::with_common_built_in_and_pii(selection)?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The analogue of [`Self::with_detection_policy_and_formatter`] over a
+    /// static custom [`Composition`] (issue #1253): the session runs exactly
+    /// the composition's detectors, narrowed by `detection`, and never makes
+    /// another built-in detector reachable.
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_composition_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        composition: &Composition,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry =
+            DetectorRegistry::with_composition(composition, [])?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The PII-aware analogue of
+    /// [`Self::with_composition_detection_policy_and_formatter`].
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_composition_and_pii_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        composition: &Composition,
+        selection: &PiiSelection,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_composition_and_pii(composition, selection, [])?
+            .with_detection(detection)?;
         Ok(Self::from_registry(registry, limits, policy, formatter))
     }
 

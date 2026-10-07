@@ -595,19 +595,33 @@
       "rationale": "The template string is the CLI `--help` usage text, containing `<detector-id>`-style placeholders for the terminal. It is printed to stdout, never assigned to `innerHTML`, rendered into a DOM, or interpreted as markup.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     },
-    "aff813a28b447d41": {
+    "a636f03dad798cac": {
       "classification": "false_positive",
-      "line": 145,
+      "line": 149,
       "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
       "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "3f440c23d169cfd2": {
+    "9ea155069748168c": {
       "classification": "false_positive",
-      "line": 143,
+      "line": 147,
       "path": "crates/secret-scan-core/examples/pii_identity_evaluation.rs",
       "rationale": "The maintainer-local PII identity evaluation example reads `env::args().skip(1)`, discarding argv[0], and accepts one option: --family, whose value must name one of the six closed production PII family ids or the example exits with an error. Arguments are never interpreted as a command, passed to a shell, used to launch a process, or used for an authorization decision, and the example is outside every published package, so neither the argv[0] nor the command-argument injection concern this generic rule targets applies.",
       "rule_id": "sast.rules.rust.lang.security.args"
+    },
+    "a4d4738193d11038": {
+      "classification": "false_positive",
+      "line": 202,
+      "path": "scripts/build-custom-artifact.mjs",
+      "rationale": "The pattern is built inside verifyLockUnchanged from a field name that is one of four string literals written in the same function (name, version, source, checksum); no composition input, file content or environment value reaches it, and the pattern it forms has no nested quantifier. The text it is matched against is a Cargo.lock the build itself copied, so the non-literal construction cannot be steered by a consumer.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
+    },
+    "ab83b227f388c1ec": {
+      "classification": "false_positive",
+      "line": 59,
+      "path": "scripts/lib/composition.mjs",
+      "rationale": "The identifier pattern has no ambiguous nested quantifier: every repeated group begins with a single separator character that the preceding class excludes, so each input position has one parse and matching is linear. isIdentifier also checks the 64-character bound before the pattern is evaluated, so the input is short as well. It runs in build tooling over a composition file the developer wrote, never in the core runtime.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
     }
   },
   "known_errors": {
