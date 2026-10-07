@@ -6,7 +6,7 @@ body:
         Float an early provider/family request or feature idea before it is
         concrete. 아직 구체적이지 않은 아이디어를 자유롭게 남겨주세요. When it becomes concrete
         enough for a public format link and a use case, convert it to a
-        [Request a detector](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml)
+        [Request sensitive-data support](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml)
         issue instead.
 
         Do not paste any real, revoked-but-real, or real-derived credential or

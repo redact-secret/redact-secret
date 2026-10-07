@@ -174,9 +174,10 @@ passes without anyone having to read the checker script itself:
    which must carry `research.verdict: ready` before the family is handed to
    core (the handoff states are in the benchmarks
    [contribution handoff states](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/specs/contribution-handoff-states.md)).
-   A detector request ([issue form](.github/ISSUE_TEMPLATE/request-detector.yml))
-   is answered by linking the research issue in `redact-secret-benchmarks`
-   (its `research-family` form). The product PR links the dossier by its
+   A support request ([issue form](.github/ISSUE_TEMPLATE/request-detector.yml))
+   needs nothing from the reporter beyond a name; maintainers link or open
+   the research issue in `redact-secret-benchmarks` themselves, and a
+   reporter is never asked to file a second issue. The product PR links the dossier by its
    `main` URL (living documentation links `main`, not a branch or a commit).
    This repository keeps no dossier and no research record of its own: the
    detector module doc, the `docs/specs/detector-families.md` row, and the

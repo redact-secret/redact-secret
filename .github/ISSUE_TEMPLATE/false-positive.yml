@@ -1,5 +1,5 @@
 name: False positive report
-description: A scanned value was flagged or redacted but should not have been.
+description: A value was flagged or redacted but should not have been.
 title: "[false-positive] "
 labels:
   - area:conformance
@@ -7,83 +7,80 @@ body:
   - type: markdown
     attributes:
       value: |
-        Read the [reporting guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md)
-        before filing. In short:
+        Tell us about a value that was flagged or redacted but should not have
+        been. A short description is enough to start; maintainers can ask for
+        more. 영어와 한국어 모두 가능합니다.
 
-        - **Never** paste a live, revoked-but-real, or real-derived credential
-          here, even truncated or partially masked. Build an independently
-          authored synthetic equivalent instead — the guide shows how.
-        - Raw logs, screenshots, prompt exports, and tool payloads are
-          discouraged unless you have personally reviewed and sanitized every
-          line yourself.
-        - Filing this form does not by itself change any conformance fixture
-          or open a confirmed defect. Accepted reports enter the governed
-          known-gap lifecycle in `redact-secret-benchmarks`
-          (`observed → reviewed → promoted → fixed → verified`) before any
-          fixture or expected result changes.
-        - Redact Secret collects no telemetry automatically; you are sharing
-          this information manually.
+        **Never paste real data.** No live, revoked-but-real, or real-derived
+        credentials (not even truncated or partly masked), personal data,
+        customer logs, or unsanitized screenshots, prompt exports, or tool
+        payloads. Write an independently made synthetic example with the same
+        shape instead. The
+        [reporting guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md)
+        is optional help for that; you do not need to read it first.
 
-  - type: input
-    id: package-version
+        Filing this does not by itself change any fixture or confirm a defect.
+        Maintainers route accepted reports internally. For a suspected
+        security vulnerability use
+        [private reporting](https://github.com/redact-secret/redact-secret/security/advisories/new).
+
+  - type: textarea
+    id: repro-shape
     attributes:
-      label: Package version
+      label: Synthetic example
       description: >-
-        Exact published version or commit, e.g. `@redact-secret/core@0.1.0-beta.6`,
-        `redact-secret==0.1.0b6`, `redact-secret-cli 0.1.0-beta.6`, or a commit SHA.
-      placeholder: "0.1.0-beta.6"
+        Paste or describe an independently made synthetic value with the same
+        prefix, length, and character set as the real one, never the real value
+        or an edited copy of it. If it depends on nearby text, describe that
+        context with placeholders.
+      render: text
     validations:
       required: true
-
-  - type: input
-    id: runtime
-    attributes:
-      label: Runtime
-      description: >-
-        Binding plus runtime/OS, e.g. "Node 20.11 on Linux x64",
-        "Python 3.12 CPython on macOS arm64", "browser WebAssembly, Chrome 128",
-        or "CLI, Rust 1.79".
-      placeholder: "Node 20.11 on Linux x64"
-    validations:
-      required: true
-
-  - type: input
-    id: family
-    attributes:
-      label: Detector family (if known)
-      description: >-
-        The detector id or provider family, if known (e.g. `github-token`,
-        `aws`, `generic-token`). Leave blank if you don't know it.
-      placeholder: "github-token"
-    validations:
-      required: false
 
   - type: dropdown
     id: expected-action
     attributes:
-      label: Expected action
-      description: What the scanner should have done with this value instead.
+      label: What should have happened? (optional)
       options:
         - "No finding at all (allow)"
         - "warn instead of redact"
         - "warn instead of block"
         - "redact instead of block"
-        - "Other (describe below)"
+        - "Other (describe above)"
     validations:
-      required: true
+      required: false
 
-  - type: textarea
-    id: repro-shape
+  - type: input
+    id: family
     attributes:
-      label: Safe reproduction shape
-      description: >-
-        Describe the input's structural shape using an independently authored
-        synthetic value with the same grammar, prefix, and length as the real
-        one — never the real value. Paste the local reproduction template's
-        JSON output here if you ran it (see the reporting guide).
-      render: text
+      label: Provider or detector family (optional)
+      description: The detector id or provider, if you know it (for example `github-token`). Leave blank if unsure.
+      placeholder: "github-token"
     validations:
-      required: true
+      required: false
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Where did you run it? (optional)
+      options:
+        - JavaScript (Node.js)
+        - JavaScript (browser)
+        - Python
+        - Command line
+        - Rust
+        - Other / not sure
+    validations:
+      required: false
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version (optional)
+      description: For example `@redact-secret/core@0.1.0-beta.14`, or a commit SHA. Leave blank if unsure.
+      placeholder: "0.1.0-beta.14"
+    validations:
+      required: false
 
   - type: checkboxes
     id: safety-ack
@@ -92,7 +89,7 @@ body:
       options:
         - label: >-
             I have not included any live, revoked-but-real, or real-derived
-            credential anywhere in this report or its attachments.
+            credential or personal data anywhere in this report or its attachments.
           required: true
         - label: >-
             Any log, screenshot, prompt export, or tool payload I attached has

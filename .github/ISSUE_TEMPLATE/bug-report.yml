@@ -12,12 +12,9 @@ body:
         same input), or a redaction output that is wrong for a reason other
         than a detection judgement. 탐지 판단(오탐/미탐) 문제는 아래 폼을 대신 사용하세요.
 
-        If the problem is that a value was flagged when it shouldn't have
-        been, or missed when it should have been caught, use
-        [False positive report](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml)
-        or
-        [Missed detection report](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml)
-        instead — this form is for code defects, not detection judgements.
+        If you are not sure which form fits, file here; a maintainer will route
+        it. Detection judgements (flagged or missed values) can also use the
+        False positive and Missed detection forms.
 
         Do not paste any real, revoked-but-real, or real-derived credentials,
         personal data, customer logs, screenshots, or prompt exports. Build a
