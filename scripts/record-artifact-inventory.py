@@ -129,6 +129,11 @@ def collect(artifacts: Path) -> list[dict]:
         name = directory.name
         if name.startswith(("installed-javascript-", "clean-install-", "golden-path-")):
             continue
+        if name == "configuration-journeys":
+            # Issue #1255: the report of the installed-candidate configuration
+            # journeys, which the `configuration` job already judged. A
+            # qualification record, not a shipped artifact.
+            continue
         if name.startswith("shadow-determinism-"):
             # Issue #772: the CI workflow's per-host shadow evaluations and
             # their comparison report, which the `shadow-determinism` job
