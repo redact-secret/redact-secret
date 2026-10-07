@@ -660,6 +660,161 @@ export interface ActionComparison {
   readonly findings: readonly ComparedFinding[];
 }
 
+/**
+ * Options of `compareConfigurations`
+ * (`decision-define-the-artifact-manifest-and-configuration-data-contracts`,
+ * `configuration-comparison/v1`). Whole-input only, like
+ * {@link CompareActionPoliciesOptions}: one string, never a stream. A key this
+ * interface does not name is `INVALID_OPTIONS`.
+ */
+export interface CompareConfigurationsOptions {
+  /**
+   * One to four configurations, compared in this order: the first is the
+   * baseline. Each side's `detection`, `pii`, `ruleset`, `actionPolicy` and
+   * `limits` are honored for that side only. A side that cannot be built or
+   * scanned is a failed side in the result, not a thrown error.
+   */
+  readonly configs: readonly RuntimeConfig[];
+  /**
+   * A declarative action policy for every side whose own `actionPolicy` is
+   * absent. Without either, a side uses the artifact's default evaluation.
+   */
+  readonly actionPolicy?: ActionPolicyInput;
+  /**
+   * A callback policy for every side. It may have side effects and has no
+   * stable identity: it is called once per finalized finding of each scanned
+   * side, side by side in the order supplied, and a failure fails the whole
+   * call with no partial result. Together with any `actionPolicy` (this one or
+   * a side's) it is `INVALID_OPTIONS`.
+   */
+  readonly policy?: SecretPolicy;
+}
+
+/** Whether a side produced findings, and if not, why not. */
+export type ComparedSideStatus = "scanned" | "limited" | "unsupported" | "error";
+
+/** One compared configuration: its identities, origins and diagnostics. */
+export interface ComparedConfigurationSummary {
+  /** `"baseline"` for the first side, then `"candidate-1"`, `"candidate-2"`, `"candidate-3"`. */
+  readonly label: string;
+  /** The snapshot digest, or `null` when the configuration did not resolve. */
+  readonly digest: string | null;
+  /**
+   * Equal digests mean the same detection. A different ruleset, selection or
+   * PII activation always differs here, whatever the action policy bytes are.
+   */
+  readonly detectionDigest: string | null;
+  /** Where each value came from (`artifact-default` or `runtime`), or `null` when unresolved. */
+  readonly origins: ConfigSnapshot["origins"] | null;
+  /** The configuration's own diagnostics (`resolveConfig`'s), safe and bounded. */
+  readonly diagnostics: readonly ConfigDiagnostic[];
+  /** The side's policy: a callback has no identity and may have side effects. */
+  readonly policy: {
+    readonly kind: ComparedPolicyKind;
+    /** The action policy document's SHA-256, as for {@link ComparedPolicySummary.documentSha256}; `null` otherwise. */
+    readonly documentSha256: string | null;
+  };
+}
+
+/** One finalized finding of one side, as safe metadata. There is no per-scan id: it is not a stable identity. */
+export interface ConfigurationFinding {
+  readonly type: string;
+  readonly detector: string;
+  readonly confidence: SecretConfidence;
+  readonly obfuscation: SecretObfuscation;
+  /** Start in {@link ConfigurationComparison.rangeUnit}. */
+  readonly start: number;
+  /** Exclusive end in {@link ConfigurationComparison.rangeUnit}. */
+  readonly end: number;
+  readonly action: SecretAction;
+  readonly reason: {
+    readonly basis: DecisionBasis;
+    readonly ruleId: string | null;
+    readonly ruleIndex: number | null;
+  };
+}
+
+/**
+ * One side's outcome. A failed side (`status` other than `"scanned"`) has no
+ * findings, which is not the same as finding nothing: check `status`.
+ */
+export interface ConfigurationSideResult {
+  readonly status: ComparedSideStatus;
+  /** The fixed code of a failed side (a configuration diagnostic or error code); otherwise `null`. */
+  readonly failure: string | null;
+  readonly counts: ActionCounts;
+  /** In input order. */
+  readonly findings: readonly ConfigurationFinding[];
+}
+
+/** What a changed attribute of a {@link ConfigurationDifference} can be. */
+export type ConfigurationChange = "range" | "type" | "detector" | "confidence" | "action" | "reason";
+
+/**
+ * One difference between the baseline and another side. `base` and `other`
+ * are positions in `results[0].findings` and in the other side's `findings`.
+ *
+ * - `added` / `removed`: a finding only one side has (one per entry).
+ * - `changed`: one finding on each side over overlapping ranges with at least
+ *   one attribute changed. A provider detector removed while a contextual one
+ *   takes the same span is this kind, with `type` and `detector` changed, not
+ *   a removal.
+ * - `split` / `merged` / `regrouped`: several findings share the overlap. They
+ *   are listed together and are not paired (`correspondence: "ambiguous"`).
+ */
+export interface ConfigurationDifference {
+  readonly kind: "added" | "removed" | "changed" | "split" | "merged" | "regrouped";
+  /** `exact`: the same range; `overlap`: one each over different ranges; `ambiguous`: several; `null` for added and removed. */
+  readonly correspondence: "exact" | "overlap" | "ambiguous" | null;
+  readonly base: readonly number[];
+  readonly other: readonly number[];
+  /** Only for `changed`. */
+  readonly changes: readonly ConfigurationChange[];
+}
+
+/** The differences of one side against the baseline, on this input only. */
+export interface ConfigurationDifferences {
+  /** In input order. */
+  readonly entries: readonly ConfigurationDifference[];
+  /** Pairs with the same range and every attribute equal. */
+  readonly unchanged: number;
+}
+
+/**
+ * The result of `compareConfigurations` (`configuration-comparison/v1`): what
+ * independent detection passes over this one input found under each
+ * configuration, and how those findings correspond. A preview, never
+ * enforcement; frozen plain data with no input byte, matched value, snippet or
+ * hash of either.
+ *
+ * It reports differences **on this input only** (`scope: "input"`) and covers
+ * finalized findings only: not overlap losers, not candidates a gate removed.
+ * A side or a pair with no finding says nothing about absence of risk, about
+ * other input, or that a detector or rule is ineffective. Findings of
+ * different passes have no stable identity; correspondence comes from the
+ * declared `rangeUnit` ranges.
+ */
+export interface ConfigurationComparison {
+  readonly schema: "configuration-comparison/v1";
+  /** The package version that produced the result. */
+  readonly version: string;
+  readonly rangeUnit: RangeUnit;
+  readonly scope: "input";
+  readonly mode: "preview";
+  readonly enforced: false;
+  /** Positions of callback sides: they may have side effects and have no stable identity. */
+  readonly callbackSides: readonly number[];
+  /** One per side, in the order supplied. */
+  readonly configs: readonly ComparedConfigurationSummary[];
+  /** One per side, in the order supplied. */
+  readonly results: readonly ConfigurationSideResult[];
+  /**
+   * One per side: `null` for the baseline, and for a side where it or the
+   * baseline did not scan, so a failure is never read as equivalence.
+   */
+  readonly differences: readonly (ConfigurationDifferences | null)[];
+}
+
 /** The terminally distinct lifecycle states of an incremental session. */
 export type IncrementalSanitizerState = "accepting" | "finalized" | "aborted" | "failed";
 

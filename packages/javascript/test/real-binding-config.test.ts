@@ -70,6 +70,53 @@ for (const [artifact, profile] of SURFACES) {
       expect(result.ran).toBeGreaterThanOrEqual(30);
     });
 
+    it("compares configurations from the shared cases, with nothing but safe metadata in the result", async () => {
+      const result = await scenario<{ ran: number; failures: string[]; leaks: string[] }>(artifact, profile, "compare");
+      expect(result.failures).toEqual([]);
+      expect(result.leaks).toEqual([]);
+      expect(result.ran).toBeGreaterThanOrEqual(profile === "full" ? 13 : 11);
+    });
+
+    it("keeps a comparison independent of the owner, discloses callbacks and refuses malformed calls", async () => {
+      const result = await scenario<Record<string, unknown>>(artifact, profile, "compareContract");
+      // Independent passes: the baseline finds the provider token the owner's narrow selection cannot.
+      if (profile === "full") expect(result.wideDetectors).toEqual(["github-token"]);
+      expect(result.narrowDetectors).not.toContain("github-token");
+      expect(result.ownerUnchanged).toBe(true);
+      expect(result.preview).toEqual(["preview", false, "input", "configuration-comparison/v1", "utf16-code-units"]);
+      expect(result.noCallbacks).toEqual([]);
+      // A callback is called once per finding of each scanned side, side by side; the failed
+      // third side (nothing enabled) never calls it.
+      expect(result.callbackLog).toEqual(["jwt#0", "jwt#0"]);
+      expect(result.callbackSides).toEqual([0, 1, 2]);
+      expect(result.callbackKinds).toEqual([
+        ["callback", null],
+        ["callback", null],
+        ["callback", null],
+      ]);
+      expect(result.callbackStatus).toEqual(["scanned", "scanned", "error"]);
+      expect(result.callbackActions).toEqual([["warn"], ["warn"], []]);
+      expect(result.throwing).toBe("POLICY_FAILURE");
+      expect(result.badAction).toBe("INVALID_POLICY_ACTION");
+      expect(result.badDocument).toBe("INVALID_ACTION_POLICY");
+      expect(result.badDocumentWithCallback).toBe("INVALID_OPTIONS");
+      expect(result.callbackCallsAfterRejection).toBe(0);
+      for (const key of ["zero", "five", "unknownKey", "notObject", "notArray", "missing"]) {
+        expect(result[key], key).toBe("INVALID_OPTIONS");
+      }
+      expect(result.notString).toBe("INVALID_INPUT");
+      // PII an artifact without the PII runtime cannot build is an unsupported side, never ignored.
+      expect(result.pii).toEqual(
+        artifact === "wasm"
+          ? ["unsupported", "PII_SELECTOR_UNAVAILABLE", true, "scanned", [], null, false]
+          : ["scanned", null, false, "scanned", ["pii-domain"], ["added"], false],
+      );
+      // The shared policy applies to a side without its own; a side's own replaces it.
+      expect(result.shared).toEqual([["allow"], ["redact"]]);
+      expect(result.sharedDigests).toEqual([true, true]);
+      expect(result.sharedDigestsDiffer).toBe(true);
+    });
+
     it("leaves a legacy initialize untouched: every included detector, default origin, one digest", async () => {
       const result = await scenario<{
         mode: string;

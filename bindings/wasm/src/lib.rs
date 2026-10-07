@@ -420,6 +420,47 @@ pub fn compare_action_policies(
     Ok(compare::comparison_to_array(input, &comparison).into())
 }
 
+/// Scans one input under one explicit configuration and evaluates one policy
+/// over the finalized findings, without enforcing anything (issue #1254): one
+/// side of `compareConfigurations`. The package's own wrapper calls it once
+/// per side and relates the sides.
+///
+/// The registry is **temporary**: built from `config` (the `runtime-config/v1`
+/// text) and `ruleset` for this call and dropped with it. It reads no owner
+/// state, so it needs no successful [`initialize`] and never changes one. The
+/// side's policy arrives as `compareActionPolicies` sides do, with exactly one
+/// kind. The result is the flat array of `compareActionPolicies` for one side.
+/// The whole-input limits are the configuration's own.
+///
+/// # Errors
+///
+/// `INVALID_OPTIONS` when `kinds` does not hold exactly one side or the
+/// configuration does not resolve, `EMPTY_DETECTION_SET`, the limit errors
+/// exactly as [`scan`], `INVALID_ACTION_POLICY`, and `POLICY_FAILURE` or
+/// `INVALID_POLICY_ACTION` when the callback fails.
+#[allow(clippy::needless_pass_by_value)]
+#[wasm_bindgen(js_name = "scanConfigurationSide")]
+pub fn scan_configuration_side(
+    input: &str,
+    config: Option<String>,
+    ruleset: Option<Vec<u8>>,
+    kinds: Vec<String>,
+    documents: Vec<js_sys::Uint8Array>,
+    callbacks: Vec<Function>,
+) -> Result<JsValue, JsValue> {
+    let documents: Vec<Vec<u8>> = documents.iter().map(js_sys::Uint8Array::to_vec).collect();
+    let plans = compare::plan_sides(&kinds, &documents, callbacks.len()).map_err(to_js_error)?;
+    if plans.len() != 1 {
+        return Err(to_js_error(SecretScanErrorCode::InvalidOptions.into()));
+    }
+    let (registry, limits) =
+        lifecycle::build_temporary_registry(config.as_deref(), ruleset.as_deref())
+            .map_err(to_js_error)?;
+    let comparison = compare::run_compare(input, &registry, &plans, &callbacks, &limits)
+        .map_err(|error| to_js_error(error.into()))?;
+    Ok(compare::comparison_to_array(input, &comparison).into())
+}
+
 /// Evaluates the core's default policy for one finding's safe metadata and
 /// returns its action name, so a JavaScript policy that wants "mine, else the
 /// default" never copies the default table

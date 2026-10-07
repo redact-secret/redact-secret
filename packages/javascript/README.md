@@ -379,7 +379,7 @@ mapped to the same fixed error vocabulary.
 ## Public API
 
 Runtime values: `initialize`, `artifact`, `artifactManifest`, `resolveConfig`, `describeConfig`, `scan`, `redact`, `scanAndRedact`,
-`compareActionPolicies`, `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
+`compareActionPolicies`, `compareConfigurations`, `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `defaultPolicy`, `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`,
 `VERSION`, `PROFILE`.
 
@@ -394,7 +394,20 @@ Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `ArtifactManifest`, `A
 `CompareActionPoliciesOptions`, `ComparedPolicy`, `ComparedPolicyKind`,
 `ActionComparison`, `ComparedPolicySummary`, `ComparisonDetection`,
 `ComparedFinding`, `ActionDecision`, `ActionCounts`, `DecisionBasis`,
+`CompareConfigurationsOptions`, `ConfigurationComparison`, `ConfigurationSideResult`,
+`ConfigurationFinding`, `ConfigurationDifferences`, `ConfigurationDifference`,
+`ConfigurationChange`, `ComparedConfigurationSummary`, `ComparedSideStatus`,
 `RangeUnit`, `SecretScanErrorCode`.
+
+`compareConfigurations(input, { configs, actionPolicy?, policy? })` previews what a
+change of detector selection, PII selection, ruleset, action policy or limits does to
+one input: one independent pass per `RuntimeConfig` side (one to four, the first is
+the baseline), each over a temporary registry, then the differences against the first
+side (`added`, `removed`, `changed` with the changed attributes, and the ambiguous
+`split`, `merged`, `regrouped`). It is a preview scoped to that input, never
+enforcement, changes no owner and returns no text; a side that cannot be built or hits
+a limit is reported with a fixed code and gets no difference. See the
+[API contract](https://github.com/redact-secret/redact-secret/blob/main/docs/reference/api-contract.md#configuration-comparison).
 
 `artifactManifest()` returns what the loaded artifact contains and supports
 (`artifact-manifest/v1`): the built-in detectors in canonical order with the

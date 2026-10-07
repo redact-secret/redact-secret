@@ -64,6 +64,7 @@
 //! | Declarative rulesets | [`load_ruleset`], [`RulesetError`], [`RulesetErrorClass`] |
 //! | Declarative action policy | [`load_action_policy`], [`ActionPolicy`], [`ActionPolicyError`], [`ActionPolicyErrorClass`], [`MAX_ACTION_POLICY_BYTES`] |
 //! | Explain and compare action policies | [`compare_action_policies`], [`compare_action_policies_with_limits`], [`ComparedPolicy`], [`ActionComparison`], [`ComparedFinding`], [`ActionDecision`], [`DecisionBasis`], [`ComparedSide`], [`PolicyBinding`], [`ActionCounts`], [`DetectionIdentity`], [`MAX_COMPARED_POLICIES`] |
+//! | Compare detection configurations | [`compare_configurations`], [`ConfigurationSide`], [`ConfigurationComparison`], [`ConfigurationResult`], [`ConfigurationDifferences`], [`ConfigurationDifference`], [`DifferenceKind`], [`Correspondence`], [`SideStatus`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Artifact manifest | [`ArtifactManifest`], [`ArtifactKind`], [`ArtifactManifestError`] |
 //! | Static custom composition | [`composition`] |
@@ -139,6 +140,7 @@
 mod action_policy;
 mod compare;
 mod config;
+mod configuration_compare;
 mod detectors;
 mod entropy;
 mod error;
@@ -182,6 +184,11 @@ pub use compare::{
 pub use config::{
     ConfigDiagnostic, ConfigRequest, ConfigResolution, ConfigSeverity, ConfigSnapshot,
     describe_config, resolve_config,
+};
+pub use configuration_compare::{
+    ConfigurationComparison, ConfigurationDifference, ConfigurationDifferences,
+    ConfigurationResult, ConfigurationSide, Correspondence, DifferenceKind, SideStatus,
+    compare_configurations,
 };
 pub use entropy::shannon_entropy;
 pub use error::{

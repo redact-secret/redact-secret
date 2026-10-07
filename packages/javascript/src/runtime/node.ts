@@ -79,6 +79,8 @@ interface NodeAddon {
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
   compareActionPolicies: AddonCompare;
+  /** One side of a configuration comparison (issue #1254). */
+  scanConfigurationSide?: AddonScanSide;
   defaultPolicy(finding: NativeDetectedFinding): string;
 }
 
@@ -108,6 +110,20 @@ type AddonCompare = (
   callbacks: NativePolicyCallback[],
   limits?: NativeWholeInputLimits,
   ruleset?: Uint8Array,
+) => NativeActionComparison;
+
+/**
+ * The addon's one-side configuration scan, which takes the side as the
+ * one-element parallel arrays {@link splitNativeSides} builds
+ * (`bindings/node/src/lib.rs`'s `scan_configuration_side`).
+ */
+type AddonScanSide = (
+  input: string,
+  config: string | undefined,
+  ruleset: Uint8Array | undefined,
+  kinds: string[],
+  documents: Uint8Array[],
+  callbacks: NativePolicyCallback[],
 ) => NativeActionComparison;
 
 /**
@@ -152,6 +168,8 @@ interface CommonNodeAddon {
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizerCommon(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
   compareActionPoliciesCommon: AddonCompare;
+  /** One side of a configuration comparison (issue #1254). */
+  scanConfigurationSideCommon?: AddonScanSide;
   defaultPolicy(finding: NativeDetectedFinding): string;
   profileCommon(): string;
 }
@@ -337,6 +355,7 @@ interface ProfiledAddonMethods {
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(options: NativeIncrementalOptions): NativeIncrementalSanitizer;
   compareActionPolicies: AddonCompare;
+  scanConfigurationSide?: AddonScanSide;
 }
 
 /**
@@ -371,6 +390,18 @@ function resolveMethod(read: AddonResolveConfig | undefined): Pick<NativeBinding
   return read === undefined ? {} : { resolveConfig: (...args) => read(...args) };
 }
 
+/** The binding's `scanConfigurationSide`, present only when the profile's method is. */
+function scanSideMethod(read: AddonScanSide | undefined): Pick<NativeBinding, "scanConfigurationSide"> {
+  return read === undefined
+    ? {}
+    : {
+        scanConfigurationSide: (input, config, ruleset, side) => {
+          const { kinds, documents, callbacks } = splitNativeSides([side]);
+          return read(input, config, ruleset, kinds, documents, callbacks);
+        },
+      };
+}
+
 /** The binding's `artifactManifest`, present only when the profile's method is. */
 function manifestMethod(read: (() => string) | undefined): Pick<NativeBinding, "artifactManifest"> {
   return read === undefined ? {} : { artifactManifest: () => read() };
@@ -396,6 +427,7 @@ function buildBinding(
     piiActivation: () => methods.piiActivation(),
     ...manifestMethod(methods.artifactManifest),
     ...resolveMethod(methods.resolveConfig),
+    ...scanSideMethod(methods.scanConfigurationSide),
     scan: (input, policy, limits, ruleset, actionPolicy) => methods.scan(input, policy, limits, ruleset, actionPolicy),
     redact: (input, findings, formatter, limits) => addon.redact(input, findings, formatter, limits),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy): NativeScanAndRedactResult => {
@@ -440,6 +472,20 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
     createIncrementalSanitizer: (options) => addon.createIncrementalSanitizer(options),
     compareActionPolicies: (input, kinds, documents, callbacks, limits, ruleset) =>
       addon.compareActionPolicies(input, kinds, documents, callbacks, limits, ruleset),
+    ...(addon.scanConfigurationSide === undefined
+      ? {}
+      : {
+          scanConfigurationSide: (input, config, ruleset, kinds, documents, callbacks) =>
+            (addon.scanConfigurationSide as AddonScanSide).call(
+              addon,
+              input,
+              config,
+              ruleset,
+              kinds,
+              documents,
+              callbacks,
+            ),
+        }),
   });
 }
 
@@ -473,6 +519,20 @@ export function createBindingFromCommonAddon(addon: CommonNodeAddon): NativeBind
     createIncrementalSanitizer: (options) => addon.createIncrementalSanitizerCommon(options),
     compareActionPolicies: (input, kinds, documents, callbacks, limits, ruleset) =>
       addon.compareActionPoliciesCommon(input, kinds, documents, callbacks, limits, ruleset),
+    ...(addon.scanConfigurationSideCommon === undefined
+      ? {}
+      : {
+          scanConfigurationSide: (input, config, ruleset, kinds, documents, callbacks) =>
+            (addon.scanConfigurationSideCommon as AddonScanSide).call(
+              addon,
+              input,
+              config,
+              ruleset,
+              kinds,
+              documents,
+              callbacks,
+            ),
+        }),
   });
 }
 

@@ -9,6 +9,7 @@
 | Both together | `scanAndRedact` | `scan_and_redact` | Text and findings |
 | Supported defaults, Rust only | none | `sanitize`, `sanitize_with_profile` | Text and findings, as `scan_and_redact` |
 | Compare action policies, preview only (whole input) | `compareActionPolicies` | `compare_action_policies` (Python and Rust); the CLI's `--compare-action-policy` | Per-finding actions and reasons for 1 to 4 policies over one detection pass, no text |
+| Compare detection configurations, preview only (whole input) | `compareConfigurations` | `compare_configurations` (Rust only) | Per-side findings and the differences against the first side, from independent passes, no text |
 
 Bindings adapt arguments and results; they do not copy detector logic. Rust
 additionally takes a registry, policy, and formatter; `sanitize(input)` and
@@ -271,6 +272,83 @@ its position in the array, never the id. `resolveConfig` reports the class
 fixed-syntax path such as `detection.include[3]` (an unknown member is addressed
 by position, `detection.@1`, never its name) and only a canonical catalog id
 ([`decision-define-detector-id-selection-and-configuration-replacement-precedence`](../decisions/2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md)).
+
+## Configuration comparison
+
+`compareActionPolicies` changes only the action and runs detection once. When a
+change may alter **detection** (the detector selection, the PII selection, a
+ruleset, the limits), use `compareConfigurations` (`configuration-comparison/v1`,
+issue #1254): a whole-input preview that runs one **independent** detection pass
+per side and relates the sides' finalized findings. It is not enforcement and not
+a handle: it returns no text, builds a temporary registry for each side for the
+duration of the call, reads and changes no owner, and holds nothing.
+
+```ts
+compareConfigurations(input, {
+  configs: [{}, { detection: { exclude: ["github-token"] } }], // one to four RuntimeConfig sides
+  actionPolicy, // optional, for every side without its own `actionPolicy`
+  policy, // optional callback for every side; not together with an actionPolicy
+});
+```
+
+Each side is a `RuntimeConfig`; its `detection`, `pii`, `ruleset`, `actionPolicy` and
+`limits` apply to that side only, and the first side is the baseline. Rust takes
+registries the caller built (`ConfigurationSide::new(&registry, policy)`, with
+`with_limits` and `with_snapshot`) because the Rust registry value is the owner;
+`ConfigSnapshot::detection_selection`, `pii_selection` and `whole_input_limits` carry a
+resolved configuration to that construction.
+
+| Result member | Meaning |
+| --- | --- |
+| `schema`, `version`, `rangeUnit` | `configuration-comparison/v1`, the producing package version and the unit of every range |
+| `scope: "input"`, `mode: "preview"`, `enforced: false` | differences on this input only; never enforcement |
+| `configs[i]` | `label` (`baseline`, `candidate-N`), `digest` and `detectionDigest` of the side's snapshot (`null` if it did not resolve), `origins`, the side's own `diagnostics`, and `policy` (`kind`, `documentSha256`) |
+| `results[i]` | `status` (`scanned`, `limited`, `unsupported`, `error`), a fixed `failure` code, action `counts`, and the side's finalized `findings` (type, detector, confidence, obfuscation, `start`, `end`, `action`, `reason`) |
+| `differences[i]` | `null` for the baseline and for any side where it or the baseline did not scan; otherwise `entries` and an `unchanged` count |
+| `callbackSides` | positions of callback sides |
+
+A finding has no per-scan id in a comparison, because ids are not a stable identity
+across scans. Correspondence comes from the findings' ranges in the declared unit:
+findings joined by overlapping ranges form a cluster, and a cluster is
+
+- `added` (only the other side) or `removed` (only the baseline), one entry per finding;
+- `changed`: one finding on each side, `correspondence` `exact` (same range) or
+  `overlap` (different ranges), with `changes` naming any of `range`, `type`,
+  `detector`, `confidence`, `action` and `reason`; a pair equal in all of them is only
+  counted in `unchanged`. Removing a provider detector can expose a contextual one on
+  the same span: that is `changed` with `type` and `detector`, not a removal;
+- `split`, `merged` or `regrouped`: several findings share the overlap. They are listed
+  together as `ambiguous` and are not paired.
+
+`base` and `other` are positions in `results[0].findings` and the other side's
+`findings`. A side that cannot be built (an invalid selection or ruleset, nothing
+enabled, PII the artifact cannot provide) or stops on a limit (each side has its own
+`limits`) is a failed side with a fixed code (`UNKNOWN_DETECTOR_ID`,
+`EMPTY_DETECTION_SET`, `PII_SELECTOR_UNAVAILABLE`, `INPUT_LIMIT_EXCEEDED`, ...) and no
+findings, which is not the same as finding nothing. A different ruleset, detector
+selection or PII selection always has a different `detectionDigest`, whatever the policy
+bytes are. A side or pair without findings or differences says nothing about the
+absence of risk, about other input, or that a detector or rule is ineffective, and the
+comparison covers finalized findings only (never an overlap loser or a candidate a gate
+dropped; a policy cannot recover one).
+
+A malformed call is `INVALID_OPTIONS` before anything runs (no side or more than four,
+an unknown key, a side that is not a plain object, a callback together with an action
+policy); a rejected policy document is `INVALID_ACTION_POLICY` before any side is scanned
+or callback called. A callback may have side effects and has no stable identity: it is
+called once per finalized finding of each scanned side, side by side in the order given,
+and its failure (`POLICY_FAILURE`, `INVALID_POLICY_ACTION`) fails the whole call with no
+partial result.
+
+Supported on Rust, the Node addon and WebAssembly (the same function on both, including
+the custom wrapper); unsupported on Python and the CLI. Independent configurations that
+are scans, not previews, still use the Worker, module-instance or process recipes of the
+[ownership guide](../guides/configuration-ownership.md): wrapping a singleton does not
+isolate PII, and a comparison side that needs PII on an artifact without the PII runtime
+is an `unsupported` side, never a silent fallback. The relation is computed in the
+JavaScript package, outside the WebAssembly artifact, and the Rust function has the same
+rules (`conformance/fixtures/configuration-compare-v1.json` runs on both, on the addon
+and on WebAssembly, `full` and `common`).
 
 ## Errors and extensions
 

@@ -128,6 +128,43 @@ evidence is linked from each published version.
   Removal is of detector code only; no size or speed is guaranteed. A custom
   Node addon, Python wheel or CLI is unsupported.
 
+- Configuration comparison, `configuration-comparison/v1` (#1254, epic #1246,
+  `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
+  `compareConfigurations(input, { configs, actionPolicy?, policy? })`
+  (JavaScript, both entry points and the custom wrapper; Node addon and
+  WebAssembly) and `compare_configurations` (Rust) tell a consumer whether a
+  change to the detector selection, PII selection, ruleset, action policy or
+  limits altered detection or only the action, on one input. Each of one to four
+  sides is an independent pass over a temporary registry built for that call (it
+  reads and changes no owner and is not a handle); the sides' finalized findings
+  are related by their ranges in the declared unit into `added`, `removed`,
+  `changed` (with `type`, `detector`, `confidence`, `action`, `reason` and
+  `range` named, so removing a provider that exposes a contextual detection on
+  the same span is a type and detector change, not a removal) and the ambiguous
+  `split`, `merged` and `regrouped`. A side that cannot be built or scanned is
+  reported as `limited`, `unsupported` or `error` with a fixed code and gets no
+  difference, so a failure is never read as equivalence; each side carries its
+  snapshot and detection digests, origins and policy identity, which differ for
+  a different ruleset or selection even when the policy bytes match. The result
+  is a non-enforcing preview scoped to the input (`scope: "input"`): it returns
+  no text, snippet, per-scan id or hash of input, covers finalized findings
+  only, and a side with no finding claims nothing about absence of risk. A
+  callback policy is disclosed (`callbackSides`), may have side effects and has
+  no identity; it runs once per finding of each scanned side, side by side, and
+  its failure fails the call. `compareActionPolicies` is unchanged (one
+  detection pass, policy-only). Python and the CLI are unsupported. New
+  names: JavaScript `compareConfigurations`, `CompareConfigurationsOptions`,
+  `ConfigurationComparison` and its member types; Rust
+  `compare_configurations`, `ConfigurationSide`, `ConfigurationComparison`,
+  `ConfigurationResult`, `ConfigurationDifference(s)`, `DifferenceKind`,
+  `Correspondence`, `SideStatus`, `CHANGE_NAMES`, and the
+  `ConfigSnapshot` accessors `detection_selection`, `pii_selection` and
+  `whole_input_limits`; the Node addon exports `scanConfigurationSide` and
+  `scanConfigurationSideCommon` and the WebAssembly module `scanConfigurationSide`.
+  The comparison is related in the JavaScript package, not in the artifact: on
+  the standard `full` WebAssembly artifact the change is +1,044 bytes brotli
+  (204,726 to 205,770), 13.13% above the pre-epic 181,882 in total.
+
 ### Fixed
 
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a

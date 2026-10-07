@@ -23,6 +23,7 @@ import type {
   ActionPolicyRuleAction,
   ArtifactKind,
   CompareActionPoliciesOptions,
+  CompareConfigurationsOptions,
   ComparedFinding,
   ComparedPolicy,
   ComparedPolicyKind,
@@ -30,6 +31,8 @@ import type {
   ConfigDiagnostic,
   ConfigResolution,
   ConfigSnapshot,
+  ConfigurationComparison,
+  ConfigurationDifference,
   CoreStatus,
   DecisionBasis,
   DefaultSecretPolicy,
@@ -59,6 +62,7 @@ import type {
 import {
   artifact,
   compareActionPolicies,
+  compareConfigurations,
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
   defaultPolicy,
@@ -329,6 +333,55 @@ function rejectedComparisonUsage(): void {
 }
 
 void rejectedComparisonUsage;
+
+/**
+ * The configuration comparison (#1254): whole-input only, one to four
+ * `RuntimeConfig` sides, and a result of plain readonly, non-enforcing data
+ * scoped to the input.
+ */
+function documentedConfigurationComparisonUsage(): void {
+  const options: CompareConfigurationsOptions = {
+    configs: [{}, { detection: { exclude: ["github-token"] }, limits: { maxInputBytes: 1_024 } }, { pii: [] }],
+    actionPolicy: { actionPolicyRevision: 1, base: "default", rules: [] },
+  };
+  const withCallback: CompareConfigurationsOptions = { configs: [{}], policy: defaultPolicy };
+  const comparison: ConfigurationComparison = compareConfigurations("input", options);
+  const schema: "configuration-comparison/v1" = comparison.schema;
+  const scope: "input" = comparison.scope;
+  const mode: "preview" = comparison.mode;
+  const enforced: false = comparison.enforced;
+  const difference: ConfigurationDifference | undefined = comparison.differences[1]?.entries[0];
+  const status: "scanned" | "limited" | "unsupported" | "error" | undefined = comparison.results[0]?.status;
+  const callbacks: readonly number[] = comparison.callbackSides;
+
+  // @ts-expect-error a comparison is frozen data: no field is assignable.
+  comparison.results = [];
+  // @ts-expect-error `scope` is the literal "input": no claim beyond this input.
+  const wider: "corpus" = comparison.scope;
+
+  void [withCallback, schema, scope, mode, enforced, difference, status, callbacks, wider];
+}
+
+void documentedConfigurationComparisonUsage;
+
+function rejectedConfigurationComparisonUsage(): void {
+  // @ts-expect-error a comparison takes a string, never a chunk or a stream.
+  compareConfigurations(["a", "b"], { configs: [{}] });
+  // @ts-expect-error the options are required: there is nothing to compare without configurations.
+  compareConfigurations("input");
+  // @ts-expect-error a per-call detection argument is not an option of any other call, and not here.
+  const perCall: CompareConfigurationsOptions = { configs: [{}], detection: { include: ["jwt"] } };
+  void perCall;
+}
+
+void rejectedConfigurationComparisonUsage;
+
+type SessionHasNoConfigurationComparison = Expect<
+  "compareConfigurations" extends keyof IncrementalSanitizer ? false : true
+>;
+type StreamHasNoConfigurationComparison = Expect<
+  "compareConfigurations" extends keyof NodeStreamSanitizer ? false : true
+>;
 
 type ComparedKindsAreClosed = Expect<Equal<ComparedPolicy["kind"], ComparedPolicyKind>>;
 type BasisNamesAreTheCores = Expect<

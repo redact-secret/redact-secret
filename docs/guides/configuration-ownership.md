@@ -116,6 +116,12 @@ let comparison = registry.compare_action_policies(
 assert_eq!(comparison.changed_count(), 1);
 ```
 
+To preview several detection configurations on one input without creating an owner for
+each, use `compareConfigurations` (JavaScript) or `compare_configurations` (Rust, over
+registries you build): it builds temporary registries for the call, never changes an
+owner and is not a handle, so it is a preview and not a way to scan with another
+configuration. Scanning under a different configuration still uses the recipes above.
+
 Node and WebAssembly (`actionPolicy`, `compareActionPolicies`):
 
 ```js

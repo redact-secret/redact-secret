@@ -20,7 +20,7 @@ use std::rc::Rc;
 use redact_secret::{
     ArtifactKind, ArtifactManifest, ConfigRequest, DetectionSelection, DetectorRegistry,
     IncrementalLimits, IncrementalPolicy, IncrementalSanitizer, PiiSelection, PlaceholderFormatter,
-    Profile, SecretScanError, SecretScanErrorCode,
+    Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
 };
 
 use crate::error::WasmErrorCode;
@@ -177,9 +177,51 @@ fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErr
 /// The errors of [`registry_with_ruleset_unselected`], or the selection's own
 /// rejection, which a validated owner never produces.
 pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
-    let registry = registry_with_ruleset_unselected(ruleset)?;
+    let registry = registry_with_ruleset_unselected(ruleset, active_selection())?;
     let detection = active_detection()?;
     Ok(registry.with_detection(&detection)?)
+}
+
+/// Builds one configuration's **temporary** registry from explicit input
+/// (issue #1254): the configuration is resolved over this artifact's
+/// defaults, then composed with the same constructors the owner uses. It
+/// reads no owner state, so it needs no [`initialize`], caches nothing and
+/// changes nothing. Returns the registry and the whole-input limits the
+/// configuration resolved. The caller has already read `resolveConfig`'s
+/// diagnostics, so a configuration that does not resolve is only
+/// `INVALID_OPTIONS` here.
+///
+/// # Errors
+///
+/// `INVALID_OPTIONS` for input that does not resolve, `EMPTY_DETECTION_SET`
+/// for a configuration that enables nothing, or the composition's own code.
+pub(crate) fn build_temporary_registry(
+    config: Option<&str>,
+    ruleset: Option<&[u8]>,
+) -> Result<(DetectorRegistry, WholeInputLimits), WasmErrorCode> {
+    let mut request = ConfigRequest::new();
+    if let Some(config) = config {
+        request = request.runtime_config(config);
+    }
+    if let Some(bytes) = ruleset {
+        request = request.ruleset(bytes);
+    }
+    let resolution = redact_secret::resolve_config(&manifest()?, &request);
+    let Some(snapshot) = resolution.snapshot() else {
+        return Err(SecretScanErrorCode::InvalidOptions.into());
+    };
+    if snapshot.is_inert() {
+        return Err(SecretScanErrorCode::EmptyDetectionSet.into());
+    }
+    let pii = snapshot.pii_selection();
+    let registry = match ruleset {
+        Some(bytes) => registry_with_ruleset_unselected(bytes, Ok(pii.clone()))?,
+        None => build_registry(pii)?,
+    };
+    Ok((
+        registry.with_detection(snapshot.detection_selection())?,
+        snapshot.whole_input_limits(),
+    ))
 }
 
 /// Builds a registry over this artifact's compiled profile's built-ins,
@@ -204,9 +246,12 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
 /// [`WasmErrorCode::InitializationFailed`] on the same never-observed
 /// built-in registration failure [`build_registry`] documents.
 #[cfg(all(feature = "full", feature = "pii", not(feature = "custom")))]
-fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(
+    ruleset: &[u8],
+    selection: Result<PiiSelection, WasmErrorCode>,
+) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    let selection = active_selection()?;
+    let selection = selection?;
     Ok(DetectorRegistry::with_built_in_and_pii_custom(
         &selection, detectors,
     )?)
@@ -214,9 +259,12 @@ fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, 
 
 /// See the `full` + `pii` variant above.
 #[cfg(all(not(feature = "full"), feature = "pii", not(feature = "custom")))]
-fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(
+    ruleset: &[u8],
+    selection: Result<PiiSelection, WasmErrorCode>,
+) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    let selection = active_selection()?;
+    let selection = selection?;
     Ok(DetectorRegistry::with_common_built_in_and_pii_custom(
         &selection, detectors,
     )?)
@@ -224,17 +272,23 @@ fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, 
 
 /// See the `full` + `pii` variant above.
 #[cfg(all(feature = "full", not(feature = "pii"), not(feature = "custom")))]
-fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(
+    ruleset: &[u8],
+    selection: Result<PiiSelection, WasmErrorCode>,
+) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    active_selection()?;
+    selection?;
     Ok(DetectorRegistry::with_built_in(detectors)?)
 }
 
 /// See the `full` + `pii` variant above.
 #[cfg(all(not(feature = "full"), not(feature = "pii"), not(feature = "custom")))]
-fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(
+    ruleset: &[u8],
+    selection: Result<PiiSelection, WasmErrorCode>,
+) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    active_selection()?;
+    selection?;
     Ok(DetectorRegistry::with_common_built_in(detectors)?)
 }
 
@@ -389,9 +443,12 @@ fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErr
 
 /// See the `custom` + `pii` variant above.
 #[cfg(all(feature = "custom", feature = "pii"))]
-fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(
+    ruleset: &[u8],
+    selection: Result<PiiSelection, WasmErrorCode>,
+) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    let selection = active_selection()?;
+    let selection = selection?;
     let composition = crate::custom::composition()?;
     Ok(DetectorRegistry::with_composition_and_pii(
         &composition,
@@ -402,9 +459,12 @@ fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, 
 
 /// See the `custom` + `pii` variant above.
 #[cfg(all(feature = "custom", not(feature = "pii")))]
-fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(
+    ruleset: &[u8],
+    selection: Result<PiiSelection, WasmErrorCode>,
+) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    active_selection()?;
+    selection?;
     let composition = crate::custom::composition()?;
     Ok(DetectorRegistry::with_composition(&composition, detectors)?)
 }
@@ -882,5 +942,48 @@ validator: none\n";
         REGISTRY.with(|cell| assert!(cell.get().is_none()));
         // The artifact manifest says selection is supported on WebAssembly.
         assert!(manifest().unwrap().detector_selection());
+    }
+
+    /// Issue #1254: a comparison side builds its own registry from explicit
+    /// input, before and without an owner, and leaves the owner alone.
+    #[test]
+    fn a_temporary_registry_is_independent_of_the_owner() {
+        let (all, limits) = build_temporary_registry(None, None).unwrap();
+        let (narrow, narrow_limits) = build_temporary_registry(
+            Some(r#"{"detection":{"include":["jwt"]},"limits":{"maxFindings":7}}"#),
+            None,
+        )
+        .unwrap();
+        assert_eq!(limits, WholeInputLimits::default());
+        assert_eq!(narrow_limits.max_findings(), 7);
+        assert_eq!(narrow.ids().collect::<Vec<_>>(), ["jwt"]);
+        assert!(all.len() > narrow.len());
+        // No owner was created or consulted.
+        REGISTRY.with(|cell| assert!(cell.get().is_none()));
+        assert_eq!(
+            ensure_initialized().unwrap_err(),
+            WasmErrorCode::NotInitialized
+        );
+    }
+
+    #[test]
+    fn a_temporary_registry_refuses_what_it_cannot_build() {
+        let inert = build_temporary_registry(Some(r#"{"detection":{"include":[]}}"#), None);
+        assert_eq!(
+            inert.unwrap_err(),
+            WasmErrorCode::Core(SecretScanErrorCode::EmptyDetectionSet)
+        );
+        let unknown =
+            build_temporary_registry(Some(r#"{"detection":{"include":["no-such-id"]}}"#), None);
+        assert_eq!(
+            unknown.unwrap_err(),
+            WasmErrorCode::Core(SecretScanErrorCode::InvalidOptions)
+        );
+        let pii = build_temporary_registry(Some(r#"{"pii":["pii:global"]}"#), None);
+        assert_eq!(
+            pii.is_ok(),
+            PII_RUNTIME,
+            "PII is built only where the PII runtime is linked"
+        );
     }
 }

@@ -1627,6 +1627,137 @@ pub fn compare_action_policies_common(
     )
 }
 
+// ---------------------------------------------------------------------
+// One side of a configuration comparison (issue #1254)
+// ---------------------------------------------------------------------
+
+/// Scans `input` under one explicit configuration and evaluates one policy
+/// over the finalized findings: one side of `compareConfigurations`, whose
+/// wrapper calls it once per side and relates the sides.
+///
+/// The registry is **temporary**: built from `config` (the `runtime-config/v1`
+/// text) and `ruleset` for this call, never cached and dropped with it. It
+/// reads and changes no owner state, so it needs no `initialize`. The
+/// whole-input limits are the configuration's own.
+fn scan_configuration_side_for(
+    profile: Profile,
+    input: &str,
+    config: Option<&str>,
+    ruleset: Option<&[u8]>,
+    kinds: &[String],
+    documents: &[Buffer],
+    callbacks: &[PolicyCallback<'_>],
+) -> napi::Result<JsActionComparison, String> {
+    let plans = plan_compared_sides(kinds, documents, callbacks.len())?;
+    let invalid = |code: SecretScanErrorCode| to_js_error(code.into());
+    if plans.len() != 1 {
+        return Err(invalid(SecretScanErrorCode::InvalidOptions));
+    }
+    let manifest = match profile {
+        Profile::Common => ArtifactManifest::common(ArtifactKind::NodeAddon, true, SOURCE_REVISION),
+        _ => ArtifactManifest::full(ArtifactKind::NodeAddon, true, SOURCE_REVISION),
+    }
+    .map_err(to_js_manifest_error)?;
+    let mut request = ConfigRequest::new();
+    if let Some(config) = config {
+        request = request.runtime_config(config);
+    }
+    if let Some(bytes) = ruleset {
+        request = request.ruleset(bytes);
+    }
+    let resolution = core_resolve_config(&manifest, &request);
+    let Some(snapshot) = resolution.snapshot() else {
+        return Err(invalid(SecretScanErrorCode::InvalidOptions));
+    };
+    if snapshot.is_inert() {
+        return Err(invalid(SecretScanErrorCode::EmptyDetectionSet));
+    }
+    let pii = snapshot.pii_selection();
+    let registry = match (profile, ruleset) {
+        (Profile::Common, None) => DetectorRegistry::with_common_built_in_and_pii(pii),
+        (Profile::Common, Some(bytes)) => DetectorRegistry::with_common_built_in_and_pii_custom(
+            pii,
+            load_ruleset(bytes).map_err(to_js_ruleset_error)?,
+        ),
+        (_, None) => DetectorRegistry::with_built_in_and_pii(pii),
+        (_, Some(bytes)) => DetectorRegistry::with_built_in_and_pii_custom(
+            pii,
+            load_ruleset(bytes).map_err(to_js_ruleset_error)?,
+        ),
+    }
+    .map_err(to_js_error)?
+    .with_detection(snapshot.detection_selection())
+    .map_err(to_js_detection_error)?;
+    run_compare(
+        input,
+        &registry,
+        &plans,
+        callbacks,
+        &snapshot.whole_input_limits(),
+    )
+    .map_err(to_js_error)
+}
+
+/// One side of `compareConfigurations` against the `full` profile (see
+/// [`scan_configuration_side_for`]).
+///
+/// # Errors
+///
+/// `INVALID_OPTIONS` when `kinds` does not hold exactly one side or the
+/// configuration does not resolve, `EMPTY_DETECTION_SET`, the limit errors
+/// exactly as [`scan`], `INVALID_ACTION_POLICY`, `INVALID_RULESET`, and
+/// `POLICY_FAILURE` or `INVALID_POLICY_ACTION` when the callback fails.
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "scanConfigurationSide")]
+pub fn scan_configuration_side(
+    input: String,
+    config: Option<String>,
+    ruleset: Option<Buffer>,
+    kinds: Vec<String>,
+    #[napi(ts_arg_type = "Uint8Array[]")] documents: Vec<Buffer>,
+    #[napi(ts_arg_type = "((finding: JsDetectedFinding, context: JsPolicyContext) => string)[]")]
+    callbacks: Vec<PolicyCallback<'_>>,
+) -> napi::Result<JsActionComparison, String> {
+    scan_configuration_side_for(
+        Profile::Full,
+        &input,
+        config.as_deref(),
+        ruleset.as_deref(),
+        &kinds,
+        &documents,
+        &callbacks,
+    )
+}
+
+/// The `common`-profile analogue of [`scan_configuration_side`].
+///
+/// # Errors
+///
+/// The same as [`scan_configuration_side`].
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "scanConfigurationSideCommon")]
+pub fn scan_configuration_side_common(
+    input: String,
+    config: Option<String>,
+    ruleset: Option<Buffer>,
+    kinds: Vec<String>,
+    #[napi(ts_arg_type = "Uint8Array[]")] documents: Vec<Buffer>,
+    #[napi(ts_arg_type = "((finding: JsDetectedFinding, context: JsPolicyContext) => string)[]")]
+    callbacks: Vec<PolicyCallback<'_>>,
+) -> napi::Result<JsActionComparison, String> {
+    scan_configuration_side_for(
+        Profile::Common,
+        &input,
+        config.as_deref(),
+        ruleset.as_deref(),
+        &kinds,
+        &documents,
+        &callbacks,
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

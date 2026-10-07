@@ -24,6 +24,7 @@ published today.
 | `actionPolicy` option, `INVALID_ACTION_POLICY` | `0.1.0-beta.14` |
 | `defaultPolicy` | `0.1.0-beta.14` |
 | `compareActionPolicies` | `0.1.0-beta.14` |
+| `compareConfigurations` | the next release after `0.1.0-beta.14` |
 
 A named import of a missing export fails to link, so a program that must run
 on an older release imports the namespace and tests each name before use. This
@@ -231,7 +232,11 @@ policy's action, the deciding rule and each document's SHA-256 as frozen data. I
 is a preview, never enforcement, it takes one string (there is no stream or
 incremental comparison), and a callback side that fails fails the whole
 comparison with no partial result. See
-[Compare in JavaScript](action-policy.md#compare-in-javascript).
+[Compare in JavaScript](action-policy.md#compare-in-javascript). When the change may alter
+what is detected (a detector or PII selection, a ruleset, the limits), use
+`compareConfigurations(input, { configs })` instead: it runs one independent pass per
+configuration and relates the findings by range; see
+[Compare configurations](action-policy.md#compare-configurations-not-only-policies).
 
 ## Request-wide placeholder numbering
 

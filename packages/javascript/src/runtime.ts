@@ -10,6 +10,7 @@
 
 import { toActionComparison } from "./compare.js";
 import { parseConfigResolution } from "./config.js";
+import { type SideOutcome, toConfigurationComparison } from "./configuration-compare.js";
 import { SecretScanError, type SecretScanErrorCode, toSecretScanError } from "./errors.js";
 import { defaultPlaceholderFormatter } from "./formatters.js";
 import { assertManifestDigest, parseArtifactManifest } from "./manifest.js";
@@ -32,8 +33,11 @@ import type {
   ArtifactKind,
   ArtifactManifest,
   CompareActionPoliciesOptions,
+  CompareConfigurationsOptions,
+  ComparedPolicyKind,
   ConfigResolution,
   ConfigSnapshot,
+  ConfigurationComparison,
   CoreStatus,
   DefaultSecretPolicy,
   DetectedSecretFinding,
@@ -437,6 +441,7 @@ export interface RedactSecretRuntime {
   redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string;
   scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult;
   compareActionPolicies(input: string, options: CompareActionPoliciesOptions): ActionComparison;
+  compareConfigurations(input: string, options: CompareConfigurationsOptions): ConfigurationComparison;
   createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer;
   readonly defaultPolicy: DefaultSecretPolicy;
 }
@@ -843,6 +848,132 @@ export function createRedactSecretRuntime(
     }
   }
 
+  /**
+   * The failure codes of a side that was built but could not be scanned,
+   * recorded in the result instead of thrown. Every other code is a malformed
+   * call or a callback failure and fails the whole comparison.
+   */
+  const SIDE_FAILURES: readonly string[] = [
+    "INPUT_LIMIT_EXCEEDED",
+    "FINDING_LIMIT_EXCEEDED",
+    "DETECTOR_FAILURE",
+    "INVALID_CANDIDATE",
+    "EMPTY_DETECTION_SET",
+    "INVALID_DETECTION_CONFIG",
+    "INVALID_RULESET",
+    "PII_SELECTOR_INVALID",
+    "PII_SELECTOR_UNSUPPORTED",
+    "PII_SELECTOR_UNAVAILABLE",
+  ];
+
+  /**
+   * Compares detection configurations over one input (`configuration-comparison/v1`,
+   * issue #1254): each side is an independent pass over a temporary registry
+   * the artifact builds for that call from the side's own `detection`, `pii`,
+   * `ruleset` and `limits`, then the sides' finalized findings are related by
+   * their declared-unit ranges. A preview, never enforcement; it returns no
+   * text and changes no owner. It reads the loaded artifact's resolver and
+   * registry constructors, so it needs a successful `initialize()`, but it
+   * neither requires nor changes the owner's `detection` or `pii` (a side the
+   * artifact cannot build, such as PII on an artifact without the PII runtime,
+   * is a failed side). It takes one string; there is no session or stream form.
+   *
+   * Every side is validated and resolved before any side is scanned, so a
+   * malformed call or an invalid action policy document detects nothing and
+   * calls no callback. A configuration problem or a limit is data in the
+   * result.
+   */
+  function compareConfigurations(input: string, options: CompareConfigurationsOptions): ConfigurationComparison {
+    const native = active();
+    const text = requireString(input);
+    const record = requireExactKeys(options, ["configs", "actionPolicy", "policy"]);
+    const configs = record.configs;
+    if (!Array.isArray(configs) || configs.length < 1 || configs.length > MAX_COMPARED_POLICIES) {
+      throw new SecretScanError("INVALID_OPTIONS");
+    }
+    for (let index = 0; index < configs.length; index += 1) {
+      if (!Object.hasOwn(configs, index) || !isPlainObject(configs[index])) {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+    }
+    const callback = toPolicyCallback(record.policy as CompareConfigurationsOptions["policy"]);
+    const shared = toNativeActionPolicy(
+      record.actionPolicy as CompareConfigurationsOptions["actionPolicy"],
+      callback !== undefined,
+    );
+    const sides = (configs as readonly RuntimeConfig[]).map((config) => {
+      const {
+        ruleset: rulesetInput,
+        actionPolicy: policyInput,
+        ...data
+      } = config as RuntimeConfig & Record<string, unknown>;
+      const ruleset = toNativeRuleset(rulesetInput);
+      const own = toNativeActionPolicy(policyInput, callback !== undefined);
+      let configText: string;
+      try {
+        const serialized: unknown = JSON.stringify(data);
+        if (typeof serialized !== "string") throw new SecretScanError("INVALID_OPTIONS");
+        configText = serialized;
+      } catch {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+      const document = own ?? shared;
+      const side: NativeComparedSide =
+        callback !== undefined
+          ? { kind: "callback", callback }
+          : document !== undefined
+            ? { kind: "action-policy", document }
+            : { kind: "default" };
+      return {
+        configText,
+        ruleset,
+        side,
+        resolution: resolveWith(native, configText, ruleset, document, callback !== undefined, false),
+      };
+    });
+    // A rejected policy document is a malformed call, like for
+    // `compareActionPolicies`: it fails before any side is scanned.
+    if (sides.some((side) => side.resolution.diagnostics.items.some((item) => item.code === "INVALID_ACTION_POLICY"))) {
+      throw new SecretScanError("INVALID_ACTION_POLICY");
+    }
+    if (native.scanConfigurationSide === undefined) throw new SecretScanError("INITIALIZATION_FAILED");
+
+    const outcomes: SideOutcome[] = sides.map(({ configText, ruleset, side, resolution }, index) => {
+      const snapshot = resolution.snapshot;
+      const kind: ComparedPolicyKind = side.kind;
+      const digest = snapshot?.actionPolicy.digest ?? null;
+      const summary = Object.freeze({
+        label: index === 0 ? "baseline" : `candidate-${index}`,
+        digest: snapshot?.digest ?? null,
+        detectionDigest: snapshot?.detectionDigest ?? null,
+        origins: snapshot?.origins ?? null,
+        diagnostics: resolution.diagnostics.items,
+        policy: Object.freeze({
+          kind,
+          documentSha256: kind === "action-policy" && digest !== null ? digest.replace(/^sha256:/, "") : null,
+        }),
+      });
+      if (snapshot === null) {
+        const failure =
+          resolution.diagnostics.items.find((item) => item.severity === "error")?.code ?? "INVALID_OPTIONS";
+        return { summary, failure, native: null };
+      }
+      if (snapshot.effects.inert) return { summary, failure: "EMPTY_DETECTION_SET", native: null };
+      try {
+        return {
+          summary,
+          failure: null,
+          native: native.scanConfigurationSide?.(text, configText, ruleset, side) ?? null,
+        };
+      } catch (thrown) {
+        const error = toSecretScanError(thrown, "DETECTOR_FAILURE");
+        if (!SIDE_FAILURES.includes(error.code)) throw error;
+        return { summary, failure: error.code, native: null };
+      }
+    });
+    return toConfigurationComparison(outcomes);
+  }
+
   function createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer {
     const native = active();
     let session: NativeIncrementalSanitizer;
@@ -946,6 +1077,7 @@ export function createRedactSecretRuntime(
     redact,
     scanAndRedact,
     compareActionPolicies,
+    compareConfigurations,
     createIncrementalSanitizer,
     defaultPolicy,
   };

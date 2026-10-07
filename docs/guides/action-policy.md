@@ -372,6 +372,41 @@ branch head that already held the core's comparison, the brotli size grows by
 the parser, the digest and the comparison together add 11,493 bytes to `full`
 (7.0%). See the [evidence](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1220/README.md).
 
+### Compare configurations, not only policies
+
+`compareActionPolicies` is for a change that only moves the action: it detects once,
+because no policy can add, remove or move a finding. When the change may alter what is
+detected (the detector selection, the PII selection, a ruleset or the limits), the
+two passes are different passes, and `compareConfigurations` (issue #1254) runs one
+independent pass per side and relates the findings:
+
+```ts
+import { compareConfigurations, initialize } from "@redact-secret/core";
+
+await initialize();
+const result = compareConfigurations("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", {
+  configs: [{}, { detection: { exclude: ["github-token"] } }],
+});
+// result.differences[1].entries[0] is
+// { kind: "changed", correspondence: "exact", base: [0], other: [0],
+//   changes: ["type", "detector", "confidence", "action"] }
+```
+
+With the provider detector off, a contextual detector holds the same span, so the
+difference is a type and detector change, not a removed finding. Each side takes the
+`RuntimeConfig` members (`detection`, `pii`, `ruleset`, `actionPolicy`, `limits`); an
+`actionPolicy` or callback `policy` at the top level applies to every side that has no
+policy of its own. Findings carry no per-scan id; they correspond by their ranges in the
+declared unit, and a split, merge or regrouping is listed as `ambiguous` rather than
+paired. A side that cannot be built or hits a limit is reported with a fixed code and
+gets no difference. The result is a preview scoped to that input
+(`scope: "input"`, `enforced: false`): it has no text, and a side without findings does
+not say a detector is ineffective. Policies with the same bytes on two sides do not make
+two rulesets equal: compare `detectionDigest`. A callback may have side effects and has
+no identity; it runs once per finding of each scanned side, side by side, and is listed
+in `callbackSides`. It does not change an owner's selection: the temporary registries
+exist only for the call. See the [API contract](../reference/api-contract.md#configuration-comparison).
+
 ## Command line
 
 ```bash

@@ -229,6 +229,36 @@ tests are authoritative; the decision of each section is unchanged.
   (`info`: a callback, or a name an open source could emit). An item may carry a
   `related` pointer, and `id` may be a rule id. A declared closed vocabulary
   (Rust only) makes an unknown name an error. See the [action policy guide](../guides/action-policy.md#diagnose-a-policy-before-use).
+- **#1254.** `compareConfigurations` is implemented with the placement the Size
+  paragraph allows. The Rust core has `compare_configurations` (sides are
+  registries the caller builds, from `ConfigSnapshot::detection_selection`,
+  `pii_selection` and `whole_input_limits`; it reuses `compare_action_policies`
+  for each independent pass). The JavaScript package orchestrates the sides over
+  one new per-side native primitive, `scanConfigurationSide` (Node addon and
+  WebAssembly: a temporary registry from the side's `runtime-config/v1` text and
+  ruleset, one policy side, the single-side shape `compareActionPolicies`
+  already returns), and relates the findings in TypeScript. Measured on the
+  standard `full` WebAssembly brotli: the whole comparison in the artifact
+  (core relation and flattened result) was +6,818 bytes (204,726 to 211,544,
+  cumulative 16.3%, over the 15% bound), so the relation stays out of the
+  artifact: the shipped entry point is +1,044 bytes (204,726 to 205,770, 13.13%
+  of the 181,882 pre-epic baseline in total; `common` +1,139, `full` with `pii`
+  +1,144, `common` with `pii` +994). The core relation and the TypeScript
+  relation are one algorithm, pinned to the same answers by
+  `conformance/fixtures/configuration-compare-v1.json`, which runs on the Rust
+  core, the addon and WebAssembly, `full` and `common`. Settled where the data
+  contract left open: each side is a `RuntimeConfig` (its `actionPolicy` and
+  `limits` apply to that side, and a shared `actionPolicy` or callback applies to
+  sides without their own, so the result is `configs`, `results` and
+  `differences` as written, with the policy identity beside each snapshot digest
+  pair); correspondence is overlap clustering over ranges, never ids, with
+  `added`, `removed`, `changed` (`exact` or `overlap`, naming `range`, `type`,
+  `detector`, `confidence`, `action`, `reason`) and the `ambiguous` `split`,
+  `merged` and `regrouped`; a side that does not build or scan is `limited`,
+  `unsupported` or `error` with a fixed code and gets no difference, and a
+  failed baseline leaves every difference `null`; a rejected policy document or
+  a failing callback fails the whole call. Python and the CLI stay unsupported.
+  See [the API contract](../reference/api-contract.md#configuration-comparison).
 
 ## Rejected
 

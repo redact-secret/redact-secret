@@ -270,6 +270,7 @@ export const scan = runtime.scan;
 export const redact = runtime.redact;
 export const scanAndRedact = runtime.scanAndRedact;
 export const compareActionPolicies = runtime.compareActionPolicies;
+export const compareConfigurations = runtime.compareConfigurations;
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 export const defaultPolicy = runtime.defaultPolicy;
 

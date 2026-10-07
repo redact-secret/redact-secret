@@ -113,6 +113,13 @@ export const scanAndRedact = runtime.scanAndRedact;
  */
 export const compareActionPolicies = runtime.compareActionPolicies;
 
+/**
+ * Compares detection configurations over one input against the `common`
+ * artifact: each side an independent preview pass over a temporary registry
+ * (see `@redact-secret/core`'s `compareConfigurations`). Whole-input only.
+ */
+export const compareConfigurations = runtime.compareConfigurations;
+
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 

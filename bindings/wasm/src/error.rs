@@ -50,7 +50,7 @@ pub(crate) enum WasmErrorCode {
 impl WasmErrorCode {
     /// The stable `SCREAMING_SNAKE_CASE` code string, matching the core's
     /// convention for the codes this binding shares with it.
-    fn as_str(self) -> &'static str {
+    pub(crate) fn as_str(self) -> &'static str {
         match self {
             Self::NotInitialized => "NOT_INITIALIZED",
             Self::InitializationFailed => "INITIALIZATION_FAILED",

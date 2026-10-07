@@ -15,6 +15,12 @@ import { createRequire } from "node:module";
 import { parentPort, workerData } from "node:worker_threads";
 
 import {
+  casesFor as compareCasesFor,
+  loadConfigurationCompareFixture,
+  optionsFor,
+  project,
+} from "../../../../conformance/configuration-compare.mjs";
+import {
   casesFor,
   checkCase,
   loadRuntimeConfigFixture,
@@ -107,6 +113,148 @@ async function run() {
       });
     }
     return { ran, failures };
+  }
+
+  if (scenario === "compare") {
+    // Every shared case, from the fixture: the Rust core runs the same file.
+    const fixture = loadConfigurationCompareFixture();
+    await runtime.initialize();
+    const failures = [];
+    let ran = 0;
+    const leaks = [];
+    for (const fixtureCase of compareCasesFor(fixture, profile)) {
+      const options = optionsFor(fixtureCase);
+      let comparison;
+      try {
+        comparison = runtime.compareConfigurations(fixtureCase.input, options);
+      } catch (error) {
+        failures.push(`${fixtureCase.name}: threw ${error.code ?? error.message}`);
+        continue;
+      }
+      ran += 1;
+      const actual = canonical(project(fixtureCase.input, comparison));
+      const expected = canonical(fixtureCase.expect[profile]);
+      if (actual !== expected)
+        failures.push(`${fixtureCase.name}: ${actual.slice(0, 300)} !== ${expected.slice(0, 300)}`);
+      // The serialized result holds no input, no per-scan id and no digest of
+      // anything but a configuration or a policy document.
+      const serialized = JSON.stringify(comparison);
+      for (const word of fixtureCase.input.split(/\s+/).filter((word) => word.length >= 12)) {
+        if (serialized.includes(word)) leaks.push(`${fixtureCase.name}: input word`);
+      }
+      if (/finding-\d/.test(serialized)) leaks.push(`${fixtureCase.name}: per-scan id`);
+      const allowed = new Set();
+      for (const config of comparison.configs) {
+        for (const digest of [config.digest, config.detectionDigest]) {
+          if (digest !== null) allowed.add(digest.replace("sha256:", ""));
+        }
+        if (config.policy.documentSha256 !== null) allowed.add(config.policy.documentSha256);
+      }
+      for (const run of serialized.match(/[0-9a-f]{64}/g) ?? []) {
+        if (!allowed.has(run)) leaks.push(`${fixtureCase.name}: unexpected 64-hex run`);
+      }
+      if (!Object.isFrozen(comparison) || !Object.isFrozen(comparison.results[0])) leaks.push("not frozen");
+    }
+    return { ran, failures, leaks };
+  }
+
+  if (scenario === "compareContract") {
+    const jwtInput = "token eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 end";
+    // The owner is fixed to a narrow selection; a comparison is independent of
+    // it and leaves it, and every scan, unchanged.
+    await runtime.initialize({ detection: { include: ["jwt"] } });
+    const before = {
+      status: runtime.status(),
+      snapshot: runtime.describeConfig(),
+      keyed: detectors(runtime.scan(KEYED)),
+    };
+    const observed = {};
+    const wide = runtime.compareConfigurations(KEYED, { configs: [{}, { detection: { include: ["jwt"] } }] });
+    observed.wideDetectors = wide.results[0].findings.map((finding) => finding.detector);
+    observed.narrowDetectors = wide.results[1].findings.map((finding) => finding.detector);
+    observed.ownerUnchanged =
+      runtime.describeConfig() === before.snapshot &&
+      runtime.status().configuration === before.status.configuration &&
+      canonical(detectors(runtime.scan(KEYED))) === canonical(before.keyed);
+    observed.preview = [wide.mode, wide.enforced, wide.scope, wide.schema, wide.rangeUnit];
+    observed.noCallbacks = wide.callbackSides;
+
+    // Callbacks: disclosed, once per finding of each scanned side, in order.
+    const log = [];
+    const policy = {
+      evaluate(finding, context) {
+        log.push(`${finding.detector}#${context.findingIndex}`);
+        return "warn";
+      },
+    };
+    const withCallback = runtime.compareConfigurations(jwtInput, {
+      configs: [{}, {}, { detection: { include: [] } }],
+      policy,
+    });
+    observed.callbackLog = log.slice();
+    observed.callbackSides = withCallback.callbackSides;
+    observed.callbackKinds = withCallback.configs.map((config) => [config.policy.kind, config.policy.documentSha256]);
+    observed.callbackStatus = withCallback.results.map((result) => result.status);
+    observed.callbackActions = withCallback.results.map((result) => result.findings.map((finding) => finding.action));
+
+    // A failing callback fails the whole call; a bad document fails it before any callback.
+    observed.throwing = await settle(async () =>
+      runtime.compareConfigurations(jwtInput, {
+        configs: [{}, {}],
+        policy: {
+          evaluate: () => {
+            throw new Error("boom");
+          },
+        },
+      }),
+    );
+    observed.badAction = await settle(async () =>
+      runtime.compareConfigurations(jwtInput, { configs: [{}], policy: { evaluate: () => "mask" } }),
+    );
+    log.length = 0;
+    observed.badDocument = await settle(async () =>
+      runtime.compareConfigurations(jwtInput, { configs: [{}, { actionPolicy: "{}" }], policy: undefined }),
+    );
+    observed.badDocumentWithCallback = await settle(async () =>
+      runtime.compareConfigurations(jwtInput, { configs: [{ actionPolicy: "{}" }], policy }),
+    );
+    observed.callbackCallsAfterRejection = log.length;
+
+    // Malformed calls detect nothing.
+    const bad = (options) => settle(async () => runtime.compareConfigurations(jwtInput, options));
+    observed.zero = await bad({ configs: [] });
+    observed.five = await bad({ configs: [{}, {}, {}, {}, {}] });
+    observed.unknownKey = await bad({ configs: [{}], detection: {} });
+    observed.notObject = await bad({ configs: ["x"] });
+    observed.notArray = await bad({ configs: {} });
+    observed.missing = await bad({});
+    observed.notString = await settle(async () => runtime.compareConfigurations(["x"], { configs: [{}] }));
+
+    // PII the artifact cannot build is a failed, unsupported side, not a silent fallback.
+    const email = "email: fixture876-q7m9@x4z8v2n6.synthetic";
+    const pii = runtime.compareConfigurations(email, { configs: [{}, { pii: ["pii:family:global:email"] }] });
+    observed.pii = [
+      pii.results[1].status,
+      pii.results[1].failure,
+      pii.differences[1] === null,
+      pii.results[0].status,
+      pii.results[1].findings.map((finding) => finding.detector),
+      pii.differences[1]?.entries.map((entry) => entry.kind) ?? null,
+      JSON.stringify(pii).includes("fixture876"),
+    ];
+
+    // Shared and per-side action policies.
+    const allowJwt =
+      '{"actionPolicyRevision":1,"base":"default","rules":[{"id":"allow-jwt","match":{"type":["jwt"]},"action":"allow"}]}';
+    const noRules = '{"actionPolicyRevision":1,"base":"default","rules":[]}';
+    const shared = runtime.compareConfigurations(jwtInput, {
+      configs: [{}, { actionPolicy: noRules }],
+      actionPolicy: allowJwt,
+    });
+    observed.shared = shared.results.map((result) => result.findings.map((finding) => finding.action));
+    observed.sharedDigests = shared.configs.map((config) => config.policy.documentSha256 !== null);
+    observed.sharedDigestsDiffer = shared.configs[0].policy.documentSha256 !== shared.configs[1].policy.documentSha256;
+    return observed;
   }
 
   if (scenario === "legacy") {

@@ -40,7 +40,7 @@ use crate::action_policy::{ActionPolicy, load_action_policy};
 use crate::detectors::built_in_ids;
 use crate::error::SecretScanErrorCode;
 use crate::json::{self, Value};
-use crate::limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES};
+use crate::limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, WholeInputLimits};
 use crate::manifest::{ArtifactKind, ArtifactManifest};
 use crate::pii::{PiiSelection, is_reserved_detector_id};
 use crate::policy_diagnostics;
@@ -328,6 +328,9 @@ pub struct ConfigSnapshot {
     detection_digest: String,
     enabled: Vec<String>,
     inert: bool,
+    selection: DetectionSelection,
+    pii: PiiSelection,
+    limits: (usize, usize),
 }
 
 impl ConfigSnapshot {
@@ -363,6 +366,26 @@ impl ConfigSnapshot {
     #[must_use]
     pub const fn is_inert(&self) -> bool {
         self.inert
+    }
+
+    /// The detector-id selection to apply to the artifact's built-ins when a
+    /// registry is composed from this snapshot.
+    #[must_use]
+    pub const fn detection_selection(&self) -> &DetectionSelection {
+        &self.selection
+    }
+
+    /// The PII selection to compose a registry with.
+    #[must_use]
+    pub const fn pii_selection(&self) -> &PiiSelection {
+        &self.pii
+    }
+
+    /// The whole-input limits the snapshot resolved: the artifact defaults
+    /// where the input gave none.
+    #[must_use]
+    pub fn whole_input_limits(&self) -> WholeInputLimits {
+        WholeInputLimits::new(self.limits.0, self.limits.1).unwrap_or_default()
     }
 }
 
@@ -408,6 +431,7 @@ impl ConfigResolution {
 
 /// The effective values the snapshot is built from.
 struct Effective<'a> {
+    selection: DetectionSelection,
     detection_mode: &'static str,
     detection_origin: &'static str,
     enabled: Vec<&'a str>,
@@ -480,6 +504,7 @@ pub fn resolve_config(
 
     let effective = Effective {
         detection_mode: selection.mode(),
+        selection,
         detection_origin: origin(detection_given),
         custom_detectors: 0,
         pii,
@@ -1016,6 +1041,9 @@ fn build_snapshot(
             .map(|id| (*id).to_owned())
             .collect(),
         inert,
+        selection: effective.selection.clone(),
+        pii: effective.pii.clone(),
+        limits: (effective.max_input_bytes, effective.max_findings),
     }
 }
 
@@ -1082,6 +1110,7 @@ pub fn describe_config(manifest: &ArtifactManifest, registry: &DetectorRegistry)
         - registry.built_in_ids().count()
         - usize::from(registry.contains(PII_ADAPTER_ID));
     let effective = Effective {
+        selection: registry.detection().clone(),
         detection_mode: registry.detection().mode(),
         detection_origin: origin(!registry.detection().is_all()),
         enabled,

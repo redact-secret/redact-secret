@@ -17,6 +17,7 @@ const PUBLIC_RUNTIME_EXPORTS = [
   "artifact",
   "artifactManifest",
   "compareActionPolicies",
+  "compareConfigurations",
   "createIncrementalSanitizer",
   "defaultPlaceholderFormatter",
   "defaultPolicy",

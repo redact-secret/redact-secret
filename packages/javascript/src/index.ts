@@ -145,6 +145,13 @@ export const scanAndRedact = runtime.scanAndRedact;
  */
 export const compareActionPolicies = runtime.compareActionPolicies;
 
+/**
+ * Compares detection configurations over one input, each side an independent
+ * preview pass over a temporary registry (`configuration-comparison/v1`).
+ * Whole-input only; never enforcement; it changes no owner.
+ */
+export const compareConfigurations = runtime.compareConfigurations;
+
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 

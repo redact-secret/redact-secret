@@ -197,6 +197,24 @@ depend on `src/`.
   the addon and the WebAssembly artifact, both profiles, in
   `packages/javascript/test/real-binding-config.test.ts`. No surface keeps a copy
   of the table.
+- [`fixtures/configuration-compare-v1.json`](./fixtures/configuration-compare-v1.json) —
+  the shared cases of `compareConfigurations` (issue #1254,
+  `configuration-comparison/v1`). It is data only: each case gives one synthetic
+  input, one to four sides (the `runtime-config/v1` members that are data, an
+  exact `ruleset` text, a per-side `actionPolicy`), the profiles it applies to and
+  the expected projection: per side the `status`, the fixed `failure` code and the
+  findings as type, detector and range in Unicode code points (so one expectation
+  serves a byte, UTF-16 or code-point surface), and the differences against side 0.
+  The cases cover a provider detector removed that exposes a contextual one on
+  the same span, identical configurations, added and removed findings, rulesets
+  that differ with the same policy bytes, a split and a merge, ranges after an
+  astral character, an action and reason change, a limit, an unbuildable side, a
+  failed baseline and a sample with no finding. The Rust core runs it
+  (`crates/secret-scan-core/tests/configuration_compare_1254.rs`) and the published
+  package runs it on top of the addon and the WebAssembly artifact, both profiles
+  (`conformance/configuration-compare.mjs`,
+  `packages/javascript/test/real-binding-config.test.ts`). No surface keeps a copy
+  of the expectations.
 - [`fixtures/action-policy-compare-v1.json`](./fixtures/action-policy-compare-v1.json) —
   the explain-and-compare truth table (issue #1220,
   `decision-explain-and-compare-action-policies-over-one-detection-pass`). It is

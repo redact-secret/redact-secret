@@ -253,6 +253,22 @@ export interface NativeBinding {
     ruleset: Uint8Array | undefined,
   ): NativeActionComparison;
   /**
+   * One side of a configuration comparison (`configuration-comparison/v1`,
+   * issue #1254): a whole-input pass over a **temporary** registry built from
+   * `config` (the `runtime-config/v1` text) and `ruleset` for this call, with
+   * one policy evaluated over the finalized findings. It reads and changes no
+   * owner and holds nothing. The result is the single-side shape of
+   * {@link NativeBinding.compareActionPolicies}; the whole-input limits are the
+   * configuration's own. The public wrapper relates the sides; a binding never
+   * does. Absent on an artifact built before the comparison existed.
+   */
+  scanConfigurationSide?(
+    input: string,
+    config: string | undefined,
+    ruleset: Uint8Array | undefined,
+    side: NativeComparedSide,
+  ): NativeActionComparison;
+  /**
    * The core's default evaluation of one finding's safe metadata, as an
    * action name. The default table lives only in the core; nothing here
    * copies it.

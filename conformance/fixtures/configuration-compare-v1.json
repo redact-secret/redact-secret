@@ -1,0 +1,1380 @@
+{
+  "schema": "configuration-comparison-conformance/v1",
+  "note": "The shared conformance fixture for compareConfigurations (issue #1254, configuration-comparison/v1). Each case gives one synthetic `input` and one to four `sides`: the runtime-config/v1 data members as `config`, the exact `ruleset` text and a per-side `actionPolicy` document. `expect` is a projection: per side the `status`, the `failure` code and the findings as type, detector and range in Unicode code points, and per side the `differences` against side 0 (null when none is reported). The Rust core and every JavaScript surface that loads a binding run every case for each listed profile and compare the same projection. Expected values are authored here; no surface derives them. No case carries a real credential.",
+  "cases": [
+    {
+      "name": "provider-removed-exposes-contextual-detection",
+      "note": "Removing the provider detector leaves the same span to a contextual detector: a type and detector change, not a removal.",
+      "profiles": [
+        "full"
+      ],
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "sides": [
+        {},
+        {
+          "config": {
+            "detection": {
+              "exclude": [
+                "github-token"
+              ]
+            }
+          }
+        }
+      ],
+      "expect": {
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [
+                    "type",
+                    "detector",
+                    "confidence",
+                    "action"
+                  ],
+                  "correspondence": "exact",
+                  "kind": "changed",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "github-token",
+                  "range": [
+                    8,
+                    48
+                  ],
+                  "type": "github_token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "generic-token",
+                  "range": [
+                    8,
+                    48
+                  ],
+                  "type": "contextual_secret"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "identical-configurations-have-no-differences",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "token eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 end",
+      "sides": [
+        {},
+        {
+          "config": {
+            "detection": {
+              "exclude": []
+            }
+          }
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [],
+              "unchanged": 1
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [],
+              "unchanged": 1
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "removed-and-added-findings",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "token eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 id ACME_AN_AAAAAAAAAAAAAAAAAAAAAAAA end",
+      "sides": [
+        {},
+        {
+          "config": {
+            "detection": {
+              "include": []
+            },
+            "limits": {
+              "maxFindings": 10
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-alpha-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n"
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "removed",
+                  "other": []
+                },
+                {
+                  "base": [],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "added",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-alpha-token",
+                  "range": [
+                    81,
+                    113
+                  ],
+                  "type": "acme-alpha-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "removed",
+                  "other": []
+                },
+                {
+                  "base": [],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "added",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-alpha-token",
+                  "range": [
+                    81,
+                    113
+                  ],
+                  "type": "acme-alpha-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "added-finding",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "token eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 end",
+      "sides": [
+        {
+          "config": {
+            "detection": {
+              "exclude": [
+                "jwt"
+              ]
+            }
+          }
+        },
+        {}
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "added",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "added",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "different-rulesets-stay-distinct-when-policy-bytes-match",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "id ACME_AN_AAAAAAAAAAAAAAAAAAAAAAAA",
+      "sides": [
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-alpha-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n",
+          "actionPolicy": {
+            "actionPolicyRevision": 1,
+            "base": "default",
+            "rules": []
+          }
+        },
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-bravo-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n",
+          "actionPolicy": {
+            "actionPolicyRevision": 1,
+            "base": "default",
+            "rules": []
+          }
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [
+                    "type",
+                    "detector"
+                  ],
+                  "correspondence": "exact",
+                  "kind": "changed",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-alpha-token",
+                  "range": [
+                    3,
+                    35
+                  ],
+                  "type": "acme-alpha-token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-bravo-token",
+                  "range": [
+                    3,
+                    35
+                  ],
+                  "type": "acme-bravo-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [
+                    "type",
+                    "detector"
+                  ],
+                  "correspondence": "exact",
+                  "kind": "changed",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-alpha-token",
+                  "range": [
+                    3,
+                    35
+                  ],
+                  "type": "acme-alpha-token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-bravo-token",
+                  "range": [
+                    3,
+                    35
+                  ],
+                  "type": "acme-bravo-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "one-finding-splits-into-two",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "id ACME_AD_AAAAAAAAAAAA-TL-111111111111 end",
+      "sides": [
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-pair-token\nspecificity: contextual\nprefix: \"ACME_AD_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n"
+        },
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-head-token\nspecificity: contextual\nprefix: \"ACME_AD_\"\nalphabet: alnum\nrun: exact 12\nvalidator: none\ndetector: acme-tail-token\nspecificity: contextual\nprefix: \"-TL-\"\nalphabet: digit\nrun: exact 12\nvalidator: none\n"
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [],
+                  "correspondence": "ambiguous",
+                  "kind": "split",
+                  "other": [
+                    0,
+                    1
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-pair-token",
+                  "range": [
+                    3,
+                    39
+                  ],
+                  "type": "acme-pair-token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-head-token",
+                  "range": [
+                    3,
+                    23
+                  ],
+                  "type": "acme-head-token"
+                },
+                {
+                  "detector": "acme-tail-token",
+                  "range": [
+                    23,
+                    39
+                  ],
+                  "type": "acme-tail-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [],
+                  "correspondence": "ambiguous",
+                  "kind": "split",
+                  "other": [
+                    0,
+                    1
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-pair-token",
+                  "range": [
+                    3,
+                    39
+                  ],
+                  "type": "acme-pair-token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-head-token",
+                  "range": [
+                    3,
+                    23
+                  ],
+                  "type": "acme-head-token"
+                },
+                {
+                  "detector": "acme-tail-token",
+                  "range": [
+                    23,
+                    39
+                  ],
+                  "type": "acme-tail-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "two-findings-merge-into-one",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "id ACME_AD_AAAAAAAAAAAA-TL-111111111111 end",
+      "sides": [
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-head-token\nspecificity: contextual\nprefix: \"ACME_AD_\"\nalphabet: alnum\nrun: exact 12\nvalidator: none\ndetector: acme-tail-token\nspecificity: contextual\nprefix: \"-TL-\"\nalphabet: digit\nrun: exact 12\nvalidator: none\n"
+        },
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-pair-token\nspecificity: contextual\nprefix: \"ACME_AD_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n"
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0,
+                    1
+                  ],
+                  "changes": [],
+                  "correspondence": "ambiguous",
+                  "kind": "merged",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-head-token",
+                  "range": [
+                    3,
+                    23
+                  ],
+                  "type": "acme-head-token"
+                },
+                {
+                  "detector": "acme-tail-token",
+                  "range": [
+                    23,
+                    39
+                  ],
+                  "type": "acme-tail-token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-pair-token",
+                  "range": [
+                    3,
+                    39
+                  ],
+                  "type": "acme-pair-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0,
+                    1
+                  ],
+                  "changes": [],
+                  "correspondence": "ambiguous",
+                  "kind": "merged",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-head-token",
+                  "range": [
+                    3,
+                    23
+                  ],
+                  "type": "acme-head-token"
+                },
+                {
+                  "detector": "acme-tail-token",
+                  "range": [
+                    23,
+                    39
+                  ],
+                  "type": "acme-tail-token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "acme-pair-token",
+                  "range": [
+                    3,
+                    39
+                  ],
+                  "type": "acme-pair-token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ranges-follow-the-declared-unit-across-unicode",
+      "note": "Expected ranges are in Unicode code points; a surface converts to its own unit. An astral character precedes the token.",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "🔑 é eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 end",
+      "sides": [
+        {},
+        {
+          "config": {
+            "detection": {
+              "exclude": [
+                "jwt"
+              ]
+            }
+          }
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "removed",
+                  "other": []
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    4,
+                    75
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [],
+                  "correspondence": null,
+                  "kind": "removed",
+                  "other": []
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    4,
+                    75
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "action-and-reason-changes-are-classified",
+      "profiles": [
+        "full"
+      ],
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "sides": [
+        {
+          "actionPolicy": {
+            "actionPolicyRevision": 1,
+            "base": "default",
+            "rules": []
+          }
+        },
+        {
+          "actionPolicy": {
+            "actionPolicyRevision": 1,
+            "base": "default",
+            "rules": [
+              {
+                "id": "allow-github",
+                "match": {
+                  "type": [
+                    "github_token"
+                  ]
+                },
+                "action": "allow"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [
+                {
+                  "base": [
+                    0
+                  ],
+                  "changes": [
+                    "action",
+                    "reason"
+                  ],
+                  "correspondence": "exact",
+                  "kind": "changed",
+                  "other": [
+                    0
+                  ]
+                }
+              ],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "github-token",
+                  "range": [
+                    8,
+                    48
+                  ],
+                  "type": "github_token"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "github-token",
+                  "range": [
+                    8,
+                    48
+                  ],
+                  "type": "github_token"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a-limit-is-a-limited-side-not-equivalence",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "token eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 end",
+      "sides": [
+        {},
+        {
+          "config": {
+            "limits": {
+              "maxInputBytes": 5
+            }
+          }
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            null
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": "INPUT_LIMIT_EXCEEDED",
+              "findings": [],
+              "status": "limited"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            null
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": "INPUT_LIMIT_EXCEEDED",
+              "findings": [],
+              "status": "limited"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "an-unbuildable-side-is-a-failed-side",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "token eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 end",
+      "sides": [
+        {},
+        {
+          "config": {
+            "detection": {
+              "include": [
+                "no-such-detector"
+              ]
+            }
+          }
+        },
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          }
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            null,
+            null
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": "UNKNOWN_DETECTOR_ID",
+              "findings": [],
+              "status": "error"
+            },
+            {
+              "failure": "EMPTY_DETECTION_SET",
+              "findings": [],
+              "status": "error"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            null,
+            null
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    6,
+                    77
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            },
+            {
+              "failure": "UNKNOWN_DETECTOR_ID",
+              "findings": [],
+              "status": "error"
+            },
+            {
+              "failure": "EMPTY_DETECTION_SET",
+              "findings": [],
+              "status": "error"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a-failed-baseline-compares-nothing",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "two eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00 and eyJhbGciOiJub25lIn0.eyJzdWIiOiJTWU5USEVUSUMifQ.SYNTHETIC_REVOKED_SIG_00",
+      "sides": [
+        {
+          "config": {
+            "limits": {
+              "maxFindings": 1
+            }
+          }
+        },
+        {}
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            null
+          ],
+          "sides": [
+            {
+              "failure": "FINDING_LIMIT_EXCEEDED",
+              "findings": [],
+              "status": "limited"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    4,
+                    75
+                  ],
+                  "type": "jwt"
+                },
+                {
+                  "detector": "jwt",
+                  "range": [
+                    80,
+                    151
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            null
+          ],
+          "sides": [
+            {
+              "failure": "FINDING_LIMIT_EXCEEDED",
+              "findings": [],
+              "status": "limited"
+            },
+            {
+              "failure": null,
+              "findings": [
+                {
+                  "detector": "jwt",
+                  "range": [
+                    4,
+                    75
+                  ],
+                  "type": "jwt"
+                },
+                {
+                  "detector": "jwt",
+                  "range": [
+                    80,
+                    151
+                  ],
+                  "type": "jwt"
+                }
+              ],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "no-match-makes-no-claim",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "input": "nothing to see in this plain sentence",
+      "sides": [
+        {},
+        {
+          "config": {
+            "detection": {
+              "include": []
+            }
+          },
+          "ruleset": "ruleset-revision: 1\ndetector: acme-alpha-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\n"
+        }
+      ],
+      "expect": {
+        "common": {
+          "differences": [
+            null,
+            {
+              "entries": [],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            }
+          ]
+        },
+        "full": {
+          "differences": [
+            null,
+            {
+              "entries": [],
+              "unchanged": 0
+            }
+          ],
+          "sides": [
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            },
+            {
+              "failure": null,
+              "findings": [],
+              "status": "scanned"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
