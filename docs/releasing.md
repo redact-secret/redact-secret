@@ -49,6 +49,11 @@ on packages that already published successfully, since most registries reject
 publishing over an existing version. Details on why to prefer each workflow,
 and what evidence each requires, are in the sections below.
 
+There is no local publish command. `npm run release` only prints this pointer
+and exits non-zero (`scripts/refuse-direct-publish.mjs`, held by `npm run
+release-entry:test`); registry publication and the version tag come from
+`Release` and `Reconcile Release` alone.
+
 ## Branching model
 
 `main` is both the integration branch and the only release source. Normal
