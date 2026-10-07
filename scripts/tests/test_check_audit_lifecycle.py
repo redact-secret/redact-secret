@@ -325,6 +325,15 @@ class CommandLineTest(LifecycleCase):
         snapshot = self.tree.write("closed.txt", "31\n")
         self.assertEqual(self.run_cli("--release", "--closed-issues", str(snapshot)).returncode, 1)
 
+    def test_release_mode_fails_a_unit_whose_issue_closed_and_passes_an_open_one(self) -> None:
+        self.tree.doc("epic", block(status="deferred", retire_on="after-issue:#900"))
+        stale = self.run_cli("--release", "--closed-issues", str(self.tree.write("closed.txt", "12\n900\n")))
+        self.assertEqual(stale.returncode, 1, stale.stdout + stale.stderr)
+        self.assertIn("#900 is closed", stale.stdout)
+        passed = self.run_cli("--release", "--closed-issues", str(self.tree.write("open.txt", "12\n")))
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        self.assertNotIn("unverified", passed.stdout)
+
     def test_running_the_check_never_changes_a_file(self) -> None:
         self.tree.doc("old", "# no block\n")
         self.tree.write(CHECK.LEGACY_FILE, "docs/audits/old.md\n")
@@ -481,7 +490,11 @@ class WorkflowEntryPointTest(unittest.TestCase):
         text, jobs = self.workflow("artifact-qualification.yml")
         self.assertIn("lifecycle", jobs)
         body = jobs["lifecycle"]
-        self.assertIn("python3 -B scripts/check-audit-lifecycle.py --release", body)
+        self.assertIn("scripts/check-audit-lifecycle.py --release --closed-issues", body)
+        self.assertIn("scripts/snapshot-closed-issues.py", body)
+        self.assertLess(body.index("snapshot-closed-issues.py"), body.index("check-audit-lifecycle.py --release"))
+        self.assertIn("issues: read", body)
+        self.assertIn("GH_TOKEN: ${{ github.token }}", body)
         self.assertIn("test_check_audit_lifecycle.py", body)
         self.assertIn("github.event_name == 'workflow_dispatch'", body)
         self.assertIn("refs/heads/rc/", body)
@@ -494,7 +507,14 @@ class WorkflowEntryPointTest(unittest.TestCase):
 
     def test_release_workflow_cannot_build_or_publish_without_the_check(self) -> None:
         text, jobs = self.workflow("release.yml")
-        self.assertIn("python3 -B scripts/check-audit-lifecycle.py --release", jobs["lifecycle"])
+        self.assertIn("scripts/check-audit-lifecycle.py --release --closed-issues", jobs["lifecycle"])
+        self.assertIn("scripts/snapshot-closed-issues.py", jobs["lifecycle"])
+        self.assertLess(
+            jobs["lifecycle"].index("snapshot-closed-issues.py"),
+            jobs["lifecycle"].index("check-audit-lifecycle.py --release"),
+        )
+        self.assertIn("issues: read", jobs["lifecycle"])
+        self.assertNotIn("|| true", jobs["lifecycle"])
         self.assertNotIn("continue-on-error", jobs["lifecycle"])
         self.assertEqual(GATE.extract_needs(jobs["lifecycle"]), [])
         for job in jobs:
@@ -502,6 +522,8 @@ class WorkflowEntryPointTest(unittest.TestCase):
                 self.assertIn("lifecycle", self.ancestors(jobs, job), f"{job} can run without the lifecycle check")
         for job in ("ci", "artifact-qualification"):
             self.assertIn("lifecycle", GATE.extract_needs(jobs[job]))
+        # A called workflow cannot hold a permission its caller withholds.
+        self.assertIn("issues: read", jobs["artifact-qualification"])
         self.assertNotIn("inputs:", text.split("jobs:")[0].split("workflow_dispatch:")[1].split("permissions:")[0])
 
     def test_rehearsal_reaches_the_check_through_artifact_qualification(self) -> None:
@@ -511,18 +533,32 @@ class WorkflowEntryPointTest(unittest.TestCase):
         )
         self.assertIn("artifact-qualification", GATE.extract_needs(jobs["rehearse"]))
         self.assertNotRegex(jobs["artifact-qualification"], r"(?m)^    if:")
+        self.assertIn("issues: read", jobs["artifact-qualification"])
 
     def test_reconcile_runs_the_source_revision_check_before_any_repair_step(self) -> None:
         text, jobs = self.workflow("reconcile-release.yml")
         steps = GATE.extract_step_blocks(jobs["reconcile"])
         names = [name for _, name, _ in steps]
         gate = names.index("Verify the source revision's audit lifecycle")
-        self.assertEqual(names[gate - 1], "Evaluate reconcile guard")
+        snapshot = names.index("Snapshot the issues closed before the source revision")
+        self.assertEqual(snapshot, gate - 1)
+        self.assertEqual(names[snapshot - 1], "Evaluate reconcile guard")
+        snapshot_body = steps[snapshot][2]
+        for needle in (
+            "scripts/snapshot-closed-issues.py",
+            "--closed-on-or-before",
+            "GH_TOKEN: ${{ github.token }}",
+            "steps.guard.outputs.source_revision",
+        ):
+            self.assertIn(needle, snapshot_body)
+        self.assertNotIn("continue-on-error", snapshot_body)
+        self.assertNotIn("|| true", snapshot_body)
+        self.assertIn("issues: read", jobs["reconcile"])
         self.assertLess(gate, names.index("Verify original run and artifact inventory"))
         self.assertLess(gate, names.index("Reconcile npm dependency packages"))
         body = steps[gate][2]
         for needle in (
-            '--release --root "$source_tree" --version "$VERSION"',
+            '--release --root "$source_tree" --version "$VERSION" --closed-issues "$CLOSED_ISSUES"',
             "steps.guard.outputs.source_revision",
             "predates the audit lifecycle check",
             'git worktree add --detach "$source_tree" "$SOURCE_REVISION"',
@@ -533,16 +569,31 @@ class WorkflowEntryPointTest(unittest.TestCase):
         triggers = text.split("\non:\n", 1)[1].split("\npermissions:", 1)[0]
         self.assertNotRegex(triggers.lower(), r"skip|bypass|lifecycle|ignore")
 
-    def run_reconcile_step(self, source: Path, revision: str, version: str) -> subprocess.CompletedProcess:
+    def test_no_workflow_runs_release_mode_without_the_snapshot(self) -> None:
+        for name in ("artifact-qualification.yml", "release.yml", "reconcile-release.yml"):
+            text = (REPO / ".github" / "workflows" / name).read_text(encoding="utf-8")
+            calls = [line for line in text.splitlines() if "check-audit-lifecycle.py" in line and "--release" in line]
+            self.assertTrue(calls, name)
+            for line in calls:
+                if line.lstrip().startswith("#"):
+                    continue
+                self.assertIn("--closed-issues", line, f"{name}: {line.strip()}")
+
+    def run_reconcile_step(
+        self, source: Path, revision: str, version: str, closed: str = "1\n"
+    ) -> subprocess.CompletedProcess:
         _, jobs = self.workflow("reconcile-release.yml")
         steps = GATE.extract_step_blocks(jobs["reconcile"])
         body = next(b for _, n, b in steps if n == "Verify the source revision's audit lifecycle")
         script = body.split("run: |\n", 1)[1]
         script = "\n".join(line[10:] if line.startswith(" " * 10) else line for line in script.splitlines())
         with tempfile.TemporaryDirectory() as runner_temp:
+            closed_file = Path(runner_temp) / "closed-issues.txt"
+            closed_file.write_text(closed, encoding="utf-8")
             env = {
                 **os.environ,
                 "RUNNER_TEMP": runner_temp,
+                "CLOSED_ISSUES": str(closed_file),
                 "VERSION": version,
                 "SOURCE_REVISION": revision,
                 "GIT_CONFIG_GLOBAL": os.devnull,
@@ -599,6 +650,11 @@ class WorkflowEntryPointTest(unittest.TestCase):
 
         repaired = self.run_reconcile_step(tree.root, clean, "0.1.0-beta.14")
         self.assertEqual(repaired.returncode, 0, repaired.stderr + repaired.stdout)
+
+        # The unit waits on #900: once the snapshot says it closed, reconcile refuses.
+        stale = self.run_reconcile_step(tree.root, clean, "0.1.0-beta.14", closed="900\n")
+        self.assertNotEqual(stale.returncode, 0)
+        self.assertIn("#900 is closed", stale.stdout)
         # The step leaves no worktree behind and changes nothing in the checkout.
         self.assertEqual(git("worktree", "list").count("\n"), 0)
         self.assertEqual(git("status", "--porcelain"), "")
@@ -667,3 +723,102 @@ class ScriptsDoNotTargetTheAuditTreeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+FAKE_GH = """#!/bin/sh
+echo "$@" > "$FAKE_GH_ARGS"
+case "$FAKE_GH_MODE" in
+  fail) echo "boom" >&2; exit 4 ;;
+  empty) exit 0 ;;
+  junk) echo "12"; echo "not-a-number"; exit 0 ;;
+  many) i=1; while [ "$i" -le "$FAKE_GH_COUNT" ]; do echo "$i"; i=$((i+1)); done; exit 0 ;;
+esac
+"""
+
+
+class ClosedIssueSnapshotTest(unittest.TestCase):
+    SNAPSHOT = SCRIPTS / "snapshot-closed-issues.py"
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        self.gh = self.root / "gh"
+        self.gh.write_text(FAKE_GH, encoding="utf-8")
+        self.gh.chmod(0o755)
+        self.out = self.root / "closed.txt"
+        self.args = self.root / "args.txt"
+
+    def run_snapshot(self, mode: str, *extra: str, count: int = 3) -> subprocess.CompletedProcess:
+        env = {
+            **os.environ,
+            "GH_BIN": str(self.gh),
+            "FAKE_GH_MODE": mode,
+            "FAKE_GH_COUNT": str(count),
+            "FAKE_GH_ARGS": str(self.args),
+        }
+        return subprocess.run(
+            [sys.executable, "-B", str(self.SNAPSHOT), "--out", str(self.out), *extra],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=env,
+        )
+
+    def test_a_complete_snapshot_is_written_sorted_and_deduplicated(self) -> None:
+        result = self.run_snapshot("many", "--limit", "10", count=4)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.out.read_text(encoding="utf-8"), "1\n2\n3\n4\n")
+        self.assertIn("--state closed", self.args.read_text(encoding="utf-8"))
+
+    def test_the_closed_before_filter_and_repository_reach_gh(self) -> None:
+        result = self.run_snapshot(
+            "many", "--limit", "10", "--repo", "o/r", "--closed-on-or-before", "2026-10-06T00:00:00Z"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        args = self.args.read_text(encoding="utf-8")
+        self.assertIn("--repo o/r", args)
+        self.assertIn("closed:<=2026-10-06T00:00:00Z", args)
+
+    def test_a_snapshot_that_cannot_be_trusted_fails_and_leaves_no_file(self) -> None:
+        self.out.write_text("999\n", encoding="utf-8")
+        cases = {
+            "fail": ("--limit", "10"),
+            "empty": ("--limit", "10"),
+            "junk": ("--limit", "10"),
+            "many": ("--limit", "3"),
+        }
+        for mode, extra in cases.items():
+            with self.subTest(mode=mode):
+                self.out.write_text("999\n", encoding="utf-8")
+                result = self.run_snapshot(mode, *extra, count=3)
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertTrue(result.stderr.startswith("UNAVAILABLE"), result.stderr)
+                self.assertFalse(self.out.exists(), "a stale or partial snapshot must not survive a failure")
+
+    def test_reaching_the_limit_is_reported_as_truncation(self) -> None:
+        result = self.run_snapshot("many", "--limit", "3", count=3)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("truncated", result.stderr)
+
+    def test_an_unavailable_gh_fails_closed(self) -> None:
+        env = {**os.environ, "GH_BIN": str(self.root / "missing-gh")}
+        result = subprocess.run(
+            [sys.executable, "-B", str(self.SNAPSHOT), "--out", str(self.out)],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=env,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse(self.out.exists())
+
+    def test_a_malformed_timestamp_is_refused_before_gh_runs(self) -> None:
+        result = self.run_snapshot("many", "--closed-on-or-before", "yesterday")
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse(self.args.exists())
+
+    def test_the_snapshot_script_writes_only_its_out_file(self) -> None:
+        source = self.SNAPSHOT.read_text(encoding="utf-8")
+        for forbidden in ("docs/audits", "shutil", "git ", "push", "publish"):
+            self.assertNotIn(forbidden, source)

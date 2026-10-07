@@ -169,10 +169,17 @@ and must use the qualified binaries and recorded digests.
    enforces this on the checked-out tree (it fails on every `final`,
    `in-progress`, `before-qualification` or unclassified unit and names each
    path); development (`npm run lifecycle:check`, part of `npm run ci`) accepts
-   a declared temporary unit. For a `deferred` unit, confirm `after-issue:#N`
-   is still open, optionally with `--closed-issues FILE` from
-   `gh issue list --state closed --limit 1000 --json number --jq '.[].number'`;
-   the check never calls the API. `Artifact qualification` (dispatch and `rc/*`
+   a declared temporary unit. The check never calls the API. The three
+   workflows below generate the closed-issue snapshot it needs for each
+   `deferred` unit's `after-issue:#N` with `scripts/snapshot-closed-issues.py`
+   (the workflow's read-only token) and pass it as `--closed-issues`; the job
+   fails if the snapshot cannot be generated, is empty, or reaches its 5000-issue
+   limit (a result that reaches the limit is treated as truncated), and a unit
+   whose issue has closed fails release mode. `Reconcile Release` counts only
+   issues closed at or before the source revision's commit time. Locally,
+   `python3 -B scripts/snapshot-closed-issues.py --out FILE` makes the same
+   file. Keep an epic that a `deferred` unit waits on open until the release it
+   qualifies has been closed out. `Artifact qualification` (dispatch and `rc/*`
    pushes), `Release` and `Reconcile Release` run it in release mode before
    anything is built or published, and it approves and publishes nothing.
 5. Run the local checks below before merging. After merge, record the exact

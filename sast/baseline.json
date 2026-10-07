@@ -566,482 +566,28 @@
       "path": "examples/configuration-ownership/node-policy-per-call.mjs",
       "rationale": "Documentation example (examples/configuration-ownership): the first `console.log` argument is the joined action names of a comparison, each one of the four fixed values allow/warn/redact/block produced by the library, printed to the local terminal; no format directive from external input is interpreted and the output is never used as a format string.",
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-formatstring"
+    },
+    "2900e7eed2993d0d": {
+      "classification": "false_positive",
+      "line": 65,
+      "path": "scripts/snapshot-closed-issues.py",
+      "rationale": "The argument list is built as a list and never passed to a shell. The executable is `gh` (or the `GH_BIN` override a test sets), the dynamic values are the repository name from the workflow, an integer limit, and a timestamp validated against a fixed UTC pattern before use, and `gh` output is parsed as integers only, so this generic audit rule's command-injection concern does not apply.",
+      "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
+    },
+    "abac9b77749c45b2": {
+      "classification": "false_positive",
+      "line": 65,
+      "path": "scripts/snapshot-closed-issues.py",
+      "rationale": "The argument list is built as a list and never passed to a shell. The executable is `gh` (or the `GH_BIN` override a test sets), the dynamic values are the repository name from the workflow, an integer limit, and a timestamp validated against a fixed UTC pattern before use, and `gh` output is parsed as integers only, so this generic audit rule's command-injection concern does not apply.",
+      "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-tainted-env-args"
     }
   },
   "known_errors": {
-    "02ef21d754dd4eb4": {
-      "line": 247,
-      "path": ".github/workflows/reconcile-release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "c4397c5e3d25faa7": {
-      "line": 325,
-      "path": ".github/workflows/reconcile-release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "fc5e8d05105ef94e": {
-      "line": 389,
-      "path": ".github/workflows/reconcile-release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "3b6ddc3b351f01c0": {
-      "line": 397,
-      "path": ".github/workflows/reconcile-release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "234c8ca03913f3ab": {
-      "line": 129,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "902c789568df85af": {
-      "line": 144,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "f249ee9caad7f1d6": {
-      "line": 147,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "42145b87477fd2bf": {
-      "line": 158,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "8f6ff9d95485530d": {
-      "line": 353,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "bec881aa8e314b27": {
-      "line": 447,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "4ce9fc66e7d9d8c1": {
-      "line": 466,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "d08a914edecaaf72": {
-      "line": 550,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "49fdd9e0c469cb2e": {
-      "line": 335,
-      "path": ".github/workflows/reconcile-release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "c106a6dc1cd0bb27": {
-      "line": 407,
-      "path": ".github/workflows/reconcile-release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "28621df53b1c64ca": {
-      "line": 360,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "fcb5c29c505a0c79": {
-      "line": 461,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "e3bf474b4da38858": {
-      "line": 480,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "91537adcbe2912b4": {
-      "line": 567,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
     "69796645ea40e01f": {
       "line": 29,
       "path": "packages/javascript/src/native.ts",
       "rationale": "OpenGrep 1.30.0's TypeScript parser does not yet support the `unique symbol` type annotation; this is a parser limitation in the pinned tool version, not a defect in this file. Tracked for re-check on the next reviewed OpenGrep version bump.",
       "type": "PartialParsing"
-    },
-    "3b24a098020fcea1": {
-      "line": 128,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "59fabb2e6c5f34c9": {
-      "line": 143,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "84b184145ceb31cb": {
-      "line": 146,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "453b2ba6ff5b6426": {
-      "line": 157,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "a795f6296d7eb50d": {
-      "line": 359,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "f7ce93fcbc9cee7e": {
-      "line": 460,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "a8ea689b0b95f263": {
-      "line": 479,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "79746a1978688f7a": {
-      "line": 566,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "b3099afe5d8ea286": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/reconcile-release.yml",
-      "line": 271,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "58571abac6124a7f": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/reconcile-release.yml",
-      "line": 359,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "cb29222d2642d609": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/reconcile-release.yml",
-      "line": 431,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "0d7514c06bb664ee": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 135,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "594d2a15bf98f00c": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 150,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "ca242ad15c2b6cca": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 153,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "f8a7f1e2c9b67a32": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 164,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "8b7b2b9a627b4fd5": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 280,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "32d063d12a37138a": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 414,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "3992bfb00e259156": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 515,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "9b71872e157be141": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 534,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "c21dd16d0cf0372c": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 621,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "fa932e2bcca56c15": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 139,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "9a31f5684d3f38b6": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 154,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "cba36af28bf0759b": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 168,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "420ad1e50aa12cdc": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 284,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "5f4b8ad0b625c719": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 418,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "1c171813f4c87bda": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 519,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "7aee5b288dce4158": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 538,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "c6362ba455ed9972": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 625,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "ebcf12f4e3e05b85": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 152,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "3975b594eba68682": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 167,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "2596c076189d875d": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 178,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "77a791797fcea1e0": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 294,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses this `run:` step's shell snippet as Bash. The step's body is a `node --input-type=module <<'NODE_VERIFY' ... NODE_VERIFY` heredoc with a quoted delimiter, so real Bash never interprets the heredoc's JavaScript body; the embedded backtick-delimited JS template literals (e.g. the `${reportedCommon}` interpolation ending at line 292) are read by the Bash sub-parser as legacy command-substitution syntax, which is not valid Bash, and it reports a partial-parsing error once it cannot recover. This is an upstream rule/tool limitation against non-Bash content inside a heredoc, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "b23397f54c5dc099": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 427,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "f27d1cf100d3fdc1": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 528,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "658c8d20bfc4616a": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 547,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "3ae612d1d25508e6": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 655,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "64e7ee55f00f3ff8": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 176,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "326f26f8fb382316": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 186,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "e2831e198a7a29b9": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 190,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "fe8802afcf74ec24": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 202,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "5c9279f60f847719": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 233,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "6c24adf6844d4ad0": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 365,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses this `run:` step's shell snippet as Bash. The step's body is a `node --input-type=module <<'NODE_VERIFY' ... NODE_VERIFY` heredoc with a quoted delimiter, so real Bash never interprets the heredoc's JavaScript body; the embedded backtick-delimited JS template literals (e.g. the `${reportedCommon}` interpolation at line 356) are read by the Bash sub-parser as legacy command-substitution syntax, which is not valid Bash, and it reports a partial-parsing error once it cannot recover. This is an upstream rule/tool limitation against non-Bash content inside a heredoc, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "1cdac6691525f229": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 558,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "2208906f60d7dd7c": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 596,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "3091526b9727b11d": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 696,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "e0c385c4958c0e14": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 713,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "dca0f899713bb957": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 729,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "161555a862b86f8c": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 742,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "d6c1a81af50a271e": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 753,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "d3c526471c58839b": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 784,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "ffcac592d643727f": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 903,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "0228db9c8211f514": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 925,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "5f870ce4eb6cdb80": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 572,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "ac2e76c14c7c70f7": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 604,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "f161e03d2d082db8": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 704,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "08db120b46ba2040": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 721,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "8990e379ce1d46a6": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 737,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "d22c691788ac6a23": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 750,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "883429ce5aa78513": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 761,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "a46c9cc6dea44ff4": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 792,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
     "e876b068ba0c5989": {
       "type": "PartialParsing",
@@ -1049,209 +595,11 @@
       "line": 911,
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
     },
-    "54b3004d7d69b2b2": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/release.yml",
-      "line": 933,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
     "62beec2d462a3350": {
       "type": "PartialParsing",
       "path": "packages/javascript/src/native.ts",
       "line": 30,
       "rationale": "OpenGrep 1.30.0's TypeScript parser does not yet support the `unique symbol` type annotation; this is a parser limitation in the pinned tool version, not a defect in this file. Tracked for re-check on the next reviewed OpenGrep version bump."
-    },
-    "ddf99ac75592b8e1": {
-      "line": 651,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "c7d8145385d981e1": {
-      "line": 684,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "4f4b3afde23e11dc": {
-      "line": 772,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "a9150a4fc9f3edf4": {
-      "line": 801,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "341bccb94948cdaa": {
-      "line": 817,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "d9c24162fabdb039": {
-      "line": 830,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "d3257ecfd1dd2ce9": {
-      "line": 841,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "29491970a9d7c0c5": {
-      "line": 872,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "b58931eeac561a7b": {
-      "line": 991,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "61915790b9db4153": {
-      "line": 1013,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "e465e4051aab0211": {
-      "line": 420,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "81f642aab5c3b056": {
-      "line": 429,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "d3570c2c99bce5d0": {
-      "line": 719,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "34a9363fc069d323": {
-      "line": 788,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "eb6601c625fdf185": {
-      "line": 258,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "f48d1e2de803ad4e": {
-      "line": 462,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "6ccc2f6da5c086d6": {
-      "line": 530,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "932985af0f2b05e2": {
-      "line": 595,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "070037ccd7c42c7b": {
-      "line": 664,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "2064bc051e87b97b": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/artifact-qualification.yml",
-      "line": 348,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "e088db656e4f1374": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/artifact-qualification.yml",
-      "line": 357,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "b34dfc21bfbcd36e": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/artifact-qualification.yml",
-      "line": 642,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "f157a3a3755644c5": {
-      "type": "PartialParsing",
-      "path": ".github/workflows/artifact-qualification.yml",
-      "line": 706,
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected."
-    },
-    "06caeba9a237acfa": {
-      "line": 447,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "a583d805b5f12645": {
-      "line": 456,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "7332aaf14b649cab": {
-      "line": 746,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "c9d05155a444ec99": {
-      "line": 815,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "2ff5d0faa8a20f1b": {
-      "line": 452,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "dbd9550d30045776": {
-      "line": 461,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "326bc2f5b2449e85": {
-      "line": 751,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "4209c87e6eb56573": {
-      "line": 820,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "289e26a0f3b29928": {
-      "line": 984,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
     },
     "13aa57cb30ff656f": {
       "line": 209,
@@ -1283,194 +631,152 @@
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "c0527273968b5fbe": {
-      "line": 457,
+    "a63308633780721a": {
+      "line": 502,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "f425c5fd11b9a7be": {
-      "line": 466,
+    "dd41e68346c5e608": {
+      "line": 511,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "631c37280c6d83fd": {
-      "line": 756,
+    "a1a8b31538f9b442": {
+      "line": 801,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "e26aeaac65c69f21": {
-      "line": 825,
+    "b985e07bc624479c": {
+      "line": 870,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "46d50f0b4954639f": {
-      "line": 1003,
+    "b1e2d6942816b28f": {
+      "line": 1048,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "7916a892009f693f": {
-      "line": 1092,
+    "d27e3cee93fbb122": {
+      "line": 1137,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "9ed11b4453271f96": {
-      "line": 495,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "ce000cfb4c47d3d9": {
-      "line": 504,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "7faf7e365ceae16f": {
-      "line": 794,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "0eeb19b5f7cd82be": {
-      "line": 863,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "4763aa39911a7e78": {
-      "line": 1041,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "d7a4fd44ebb74af0": {
-      "line": 1130,
-      "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "af445802fe7546c1": {
-      "line": 296,
+    "d591b5cdab8ec805": {
+      "line": 315,
       "path": ".github/workflows/reconcile-release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "38e82b1cfd81ca72": {
-      "line": 384,
+    "23a6cc49c5e304c2": {
+      "line": 403,
       "path": ".github/workflows/reconcile-release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "0ed3214c6b7411a0": {
-      "line": 456,
+    "e7b8570a17deb3c5": {
+      "line": 475,
       "path": ".github/workflows/reconcile-release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "33cfa48e4d61d891": {
-      "line": 182,
+    "51caa67fcaca32fd": {
+      "line": 191,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "74f184cd150757e1": {
-      "line": 206,
+    "c0cb2f6a0d1ce5f5": {
+      "line": 215,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "d594716fc66cef73": {
-      "line": 216,
+    "cd4947c3f546711d": {
+      "line": 225,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "71c869e3f9163928": {
-      "line": 220,
+    "b09057d1710f18f3": {
+      "line": 229,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "3fc7c81738d5f5c2": {
-      "line": 232,
+    "3f4c2440fc032dee": {
+      "line": 241,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "4ff9a5b2a80195b1": {
-      "line": 263,
+    "24ef4d72b5cae22b": {
+      "line": 272,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "cc22c32144edffea": {
-      "line": 395,
+    "c609d84164df175e": {
+      "line": 404,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "d83e2b82f49390cf": {
-      "line": 681,
+    "c0c52e3cbc110913": {
+      "line": 690,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "a8be921cb52e2d2f": {
-      "line": 714,
+    "eef2489525acba25": {
+      "line": 723,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "53bd2ae51b7ef525": {
-      "line": 814,
+    "31c23b22ecfbecb1": {
+      "line": 823,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "1c0a9d166548d864": {
-      "line": 831,
+    "e35a5b4d50eb372a": {
+      "line": 840,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "d62661c42673c985": {
-      "line": 847,
+    "cf21f493e51d95cc": {
+      "line": 856,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "14c344e8aa78d8e4": {
-      "line": 860,
+    "7dc8c2f4a12fe6a9": {
+      "line": 869,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "2a92e07916c233e6": {
-      "line": 871,
+    "cd60c51bc3ee1fee": {
+      "line": 880,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "5c0f38427d5974f5": {
-      "line": 902,
+    "cb4737d62e4b1fe6": {
+      "line": 1030,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "a02577ae84011fbc": {
-      "line": 1021,
-      "path": ".github/workflows/release.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
-      "type": "PartialParsing"
-    },
-    "136fd7632dd6a252": {
-      "line": 1043,
+    "c4d85d484cb0d049": {
+      "line": 1052,
       "path": ".github/workflows/release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"

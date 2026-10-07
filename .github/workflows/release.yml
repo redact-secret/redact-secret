@@ -77,6 +77,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Read-only: the closed-issue snapshot for `after-issue:#N` units.
+      issues: read
     steps:
       - name: Require main as the release source
         if: ${{ github.ref != 'refs/heads/main' }}
@@ -91,7 +93,13 @@ jobs:
           fetch-depth: 0
 
       - name: Check the audit lifecycle in release mode
-        run: python3 -B scripts/check-audit-lifecycle.py --release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The check stays offline. The snapshot is generated here and the job
+          # fails if it cannot be generated, is empty or is truncated.
+          python3 -B scripts/snapshot-closed-issues.py --repo "$GITHUB_REPOSITORY" --out "$RUNNER_TEMP/closed-issues.txt"
+          python3 -B scripts/check-audit-lifecycle.py --release --closed-issues "$RUNNER_TEMP/closed-issues.txt"
 
   # Reuse qualification so every publisher gates on this exact `github.sha`,
   # rather than a separate, potentially stale run on the same ref.
@@ -115,6 +123,7 @@ jobs:
     uses: ./.github/workflows/artifact-qualification.yml
     permissions:
       contents: read
+      issues: read
 
   # Publishes the eight native dependency packages from the addons
   # `artifact-qualification` already built and qualified for this commit --
