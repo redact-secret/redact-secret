@@ -26,7 +26,56 @@ evidence is linked from each published version.
   another schema, version or variant, or whose digest is not its own fails
   `initialize()` with `INITIALIZATION_FAILED` and echoes none of it. Detection,
   findings, defaults and every existing contract are unchanged;
-  `detectorSelection` is `false` until runtime selection (#1251) exists.
+  `capabilities.detectorSelection` says whether the artifact supports runtime
+  selection (#1251: true for Rust, the Node addon and WebAssembly, false for the
+  Python wheel and the CLI, so a manifest digest differs by artifact kind).
+
+- Detector-id selection and effective-configuration resolution (#1251, epic
+  #1246, `decision-define-detector-id-selection-and-configuration-replacement-precedence`
+  and `decision-define-the-artifact-manifest-and-configuration-data-contracts`),
+  implemented once in the Rust core and forwarded by every binding. A consumer
+  can enable a subset of an artifact's built-in detectors by id and see, before
+  committing, exactly what a request resolves to.
+  - Selection: `initialize({ detection: { include } })` or `{ exclude }`
+    (JavaScript, Node and WebAssembly) and `DetectorRegistry::with_detection`
+    (Rust), also `BuiltInRegistry::with_detection` and the
+    `IncrementalSanitizer::with_*detection_policy_and_formatter` constructors.
+    It is applied when the registry is composed, before the prefilter and
+    overlap resolution, so a disabled detector produces no candidate and no
+    overlap competitor, and the enabled set is the artifact's canonical order
+    whatever order was requested. An unknown, not-included, repeated or
+    non-selectable id is rejected (`INVALID_DETECTION_CONFIG`; the `common`
+    entry never loads `full`), an empty total set is `EMPTY_DETECTION_SET`, and
+    a differing second request, including a plain `initialize()` after a narrowed
+    one, is `DETECTION_CONFIG_CONFLICT`; a rejected or conflicting request changes
+    nothing. There is no setter and no per-call detection argument (a
+    `detection` key on `scan`, `scanAndRedact`, `redact` or a session is
+    `INVALID_OPTIONS`), and a streaming session captures the owner's selection at
+    creation. Python and the CLI do not support it. Without a selection every
+    finding, order, range, output and error is unchanged.
+  - Resolution: `resolveConfig(config?, options?)`, `describeConfig()` and the
+    additive output field `status().configuration` (JavaScript, both entry
+    points), Rust `resolve_config`, `describe_config`, `ConfigRequest`,
+    `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`,
+    `DetectionSelection` and `DetectionConfigError`, the Node addon exports
+    `initializeDetection`, `initializeCommonDetection`, `resolveConfig` and
+    `resolveConfigCommon`, and the WebAssembly exports `resolveConfig` and a
+    second `initialize` argument. It produces the immutable `config-snapshot/v1`
+    from the artifact defaults plus explicit input through one truth table
+    (absent inherits, explicit empty disables, arrays and policy documents
+    replace and are never concatenated, a callback with `actionPolicy` is
+    `INVALID_OPTIONS`), reports compiled, enabled, disabled and unavailable
+    detectors separately (an `allow` action is not detector disabling), the
+    origin of each value, and the artifact, detection and exact policy-document
+    identities. Invalid input is data (`ok: false`), observation is input-free and
+    changes nothing, a callback is a labelled dynamic reference, and a ruleset's
+    detector ids and digest are withheld unless asked for. The snapshot holds no
+    input, ruleset body, value, path or sensitivity score.
+  - New fixed error codes `INVALID_DETECTION_CONFIG`, `DETECTION_CONFIG_CONFLICT`
+    and `EMPTY_DETECTION_SET`. `status()` gains `configuration` (additive, not a
+    breaking change).
+  - Cost: the standard WebAssembly artifacts carry the selection, the resolver
+    and a small JSON reader; the measured delta is in the pull request.
 
 ### Fixed
 

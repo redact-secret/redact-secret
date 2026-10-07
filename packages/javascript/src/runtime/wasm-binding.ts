@@ -127,10 +127,18 @@ export interface WasmModule {
   default(source?: { module_or_path: Uint8Array | object }): Promise<unknown>;
   version(): string;
   profile(): string;
-  initialize(pii: readonly string[]): void;
+  initialize(pii: readonly string[], detection?: string): void;
   piiActivation(): string;
   /** The artifact's `artifact-manifest/v1` document as JSON text (side-effect free). */
   artifactManifest?(): string;
+  /** The `config-resolution/v1` document as JSON text (pure; `bindings/wasm/src/lib.rs`). */
+  resolveConfig?(
+    config: string | undefined,
+    ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
+    callback: boolean,
+    disclose: boolean,
+  ): string;
   scan(
     input: string,
     policy?: WasmPolicyCallback,
@@ -383,15 +391,22 @@ export function decodeComparison(flat: readonly unknown[]): NativeActionComparis
  */
 export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
   const readManifest = wasm.artifactManifest;
+  const resolve = wasm.resolveConfig;
   return {
     version: () => wasm.version(),
     profile: () => wasm.profile(),
     artifact: () => "wasm",
-    initialize: (pii = []) => {
-      wasm.initialize(pii);
+    initialize: (pii = [], detection) => {
+      wasm.initialize(pii, detection);
     },
     piiActivation: () => wasm.piiActivation(),
     ...(readManifest === undefined ? {} : { artifactManifest: () => readManifest.call(wasm) }),
+    ...(resolve === undefined
+      ? {}
+      : {
+          resolveConfig: (config, ruleset, actionPolicy, callback, disclose) =>
+            resolve.call(wasm, config, ruleset, actionPolicy, callback, disclose),
+        }),
     scan: (input, policy, limits, ruleset, actionPolicy) =>
       wasm
         .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset, actionPolicy)

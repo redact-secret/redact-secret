@@ -21,14 +21,17 @@ was run.
 
 An action policy cannot recover a candidate that detection did not emit, and it
 is not a sensitivity control. A PII selection is an activation, not a
-threshold. No surface offers per-detector selection or a numeric sensitivity.
+threshold. Rust, Node and WebAssembly can select which built-in detectors are
+enabled by id, once, when the owner is initialized (see
+[Choosing detectors](#choosing-detectors-by-id)); no surface offers a numeric
+sensitivity.
 
 ## Who owns what, per surface
 
 | Surface | Detection configuration | Action policy | Host limits |
 | --- | --- | --- | --- |
 | Rust | each registry value: `BuiltInRegistry` (`Send + Sync`, built-ins and PII) or `DetectorRegistry` (`!Send`, adds a ruleset and custom detectors); no global state | an argument of each call, or of each compared side | an argument (`WholeInputLimits`, `IncrementalLimits`) |
-| Node (`@redact-secret/core`) | one runtime per entry point per thread: the profile is the import (`@redact-secret/core` is `full`, `/common` is `common`), PII is the first `initialize({ pii })`, a ruleset is a per-call option | the `actionPolicy` option of each call, or `compareActionPolicies` sides | per-call `limits` |
+| Node (`@redact-secret/core`) | one runtime per entry point per thread: the profile is the import (`@redact-secret/core` is `full`, `/common` is `common`), PII and the detector selection are the first `initialize({ pii, detection })`, a ruleset is a per-call option | the `actionPolicy` option of each call, or `compareActionPolicies` sides | per-call `limits` |
 | WebAssembly (browser, workerd, Node fallback) | one runtime per entry point per module instance; the artifact is chosen at load (`full` or `common`, with or without `pii`) | the same options as Node | the same options as Node |
 | Python | one process: the first `initialize(pii=...)` holds for every thread; a ruleset is a per-call argument; the wheel is `full` only | `action_policy=` of each call, or `compare_action_policies` sides | per-call `limits` |
 | CLI | one invocation: `--pii`, `--ruleset`; `full` only | `--action-policy`, `--compare-action-policy` | fixed by the binary |
@@ -382,6 +385,28 @@ tenant.txt:54-65 pii_global_network_address detector=pii-domain confidence=high 
 redact-secret: 1 finding(s) in 1 source(s); ranges are utf8-bytes
 ```
 
+## Choosing detectors by id
+
+`initialize({ detection })` (Rust: `DetectorRegistry::with_detection`) chooses
+which of the artifact's included built-in detectors are enabled, with
+`include` (an allowlist) or `exclude` (a denylist), never both. It is part of
+the same one-shot owner contract as `pii`: an equivalent selection is
+idempotent, a differing one, including a plain `initialize()` afterwards, is
+`DETECTION_CONFIG_CONFLICT`, and a rejected or conflicting request changes
+nothing. There is no setter, no `reconfigure` and no per-call detection
+argument; independent selections in one process use the same Worker, module
+instance or process recipes as independent PII selections. A streaming session
+takes the owner's selection when it is created and keeps it.
+
+Look before you commit: `resolveConfig({ detection })` returns the snapshot a
+selection would give, or the diagnostics that refuse it, without initializing
+or changing anything, and `describeConfig()` returns what the runtime is fixed
+to. Disabling a built-in can change which detector wins an overlap, so a span
+can be reported under a weaker detector's type and action rather than vanish;
+the snapshot says so (`effects.overlapOutcomesMayChange`). Treat client-side
+selection as preventive UX and run an unselected `full` where enforcement is
+authoritative.
+
 ## Why a second JavaScript wrapper does not isolate the singleton
 
 Wrapping `@redact-secret/core` in your own object, or configuring it from a
@@ -425,8 +450,10 @@ verifies it; keep that ordering. Check what is active with `status()` and
   `Sanitizer` builder that bundles detection, policy and formatter.
 - Sharing a configuration between Workers or processes; each owns its own.
 - A thread-shareable Python handle.
-- Selecting individual detectors by id, a numeric sensitivity or confidence
-  threshold, and choosing `common` or `full` implicitly from a PII selection.
+- Selecting detectors by id on Python or the CLI, per call, or after
+  initialization; a group, prefix or pattern selector; a numeric sensitivity or
+  confidence threshold; and choosing `common` or `full` implicitly from a PII
+  selection or a detector id.
 - Comparing policies inside an incremental session or stream.
 - Treating an action policy as a way to detect more. It only acts on findings
   that exist.

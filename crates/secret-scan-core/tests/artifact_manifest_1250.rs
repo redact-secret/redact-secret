@@ -175,7 +175,24 @@ fn the_document_carries_the_contracted_identity_and_capabilities() {
     assert_eq!(value["composition"]["id"], Value::Null);
     assert_eq!(value["pii"]["available"], false);
     assert!(value["pii"]["families"].as_array().unwrap().is_empty());
-    assert_eq!(value["capabilities"]["detectorSelection"], false);
+    // Detector selection is supported on Rust, the Node addon and WebAssembly
+    // (issue #1251) and not on the Python wheel or the CLI.
+    assert_eq!(value["capabilities"]["detectorSelection"], true);
+    for (kind, supported) in [
+        (ArtifactKind::NodeAddon, true),
+        (ArtifactKind::RustRegistry, true),
+        (ArtifactKind::PythonWheel, false),
+        (ArtifactKind::Cli, false),
+    ] {
+        let other = ArtifactManifest::full(kind, true, None).unwrap();
+        assert_eq!(
+            document(&other)["capabilities"]["detectorSelection"],
+            supported,
+            "{}",
+            kind.as_str()
+        );
+        assert_eq!(other.detector_selection(), supported);
+    }
     assert_eq!(value["capabilities"]["incremental"], true);
     assert_eq!(value["capabilities"]["ruleset"]["revisions"][0], 1);
     assert_eq!(value["capabilities"]["actionPolicy"]["revisions"][0], 1);

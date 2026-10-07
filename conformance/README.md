@@ -182,6 +182,21 @@ depend on `src/`.
   than literal text, the same provenance idea
   [Mutation provenance](#mutation-provenance) uses for a reproducible case
   too large to commit as data.
+- [`fixtures/runtime-config-v1.json`](./fixtures/runtime-config-v1.json) —
+  the shared truth table of `resolveConfig` (issue #1251,
+  `decision-define-detector-id-selection-and-configuration-replacement-precedence`).
+  It is data only: each case gives the `runtime-config/v1` members that are data,
+  the exact `ruleset` and `actionPolicy` text, whether a callback is in force, the
+  profiles it applies to, and the expected `ok`, every diagnostic code and path
+  in order, and the snapshot fields that matter (mode, enabled and disabled ids,
+  inertness, policy source and digest, limits, origins, ruleset disclosure). It
+  holds no scan input and no secret-shaped value. The Rust core runs it
+  (`crates/secret-scan-core/tests/runtime_config_1251.rs`); the Node addon smoke
+  test runs it through the raw exports for both profiles
+  (`conformance/runtime-config.mjs`), and the published package runs it on top of
+  the addon and the WebAssembly artifact, both profiles, in
+  `packages/javascript/test/real-binding-config.test.ts`. No surface keeps a copy
+  of the table.
 - [`fixtures/action-policy-compare-v1.json`](./fixtures/action-policy-compare-v1.json) —
   the explain-and-compare truth table (issue #1220,
   `decision-explain-and-compare-action-policies-over-one-detection-pass`). It is

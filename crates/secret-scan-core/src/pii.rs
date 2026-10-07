@@ -154,6 +154,24 @@ impl PiiSelection {
         self.selectors.is_empty()
     }
 
+    /// The `off` selection as a constant, for a `const` constructor.
+    pub(crate) const fn empty() -> Self {
+        Self {
+            selectors: Vec::new(),
+            families: Vec::new(),
+        }
+    }
+
+    /// The canonical selectors, sorted; empty when off.
+    pub(crate) fn selectors(&self) -> &[String] {
+        &self.selectors
+    }
+
+    /// The families the selectors close over, sorted; empty when off.
+    pub(crate) fn families(&self) -> &[String] {
+        &self.families
+    }
+
     /// Canonical activation identity for `profile`.
     #[must_use]
     pub fn activation_identity(&self, profile: crate::Profile) -> String {

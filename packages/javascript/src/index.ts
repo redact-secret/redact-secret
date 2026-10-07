@@ -83,6 +83,35 @@ export const artifact = runtime.artifact;
  */
 export const artifactManifest = runtime.artifactManifest;
 
+/**
+ * Resolves what a caller asks for (`runtime-config/v1`: `detection`, `pii`,
+ * `ruleset`, `actionPolicy`, `limits`) over the artifact's build defaults into
+ * a frozen `config-resolution/v1`: the effective configuration as a
+ * `config-snapshot/v1`, and every safe diagnostic. Absent inherits, an
+ * explicit empty disables, arrays and policy documents replace and are never
+ * merged, and a callback policy (`options.policy`) is recorded as a dynamic
+ * reference and conflicts with `actionPolicy`. The shared truth table lives
+ * in the Rust core; this function holds no copy.
+ *
+ * Compiled, enabled, disabled and unavailable detectors are reported
+ * separately, and an action (including `allow`) never disables a detector.
+ * Pure data: it scans nothing, builds no registry, changes no runtime, and an
+ * invalid request is `ok: false` with diagnostics, not a throw. It needs a
+ * successful `initialize()` like every other operation, because the resolver
+ * is the loaded artifact's own. The snapshot holds ids, counts and digests,
+ * never an input byte, a ruleset body or a rule pattern.
+ */
+export const resolveConfig = runtime.resolveConfig;
+
+/**
+ * The snapshot of the configuration this runtime is fixed to: the detector
+ * selection and PII activation `initialize()` set, with the artifact's
+ * defaults for what a call supplies. Takes no input, initializes and changes
+ * nothing, and returns the same frozen value every time. `status().configuration`
+ * is its `digest`.
+ */
+export const describeConfig = runtime.describeConfig;
+
 /** Scans `input` and returns every finding, in input order. */
 export const scan = runtime.scan;
 

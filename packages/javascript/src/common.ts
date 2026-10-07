@@ -79,6 +79,19 @@ export const artifact = runtime.artifact;
  */
 export const artifactManifest = runtime.artifactManifest;
 
+/**
+ * Resolves a configuration request over the `common` artifact's defaults (see
+ * `@redact-secret/core`'s `resolveConfig`). A `provider` detector id is
+ * `DETECTOR_NOT_INCLUDED` here, never satisfied by loading `full`.
+ */
+export const resolveConfig = runtime.resolveConfig;
+
+/**
+ * The snapshot of the configuration this `common` runtime is fixed to (see
+ * `@redact-secret/core`'s `describeConfig`).
+ */
+export const describeConfig = runtime.describeConfig;
+
 /** Scans `input` and returns every finding, in input order. */
 export const scan = runtime.scan;
 

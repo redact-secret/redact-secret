@@ -49,9 +49,13 @@ interface NodeAddon {
   profile(): string;
   initialize(): void;
   initializePii?(pii: readonly string[]): void;
+  /** Initializes with a PII selection and the JSON text of a detector selection (issue #1251). */
+  initializeDetection?(pii: readonly string[], detection: string): void;
   piiActivation?(): string;
   /** The `full` profile's `artifact-manifest/v1` document as JSON text (side-effect free). */
   artifactManifest?(): string;
+  /** The `config-resolution/v1` document for the `full` profile, as JSON text (pure). */
+  resolveConfig?: AddonResolveConfig;
   scan(
     input: string,
     policy?: NativePolicyCallback,
@@ -79,6 +83,20 @@ interface NodeAddon {
 }
 
 /**
+ * The addon's configuration-resolution export: the `runtime-config/v1` text of
+ * the data members, the exact `ruleset` and `actionPolicy` bytes, whether a
+ * callback policy is in force and whether to disclose the ruleset identity
+ * (`bindings/node/src/lib.rs`'s `resolve_config`). Returns JSON text.
+ */
+type AddonResolveConfig = (
+  config: string | undefined,
+  ruleset: Uint8Array | undefined,
+  actionPolicy: Uint8Array | undefined,
+  callback: boolean,
+  disclose: boolean,
+) => string;
+
+/**
  * The addon's whole-input comparison export, which takes the sides as the
  * parallel `kinds`/`documents`/`callbacks` arrays {@link splitNativeSides}
  * builds (`bindings/node/src/lib.rs`'s `compare_action_policies`).
@@ -104,9 +122,13 @@ interface CommonNodeAddon {
   version(): string;
   initializeCommon(): void;
   initializeCommonPii?(pii: readonly string[]): void;
+  /** Initializes with a PII selection and the JSON text of a detector selection (issue #1251). */
+  initializeCommonDetection?(pii: readonly string[], detection: string): void;
   piiActivationCommon?(): string;
   /** The `common` profile's `artifact-manifest/v1` document as JSON text (side-effect free). */
   artifactManifestCommon?(): string;
+  /** The `config-resolution/v1` document for the `common` profile, as JSON text (pure). */
+  resolveConfigCommon?: AddonResolveConfig;
   scanCommon(
     input: string,
     policy?: NativePolicyCallback,
@@ -294,9 +316,10 @@ export function loadCommonAddon(): CommonNodeAddon {
  */
 interface ProfiledAddonMethods {
   profile(): string;
-  initialize(pii: readonly string[]): void;
+  initialize(pii: readonly string[], detection?: string): void;
   piiActivation(): string;
   artifactManifest?(): string;
+  resolveConfig?: AddonResolveConfig;
   scan(
     input: string,
     policy?: NativePolicyCallback,
@@ -327,6 +350,27 @@ function manifestSource(
   return read === undefined ? {} : { artifactManifest: () => read.call(addon) };
 }
 
+/**
+ * The profile-selected `resolveConfig` method, present only when the addon
+ * exports it. A missing export is reported by the facade, not invented here.
+ */
+function resolveSource(
+  read: AddonResolveConfig | undefined,
+  addon: object,
+): Pick<ProfiledAddonMethods, "resolveConfig"> {
+  return read === undefined
+    ? {}
+    : {
+        resolveConfig: (config, ruleset, actionPolicy, callback, disclose) =>
+          read.call(addon, config, ruleset, actionPolicy, callback, disclose),
+      };
+}
+
+/** The binding's `resolveConfig`, present only when the profile's method is. */
+function resolveMethod(read: AddonResolveConfig | undefined): Pick<NativeBinding, "resolveConfig"> {
+  return read === undefined ? {} : { resolveConfig: (...args) => read(...args) };
+}
+
 /** The binding's `artifactManifest`, present only when the profile's method is. */
 function manifestMethod(read: (() => string) | undefined): Pick<NativeBinding, "artifactManifest"> {
   return read === undefined ? {} : { artifactManifest: () => read() };
@@ -346,11 +390,12 @@ function buildBinding(
     version: () => addon.version(),
     profile: () => methods.profile(),
     artifact: () => "addon",
-    initialize: (pii = []) => {
-      methods.initialize(pii);
+    initialize: (pii = [], detection) => {
+      methods.initialize(pii, detection);
     },
     piiActivation: () => methods.piiActivation(),
     ...manifestMethod(methods.artifactManifest),
+    ...resolveMethod(methods.resolveConfig),
     scan: (input, policy, limits, ruleset, actionPolicy) => methods.scan(input, policy, limits, ruleset, actionPolicy),
     redact: (input, findings, formatter, limits) => addon.redact(input, findings, formatter, limits),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy): NativeScanAndRedactResult => {
@@ -376,13 +421,19 @@ function buildBinding(
 export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profile(),
-    initialize: (pii) => {
-      if (addon.initializePii !== undefined) addon.initializePii(pii);
+    initialize: (pii, detection) => {
+      if (detection !== undefined) {
+        // An addon without the export cannot take a selection: it is rejected,
+        // never ignored and never satisfied by loading another artifact.
+        if (addon.initializeDetection === undefined) throw new SecretScanError("INVALID_DETECTION_CONFIG");
+        addon.initializeDetection(pii, detection);
+      } else if (addon.initializePii !== undefined) addon.initializePii(pii);
       else addon.initialize();
     },
     piiActivation: () =>
       addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
     ...manifestSource(addon.artifactManifest, addon),
+    ...resolveSource(addon.resolveConfig, addon),
     scan: (input, policy, limits, ruleset, actionPolicy) => addon.scan(input, policy, limits, ruleset, actionPolicy),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) =>
       addon.scanAndRedact(input, policy, formatter, limits, ruleset, actionPolicy),
@@ -404,13 +455,17 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
 export function createBindingFromCommonAddon(addon: CommonNodeAddon): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profileCommon(),
-    initialize: (pii) => {
-      if (addon.initializeCommonPii !== undefined) addon.initializeCommonPii(pii);
+    initialize: (pii, detection) => {
+      if (detection !== undefined) {
+        if (addon.initializeCommonDetection === undefined) throw new SecretScanError("INVALID_DETECTION_CONFIG");
+        addon.initializeCommonDetection(pii, detection);
+      } else if (addon.initializeCommonPii !== undefined) addon.initializeCommonPii(pii);
       else addon.initializeCommon();
     },
     piiActivation: () =>
       addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
     ...manifestSource(addon.artifactManifestCommon, addon),
+    ...resolveSource(addon.resolveConfigCommon, addon),
     scan: (input, policy, limits, ruleset, actionPolicy) =>
       addon.scanCommon(input, policy, limits, ruleset, actionPolicy),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) =>

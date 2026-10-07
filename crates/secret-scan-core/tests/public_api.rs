@@ -1007,3 +1007,58 @@ fn artifact_manifest_is_public_side_effect_free_and_bounded() {
     assert_eq!(common.profile(), Profile::Common);
     assert_eq!(common.detector_ids().count(), 6);
 }
+
+#[test]
+fn detector_selection_and_configuration_resolution_are_public() {
+    use redact_secret::{
+        ArtifactKind, ArtifactManifest, ConfigDiagnostic, ConfigRequest, ConfigResolution,
+        ConfigSeverity, ConfigSnapshot, DetectionConfigError, DetectionSelection, describe_config,
+        resolve_config,
+    };
+
+    // A selection is applied when a registry is composed.
+    let selection: DetectionSelection = DetectionSelection::include(["jwt", "private-key"]);
+    assert_eq!(selection.mode(), "include");
+    assert_eq!(selection.ids().collect::<Vec<_>>(), ["jwt", "private-key"]);
+    assert!(DetectionSelection::all().is_all());
+    assert!(DetectionSelection::exclude(Vec::<String>::new()).is_all());
+    let narrowed = registry().with_detection(&selection).unwrap();
+    assert_eq!(narrowed.ids().collect::<Vec<_>>(), ["private-key", "jwt"]);
+    assert_eq!(narrowed.detection(), &selection);
+    let rejected: DetectionConfigError = registry()
+        .with_detection(&DetectionSelection::include(["nope"]))
+        .unwrap_err();
+    assert_eq!(rejected.class_name(), "UNKNOWN_DETECTOR_ID");
+    assert_eq!(rejected.index(), Some(0));
+    assert_eq!(rejected.code(), SecretScanErrorCode::InvalidDetectionConfig);
+    assert_eq!(SecretScanError::from(rejected).code(), rejected.code());
+    assert!(DetectionSelection::from_json(r#"{"include":["jwt"]}"#).is_ok());
+
+    // Resolution is data over a manifest.
+    let manifest = ArtifactManifest::full(ArtifactKind::RustRegistry, true, None).unwrap();
+    assert!(manifest.detector_selection());
+    let resolution: ConfigResolution = resolve_config(
+        &manifest,
+        &ConfigRequest::new().runtime_config(r#"{"detection":{"include":["jwt"]}}"#),
+    );
+    assert!(resolution.is_ok());
+    let snapshot: &ConfigSnapshot = resolution.snapshot().unwrap();
+    assert_eq!(snapshot.enabled_ids().collect::<Vec<_>>(), ["jwt"]);
+    assert!(snapshot.digest().starts_with("sha256:"));
+    assert!(snapshot.detection_digest().starts_with("sha256:"));
+    assert!(!snapshot.is_inert());
+    let diagnostic: &ConfigDiagnostic = &resolution.diagnostics()[0];
+    assert_eq!(diagnostic.severity(), ConfigSeverity::Info);
+    assert_eq!(diagnostic.code(), "OVERLAP_OUTCOMES_MAY_CHANGE");
+    assert_eq!(diagnostic.path(), "detection");
+    assert_eq!(diagnostic.id(), None);
+    // Describing a registry composed with the same selection gives the same
+    // detection identity as resolving it.
+    let jwt_only = registry()
+        .with_detection(&DetectionSelection::include(["jwt"]))
+        .unwrap();
+    assert_eq!(
+        describe_config(&manifest, &jwt_only).detection_digest(),
+        snapshot.detection_digest()
+    );
+}

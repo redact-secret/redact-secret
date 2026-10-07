@@ -165,7 +165,8 @@ test("scaffolding writes the module and keeps every edited table consistent", ()
     assert.equal(cost.match(/^ {4}"demo-token",$/gm).length, 1);
     assert.match(
       readFileSync(join(root, "CHANGELOG.md"), "utf8"),
-      /### Added\n\n- `demo-token` \(#4242\): TODO\(scaffold\)/,
+      // Appended to the end of an existing "### Added" list, or opened as one.
+      /### Added\n\n(?:[\s\S]*\n)?- `demo-token` \(#4242\): TODO\(scaffold\)/,
     );
     assert.match(
       readFileSync(join(root, "docs/specs/detector-families.md"), "utf8"),

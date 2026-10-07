@@ -98,14 +98,16 @@ the unsupported list.
 Introduced in `0.1.0-beta.14`. `status()` reports whether this entry point is initialized, and its public
 activation, without loading, initializing or reconfiguring anything. It is
 synchronous, takes no input, never throws, and returns a frozen object with
-three fixed fields and nothing else.
+four fixed fields and nothing else. `configuration` is new after `0.1.0-beta.14`
+and additive: the digest of the snapshot of the configuration this runtime is
+fixed to (`describeConfig().digest`), `null` before initialization.
 
 ```ts
 import { status } from "@redact-secret/core";
 
 status();
-// { initialized: false, profile: "full", activation: null }   before initialize()
-// { initialized: true, profile: "full", activation: "credentials=full;selectors=off;..." }
+// { initialized: false, profile: "full", activation: null, configuration: null }   before initialize()
+// { initialized: true, profile: "full", activation: "credentials=full;selectors=off;...", configuration: "sha256:..." }
 ```
 
 `initialized` is `true` only after an `initialize()` call has succeeded, so it

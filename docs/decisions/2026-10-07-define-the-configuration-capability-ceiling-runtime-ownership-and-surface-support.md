@@ -171,7 +171,7 @@ a custom Node, Python or CLI artifact; an in-process multi-tenant requirement
 
 | Issue | Delivers from this record |
 | --- | --- |
-| [#1250](https://github.com/redact-secret/redact-secret/issues/1250) | manifest generation and self-report, `build-defaults/v1`, canonical-JSON fixture, manifest digest check at `initialize`, `artifactManifest()` on all surfaces |
+| [#1250](https://github.com/redact-secret/redact-secret/issues/1250) | manifest generation and self-report, `build-defaults/v1`, canonical-JSON fixture, self-digest check at `initialize`, `artifactManifest()` on all surfaces |
 | [#1251](https://github.com/redact-secret/redact-secret/issues/1251) | `runtime-config/v1`, grammar and precedence table, `initialize({ detection })`, the new codes, `resolveConfig`, `describeConfig`, snapshot, `status().configuration` |
 | [#1252](https://github.com/redact-secret/redact-secret/issues/1252) | `config-diagnostics/v1` and every listed code, provable-shadow rule, no echo of input |
 | [#1253](https://github.com/redact-secret/redact-secret/issues/1253) | `composition/v1`, generated leaf crate, per-detector public constructors, WebAssembly wrapper, `PROFILE "custom"`, capability report |

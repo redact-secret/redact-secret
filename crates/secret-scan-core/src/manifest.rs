@@ -90,6 +90,14 @@ pub enum ArtifactKind {
 }
 
 impl ArtifactKind {
+    /// Whether runtime detector-id selection is supported on this kind of
+    /// artifact: Rust, the Node addon and WebAssembly. Python and the CLI are
+    /// server and enforcement surfaces where a reduced detection set would
+    /// only weaken them (`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`).
+    const fn supports_detector_selection(self) -> bool {
+        matches!(self, Self::Wasm | Self::NodeAddon | Self::RustRegistry)
+    }
+
     /// The wire name: `wasm`, `node-addon`, `python-wheel`, `cli` or
     /// `rust-registry`.
     #[must_use]
@@ -178,6 +186,7 @@ pub struct ArtifactManifest {
     profile: Profile,
     kind: ArtifactKind,
     pii: bool,
+    selection: bool,
     ids: Vec<&'static str>,
     not_included: Vec<&'static str>,
     digest: String,
@@ -261,7 +270,16 @@ impl ArtifactManifest {
             .filter(|id| !ids.contains(id))
             .collect();
 
-        let members = Members::new(profile, kind, pii, source_revision, &entries, &not_included);
+        let selection = kind.supports_detector_selection();
+        let members = Members::new(
+            profile,
+            kind,
+            pii,
+            selection,
+            source_revision,
+            &entries,
+            &not_included,
+        );
         let canonical = members.render(None);
         let digest = format!("sha256:{}", to_hex(&sha256(canonical.as_bytes())));
         let json = members.render(Some(&digest));
@@ -270,6 +288,7 @@ impl ArtifactManifest {
             profile,
             kind,
             pii,
+            selection,
             ids,
             not_included,
             digest,
@@ -293,6 +312,14 @@ impl ArtifactManifest {
     #[must_use]
     pub const fn pii_linked(&self) -> bool {
         self.pii
+    }
+
+    /// Whether the artifact supports runtime detector-id selection
+    /// (`capabilities.detectorSelection`): true for Rust, the Node addon and
+    /// WebAssembly, false for Python and the CLI.
+    #[must_use]
+    pub const fn detector_selection(&self) -> bool {
+        self.selection
     }
 
     /// The included built-in detector ids, in canonical registration order.
@@ -361,7 +388,7 @@ fn is_revision(value: &str) -> bool {
 struct Members {
     artifact: String,
     bounds: String,
-    capabilities: &'static str,
+    capabilities: String,
     composition: String,
     defaults: &'static str,
     detectors: String,
@@ -377,6 +404,7 @@ impl Members {
         profile: Profile,
         kind: ArtifactKind,
         pii: bool,
+        selection: bool,
         source_revision: Option<&str>,
         entries: &[Entry],
         not_included: &[&'static str],
@@ -427,8 +455,10 @@ impl Members {
         Self {
             artifact,
             bounds,
-            capabilities: "{\"actionPolicy\":{\"revisions\":[1]},\"detectorSelection\":false,\
-                           \"incremental\":true,\"ruleset\":{\"revisions\":[1]}}",
+            capabilities: format!(
+                "{{\"actionPolicy\":{{\"revisions\":[1]}},\"detectorSelection\":{selection},\
+                 \"incremental\":true,\"ruleset\":{{\"revisions\":[1]}}}}"
+            ),
             composition,
             defaults: "{\"actionPolicy\":\"artifact-default\",\"detection\":\"all-included\",\
                        \"limits\":\"artifact-default\",\"pii\":{\"selectors\":[]},\
@@ -453,7 +483,7 @@ impl Members {
         let rows: [(&str, &str); 14] = [
             ("artifact", &self.artifact),
             ("bounds", &self.bounds),
-            ("capabilities", self.capabilities),
+            ("capabilities", &self.capabilities),
             ("composition", &self.composition),
             ("defaults", self.defaults),
             ("detectors", &self.detectors),

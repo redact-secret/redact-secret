@@ -21,8 +21,11 @@ finding, default, artifact or version.
 
 ### 1. Seven separate contracts
 
-Each is UTF-8 JSON with a first member `schema`, a string `<name>/v<N>`. Inputs
-fail closed; outputs are additive within a version (see Compatibility).
+Each is UTF-8 JSON with a member `schema`, a string `<name>/v<N>`. An **emitted**
+document writes `schema` first and every other member, at every depth, in bytewise
+order; the **canonical form** a digest is taken over writes every member, `schema`
+included, in bytewise order (see Canonical JSON). Inputs fail closed; outputs are
+additive within a version (see Compatibility).
 
 | Schema | Role | Direction | Owner |
 | --- | --- | --- | --- |
@@ -48,7 +51,7 @@ ownership record.
 | `product` | string | `"redact-secret"` |
 | `version` | string | the lockstep SemVer |
 | `sourceRevision` | string or null | 40-hex, null when the build has none |
-| `artifact` | object | `{ kind, variant, pii }`: `kind` one of `wasm`, `node-addon`, `python-wheel`, `cli`, `rust-registry`; `variant` one of `full`, `common`, `custom`; `pii` a boolean (the PII runtime is linked) |
+| `artifact` | object | `{ kind, variant, pii }`: `kind` (the build target class; there is no separate `target`) one of `wasm`, `node-addon`, `python-wheel`, `cli`, `rust-registry`; `variant` one of `full`, `common`, `custom`; `pii` a boolean (the PII runtime is linked) |
 | `composition` | object | `{ kind, profile, id }`: `kind` `standard` or `custom`; `profile` `full`, `common` or `custom`; `id` null for standard, `custom:<sha256 hex of canonical composition/v1>` for custom |
 | `detectors` | array | one object per **included** built-in, canonical order: `{ id, pack, types, aliases }`. `pack` is `common` or `provider`, `types` the sorted finding types it can emit, `aliases` sorted ids (empty today) |
 | `notIncluded` | array | `full` built-in ids absent from this artifact, canonical order; empty for `full` |
@@ -56,20 +59,34 @@ ownership record.
 | `capabilities` | object | `{ detectorSelection: bool, ruleset: { revisions: [int] } or null, actionPolicy: { revisions: [int] }, incremental: bool }` |
 | `defaults` | object | `build-defaults/v1` |
 | `bounds` | object | the artifact defaults of `limits` and the document bounds (`actionPolicyBytes`, `detectorIdsMax`, `diagnosticsMax`) |
+| `typeVocabulary` | object | `{ builtInTypes: "declared", complete: false, dynamicSources: ["custom-detector", "pii", "ruleset"] }`: says that each detector's `types` is its reviewed declaration and not a closed vocabulary, because a declarative ruleset, a custom detector and the PII adapter emit types no list names (added by #1250; a new member is additive within `v1`) |
 | `digest` | string | `sha256:<hex>` of the canonical JSON of this object without `digest` |
 
-**Canonical JSON** for every digest: UTF-8, object members in bytewise order,
-arrays in their stated order, no whitespace, integers in decimal, no floats, ASCII
-strings only. A manifest contains no timestamp, path, host name, username,
-environment value, or build machine detail. The canonical form is a shared
-fixture (`conformance/fixtures/`), run by every surface.
+**Canonical JSON** for every digest: UTF-8, object members in bytewise order at
+every depth, `schema` in its bytewise place and `digest` absent, arrays in their
+stated order, no whitespace, integers in decimal, no floats, ASCII strings only.
+The emitted document differs from it in two ways only: `schema` is written first,
+and `digest` is present, in its bytewise place among the other members. A consumer
+re-derives a digest by parsing the document, removing `digest`, sorting the keys at
+every depth and hashing the compact text. A manifest contains no timestamp, path,
+host name, username, environment value, or build machine detail. The canonical
+form is a shared fixture (`conformance/fixtures/`), run by every surface.
 
 The manifest is generated from the artifact's real composition: the registry that
-the artifact links, never a hand-kept list. The packaged
-`artifact-manifest.<variant>.json` is a build output; the self-reported manifest of
-the loaded binary must have the same digest, or `initialize()` fails with
-`INITIALIZATION_FAILED`, as a profile mismatch does. A standard artifact's
-`detectors` and `composition` never change between builds of one version.
+the artifact links, never a hand-kept list. **Current state (#1250):** it is embedded
+in the binary and generated at call time from the registration rows the artifact
+links, so the artifact digests the release process already records cover it, and no
+separate `artifact-manifest.<variant>.json` file is packaged. `initialize()` verifies
+what the loaded artifact reports: the `artifact-manifest/v1` schema, the lockstep
+version, the variant of the entry point and the document's own digest (the SHA-256
+of its canonical form); any mismatch fails with `INITIALIZATION_FAILED`, as a profile
+mismatch does, and echoes nothing of the document. `ArtifactManifest::verify_packaged`
+exists for comparing a packaged document with the generated one and is not used by any
+surface yet. **Follow-up, not built:** a packaged file per variant compared with
+the self-reported manifest at `initialize()`; #1253 (custom artifacts) and #1255
+(qualification) may pick it up. A standard artifact's `detectors` and `composition` never
+change between builds of one version. There is no `target` field: the build target
+class is `artifact.kind`.
 
 There is no NER, entity, customer, case or profile-interpretation field. A future
 capability that is not listed here is a new `capabilities` key, off by default.
@@ -169,11 +186,40 @@ registries for the call, and holds nothing. Details are #1254's, inside this sha
 - **Security.** The core reads no file, network or environment value and
   fetches nothing; hosts read files and pass bytes. Output is bounded by the
   catalog, 256 diagnostics, four comparison configs and the existing limits.
-- **Size.** The combined parser, resolver, manifest and diagnostics of #1250 to
-  #1252 and #1254 are measured per real artifact. If the `full` brotli increase
-  exceeds 5% of its then-current size, the implementing issue stops and reopens
-  placement (for example moving comparison out of the artifact). That bound is a
-  budget, not a performance claim.
+- **Size.** The combined manifest, parser, resolver, diagnostics and comparison
+  of #1250 to #1252 and #1254 are measured per real artifact against the
+  pre-epic `full` brotli WebAssembly (181,882 B). The first bound of 5% was a
+  trigger to revisit, not a measured limit. Measured: #1250 added 2.3% and #1251
+  a further 6.9% (`full`; common 2.8% and 9.4%), about 9.3% in total, and the
+  feature is the epic's outcome, so the bound is revised to 15% cumulative for
+  `full`. Each remaining issue reports its own delta; if the total would pass
+  15%, that issue stops and reopens placement (for example moving comparison
+  out of the artifact). Size-sensitive consumers use a custom composition
+  (#1253) rather than a smaller standard artifact. The bound is a budget, not a
+  performance claim.
+
+## Implementation status
+
+Where the shipped code differs from or settles something above, the code and its
+tests are authoritative; the decision of each section is unchanged.
+
+- **#1250.** The manifest is embedded and self-verified, not a packaged file
+  (section 2); `typeVocabulary` is added; `artifact.kind` is the target class;
+  `capabilities.detectorSelection` is `true` for the Rust, Node addon and
+  WebAssembly kinds and `false` for the Python wheel and the CLI, so a manifest
+  digest differs by kind.
+- **#1251.** `resolveConfig` and `describeConfig` are implemented once, in the
+  Rust core. `ruleset` and `actionPolicy` are given beside the JSON text of the
+  other `runtime-config/v1` members as their exact bytes (so the policy identity
+  is the digest of the bytes a call would load), and a callback as the fact that
+  one is in force. A ruleset's detector ids and digest are withheld from the
+  snapshot by default (`ruleset.disclosed`), while `detectionDigest` still binds
+  them. Added additively to the snapshot: `detection.compiledCount`,
+  `detection.unavailable`, `detection.customDetectors`, `pii.available`,
+  `artifact.kind`, `owners.incremental` and `origins`. In JavaScript
+  `describeConfig()` takes no argument and describes what the runtime is fixed
+  to; a preview is `resolveConfig`. [API contract](../reference/api-contract.md#detector-selection-and-effective-configuration)
+  has the rest.
 
 ## Rejected
 

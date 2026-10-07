@@ -14,13 +14,22 @@ import {
   createIncrementalSanitizer,
   defaultPolicy,
   initialize,
+  initializeDetection,
   initializePii,
   piiActivation,
   redact,
+  resolveConfig,
+  resolveConfigCommon,
   scan,
   scanAndRedact,
   version,
 } from "./index.js";
+import {
+  bindingArguments,
+  casesFor,
+  checkCase,
+  loadRuntimeConfigFixture,
+} from "../../conformance/runtime-config.mjs";
 
 const SYNTHETIC_TOKEN =
   "Authorization: Bearer sk-syntheticRevokedExampleToken00000000000000000000";
@@ -85,6 +94,36 @@ check("artifact manifest describes the addon and touches no activation", () => {
   assert.deepEqual(full.notIncluded, []);
   assert.equal(common.detectors.length + common.notIncluded.length, full.detectors.length);
   assert.ok(common.detectors.length > 0 && common.detectors.length < full.detectors.length);
+});
+
+// The shared truth table for `resolveConfig` runs against the addon's own
+// resolver for both profiles. Resolution is pure: it builds no registry and
+// fixes no owner, so it runs here, before anything is initialized, and the
+// checks after it still see an untouched activation.
+check("resolveConfig runs the shared truth table and touches no activation", () => {
+  const fixture = loadRuntimeConfigFixture();
+  for (const [profile, resolve, manifestText] of [
+    ["full", resolveConfig, artifactManifest()],
+    ["common", resolveConfigCommon, artifactManifestCommon()],
+  ]) {
+    const manifest = JSON.parse(manifestText);
+    const cases = casesFor(fixture, profile);
+    assert.ok(cases.length >= 35, `${profile} ran ${cases.length} cases`);
+    for (const fixtureCase of cases) {
+      const { config, ruleset, actionPolicy, callback, disclose } = bindingArguments(fixtureCase);
+      const resolution = JSON.parse(resolve(config, ruleset, actionPolicy, callback, disclose));
+      checkCase(fixtureCase, profile, resolution, manifest, (actual, expected, message) =>
+        assert.deepEqual(actual, expected, message),
+      );
+      if (resolution.snapshot !== null) {
+        // The digest re-derived independently: sha256 over the canonical
+        // JSON of the snapshot without `digest`.
+        const { digest, ...rest } = resolution.snapshot;
+        assert.equal(digest, `sha256:${createHash("sha256").update(canonicalJson(rest)).digest("hex")}`);
+        assert.equal(Object.keys(resolution.snapshot)[0], "schema");
+      }
+    }
+  }
 });
 
 // Repeated initialization: idempotent, callable any number of times.
@@ -525,6 +564,38 @@ check("compareActionPolicies fails closed on a bad side count, a bad return and 
     () => compareActionPolicies("irrelevant", ["action-policy"], [Buffer.from("{}")], []),
     (error) => error.code === "INVALID_ACTION_POLICY",
   );
+});
+
+// Detector selection joins the one-shot ownership of the PII selection. The
+// owner is already fixed by the checks above, so this proves the refusals: an
+// equivalent request is idempotent, a differing one conflicts without any
+// change, and a rejected one is a fixed code that never echoes the id.
+check("detector selection is rejected or conflicts without changing the owner", () => {
+  const before = JSON.stringify(scan(SYNTHETIC_TOKEN));
+  // The owner's PII selection is part of the request: a differing one would
+  // be a PII conflict, reported first.
+  const pii = PII_SELECTOR === undefined ? [] : [PII_SELECTOR];
+  assert.throws(
+    () => initializeDetection(pii, '{"exclude":["jwt"]}'),
+    (error) => error.code === "DETECTION_CONFIG_CONFLICT",
+  );
+  const secretLike = "SYNTHETICUNKNOWNDETECTORID000000";
+  assert.throws(
+    () => initializeDetection(pii, JSON.stringify({ include: [secretLike.toLowerCase()] })),
+    (error) =>
+      error.code === "INVALID_DETECTION_CONFIG" &&
+      error.message.includes("UNKNOWN_DETECTOR_ID") &&
+      !error.message.toLowerCase().includes(secretLike.toLowerCase()),
+  );
+  assert.throws(
+    () => initializeDetection(pii, '{"include":[]}'),
+    (error) => error.code === "EMPTY_DETECTION_SET",
+  );
+  assert.throws(
+    () => initializeDetection(pii, '{"include":["jwt"],"exclude":["jwt"]}'),
+    (error) => error.code === "INVALID_DETECTION_CONFIG" && error.message.includes("DETECTION_SELECTOR_CONFLICT"),
+  );
+  assert.equal(JSON.stringify(scan(SYNTHETIC_TOKEN)), before);
 });
 
 if (process.exitCode) {

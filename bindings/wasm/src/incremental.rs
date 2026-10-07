@@ -1055,7 +1055,7 @@ mod tests {
         policy: Option<Function>,
         formatter: Option<Function>,
     ) -> IncrementalSanitizerJs {
-        crate::initialize(Vec::new()).unwrap();
+        crate::initialize(Vec::new(), None).unwrap();
         create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, policy, formatter, None)
             .unwrap()
     }
@@ -1067,7 +1067,7 @@ mod tests {
     /// is involved, so this runs natively.
     #[test]
     fn a_session_binds_the_action_policy_it_was_constructed_with() {
-        crate::initialize(Vec::new()).unwrap();
+        crate::initialize(Vec::new(), None).unwrap();
         let secret = crate::synthetic::secret();
         let document = |action: &str| {
             format!(
@@ -1284,7 +1284,7 @@ mod tests {
     /// plaintext it was still holding.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_token_limit_failure_discards_retained_plaintext() {
-        crate::initialize(Vec::new()).unwrap();
+        crate::initialize(Vec::new(), None).unwrap();
         let (token, multiline): (usize, usize) = (32, 64);
         let buffered = IncrementalLimits::minimum_buffered_bytes(token, multiline);
         let mut session = create_incremental_sanitizer(

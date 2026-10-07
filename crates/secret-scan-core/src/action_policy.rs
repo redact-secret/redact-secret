@@ -389,6 +389,11 @@ impl ActionPolicy {
         self.explain(finding).0
     }
 
+    /// The number of rules, for the configuration snapshot.
+    pub(crate) fn rule_count(&self) -> usize {
+        self.rules.len()
+    }
+
     /// The SHA-256 of the exact document bytes this policy was loaded from:
     /// the policy's revision binding.
     ///

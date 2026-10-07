@@ -129,9 +129,205 @@ export interface ArtifactManifest {
  */
 export type SecretObfuscation = "none" | "invisible-characters";
 
-/** Options accepted by `initialize`. PII stays off when omitted or empty. */
+/**
+ * The detector-id selection (`detection` of `runtime-config/v1`): which of the
+ * artifact's included built-in detectors are enabled. At most one of the two
+ * members.
+ *
+ * - `include`: exactly these, an allowlist. A detector added in a later
+ *   release is not enabled. `include: []` enables no built-in detector.
+ * - `exclude`: every included detector except these, a denylist. A detector
+ *   added later is enabled. `exclude: []` is the same as omitting `detection`.
+ *
+ * Ids are `Finding.detector` values such as `"github-token"`, not types. They
+ * are not case-folded or trimmed, and request order never matters: the enabled
+ * set is the artifact's canonical order filtered to the enabled ids. An
+ * unknown, not-included or repeated id is rejected, never ignored.
+ */
+export interface DetectionSelection {
+  readonly include?: readonly string[];
+  readonly exclude?: readonly string[];
+}
+
+/**
+ * Options accepted by `initialize`. PII stays off and every included detector
+ * stays enabled when omitted.
+ *
+ * `detection` and `pii` are fixed for the thread (and profile) by the first
+ * successful call: an equivalent later request is idempotent, a differing one
+ * is `DETECTION_CONFIG_CONFLICT` (`PII_ACTIVATION_CONFLICT` for `pii`), and a
+ * rejected or conflicting request changes nothing. There is no per-call
+ * detection argument and no way to reconfigure after initialization.
+ */
 export interface InitializeOptions {
   readonly pii?: readonly string[];
+  /**
+   * The detector-id selection (issue #1251). Applied when the registry is
+   * built, before the prefilter and overlap resolution. Rejected with
+   * `INVALID_DETECTION_CONFIG` when it names an unknown, not-included or
+   * repeated id (no other artifact is ever loaded to satisfy it), and with
+   * `EMPTY_DETECTION_SET` when nothing would be enabled.
+   */
+  readonly detection?: DetectionSelection;
+}
+
+/**
+ * What a caller asks for, as data (`runtime-config/v1`). Every key is
+ * optional and an absent key inherits the artifact default; an explicit empty
+ * value disables; an array or a policy document replaces and is never merged
+ * with another layer. A callback is not data: pass it as
+ * {@link ResolveConfigOptions.policy}.
+ */
+export interface RuntimeConfig {
+  readonly schema?: "runtime-config/v1";
+  readonly detection?: DetectionSelection;
+  /** PII selectors, as for {@link InitializeOptions.pii}. Absent and `[]` are both off. */
+  readonly pii?: readonly string[];
+  /** A declarative ruleset, as for {@link ScanOptions.ruleset}. Adds detectors; empty is not expressible. */
+  readonly ruleset?: Uint8Array | string;
+  /** A declarative action policy, as for {@link ScanOptions.actionPolicy}. Replaces the whole document. */
+  readonly actionPolicy?: ActionPolicyInput;
+  /** Whole-input limits; each field inherits the artifact default independently. */
+  readonly limits?: { readonly maxInputBytes?: number; readonly maxFindings?: number };
+}
+
+/** Options of `resolveConfig` that are not configuration data. */
+export interface ResolveConfigOptions {
+  /**
+   * A callback policy that is in force. It is recorded as a dynamic reference
+   * (`actionPolicy.source: "callback"`, `explainable: false`) and never
+   * called; together with `actionPolicy` it is `INVALID_OPTIONS`.
+   */
+  readonly policy?: SecretPolicy;
+  /**
+   * Includes the ruleset's detector ids and byte digest in the snapshot. Off
+   * by default: a ruleset's identity can be sensitive, and
+   * {@link ConfigSnapshot.detectionDigest} already says whether two
+   * detections are the same.
+   */
+  readonly discloseRulesetIdentity?: boolean;
+}
+
+/** One safe finding about a configuration input (`config-diagnostics/v1`). */
+export interface ConfigDiagnostic {
+  /** A fixed code such as `UNKNOWN_DETECTOR_ID`; an unknown code is handled by its `severity`. */
+  readonly code: string;
+  readonly severity: "error" | "warning" | "info";
+  /**
+   * A fixed-syntax pointer such as `detection.include[3]`. An unknown member is
+   * addressed by its position (`detection.@1`), never its name.
+   */
+  readonly path: string;
+  /** Only ever a canonical detector id from the catalog; `null` otherwise. */
+  readonly id: string | null;
+}
+
+/**
+ * The resolved, effective configuration (`config-snapshot/v1`): immutable data
+ * that explains what is compiled, enabled, disabled and unavailable, where each
+ * value came from, and which identity it has. It is not a handle and cannot
+ * scan.
+ *
+ * It holds ids, counts, digests and fixed words. It never holds an input byte,
+ * a ruleset body, a rule's pattern, a matched value or a path, and no scalar
+ * sensitivity or probability.
+ */
+export interface ConfigSnapshot {
+  readonly schema: "config-snapshot/v1";
+  readonly artifact: {
+    readonly compositionId: string | null;
+    readonly kind: string;
+    /** The digest of the artifact manifest the defaults are bound to. */
+    readonly manifestDigest: string;
+    readonly profile: string;
+    readonly version: string;
+  };
+  readonly detection: {
+    /** Built-in detectors linked into the artifact. */
+    readonly compiledCount: number;
+    /** Custom detectors a Rust registry holds; they are code, not data. */
+    readonly customDetectors: number;
+    /** Included but not enabled, in canonical order. */
+    readonly disabled: readonly string[];
+    /** Enabled, in canonical order. */
+    readonly enabled: readonly string[];
+    readonly enabledCount: number;
+    readonly mode: "all-included" | "include" | "exclude";
+    /** `full` built-ins this artifact does not include: unavailable here. */
+    readonly unavailable: readonly string[];
+  };
+  readonly ruleset: {
+    readonly detectorCount: number | null;
+    /** Withheld (`null`) unless `discloseRulesetIdentity` was set. */
+    readonly detectorIds: readonly string[] | null;
+    readonly digest: string | null;
+    readonly disclosed: boolean;
+    readonly present: boolean;
+    readonly revision: number | null;
+  };
+  readonly pii: {
+    /** The existing canonical activation identity string, unchanged. */
+    readonly activation: string;
+    readonly available: boolean;
+    readonly families: readonly string[];
+    readonly selectors: readonly string[];
+  };
+  readonly actionPolicy: {
+    /** The digest of the exact serialized policy document, or `null`. */
+    readonly digest: string | null;
+    /** `false` for a callback: its decisions cannot be explained or reproduced. */
+    readonly explainable: boolean;
+    readonly revision: number | null;
+    readonly ruleCount: number | null;
+    readonly source: "default" | "document" | "callback";
+  };
+  readonly limits: { readonly maxFindings: number; readonly maxInputBytes: number };
+  /** Who fixes each setting on this surface: `initialize`, `registry`, `call` or `session`. */
+  readonly owners: {
+    readonly actionPolicy: string;
+    readonly detection: string;
+    readonly incremental: string;
+    readonly limits: string;
+    readonly pii: string;
+    readonly ruleset: string;
+  };
+  /** Where each value came from: `artifact-default` or `runtime`. */
+  readonly origins: {
+    readonly actionPolicy: string;
+    readonly detection: string;
+    readonly maxFindings: string;
+    readonly maxInputBytes: string;
+    readonly pii: string;
+    readonly ruleset: string;
+  };
+  readonly effects: {
+    /** `true` when a disabled built-in could change which detector wins an overlap. */
+    readonly overlapOutcomesMayChange: boolean;
+    /** `true` when nothing at all is enabled; binding it to an owner fails. */
+    readonly inert: boolean;
+  };
+  /** `sha256:` over the manifest digest, the enabled ids, the ruleset digest and the PII activation: equal digests mean the same detection. */
+  readonly detectionDigest: string;
+  /** `sha256:` over the canonical JSON of this object without `digest`. */
+  readonly digest: string;
+}
+
+/**
+ * What `resolveConfig` returns (`config-resolution/v1`). Invalid input is
+ * data: `ok` is `false`, `snapshot` is `null` and every problem is listed, so
+ * a tool can show them all.
+ */
+export interface ConfigResolution {
+  readonly schema: "config-resolution/v1";
+  readonly ok: boolean;
+  readonly snapshot: ConfigSnapshot | null;
+  readonly diagnostics: {
+    readonly schema: "config-diagnostics/v1";
+    /** `true` when more than 256 diagnostics were produced and the rest dropped. */
+    readonly truncated: boolean;
+    /** Errors first, then in document order. */
+    readonly items: readonly ConfigDiagnostic[];
+  };
 }
 
 /**
@@ -150,6 +346,12 @@ export interface CoreStatus {
    * string) once initialized; `null` before.
    */
   readonly activation: string | null;
+  /**
+   * The `digest` of the snapshot of the configuration this runtime is fixed to
+   * (`describeConfig().digest`) once initialized; `null` before, and `null`
+   * when the loaded artifact reports no configuration. An additive field.
+   */
+  readonly configuration: string | null;
 }
 
 /**

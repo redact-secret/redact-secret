@@ -18,9 +18,9 @@ use std::cell::{OnceCell, RefCell};
 use std::rc::Rc;
 
 use redact_secret::{
-    ArtifactKind, ArtifactManifest, DetectorRegistry, IncrementalLimits, IncrementalPolicy,
-    IncrementalSanitizer, PiiSelection, PlaceholderFormatter, Profile, SecretScanError,
-    SecretScanErrorCode,
+    ArtifactKind, ArtifactManifest, ArtifactManifestError, ConfigRequest, DetectionSelection,
+    DetectorRegistry, IncrementalLimits, IncrementalPolicy, IncrementalSanitizer, PiiSelection,
+    PlaceholderFormatter, Profile, SecretScanError, SecretScanErrorCode,
 };
 
 use crate::error::WasmErrorCode;
@@ -51,19 +51,62 @@ const SOURCE_REVISION: Option<&str> = option_env!("REDACT_SECRET_SOURCE_REVISION
 /// `common` artifact links no `provider` detector for it. It builds no
 /// registry and reads no PII selection, so it is safe before and without
 /// [`initialize`].
-#[cfg(feature = "full")]
 pub(crate) fn artifact_manifest() -> Result<String, WasmErrorCode> {
-    ArtifactManifest::full(ArtifactKind::Wasm, PII_RUNTIME, SOURCE_REVISION)
+    manifest()
         .map(|manifest| manifest.as_json().to_owned())
         .map_err(WasmErrorCode::from)
 }
 
+/// This artifact's manifest value, selected at compile time like
+/// [`artifact_manifest`] (one constructor per build).
+#[cfg(feature = "full")]
+fn manifest() -> Result<ArtifactManifest, ArtifactManifestError> {
+    ArtifactManifest::full(ArtifactKind::Wasm, PII_RUNTIME, SOURCE_REVISION)
+}
+
 /// See the `full` variant above.
 #[cfg(not(feature = "full"))]
-pub(crate) fn artifact_manifest() -> Result<String, WasmErrorCode> {
+fn manifest() -> Result<ArtifactManifest, ArtifactManifestError> {
     ArtifactManifest::common(ArtifactKind::Wasm, PII_RUNTIME, SOURCE_REVISION)
-        .map(|manifest| manifest.as_json().to_owned())
-        .map_err(WasmErrorCode::from)
+}
+
+/// Resolves explicit runtime input over this artifact's build defaults into
+/// the `config-resolution/v1` document (issue #1251), as JSON text. Pure: it
+/// builds no registry, reads no owner state and initializes nothing, so it is
+/// safe before and without [`initialize`]. Invalid input is data in the
+/// document, never an error.
+///
+/// # Errors
+///
+/// The fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class when the
+/// compile-time source revision is malformed.
+pub(crate) fn resolve_config(
+    config: Option<&str>,
+    ruleset: Option<&[u8]>,
+    action_policy: Option<&[u8]>,
+    callback: bool,
+    disclose: bool,
+) -> Result<String, WasmErrorCode> {
+    let manifest = manifest()?;
+    let mut request = ConfigRequest::new();
+    if let Some(config) = config {
+        request = request.runtime_config(config);
+    }
+    if let Some(bytes) = ruleset {
+        request = request.ruleset(bytes);
+    }
+    if let Some(bytes) = action_policy {
+        request = request.action_policy(bytes);
+    }
+    if callback {
+        request = request.callback_policy();
+    }
+    if disclose {
+        request = request.disclose_ruleset_identity();
+    }
+    Ok(redact_secret::resolve_config(&manifest, &request)
+        .as_json()
+        .to_owned())
 }
 
 /// Builds this artifact's profile registry with no custom detectors.
@@ -104,6 +147,22 @@ fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErr
     DetectorRegistry::with_common_built_in([]).map_err(WasmErrorCode::from)
 }
 
+/// [`registry_with_ruleset_unselected`] with the owner's detector selection
+/// applied to the built-ins (issue #1251). The ruleset's detectors stay, so
+/// the registry is never inert here. Applied after construction, so the
+/// compile-time constructor choice below is untouched and a `common` artifact
+/// still links no `provider` detector.
+///
+/// # Errors
+///
+/// The errors of [`registry_with_ruleset_unselected`], or the selection's own
+/// rejection, which a validated owner never produces.
+pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+    let registry = registry_with_ruleset_unselected(ruleset)?;
+    let detection = active_detection()?;
+    Ok(registry.with_detection(&detection)?)
+}
+
 /// Builds a registry over this artifact's compiled profile's built-ins,
 /// plus every detector `ruleset` declares (issue #495,
 /// `decision-define-declarative-detector-ruleset-contract`). Unlike
@@ -126,7 +185,7 @@ fn build_registry(_selection: &PiiSelection) -> Result<DetectorRegistry, WasmErr
 /// [`WasmErrorCode::InitializationFailed`] on the same never-observed
 /// built-in registration failure [`build_registry`] documents.
 #[cfg(all(feature = "full", feature = "pii"))]
-pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
     let selection = active_selection()?;
     Ok(DetectorRegistry::with_built_in_and_pii_custom(
@@ -136,7 +195,7 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
 
 /// See the `full` + `pii` variant above.
 #[cfg(all(not(feature = "full"), feature = "pii"))]
-pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
     let selection = active_selection()?;
     Ok(DetectorRegistry::with_common_built_in_and_pii_custom(
@@ -146,7 +205,7 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
 
 /// See the `full` + `pii` variant above.
 #[cfg(all(feature = "full", not(feature = "pii")))]
-pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
     active_selection()?;
     Ok(DetectorRegistry::with_built_in(detectors)?)
@@ -154,7 +213,7 @@ pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, 
 
 /// See the `full` + `pii` variant above.
 #[cfg(all(not(feature = "full"), not(feature = "pii")))]
-pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+fn registry_with_ruleset_unselected(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
     active_selection()?;
     Ok(DetectorRegistry::with_common_built_in(detectors)?)
@@ -219,6 +278,15 @@ fn active_selection_for_session() -> Result<PiiSelection, SecretScanError> {
     })
 }
 
+/// The detector selection the owner is fixed to, as the core error an
+/// incremental constructor reports.
+fn active_detection_for_session() -> Result<DetectionSelection, SecretScanError> {
+    active_detection().map_err(|code| match code {
+        WasmErrorCode::Core(core) => SecretScanError::from(core),
+        _ => SecretScanErrorCode::InvalidState.into(),
+    })
+}
+
 /// Creates an incremental session over this artifact's profile's built-in
 /// detectors: the incremental counterpart of [`build_registry`], selected
 /// the same compile-time way so the `common` artifact's streaming path
@@ -236,8 +304,9 @@ pub(crate) fn new_incremental_session(
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
     let selection = active_selection_for_session()?;
-    IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
-        limits, &selection, policy, formatter,
+    let detection = active_detection_for_session()?;
+    IncrementalSanitizer::with_built_in_and_pii_detection_policy_and_formatter(
+        limits, &selection, &detection, policy, formatter,
     )
 }
 
@@ -249,8 +318,9 @@ pub(crate) fn new_incremental_session(
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
     let selection = active_selection_for_session()?;
-    IncrementalSanitizer::with_common_built_in_and_pii_policy_and_formatter(
-        limits, &selection, policy, formatter,
+    let detection = active_detection_for_session()?;
+    IncrementalSanitizer::with_common_built_in_and_pii_detection_policy_and_formatter(
+        limits, &selection, &detection, policy, formatter,
     )
 }
 
@@ -262,7 +332,8 @@ pub(crate) fn new_incremental_session(
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
     active_selection_for_session()?;
-    IncrementalSanitizer::with_policy_and_formatter(limits, policy, formatter)
+    let detection = active_detection_for_session()?;
+    IncrementalSanitizer::with_detection_policy_and_formatter(limits, &detection, policy, formatter)
 }
 
 /// See the `full` + `pii` variant above.
@@ -273,12 +344,18 @@ pub(crate) fn new_incremental_session(
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
     active_selection_for_session()?;
-    IncrementalSanitizer::with_common_built_in_policy_and_formatter(limits, policy, formatter)
+    let detection = active_detection_for_session()?;
+    IncrementalSanitizer::with_common_built_in_detection_policy_and_formatter(
+        limits, &detection, policy, formatter,
+    )
 }
 
 thread_local! {
     static REGISTRY: OnceCell<Result<DetectorRegistry, WasmErrorCode>> = const { OnceCell::new() };
     static SELECTION: OnceCell<PiiSelection> = const { OnceCell::new() };
+    /// The detector selection the owner is fixed to (issue #1251), set by the
+    /// first successful initialization and never changed afterwards.
+    static DETECTION: OnceCell<DetectionSelection> = const { OnceCell::new() };
 }
 
 /// Idempotently initializes the module: the first call builds and caches the
@@ -297,14 +374,43 @@ thread_local! {
 /// without caching it, so a later PII-off call can still succeed; once it
 /// has been initialized PII-off, a different selection is the same
 /// `PII_ACTIVATION_CONFLICT` a PII-capable artifact reports.
+#[cfg(test)]
 pub(crate) fn initialize(selectors: &[String]) -> Result<(), WasmErrorCode> {
+    initialize_with(selectors, &DetectionSelection::all())
+}
+
+/// [`initialize`] with a detector-id selection (issue #1251).
+///
+/// An equivalent resolved selection is idempotent (the same enabled detectors
+/// in the same order), a differing one, including the legacy call that names
+/// none, is `DETECTION_CONFIG_CONFLICT`, and a rejected or conflicting
+/// request changes nothing: it is validated before anything is cached, so a
+/// later valid initialization still succeeds. An unknown, not-included or
+/// repeated id is `INVALID_DETECTION_CONFIG`; a configuration that enables
+/// nothing is `EMPTY_DETECTION_SET`. No other artifact is ever loaded to
+/// satisfy a request.
+///
+/// # Errors
+///
+/// As [`initialize`], plus the selection errors above.
+pub(crate) fn initialize_with(
+    selectors: &[String],
+    detection: &DetectionSelection,
+) -> Result<(), WasmErrorCode> {
     let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
     let selection = PiiSelection::parse(&borrowed)?;
     let identity = selection.activation_identity(PROFILE);
     REGISTRY.with(|cell| {
         if let Some(existing) = cell.get() {
             return match existing {
-                Ok(registry) if registry.activation_identity() == identity => Ok(()),
+                Ok(registry) if registry.activation_identity() == identity => {
+                    let candidate = build_registry(&selection)?.with_detection(detection)?;
+                    if registry.ids().eq(candidate.ids()) {
+                        Ok(())
+                    } else {
+                        Err(SecretScanErrorCode::DetectionConfigConflict.into())
+                    }
+                }
                 Ok(_) => Err(SecretScanErrorCode::PiiActivationConflict.into()),
                 Err(code) => Err(*code),
             };
@@ -312,16 +418,39 @@ pub(crate) fn initialize(selectors: &[String]) -> Result<(), WasmErrorCode> {
         if !PII_RUNTIME && !selection.is_off() {
             return Err(SecretScanErrorCode::PiiSelectorUnavailable.into());
         }
-        let registry = build_registry(&selection);
+        // Validate before caching: a rejected selection leaves the owner as
+        // it was.
+        let registry = build_registry(&selection).and_then(|registry| {
+            registry
+                .with_detection(detection)
+                .map_err(WasmErrorCode::from)
+        });
+        if let Err(code) = &registry
+            && matches!(code, WasmErrorCode::Detection(_))
+        {
+            return Err(*code);
+        }
         let outcome = registry.as_ref().map(|_| ()).map_err(|code| *code);
         let _ = cell.set(registry);
         if outcome.is_ok() {
             SELECTION.with(|slot| {
                 let _ = slot.set(selection);
             });
+            DETECTION.with(|slot| {
+                let _ = slot.set(detection.clone());
+            });
         }
         outcome
     })
+}
+
+/// The detector selection the owner is fixed to.
+///
+/// # Errors
+///
+/// [`WasmErrorCode::NotInitialized`] before a successful [`initialize`].
+fn active_detection() -> Result<DetectionSelection, WasmErrorCode> {
+    DETECTION.with(|cell| cell.get().cloned().ok_or(WasmErrorCode::NotInitialized))
 }
 
 fn active_selection() -> Result<PiiSelection, WasmErrorCode> {
@@ -532,5 +661,120 @@ validator: none\n";
         .unwrap()
         .unwrap();
         assert!(inner);
+    }
+
+    // -- Detector selection (issue #1251). Each test runs on its own thread
+    // and so sees its own owner state.
+
+    fn include(ids: &[&str]) -> DetectionSelection {
+        DetectionSelection::include(ids.iter().copied())
+    }
+
+    #[test]
+    fn a_selection_narrows_every_registry_the_owner_builds() {
+        let selection = DetectionSelection::exclude(["github-token"]);
+        if !cfg!(feature = "full") {
+            // `common` has no `github-token`: the request is rejected, never
+            // satisfied by loading `full`.
+            let error = initialize_with(&[], &selection).unwrap_err();
+            assert!(matches!(error, WasmErrorCode::Detection(_)));
+            return;
+        }
+        initialize_with(&[], &selection).unwrap();
+        assert!(!with_registry(|registry| registry.contains("github-token")).unwrap());
+        assert!(
+            !registry_with_ruleset(RULESET_A)
+                .unwrap()
+                .contains("github-token")
+        );
+        assert!(
+            registry_with_ruleset(RULESET_A)
+                .unwrap()
+                .contains("acme-internal-token")
+        );
+        assert_eq!(active_detection().unwrap(), selection);
+    }
+
+    #[test]
+    fn equivalent_selections_are_idempotent_and_differing_ones_conflict_without_change() {
+        initialize_with(&[], &include(&["jwt", "private-key"])).unwrap();
+        initialize_with(&[], &include(&["private-key", "jwt"])).unwrap();
+        let before =
+            with_registry(|registry| registry.ids().map(str::to_owned).collect::<Vec<_>>())
+                .unwrap();
+        for different in [
+            include(&["jwt"]),
+            DetectionSelection::exclude(["jwt"]),
+            DetectionSelection::all(),
+        ] {
+            assert_eq!(
+                initialize_with(&[], &different).unwrap_err(),
+                WasmErrorCode::Core(SecretScanErrorCode::DetectionConfigConflict)
+            );
+        }
+        assert_eq!(
+            initialize(&[]).unwrap_err(),
+            WasmErrorCode::Core(SecretScanErrorCode::DetectionConfigConflict)
+        );
+        let after = with_registry(|registry| registry.ids().map(str::to_owned).collect::<Vec<_>>())
+            .unwrap();
+        assert_eq!(before, after);
+    }
+
+    #[test]
+    fn a_rejected_selection_caches_nothing_and_a_later_valid_one_succeeds() {
+        for rejected in [
+            include(&["jwt", "no-such-detector"]),
+            include(&["jwt", "jwt"]),
+            include(&[]),
+        ] {
+            assert!(matches!(
+                initialize_with(&[], &rejected).unwrap_err(),
+                WasmErrorCode::Detection(_)
+            ));
+            assert_eq!(
+                ensure_initialized().unwrap_err(),
+                WasmErrorCode::NotInitialized
+            );
+        }
+        initialize_with(&[], &include(&["jwt"])).unwrap();
+        assert_eq!(with_registry(DetectorRegistry::len).unwrap(), 1);
+    }
+
+    #[test]
+    fn a_session_captures_the_owner_selection_at_creation() {
+        initialize_with(&[], &include(&["jwt"])).unwrap();
+        let limits = IncrementalLimits::new(1_000_000, 16_512, 8_192, 16_384).unwrap();
+        let mut session = new_incremental_session(
+            limits,
+            Box::new(redact_secret::DefaultPolicy),
+            Box::new(redact_secret::default_placeholder_formatter),
+        )
+        .unwrap();
+        let input = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+        let mut text = session.append(input).unwrap().text().to_owned();
+        text.push_str(session.finalize().unwrap().text());
+        assert_eq!(text, input, "no enabled detector claims the span");
+    }
+
+    #[test]
+    fn resolve_config_is_pure_before_initialize() {
+        let document = resolve_config(
+            Some(r#"{"detection":{"exclude":["jwt"]}}"#),
+            None,
+            None,
+            false,
+            false,
+        )
+        .unwrap();
+        assert!(document.starts_with("{\"schema\":\"config-resolution/v1\","));
+        assert!(document.contains("\"ok\":true"));
+        assert_eq!(
+            ensure_initialized().unwrap_err(),
+            WasmErrorCode::NotInitialized
+        );
+        REGISTRY.with(|cell| assert!(cell.get().is_none()));
+        // The artifact manifest says selection is supported on WebAssembly.
+        assert!(manifest().unwrap().detector_selection());
     }
 }

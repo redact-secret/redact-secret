@@ -3,7 +3,7 @@
  *
  * Every code and message below is fixed and input-free: no error carries the
  * scanned input, a matched value, a placeholder, or a failing callback's own
- * message (`decision-define-runtime-bindings`). Twenty-three codes come from the
+ * message (`decision-define-runtime-bindings`). Twenty-six codes come from the
  * Rust core — including `FINDING_LIMIT_EXCEEDED` and the broadened
  * `INPUT_LIMIT_EXCEEDED`/`INVALID_LIMITS`, shared between incremental
  * sessions and whole-input `scan`/`redact`/`scanAndRedact`
@@ -51,6 +51,9 @@ export type SecretScanErrorCode =
   | "PII_SELECTOR_UNSUPPORTED"
   | "PII_SELECTOR_UNAVAILABLE"
   | "PII_ACTIVATION_CONFLICT"
+  | "INVALID_DETECTION_CONFIG"
+  | "DETECTION_CONFIG_CONFLICT"
+  | "EMPTY_DETECTION_SET"
   | "NOT_INITIALIZED"
   | "INITIALIZATION_FAILED"
   | "INVALID_CHUNK"
@@ -90,6 +93,13 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   PII_SELECTOR_UNSUPPORTED: "PII jurisdiction or family is unsupported.",
   PII_SELECTOR_UNAVAILABLE: "PII selection is unavailable in this artifact.",
   PII_ACTIVATION_CONFLICT: "PII activation is already initialized differently.",
+  // As `INVALID_RULESET`: the raw addon and WebAssembly errors append the
+  // fixed rejection class and the id's position in parentheses; this package
+  // carries only the code, with one fixed message. `resolveConfig` reports the
+  // class, the path and the canonical id as data without throwing.
+  INVALID_DETECTION_CONFIG: "The detector selection is invalid.",
+  DETECTION_CONFIG_CONFLICT: "The detector selection is already initialized differently.",
+  EMPTY_DETECTION_SET: "The configuration enables no detector.",
   NOT_INITIALIZED: "redact-secret is not initialized; await initialize() before this call.",
   // Fixed and input-free like every other message, but also actionable
   // (issue #586): it names the failure classes and the guide that separates

@@ -6,7 +6,9 @@
 //! error carries input or a matched value.
 
 use napi::Error as NapiError;
-use redact_secret::{ActionPolicyError, ArtifactManifestError, RulesetError, SecretScanError};
+use redact_secret::{
+    ActionPolicyError, ArtifactManifestError, DetectionConfigError, RulesetError, SecretScanError,
+};
 
 /// The JavaScript error type this crate throws: `status` (surfaced to
 /// JavaScript as `code`) carries the fixed [`redact_secret::SecretScanErrorCode`]
@@ -64,6 +66,24 @@ pub fn to_js_action_policy_error(error: ActionPolicyError) -> JsError {
     )
 }
 
+/// Converts a rejected detector selection into the JavaScript error contract
+/// (issue #1251). `status` is `INVALID_DETECTION_CONFIG` (or
+/// `EMPTY_DETECTION_SET`); the fixed rejection class and, for a problem in one
+/// id, its zero-based array position are appended to the message, never the
+/// id itself, so a secret pasted where an id belongs is not echoed.
+#[must_use]
+pub fn to_js_detection_error(error: DetectionConfigError) -> JsError {
+    let message = match error.index() {
+        Some(index) => format!(
+            "{} ({}, id {index})",
+            error.code().message(),
+            error.class_name()
+        ),
+        None => format!("{} ({})", error.code().message(), error.class_name()),
+    };
+    NapiError::new(error.code().as_str().to_owned(), message)
+}
+
 /// Converts a manifest failure into the JavaScript error contract (issue
 /// #1250). `status` is the fixed `ARTIFACT_MANIFEST_*` class code and the
 /// message is the fixed one; neither carries any document content.
@@ -86,6 +106,21 @@ mod tests {
             error.reason,
             "The artifact manifest does not match this artifact."
         );
+    }
+
+    #[test]
+    fn detection_errors_carry_the_fixed_code_class_and_position_only() {
+        let rejection = redact_secret::DetectionSelection::from_json(
+            r#"{"include":["jwt","Not-An-Identifier"]}"#,
+        )
+        .expect_err("expected the malformed id to be rejected");
+        let error = to_js_detection_error(rejection);
+        assert_eq!(error.status, "INVALID_DETECTION_CONFIG");
+        assert_eq!(
+            error.reason,
+            "The detector selection is invalid. (INVALID_IDENTIFIER, id 1)"
+        );
+        assert!(!error.reason.contains("Not-An-Identifier"));
     }
 
     #[test]

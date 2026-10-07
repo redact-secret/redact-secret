@@ -104,8 +104,12 @@ for profile membership and the false-negative tradeoff, and the
 without initializing or reconfiguring anything. They take no input, never
 throw or raise, and return only fixed fields: `initialized` (boolean),
 `profile` (`"full"` or `"common"`) and `activation` (the `piiActivation()` /
-`pii_activation()` identity once initialized, otherwise `null` / `None`). Both
-types are named `CoreStatus`. They are additive stable names, not available in
+`pii_activation()` identity once initialized, otherwise `null` / `None`). The
+JavaScript result also carries the additive field `configuration`, the `digest`
+of the snapshot of the configuration the runtime is fixed to (`describeConfig()`),
+`null` before initialization; it is an additive output field, not a breaking
+change, and Python's result does not have it (Python has no configuration
+resolution). Both types are named `CoreStatus`. They are additive stable names, not available in
 releases before the one that adds them, and they are not a detection-readiness
 claim. The Rust crate and the CLI add nothing: Rust has no lifecycle to query
 and the CLI runs one shot. A core-published synthetic readiness probe is
@@ -136,9 +140,90 @@ reads no PII selection. In JavaScript it reports the artifact `initialize()`
 loaded, and `initialize()` rejects with `INITIALIZATION_FAILED` when the
 manifest is missing from an artifact that should report one, or has another
 schema, version or variant, or a digest that is not its own, echoing none of it.
-`status()` is unchanged; no runtime detector selection exists yet, and the
-manifest says so (`capabilities.detectorSelection` is `false`)
+`capabilities.detectorSelection` is `true` for the Rust, Node addon and
+WebAssembly artifacts and `false` for the Python wheel and the CLI, so a
+manifest digest differs by artifact kind
 ([`decision-define-the-artifact-manifest-and-configuration-data-contracts`](../decisions/2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md)).
+
+## Detector selection and effective configuration
+
+A **detector-id selection** chooses which of an artifact's included built-in
+detectors are enabled. It is applied when the registry is composed, before the
+prefilter, candidate collection and overlap resolution, so a disabled detector
+produces no candidate, is no overlap competitor and adds no retention behavior;
+the enabled set is the artifact's canonical order filtered to the enabled ids,
+whatever order they were requested in. `include` is an allowlist (a detector
+added in a later release stays off), `exclude` a denylist (a later detector is
+on), never both; each takes at most 256 lowercase identifiers. An unknown,
+not-included, repeated or non-selectable id is rejected, never ignored and
+never satisfied by loading another artifact. A selection can lose coverage and
+can move a span to a weaker detector's type and action; the standard artifacts
+are unchanged without one, and server-side enforcement should run an unselected
+`full`.
+
+`resolveConfig` resolves explicit input over the artifact's build defaults into a
+`config-snapshot/v1` and every safe diagnostic (`config-resolution/v1`). It is
+pure: it scans nothing, builds no registry, initializes nothing and changes no
+owner, and invalid input is data (`ok: false`, no snapshot), not a throw. The
+shared truth table lives once, in the Rust core:
+
+| Key | Absent | Explicit empty | Explicit value |
+| --- | --- | --- | --- |
+| `detection.include` | every included detector | no built-in detector | exactly the list |
+| `detection.exclude` | none excluded | same as absent | every included detector but the list |
+| `pii` | off | off | the canonical selector set |
+| `ruleset` | none | not expressible | adds the ruleset's detectors |
+| `actionPolicy` | the artifact default | `rules: []` is the base | replaces the whole document |
+| `limits.*` | artifact default | zero is rejected | replaces that field only |
+| callback `policy` | none | n/a | replaces the default; with `actionPolicy` is `INVALID_OPTIONS` |
+
+Arrays and policy documents replace and are never merged across layers, and an
+action, `allow` included, never enables or disables a detector. The snapshot
+reports what is **compiled** (`detection.compiledCount`), **enabled**,
+**disabled** and **unavailable** (the `full` built-ins the artifact does not
+include) separately, where each value came from (`origins`), who fixes each
+setting on this surface (`owners`), and the identity of the artifact, the
+enabled detection (`detectionDigest`), the exact serialized policy document
+(`actionPolicy.digest`) and the snapshot itself (`digest`). A callback is
+labelled a dynamic reference (`source: "callback"`, `explainable: false`). The
+ruleset's detector ids and byte digest are withheld unless the caller asks for
+them. The snapshot holds ids, counts and digests only: no input byte, no ruleset
+body or rule pattern, no value, no path and no sensitivity score. Its `digest` is
+the SHA-256 of its canonical JSON without `digest`, the same rule as the manifest.
+
+| Surface | Name |
+| --- | --- |
+| Rust | `DetectionSelection`, `DetectorRegistry::with_detection`, `BuiltInRegistry::with_detection`, `IncrementalSanitizer::with_detection_policy_and_formatter` (and the `common`, PII-aware forms), `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`, `DetectionConfigError` |
+| JavaScript (root and `./common`) | `initialize({ detection })`, `resolveConfig(config?, options?)`, `describeConfig()`, `status().configuration`, types `DetectionSelection`, `RuntimeConfig`, `ResolveConfigOptions`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic` |
+| Node addon | `initializeDetection`, `initializeCommonDetection`, `resolveConfig`, `resolveConfigCommon` |
+| WebAssembly | `initialize(pii, detection?)`, `resolveConfig` |
+| Python, CLI | unsupported: a reduced detection set would only weaken a server or enforcement surface |
+
+Ownership: `detection` and `pii` belong to the initialization owner (`initialize`
+in Node and WebAssembly, the registry value in Rust) and join the one-shot
+contract of `pii`. An equivalent resolved selection is idempotent, a differing
+one, including a plain `initialize()` after a narrowed one, is
+`DETECTION_CONFIG_CONFLICT`, and a rejected or conflicting request changes
+nothing. A selection that leaves no built-in detector, no ruleset and no PII
+family enabled is inert: binding it to an owner or a session is
+`EMPTY_DETECTION_SET`, while `resolveConfig` still describes it (with the warning
+`NO_BUILT_IN_DETECTORS`). There is no `reconfigure`, setter or per-call detection
+argument: a `detection` key on `scan`, `scanAndRedact`, `redact` or a session is
+`INVALID_OPTIONS`. A streaming session captures the owner's configuration once, at
+creation, and neither accepts a ruleset nor changes afterwards. `describeConfig()`
+takes no input, reads no scan input and changes nothing; it returns the
+configuration the runtime is fixed to, and `status().configuration` is its
+`digest` (`null` before initialization). Both need a successful `initialize()` in
+JavaScript, because the resolver is the loaded artifact's own.
+
+New fixed error codes: `INVALID_DETECTION_CONFIG`, `DETECTION_CONFIG_CONFLICT` and
+`EMPTY_DETECTION_SET`. The thrown error carries only the code in JavaScript; the
+Node and WebAssembly message appends the fixed rejection class and, for one id,
+its position in the array, never the id. `resolveConfig` reports the class
+(`UNKNOWN_DETECTOR_ID`, `DETECTOR_NOT_INCLUDED`, `DUPLICATE_DETECTOR_ID`, ...), a
+fixed-syntax path such as `detection.include[3]` (an unknown member is addressed
+by position, `detection.@1`, never its name) and only a canonical catalog id
+([`decision-define-detector-id-selection-and-configuration-replacement-precedence`](../decisions/2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md)).
 
 ## Errors and extensions
 

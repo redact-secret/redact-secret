@@ -27,10 +27,14 @@ import type {
   ComparedPolicy,
   ComparedPolicyKind,
   ComparedPolicySummary,
+  ConfigDiagnostic,
+  ConfigResolution,
+  ConfigSnapshot,
   CoreStatus,
   DecisionBasis,
   DefaultSecretPolicy,
   DetectedSecretFinding,
+  DetectionSelection,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
   IncrementalSanitizerResult,
@@ -39,6 +43,8 @@ import type {
   PlaceholderFormatter,
   PolicyContext,
   RangeUnit,
+  ResolveConfigOptions,
+  RuntimeConfig,
   ScanAndRedactOptions,
   ScanOptions,
   ScanResult,
@@ -56,10 +62,12 @@ import {
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
   defaultPolicy,
+  type describeConfig,
   initialize,
   type PROFILE,
   RANGE_UNIT,
   redact,
+  type resolveConfig,
   SecretScanError,
   scan,
   scanAndRedact,
@@ -105,7 +113,46 @@ type ScanAndRedactIsSync = Expect<Equal<ReturnType<typeof scanAndRedact>, ScanRe
 type StatusIsSync = Expect<Equal<ReturnType<typeof status>, CoreStatus>>;
 type StatusTakesNoInput = Expect<Equal<Parameters<typeof status>, []>>;
 type StatusIsImmutable = Expect<Equal<CoreStatus, Readonly<CoreStatus>>>;
-type StatusFieldsAreFixed = Expect<Equal<keyof CoreStatus, "initialized" | "profile" | "activation">>;
+type StatusFieldsAreFixed = Expect<Equal<keyof CoreStatus, "initialized" | "profile" | "activation" | "configuration">>;
+/** The configuration digest is a string once initialized and null before. */
+type StatusConfigurationIsADigestOrNull = Expect<Equal<CoreStatus["configuration"], string | null>>;
+
+/**
+ * Configuration resolution is synchronous data. `resolveConfig` takes data and
+ * an options bag, `describeConfig` takes nothing at all (it is input-free), and
+ * both return frozen, readonly snapshots that carry no value.
+ */
+type ResolveConfigIsSync = Expect<Equal<ReturnType<typeof resolveConfig>, ConfigResolution>>;
+type ResolveConfigTakesDataAndOptions = Expect<
+  Parameters<typeof resolveConfig> extends [
+    config?: RuntimeConfig | undefined,
+    options?: ResolveConfigOptions | undefined,
+  ]
+    ? true
+    : false
+>;
+type DescribeConfigIsSync = Expect<Equal<ReturnType<typeof describeConfig>, ConfigSnapshot>>;
+type DescribeConfigTakesNoInput = Expect<Equal<Parameters<typeof describeConfig>, []>>;
+type SnapshotIsImmutable = Expect<Equal<ConfigSnapshot, Readonly<ConfigSnapshot>>>;
+type ResolutionIsImmutable = Expect<Equal<ConfigResolution, Readonly<ConfigResolution>>>;
+type DiagnosticIsImmutable = Expect<Equal<ConfigDiagnostic, Readonly<ConfigDiagnostic>>>;
+type SnapshotCarriesNoScalarSensitivity = Expect<
+  "sensitivity" | "score" | "probability" | "percentage" extends never
+    ? true
+    : Extract<keyof ConfigSnapshot, "sensitivity" | "score" | "probability" | "percentage"> extends never
+      ? true
+      : false
+>;
+type SnapshotHoldsNoInputOrRulesetBody = Expect<
+  Extract<keyof ConfigSnapshot, "input" | "text" | "value" | "body" | "pattern"> extends never ? true : false
+>;
+/** Detection is an `initialize` setting and a configuration key, never a call option. */
+type NoPerCallDetection = Expect<
+  "detection" extends keyof ScanOptions | keyof ScanAndRedactOptions | keyof IncrementalSanitizerOptions ? false : true
+>;
+type DetectionIsOneOfTwoLists = Expect<Equal<keyof DetectionSelection, "include" | "exclude">>;
+/** A callback is not configuration data. */
+type RuntimeConfigHasNoCallback = Expect<"policy" extends keyof RuntimeConfig ? false : true>;
 
 const policy: SecretPolicy = {
   evaluate(finding: DetectedSecretFinding, context: PolicyContext): SecretAction {

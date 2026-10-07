@@ -37,10 +37,12 @@ only layer that changes what can be found at all.
 | Declarative ruleset (adds detectors) | supported (`load_ruleset` into `DetectorRegistry`; not `BuiltInRegistry`) | supported (argument of `scan`, `scanAndRedact`; not incremental) | supported (same, per module instance) | supported (`ruleset=` of `scan`, `scan_and_redact`; not incremental) | supported (`--ruleset <path>`; refused with standard input) |
 | PII selector | per registry or session (`PiiSelection`) | one-shot per thread and profile (`initialize({ pii })`) | one-shot per module instance; only the `pii` artifact variant accepts a selection | one-shot per process (`initialize(pii=...)`) | per invocation (`--pii`, repeatable) |
 
-Per-detector runtime selection is excluded by the
-[profile and pack contract](../decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
-("Runtime detector selection by detector id is not offered on any surface"). A
-profile is the unit of selection; a ruleset only adds.
+The [profile and pack contract](../decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
+excluded per-detector runtime selection; the [#1249 records](../decisions/2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md)
+amended that for Rust, Node and WebAssembly, and section 6 has what shipped
+with #1251: a selection by detector id, fixed once by the initialization owner,
+within the artifact's compiled detectors. A profile is still the named unit; a
+ruleset only adds; Python and the CLI stay profile-only.
 
 ### Detector disabling and overlap
 
@@ -170,9 +172,9 @@ requirement with evidence reopens it. The rows above are unchanged unless named.
 | --- | --- | --- | --- | --- | --- |
 | `full`, `common` profiles | existing | existing | existing | existing (`full`) | existing (`full`) |
 | Artifact manifest, generated from the real composition (#1250) | existing (`ArtifactManifest`) | existing (`artifactManifest()`; addon `artifactManifest`, `artifactManifestCommon`) | existing (`artifactManifest()`; one manifest per built artifact) | existing (`artifact_manifest()`) | existing (`--print-artifact-manifest`) |
-| `resolveConfig`, `describeConfig`, `status().configuration` (#1251) | proposed | proposed | proposed | unsupported | unsupported |
+| `resolveConfig`, `describeConfig`, `status().configuration` (#1251) | existing (`resolve_config`, `describe_config`) | existing (`resolveConfig()`, `describeConfig()`, `status().configuration`; addon `resolveConfig`, `resolveConfigCommon`) | existing (`resolveConfig()`, `describeConfig()`; module export `resolveConfig`) | unsupported | unsupported |
 | Safe diagnostics (#1252) | proposed | proposed | proposed | unsupported | unsupported |
-| Runtime detector-id selection, owned by `initialize` or the registry (#1251) | proposed | proposed | proposed | unsupported | unsupported |
+| Runtime detector-id selection, owned by `initialize` or the registry (#1251) | existing (`DetectorRegistry::with_detection`) | existing (`initialize({ detection })`; addon `initializeDetection`, `initializeCommonDetection`) | existing (`initialize({ detection })`; module `initialize(pii, detection)`) | unsupported | unsupported |
 | Static custom composition (#1253) | proposed (leaf crate) | unsupported | proposed, first | unsupported | unsupported |
 | `compareConfigurations`, per call, preview only (#1254) | proposed | proposed | proposed | unsupported | unsupported |
 | Action policy and `compareActionPolicies` | existing | existing | existing | policy only | existing |
@@ -218,9 +220,43 @@ pack or type table of its own. What it says and does not say:
   version, of another variant, or whose digest is not its own fails
   `initialize()` with `INITIALIZATION_FAILED` and echoes none of the document.
 
+### Detector selection and configuration resolution (#1251)
+
+Implemented once in the Rust core; every binding forwards to it and keeps no
+precedence table, detector list or default of its own. What it does and does
+not say:
+
+- **Selection acts at composition.** A disabled detector is not prefiltered and
+  has no candidate or overlap role. The prefilter is recompiled over the
+  survivors, so a disabled detector costs nothing at scan time, and the PII
+  activation identity is unchanged. The cost is the one this matrix measured:
+  with `common`, a bare provider token disappears, and after `API_KEY=` a span
+  becomes `contextual_secret` with another default action. The snapshot flags
+  it (`effects.overlapOutcomesMayChange`) and `resolveConfig` reports
+  `OVERLAP_OUTCOMES_MAY_CHANGE`.
+- **The four levels are separate in the snapshot.** Compiled
+  (`detection.compiledCount`), enabled and disabled (`detection.enabled`,
+  `detection.disabled`) and unavailable (`detection.unavailable`, the `full`
+  built-ins this artifact lacks) are distinct lists; an action policy never
+  appears in them, and an `allow` rule changes nothing in `detection`.
+- **Above the ceiling is refused, not ignored.** `common` rejects a `provider`
+  id as `DETECTOR_NOT_INCLUDED` and never loads `full`; an artifact without
+  the PII runtime rejects a PII selection as `PII_SELECTOR_UNAVAILABLE`; the
+  Python wheel and the CLI report `detectorSelection: false` and reject a
+  selection as `DETECTION_SELECTION_UNSUPPORTED`.
+- **One owner, fixed once.** Selection joins the one-shot contract of the PII
+  selection; nothing reconfigures an owner, a session fixes the owner's
+  configuration at creation and takes no ruleset, and a second JavaScript
+  wrapper still shares the entry singleton. An owner that enables nothing is
+  `EMPTY_DETECTION_SET`.
+- **Snapshots are data.** They cannot scan, hold no input, ruleset body, rule
+  pattern, value or path, withhold the ruleset's ids and digest by default, and
+  carry no scalar sensitivity or percentage. A callback is a labelled dynamic
+  reference, not reproducible behavior.
+
 ## 7. What this does not authorize
 
-- No per-detector selection beyond the proposed rows of section 6, no numeric sensitivity or confidence threshold,
+- No per-detector selection beyond the rows of section 6 (Rust, Node and WebAssembly only), no numeric sensitivity or confidence threshold,
   and no change to the identity and sensitivity gate is offered.
 - No second, reconfigurable global; a handle, when one is added, is built
   once with a fixed selection and never mutated.

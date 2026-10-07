@@ -66,6 +66,8 @@
 //! | Explain and compare action policies | [`compare_action_policies`], [`compare_action_policies_with_limits`], [`ComparedPolicy`], [`ActionComparison`], [`ComparedFinding`], [`ActionDecision`], [`DecisionBasis`], [`ComparedSide`], [`PolicyBinding`], [`ActionCounts`], [`DetectionIdentity`], [`MAX_COMPARED_POLICIES`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Artifact manifest | [`ArtifactManifest`], [`ArtifactKind`], [`ArtifactManifestError`] |
+//! | Detector selection | [`DetectionSelection`], [`DetectionConfigError`] |
+//! | Effective configuration | [`resolve_config`], [`describe_config`], [`ConfigRequest`], [`ConfigResolution`], [`ConfigSnapshot`], [`ConfigDiagnostic`], [`ConfigSeverity`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
 //!
@@ -135,12 +137,14 @@
 
 mod action_policy;
 mod compare;
+mod config;
 mod detectors;
 mod entropy;
 mod error;
 mod evidence;
 mod incremental;
 mod invisible_table;
+mod json;
 mod limits;
 mod manifest;
 mod normalize;
@@ -157,6 +161,7 @@ mod policy;
 mod redact;
 mod registry;
 mod ruleset;
+mod selection;
 mod sha256;
 mod structured_validators;
 mod types;
@@ -169,6 +174,10 @@ pub use compare::{
     ActionComparison, ActionCounts, ActionDecision, ComparedFinding, ComparedPolicy, ComparedSide,
     DecisionBasis, DetectionIdentity, MAX_COMPARED_POLICIES, PolicyBinding,
     compare_action_policies, compare_action_policies_with_limits,
+};
+pub use config::{
+    ConfigDiagnostic, ConfigRequest, ConfigResolution, ConfigSeverity, ConfigSnapshot,
+    describe_config, resolve_config,
 };
 pub use entropy::shannon_entropy;
 pub use error::{
@@ -192,6 +201,7 @@ pub use redact::{
 };
 pub use registry::{BuiltInRegistry, DetectorRegistry, Profile, RegisteredDetector};
 pub use ruleset::{RulesetError, RulesetErrorClass, load_ruleset};
+pub use selection::{DetectionConfigError, DetectionSelection};
 pub use types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     MAX_IDENTIFIER_LENGTH, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,

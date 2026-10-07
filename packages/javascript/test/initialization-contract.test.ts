@@ -137,8 +137,8 @@ describe("initialization contract", () => {
         return binding;
       }, "full");
 
-      expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null });
-      expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null });
+      expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null, configuration: null });
+      expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null, configuration: null });
       expect(loads).toBe(0);
       expect(binding.calls).toEqual([]);
     });
@@ -154,12 +154,13 @@ describe("initialization contract", () => {
         initialized: true,
         profile: "full",
         activation: runtime.piiActivation(),
+        configuration: null,
       });
       expect(first.activation).toContain("selectors=pii:global");
       expect(runtime.status()).toEqual(first);
       expect(binding.calls).toEqual(callsBefore);
       expect(Object.isFrozen(first)).toBe(true);
-      expect(Object.keys(first).sort()).toEqual(["activation", "initialized", "profile"]);
+      expect(Object.keys(first).sort()).toEqual(["activation", "configuration", "initialized", "profile"]);
     });
 
     it("is not initialized while a load is pending, and starts no load", async () => {
@@ -175,13 +176,19 @@ describe("initialization contract", () => {
       const pending = runtime.initialize();
       await Promise.resolve();
 
-      expect(runtime.status()).toEqual({ initialized: false, profile: "common", activation: null });
+      expect(runtime.status()).toEqual({
+        initialized: false,
+        profile: "common",
+        activation: null,
+        configuration: null,
+      });
       release?.();
       await pending;
       expect(runtime.status()).toEqual({
         initialized: true,
         profile: "common",
         activation: "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
+        configuration: null,
       });
       expect(loads).toBe(1);
     });
@@ -193,7 +200,7 @@ describe("initialization contract", () => {
       await expect(runtime.initialize()).rejects.toThrowError(new SecretScanError("INITIALIZATION_FAILED"));
 
       const status = runtime.status();
-      expect(status).toEqual({ initialized: false, profile: "full", activation: null });
+      expect(status).toEqual({ initialized: false, profile: "full", activation: null, configuration: null });
       expect(JSON.stringify(status)).not.toMatch(/private|SYNTHETIC/);
     });
 
@@ -204,7 +211,7 @@ describe("initialization contract", () => {
         code: "PII_ACTIVATION_CONFLICT",
       });
 
-      expect(runtime.status()).toEqual({ initialized: true, profile: "full", activation: OFF });
+      expect(runtime.status()).toEqual({ initialized: true, profile: "full", activation: OFF, configuration: null });
     });
 
     it("falls back to the off identity for a binding without piiActivation", async () => {
@@ -224,7 +231,7 @@ describe("initialization contract", () => {
       const runtime = createRedactSecretRuntime(async () => binding, "full");
       await runtime.initialize();
 
-      expect(runtime.status()).toEqual({ initialized: true, profile: "full", activation: null });
+      expect(runtime.status()).toEqual({ initialized: true, profile: "full", activation: null, configuration: null });
     });
   });
 

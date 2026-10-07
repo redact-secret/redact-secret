@@ -63,13 +63,6 @@
       "rationale": "The process arguments are collected only to serialize the assessment invocation as JSON provenance. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "a16e6e837f3c79dc": {
-      "classification": "false_positive",
-      "line": 141,
-      "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
-      "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
-      "rule_id": "sast.rules.rust.lang.security.args"
-    },
     "e59ba1065557f649": {
       "classification": "false_positive",
       "line": 349,
@@ -518,13 +511,6 @@
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic lookup selects a lane function from a literal three-entry object (`node`/`python`/`browser`); `options.lane` is validated against the fixed `LANES` list during argument parsing, before this call, so the invoked function is always one of the three lane functions defined in this file, never externally controlled. This is a local qualification script, not a network-facing service."
     },
-    "4240b15f2c8c9d92": {
-      "classification": "false_positive",
-      "line": 139,
-      "path": "crates/secret-scan-core/examples/pii_identity_evaluation.rs",
-      "rationale": "The maintainer-local PII identity evaluation example reads `env::args().skip(1)`, discarding argv[0], and accepts one option: --family, whose value must name one of the six closed production PII family ids or the example exits with an error. Arguments are never interpreted as a command, passed to a shell, used to launch a process, or used for an authorization decision, and the example is outside every published package, so neither the argv[0] nor the command-argument injection concern this generic rule targets applies.",
-      "rule_id": "sast.rules.rust.lang.security.args"
-    },
     "30911d02b54979a8": {
       "classification": "false_positive",
       "line": 142,
@@ -608,6 +594,20 @@
       "path": "scripts/contrib-new-detector.mjs",
       "rationale": "The template string is the CLI `--help` usage text, containing `<detector-id>`-style placeholders for the terminal. It is printed to stdout, never assigned to `innerHTML`, rendered into a DOM, or interpreted as markup.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
+    },
+    "aff813a28b447d41": {
+      "classification": "false_positive",
+      "line": 145,
+      "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
+      "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
+      "rule_id": "sast.rules.rust.lang.security.args"
+    },
+    "3f440c23d169cfd2": {
+      "classification": "false_positive",
+      "line": 143,
+      "path": "crates/secret-scan-core/examples/pii_identity_evaluation.rs",
+      "rationale": "The maintainer-local PII identity evaluation example reads `env::args().skip(1)`, discarding argv[0], and accepts one option: --family, whose value must name one of the six closed production PII family ids or the example exits with an error. Arguments are never interpreted as a command, passed to a shell, used to launch a process, or used for an authorization decision, and the example is outside every published package, so neither the argv[0] nor the command-argument injection concern this generic rule targets applies.",
+      "rule_id": "sast.rules.rust.lang.security.args"
     }
   },
   "known_errors": {
