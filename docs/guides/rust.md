@@ -2,8 +2,11 @@
 
 [Documentation home](../README.md) · [Installation](../getting-started.md)
 
-The `redact-secret` crate is imported as `redact_secret`. It has no normal
-runtime dependencies and performs no network or filesystem access. Add it with
+The `redact-secret` crate is imported as `redact_secret`. It performs no
+network, filesystem, or environment access: processing is local and
+deterministic. It is not dependency-free: its one normal dependency is
+`unicode-normalization` (pinned exactly, pure table-driven Unicode NFC, which
+brings `tinyvec`); it has no optional dependencies and no Cargo features. Add it with
 `cargo add redact-secret`, which selects the newest beta while no stable
 release exists; the [quickstart](../quickstart.md#rust) pins an exact version
 and shows a complete program.
