@@ -164,6 +164,14 @@ evidence is linked from each published version.
   The comparison is related in the JavaScript package, not in the artifact: on
   the standard `full` WebAssembly artifact the change is +1,044 bytes brotli
   (204,726 to 205,770), 13.13% above the pre-epic 181,882 in total.
+- `ory-token` (#1110): Ory session tokens, `ory_st_` + exactly 32 `[A-Za-z0-9]`
+  (`ory_session_token`), and Ory Hydra OAuth2 access, refresh and
+  authorization-code tokens, `ory_at_`, `ory_rt_` or `ory_ac_` + a base64url key
+  of 43 or more + `.` + exactly 43 base64url (`ory_oauth2_token`), always
+  redacted. A three-part dotted value is JWT-shaped and stays with `jwt`. The
+  admin keys (`ory_pat_`, `ory_apikey_`, `ory_wak_`), the `ory_lo_` logout
+  token, enterprise custom OAuth2 prefixes and pre-2023 unprefixed session
+  tokens are not claimed.
 
 ### Fixed
 

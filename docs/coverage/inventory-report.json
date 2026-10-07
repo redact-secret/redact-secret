@@ -7231,12 +7231,88 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "fly_access_token"
+    },
+    {
+      "detector": "ory-token",
+      "evidence": {
+        "fixtureCount": 36,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "markdown",
+          "plain-text",
+          "python"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "ory-token-positive-session-bare",
+        "ory-token-positive-session-dotenv",
+        "ory-token-positive-session-sdk-call",
+        "ory-token-positive-session-sentence-dot",
+        "ory-token-positive-session-x-session-token-header"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "ory_session_token"
+    },
+    {
+      "detector": "ory-token",
+      "evidence": {
+        "fixtureCount": 36,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "markdown",
+          "plain-text",
+          "python"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "ory-token-positive-oauth2-access-bare",
+        "ory-token-positive-oauth2-authorization-code-bare",
+        "ory-token-positive-oauth2-bearer-header",
+        "ory-token-positive-oauth2-dotenv",
+        "ory-token-positive-oauth2-refresh-bare",
+        "ory-token-positive-oauth2-sdk-call",
+        "ory-token-positive-oauth2-sentence-dot",
+        "ory-token-positive-oauth2-token-response-json",
+        "ory-token-positive-oauth2-wider-key-48"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "ory_oauth2_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 157,
+    "supported": 159,
     "unresolved": 0
   }
 }

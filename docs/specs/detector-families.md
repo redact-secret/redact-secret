@@ -121,6 +121,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `openai_admin_api_key` | `openai-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #774 splits the `sk-admin-` namespace out of the shared `openai_api_key` type (materially different blast radius: an organization Admin API key, not a project/service-account key). Grammar untouched: still the T2 marker-gated 58/74-byte contract from [#863](https://github.com/redact-secret/redact-secret/issues/863), [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `openai_api_key` | `openai-token` | `always-redact` | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `openrouter_api_key` | `openrouter-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `ory_oauth2_token` | `ory-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Kratos generator and fosite HMAC strategy, R1 and R9), grammar and trade-offs in [Beta.15 Ory session and OAuth2 tokens (#1110)](#beta15-ory-session-and-oauth2-tokens-1110) |
+| `ory_session_token` | `ory-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Kratos generator and fosite HMAC strategy, R1 and R9), grammar and trade-offs in [Beta.15 Ory session and OAuth2 tokens (#1110)](#beta15-ory-session-and-oauth2-tokens-1110) |
 | `otpauth_secret` | `otpauth-uri` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `paddle_api_key` | `paddle-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (Paddle docs publish the full regex and the 69-character length), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `perplexity_api_key` | `perplexity-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
@@ -1633,6 +1635,43 @@ row is not support.
 | Reddit client secret, access token and refresh token (3 rows) | The three carriers the archived wiki documents, which Reddit's current Help page points to, are read generically: the Basic envelope as one whole `authorization_credential` span (an installed app's empty-password envelope included, since nothing is decoded), `client_secret`, the `access_token` member, the URL fragment, a lower-case `bearer` header and the `refresh_token` body field as their generic types; the revoke request `token=` parameter (shared by access and refresh tokens) is read only where the request names a revoke or introspect endpoint or carries `token_type_hint=` (#1230 addendum `addendum-revoke-token-parameter.md`), a bare `token=` staying a recorded policy limit. App types, lifetimes, registration, installed-app secrets and every format stay historical and unresolved until a current source verifies them. | [#1230](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1230/README.md) |
 | Round-1 deliberate deviations from the Cases and carried-over limits (Groups C, D and E) | Three measured disagreements are **policy, not defects**, each with a basis and per-party consequences in the record's measurement addendum: (a) the Meta `APP_ID\|SECRET` composite is redacted whole, the public app id included, where the Case expects the secret half only (decision 4 of [#1229](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1229/README.md); no secret byte uncovered; the benchmarks score it on full coverage); (b) an `x-api-key` header whose value is Adobe's public client id keeps being flagged, because a generic scanner cannot know whose key a slot carries and role facts stay out of detection (security-first; the six controls are an accepted false positive); (c) the `curl -u` / `--user` password slot (JFrog API key and reference token, Reddit client secret) is not read, a stated false negative carried over to issue [#1247](https://github.com/redact-secret/redact-secret/issues/1247) with its policy for a literal user part. Two limits follow the bare-`token` rule of #1241: a lone Contentful `token` member ([#1256](https://github.com/redact-secret/redact-secret/issues/1256), 15 measured cases), and a `token=` with no revoke or introspect context (2 measured cases), both kept as stated false negatives by the #1256 decision in [`contextual-detection.md`](contextual-detection.md). Round 3 measured every remaining scored failure as one of these recorded cases (119: 59 `curl -u`, 15 Contentful `token` member, 2 `token=`, 1 Elastic `encoded` alone, 36 Meta pair, 6 `x-api-key` controls); the JFrog `AKCp` bare reader is deferred to [#1248](https://github.com/redact-secret/redact-secret/issues/1248). | [#1228](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1228/README.md), [#1229](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1229/README.md), [#1230](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1230/README.md) |
 | JFrog `X-JFrog-Art-Api` header (reference token, API key; round-1 gap `G-jfrog`) | `x_jfrog_art_api` is one whole-name, high-signal contextual name, matched in either documented spelling and any letter case (`X-JFrog-Art-Api`, `X-JFrog-Art-API`): the value is `contextual_secret`, high at random-looking material and `warn` at medium, `redact` at high, exactly the value, in a raw HTTP header (CRLF, LF, end of input), a curl `-H` or `--header` argument and a JSON header map, whatever its shape (8 bytes or more; no prefix, width or alphabet claim, no JFrog type, no reference-token or API-key subtype). Placeholders, references, masks and empty values are silent; `X-JFrog-Art-Api-Id`, `JFrog-Art-Api`, `X-Art-Api` and a further-prefixed name are not read. Stated false negative: the `curl -u user:<secret>` Basic password slot is not read (deferred, issue [#1247](https://github.com/redact-secret/redact-secret/issues/1247)); a digits-only value is the digits-only row. FP cost: a non-secret literal of 8+ bytes in this header; FN cost: the Basic slot, a value under 8 bytes. | [#1228](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1228/addendum-jfrog-art-api-header.md), [#1230](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1230/README.md) |
+
+## Beta.15 Ory session and OAuth2 tokens (#1110)
+
+[#1110](https://github.com/redact-secret/redact-secret/issues/1110) implements
+the sibling shapes of the historical
+[#1014 Ory handoff](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/ory.md)
+after the 2026-10-07 reconciliation and adoption ruling in
+[`docs/audits/evidence/1110/README.md`](../audits/evidence/1110/README.md). It
+is a new detector, `Provider` specificity, high confidence and always redacted,
+not an extension of an existing family. The admin keys stay blocked and are not
+part of this contract. No support-status claim until the benchmarks arrival
+evidence lands.
+
+| Family | Detector | Grammar | Finding type | Tier |
+| --- | --- | --- | --- | --- |
+| `ory:network-api-key` (session and OAuth2 siblings) | `ory-token` | `ory_st_` + exactly 32 `[A-Za-z0-9]`; or `ory_at_`, `ory_rt_` or `ory_ac_` + key `[A-Za-z0-9_-]{43,}` + `.` + signature exactly 43 `[A-Za-z0-9_-]`; identifier boundary on both sides, case-sensitive prefix | `ory_session_token` (`ory_st_`), `ory_oauth2_token` (`ory_at_`, `ory_rt_`, `ory_ac_`) | T1 (Kratos generator and `randx` alphabet, fosite HMAC strategy, R1 and R9; prefixes also in Ory's docs and changelog) |
+
+The session width and alphabet come from the Kratos generator
+(`randx.MustString(32, randx.AlphaNum)`); the OAuth2 token is the fosite HMAC
+strategy's `RawURLEncoding(key)` + `.` + `RawURLEncoding(HMAC-SHA512/256)`, whose
+signature is 32 bytes (43 characters) and whose key is at least 32 bytes (43
+characters) with no ceiling because the operator can raise the entropy. The
+span is the whole dotted token; a trailing sentence `.` stays outside it. A
+signature followed by `.` and a further body byte is a third segment and is not
+claimed (JWT-shaped, owned by `jwt`). The rest of the run is read and rejected,
+never truncated.
+
+False positives: an unrelated run with an `ory_(st|at|rt|ac)_` prefix and
+exactly this body grammar is redacted; the exact widths make this rare and none
+is known. False negatives, each an exclusion rather than a hidden gap: the admin
+keys (`ory_pat_`, `ory_apikey_`, `ory_wak_`), which no source gives a body for;
+the `ory_lo_` logout flow token; JWT access tokens (no Ory prefix, owned by
+`jwt`); enterprise custom OAuth2 prefixes; pre-2023 unprefixed session tokens;
+an operator-changed HMAC hasher with a different signature width; and the
+`ory_session_` and `ory_kratos_session` cookie names, which are names and fail
+the body grammar. Tests: `crates/secret-scan-core/src/detectors/ory_token.rs`,
+`tests/ory_token_1110.rs`, the `ory-token-*` fixtures of the synchronous corpus.
 
 ## Rules
 

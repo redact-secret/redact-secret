@@ -175,6 +175,7 @@ export const CANONICAL_IDS = [
   "square-token",
   "mapbox-token",
   "fly-token",
+  "ory-token",
   "jwt",
   "bearer-token",
   "connection-string",
@@ -318,6 +319,7 @@ export const GROUPS = {
     "unkey-root-key",
     "square-token",
     "mapbox-token",
+    "ory-token",
   ],
 };
 

@@ -68,6 +68,7 @@ mod nvidia;
 mod okta;
 mod onepassword;
 mod openai;
+mod ory_token;
 mod otpauth;
 mod paddle;
 mod pattern;
@@ -426,6 +427,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("square-token", &square::SQUARE),
         row("mapbox-token", &mapbox::MAPBOX),
         row("fly-token", &fly::FLY),
+        row("ory-token", &ory_token::ORY_TOKEN),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -816,6 +818,7 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
             postman::POSTMAN_COLLECTION_ACCESS_KEY.shapes(),
         )],
     ),
+    (ory_token::ID, &[Literals::Shapes(ory_token::SHAPES)]),
 ];
 
 /// The prefilter declaration groups of the declared built-in `id`, resolved
@@ -993,6 +996,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("square-token", Pack::Provider),
     ("mapbox-token", Pack::Provider),
     ("fly-token", Pack::Provider),
+    ("ory-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1158,6 +1162,7 @@ mod tests {
                 "square-token",
                 "mapbox-token",
                 "fly-token",
+                "ory-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1543,6 +1548,7 @@ mod tests {
         let pydantic_logfire_token_input = format!("pylf_v1_us_{}", "5e7c0ded".repeat(5));
         let square_token_input = format!("EAAA{}{}", "5e7c0ded".repeat(7), "5e7c");
         let fly_token_input = format!("fm2_{}", "5e7c0ded".repeat(8));
+        let ory_token_input = format!("ory_st_{}", "5e7c0ded".repeat(4));
         let mapbox_token_input = format!(
             "sk.eyJ{}.{}{}",
             "5e7c0ded".repeat(3),
@@ -1698,6 +1704,7 @@ mod tests {
             ("square-token", square_token_input.as_str()),
             ("mapbox-token", mapbox_token_input.as_str()),
             ("fly-token", fly_token_input.as_str()),
+            ("ory-token", ory_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

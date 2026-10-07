@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 99,
+  "fixtureCount": 100,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1582,6 +1582,30 @@
         }
       ],
       "note": "Issues #1040 and #1044: an AKIA line is released when it closes and the secret below it is still claimed through the session's copy of it; the next secret, directly above an ASIA line, is held for exactly one line. Whole-input results at every partition."
+    },
+    {
+      "id": "ory-token-incremental-session-and-oauth2-partitions",
+      "input": "ORY_SESSION_TOKEN=\u006fry_st_SyntheticRevokedOryFixture000000\nrefresh_token=\u006fry_rt_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\n\u006fry_st_SyntheticRevokedOryFixture00000\n",
+      "text": "ORY_SESSION_TOKEN=<SECRET_1>\nrefresh_token=<SECRET_2>\n\u006fry_st_SyntheticRevokedOryFixture00000\n",
+      "expected": [
+        {
+          "detector": "ory-token",
+          "type": "ory_session_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 57
+        },
+        {
+          "detector": "ory-token",
+          "type": "ory_oauth2_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 72,
+          "end": 166
+        }
+      ],
+      "note": "Issue #1110: the 39-byte \u006fry_st_ session token and the dotted \u006fry_rt_ OAuth2 token (43-byte key, dot, 43-byte signature) stay whole at every UTF-8 byte and char partition, including splits inside the prefix, at the dot and in the signature, while the 31-byte session twin on the last line never emits a finding."
     }
   ]
 }

@@ -17474,6 +17474,230 @@
       "type": "fly_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "ory-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "ory-token-positive-session-bare",
+            "ory-token-positive-session-dotenv",
+            "ory-token-positive-session-sdk-call",
+            "ory-token-positive-session-sentence-dot",
+            "ory-token-positive-session-x-session-token-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "ory-token-overlap-session-contextual-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "ory-token-negative-admin-key-prefixes",
+            "ory-token-negative-cookie-and-flow-names",
+            "ory-token-negative-jwt-mentioning-prefix",
+            "ory-token-negative-placeholders"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for ory_session_token (ory-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "ory_session_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "ory-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "ory-token-positive-oauth2-access-bare",
+            "ory-token-positive-oauth2-authorization-code-bare",
+            "ory-token-positive-oauth2-bearer-header",
+            "ory-token-positive-oauth2-dotenv",
+            "ory-token-positive-oauth2-refresh-bare",
+            "ory-token-positive-oauth2-sdk-call",
+            "ory-token-positive-oauth2-sentence-dot",
+            "ory-token-positive-oauth2-token-response-json",
+            "ory-token-positive-oauth2-wider-key-48"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "ory-token-overlap-oauth2-bearer-scheme"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "ory-token-negative-admin-key-prefixes",
+            "ory-token-negative-cookie-and-flow-names",
+            "ory-token-negative-jwt-mentioning-prefix",
+            "ory-token-negative-placeholders"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for ory_oauth2_token (ory-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "ory_oauth2_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -17576,6 +17800,7 @@
             "openai-project-length-twin-discriminating-boundary",
             "openai-svcacct-length-twin-discriminating-boundary",
             "openrouter-api-key-incremental-exact-width-partitions",
+            "ory-token-incremental-session-and-oauth2-partitions",
             "otpauth-embedded-identifier-discriminating-boundary",
             "private-key-empty-body-then-real-key-discriminating-boundary",
             "private-key-public-block-then-real-key-discriminating-boundary",
@@ -17718,6 +17943,8 @@
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes",
             "otpauth-adversarial-overlong-query",
             "paddle-api-key-adversarial-long-run",
             "perplexity-api-key-adversarial-long-suffix",
@@ -18018,6 +18245,7 @@
             "openai-project-length-twin-discriminating-boundary",
             "openai-svcacct-length-twin-discriminating-boundary",
             "openrouter-api-key-incremental-exact-width-partitions",
+            "ory-token-incremental-session-and-oauth2-partitions",
             "otpauth-embedded-identifier-discriminating-boundary",
             "private-key-empty-body-then-real-key-discriminating-boundary",
             "private-key-public-block-then-real-key-discriminating-boundary",
@@ -18221,6 +18449,8 @@
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes",
             "otpauth-adversarial-overlong-query",
             "paddle-api-key-adversarial-long-run",
             "perplexity-api-key-adversarial-long-suffix",
@@ -18582,6 +18812,7 @@
             "openai-project-length-twin-discriminating-boundary",
             "openai-svcacct-length-twin-discriminating-boundary",
             "openrouter-api-key-incremental-exact-width-partitions",
+            "ory-token-incremental-session-and-oauth2-partitions",
             "otpauth-embedded-identifier-discriminating-boundary",
             "private-key-empty-body-then-real-key-discriminating-boundary",
             "private-key-public-block-then-real-key-discriminating-boundary",

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 4201,
+  "fixtureCount": 4237,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -95258,6 +95258,636 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       }
-    }
+    },
+      {
+        "id": "ory-token-positive-session-bare",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_st_SyntheticRevokedOryFixture000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_session_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 0,
+            "end": 39
+          }
+        ],
+        "note": "\u006fry_st_ plus exactly 32 alphanumerics is one session-token finding."
+      },
+      {
+        "id": "ory-token-positive-session-x-session-token-header",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "http"
+        ],
+        "input": "X-Session-Token: \u006fry_st_SyntheticRevokedOryFixture000000\n",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_session_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 17,
+            "end": 56
+          }
+        ],
+        "note": "The Kratos X-Session-Token header carries the session token; the span is exactly the token."
+      },
+      {
+        "id": "ory-token-positive-session-dotenv",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "dotenv"
+        ],
+        "input": "ORY_SESSION_TOKEN=\u006fry_st_SyntheticRevokedOryFixture000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_session_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 18,
+            "end": 57
+          }
+        ],
+        "note": "A dotenv assignment is reported at exactly the value."
+      },
+      {
+        "id": "ory-token-positive-session-sdk-call",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "python"
+        ],
+        "input": "client = OryClient(session_token=\"\u006fry_st_SyntheticRevokedOryFixture000000\")\n",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_session_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 34,
+            "end": 73
+          }
+        ],
+        "note": "A constructor argument is reported at exactly the token."
+      },
+      {
+        "id": "ory-token-positive-session-sentence-dot",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "chat"
+        ],
+        "input": "My session token is \u006fry_st_SyntheticRevokedOryFixture000000. Please check it.",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_session_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 20,
+            "end": 59
+          }
+        ],
+        "note": "A sentence-ending dot is outside the span."
+      },
+      {
+        "id": "ory-token-positive-oauth2-access-bare",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 0,
+            "end": 94
+          }
+        ],
+        "note": "\u006fry_at_ plus a base64url key of 43, one dot and a 43-byte signature is one finding."
+      },
+      {
+        "id": "ory-token-positive-oauth2-refresh-bare",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_rt_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 0,
+            "end": 94
+          }
+        ],
+        "note": "\u006fry_rt_ plus a base64url key of 43, one dot and a 43-byte signature is one finding."
+      },
+      {
+        "id": "ory-token-positive-oauth2-authorization-code-bare",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_ac_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 0,
+            "end": 94
+          }
+        ],
+        "note": "\u006fry_ac_ plus a base64url key of 43, one dot and a 43-byte signature is one finding."
+      },
+      {
+        "id": "ory-token-positive-oauth2-bearer-header",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "http"
+        ],
+        "input": "Authorization: Bearer \u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\n",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 22,
+            "end": 116
+          }
+        ],
+        "note": "An Authorization Bearer header carries the access token; one finding for the whole dotted token, not a separate bearer or jwt finding."
+      },
+      {
+        "id": "ory-token-positive-oauth2-dotenv",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "dotenv"
+        ],
+        "input": "ORY_ACCESS_TOKEN=\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 17,
+            "end": 111
+          }
+        ],
+        "note": "A dotenv assignment is reported at exactly the value."
+      },
+      {
+        "id": "ory-token-positive-oauth2-token-response-json",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "contextual",
+        "contexts": [
+          "json"
+        ],
+        "input": "{\"access_token\": \"\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\", \"refresh_token\": \"\u006fry_rt_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\", \"token_type\": \"bearer\"}",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 18,
+            "end": 112
+          },
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 133,
+            "end": 227
+          }
+        ],
+        "note": "An OAuth2 token response yields one finding for each token."
+      },
+      {
+        "id": "ory-token-positive-oauth2-sdk-call",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "python"
+        ],
+        "input": "Ory(access_token=\"\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\")\n",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 18,
+            "end": 112
+          }
+        ],
+        "note": "A constructor argument is reported at exactly the token."
+      },
+      {
+        "id": "ory-token-positive-oauth2-wider-key-48",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-000000000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 0,
+            "end": 99
+          }
+        ],
+        "note": "The key part has no ceiling (raised entropy): 48 bytes still matches."
+      },
+      {
+        "id": "ory-token-positive-oauth2-sentence-dot",
+        "detector": "ory-token",
+        "kind": "positive",
+        "support": "supported",
+        "tier": "canonical",
+        "contexts": [
+          "chat"
+        ],
+        "input": "The access token is \u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000. Please check it.",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 20,
+            "end": 114
+          }
+        ],
+        "note": "A sentence-ending dot is outside the span."
+      },
+      {
+        "id": "ory-token-overlap-session-contextual-secret",
+        "detector": "ory-token",
+        "kind": "overlap",
+        "support": "supported",
+        "tier": "contextual",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "secret_key=\u006fry_st_SyntheticRevokedOryFixture000000",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_session_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 11,
+            "end": 50
+          }
+        ],
+        "note": "The provider type wins over a generic contextual secret at the same span."
+      },
+      {
+        "id": "ory-token-overlap-oauth2-bearer-scheme",
+        "detector": "ory-token",
+        "kind": "overlap",
+        "support": "supported",
+        "tier": "contextual",
+        "contexts": [
+          "http"
+        ],
+        "input": "Authorization: Bearer \u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\n",
+        "expected": [
+          {
+            "detector": "ory-token",
+            "type": "ory_oauth2_token",
+            "confidence": "high",
+            "specificity": "provider",
+            "start": 22,
+            "end": 116
+          }
+        ],
+        "note": "The provider type wins over the Bearer-header candidate: one finding for the span."
+      },
+      {
+        "id": "ory-token-boundary-session-31",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_st_SyntheticRevokedOryFixture00000",
+        "expected": [],
+        "note": "A 31-byte session body is not claimed."
+      },
+      {
+        "id": "ory-token-boundary-session-33",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_st_SyntheticRevokedOryFixture0000001",
+        "expected": [],
+        "note": "A 33-byte session body is not claimed: the generator fixes the width."
+      },
+      {
+        "id": "ory-token-boundary-session-dash-in-body",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_st_SyntheticRevoke-OryFixture000000",
+        "expected": [],
+        "note": "A dash in the session body breaks the alphanumeric alphabet."
+      },
+      {
+        "id": "ory-token-boundary-session-glued-suffix",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_st_SyntheticRevokedOryFixture000000_backup",
+        "expected": [],
+        "note": "A directly glued wider identifier is not a session token."
+      },
+      {
+        "id": "ory-token-boundary-session-glued-prefix",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "x\u006fry_st_SyntheticRevokedOryFixture000000",
+        "expected": [],
+        "note": "A leading glue byte rejects the match."
+      },
+      {
+        "id": "ory-token-boundary-session-uppercase-prefix",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "ORY_ST_SyntheticRevokedOryFixture000000",
+        "expected": [],
+        "note": "The prefix is case-sensitive."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-key-42",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [],
+        "note": "A 42-byte key part is below the 43-byte floor."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-signature-42",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-0000000000",
+        "expected": [],
+        "note": "A 42-byte signature is not the 43-byte HMAC width."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-signature-44",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-000000000001",
+        "expected": [],
+        "note": "A 44-byte signature is not the 43-byte HMAC width."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-no-dot",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [],
+        "note": "A token without the dot separator is not claimed."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-two-dots",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [],
+        "note": "A third dot-separated segment is JWT-shaped and not claimed."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-plus-in-body",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-OR+-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [],
+        "note": "A standard-base64 plus is outside the base64url alphabet."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-slash-in-signature",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-OR/-SIGNATURE-00000000000",
+        "expected": [],
+        "note": "A standard-base64 slash is outside the base64url alphabet."
+      },
+      {
+        "id": "ory-token-boundary-oauth2-uppercase-prefix",
+        "detector": "ory-token",
+        "kind": "boundary",
+        "support": "intentionally-unsupported",
+        "tier": "malformed",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "ORY_AT_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+        "expected": [],
+        "note": "The prefix is case-sensitive."
+      },
+      {
+        "id": "ory-token-negative-cookie-and-flow-names",
+        "detector": "ory-token",
+        "kind": "negative",
+        "support": "supported",
+        "tier": "negative",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "ory_kratos_session=abc ory_session_SyntheticRevokedOryFixture000000 \u006fry_lo_SyntheticRevokedOryFixture000000",
+        "expected": [],
+        "note": "Cookie names and the \u006fry_lo_ logout flow token are not account credentials and are not claimed."
+      },
+      {
+        "id": "ory-token-negative-placeholders",
+        "detector": "ory-token",
+        "kind": "negative",
+        "support": "supported",
+        "tier": "negative",
+        "contexts": [
+          "markdown"
+        ],
+        "input": "Set ORY_SESSION_TOKEN=${ORY_SESSION_TOKEN}, header X-Session-Token: \u006fry_st_<your-session-token>, or \u006fry_st_placeholder.",
+        "expected": [],
+        "note": "Names, references and placeholders are not token values."
+      },
+      {
+        "id": "ory-token-negative-admin-key-prefixes",
+        "detector": "ory-token",
+        "kind": "negative",
+        "support": "supported",
+        "tier": "negative",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_pat_SyntheticRevokedOryFixture000000 \u006fry_apikey_SyntheticRevokedOryFixture000000 \u006fry_wak_SyntheticRevokedOryFixture000000",
+        "expected": [],
+        "note": "The admin key prefixes (\u006fry_pat_, \u006fry_apikey_, \u006fry_wak_) are excluded until a source states their body; no ory-token claim."
+      },
+      {
+        "id": "ory-token-negative-jwt-mentioning-prefix",
+        "detector": "ory-token",
+        "kind": "negative",
+        "support": "supported",
+        "tier": "negative",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "eyJhbGciOiJub25lIn0.SYNTHETIC-\u006fry_at_-PAYLOAD.SYNTHETIC-NON-DECODABLE-SIGNATURE-MARKER",
+        "expected": [],
+        "note": "A JWT-shaped value that merely contains \u006fry_at_ is not claimed by ory-token."
+      },
+      {
+        "id": "ory-token-adversarial-repeated-prefixes",
+        "detector": "ory-token",
+        "kind": "adversarial",
+        "support": "supported",
+        "tier": "adversarial",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ \u006fry_at_ \u006fry_st_ ",
+        "expected": [],
+        "note": "Repeated prefixes with no body stay linear and bounded.",
+        "resource": {
+          "maxInputBytes": 12000,
+          "maxFindings": 0,
+          "maxRuntimeMs": 250
+        }
+      },
+      {
+        "id": "ory-token-adversarial-long-key-run-without-dot",
+        "detector": "ory-token",
+        "kind": "adversarial",
+        "support": "supported",
+        "tier": "adversarial",
+        "contexts": [
+          "plain-text"
+        ],
+        "input": "\u006fry_at_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ",
+        "expected": [],
+        "note": "A long key run without the dot or signature stays bounded and unclaimed.",
+        "resource": {
+          "maxInputBytes": 12000,
+          "maxFindings": 0,
+          "maxRuntimeMs": 250
+        }
+      }
   ]
 }
