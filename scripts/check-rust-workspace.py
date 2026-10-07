@@ -171,7 +171,7 @@ WASM_BINDGEN_LITERAL = re.compile(
     r"|^\s*WASM_BINDGEN_VERSION:\s*[\"']?(?P<env>\d[\w.+-]*)[\"']?\s*$",
     re.M,
 )
-USER_AGENT ="redact-secret workspace check (https://github.com/redact-secret/redact-secret)"
+USER_AGENT = "redact-secret workspace check (https://github.com/redact-secret/redact-secret)"
 
 
 def version_key(version: str) -> tuple[int, int, int]:

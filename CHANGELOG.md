@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Fixed
+
+- JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a
+  finding type, matching the Rust core's `to_ascii_uppercase` (#1276). Every
+  built-in type name is ASCII, so built-in output is unchanged; a custom
+  non-ASCII type name no longer expands under full-Unicode case folding
+  (`ß` stays `ß`, not `SS`). A test now compares the formatter with the core
+  rule over every built-in type name.
+
 ### Documentation
 
 - The deferred quality backlog is retired from the tree (epic #1259). Fourteen of
