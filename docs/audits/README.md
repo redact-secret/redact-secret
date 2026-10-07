@@ -35,7 +35,6 @@ shrinks when a unit is retired; it keeps no row for a retired unit.
 
 | Unit | Owner | Status | Retires |
 | --- | --- | --- | --- |
-| [Deferred quality backlog](deferred-quality-backlog.md) | [#80](https://github.com/redact-secret/redact-secret/issues/80) (closed) | `deferred`: 25 non-blocking findings, cited by `conformance/fixtures/synchronous-corpus.json` and a coverage-declaration comment | after epic [#1259](https://github.com/redact-secret/redact-secret/issues/1259), which decides where those citations point |
 | [#1003 us-ssn identity-only mismatch, public investigation](evidence/1003/README.md) | [#1003](https://github.com/redact-secret/redact-secret/issues/1003) | `deferred`: the protected half of the issue is open | after #1003 |
 
 ## History
@@ -54,6 +53,15 @@ live at a second pin, `0c62fd38bca75c5b28b042dc79789b708ebf1d17` (the
 [beta.14 release record](../releases/0.1.0-beta.14/README.md)) and the
 `evidence/1219` and `evidence/1220` WebAssembly size records (their figures are
 in the action policy decisions).
+
+The deferred quality backlog (`deferred-quality-backlog.md`, 25 findings, owner
+#80) was retired by epic #1259 and lives at a third pin,
+`871207e201664ed17a654cbe2cfa9ab4433a06fc`. Ten of its findings were still
+valid and are tracked by [#1273](https://github.com/redact-secret/redact-secret/issues/1273),
+[#1274](https://github.com/redact-secret/redact-secret/issues/1274),
+[#1275](https://github.com/redact-secret/redact-secret/issues/1275) and
+[#1276](https://github.com/redact-secret/redact-secret/issues/1276); the rest
+were closed or stale.
 
 The first pin has one exception: `evidence/367/README.md` and `evidence/475/README.md`
 were edited by #1262 when the files they described moved, so the pin holds

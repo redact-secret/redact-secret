@@ -16038,7 +16038,7 @@
       ],
       "input": "future_provider_SYNTHETIC_REVOKED_UNQUALIFIED_VALUE",
       "expected": [],
-      "note": "No provider-family grammar has been proposed or accepted for this placeholder value; inventing detection for an unqualified prefix would assert a grammar the corpus has no evidence for. Intentionally unsupported until a real provider proposes a concrete, evaluable grammar (see docs/audits/deferred-quality-backlog.md, C/F-03)."
+      "note": "No provider-family grammar has been proposed or accepted for this placeholder value; inventing detection for an unqualified prefix would assert a grammar the corpus has no evidence for. Intentionally unsupported until a real provider proposes a concrete, evaluable grammar."
     },
     {
       "id": "contextual-positive-colon-spaced-operator",

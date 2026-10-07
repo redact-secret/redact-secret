@@ -15,7 +15,8 @@
  * `instanceof SecretScanError` holds on every runtime and every subpath.
  *
  * `UNPAIRED_SURROGATE` resolves `B/F-10`
- * (`docs/audits/deferred-quality-backlog.md`): a JavaScript string may hold a
+ * (retired deferred quality backlog,
+ * https://github.com/redact-secret/redact-secret/blob/871207e201664ed17a654cbe2cfa9ab4433a06fc/docs/audits/deferred-quality-backlog.md): a JavaScript string may hold a
  * lone UTF-16 surrogate, which has no UTF-8 representation, so it cannot
  * cross into the Rust core's `&str` without either a silent `U+FFFD`
  * substitution (which would make `redact`'s output a transcoded copy, not the
