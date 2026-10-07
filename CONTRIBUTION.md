@@ -164,30 +164,40 @@ by `scripts/check-evidence-arrival.mjs` (`npm run arrival:check`, issue #52
 there). Satisfy every item below, in that repository's PR, so the check
 passes without anyone having to read the checker script itself:
 
-0. **Dossier verdict.** The family's entry in its provider dossier,
+0. **Research and handoff.** The route is credential-evidence research,
+   then product-contract adoption in this repository, then evaluation, then
+   benchmark results. Provider facts (shapes, sources, issuance, carrier
+   layouts) are researched in
+   [`credential-evidence`](https://github.com/redact-secret/credential-evidence)
+   and in the family's provider dossier,
    `benchmarks/support/dossiers/<provider>.md` in `redact-secret-benchmarks`,
-   has `research.verdict: ready`, and the product PR links that dossier by
-   its `main` URL
-   (`https://github.com/redact-secret/redact-secret-benchmarks/blob/main/benchmarks/support/dossiers/<provider>.md`;
-   living documentation links `main`, not a branch or a commit). Provider
-   research is tracked there, not in this repository; a detector request
-   ([issue form](.github/ISSUE_TEMPLATE/request-detector.yml)) is routed to
-   the benchmarks `research-family` form. This repository keeps no dossier of
-   its own: the detector module doc, the `docs/specs/detector-families.md`
-   row, and any temporary review under `docs/audits/` are the implementation
-   record until that review is retired; the dossier links to the spec row and
-   to a 40-hex permalink for anything retired. Until the dossier convention lands in
-   `redact-secret-benchmarks` (issue #473 there), a family with no dossier
-   entry cites its research issue instead.
-1. **Provider or tool evidence.** In `benchmarks/lib/assessment.ts`, record
-   a `providerSource`, `twinSource`, or `candidateSource` (each a `url`, an
-   `observedAt` date, a `formatVersion`, and what it `covers`), or at least
-   one `corroboration` entry (`tool`, `label`, `url`), for the family.
-   Anything not directly backed by provider documentation is a T2
-   (tool-corroborated) contract, not T1, and must say so rather than assert
-   provider grounding it doesn't have --
+   which must carry `research.verdict: ready` before the family is handed to
+   core (the handoff states are in the benchmarks
+   [contribution handoff states](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/specs/contribution-handoff-states.md)).
+   A detector request ([issue form](.github/ISSUE_TEMPLATE/request-detector.yml))
+   is answered by linking the research issue in `redact-secret-benchmarks`
+   (its `research-family` form). The product PR links the dossier by its
+   `main` URL (living documentation links `main`, not a branch or a commit).
+   This repository keeps no dossier and no research record of its own: the
+   detector module doc, the `docs/specs/detector-families.md` row, and the
+   frozen evidence under `docs/audits/evidence/<issue>/` are the product
+   record, and a retired temporary review is cited by a 40-hex permalink. Do
+   not copy research or benchmark results into this repository
+   ([policy](docs/decisions/2026-10-06-retire-historical-audit-bodies-before-release-qualification.md#5-boundaries-between-repositories)).
+1. **Provider or tool evidence.** Record the family's evidence in the
+   benchmarks product-contract registry
+   (`benchmarks/evaluation/domains/credential/assessment.ts` in
+   `redact-secret-benchmarks`): a `providerSource`, `twinSource`, or
+   `candidateSource` (each a `url`, an `observedAt` date, a `formatVersion`,
+   and what it `covers`), or at least one `corroboration` entry (`tool`,
+   `label`, `url`), for the family. Anything not directly backed by provider
+   documentation is a T2 (tool-corroborated) contract, not T1, and must say so
+   rather than assert provider grounding it doesn't have --
    [`decision-freeze-precision-contracts-seven-provider-families`](docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md#folded-records)
    (Pulumi row) shows a T1-prefix/T2-body contract written up this way.
+   The older `benchmarks/lib/assessment.ts` path survives only as a
+   compatibility re-export of that file for existing importers; write new
+   evidence against the domain path.
 2. **Canonical positives.** At least one fixture carrying the family's
    documented shape in a realistic context, run through the differential
    method against the pinned scanners.
@@ -213,7 +223,8 @@ passes without anyone having to read the checker script itself:
    pinned scanners.
 
 **The detector and its contract land together.** The support matrix derives
-its family list from the contracts registered in `assessment.ts`, so a
+its family list from the contracts registered in `assessment.ts` (the path in
+item 1), so a
 detector merged here without a matching contract in
 `redact-secret-benchmarks` isn't `provisional` -- it's invisible to the
 support matrix until someone notices the family count is wrong. Coordinate
