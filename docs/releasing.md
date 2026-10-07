@@ -460,6 +460,44 @@ release workflow, so it needs maintainer approval of that change and a fresh
 rehearsal before it is adopted. Until then, treat the manifest and the
 registry attestations, not the tag signature, as the source-identity evidence.
 
+### npm publish authentication (trusted publishing deferred)
+
+The npm publish steps in `release.yml` (the native and Wasm dependency jobs
+and the facade job) and in `reconcile-release.yml` still authenticate with the
+`NPM_TOKEN` secret, passed as `NODE_AUTH_TOKEN`. npm trusted publishing (OIDC)
+does not replace it. This is a recorded deferral, not a finding that the token
+is preferable. Issue #1275 changed no workflow.
+
+- **Where the token lives.** `NPM_TOKEN` and `CARGO_REGISTRY_TOKEN` are secrets
+  of the `release` environment (the repository has no repository-level
+  secrets), so only jobs that run in that environment can read them. The npm
+  secret was last updated 2026-09-11. The publish jobs also hold
+  `id-token: write`, which signs the provenance attestation; the registry login
+  still uses the stored token.
+- **Token scope: unknown here.** The token type (granular or classic), its
+  package allow-list, its permission, and its expiry are visible only in the npm
+  account that issued it. A maintainer must record them when the token is next
+  rotated.
+- **Who rotates it: not recorded.** No document names an owner, cadence, or
+  rotation procedure. npm publisher rights are maintainer-held (see
+  [Review and approval](#review-and-approval)), so a maintainer with those
+  rights rotates it. Naming that person and a cadence is open.
+- **What blocks trusted publishing: not verified.** Preconditions known from
+  npm's feature, not checked against this repository's npm settings: a trusted
+  publisher must be configured on npmjs for each published package (the facade,
+  every native platform package, and the Wasm package), naming this repository,
+  the workflow file, and the `release` environment; `release.yml` and
+  `reconcile-release.yml` both publish, and each needs to be covered; and the
+  runner needs an npm CLI that supports OIDC login, while the workflows pin only
+  `node-version: 22` and do not pin npm. Whether the npm bundled with that Node
+  release suffices, and whether the packages' settings already allow it, were
+  not checked.
+- **Adopting it** changes publish authentication in both workflows, so it needs
+  explicit maintainer approval, a rehearsal (see
+  [Rehearsing at a throwaway unpublished version](#rehearsing-at-a-throwaway-unpublished-version)),
+  and removal of the `NPM_TOKEN` secret afterwards. Until then, rotate the token
+  after any suspected exposure.
+
 ### npm dist-tag policy
 
 The release workflow publishes every `0.1.0-beta.N` npm package with

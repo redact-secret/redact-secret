@@ -160,6 +160,28 @@ npm audit --package-lock-only
 npm run ci
 ```
 
+The publication path is narrower than CI. Every publishing job runs in the
+`release` environment and only from `main`. In `release.yml` the publish jobs
+hold `contents: read`; only `tag-release` holds `contents: write`, to create the
+annotated version tag after publication and registry-install verification
+succeed (`Reconcile Release` holds it for its reconcile and tag jobs).
+`id-token: write` is granted only to the jobs that sign npm provenance or use
+PyPI trusted publishing. npm and crates.io publishing still authenticate with
+the `NPM_TOKEN` and `CARGO_REGISTRY_TOKEN` secrets of that environment; the
+deferral of npm trusted publishing is recorded in
+[docs/releasing.md](docs/releasing.md#npm-publish-authentication-trusted-publishing-deferred).
+Provenance is kept with the artifacts: npm and PyPI attestations stay with the
+published files, and every run, including a failed one, uploads a
+`release-manifest-<version>` workflow artifact (source commit, version,
+artifact set, registry state) under the repository's default Actions artifact
+retention, which the workflow does not override.
+
+The Cargo supply chain is checked in CI by `cargo deny check --locked`, with
+the policy in `deny.toml`. It allows only the crates.io index as a source,
+denies unknown registries and Git sources, denies yanked crates, restricts
+licenses to an allow-list, and denies wildcard dependencies. Multiple versions
+of one crate only warn.
+
 Inspect the resulting configuration and logs for permission expansion,
 unexpected install-script exposure, publishing authority, and plaintext-secret
 diagnostics. Never place credentials in workflow inputs or validation output.
