@@ -56,6 +56,8 @@ CORE_API = ["Finding", "VERSION", "scan"]
 CORE_MANIFEST = '[package]\nname = "redact-secret"\ninclude = ["src/**/*.rs", "README.md"]\n[lints]\nworkspace = true\n'
 PACKAGE_GLOBS = ["Cargo.toml", "README.md", "src/**/*.rs"]
 PACKAGE_REQUIRED = ["Cargo.toml", "README.md", "src/lib.rs"]
+WHEEL_TARGETS = ["aarch64-apple-darwin", "x86_64-unknown-linux-musl"]
+WASM_BINDGEN = "0.2.128"
 PACKAGE_LIST = ["Cargo.toml", "README.md", "src/lib.rs", "src/detectors/aws.rs"]
 
 
@@ -85,9 +87,20 @@ class Workspace:
         self.package_globs: list[str] = list(PACKAGE_GLOBS)
         self.package_required: list[str] = list(PACKAGE_REQUIRED)
         self.package_list: list[str] = list(PACKAGE_LIST)
+        self.wheel_targets: list[str] = list(WHEEL_TARGETS)
+        self.deny_targets: list[str] = [*WHEEL_TARGETS, "wasm32-unknown-unknown"]
         self.write(
             ".github/workflows/ci.yml",
-            f'name: CI\nenv:\n  MSRV: "{MSRV}"\njobs:\n  test:\n    strategy:\n      matrix:\n        node-version:\n          - 20\n          - 22\n',
+            f'name: CI\nenv:\n  MSRV: "{MSRV}"\njobs:\n  test:\n    strategy:\n      matrix:\n        node-version:\n          - 20\n          - 22\n'
+            f"    steps:\n      - run: cargo install wasm-bindgen-cli --version {WASM_BINDGEN} --locked\n",
+        )
+        self.write(
+            ".github/workflows/artifact-qualification.yml",
+            f'env:\n  WASM_BINDGEN_VERSION: "{WASM_BINDGEN}"\n',
+        )
+        self.write(
+            ".github/workflows/complete-assessment.yml",
+            f'env:\n  WASM_BINDGEN_VERSION: "{WASM_BINDGEN}"\n',
         )
         self.write("package.json", json.dumps({"private": True, "version": VERSION, "engines": {"node": NODE_ENGINES}}))
         self.write("bindings/node/package.json", json.dumps({"version": VERSION, "engines": {"node": NODE_ENGINES}}))
@@ -144,8 +157,11 @@ class Workspace:
         self.write(
             "Cargo.toml",
             f'[workspace]\n[workspace.package]\nversion = "{VERSION}"\nrust-version = "{MSRV}"\n'
+            f'[workspace.dependencies]\nwasm-bindgen = "{WASM_BINDGEN}"\n'
             f"[workspace.lints.rust]\n{unsafe}\n",
         )
+        quoted = ", ".join(f'"{target}"' for target in self.deny_targets)
+        self.write("deny.toml", f"[graph]\ntargets = [{quoted}]\n")
         return {
             "packages": [{key: value for key, value in entry.items() if key != "_deps"} for entry in self.packages],
             "workspace_members": list(self.members),
@@ -159,6 +175,7 @@ class Workspace:
                     "core-public-api": self.public_api,
                     "core-package-globs": self.package_globs,
                     "core-package-required": self.package_required,
+                    "python-wheel-targets": self.wheel_targets,
                 }
             },
         }
@@ -338,6 +355,55 @@ class RustWorkspaceCheckTests(unittest.TestCase):
             workspace.add_dependency("same", rust_version="1.88.0")
 
         self.assertEqual(self.run_check(configure), [])
+
+    def test_a_wheel_target_missing_from_deny_graph_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.deny_targets.remove("x86_64-unknown-linux-musl")
+
+        errors = self.run_check(configure)
+        self.assertTrue(
+            any("lacks x86_64-unknown-linux-musl, a python-wheel-targets entry" in error for error in errors), errors
+        )
+
+    def test_a_deny_graph_without_the_wasm_target_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.deny_targets.remove("wasm32-unknown-unknown")
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("lacks wasm32-unknown-unknown" in error for error in errors), errors)
+
+    def test_a_declared_wheel_target_added_without_deny_coverage_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.wheel_targets.append("aarch64-unknown-linux-musl")
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("lacks aarch64-unknown-linux-musl" in error for error in errors), errors)
+
+    def test_ci_wasm_bindgen_cli_drift_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                ".github/workflows/ci.yml",
+                f'env:\n  MSRV: "{MSRV}"\n  X: cargo install wasm-bindgen-cli --version 0.2.99 --locked\n',
+            )
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("ci.yml: wasm-bindgen-cli version 0.2.99 must equal" in error for error in errors), errors)
+
+    def test_artifact_qualification_wasm_bindgen_drift_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(".github/workflows/artifact-qualification.yml", 'env:\n  WASM_BINDGEN_VERSION: "0.2.99"\n')
+
+        errors = self.run_check(configure)
+        self.assertTrue(
+            any("artifact-qualification.yml: wasm-bindgen-cli version 0.2.99" in error for error in errors), errors
+        )
+
+    def test_a_workflow_without_a_wasm_bindgen_literal_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(".github/workflows/artifact-qualification.yml", "name: Q\n")
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("no wasm-bindgen-cli version literal found" in error for error in errors), errors)
 
     def test_ci_msrv_must_match_manifest(self) -> None:
         def configure(workspace: Workspace) -> None:
