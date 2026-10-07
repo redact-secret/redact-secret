@@ -21,6 +21,7 @@ mod bearer_token;
 mod bitwarden;
 mod browserbase;
 mod buildkite;
+mod catalog;
 mod cerebras;
 mod clickhouse_cloud;
 mod clojars;
@@ -107,6 +108,7 @@ use crate::types::Detector;
 use connection_string::ConnectionStringDetector;
 use private_key::PrivateKeyDetector;
 
+pub(crate) use catalog::{declared_common_types, declared_types};
 use prefilter::Literals;
 pub(crate) use prefilter::{LiteralMatcher, RequiredLiterals, ScanScope};
 

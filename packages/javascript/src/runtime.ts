@@ -11,6 +11,7 @@
 import { toActionComparison } from "./compare.js";
 import { SecretScanError, type SecretScanErrorCode, toSecretScanError } from "./errors.js";
 import { defaultPlaceholderFormatter } from "./formatters.js";
+import { assertManifestDigest, parseArtifactManifest } from "./manifest.js";
 import {
   NATIVE_HANDLE,
   type NativeBinding,
@@ -28,6 +29,7 @@ import {
 import type {
   ActionComparison,
   ArtifactKind,
+  ArtifactManifest,
   CompareActionPoliciesOptions,
   CoreStatus,
   DefaultSecretPolicy,
@@ -400,6 +402,7 @@ export interface RedactSecretRuntime {
   piiActivation(): string;
   status(): CoreStatus;
   artifact(): ArtifactKind;
+  artifactManifest(): ArtifactManifest;
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
   redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string;
   scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult;
@@ -429,6 +432,7 @@ export function createRedactSecretRuntime(
   expectedProfile: "full" | "common",
 ): RedactSecretRuntime {
   let binding: NativeBinding | undefined;
+  let manifest: ArtifactManifest | undefined;
   let pending: Promise<void> | undefined;
   let pendingKey: string | undefined;
   let activeKey: string | undefined;
@@ -472,6 +476,16 @@ export function createRedactSecretRuntime(
       }
       if (loaded.profile() !== expectedProfile) {
         throw new SecretScanError("INITIALIZATION_FAILED");
+      }
+      // The artifact's own manifest, when it reports one, must describe this
+      // entry point: another schema, version or variant, or a digest that is
+      // not the document's own, is an unusable artifact. It reads no PII
+      // selection and builds no registry, so it runs before `initialize`.
+      const reported = loaded.artifactManifest?.();
+      if (reported !== undefined) {
+        const parsed = parseArtifactManifest(reported, expectedProfile);
+        await assertManifestDigest(parsed);
+        manifest = parsed;
       }
       loaded.initialize(pii);
     } catch (thrown) {
@@ -518,6 +532,19 @@ export function createRedactSecretRuntime(
   /** Which artifact `initialize()` loaded. Requires initialization, like every other operation here. */
   function artifact(): ArtifactKind {
     return active().artifact();
+  }
+
+  /**
+   * What the loaded artifact contains and supports (`artifact-manifest/v1`).
+   * Reports the artifact `initialize()` loaded, so it needs a successful
+   * `initialize()` like every other operation here, but it reads no input,
+   * builds no registry and changes no activation. An artifact that reports no
+   * manifest fails with `INITIALIZATION_FAILED`.
+   */
+  function artifactManifest(): ArtifactManifest {
+    active();
+    if (manifest === undefined) throw new SecretScanError("INITIALIZATION_FAILED");
+    return manifest;
   }
 
   function piiActivation(): string {
@@ -709,6 +736,7 @@ export function createRedactSecretRuntime(
     piiActivation,
     status,
     artifact,
+    artifactManifest,
     scan,
     redact,
     scanAndRedact,

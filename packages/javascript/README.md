@@ -378,12 +378,12 @@ mapped to the same fixed error vocabulary.
 
 ## Public API
 
-Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
+Runtime values: `initialize`, `artifact`, `artifactManifest`, `scan`, `redact`, `scanAndRedact`,
 `compareActionPolicies`, `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `defaultPolicy`, `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`,
 `VERSION`, `PROFILE`.
 
-Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
+Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `ArtifactManifest`, `ArtifactManifestDetector`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 `SecretConfidence`, `SecretObfuscation`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
 `PlaceholderContext`, `ScanOptions`, `RedactOptions`, `ScanAndRedactOptions`,
 `ScanResult`, `WholeInputLimits`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,
@@ -395,6 +395,25 @@ Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding
 `ActionComparison`, `ComparedPolicySummary`, `ComparisonDetection`,
 `ComparedFinding`, `ActionDecision`, `ActionCounts`, `DecisionBasis`,
 `RangeUnit`, `SecretScanErrorCode`.
+
+`artifactManifest()` returns what the loaded artifact contains and supports
+(`artifact-manifest/v1`): the built-in detectors in canonical order with the
+finding types each can emit, the `variant` (`full` or `common`), whether the PII
+runtime is linked, capabilities, defaults, bounds and a `digest`. It reads the
+artifact `initialize()` loaded, takes no input, builds no registry and reads or
+changes no PII activation. The result is frozen and holds no input or secret.
+Each `types` list is that detector's declared types, not a closed vocabulary
+(`typeVocabulary.complete` is `false`), and `detectorSelection` is `false`:
+there is no runtime detector selection.
+
+```ts
+import { artifactManifest, initialize } from "@redact-secret/core";
+
+await initialize();
+const manifest = artifactManifest();
+const ids = manifest.detectors.map((detector) => detector.id); // canonical order
+console.log(manifest.artifact.variant, ids.length);
+```
 
 PII activation is opt-in and off by default. Pass `pii` selectors to
 `initialize`, for example `await initialize({ pii: ["pii"] })`, then read the

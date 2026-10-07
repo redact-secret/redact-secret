@@ -72,6 +72,13 @@ export const status = runtime.status;
  */
 export const artifact = runtime.artifact;
 
+/**
+ * The loaded `common` artifact's `artifact-manifest/v1` document (see
+ * `@redact-secret/core`'s `artifactManifest`). Its `variant` is `"common"`
+ * and the `full` built-in ids it lacks are listed in `notIncluded`.
+ */
+export const artifactManifest = runtime.artifactManifest;
+
 /** Scans `input` and returns every finding, in input order. */
 export const scan = runtime.scan;
 

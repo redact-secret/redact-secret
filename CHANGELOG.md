@@ -5,6 +5,29 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- Artifact manifest, `artifact-manifest/v1` (#1250, epic #1246,
+  `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
+  a consumer can read what the exact loaded artifact contains without scanning
+  an input and without initializing anything. The Rust core generates the
+  document from the registration rows the artifact links (ids, canonical
+  order, pack, the finding types each built-in can emit, whether the PII
+  runtime is linked, capabilities, build defaults, bounds, and a SHA-256
+  digest of its canonical JSON), so no binding keeps its own detector table.
+  `types` is each detector's declared list and the document says it is not a
+  closed vocabulary (`typeVocabulary.complete` is `false`). New names: Rust
+  `ArtifactManifest`, `ArtifactKind`, `ArtifactManifestError`; JavaScript
+  `artifactManifest()` and the `ArtifactManifest` and
+  `ArtifactManifestDetector` types, both entry points; Python
+  `artifact_manifest()`; the CLI flag `--print-artifact-manifest`; the Node
+  addon exports `artifactManifest` and `artifactManifestCommon`; the
+  WebAssembly module exports `artifactManifest`. A manifest that is missing, of
+  another schema, version or variant, or whose digest is not its own fails
+  `initialize()` with `INITIALIZATION_FAILED` and echoes none of it. Detection,
+  findings, defaults and every existing contract are unchanged;
+  `detectorSelection` is `false` until runtime selection (#1251) exists.
+
 ### Fixed
 
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a

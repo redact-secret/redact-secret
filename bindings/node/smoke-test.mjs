@@ -6,7 +6,10 @@
 // through `require`/`import`, not Rust unit tests.
 
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import {
+  artifactManifest,
+  artifactManifestCommon,
   compareActionPolicies,
   createIncrementalSanitizer,
   defaultPolicy,
@@ -48,6 +51,41 @@ function check(name, fn) {
     process.exitCode = 1;
   }
 }
+
+function canonicalJson(value) {
+  const sort = (item) =>
+    Array.isArray(item)
+      ? item.map(sort)
+      : item !== null && typeof item === "object"
+        ? Object.fromEntries(Object.keys(item).sort().map((key) => [key, sort(item[key])]))
+        : item;
+  return JSON.stringify(sort(value));
+}
+
+// The artifact manifest is read before anything is initialized: it must
+// describe the addon and must not build a registry or lock the PII
+// selection, so every later check (which may select PII) still applies.
+check("artifact manifest describes the addon and touches no activation", () => {
+  for (const [text, variant] of [
+    [artifactManifest(), "full"],
+    [artifactManifestCommon(), "common"],
+  ]) {
+    const manifest = JSON.parse(text);
+    assert.equal(Object.keys(manifest)[0], "schema");
+    assert.equal(manifest.schema, "artifact-manifest/v1");
+    assert.equal(manifest.version, version());
+    assert.deepEqual(manifest.artifact, { kind: "node-addon", pii: true, variant });
+    const { digest, ...rest } = manifest;
+    assert.equal(digest, `sha256:${createHash("sha256").update(canonicalJson(rest)).digest("hex")}`);
+    assert.equal(manifest.typeVocabulary.complete, false);
+  }
+  // `common` is a subset of `full`: what it lacks is exactly what it lists as not included.
+  const full = JSON.parse(artifactManifest());
+  const common = JSON.parse(artifactManifestCommon());
+  assert.deepEqual(full.notIncluded, []);
+  assert.equal(common.detectors.length + common.notIncluded.length, full.detectors.length);
+  assert.ok(common.detectors.length > 0 && common.detectors.length < full.detectors.length);
+});
 
 // Repeated initialization: idempotent, callable any number of times.
 check("repeated initialization is idempotent", () => {

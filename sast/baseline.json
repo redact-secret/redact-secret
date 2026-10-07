@@ -546,9 +546,9 @@
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     },
-    "6974f95ad17a4c3c": {
+    "1d63727bd91c59b9": {
       "classification": "false_positive",
-      "line": 73,
+      "line": 74,
       "path": "crates/secret-scan-cli/src/main.rs",
       "rationale": "The flagged call is `env::args_os().skip(1)`: argv[0] is explicitly discarded before the remaining arguments are used as scan-target paths, so the exact property this audit rule warns about (relying on argv[0] for a security decision) does not apply.",
       "rule_id": "sast.rules.rust.lang.security.args-os"

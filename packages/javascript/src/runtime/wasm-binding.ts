@@ -129,6 +129,8 @@ export interface WasmModule {
   profile(): string;
   initialize(pii: readonly string[]): void;
   piiActivation(): string;
+  /** The artifact's `artifact-manifest/v1` document as JSON text (side-effect free). */
+  artifactManifest?(): string;
   scan(
     input: string,
     policy?: WasmPolicyCallback,
@@ -380,6 +382,7 @@ export function decodeComparison(flat: readonly unknown[]): NativeActionComparis
  * artifact itself.
  */
 export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
+  const readManifest = wasm.artifactManifest;
   return {
     version: () => wasm.version(),
     profile: () => wasm.profile(),
@@ -388,6 +391,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
       wasm.initialize(pii);
     },
     piiActivation: () => wasm.piiActivation(),
+    ...(readManifest === undefined ? {} : { artifactManifest: () => readManifest.call(wasm) }),
     scan: (input, policy, limits, ruleset, actionPolicy) =>
       wasm
         .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset, actionPolicy)

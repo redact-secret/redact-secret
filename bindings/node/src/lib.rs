@@ -18,15 +18,18 @@ use std::rc::Rc;
 use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
-    Action, ActionComparison, ActionPolicy, ByteRange, ComparedPolicy, Confidence, DefaultPolicy,
-    DetectedFinding, DetectorRegistry, Finding, FormatterFailure, MAX_COMPARED_POLICIES,
-    Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    PolicyFailure, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
-    compare_action_policies_with_limits, default_placeholder_formatter, load_action_policy,
-    load_ruleset, redact_with_limits as core_redact_with_limits, run_detector_pipeline,
+    Action, ActionComparison, ActionPolicy, ArtifactKind, ArtifactManifest, ByteRange,
+    ComparedPolicy, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
+    FormatterFailure, MAX_COMPARED_POLICIES, Obfuscation, PiiSelection, PlaceholderContext,
+    PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile, SecretScanError,
+    SecretScanErrorCode, WholeInputLimits, compare_action_policies_with_limits,
+    default_placeholder_formatter, load_action_policy, load_ruleset,
+    redact_with_limits as core_redact_with_limits, run_detector_pipeline,
 };
 
-use crate::error::{to_js_action_policy_error, to_js_error, to_js_ruleset_error};
+use crate::error::{
+    to_js_action_policy_error, to_js_error, to_js_manifest_error, to_js_ruleset_error,
+};
 use crate::offsets::{Utf16Offsets, utf16_offsets_to_bytes};
 // Re-exported so the incremental N-API surface (a public export like `scan`
 // or `redact`, just organized in its own module) is part of this crate's
@@ -222,6 +225,42 @@ pub fn profile() -> String {
 #[must_use]
 pub fn profile_common() -> String {
     Profile::Common.as_str().to_owned()
+}
+
+/// The 40-hex source commit this addon was built from, when the build
+/// supplied one at compile time; `None` otherwise. The core reads no
+/// environment; this is a value fixed in the binary by the build.
+const SOURCE_REVISION: Option<&str> = option_env!("REDACT_SECRET_SOURCE_REVISION");
+
+/// The `artifact-manifest/v1` document of the `full` profile of this addon,
+/// as JSON text (issue #1250). Generated from the registration rows the
+/// addon links; builds no registry and reads no PII selection, so it is
+/// safe before and without [`initialize`] and cannot lock the thread's PII
+/// activation.
+///
+/// # Errors
+///
+/// Returns the fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class when
+/// the compile-time source revision is malformed.
+#[napi(js_name = "artifactManifest")]
+pub fn artifact_manifest() -> napi::Result<String, String> {
+    ArtifactManifest::full(ArtifactKind::NodeAddon, true, SOURCE_REVISION)
+        .map(|manifest| manifest.as_json().to_owned())
+        .map_err(to_js_manifest_error)
+}
+
+/// The `artifact-manifest/v1` document of the `common` profile of this
+/// addon. Same guarantees as [`artifact_manifest`]; the `provider`
+/// detectors are listed as `notIncluded` ids only.
+///
+/// # Errors
+///
+/// As [`artifact_manifest`].
+#[napi(js_name = "artifactManifestCommon")]
+pub fn artifact_manifest_common() -> napi::Result<String, String> {
+    ArtifactManifest::common(ArtifactKind::NodeAddon, true, SOURCE_REVISION)
+        .map(|manifest| manifest.as_json().to_owned())
+        .map_err(to_js_manifest_error)
 }
 
 /// Idempotent initialization hook required by the cross-runtime contract:
@@ -1375,6 +1414,25 @@ mod tests {
 
     fn offsets_for(input: &str) -> RefCell<Utf16Offsets<'_>> {
         RefCell::new(Utf16Offsets::new(input))
+    }
+
+    #[test]
+    fn artifact_manifests_name_each_profile_and_touch_no_activation() {
+        // Generation builds no registry: the thread's profile cells stay
+        // empty, so a later initialization with a PII selection still works.
+        let full = artifact_manifest().unwrap();
+        let common = artifact_manifest_common().unwrap();
+        assert!(full.starts_with("{\"schema\":\"artifact-manifest/v1\","));
+        assert!(full.contains("\"kind\":\"node-addon\""));
+        assert!(full.contains("\"variant\":\"full\""));
+        assert!(common.contains("\"variant\":\"common\""));
+        assert!(common.contains("\"notIncluded\":[\"aws-access-key\""));
+        assert_ne!(full, common);
+        assert_eq!(full, artifact_manifest().unwrap());
+        assert!(pii_selection(Profile::Full).is_off());
+        assert!(pii_selection(Profile::Common).is_off());
+        REGISTRY.with(|cell| assert!(cell.get().is_none()));
+        REGISTRY_COMMON.with(|cell| assert!(cell.get().is_none()));
     }
 
     fn from_one_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretScanError> {

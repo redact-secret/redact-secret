@@ -169,7 +169,7 @@ requirement with evidence reopens it. The rows above are unchanged unless named.
 | Capability (issue) | Rust | Node | WASM, browser | Python | CLI |
 | --- | --- | --- | --- | --- | --- |
 | `full`, `common` profiles | existing | existing | existing | existing (`full`) | existing (`full`) |
-| Artifact manifest, generated from the real composition (#1250) | proposed | proposed | proposed | proposed | proposed |
+| Artifact manifest, generated from the real composition (#1250) | existing (`ArtifactManifest`) | existing (`artifactManifest()`; addon `artifactManifest`, `artifactManifestCommon`) | existing (`artifactManifest()`; one manifest per built artifact) | existing (`artifact_manifest()`) | existing (`--print-artifact-manifest`) |
 | `resolveConfig`, `describeConfig`, `status().configuration` (#1251) | proposed | proposed | proposed | unsupported | unsupported |
 | Safe diagnostics (#1252) | proposed | proposed | proposed | unsupported | unsupported |
 | Runtime detector-id selection, owned by `initialize` or the registry (#1251) | proposed | proposed | proposed | unsupported | unsupported |
@@ -182,6 +182,41 @@ requirement with evidence reopens it. The rows above are unchanged unless named.
 Included, enabled, emitted and action are four levels, and a later level never
 exceeds the earlier one; an unsupported request is rejected, never ignored or
 fetched.
+
+### The artifact manifest (#1250)
+
+`artifact-manifest/v1` is the **included** level, read without a scan and
+without initialization. The Rust core generates it from the registration rows
+the artifact links, so a binding forwards one value and keeps no detector,
+pack or type table of its own. What it says and does not say:
+
+- **Native linking is described as it is.** The Node addon and the Python wheel
+  link the `full` registry (the addon also links `common`, exposing a second
+  manifest through `artifactManifestCommon`); the manifest reports what each
+  profile contains. Importing `@redact-secret/core/common` selects the `common`
+  registry and a `common` manifest, but the addon file is the same one: it makes
+  no claim of a smaller native download. Only the WebAssembly `common` build is
+  smaller, and its manifest names the `full` ids it lacks as ids only.
+- **Types are declared, not closed.** `detectors[].types` is each built-in's
+  reviewed declaration (`docs/coverage/detector-inventory.json`, reconciled in
+  the Rust drift tests). A ruleset, a custom Rust detector and the PII adapter
+  emit types the list does not name, so `typeVocabulary.complete` is `false`
+  and `dynamicSources` says which.
+- **No side effect.** Reading it builds no registry and reads no PII
+  selection, so it cannot start or lock the legacy PII activation: a later
+  `initialize({ pii })` still applies. The JavaScript `artifactManifest()`
+  reports the artifact `initialize()` loaded, so it follows a successful
+  `initialize()` there; the Python function, the CLI flag and the Rust API need
+  none.
+- **Bound to the artifact, not to a second pipeline.** The manifest is part of the
+  binary, so the artifact digests the release process already records cover it;
+  its own `digest` is the SHA-256 of its canonical JSON, and the facade checks it
+  at `initialize()`. Its `sourceRevision` is `null` unless the build set
+  `REDACT_SECRET_SOURCE_REVISION`. It is not the release manifest and carries no
+  provenance record.
+- **Fixed diagnostics.** A manifest that is missing, of another schema or
+  version, of another variant, or whose digest is not its own fails
+  `initialize()` with `INITIALIZATION_FAILED` and echoes none of the document.
 
 ## 7. What this does not authorize
 

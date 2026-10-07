@@ -1,0 +1,103 @@
+{
+  "schema": "artifact-manifest-canonical-json-fixture/v1",
+  "note": "Canonical JSON for every artifact-manifest/v1 digest: UTF-8, object members in bytewise order at every depth, arrays in their stated order, no whitespace, integers in decimal, no floats, ASCII strings only. canonical is the exact text; sha256 is its SHA-256 as lowercase hex. Every surface (Rust, JavaScript, Python) runs these cases. No case carries an input, a ruleset or a secret-shaped value.",
+  "manifest": {
+    "schemaFirst": true,
+    "schemaValue": "artifact-manifest/v1",
+    "digestPrefix": "sha256:",
+    "members": [
+      "artifact",
+      "bounds",
+      "capabilities",
+      "composition",
+      "defaults",
+      "detectors",
+      "digest",
+      "notIncluded",
+      "pii",
+      "product",
+      "schema",
+      "sourceRevision",
+      "typeVocabulary",
+      "version"
+    ]
+  },
+  "cases": [
+    {
+      "name": "members-sorted-bytewise",
+      "input": {
+        "b": 1,
+        "a": 2,
+        "B": 3,
+        "_": 4
+      },
+      "canonical": "{\"B\":3,\"_\":4,\"a\":2,\"b\":1}",
+      "sha256": "f31bf910f7cd3c3712ac9fce564535874c70451a95f0e886c40b144e668eb232"
+    },
+    {
+      "name": "nested-objects-sorted",
+      "input": {
+        "z": {
+          "y": 1,
+          "x": {
+            "b": true,
+            "a": null
+          }
+        },
+        "a": [
+          {
+            "d": 1,
+            "c": 2
+          }
+        ]
+      },
+      "canonical": "{\"a\":[{\"c\":2,\"d\":1}],\"z\":{\"x\":{\"a\":null,\"b\":true},\"y\":1}}",
+      "sha256": "891b3a531b93b1d5af40c88b078b90503becdb845716fa527509347915a4a5c7"
+    },
+    {
+      "name": "arrays-keep-their-order",
+      "input": {
+        "items": [
+          "b",
+          "a",
+          "c",
+          3,
+          1,
+          2
+        ]
+      },
+      "canonical": "{\"items\":[\"b\",\"a\",\"c\",3,1,2]}",
+      "sha256": "9d7c350763515af7541d92cf0aa0ce100786cfe7ce4dfd3acdf78957816cb4aa"
+    },
+    {
+      "name": "integers-booleans-null",
+      "input": {
+        "n": 0,
+        "big": 67108864,
+        "t": true,
+        "f": false,
+        "z": null
+      },
+      "canonical": "{\"big\":67108864,\"f\":false,\"n\":0,\"t\":true,\"z\":null}",
+      "sha256": "1aa374b01630faf59a986a0fce90be065d60e1d3c351bb4c624192f2d3abeafe"
+    },
+    {
+      "name": "ascii-escapes",
+      "input": {
+        "q": "a\"b",
+        "s": "back\\slash"
+      },
+      "canonical": "{\"q\":\"a\\\"b\",\"s\":\"back\\\\slash\"}",
+      "sha256": "f364e75a5e545e9849bc0ebfba90ec6296ab939988d41971960a0ae1efdb087c"
+    },
+    {
+      "name": "empty-containers",
+      "input": {
+        "o": {},
+        "a": []
+      },
+      "canonical": "{\"a\":[],\"o\":{}}",
+      "sha256": "9bee7ebfc94b459dacb8cbc72cb2900e61f0aa42189df18329f84f92568f4f89"
+    }
+  ]
+}

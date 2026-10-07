@@ -52,6 +52,9 @@ pub const PII_MISSING_SELECTOR: &str = "--pii requires a selector argument";
 pub const PRINT_PII_STANDALONE: &str =
     "--print-pii-activation accepts only repeatable --pii selectors";
 
+/// Manifest printing performs no scan and accepts no other argument.
+pub const PRINT_MANIFEST_STANDALONE: &str = "--print-artifact-manifest accepts no other argument";
+
 /// A failure the CLI reports to its host.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {

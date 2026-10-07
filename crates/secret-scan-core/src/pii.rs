@@ -210,6 +210,13 @@ fn selector_to_family(selector: &str) -> Option<String> {
     Some(format!("pii:{rest}"))
 }
 
+/// The canonical ids of the PII families a PII-enabled artifact can activate,
+/// sorted. Pure data: reading it builds no registry and touches no
+/// activation state (issue #1250).
+pub(crate) const fn available_families() -> &'static [&'static str] {
+    AVAILABLE_FAMILIES
+}
+
 pub(crate) fn is_reserved_detector_id(id: &str) -> bool {
     id == ADAPTER_ID || id.starts_with("pii:")
 }

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from types import TracebackType
-from typing import Callable
+from typing import Any, Callable
 
 # ---------------------------------------------------------------------
 # Module constants
@@ -387,6 +387,15 @@ def version() -> str: ...
 def initialize(pii: Sequence[str] = ()) -> None: ...
 def pii_activation() -> str: ...
 def status() -> CoreStatus: ...
+def artifact_manifest() -> dict[str, Any]:
+    """The wheel's ``artifact-manifest/v1`` document, parsed.
+
+    Takes no input, builds no registry and reads no PII selection, so it never
+    initializes, activates or locks the process-wide PII selection. Each
+    ``detectors[].types`` list is a detector's declared types, not a closed
+    vocabulary (see ``typeVocabulary``); ``digest`` is ``sha256:`` over the
+    canonical JSON of the document without ``digest``.
+    """
 def byte_offset_to_char_offset(text: str, byte_offset: int) -> int: ...
 def scan(
     text: str,

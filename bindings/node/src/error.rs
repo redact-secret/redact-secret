@@ -6,7 +6,7 @@
 //! error carries input or a matched value.
 
 use napi::Error as NapiError;
-use redact_secret::{ActionPolicyError, RulesetError, SecretScanError};
+use redact_secret::{ActionPolicyError, ArtifactManifestError, RulesetError, SecretScanError};
 
 /// The JavaScript error type this crate throws: `status` (surfaced to
 /// JavaScript as `code`) carries the fixed [`redact_secret::SecretScanErrorCode`]
@@ -64,11 +64,29 @@ pub fn to_js_action_policy_error(error: ActionPolicyError) -> JsError {
     )
 }
 
+/// Converts a manifest failure into the JavaScript error contract (issue
+/// #1250). `status` is the fixed `ARTIFACT_MANIFEST_*` class code and the
+/// message is the fixed one; neither carries any document content.
+#[must_use]
+pub fn to_js_manifest_error(error: ArtifactManifestError) -> JsError {
+    NapiError::new(error.code().to_owned(), error.message().to_owned())
+}
+
 #[cfg(test)]
 mod tests {
     use redact_secret::SecretScanErrorCode;
 
     use super::*;
+
+    #[test]
+    fn manifest_errors_carry_the_fixed_class_code_and_message() {
+        let error = to_js_manifest_error(ArtifactManifestError::DigestMismatch);
+        assert_eq!(error.status, "ARTIFACT_MANIFEST_DIGEST_MISMATCH");
+        assert_eq!(
+            error.reason,
+            "The artifact manifest does not match this artifact."
+        );
+    }
 
     #[test]
     fn carries_the_fixed_code_and_message() {

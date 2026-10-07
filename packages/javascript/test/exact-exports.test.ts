@@ -15,6 +15,7 @@ const PUBLIC_RUNTIME_EXPORTS = [
   "SecretScanError",
   "VERSION",
   "artifact",
+  "artifactManifest",
   "compareActionPolicies",
   "createIncrementalSanitizer",
   "defaultPlaceholderFormatter",

@@ -30,6 +30,98 @@ export type SecretConfidence = "high" | "medium" | "low";
 export type SecretAction = "redact" | "block" | "warn" | "allow";
 
 /**
+ * One built-in detector an artifact includes, as its manifest lists it
+ * (`ArtifactManifest.detectors`).
+ */
+export interface ArtifactManifestDetector {
+  /** The `Finding.detector` id, for example `"github-token"`. */
+  readonly id: string;
+  /** `"common"` ships in every profile; `"provider"` only in `full`. */
+  readonly pack: "common" | "provider";
+  /**
+   * The finding types this detector can emit, sorted: its reviewed
+   * declaration, not a guarantee about every finding the engine can return
+   * (see {@link ArtifactManifest.typeVocabulary}).
+   */
+  readonly types: readonly string[];
+  /** Alternate spellings of `id`, sorted. Empty today. */
+  readonly aliases: readonly string[];
+}
+
+/**
+ * What the loaded artifact contains and supports: the `artifact-manifest/v1`
+ * document the Rust core generates from the detectors the artifact actually
+ * links (`decision-define-the-artifact-manifest-and-configuration-data-contracts`).
+ *
+ * It is the **included** level of the capability ceiling, before any runtime
+ * choice. It holds no input, ruleset, literal, path, host name or timestamp.
+ * Digests bind exact content and are not stable across versions: `version`
+ * is inside `digest`.
+ */
+export interface ArtifactManifest {
+  readonly schema: "artifact-manifest/v1";
+  readonly product: "redact-secret";
+  /** The lockstep product version. */
+  readonly version: string;
+  /** The 40-hex source commit of the build, or `null` when the build has none. */
+  readonly sourceRevision: string | null;
+  readonly artifact: {
+    /** The target class of the artifact. */
+    readonly kind: "wasm" | "node-addon" | "python-wheel" | "cli" | "rust-registry";
+    readonly variant: "full" | "common" | "custom";
+    /** Whether the PII runtime is linked into this artifact. */
+    readonly pii: boolean;
+  };
+  readonly composition: {
+    readonly kind: "standard" | "custom";
+    readonly profile: "full" | "common" | "custom";
+    /** `null` for a standard artifact. */
+    readonly id: string | null;
+  };
+  /** Every included built-in detector, in canonical (registration) order. */
+  readonly detectors: readonly ArtifactManifestDetector[];
+  /** `full` built-in ids this artifact does not include, in canonical order. */
+  readonly notIncluded: readonly string[];
+  readonly pii: {
+    readonly available: boolean;
+    /** The PII family ids the artifact supports, sorted; empty when unavailable. */
+    readonly families: readonly string[];
+  };
+  readonly capabilities: {
+    readonly detectorSelection: boolean;
+    readonly ruleset: { readonly revisions: readonly number[] } | null;
+    readonly actionPolicy: { readonly revisions: readonly number[] };
+    readonly incremental: boolean;
+  };
+  /** What the artifact does when runtime input is absent (`build-defaults/v1`). */
+  readonly defaults: {
+    readonly schema: "build-defaults/v1";
+    readonly detection: "all-included";
+    readonly pii: { readonly selectors: readonly string[] };
+    readonly actionPolicy: "artifact-default";
+    readonly limits: "artifact-default";
+  };
+  /** The artifact defaults of the limits and the document bounds. */
+  readonly bounds: {
+    readonly limits: { readonly maxInputBytes: number; readonly maxFindings: number };
+    readonly actionPolicyBytes: number;
+    readonly detectorIdsMax: number;
+    readonly diagnosticsMax: number;
+  };
+  /**
+   * Says that `detectors[].types` is not a closed vocabulary: a declarative
+   * ruleset, a custom detector and the PII adapter emit types it does not name.
+   */
+  readonly typeVocabulary: {
+    readonly builtInTypes: "declared";
+    readonly complete: false;
+    readonly dynamicSources: readonly string[];
+  };
+  /** `sha256:` and 64 hex characters: the SHA-256 of the canonical JSON of this object without `digest`. */
+  readonly digest: string;
+}
+
+/**
  * Whether a finding's reported range shows evidence of invisible-character
  * obfuscation: at least one zero-rendering or format code point was removed
  * from inside it before detection. Carries no value, no offset into the

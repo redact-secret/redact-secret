@@ -981,3 +981,29 @@ fn built_in_registry_is_a_shareable_whole_input_entry_point() {
         .unwrap();
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn artifact_manifest_is_public_side_effect_free_and_bounded() {
+    use redact_secret::{ArtifactKind, ArtifactManifest, ArtifactManifestError};
+
+    let manifest: ArtifactManifest =
+        ArtifactManifest::full(ArtifactKind::RustRegistry, true, None).unwrap();
+    assert_eq!(manifest.profile(), Profile::Full);
+    assert!(manifest.digest().starts_with("sha256:"));
+    assert!(
+        manifest
+            .as_json()
+            .starts_with("{\"schema\":\"artifact-manifest/v1\",")
+    );
+    assert_eq!(
+        manifest.detector_ids().count(),
+        registry().ids().count(),
+        "the manifest lists exactly the registered built-ins"
+    );
+    let missing: ArtifactManifestError = manifest.verify_packaged(None).unwrap_err();
+    assert_eq!(missing.code(), "ARTIFACT_MANIFEST_MISSING");
+    assert_eq!(missing.to_string(), missing.message());
+    let common = ArtifactManifest::common(ArtifactKind::Wasm, false, None).unwrap();
+    assert_eq!(common.profile(), Profile::Common);
+    assert_eq!(common.detector_ids().count(), 6);
+}

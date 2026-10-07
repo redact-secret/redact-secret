@@ -18,8 +18,9 @@ use std::cell::{OnceCell, RefCell};
 use std::rc::Rc;
 
 use redact_secret::{
-    DetectorRegistry, IncrementalLimits, IncrementalPolicy, IncrementalSanitizer, PiiSelection,
-    PlaceholderFormatter, Profile, SecretScanError, SecretScanErrorCode,
+    ArtifactKind, ArtifactManifest, DetectorRegistry, IncrementalLimits, IncrementalPolicy,
+    IncrementalSanitizer, PiiSelection, PlaceholderFormatter, Profile, SecretScanError,
+    SecretScanErrorCode,
 };
 
 use crate::error::WasmErrorCode;
@@ -38,6 +39,32 @@ pub(crate) const PROFILE: Profile = Profile::Common;
 /// rejects every non-empty PII selection with `PII_SELECTOR_UNAVAILABLE`,
 /// and no constructor that references the `pii-domain` adapter is linked.
 pub(crate) const PII_RUNTIME: bool = cfg!(feature = "pii");
+
+/// The 40-hex source commit this artifact was built from, when the build
+/// supplied one at compile time; `None` otherwise. Fixed in the binary by the
+/// build: the core reads no environment.
+const SOURCE_REVISION: Option<&str> = option_env!("REDACT_SECRET_SOURCE_REVISION");
+
+/// The `artifact-manifest/v1` document of this artifact (issue #1250), as
+/// JSON text. Exactly one manifest constructor is referenced per build,
+/// selected at compile time like the registry constructors below, so a
+/// `common` artifact links no `provider` detector for it. It builds no
+/// registry and reads no PII selection, so it is safe before and without
+/// [`initialize`].
+#[cfg(feature = "full")]
+pub(crate) fn artifact_manifest() -> Result<String, WasmErrorCode> {
+    ArtifactManifest::full(ArtifactKind::Wasm, PII_RUNTIME, SOURCE_REVISION)
+        .map(|manifest| manifest.as_json().to_owned())
+        .map_err(WasmErrorCode::from)
+}
+
+/// See the `full` variant above.
+#[cfg(not(feature = "full"))]
+pub(crate) fn artifact_manifest() -> Result<String, WasmErrorCode> {
+    ArtifactManifest::common(ArtifactKind::Wasm, PII_RUNTIME, SOURCE_REVISION)
+        .map(|manifest| manifest.as_json().to_owned())
+        .map_err(WasmErrorCode::from)
+}
 
 /// Builds this artifact's profile registry with no custom detectors.
 ///

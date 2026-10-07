@@ -50,6 +50,8 @@ interface NodeAddon {
   initialize(): void;
   initializePii?(pii: readonly string[]): void;
   piiActivation?(): string;
+  /** The `full` profile's `artifact-manifest/v1` document as JSON text (side-effect free). */
+  artifactManifest?(): string;
   scan(
     input: string,
     policy?: NativePolicyCallback,
@@ -103,6 +105,8 @@ interface CommonNodeAddon {
   initializeCommon(): void;
   initializeCommonPii?(pii: readonly string[]): void;
   piiActivationCommon?(): string;
+  /** The `common` profile's `artifact-manifest/v1` document as JSON text (side-effect free). */
+  artifactManifestCommon?(): string;
   scanCommon(
     input: string,
     policy?: NativePolicyCallback,
@@ -292,6 +296,7 @@ interface ProfiledAddonMethods {
   profile(): string;
   initialize(pii: readonly string[]): void;
   piiActivation(): string;
+  artifactManifest?(): string;
   scan(
     input: string,
     policy?: NativePolicyCallback,
@@ -312,6 +317,22 @@ interface ProfiledAddonMethods {
 }
 
 /**
+ * The profile-selected `artifactManifest` method, present only when the addon
+ * exports it. A missing export is reported by the facade, not invented here.
+ */
+function manifestSource(
+  read: (() => string) | undefined,
+  addon: object,
+): Pick<ProfiledAddonMethods, "artifactManifest"> {
+  return read === undefined ? {} : { artifactManifest: () => read.call(addon) };
+}
+
+/** The binding's `artifactManifest`, present only when the profile's method is. */
+function manifestMethod(read: (() => string) | undefined): Pick<NativeBinding, "artifactManifest"> {
+  return read === undefined ? {} : { artifactManifest: () => read() };
+}
+
+/**
  * Builds the internal binding contract from an addon's shared `version` and
  * `redact` exports plus its profile-selected methods — {@link NodeAddon}
  * itself for {@link createBindingFromAddon}, or a `CommonNodeAddon` view
@@ -329,6 +350,7 @@ function buildBinding(
       methods.initialize(pii);
     },
     piiActivation: () => methods.piiActivation(),
+    ...manifestMethod(methods.artifactManifest),
     scan: (input, policy, limits, ruleset, actionPolicy) => methods.scan(input, policy, limits, ruleset, actionPolicy),
     redact: (input, findings, formatter, limits) => addon.redact(input, findings, formatter, limits),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy): NativeScanAndRedactResult => {
@@ -360,6 +382,7 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
     },
     piiActivation: () =>
       addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v2",
+    ...manifestSource(addon.artifactManifest, addon),
     scan: (input, policy, limits, ruleset, actionPolicy) => addon.scan(input, policy, limits, ruleset, actionPolicy),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) =>
       addon.scanAndRedact(input, policy, formatter, limits, ruleset, actionPolicy),
@@ -387,6 +410,7 @@ export function createBindingFromCommonAddon(addon: CommonNodeAddon): NativeBind
     },
     piiActivation: () =>
       addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v2",
+    ...manifestSource(addon.artifactManifestCommon, addon),
     scan: (input, policy, limits, ruleset, actionPolicy) =>
       addon.scanCommon(input, policy, limits, ruleset, actionPolicy),
     scanAndRedact: (input, policy, formatter, limits, ruleset, actionPolicy) =>

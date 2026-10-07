@@ -9,8 +9,8 @@
 //! `INVALID_INPUT` and `INVALID_OPTIONS` are host-produced codes.
 
 use redact_secret::{
-    ActionPolicyError, ActionPolicyErrorClass, RulesetError, RulesetErrorClass, SecretScanError,
-    SecretScanErrorCode,
+    ActionPolicyError, ActionPolicyErrorClass, ArtifactManifestError, RulesetError,
+    RulesetErrorClass, SecretScanError, SecretScanErrorCode,
 };
 use wasm_bindgen::JsValue;
 
@@ -37,6 +37,9 @@ pub(crate) enum WasmErrorCode {
     /// class and, inside a rule, its zero-based index are folded into
     /// [`Self::message`].
     ActionPolicy(ActionPolicyErrorClass, Option<usize>),
+    /// The artifact manifest could not be generated (issue #1250). The code
+    /// and message are the manifest class's fixed strings.
+    Manifest(ArtifactManifestError),
 }
 
 impl WasmErrorCode {
@@ -49,6 +52,7 @@ impl WasmErrorCode {
             Self::Core(code) => code.as_str(),
             Self::Ruleset(_) => SecretScanErrorCode::InvalidRuleset.as_str(),
             Self::ActionPolicy(..) => SecretScanErrorCode::InvalidActionPolicy.as_str(),
+            Self::Manifest(error) => error.code(),
         }
     }
 
@@ -85,6 +89,7 @@ impl WasmErrorCode {
                 SecretScanErrorCode::InvalidActionPolicy.message(),
                 class.as_str()
             ),
+            Self::Manifest(error) => error.message().to_owned(),
         }
     }
 }
@@ -104,6 +109,12 @@ impl From<SecretScanError> for WasmErrorCode {
 impl From<RulesetError> for WasmErrorCode {
     fn from(error: RulesetError) -> Self {
         Self::Ruleset(error.class())
+    }
+}
+
+impl From<ArtifactManifestError> for WasmErrorCode {
+    fn from(error: ArtifactManifestError) -> Self {
+        Self::Manifest(error)
     }
 }
 
@@ -140,6 +151,16 @@ mod tests {
             "INITIALIZATION_FAILED"
         );
         assert!(!WasmErrorCode::InitializationFailed.message().is_empty());
+    }
+
+    #[test]
+    fn manifest_errors_carry_the_fixed_class_code_and_message() {
+        let wrapped = WasmErrorCode::from(ArtifactManifestError::SchemaMismatch);
+        assert_eq!(wrapped.as_str(), "ARTIFACT_MANIFEST_SCHEMA_MISMATCH");
+        assert_eq!(
+            wrapped.message(),
+            "The artifact manifest schema is not supported."
+        );
     }
 
     #[test]

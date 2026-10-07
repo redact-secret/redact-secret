@@ -65,6 +65,7 @@
 //! | Declarative action policy | [`load_action_policy`], [`ActionPolicy`], [`ActionPolicyError`], [`ActionPolicyErrorClass`], [`MAX_ACTION_POLICY_BYTES`] |
 //! | Explain and compare action policies | [`compare_action_policies`], [`compare_action_policies_with_limits`], [`ComparedPolicy`], [`ActionComparison`], [`ComparedFinding`], [`ActionDecision`], [`DecisionBasis`], [`ComparedSide`], [`PolicyBinding`], [`ActionCounts`], [`DetectionIdentity`], [`MAX_COMPARED_POLICIES`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
+//! | Artifact manifest | [`ArtifactManifest`], [`ArtifactKind`], [`ArtifactManifestError`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
 //!
@@ -141,6 +142,7 @@ mod evidence;
 mod incremental;
 mod invisible_table;
 mod limits;
+mod manifest;
 mod normalize;
 #[cfg_attr(
     not(test),
@@ -177,6 +179,7 @@ pub use incremental::{
     IncrementalSanitizer, SessionState,
 };
 pub use limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, WholeInputLimits};
+pub use manifest::{ArtifactKind, ArtifactManifest, ArtifactManifestError};
 pub use pii::PiiSelection;
 pub use pipeline::{
     run_detector_pipeline, sanitize, sanitize_with_profile, scan, scan_and_redact,

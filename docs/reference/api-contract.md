@@ -112,6 +112,34 @@ and the CLI runs one shot. A core-published synthetic readiness probe is
 deliberately not part of the contract
 ([`decision-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe`](../decisions/2026-10-05-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe.md)).
 
+## Artifact manifest
+
+`artifact-manifest/v1` says what the exact loaded artifact contains, without a
+scan and without initializing anything: build identity, the built-in detectors
+in canonical order with their pack and the finding types each can emit, whether
+the PII runtime is linked, capabilities, build defaults, bounds and a digest.
+The Rust core generates it from the registration rows the artifact links, so
+every surface forwards one value and keeps no detector table of its own.
+
+| Surface | Name |
+| --- | --- |
+| Rust | `ArtifactManifest::full` / `::common`, `ArtifactKind`, `ArtifactManifestError` |
+| JavaScript (root and `./common`) | `artifactManifest()`, types `ArtifactManifest`, `ArtifactManifestDetector` |
+| Python | `redact_secret.artifact_manifest()` (a `dict`) |
+| CLI | `--print-artifact-manifest` (one JSON line, reads no input, accepts no other argument) |
+
+`detectors[].types` is each built-in's declared list, not a closed vocabulary:
+a ruleset, a custom detector and the PII adapter emit other types, and
+`typeVocabulary.complete` is `false`. The document holds no input, ruleset,
+literal, path, host name or timestamp, and reading it builds no registry and
+reads no PII selection. In JavaScript it reports the artifact `initialize()`
+loaded, and `initialize()` rejects with `INITIALIZATION_FAILED` when the
+manifest is missing from an artifact that should report one, or has another
+schema, version or variant, or a digest that is not its own, echoing none of it.
+`status()` is unchanged; no runtime detector selection exists yet, and the
+manifest says so (`capabilities.detectorSelection` is `false`)
+([`decision-define-the-artifact-manifest-and-configuration-data-contracts`](../decisions/2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md)).
+
 ## Errors and extensions
 
 Failures use fixed codes and input-free messages. JavaScript exposes

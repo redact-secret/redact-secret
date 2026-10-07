@@ -30,6 +30,8 @@ export type {
   ActionPolicyRule,
   ActionPolicyRuleAction,
   ArtifactKind,
+  ArtifactManifest,
+  ArtifactManifestDetector,
   CompareActionPoliciesOptions,
   ComparedFinding,
   ComparedPolicy,

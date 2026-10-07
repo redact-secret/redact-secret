@@ -77,6 +77,24 @@ pub fn profile() -> String {
     lifecycle::PROFILE.as_str().to_owned()
 }
 
+/// Returns this artifact's `artifact-manifest/v1` document as JSON text
+/// (issue #1250): the build identity, the built-in detectors it links in
+/// canonical order, the finding types each can emit, whether the PII runtime
+/// is linked, and the supported capabilities, defaults and bounds.
+///
+/// Generated from the registration rows this artifact links. Readable before
+/// [`initialize`], builds no registry and reads no PII selection, so it
+/// cannot initialize or lock anything.
+///
+/// # Errors
+///
+/// Returns the fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class if the
+/// compile-time source revision is malformed.
+#[wasm_bindgen(js_name = artifactManifest)]
+pub fn artifact_manifest() -> Result<String, JsValue> {
+    lifecycle::artifact_manifest().map_err(to_js_error)
+}
+
 /// Idempotently initializes the module: builds and caches the built-in
 /// detector registry. Every later call, whether or not the first one
 /// succeeded, returns the same cached result without rebuilding it.
@@ -671,6 +689,28 @@ mod tests {
             "common"
         };
         assert_eq!(profile(), expected);
+    }
+
+    #[test]
+    fn artifact_manifest_describes_the_compiled_composition_without_initializing() {
+        // Generated before any `initialize()`: no registry is built, so the
+        // module stays uninitialized afterwards.
+        let manifest = lifecycle::artifact_manifest().expect("manifest");
+        assert!(manifest.starts_with("{\"schema\":\"artifact-manifest/v1\","));
+        assert!(manifest.contains("\"kind\":\"wasm\""));
+        let variant = if cfg!(feature = "full") {
+            "full"
+        } else {
+            "common"
+        };
+        assert!(manifest.contains(&format!("\"variant\":\"{variant}\"")));
+        assert!(manifest.contains(&format!("\"available\":{}", cfg!(feature = "pii"))));
+        // A common artifact names no provider detector as included.
+        assert_eq!(
+            manifest.contains("\"id\":\"github-token\""),
+            cfg!(feature = "full")
+        );
+        assert_eq!(manifest, lifecycle::artifact_manifest().expect("manifest"));
     }
 
     /// A minimal, valid declarative ruleset (issue #495).
