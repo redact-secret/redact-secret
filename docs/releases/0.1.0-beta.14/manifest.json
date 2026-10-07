@@ -1,0 +1,893 @@
+{
+  "artifact_digests": {
+    "crate:redact-secret": [
+      {
+        "built": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476",
+        "comparable": true,
+        "file": "redact-secret-0.1.0-beta.14.crate",
+        "note": null,
+        "published": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476",
+        "qualified": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476"
+      }
+    ],
+    "crate:redact-secret-cli": [
+      {
+        "built": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589",
+        "comparable": true,
+        "file": "redact-secret-cli-0.1.0-beta.14.crate",
+        "note": null,
+        "published": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589",
+        "qualified": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589"
+      }
+    ],
+    "npm:@redact-secret/core": [
+      {
+        "built": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8",
+        "comparable": true,
+        "file": "packages/javascript",
+        "note": null,
+        "published": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8",
+        "qualified": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-arm64": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n55aa35f0184dbb330457c91d4cd5da0ee28929847d0a0aaeff7153944eb7d2ec",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-arm64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "91068c769562afc2348b9eb6e0c5bcd6a4c782de",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n55aa35f0184dbb330457c91d4cd5da0ee28929847d0a0aaeff7153944eb7d2ec"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-x64": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n85acf12a01b01ad7be9d20921a8044162d928158d7f30db3d2edd0a0491557ea",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-x64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "b7e38b125ee7d63327dff0ea110860b0beb94ba9",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n85acf12a01b01ad7be9d20921a8044162d928158d7f30db3d2edd0a0491557ea"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-gnu": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nca818c08366350e5e4eaefa23f0add0602d2fe4ec048978335997aa659a7290b",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "886a5fd04083c23e47516bbfde0f64047b3d1754",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nca818c08366350e5e4eaefa23f0add0602d2fe4ec048978335997aa659a7290b"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-musl": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n1d606828e38a3d62941c0fcb822b5f6b701c8f91da5b35b706da6f9e69d38f00",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "eb07bb443d1c9e9a0d0e6ec28365d05795d30386",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n1d606828e38a3d62941c0fcb822b5f6b701c8f91da5b35b706da6f9e69d38f00"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-gnu": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n25f8c5c932ecefa30b45d9b6c9a3f878cab7d89f8a54d51b172170b8491fb9f8",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "f4aa9bf864d2ef6eea031a2958debc62f0a9845a",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n25f8c5c932ecefa30b45d9b6c9a3f878cab7d89f8a54d51b172170b8491fb9f8"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-musl": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n59760612ad5c67167ce8fbf66e35c9e9222ce40295eab08d643752ed8cdacbab",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "78357f30b0817fc33f552dcd1d78add2748400d2",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n59760612ad5c67167ce8fbf66e35c9e9222ce40295eab08d643752ed8cdacbab"
+      }
+    ],
+    "npm:@redact-secret/node-win32-arm64-msvc": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n934eb3f0b22d6ca7760df337cf1af756c679c1a051f5cef21848588c0a690ecc",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-arm64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "eae7d8139081e94966a219d80403f46cdf82039a",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n934eb3f0b22d6ca7760df337cf1af756c679c1a051f5cef21848588c0a690ecc"
+      }
+    ],
+    "npm:@redact-secret/node-win32-x64-msvc": [
+      {
+        "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nc95420113abc6b8b1561ce03be3ddc7a17ee8c43446c6e1740e1d5808fb76b8f",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-x64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "731d7989a96cf6c69765cc27cda1161f258c66ff",
+        "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nc95420113abc6b8b1561ce03be3ddc7a17ee8c43446c6e1740e1d5808fb76b8f"
+      }
+    ],
+    "npm:@redact-secret/wasm": [
+      {
+        "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+        "comparable": false,
+        "file": "redact_secret_wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+      },
+      {
+        "built": "45327b89328eb433b003e722b85ace6bbc5091d0ddbfc2b138d9e7b56012a349",
+        "comparable": false,
+        "file": "redact_secret_wasm.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "45327b89328eb433b003e722b85ace6bbc5091d0ddbfc2b138d9e7b56012a349"
+      },
+      {
+        "built": "981b9aa776ee810bf3a5f074b46b0a356af8b14044e384970198520bd91abf66",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "981b9aa776ee810bf3a5f074b46b0a356af8b14044e384970198520bd91abf66"
+      },
+      {
+        "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+      },
+      {
+        "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+      },
+      {
+        "built": "b3ec315488ffd6c366dad06cdcee18dbf4c1a3262e8b2341006aae31b27d6e01",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "b3ec315488ffd6c366dad06cdcee18dbf4c1a3262e8b2341006aae31b27d6e01"
+      },
+      {
+        "built": "2d4fa12906cfb9a397fdb514d558bfe9a3d247eeea9e00476d2bd4836ee70bef",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "2d4fa12906cfb9a397fdb514d558bfe9a3d247eeea9e00476d2bd4836ee70bef"
+      },
+      {
+        "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+      },
+      {
+        "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+      },
+      {
+        "built": "cce169681968ff6d9db46eb084253ac1f480c630fc1010426f4c59f479f4cc24",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "cce169681968ff6d9db46eb084253ac1f480c630fc1010426f4c59f479f4cc24"
+      },
+      {
+        "built": "1d8eaea86e901d18d1c9d8c9564e9a292f59acbff241728d9a839908094a5bae",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "1d8eaea86e901d18d1c9d8c9564e9a292f59acbff241728d9a839908094a5bae"
+      },
+      {
+        "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+      },
+      {
+        "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+      },
+      {
+        "built": "bd8d5b6c54a34b00a8826f831da84667289427c47935d3eaa33ed24b762da6b8",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "bd8d5b6c54a34b00a8826f831da84667289427c47935d3eaa33ed24b762da6b8"
+      },
+      {
+        "built": "d1df0179af9d69876adc894f81b3fc83c7009cd4b96bb79d62e2868b08a40b85",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "d1df0179af9d69876adc894f81b3fc83c7009cd4b96bb79d62e2868b08a40b85"
+      },
+      {
+        "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+        "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+      }
+    ],
+    "pypi:redact-secret": [
+      {
+        "built": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14.tar.gz",
+        "note": null,
+        "published": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c",
+        "qualified": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c"
+      },
+      {
+        "built": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-macosx_11_0_arm64.whl",
+        "note": null,
+        "published": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62",
+        "qualified": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62"
+      },
+      {
+        "built": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-win_arm64.whl",
+        "note": null,
+        "published": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284",
+        "qualified": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284"
+      },
+      {
+        "built": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "note": null,
+        "published": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519",
+        "qualified": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519"
+      },
+      {
+        "built": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-musllinux_1_2_aarch64.whl",
+        "note": null,
+        "published": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837",
+        "qualified": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837"
+      },
+      {
+        "built": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-macosx_10_12_x86_64.whl",
+        "note": null,
+        "published": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32",
+        "qualified": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32"
+      },
+      {
+        "built": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-win_amd64.whl",
+        "note": null,
+        "published": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a",
+        "qualified": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a"
+      },
+      {
+        "built": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "note": null,
+        "published": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739",
+        "qualified": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739"
+      },
+      {
+        "built": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b14-cp310-abi3-musllinux_1_2_x86_64.whl",
+        "note": null,
+        "published": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35",
+        "qualified": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35"
+      }
+    ]
+  },
+  "artifact_inventory_sha256": "b9e6052e3dd675db4ab84d7f19667b4777a00d99d345027df2f88a9550a2ce57",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "conformance_identity": "07318cdbafde556bb886329dcc8f8358deab4605",
+  "record_kind": "reconstructed",
+  "record_schema_version": 1,
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-arm64-musl": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-musl": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "observed_at": "2026-10-07",
+    "original_manifest": {
+      "artifact_digests": {
+        "crate:redact-secret": [
+          {
+            "built": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476",
+            "comparable": true,
+            "file": "redact-secret-0.1.0-beta.14.crate",
+            "note": null,
+            "published": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476",
+            "qualified": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476"
+          }
+        ],
+        "crate:redact-secret-cli": [
+          {
+            "built": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589",
+            "comparable": true,
+            "file": "redact-secret-cli-0.1.0-beta.14.crate",
+            "note": null,
+            "published": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589",
+            "qualified": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589"
+          }
+        ],
+        "npm:@redact-secret/core": [
+          {
+            "built": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8",
+            "comparable": true,
+            "file": "packages/javascript",
+            "note": null,
+            "published": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8",
+            "qualified": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8"
+          }
+        ],
+        "npm:@redact-secret/node-darwin-arm64": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n55aa35f0184dbb330457c91d4cd5da0ee28929847d0a0aaeff7153944eb7d2ec",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.darwin-arm64.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "91068c769562afc2348b9eb6e0c5bcd6a4c782de",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n55aa35f0184dbb330457c91d4cd5da0ee28929847d0a0aaeff7153944eb7d2ec"
+          }
+        ],
+        "npm:@redact-secret/node-darwin-x64": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n85acf12a01b01ad7be9d20921a8044162d928158d7f30db3d2edd0a0491557ea",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.darwin-x64.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "b7e38b125ee7d63327dff0ea110860b0beb94ba9",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n85acf12a01b01ad7be9d20921a8044162d928158d7f30db3d2edd0a0491557ea"
+          }
+        ],
+        "npm:@redact-secret/node-linux-arm64-gnu": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nca818c08366350e5e4eaefa23f0add0602d2fe4ec048978335997aa659a7290b",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-gnu.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "886a5fd04083c23e47516bbfde0f64047b3d1754",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nca818c08366350e5e4eaefa23f0add0602d2fe4ec048978335997aa659a7290b"
+          }
+        ],
+        "npm:@redact-secret/node-linux-arm64-musl": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n1d606828e38a3d62941c0fcb822b5f6b701c8f91da5b35b706da6f9e69d38f00",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-musl.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "eb07bb443d1c9e9a0d0e6ec28365d05795d30386",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n1d606828e38a3d62941c0fcb822b5f6b701c8f91da5b35b706da6f9e69d38f00"
+          }
+        ],
+        "npm:@redact-secret/node-linux-x64-gnu": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n25f8c5c932ecefa30b45d9b6c9a3f878cab7d89f8a54d51b172170b8491fb9f8",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-gnu.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "f4aa9bf864d2ef6eea031a2958debc62f0a9845a",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n25f8c5c932ecefa30b45d9b6c9a3f878cab7d89f8a54d51b172170b8491fb9f8"
+          }
+        ],
+        "npm:@redact-secret/node-linux-x64-musl": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n59760612ad5c67167ce8fbf66e35c9e9222ce40295eab08d643752ed8cdacbab",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-musl.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "78357f30b0817fc33f552dcd1d78add2748400d2",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n59760612ad5c67167ce8fbf66e35c9e9222ce40295eab08d643752ed8cdacbab"
+          }
+        ],
+        "npm:@redact-secret/node-win32-arm64-msvc": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n934eb3f0b22d6ca7760df337cf1af756c679c1a051f5cef21848588c0a690ecc",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.win32-arm64-msvc.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "eae7d8139081e94966a219d80403f46cdf82039a",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\n934eb3f0b22d6ca7760df337cf1af756c679c1a051f5cef21848588c0a690ecc"
+          }
+        ],
+        "npm:@redact-secret/node-win32-x64-msvc": [
+          {
+            "built": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nc95420113abc6b8b1561ce03be3ddc7a17ee8c43446c6e1740e1d5808fb76b8f",
+            "comparable": false,
+            "file": "index.d.ts\nindex.js\nredact-secret.win32-x64-msvc.node",
+            "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "731d7989a96cf6c69765cc27cda1161f258c66ff",
+            "qualified": "e975e520715b157b3bade95b7c09b82aacee31b0faf1e5663bb36191b61cd329\n462f1a372e59ed10981fbfff930a17b69c6982a35c24e508410505cd02965c5c\nc95420113abc6b8b1561ce03be3ddc7a17ee8c43446c6e1740e1d5808fb76b8f"
+          }
+        ],
+        "npm:@redact-secret/wasm": [
+          {
+            "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+            "comparable": false,
+            "file": "redact_secret_wasm.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+          },
+          {
+            "built": "45327b89328eb433b003e722b85ace6bbc5091d0ddbfc2b138d9e7b56012a349",
+            "comparable": false,
+            "file": "redact_secret_wasm.js",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "45327b89328eb433b003e722b85ace6bbc5091d0ddbfc2b138d9e7b56012a349"
+          },
+          {
+            "built": "981b9aa776ee810bf3a5f074b46b0a356af8b14044e384970198520bd91abf66",
+            "comparable": false,
+            "file": "redact_secret_wasm_bg.wasm",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "981b9aa776ee810bf3a5f074b46b0a356af8b14044e384970198520bd91abf66"
+          },
+          {
+            "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+            "comparable": false,
+            "file": "redact_secret_wasm_bg.wasm.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+          },
+          {
+            "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+            "comparable": false,
+            "file": "redact_secret_wasm_pii.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+          },
+          {
+            "built": "b3ec315488ffd6c366dad06cdcee18dbf4c1a3262e8b2341006aae31b27d6e01",
+            "comparable": false,
+            "file": "redact_secret_wasm_pii.js",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "b3ec315488ffd6c366dad06cdcee18dbf4c1a3262e8b2341006aae31b27d6e01"
+          },
+          {
+            "built": "2d4fa12906cfb9a397fdb514d558bfe9a3d247eeea9e00476d2bd4836ee70bef",
+            "comparable": false,
+            "file": "redact_secret_wasm_pii_bg.wasm",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "2d4fa12906cfb9a397fdb514d558bfe9a3d247eeea9e00476d2bd4836ee70bef"
+          },
+          {
+            "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+            "comparable": false,
+            "file": "redact_secret_wasm_pii_bg.wasm.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+          },
+          {
+            "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+            "comparable": false,
+            "file": "redact_secret_wasm_common.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+          },
+          {
+            "built": "cce169681968ff6d9db46eb084253ac1f480c630fc1010426f4c59f479f4cc24",
+            "comparable": false,
+            "file": "redact_secret_wasm_common.js",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "cce169681968ff6d9db46eb084253ac1f480c630fc1010426f4c59f479f4cc24"
+          },
+          {
+            "built": "1d8eaea86e901d18d1c9d8c9564e9a292f59acbff241728d9a839908094a5bae",
+            "comparable": false,
+            "file": "redact_secret_wasm_common_bg.wasm",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "1d8eaea86e901d18d1c9d8c9564e9a292f59acbff241728d9a839908094a5bae"
+          },
+          {
+            "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+            "comparable": false,
+            "file": "redact_secret_wasm_common_bg.wasm.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+          },
+          {
+            "built": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634",
+            "comparable": false,
+            "file": "redact_secret_wasm_common_pii.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "caa1e4dfa856e44620aebe4507878ed70f2622f28cf78ef7126fa4a66556a634"
+          },
+          {
+            "built": "bd8d5b6c54a34b00a8826f831da84667289427c47935d3eaa33ed24b762da6b8",
+            "comparable": false,
+            "file": "redact_secret_wasm_common_pii.js",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "bd8d5b6c54a34b00a8826f831da84667289427c47935d3eaa33ed24b762da6b8"
+          },
+          {
+            "built": "d1df0179af9d69876adc894f81b3fc83c7009cd4b96bb79d62e2868b08a40b85",
+            "comparable": false,
+            "file": "redact_secret_wasm_common_pii_bg.wasm",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "d1df0179af9d69876adc894f81b3fc83c7009cd4b96bb79d62e2868b08a40b85"
+          },
+          {
+            "built": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad",
+            "comparable": false,
+            "file": "redact_secret_wasm_common_pii_bg.wasm.d.ts",
+            "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+            "published": "5428551d95cb00300b6661701691f48ee3d3e97c",
+            "qualified": "1d10026f949a175424f58817d5d522b7535af7d7cc97bf9ab8c1f375a92024ad"
+          }
+        ],
+        "pypi:redact-secret": [
+          {
+            "built": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14.tar.gz",
+            "note": null,
+            "published": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c",
+            "qualified": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c"
+          },
+          {
+            "built": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-macosx_11_0_arm64.whl",
+            "note": null,
+            "published": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62",
+            "qualified": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62"
+          },
+          {
+            "built": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-win_arm64.whl",
+            "note": null,
+            "published": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284",
+            "qualified": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284"
+          },
+          {
+            "built": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "note": null,
+            "published": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519",
+            "qualified": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519"
+          },
+          {
+            "built": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-musllinux_1_2_aarch64.whl",
+            "note": null,
+            "published": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837",
+            "qualified": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837"
+          },
+          {
+            "built": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-macosx_10_12_x86_64.whl",
+            "note": null,
+            "published": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32",
+            "qualified": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32"
+          },
+          {
+            "built": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-win_amd64.whl",
+            "note": null,
+            "published": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a",
+            "qualified": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a"
+          },
+          {
+            "built": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "note": null,
+            "published": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739",
+            "qualified": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739"
+          },
+          {
+            "built": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35",
+            "comparable": true,
+            "file": "redact_secret-0.1.0b14-cp310-abi3-musllinux_1_2_x86_64.whl",
+            "note": null,
+            "published": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35",
+            "qualified": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35"
+          }
+        ]
+      },
+      "artifact_set": [
+        "crate:redact-secret",
+        "crate:redact-secret-cli",
+        "npm:@redact-secret/core",
+        "npm:@redact-secret/node-darwin-arm64",
+        "npm:@redact-secret/node-darwin-x64",
+        "npm:@redact-secret/node-linux-arm64-gnu",
+        "npm:@redact-secret/node-linux-arm64-musl",
+        "npm:@redact-secret/node-linux-x64-gnu",
+        "npm:@redact-secret/node-linux-x64-musl",
+        "npm:@redact-secret/node-win32-arm64-msvc",
+        "npm:@redact-secret/node-win32-x64-msvc",
+        "npm:@redact-secret/wasm",
+        "pypi:redact-secret"
+      ],
+      "conformance_identity": "07318cdbafde556bb886329dcc8f8358deab4605",
+      "registry_state": {
+        "crate:redact-secret": "published",
+        "crate:redact-secret-cli": "published",
+        "npm:@redact-secret/core": "published",
+        "npm:@redact-secret/node-darwin-arm64": "published",
+        "npm:@redact-secret/node-darwin-x64": "published",
+        "npm:@redact-secret/node-linux-arm64-gnu": "published",
+        "npm:@redact-secret/node-linux-arm64-musl": "published",
+        "npm:@redact-secret/node-linux-x64-gnu": "published",
+        "npm:@redact-secret/node-linux-x64-musl": "published",
+        "npm:@redact-secret/node-win32-arm64-msvc": "published",
+        "npm:@redact-secret/node-win32-x64-msvc": "published",
+        "npm:@redact-secret/wasm": "published",
+        "pypi:redact-secret": "published"
+      },
+      "source_revision": "0c62fd38bca75c5b28b042dc79789b708ebf1d17",
+      "support_matrix_drift": {
+        "baseline": {
+          "generatedAt": "2026-10-02T19:28:20.296Z",
+          "revision": "573e128863e0543133e5ccbd513216d19513b7da",
+          "runId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05"
+        },
+        "candidate": {
+          "generatedAt": "2026-10-02T19:28:20.296Z",
+          "revision": "573e128863e0543133e5ccbd513216d19513b7da",
+          "runId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05"
+        },
+        "familyCount": 173,
+        "generatedAt": "2026-10-07T00:59:58.586102+00:00",
+        "improvements": [],
+        "newAndUnclassified": [],
+        "regressions": [],
+        "schemaVersion": 1,
+        "staleProviderProvenance": [],
+        "summary": {
+          "improvements": 0,
+          "newAndUnclassified": 0,
+          "regressions": 0,
+          "staleProviderProvenance": 0
+        },
+        "taxonomySchemaVersion": 1
+      },
+      "version": "0.1.0-beta.14"
+    },
+    "original_run": 37554713667,
+    "reason": "Release run 37554713667 published every artifact, passed registry-install verification on all eight Node targets and Chromium, created annotated tag v0.1.0-beta.14 and uploaded release-manifest-0.1.0-beta.14. The run's manifest is intact and correct: every registry_state entry reads published and every comparable published digest is present. It is preserved verbatim in original_manifest and every top-level field below equals it. Nothing was corrected from the live registries. This repository's manifest job does not itself populate release_evidence, and the durable-record validator requires it, so this record adds only release_evidence (tag, per-registry checksums, workflow run references, clean-install verification) and artifact_inventory_sha256. No reconcile run was dispatched for this version.",
+    "registries": {
+      "crate:redact-secret": {
+        "checksum": "2b2691a3a55efa1d2cfabe8aa86b4a08c1db8de3ee32ba714f67bdf064889476"
+      },
+      "crate:redact-secret-cli": {
+        "checksum": "cd29abae14fa1b26c8bcda2c46cafb9f5e32b3e9d5fbfcdb9547b4931bb79589"
+      },
+      "npm:@redact-secret/core": {
+        "integrity": "sha512-1h5NxUto2ZEqQD5hfIgbzwDZkmu6WXdlmtF0waG3FcKDhpCEoUphgj4B4VGRyhVhjJOFT58/TrER+3EL1bCnag==",
+        "shasum": "cb8cb61c20a2a65cfd56bbc3947d63b5bd6408c8"
+      },
+      "npm:@redact-secret/node-darwin-arm64": {
+        "integrity": "sha512-ARFG6EaEZwHGOCnaPqqtlF5BljxQ6sNAA74N7QU159EvVYCEZvg8gzSeDgt0kjJdJL+vlEjT1zWov+MoZV8KMA==",
+        "shasum": "91068c769562afc2348b9eb6e0c5bcd6a4c782de"
+      },
+      "npm:@redact-secret/node-darwin-x64": {
+        "integrity": "sha512-xAiObLUcaFjPXJ07NRt/LcfjNUKUYCwEpf9lE2v3PfXY7xnkSBop9h06rLjEziR4XjPilb2pQeuuiO3PbzBNKA==",
+        "shasum": "b7e38b125ee7d63327dff0ea110860b0beb94ba9"
+      },
+      "npm:@redact-secret/node-linux-arm64-gnu": {
+        "integrity": "sha512-v1yP2VwFyP0o9qV32jECFId9jTvRjGTFyDpwn3wMCix+9iST7fSDhakEaEKJMifBCx/tfMy/1mXltF/pKPYdDA==",
+        "shasum": "886a5fd04083c23e47516bbfde0f64047b3d1754"
+      },
+      "npm:@redact-secret/node-linux-arm64-musl": {
+        "integrity": "sha512-R8Fp1QHyVIOH+qGKcfLZbmEP4gG3sLpIKkmuzfx1sjN23WEvUz3O4UYL9DXJpXYZPG4QWPZuxSewpmGYuw6f2A==",
+        "shasum": "eb07bb443d1c9e9a0d0e6ec28365d05795d30386"
+      },
+      "npm:@redact-secret/node-linux-x64-gnu": {
+        "integrity": "sha512-LaNrvAeyzMgSlj7rXghK8LBUIDuCR5nDt7exXzyRgJRvP0jz3zeZGS4KSkbyQtrf90cyAs3VAb5ONMt5XVOwtA==",
+        "shasum": "f4aa9bf864d2ef6eea031a2958debc62f0a9845a"
+      },
+      "npm:@redact-secret/node-linux-x64-musl": {
+        "integrity": "sha512-DOvm796wqFx9aWL49ZCAmEaHymqxVMHbJudnmSxtrPY2kdWeTR4Hy+fTKZ8lODCTsbWfJoeMK6W55F2TcNC4HA==",
+        "shasum": "78357f30b0817fc33f552dcd1d78add2748400d2"
+      },
+      "npm:@redact-secret/node-win32-arm64-msvc": {
+        "integrity": "sha512-OoNSo5+AyT4s2Za9lmKhvp7qcCDOVd/DluuB02n7gmpg2Wf1TfSZCkDwvgK1RWUw92onghrKXKVWgDjMjZL2zw==",
+        "shasum": "eae7d8139081e94966a219d80403f46cdf82039a"
+      },
+      "npm:@redact-secret/node-win32-x64-msvc": {
+        "integrity": "sha512-L3y7yMRCtkZIfQkx44UdRLbPPGqN8xyO+RCYo903IMeaVmoBV+7wOS6bCghyzvj57D+EKDl4ORJq952dsFvcpA==",
+        "shasum": "731d7989a96cf6c69765cc27cda1161f258c66ff"
+      },
+      "npm:@redact-secret/wasm": {
+        "integrity": "sha512-GbNKLcvEWVzojswaInd+sZgLRkYolAU6IeKNCYvUIIQWaPcrPuLcHitixBTqeS0IEHxWbFkI6RyfMBZyVTPrBQ==",
+        "shasum": "5428551d95cb00300b6661701691f48ee3d3e97c"
+      },
+      "pypi:redact-secret": {
+        "files": [
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-macosx_10_12_x86_64.whl",
+            "sha256": "8b4d984b211cc7eb6b747026f49619e74ecb107c541ef3e526b19be7f8e74e32"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-macosx_11_0_arm64.whl",
+            "sha256": "d3279d513ed5a75f04a6e223eeec82f6d0c64d42d40e53e47726524f68008a62"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "sha256": "89818913609b915f3da0c633d74189ce4df8fa1836f5dff926056f8456d9c519"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "sha256": "d8c8f18e613ab7fc31216bd048bbb3319b673bd9f0eb8aa62ba9266cf2773739"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-musllinux_1_2_aarch64.whl",
+            "sha256": "b00611b2557bc1cce7f03b9da64cdf664e8825c8106f5a9fc09330d878e70837"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-musllinux_1_2_x86_64.whl",
+            "sha256": "37320b343fb1f4e11589992d7c7b016412d9f2156e19dcaf53f5ed636604eb35"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-win_amd64.whl",
+            "sha256": "27d92de3fe37ed958dc9378787abe9ce79cad0bfdec73d4fb3c4169fcbf6bf8a"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14-cp310-abi3-win_arm64.whl",
+            "sha256": "297490b25df1757c111fef75a6dc1c773c8f201149279034e999639af41bb284"
+          },
+          {
+            "filename": "redact_secret-0.1.0b14.tar.gz",
+            "sha256": "3ccddf1694a05bc33f2e26f3b25dba5496997b938048ba0f5269722837d2a05c"
+          }
+        ]
+      }
+    },
+    "runs": [
+      {
+        "id": 37552317712,
+        "result": "SAST passed at the release source revision 0c62fd38 (push)."
+      },
+      {
+        "id": 37552318055,
+        "result": "Artifact qualification passed at the release source revision 0c62fd38 (push)."
+      },
+      {
+        "id": 37552330420,
+        "result": "Package Release Rehearsal passed at the release source revision 0c62fd38 (workflow_dispatch)."
+      },
+      {
+        "id": 37554223815,
+        "result": "Performance evaluation in redact-secret-benchmarks (benchmarks develop at 6494f12b, candidate 0c62fd38) accepted; the four size and initialization budget breaches were carried as accepted tradeoffs by benchmarks PR #803."
+      },
+      {
+        "id": 37554713667,
+        "result": "Release (single dispatch from main at 0c62fd38) re-ran qualification, published both crates, all nine PyPI files and all ten npm packages (including the facade), passed registry-install verification on all eight Node targets and Chromium, created annotated tag v0.1.0-beta.14 at the release source revision, and uploaded release-manifest-0.1.0-beta.14. Conclusion: success. Every registry_state entry reads published."
+      }
+    ],
+    "tag": {
+      "name": "v0.1.0-beta.14",
+      "object": "db9c280bfdfa7c489da8ad767f7417259521c53d",
+      "target": "0c62fd38bca75c5b28b042dc79789b708ebf1d17"
+    },
+    "verification": {
+      "browser": "chromium",
+      "independent": "On 2026-10-07 every registry was checked directly, without relying on the workflow's own reports: all ten npm packages are at 0.1.0-beta.14 with the shasums and integrity values recorded here (dist-tag beta=0.1.0-beta.14; latest remains 0.1.0-beta.13); both crate checksums equal the manifest's and the inventory's crate digests and neither is yanked; all nine PyPI file hashes equal the manifest's and the inventory's Python entries; git tag v0.1.0-beta.14 resolves on origin to annotated object db9c280bfdfa7c489da8ad767f7417259521c53d targeting 0c62fd38bca75c5b28b042dc79789b708ebf1d17.",
+      "node": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "x86_64-unknown-linux-musl",
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc"
+      ],
+      "run": 37554713667
+    }
+  },
+  "source_revision": "0c62fd38bca75c5b28b042dc79789b708ebf1d17",
+  "support_matrix_drift": {
+    "baseline": {
+      "generatedAt": "2026-10-02T19:28:20.296Z",
+      "revision": "573e128863e0543133e5ccbd513216d19513b7da",
+      "runId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05"
+    },
+    "candidate": {
+      "generatedAt": "2026-10-02T19:28:20.296Z",
+      "revision": "573e128863e0543133e5ccbd513216d19513b7da",
+      "runId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05"
+    },
+    "familyCount": 173,
+    "generatedAt": "2026-10-07T00:59:58.586102+00:00",
+    "improvements": [],
+    "newAndUnclassified": [],
+    "regressions": [],
+    "schemaVersion": 1,
+    "staleProviderProvenance": [],
+    "summary": {
+      "improvements": 0,
+      "newAndUnclassified": 0,
+      "regressions": 0,
+      "staleProviderProvenance": 0
+    },
+    "taxonomySchemaVersion": 1
+  },
+  "version": "0.1.0-beta.14"
+}

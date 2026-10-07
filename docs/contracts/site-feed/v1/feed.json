@@ -1,11 +1,11 @@
 {
   "schemaVersion": "redact-secret.site-feed/v1",
-  "generatedAt": "2026-10-03T00:00:00Z",
+  "generatedAt": "2026-10-07T00:00:00Z",
   "sources": [
     {
       "role": "release-manifest",
-      "path": "docs/releases/0.1.0-beta.13/manifest.json",
-      "sha256": "02bcfb54964cc7150f518d904953c5e47570d899052c043b197f90d48fdc6036"
+      "path": "docs/releases/0.1.0-beta.14/manifest.json",
+      "sha256": "9736413f5a7d8c53060518073798321a60ad27340ae8f15a3a4d7f4cfe3e6458"
     },
     {
       "role": "support-matrix",
@@ -14,75 +14,75 @@
     }
   ],
   "release": {
-    "version": "0.1.0-beta.13",
-    "tag": "v0.1.0-beta.13",
-    "sourceRevision": "66b492bdff5e6751fc6b5409266916346ed7c723",
-    "verifiedOn": "2026-10-03",
+    "version": "0.1.0-beta.14",
+    "tag": "v0.1.0-beta.14",
+    "sourceRevision": "0c62fd38bca75c5b28b042dc79789b708ebf1d17",
+    "verifiedOn": "2026-10-07",
     "packages": [
       {
         "ecosystem": "npm",
         "name": "@redact-secret/core",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-darwin-arm64",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-darwin-x64",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-linux-arm64-gnu",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-linux-arm64-musl",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-linux-x64-gnu",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-linux-x64-musl",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-win32-arm64-msvc",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/node-win32-x64-msvc",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "npm",
         "name": "@redact-secret/wasm",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "crates",
         "name": "redact-secret",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "crates",
         "name": "redact-secret-cli",
-        "version": "0.1.0-beta.13"
+        "version": "0.1.0-beta.14"
       },
       {
         "ecosystem": "pypi",
         "name": "redact-secret",
-        "version": "0.1.0b13"
+        "version": "0.1.0b14"
       }
     ]
   },

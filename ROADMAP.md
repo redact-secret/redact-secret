@@ -3,10 +3,11 @@
 What Redact Secret intends to do over the next year, and what it intends
 not to do. Dates are targets, not promises. Issues and milestones are the
 authoritative tracking; this page summarizes them and is reviewed at every
-release. Last reviewed: 2026-10-06 against `3dbaa5b4` (the last published
-version is `0.1.0-beta.13`; the release candidate is `0.1.0-beta.14`, which is
-not published and has no release record yet). The Beta.13 epic status below is
-dated 2026-10-02 and was not re-reviewed after beta.13 was published.
+release. Last reviewed: 2026-10-07 against `0c62fd38` (the last published
+version is `0.1.0-beta.14`, with its
+[release record](docs/releases/0.1.0-beta.14/README.md); no release candidate is
+pending). The Beta.13 epic status below is dated 2026-10-02 and was not
+re-reviewed after beta.13 or beta.14 was published.
 
 ## Near term: stable `v0.1.0` (Q4 2026)
 
@@ -44,9 +45,9 @@ with what was still open named:
   ([#1071](https://github.com/redact-secret/redact-secret/issues/1071)).
   Not started; it needs the items above.
 
-## Next: detector coverage (Beta.14 candidate and after)
+## Next: detector coverage (Beta.14 and after)
 
-The `0.1.0-beta.14` candidate carries the Buildkite, Fly, Mapbox, Pydantic
+The published `0.1.0-beta.14` carries the Buildkite, Fly, Mapbox, Pydantic
 Logfire, Sourcegraph, Square, Unkey, and Xata detectors, which have no support
 status until their benchmarks arrival evidence lands. Next, add the remaining
 provider families researched under

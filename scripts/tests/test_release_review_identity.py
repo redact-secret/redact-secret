@@ -340,7 +340,9 @@ class RecordedIdentityTests(unittest.TestCase):
             view = identity.read_recorded_identity(inventory)
             if view is None:
                 continue
-            self.assertEqual(view["schema"], "legacy", path)
+            # Releases before beta.14 record the legacy shape; a release
+            # published after the schema 2 change records that one.
+            self.assertIn(view["schema"], ("legacy", identity.SCHEMA_VERSION), path)
             for review in view["reviews"]:
                 reviews += 1
                 self.assertRegex(review["sha256"], r"^[0-9a-f]{64}$", path)

@@ -35,11 +35,8 @@ shrinks when a unit is retired; it keeps no row for a retired unit.
 
 | Unit | Owner | Status | Retires |
 | --- | --- | --- | --- |
-| [Beta.14 candidate public-contract review](beta14-candidate-public-contract-review.md) | [#1263](https://github.com/redact-secret/redact-secret/issues/1263) | `retained` (the artifact inventory selects it by `candidate_version`) | after release `0.1.0-beta.14`; a reviewed closeout pull request then moves its conclusions into `docs/releases/0.1.0-beta.14/` |
 | [Deferred quality backlog](deferred-quality-backlog.md) | [#80](https://github.com/redact-secret/redact-secret/issues/80) (closed) | `deferred`: 25 non-blocking findings, cited by `conformance/fixtures/synchronous-corpus.json` and a coverage-declaration comment | after epic [#1259](https://github.com/redact-secret/redact-secret/issues/1259), which decides where those citations point |
 | [#1003 us-ssn identity-only mismatch, public investigation](evidence/1003/README.md) | [#1003](https://github.com/redact-secret/redact-secret/issues/1003) | `deferred`: the protected half of the issue is open | after #1003 |
-| [#1219 WebAssembly size of the action policy parser](evidence/1219/README.md) | [#1219](https://github.com/redact-secret/redact-secret/issues/1219) | `deferred`: measurement record for an open issue | after #1219 |
-| [#1220 WebAssembly size of the action policy comparison](evidence/1220/README.md) | [#1220](https://github.com/redact-secret/redact-secret/issues/1220) | `deferred`: measurement record for an open issue | after #1220 |
 
 ## History
 
@@ -50,7 +47,15 @@ pin below contains each of them byte-identical to the tree that was removed:
 - Link form: `https://github.com/redact-secret/redact-secret/blob/` + the pin + `/docs/audits/` + the path
   (use `tree` instead of `blob` for a folder)
 
-The pin has one exception: `evidence/367/README.md` and `evidence/475/README.md`
+Three units written after that pin were retired when their triggers fired and
+live at a second pin, `0c62fd38bca75c5b28b042dc79789b708ebf1d17` (the
+`0.1.0-beta.14` release source): the beta.14 candidate public-contract review
+(`beta14-candidate-public-contract-review.md`, whose conclusions are in the
+[beta.14 release record](../releases/0.1.0-beta.14/README.md)) and the
+`evidence/1219` and `evidence/1220` WebAssembly size records (their figures are
+in the action policy decisions).
+
+The first pin has one exception: `evidence/367/README.md` and `evidence/475/README.md`
 were edited by #1262 when the files they described moved, so the pin holds
 their complete text and the later commit holds only the edited pointer. The
 live files moved to

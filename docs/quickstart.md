@@ -19,12 +19,10 @@ spent downloading packages or compiling.
 
 Every release so far is a beta; the stable `0.1.0` is not published yet.
 
-> **Version status.** Latest published: `0.1.0-beta.13`. Release candidate:
-> `0.1.0-beta.14`, which becomes the latest published version when its
-> [release record](releases/status.md) lands. The commands below pin the
-> candidate because this page is qualified against it; until it is published,
-> install `0.1.0-beta.13` by substituting that version (PyPI spells the
-> candidate `0.1.0b14`).
+> **Version status.** Latest published: `0.1.0-beta.14`
+> ([release record](releases/0.1.0-beta.14/README.md), [status](releases/status.md)).
+> The commands below pin it because this page is qualified against it (PyPI
+> spells it `0.1.0b14`).
 
 The pinned commands give the same result tomorrow as today. Pin the version in
 your own lockfile too.
